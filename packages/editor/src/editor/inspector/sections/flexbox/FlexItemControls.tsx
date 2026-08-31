@@ -16,7 +16,7 @@ import { Button, TextInput } from "@/editor/chrome-ui";
 
 /** grow / shrink / basis share one narrow cell each. */
 const TRIPLE_CELL = "tw:flex tw:items-center tw:gap-1";
-const TRIPLE_LABEL = "tw:w-[30px] tw:text-xs tw:text-gray-500";
+const TRIPLE_LABEL = "tw:w-[30px] tw:text-xs tw:text-[var(--bk-ink-muted)]";
 const TRIPLE_INPUT = `${CONTROL_INPUT_WRAP} tw:[&_input]:px-[5px]`;
 // ============================================================================
 // TYPES
@@ -42,7 +42,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
   mixedKeys,
 }) => (
   <div className="tw:mt-2.5 tw:pt-2.5 tw:border-t tw:border-gray-200">
-    <div className="tw:mb-2 tw:text-xs tw:font-semibold tw:text-gray-500 tw:uppercase">
+    <div className="tw:mb-2 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink-muted)] tw:uppercase">
       Flex Item (Self)
     </div>
 

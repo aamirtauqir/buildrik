@@ -34,9 +34,9 @@ export interface CommandPaletteProps {
 /* idle/selected/disabled each supply their own bg + text color — same-property
    values can't be additive (Row/PanelFrame precedent). */
 const ITEM_STATE_CLASS: Record<"idle" | "selected" | "disabled", string> = {
-  idle: "tw:bg-transparent tw:text-gray-900",
+  idle: "tw:bg-transparent tw:text-[var(--bk-ink)]",
   selected: "tw:bg-blue-50 tw:text-[var(--bk-accent-text)]",
-  disabled: "tw:bg-transparent tw:text-gray-300 tw:pointer-events-none",
+  disabled: "tw:bg-transparent tw:text-[var(--bk-ink-disabled)] tw:pointer-events-none",
 };
 
 export function CommandPalette({
@@ -88,7 +88,7 @@ export function CommandPalette({
       <div className="tw:z-[70] tw:w-[640px] tw:max-w-[calc(100vw-32px)] tw:max-h-[420px] tw:flex tw:flex-col tw:bg-white tw:rounded-lg tw:[box-shadow:var(--bk-shadow-overlay)] tw:overflow-hidden tw:[font-family:var(--bk-font-ui)]">
         <div className="tw:h-14 tw:flex-none tw:flex tw:items-center tw:px-4 tw:border-b tw:border-gray-200">
           <input
-            className="tw:flex-1 tw:border-0 tw:bg-transparent tw:outline-none tw:[font-family:var(--bk-font-ui)] tw:text-base tw:text-gray-900 tw:placeholder:text-gray-300"
+            className="tw:flex-1 tw:border-0 tw:bg-transparent tw:outline-none tw:[font-family:var(--bk-font-ui)] tw:text-base tw:text-[var(--bk-ink)] tw:placeholder:text-gray-300"
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -127,7 +127,7 @@ export function CommandPalette({
                 onClick={() => !c.disabled && onRun(c)}
               >
                 <span>{c.label}</span>
-                {c.kbd ? <span className="tw:ml-auto tw:text-gray-500 tw:text-[11px]">{c.kbd}</span> : null}
+                {c.kbd ? <span className="tw:ml-auto tw:text-[var(--bk-ink-muted)] tw:text-[11px]">{c.kbd}</span> : null}
               </div>
             ))
           )}

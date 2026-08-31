@@ -35,7 +35,7 @@ export interface IntegrationRowProps extends React.HTMLAttributes<HTMLDivElement
  *  combined effect (same rationale as FormatRow's BASE, in the same commit). */
 const BASE =
   "tw:flex tw:items-center tw:gap-3 tw:h-16 tw:px-4 tw:w-full tw:text-left tw:border tw:border-gray-200 " +
-  "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900 " +
+  "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)] " +
   "tw:[transition:var(--bk-transition-fast)]";
 
 export function IntegrationRow({
@@ -47,7 +47,7 @@ export function IntegrationRow({
       {logo ? <span className={ROW_ICON_CLASS}>{logo}</span> : null}
       <span className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
         <span className="tw:font-medium">{name}</span>
-        <span className="tw:text-gray-500 tw:text-xs">{scope}</span>
+        <span className="tw:text-[var(--bk-ink-muted)] tw:text-xs">{scope}</span>
       </span>
       {pro ? <Badge>PRO</Badge> : null}
       <Badge color={s.color} className={s.className}>{s.label}</Badge>

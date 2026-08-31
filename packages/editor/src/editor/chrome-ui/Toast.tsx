@@ -19,7 +19,7 @@ import { createPortal } from "react-dom";
 import { Button } from "flowbite-react";
 import { getOverlayRoot } from "./OverlayRoot";
 
-const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST_BTN_CLASS = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
 
@@ -43,7 +43,7 @@ const TONE_CLASS: Record<ToastTone, string> = {
 };
 
 const TONE_TITLE_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:text-gray-600",
+  neutral: "tw:text-[var(--bk-ink-soft)]",
   info: "tw:text-[var(--bk-accent-text)]",
   success: "tw:text-[var(--bk-success-text)]",
   warning: "tw:text-[var(--bk-warning-text)]",
@@ -193,13 +193,13 @@ function ToastItem({ toast, onDismiss }: { toast: QueuedToast; onDismiss: (id: s
     <div
       className={[
         "tw:pointer-events-auto tw:flex tw:items-start tw:gap-2 tw:p-3 tw:rounded-lg " +
-          "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900",
+          "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]",
         TONE_CLASS[tone],
       ].join(" ")}
     >
       <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
         {title ? <span className={`tw:font-medium ${TONE_TITLE_CLASS[tone]}`}>{title}</span> : null}
-        <span className="tw:text-gray-600 tw:text-xs">{description}</span>
+        <span className="tw:text-[var(--bk-ink-soft)] tw:text-xs">{description}</span>
       </div>
       {action ? (
         <Button color="light" size="xs" onClick={action.onClick} className={GHOST_BTN_CLASS}>

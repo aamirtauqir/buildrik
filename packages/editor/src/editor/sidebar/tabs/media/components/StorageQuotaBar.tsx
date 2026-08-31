@@ -54,7 +54,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
     ? "tw:text-red-700"
     : isNearLimit
       ? "tw:text-amber-700"
-      : "tw:text-gray-600";
+      : "tw:text-[var(--bk-ink-soft)]";
   const fill = isExhausted
     ? "tw:bg-red-600"
     : isNearLimit
@@ -86,7 +86,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
       )}
       {isExhausted && (
         /* Board 145:250's reassurance line: existing files are untouched. */
-        <div className="tw:text-[12px] tw:leading-[18px] tw:text-gray-600">
+        <div className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
           Nothing already on your sites is affected.
         </div>
       )}

@@ -294,7 +294,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
             size="xs"
             type="button"
             onClick={handleExport}
-            disabled={exporting || subsLoading || !submissions || submissions.total === 0} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            disabled={exporting || subsLoading || !submissions || submissions.total === 0} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             {exporting ? "Exporting…" : "Export CSV"}
           </Button>
@@ -323,7 +323,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                     aria-expanded={isExpanded}
                   >
                     <div className={SUMMARY_ROW}>
-                      <span className={`${SUBJECT} ${s.isRead ? "tw:text-[var(--bk-ink-soft)] tw:font-medium" : "tw:text-gray-900 tw:font-semibold"}`}>
+                      <span className={`${SUBJECT} ${s.isRead ? "tw:text-[var(--bk-ink-soft)] tw:font-medium" : "tw:text-[var(--bk-ink)] tw:font-semibold"}`}>
                         {summarize(s.data)}
                       </span>
                       <span className={MONO_MICRO}>{formatTime(s.createdAt)}</span>
@@ -342,26 +342,26 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                       </dl>
                       <div className={ACTIONS}>
                         {!s.isSpam && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                             Mark spam
                           </Button>
                         )}
                         {s.isSpam && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                             Not spam
                           </Button>
                         )}
                         {!s.isArchived && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                             Archive
                           </Button>
                         )}
                         {s.isArchived && (
-                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                          <Button color="light" size="xs" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                             Unarchive
                           </Button>
                         )}
-                        <Button color="light" size="xs" type="button" onClick={() => handleDelete(s.id)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                        <Button color="light" size="xs" type="button" onClick={() => handleDelete(s.id)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                           Delete
                         </Button>
                       </div>
@@ -379,7 +379,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
               size="xs"
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={page <= 1 || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               ← Prev
             </Button>
@@ -391,7 +391,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
               size="xs"
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={page >= totalPages || subsLoading} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               Next →
             </Button>
@@ -431,9 +431,9 @@ function formatTime(iso: string | Date): string {
    the names and nowhere in the values. Both states are real class ternaries
    now, so the difference is in the pixels rather than only the identifier. */
 const EMPTY =
-  "tw:px-3.5 tw:py-3 tw:text-xs tw:text-gray-500 tw:bg-gray-50 tw:border tw:border-dashed tw:border-gray-300 tw:rounded-md";
+  "tw:px-3.5 tw:py-3 tw:text-xs tw:text-[var(--bk-ink-muted)] tw:bg-gray-50 tw:border tw:border-dashed tw:border-gray-300 tw:rounded-md";
 const ERROR_BOX =
-  "tw:mt-1 tw:px-2.5 tw:py-2 tw:text-[11.5px] tw:font-medium tw:[font-family:var(--bk-font-ui)] " +
+  "tw:mt-1 tw:px-2.5 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:[font-family:var(--bk-font-ui)] " +
   "tw:text-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:rounded-md";
 const FILTER_ROW = "tw:flex tw:gap-1 tw:mt-2 tw:flex-wrap";
 const CHIP = "tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-medium tw:rounded-full";
@@ -443,14 +443,14 @@ const ROW_BTN =
   "tw:block tw:w-full tw:px-2.5 tw:py-2 tw:text-left tw:bg-transparent tw:border-0 tw:cursor-pointer tw:font-inherit";
 const SUMMARY_ROW = "tw:flex tw:justify-between tw:items-center tw:gap-2";
 const SUBJECT = "tw:text-xs tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
-const MONO_MICRO = "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-gray-500 tw:flex-none";
+const MONO_MICRO = "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-[var(--bk-ink-muted)] tw:flex-none";
 const SOURCE =
-  "tw:mt-0.5 tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-gray-500 tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
+  "tw:mt-0.5 tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
 const DETAIL = "tw:px-2.5 tw:pt-2 tw:pb-2.5 tw:border-t tw:border-gray-300 tw:bg-white";
 const DL = "tw:grid tw:[grid-template-columns:minmax(80px,25%)_1fr] tw:gap-x-2 tw:gap-y-1 tw:m-0 tw:p-0";
 const DT =
-  "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:uppercase tw:tracking-[0.04em] tw:text-gray-500 tw:pt-0.5";
-const DD = "tw:m-0 tw:text-xs tw:text-gray-900 tw:break-words";
+  "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)] tw:pt-0.5";
+const DD = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink)] tw:break-words";
 const ACTIONS = "tw:flex tw:gap-1 tw:mt-2.5 tw:flex-wrap";
 const PAGINATION = "tw:flex tw:items-center tw:justify-center tw:gap-2 tw:mt-2.5";
-const PAGE_LABEL = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-gray-500";
+const PAGE_LABEL = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-[var(--bk-ink-muted)]";

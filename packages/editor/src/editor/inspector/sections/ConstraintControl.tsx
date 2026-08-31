@@ -145,7 +145,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({
         <div className="tw:flex tw:items-center tw:gap-1 tw:mt-1.5">
           {fixedInput ?? (
             <>
-              <span className="tw:w-8 tw:text-xs tw:text-gray-500">{isWidth ? "W" : "H"}</span>
+              <span className="tw:w-8 tw:text-xs tw:text-[var(--bk-ink-muted)]">{isWidth ? "W" : "H"}</span>
               <TextInput
                 type="text"
                 value={value}

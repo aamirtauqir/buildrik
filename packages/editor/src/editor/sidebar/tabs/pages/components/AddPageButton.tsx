@@ -53,7 +53,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
           color="light"
           size="xs"
           onClick={onFromTemplate}
-          className="tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:text-gray-600 tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900 tw:enabled:hover:underline"
+          className="tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:enabled:hover:underline"
         >
           From template
         </Button>

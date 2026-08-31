@@ -35,7 +35,7 @@ export interface FormatRowProps extends Omit<React.HTMLAttributes<HTMLLabelEleme
    export picker lays these out two per column). Same fix as Row's `comment`. */
 const BASE =
   "tw:flex tw:items-center tw:gap-3 tw:min-h-16 tw:py-2 tw:px-4 tw:w-full tw:text-left tw:border tw:border-gray-200 " +
-  "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900 " +
+  "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)] " +
   "tw:[transition:var(--bk-transition-fast)] " +
   "tw:aria-[checked=true]:border-blue-700 tw:aria-[checked=true]:bg-blue-50 " +
   "tw:aria-disabled:opacity-50 tw:aria-disabled:pointer-events-none tw:aria-disabled:select-none";
@@ -77,7 +77,7 @@ export function FormatRow({
         <div>{title}</div>
         {/* gray-600: a selected row's tint is light enough that gray-500
             measures 4.38:1 on it — under AA at 12px (axe, export modal). */}
-        {description ? <div className="tw:text-gray-600 tw:text-xs">{description}</div> : null}
+        {description ? <div className="tw:text-[var(--bk-ink-soft)] tw:text-xs">{description}</div> : null}
       </div>
       {trailing}
     </label>

@@ -213,7 +213,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
 
           {cmsSettings.mode === "template" && (
             <div>
-              <Label className={`${FIELD_LABEL} tw:text-gray-500`}>Template Syntax</Label>
+              <Label className={`${FIELD_LABEL} tw:text-[var(--bk-ink-muted)]`}>Template Syntax</Label>
               <div className={SEGMENTED}>
                 {(["handlebars", "liquid"] as TemplateSyntax[]).map((syntax) => (
                   <Button
@@ -231,7 +231,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
             </div>
           )}
 
-          <div className="tw:text-xs tw:text-gray-500 tw:mt-2">
+          <div className="tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mt-2">
             {cmsSettings.mode === "none" && "CMS bindings will not be resolved in export."}
             {cmsSettings.mode === "static" && "CMS data will be embedded directly in HTML."}
             {cmsSettings.mode === "template" &&

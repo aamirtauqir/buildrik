@@ -56,7 +56,7 @@ function CopyValue({ value }: { value: string }) {
         void navigator.clipboard?.writeText(value);
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1500);
-      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+      }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
     >
       {copied ? "Copied" : "Copy"}
     </Button>
@@ -244,7 +244,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
               <Button size="xs" disabled={submitting || !domainInput.trim()} onClick={() => void handleConnect()}>
                 {submitting ? "Connecting…" : "Connect"}
               </Button>
-              <Button color="light" size="xs" onClick={() => { setAdding(false); setSubmitError(null); }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" size="xs" onClick={() => { setAdding(false); setSubmitError(null); }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                 Cancel
               </Button>
             </div>
@@ -286,7 +286,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
                 size="xs"
                 disabled={!canManage}
                 title={canManage ? undefined : ADMIN_REASON}
-                onClick={() => void handleRemove(row)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                onClick={() => void handleRemove(row)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
               >
                 Remove
               </Button>

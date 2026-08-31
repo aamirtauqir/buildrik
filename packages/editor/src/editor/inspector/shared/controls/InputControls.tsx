@@ -298,7 +298,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               <X size={9} aria-hidden="true" />
             </Button>

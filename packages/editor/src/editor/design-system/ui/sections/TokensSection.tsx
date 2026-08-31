@@ -370,7 +370,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                      neither. */
                   className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-2 tw:py-0 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
                 >
-                  <span className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:text-gray-900">
+                  <span className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:text-[var(--bk-ink)]">
                     {entry.title.toLowerCase()}
                     {dirty && (
                       <span
@@ -380,7 +380,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                     )}
                   </span>
                   <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
-                    <span className="tw:text-xs tw:text-gray-500">{count}</span>
+                    <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">{count}</span>
                     <span aria-hidden="true" className="tw:text-gray-400">›</span>
                   </span>
                 </Button>
@@ -394,11 +394,11 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               onClick={() => setShowAllKinds((v) => !v)}
               className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-2 tw:py-0 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
             >
-              <span className="tw:text-[13px] tw:text-gray-500">
+              <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
                 {showAllKinds ? "Fewer token kinds" : "More token kinds"}
               </span>
               <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
-                <span className="tw:text-xs tw:text-gray-500">{ordered.muted.length}</span>
+                <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">{ordered.muted.length}</span>
                 <span aria-hidden="true" className="tw:text-gray-400">{showAllKinds ? "⌃" : "›"}</span>
               </span>
             </Button>

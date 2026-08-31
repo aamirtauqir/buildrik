@@ -445,7 +445,7 @@ const TAB =
   "tw:rounded-t-md tw:rounded-b-none tw:text-[13px]";
 const TAB_RESTING = "tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-soft)]";
 const TAB_ACTIVE =
-  "tw:border tw:border-b-0 tw:border-gray-200 tw:bg-white tw:font-medium tw:text-gray-900 " +
+  "tw:border tw:border-b-0 tw:border-gray-200 tw:bg-white tw:font-medium tw:text-[var(--bk-ink)] " +
   "tw:[box-shadow:var(--bk-shadow-raised)]";
 /** inline-block is required for overflow+ellipsis to trigger on a span. */
 const TAB_NAME = "tw:inline-block tw:max-w-30 tw:overflow-hidden tw:text-ellipsis tw:align-middle";

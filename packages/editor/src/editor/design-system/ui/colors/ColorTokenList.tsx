@@ -131,14 +131,14 @@ const FALLBACK_BG = "#FFFFFF";
    `#ef4444` and its two "intentional, off chrome palette" exemptions are gone:
    Tailwind's red-500 IS that value. */
 const GROUP_HEAD =
-  "tw:m-0 tw:text-[10.5px] tw:font-semibold tw:text-gray-500 tw:uppercase tw:tracking-[0.08em] " +
+  "tw:m-0 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:text-[var(--bk-ink-muted)] tw:uppercase tw:tracking-[0.08em] " +
   "tw:[font-family:var(--bk-font-mono)]";
 const MONO_MINI = "tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
 const TOOLBAR = "tw:flex tw:items-center tw:gap-1.5 tw:pt-2 tw:pb-2.5 tw:flex-wrap";
 const PILL = "tw:px-2.5 tw:py-1 tw:rounded-[20px] tw:text-[11px] tw:font-semibold";
 const BANNER = "tw:px-2.5 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:rounded-md tw:mb-2";
 const FIX_BTN = "tw:border tw:border-green-200 tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success)] tw:font-semibold";
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 // ─── Group header (mono-uppercase per prototype) ──────────────────────────────
 
@@ -151,7 +151,7 @@ const GroupHeader: React.FC<{ label: string; mini?: string; subtext?: string }> 
       <div className="tw:flex-1 tw:h-px tw:bg-gray-200" />
       {mini && <span className={MONO_MINI}>{mini}</span>}
     </div>
-    {subtext && <div className="tw:text-[11px] tw:text-gray-500 tw:mt-1 tw:leading-[1.4]">{subtext}</div>}
+    {subtext && <div className="tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:mt-1 tw:leading-[1.4]">{subtext}</div>}
   </div>
 );
 
@@ -354,7 +354,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           size="xs"
           onClick={handleDarkMissingClick}
           data-dark-missing-chip
-          className="tw:inline-flex tw:items-center tw:gap-1.5 tw:mb-3 tw:self-start tw:border tw:border-yellow-300 tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)] tw:text-[11.5px] tw:font-medium"
+          className="tw:inline-flex tw:items-center tw:gap-1.5 tw:mb-3 tw:self-start tw:border tw:border-yellow-300 tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)] tw:text-[length:var(--bk-text-12)] tw:font-medium"
         >
           <span aria-hidden="true">⚠</span>
           <span>
@@ -393,7 +393,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           <div className="tw:text-xs tw:text-[var(--bk-success)] tw:font-semibold">
             All colors pass WCAG
           </div>
-          <div className="tw:text-xs tw:text-gray-500 tw:mt-1">
+          <div className="tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mt-1">
             No contrast issues found
           </div>
         </div>
@@ -413,16 +413,16 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {isEmpty && !isIssuesEmpty && (
         <div className="tw:py-6 tw:text-center" data-testid="color-empty">
           {searchQuery.trim() ? (
-            <div className="tw:text-xs tw:text-gray-500">
+            <div className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
               No colors match "{searchQuery}"
             </div>
           ) : hiddenByModeCount > 0 ? (
             <>
-              <div className="tw:text-xs tw:text-gray-500" data-testid="color-empty-mode">
+              <div className="tw:text-xs tw:text-[var(--bk-ink-muted)]" data-testid="color-empty-mode">
                 Beginner mode is hiding {hiddenByModeCount}{" "}
                 {hiddenByModeCount === 1 ? "color" : "colors"}.
               </div>
-              <div className="tw:mt-1 tw:text-[11px] tw:text-gray-500">
+              <div className="tw:mt-1 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
                 They are primitives. Switch to Pro to see them.
               </div>
             </>
@@ -481,7 +481,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                   return (
                     <div
                       key={`${t.id}-fix`}
-                      className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:mt-1 tw:text-[11px] tw:text-gray-500"
+                      className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:mt-1 tw:text-[11px] tw:text-[var(--bk-ink-muted)]"
                     >
                       <span className="tw:[font-family:var(--bk-font-mono)]">
                         {t.name} · {ratio.toFixed(1)}:1 → 4.5:1

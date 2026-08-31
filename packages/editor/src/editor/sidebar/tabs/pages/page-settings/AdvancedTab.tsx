@@ -40,7 +40,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
                 transition: "background 100ms, color 100ms",
                 boxShadow: s.visibility === v ? "var(--bk-shadow-drag)" : "none",
               }}
-              onClick={() => s.setVisibility(v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              onClick={() => s.setVisibility(v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               {v.charAt(0).toUpperCase() + v.slice(1)}
             </Button>

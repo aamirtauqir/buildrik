@@ -53,7 +53,7 @@ const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-5 tw:text-[13px] tw:font-medium";
    every ghost button in the editor is not what the topbar board says. */
 const EXIT_BTN_CLASS =
   "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[12px] tw:font-normal " +
-  "tw:text-gray-900 tw:enabled:hover:bg-gray-100";
+  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-gray-100";
 
 /**
  * `published` is the 2-second success transient after a publish lands (plan
@@ -195,7 +195,7 @@ export function Topbar({
            off this ancestor. */
         "tw:flex tw:items-center tw:gap-3 tw:h-14 tw:flex-none tw:@container " +
         "tw:px-4 tw:bg-white tw:border-b tw:border-gray-200 " +
-        "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900"
+        "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]"
       }
     >
       <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS}>
@@ -203,7 +203,7 @@ export function Topbar({
       </Button>
 
       <span
-        className="tw:text-[13px] tw:font-medium tw:text-gray-900 tw:max-w-[200px] tw:min-w-[120px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
+        className="tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:max-w-[200px] tw:min-w-[120px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
         title={siteName}
       >
         {siteName}
@@ -225,7 +225,7 @@ export function Topbar({
           title={`Open the live site — ${liveUrl}`}
           className={
             "tw:inline-flex tw:flex-none tw:items-center tw:gap-1.5 tw:h-6 tw:px-2 tw:rounded " +
-            "tw:text-[12px] tw:text-gray-600 tw:no-underline tw:hover:bg-gray-100 tw:hover:text-gray-900 " +
+            "tw:text-[12px] tw:text-[var(--bk-ink-soft)] tw:no-underline tw:hover:bg-gray-100 tw:hover:text-[var(--bk-ink)] " +
             "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:focus-visible:outline-none"
           }
         >
@@ -349,8 +349,8 @@ const REVIEW_BASE_CLASS =
    `info` and `success` are visually identical by design (same neutral
    surface); only `warning` gets its own look. */
 const REVIEW_TONE_CLASS: Record<ReviewTone, string> = {
-  info: "tw:bg-gray-100 tw:text-gray-600",
-  success: "tw:bg-gray-100 tw:text-gray-600",
+  info: "tw:bg-gray-100 tw:text-[var(--bk-ink-soft)]",
+  success: "tw:bg-gray-100 tw:text-[var(--bk-ink-soft)]",
   warning: "tw:bg-yellow-50 tw:text-yellow-800",
 };
 

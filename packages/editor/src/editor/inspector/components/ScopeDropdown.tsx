@@ -137,7 +137,7 @@ export function ScopeDropdown({
               onReachAllChange?.(false);
               setOpen(false);
             }}
-            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             <span style={reachAll ? optTop : { ...optTop, color: "var(--bk-accent)" }}>This item</span>
             <span style={optSub}>just here — the default</span>
@@ -151,7 +151,7 @@ export function ScopeDropdown({
               setOpen(false);
             }}
             title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Every edit also goes to ${othersLabel}`}
-            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             <span style={reachAll ? { ...optTop, color: "var(--bk-accent)" } : optTop}>All like this</span>
             <span style={optSub}>
@@ -168,7 +168,7 @@ export function ScopeDropdown({
               setOpen(false);
               onWholeSite?.();
             }}
-            className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             <span style={optTop}>Whole site</span>
             <span style={optSub}>colors & fonts — Styles tab</span>

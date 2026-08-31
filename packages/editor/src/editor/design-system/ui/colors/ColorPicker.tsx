@@ -316,7 +316,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
       {/* Action buttons */}
       <div className="buildrick-design-picker__actions">
-        <Button color="light" onClick={onCancel} type="button" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+        <Button color="light" onClick={onCancel} type="button" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
           Cancel
         </Button>
         <Button

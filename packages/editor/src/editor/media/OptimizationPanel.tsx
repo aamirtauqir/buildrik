@@ -53,8 +53,8 @@ const MONO =
 const CHIP = "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-3 tw:py-0.5 tw:text-[12px] tw:leading-4";
 const CHIP_ACTIVE =
   "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
-const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:enabled:hover:bg-gray-200";
-const ROW = "tw:flex tw:items-center tw:justify-between tw:text-[13px] tw:leading-5 tw:text-gray-900";
+const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-gray-200";
+const ROW = "tw:flex tw:items-center tw:justify-between tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 // ============================================================================
 // COMPONENT
@@ -292,7 +292,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
             <Button
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900"
+              className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
               onClick={onClose}
             >
               Cancel

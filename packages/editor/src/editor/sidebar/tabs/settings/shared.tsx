@@ -88,7 +88,7 @@ const SETTINGS_TEXT_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> =
           "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:focus:border-[var(--bk-accent)] tw:focus:ring-[3px] tw:focus:ring-[var(--bk-accent-tint)] tw:focus:outline-none tw:aria-invalid:border-[var(--bk-error)] tw:aria-invalid:focus:border-[var(--bk-error)]",
       },
       sizes: {
-        md: "tw:py-[7px] tw:px-[9px] tw:text-[11.5px] tw:font-medium tw:[font-family:var(--bk-font-ui)]",
+        md: "tw:py-[7px] tw:px-[9px] tw:text-[length:var(--bk-text-12)] tw:font-medium tw:[font-family:var(--bk-font-ui)]",
       },
       withAddon: {
         off: "tw:rounded-[5px]",
@@ -136,10 +136,10 @@ const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
   field: {
     select: {
       colors: {
-        gray: "tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:font-medium tw:focus:border-blue-700 tw:focus:ring-[3px] tw:focus:ring-blue-50 tw:focus:outline-none",
+        gray: "tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink)] tw:font-medium tw:focus:border-blue-700 tw:focus:ring-[3px] tw:focus:ring-blue-50 tw:focus:outline-none",
       },
       sizes: {
-        md: "tw:py-[7px] tw:px-[9px] tw:text-[11.5px]",
+        md: "tw:py-[7px] tw:px-[9px] tw:text-[length:var(--bk-text-12)]",
       },
       withAddon: {
         off: "tw:rounded-[5px]",
@@ -295,27 +295,27 @@ export const LockedBtn: React.FC<
 /** Dashed placeholder shown where a list has no rows yet. */
 export const SCREEN_EMPTY =
   "tw:px-3.5 tw:py-3 tw:rounded-md tw:border tw:border-dashed tw:border-[var(--bk-border-medium)] " +
-  "tw:bg-[var(--bk-bg-subtle)] tw:text-xs tw:text-gray-500";
+  "tw:bg-[var(--bk-bg-subtle)] tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
 /** Inline validation / load failure. */
 export const SCREEN_ERROR =
   "tw:mt-1 tw:mb-2 tw:px-2.5 tw:py-2 tw:rounded-md tw:border tw:border-[var(--bk-error)] " +
-  "tw:bg-[var(--bk-error-tint)] tw:text-[11.5px] tw:font-medium tw:text-[var(--bk-error)]";
+  "tw:bg-[var(--bk-error-tint)] tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-error)]";
 
 /** Field-level hint under an input, error tone. */
 export const SCREEN_FIELD_ERROR =
-  "tw:mt-1 tw:text-[10.5px] tw:font-medium tw:text-[var(--bk-error)]";
+  "tw:mt-1 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-error)]";
 
 /** Confirmation that a value saved. */
 export const SCREEN_SUCCESS =
   "tw:px-3 tw:py-2.5 tw:rounded tw:border tw:border-[var(--bk-success)] " +
-  "tw:bg-[var(--bk-success-tint)] tw:text-[11.5px] tw:font-medium tw:leading-normal " +
+  "tw:bg-[var(--bk-success-tint)] tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-normal " +
   "tw:text-[var(--bk-success)]";
 
 /** Neutral explanatory box. */
 export const SCREEN_INFO =
   "tw:px-3 tw:py-2.5 tw:rounded tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] " +
-  "tw:text-[11.5px] tw:font-medium tw:leading-normal tw:text-gray-900";
+  "tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-normal tw:text-[var(--bk-ink)]";
 
 /** Accent-edged "saved, not live yet" banner. */
 export const SCREEN_NOTICE =

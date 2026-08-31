@@ -48,7 +48,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           <h3 className={`${TITLE} tw:mb-1 tw:text-[var(--bk-success)]`}>Template applied.</h3>
           {/* was color: var(--bk-success-tint) — a BACKGROUND tone used as text,
               i.e. pale green on pale green. The name was barely readable. */}
-          <p className={`${DESCRIPTION} tw:mb-3 tw:text-gray-900`}>
+          <p className={`${DESCRIPTION} tw:mb-3 tw:text-[var(--bk-ink)]`}>
             {appliedName}
           </p>
           {composer && (
@@ -109,10 +109,10 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
 const CONTAINER =
   "tw:flex tw:flex-col tw:items-center tw:px-4 tw:pt-12 tw:pb-6 " +
   "tw:text-center tw:text-[var(--bk-ink-soft)]";
-const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-gray-900";
+const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)]";
 /* No max-width: the board's sentence sits on one line inside the panel's
    own padding; capping it at 220px broke it across two. */
-const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-normal tw:text-gray-500";
+const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]";
 const TIP = "tw:mt-5 tw:px-3 tw:py-2 tw:rounded-md tw:bg-blue-50 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 /** Success banner after a template applies — success tokens, not a hand-mixed green. */
 const APPLIED_BANNER =

@@ -39,7 +39,7 @@
  * @license BSD-3-Clause
  */
 
-export const BK_LABEL_CLASS = "tw:text-xs tw:text-gray-600 tw:[font-family:var(--bk-font-ui)]";
+export const BK_LABEL_CLASS = "tw:text-xs tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-ui)]";
 
 export const BK_HELPER_CLASS = "tw:mt-0 tw:text-[11px] tw:[font-family:var(--bk-font-ui)]";
 

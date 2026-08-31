@@ -53,10 +53,10 @@ interface AssetDetailOverlayProps {
 
 const ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded tw:border-0 tw:bg-transparent tw:px-4 " +
-  "tw:text-left tw:text-[13px] tw:leading-5 tw:text-gray-900 tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
-const ROW_CHEVRON = "tw:text-[13px] tw:text-gray-500";
+  "tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
+const ROW_CHEVRON = "tw:text-[13px] tw:text-[var(--bk-ink-muted)]";
 const ROW_COUNT =
-  "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-gray-500";
+  "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]";
 /**
  * True when another modal dialog is VISIBLE above `el` — i.e. one this surface
  * opened. Escape belongs to the topmost layer, not to us.
@@ -302,8 +302,8 @@ export function AssetDetailOverlay({
       {view === "hub" ? (
         metaError ? (
           <div className="tw:px-4 tw:pt-10 tw:text-center tw:text-[13px] tw:leading-5">
-            <p className="tw:text-gray-900">Preview unavailable</p>
-            <p className="tw:mt-1 tw:text-[12px] tw:text-gray-500">
+            <p className="tw:text-[var(--bk-ink)]">Preview unavailable</p>
+            <p className="tw:mt-1 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
               The file may have been moved or deleted.
             </p>
             <Button
@@ -348,7 +348,7 @@ export function AssetDetailOverlay({
               </label>
               <TextField
                 id="med-alt-input"
-                className="tw:mt-1 tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-gray-400 tw:bg-white tw:px-2 tw:text-[12px] tw:text-gray-900"
+                className="tw:mt-1 tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-gray-400 tw:bg-white tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]"
                 value={altDraft}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAltDraft(e.target.value)}
                 onBlur={commitAltText}
@@ -430,10 +430,10 @@ export function AssetDetailOverlay({
           <div className="tw:relative tw:flex tw:h-14 tw:w-full tw:items-start tw:bg-[var(--bk-accent-subtle,#ebf5ff)]" role="listitem">
             <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
             <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-accent)]" aria-hidden="true" />
-            <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-gray-900">
+            <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
               now
             </span>
-            <span className="tw:mt-2.5 tw:mr-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:text-gray-500">
+            <span className="tw:mt-2.5 tw:mr-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">
               current
             </span>
           </div>
@@ -451,17 +451,17 @@ export function AssetDetailOverlay({
               <React.Fragment key={v.id}>
                 <div className="tw:flex tw:h-14 tw:w-full tw:items-start hover:tw:bg-[var(--bk-bg-subtle)]" role="listitem">
                   <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-gray-300" aria-hidden="true" />
-                  <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-gray-900">
+                  <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
                     {formatRelativeTime(ts, { fallback: "daysShort" })}
                   </span>
-                  <span className="tw:mt-2.5 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tracking-[0.5px] tw:text-gray-500">
+                  <span className="tw:mt-2.5 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
                     {meta}
                   </span>
                   <Button
                     type="button"
                     color="light"
                     size="xs"
-                    className="tw:mx-3 tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-gray-500 tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900"
+                    className="tw:mx-3 tw:mt-1.5 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
                     aria-label={`Restore options for version from ${formatRelativeTime(ts, { fallback: "daysShort" })}`}
                     disabled={restoringId !== null}
                     onClick={() => setPendingRestore(pendingRestore === v.id ? null : v.id)}
@@ -472,7 +472,7 @@ export function AssetDetailOverlay({
                 {/* Board 146:64 — restore confirms INLINE in a 32h band. */}
                 {pendingRestore === v.id ? (
                   <div className="tw:flex tw:h-8 tw:w-full tw:items-center tw:gap-6 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[12px] tw:leading-[18px]" data-testid="media-restore-confirm">
-                    <span className="tw:flex-1 tw:text-gray-900">Restore?</span>
+                    <span className="tw:flex-1 tw:text-[var(--bk-ink)]">Restore?</span>
                     <Button
                       type="button"
                       color="light"
@@ -509,7 +509,7 @@ export function AssetDetailOverlay({
             /* The caption calls this state load-bearing — the full treatment,
                not a dash: this answer is what makes deleting safe. */
             <div className="tw:px-4 tw:pt-8 tw:text-[13px] tw:leading-5" data-testid="media-used-empty">
-              <p className="tw:text-gray-900">Not used on any page</p>
+              <p className="tw:text-[var(--bk-ink)]">Not used on any page</p>
               <p className="tw:mt-1 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
                 Deleting this file won{"’"}t change anything on your site.
               </p>
@@ -527,7 +527,7 @@ export function AssetDetailOverlay({
                 {pg.hits.map((hit) => (
                   <div key={hit.elementId} className="tw:flex tw:h-11 tw:w-full tw:items-center tw:px-4" role="listitem">
                     <span className="tw:min-w-0 tw:flex-1">
-                      <span className="tw:block tw:truncate tw:text-[13px] tw:leading-5 tw:text-gray-900">
+                      <span className="tw:block tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
                         {hit.label}
                       </span>
                       <span className="tw:block tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">

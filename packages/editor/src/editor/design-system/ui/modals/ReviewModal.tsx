@@ -34,10 +34,10 @@ export interface ReviewModalProps {
    the swatches had no outline. Real tokens now. */
 const DIFF_ROW = "tw:flex tw:items-center tw:gap-2 tw:px-2.5 tw:py-1.5 tw:bg-gray-50 tw:rounded-md tw:mb-1";
 const SECTION_HEAD =
-  "tw:text-xs tw:font-bold tw:text-gray-500 tw:mb-2 tw:uppercase tw:tracking-[0.07em]";
+  "tw:text-xs tw:font-bold tw:text-[var(--bk-ink-muted)] tw:mb-2 tw:uppercase tw:tracking-[0.07em]";
 const SECTION = "tw:mb-3.5";
-const NAME = "tw:text-xs tw:text-gray-900 tw:flex-1";
-const WAS = "tw:text-xs tw:[font-family:var(--bk-font-mono)] tw:text-gray-500 tw:line-through";
+const NAME = "tw:text-xs tw:text-[var(--bk-ink)] tw:flex-1";
+const WAS = "tw:text-xs tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)] tw:line-through";
 const NOW = "tw:text-xs tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-success)]";
 const SWATCH = "tw:size-5 tw:rounded tw:border tw:border-gray-200 tw:flex-none";
 
@@ -57,7 +57,7 @@ function ValueDiffSection({
         <div key={r.id} className={DIFF_ROW}>
           <span className={NAME}>{r.name}</span>
           <span className={WAS}>{r.was}</span>
-          <span className="tw:text-xs tw:text-gray-500">→</span>
+          <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">→</span>
           <span className={NOW}>{r.now}</span>
         </div>
       ))}
@@ -115,7 +115,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               63 places." A count in the title is the difference between
               "review changes" and knowing whether this is a typo fix or a
               rebrand. */}
-          <ModalTitle inset={false} className="tw:text-sm tw:font-semibold tw:text-gray-900 tw:mb-1">
+          <ModalTitle inset={false} className="tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)] tw:mb-1">
             Review {totalChanges} staged {totalChanges === 1 ? "change" : "changes"}
           </ModalTitle>
 
@@ -138,7 +138,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="1.5"
-                        className="tw:text-gray-500"
+                        className="tw:text-[var(--bk-ink-muted)]"
                         aria-hidden="true"
                       >
                         <path d="M2 6h8M8 3l3 3-3 3" strokeLinecap="round" />
@@ -164,7 +164,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                           this is the last screen before every element bound to
                           the token moves. */}
                       <span className={WAS}>{diff.previousValue}</span>
-                      <span className="tw:text-xs tw:text-gray-500">→</span>
+                      <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">→</span>
                       <span className={NOW}>{diff.currentValue}</span>
                     </div>
                   );
@@ -176,7 +176,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           <ValueDiffSection title="Typography Changes" rows={typeRows} />
           <ValueDiffSection title="Spacing Changes" rows={spacingRows} />
 
-          <p className="tw:mt-3 tw:mb-0 tw:text-xs tw:text-gray-500">
+          <p className="tw:mt-3 tw:mb-0 tw:text-xs tw:text-[var(--bk-ink-muted)]">
             Applying updates every element bound to these tokens
             {usageCount != null && usageCount > 0
               ? ` — ${usageCount} place${usageCount === 1 ? "" : "s"}.`
@@ -199,7 +199,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               color="light"
               size="xs"
               onClick={onClose}
-              className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               Keep editing
             </Button>

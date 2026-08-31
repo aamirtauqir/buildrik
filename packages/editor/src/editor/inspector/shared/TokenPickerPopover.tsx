@@ -202,7 +202,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
             className={`tw:flex-1 tw:px-0 tw:py-[7px] tw:rounded-none tw:border-0 tw:border-b-2 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${
               tab === t
                 ? "tw:border-b-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)]"
-                : "tw:border-b-transparent tw:bg-transparent tw:text-gray-500 tw:hover:text-gray-900"
+                : "tw:border-b-transparent tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]"
             }`}
           >
             {t === "tokens" ? "Tokens" : "Custom"}
@@ -234,13 +234,13 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               <div className="tw:mb-1 tw:text-[11px] tw:text-[var(--bk-ink-soft)]">
                 No {tokenLabel} tokens yet
               </div>
-              <div className="tw:text-[10px] tw:text-gray-500">Add tokens in the Design tab</div>
+              <div className="tw:text-[10px] tw:text-[var(--bk-ink-muted)]">Add tokens in the Design tab</div>
             </div>
           )}
 
           {/* Empty state — search no-results */}
           {hasNoResults && (
-            <div className="tw:px-3 tw:py-4 tw:text-center tw:text-[11px] tw:text-gray-500">
+            <div className="tw:px-3 tw:py-4 tw:text-center tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
               No tokens found
             </div>
           )}
@@ -279,7 +279,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       {/* Swatch */}
                       <div className={SWATCH} style={{ background: token.value }} />
                       {/* Name */}
-                      <span className="tw:max-w-11 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-center tw:text-[9px] tw:leading-tight tw:text-gray-500">
+                      <span className="tw:max-w-11 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-center tw:text-[9px] tw:leading-tight tw:text-[var(--bk-ink-muted)]">
                         {token.name}
                       </span>
                     </div>
@@ -310,7 +310,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
       )}
       {tab === "custom" && (
         <div className="tw:p-2.5">
-          <div className="tw:mb-1.5 tw:text-[11px] tw:text-gray-500">Enter any CSS color value</div>
+          <div className="tw:mb-1.5 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">Enter any CSS color value</div>
           <div className="tw:flex tw:items-center tw:gap-1.5">
             {/* Preview swatch */}
             <div className={SWATCH} style={{ background: customInput }} />
@@ -327,7 +327,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               className={`tw:flex-1 ${PICKER_INPUT} tw:[&_input]:text-xs`}
             />
           </div>
-          <div className="tw:mt-2 tw:text-[10px] tw:text-gray-500">
+          <div className="tw:mt-2 tw:text-[10px] tw:text-[var(--bk-ink-muted)]">
             Accepts hex, rgb(), hsl(), or any CSS keyword
           </div>
         </div>

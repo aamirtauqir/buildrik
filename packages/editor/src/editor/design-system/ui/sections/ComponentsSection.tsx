@@ -47,16 +47,16 @@ const ROW =
   "tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100";
 const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-gray-200 tw:rounded-lg tw:bg-white tw:min-h-29";
 const PREVIEW_BOX =
-  "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-gray-50 tw:text-[10px] tw:text-gray-500";
-const CARD_NAME = "tw:text-[11px] tw:font-semibold tw:text-gray-900 tw:mb-0.5";
-const CARD_META = "tw:text-[10px] tw:text-gray-500 tw:leading-[1.4]";
+  "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-gray-50 tw:text-[10px] tw:text-[var(--bk-ink-muted)]";
+const CARD_NAME = "tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink)] tw:mb-0.5";
+const CARD_META = "tw:text-[10px] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]";
 const AI_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-4 tw:pb-1 tw:gap-2";
 const AI_CTA = "tw:text-xs tw:font-medium tw:text-[var(--bk-accent-text)]";
-const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-gray-500";
+const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const SAVED_HEADER =
   "tw:px-3 tw:pt-2 tw:pb-1.5 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)] tw:uppercase tw:tracking-[0.04em]";
 const EMPTY_SAVED =
-  "tw:mx-3 tw:mb-4 tw:p-3 tw:border tw:border-dashed tw:border-gray-200 tw:rounded-lg tw:text-[11px] tw:text-gray-500 tw:text-center";
+  "tw:mx-3 tw:mb-4 tw:p-3 tw:border tw:border-dashed tw:border-gray-200 tw:rounded-lg tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:text-center";
 const FOOTER_CALLOUT =
   "tw:m-4 tw:mx-3 tw:px-3 tw:py-2.5 tw:bg-[var(--bk-accent-tint)] tw:border tw:border-[var(--bk-accent-subtle)] " +
   "tw:rounded-lg tw:text-[11px] tw:text-[var(--bk-ink-soft)] tw:leading-normal";

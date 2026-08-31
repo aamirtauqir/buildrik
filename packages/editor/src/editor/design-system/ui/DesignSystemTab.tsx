@@ -83,7 +83,7 @@ const STRIP = "tw:flex tw:items-center tw:flex-none tw:border-b tw:border-gray-2
 /** Square icon button in the toolbar (themes, AI). */
 const TOOL_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:w-7 tw:h-6 tw:p-0 tw:rounded-md " +
-  "tw:border tw:border-gray-200 tw:bg-transparent tw:text-sm tw:text-gray-600 tw:hover:bg-gray-100";
+  "tw:border tw:border-gray-200 tw:bg-transparent tw:text-sm tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100";
 /** Back crumb inside a destination — board 153:2 draws `‹ <Section>` in accent. */
 const CRUMB =
   "tw:flex tw:items-center tw:gap-[5px] tw:h-auto tw:px-0 tw:border-0 tw:bg-transparent " +
@@ -598,11 +598,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         className={`${STRIP} tw:gap-2 tw:px-3 tw:py-2`}
       >
         <div className="tw:flex-1 tw:min-w-0">
-          <div className="tw:text-[11px] tw:font-semibold tw:text-gray-900">Brand &amp; shared theme</div>
+          <div className="tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink)]">Brand &amp; shared theme</div>
           {/* gray-600, not gray-500: on this strip's --bk-bg-subtle background,
               gray-500 measures 4.39:1 — under AA for text this size. Measured
               with axe on the live Brand panel. */}
-          <div className="tw:text-[10px] tw:leading-snug tw:text-gray-600">
+          <div className="tw:text-[10px] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
             Everyday styling lives here. The brand syncs from your workspace shared theme.
           </div>
         </div>
@@ -724,7 +724,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                           "Starters" are not words a first-time user can rank
                           without them. */}
                       <span className="tw:flex tw:flex-col tw:gap-px tw:min-w-0 tw:text-left">
-                        <span className="tw:flex tw:items-center tw:gap-[5px] tw:min-w-0 tw:text-[13px] tw:text-gray-900">
+                        <span className="tw:flex tw:items-center tw:gap-[5px] tw:min-w-0 tw:text-[13px] tw:text-[var(--bk-ink)]">
                           {s.label}
                           {dirtyHere && (
                             <span
@@ -733,13 +733,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                             />
                           )}
                         </span>
-                        <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:font-normal tw:text-gray-600">
+                        <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-soft)]">
                           {s.hint}
                         </span>
                       </span>
                       <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
                         {(s.id === "lint" ? lintIssues.length : sectionCounts[s.id]) ? (
-                          <span className="tw:text-xs tw:text-gray-600">
+                          <span className="tw:text-xs tw:text-[var(--bk-ink-soft)]">
                             {s.id === "lint" ? lintIssues.length : sectionCounts[s.id]}
                           </span>
                         ) : null}
@@ -754,7 +754,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                   shows less with no reason given, which reads as missing
                   features rather than a setting the user can change. */}
               {isBeginner && (
-                <li className="tw:mt-3 tw:px-2 tw:text-xs tw:leading-normal tw:text-gray-600" data-basic-mode-note>
+                <li className="tw:mt-3 tw:px-2 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-soft)]" data-basic-mode-note>
                   Basic mode hides what you cannot edit yet. Switch to Pro to unlock.
                 </li>
               )}
@@ -763,7 +763,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
           {isFirstLoad && activeSection === "tokens" && (
             <div className="tw:mx-2.5 tw:mt-2.5 tw:px-3 tw:py-2 tw:rounded-lg tw:border tw:border-[var(--bk-accent-tint)] tw:bg-[var(--bk-accent-tint)]">
-              <span className="tw:text-xs tw:leading-relaxed tw:text-gray-900">
+              <span className="tw:text-xs tw:leading-relaxed tw:text-[var(--bk-ink)]">
                 These are your site's default design tokens. Customize them and click{" "}
                 <strong>{APPLY_CHANGES_LABEL}</strong> to go live.
               </span>

@@ -167,7 +167,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
         <span className="bk-notifications__title">Notifications</span>
         {/* F5: no mark-all while there is nothing loaded to mark. */}
         {state === "ready" ? (
-          <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
             Mark all read
           </Button>
         ) : null}
@@ -205,7 +205,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
           return (
             <React.Fragment key={n.id}>
             {showBand && (
-              <div className="tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-gray-500">
+              <div className="tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-ink-muted)]">
                 {band}
               </div>
             )}

@@ -68,11 +68,11 @@ export interface TokenDetailViewProps {
 const CONTAINER = "tw:flex tw:flex-col tw:gap-4 tw:px-1 tw:py-3";
 const FIELD_ROW = "tw:border-t tw:border-gray-200 tw:py-2";
 const MONO = "tw:[font-family:var(--bk-font-mono)]";
-const NAME = "tw:text-base tw:font-semibold tw:text-gray-900 tw:leading-tight";
-const ID_MONO = `tw:text-xs tw:text-gray-500 ${MONO}`;
-const CSS_VAR = `tw:text-[11px] tw:text-gray-500 tw:mt-0.5 ${MONO}`;
+const NAME = "tw:text-base tw:font-semibold tw:text-[var(--bk-ink)] tw:leading-tight";
+const ID_MONO = `tw:text-xs tw:text-[var(--bk-ink-muted)] ${MONO}`;
+const CSS_VAR = `tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:mt-0.5 ${MONO}`;
 /** The quiet button look, previously six copies of the same class list. */
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 const LINK_BTN = `${GHOST} tw:p-0 tw:text-left tw:inline-flex tw:items-center tw:gap-1.5`;
 
 // ─── Preview slot ─────────────────────────────────────────────────────────────
@@ -90,7 +90,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
     return (
       <span
         aria-hidden="true"
-        className="tw:inline-flex tw:items-center tw:justify-center tw:size-6 tw:text-sm tw:font-semibold tw:text-gray-900 tw:flex-none"
+        className="tw:inline-flex tw:items-center tw:justify-center tw:size-6 tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)] tw:flex-none"
         style={token.type === "font-family" ? { fontFamily: token.value } : undefined}
       >
         Aa
@@ -452,7 +452,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             disabled={usageCount === 0}
             data-used-by-toggle
           >
-            <span aria-hidden="true" className="tw:inline-block tw:w-2.5 tw:text-[10px] tw:text-gray-500">
+            <span aria-hidden="true" className="tw:inline-block tw:w-2.5 tw:text-[10px] tw:text-[var(--bk-ink-muted)]">
               {usageCount === 0 ? "" : usageExpanded ? "▾" : "▸"}
             </span>
             <span data-used-count={usageCount}>
@@ -485,7 +485,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                       className={`${LINK_BTN} tw:w-full`}
                     >
                       <span>{name}</span>
-                      <span className={`tw:text-gray-500 tw:text-[11px] ${MONO}`}>· {ref.styleProp}</span>
+                      <span className={`tw:text-[var(--bk-ink-muted)] tw:text-[11px] ${MONO}`}>· {ref.styleProp}</span>
                     </Button>
                   </li>
                 );
@@ -548,7 +548,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       {/* Beginner notice */}
       {!isPro && (
         <div
-          className="tw:mt-3 tw:px-3 tw:py-2.5 tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:rounded-md tw:text-[11.5px] tw:leading-normal"
+          className="tw:mt-3 tw:px-3 tw:py-2.5 tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:rounded-md tw:text-[length:var(--bk-text-12)] tw:leading-normal"
           role="note"
           data-beginner-notice
         >

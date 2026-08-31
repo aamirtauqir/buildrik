@@ -200,7 +200,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to left"
               onClick={handleAlignLeft}
-              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             ><AlignLeft size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Center")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -209,7 +209,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to center horizontally"
               onClick={handleAlignCenterH}
-              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             ><AlignCenter size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Right")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -218,7 +218,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to right"
               onClick={handleAlignRight}
-              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             ><AlignRight size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Top")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -227,7 +227,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to top"
               onClick={handleAlignTop}
-              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             ><AlignStartVertical size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Middle")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -236,7 +236,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to middle vertically"
               onClick={handleAlignMiddle}
-              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             ><AlignCenterVertical size={16} /></Button>
           </Tooltip>
           <Tooltip content={getAlignTooltip("Align Bottom")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
@@ -245,7 +245,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Align elements to bottom"
               onClick={handleAlignBottom}
-              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={isDisabled} className="tw:border tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             ><AlignEndVertical size={16} /></Button>
           </Tooltip>
         </div>
@@ -261,7 +261,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Distribute elements horizontally with equal spacing"
               onClick={handleDistributeH}
-              disabled={distributeDisabled} className="tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={distributeDisabled} className="tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <rect x="4" y="5" width="4" height="14" rx="1" />
@@ -276,7 +276,7 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
               size="xs"
               aria-label="Distribute elements vertically with equal spacing"
               onClick={handleDistributeV}
-              disabled={distributeDisabled} className="tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-gray-600 tw:hover:text-gray-900"
+              disabled={distributeDisabled} className="tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <rect x="5" y="4" width="14" height="4" rx="1" />

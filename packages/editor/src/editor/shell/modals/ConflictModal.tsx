@@ -65,7 +65,7 @@ export function ConflictModal({ open, onReload, onSaveBackup, onOverwrite, onClo
           {confirmOverwrite ? (
             <Button color="red" onClick={onOverwrite}>Yes, overwrite</Button>
           ) : (
-            <Button color="light" onClick={() => setConfirmOverwrite(true)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Overwrite…</Button>
+            <Button color="light" onClick={() => setConfirmOverwrite(true)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Overwrite…</Button>
           )}
         </div>
       </div>

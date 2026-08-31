@@ -77,7 +77,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
             {state === "failed" ? "Migration failed" : "Updating your project"}
           </ModalTitle>
           {rangeLabel && (
-            <ModalDescription inset={false} className="tw:mt-1 tw:text-[11px] tw:text-gray-500">
+            <ModalDescription inset={false} className="tw:mt-1 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
               {rangeLabel}
             </ModalDescription>
           )}
@@ -90,7 +90,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
               <div className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-error)]">
                 Migration v{stuckAt ?? "?"} failed
               </div>
-              <div className="tw:mt-1 tw:text-[11px] tw:text-gray-900 tw:[font-family:var(--bk-font-mono)]">
+              <div className="tw:mt-1 tw:text-[11px] tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-mono)]">
                 {failureMessage}
               </div>
             </div>
@@ -102,7 +102,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                 key={step.version}
                 className="tw:flex tw:items-center tw:gap-2 tw:py-2 tw:border-b tw:border-gray-200 tw:text-[13px]"
               >
-                <span className="tw:flex-1 tw:text-gray-900">
+                <span className="tw:flex-1 tw:text-[var(--bk-ink)]">
                   v{step.version} · {step.label}
                 </span>
                 <span className="tw:text-[11px]">{statusLabel(step.status)}</span>
@@ -123,7 +123,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                 {/* width is the live value — the one thing here that is data */}
                 <div className="tw:h-full tw:bg-[var(--bk-accent)] tw:transition-[width]" style={{ width: `${progress}%` }} />
               </div>
-              <div className="tw:mt-1 tw:text-center tw:text-[10px] tw:text-gray-500">
+              <div className="tw:mt-1 tw:text-center tw:text-[10px] tw:text-[var(--bk-ink-muted)]">
                 {completedCount} of {total}
               </div>
             </>
@@ -169,8 +169,8 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
 function Row({ label, value, tone }: { label: string; value: string; tone?: "success" }) {
   return (
     <div className="tw:flex tw:justify-between tw:py-1 tw:text-xs">
-      <span className="tw:text-gray-500">{label}</span>
-      <span className={tone === "success" ? "tw:text-[var(--bk-success)]" : "tw:text-gray-900"}>
+      <span className="tw:text-[var(--bk-ink-muted)]">{label}</span>
+      <span className={tone === "success" ? "tw:text-[var(--bk-success)]" : "tw:text-[var(--bk-ink)]"}>
         {value}
       </span>
     </div>
@@ -187,6 +187,6 @@ function statusLabel(status: MigrationStep["status"]): React.ReactNode {
       return <span className="tw:text-[var(--bk-error)]">failed</span>;
     case "queued":
     default:
-      return <span className="tw:text-gray-500">queued</span>;
+      return <span className="tw:text-[var(--bk-ink-muted)]">queued</span>;
   }
 }

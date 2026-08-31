@@ -225,7 +225,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
           </div>
         ) : null}
         <div className="bk-send-review__actions">
-          <Button color="light" size="xs" onClick={() => setOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <Button color="light" size="xs" onClick={() => setOpen(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
             Cancel
           </Button>
           <Button size="xs" disabled={state === "sending"} onClick={() => void send()} aria-busy={state === "sending" || undefined}>

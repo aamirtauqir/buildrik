@@ -19,8 +19,8 @@ import { Button, Checkbox, Modal } from "@/editor/chrome-ui";
 // ============================================================================
 
 /** Checkbox + two-line explanation, used twice by ReplaceModal. */
-const OPTION_ROW = "tw:flex tw:items-start tw:gap-2 tw:mb-1.5 tw:text-[13px] tw:text-gray-500 tw:cursor-pointer";
-const OPTION_TITLE = "tw:block tw:font-medium tw:text-gray-900";
+const OPTION_ROW = "tw:flex tw:items-start tw:gap-2 tw:mb-1.5 tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-pointer";
+const OPTION_TITLE = "tw:block tw:font-medium tw:text-[var(--bk-ink)]";
 const OPTION_HINT = "tw:block tw:mt-px tw:text-[11px]";
 
 /** Circular hero glyph above a modal's copy (Pro upsell, create outcomes). */

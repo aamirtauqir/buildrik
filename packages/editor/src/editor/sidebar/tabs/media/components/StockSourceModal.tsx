@@ -171,7 +171,7 @@ export function StockSourceModal({
                     className={`tw:px-2.5 tw:py-1 tw:text-xs tw:rounded ${
                       active
                         ? "tw:bg-[var(--bk-accent)] tw:text-white tw:font-semibold tw:border-[var(--bk-accent)]"
-                        : "tw:bg-transparent tw:text-gray-500 tw:font-medium tw:border-transparent"
+                        : "tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:font-medium tw:border-transparent"
                     }`}
                   >
                     {s.label}

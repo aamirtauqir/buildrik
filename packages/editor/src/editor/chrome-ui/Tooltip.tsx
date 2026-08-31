@@ -42,7 +42,7 @@ export function Tooltip(props: TooltipProps) {
   /* The text colour rides on `className`, NOT on the theme. Measured live:
      a caller-supplied theme string is not run through flowbite's `tw:`
      prefixing (that happens to its OWN theme), so the override landed
-     unprefixed, lost to `tw:text-gray-900` from the built-in `light` variant,
+     unprefixed, lost to `tw:text-[var(--bk-ink)]` from the built-in `light` variant,
      and the bubble went white with ink text. `className` is appended last and
      carries the prefix this file writes, so it wins. A caller's own `theme`
      passes straight through in the spread, untouched. */

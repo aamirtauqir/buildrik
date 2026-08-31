@@ -61,17 +61,17 @@ function makeId(): string {
 const STEP_BAR = "tw:flex tw:items-center tw:gap-2 tw:pb-4 tw:mb-4 tw:border-b tw:border-gray-200";
 const STEP = "tw:flex tw:items-center tw:gap-1.5 tw:text-xs";
 const STEP_LABEL_ON = "tw:text-[var(--bk-accent-text)] tw:font-semibold";
-const STEP_LABEL_OFF = "tw:text-gray-500";
+const STEP_LABEL_OFF = "tw:text-[var(--bk-ink-muted)]";
 const STEP_DOT =
   "tw:size-5 tw:rounded-full tw:flex tw:items-center tw:justify-center tw:text-[11px] tw:font-bold tw:flex-none";
 const STEP_DOT_ON = "tw:bg-[var(--bk-accent)] tw:text-white";
 /* The board marks a finished step with success green, not another blue. */
 const STEP_DOT_DONE = "tw:bg-[var(--bk-success)] tw:text-white";
-const STEP_DOT_OFF = "tw:bg-gray-200 tw:text-gray-500";
+const STEP_DOT_OFF = "tw:bg-gray-200 tw:text-[var(--bk-ink-muted)]";
 const STEP_DIVIDER = "tw:flex-1 tw:h-px tw:bg-gray-200";
 const LABEL = "tw:block tw:text-xs tw:font-medium tw:text-[var(--bk-ink-soft)] tw:mb-1.5";
 const FIELD_ROW = "tw:flex tw:items-center tw:gap-2 tw:py-1.5 tw:border-b tw:border-gray-200";
-const COL_HEAD = "tw:text-[11px] tw:text-gray-500 tw:font-medium";
+const COL_HEAD = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:font-medium";
 /* Board 1170:4713 — every measurement below is read off that frame. */
 const BOARD_CAPTION = "tw:text-[10px] tw:text-[var(--bk-ink-muted)]";
 const BOARD_GROUP_LABEL = "tw:text-[9px] tw:font-semibold tw:text-[var(--bk-ink-muted)]";
@@ -95,7 +95,7 @@ const ERROR_BANNER =
   "tw:mt-2.5 tw:px-3 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 " +
   "tw:rounded-lg tw:text-[var(--bk-error)] tw:text-xs";
 const FOOTER = "tw:flex tw:justify-end tw:gap-2 tw:pt-4 tw:mt-2 tw:border-t tw:border-gray-200";
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 // =============================================================================
 // COMPONENT

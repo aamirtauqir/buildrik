@@ -216,7 +216,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
               onClick={() => setMarginLinked((v) => !v)}
               aria-pressed={marginLinked}
               title={marginLinked ? "Unlink margin sides" : "Link margin sides"}
-              className={marginLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+              className={marginLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"}
             >
               {marginLinked ? <Link size={12} /> : <Link2Off size={12} />}
               <span style={{ marginLeft: 4 }}>Margin</span>
@@ -227,7 +227,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
               onClick={() => setPaddingLinked((v) => !v)}
               aria-pressed={paddingLinked}
               title={paddingLinked ? "Unlink padding sides" : "Link padding sides"}
-              className={paddingLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+              className={paddingLinked ? undefined : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"}
             >
               {paddingLinked ? <Link size={12} /> : <Link2Off size={12} />}
               <span style={{ marginLeft: 4 }}>Padding</span>

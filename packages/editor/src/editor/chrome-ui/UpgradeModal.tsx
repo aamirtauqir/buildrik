@@ -109,7 +109,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:py-1">
         <Badge>{requiredPlan}</Badge>
 
-        <p className="tw:m-0 tw:text-sm tw:text-gray-600 tw:leading-normal">
+        <p className="tw:m-0 tw:text-sm tw:text-[var(--bk-ink-soft)] tw:leading-normal">
           {feature
             ? `${feature} requires the ${requiredPlan} plan.`
             : `This feature requires the ${requiredPlan} plan.`}
@@ -117,7 +117,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
 
         <div className="tw:flex tw:flex-col tw:gap-2 tw:w-full">
           {FEATURES.map((item) => (
-            <div key={item} className="tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-gray-900">
+            <div key={item} className="tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink)]">
               <span className="tw:text-[var(--bk-success)] tw:font-semibold tw:text-sm" aria-hidden="true">
                 ✓
               </span>

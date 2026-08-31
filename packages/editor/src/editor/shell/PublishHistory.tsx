@@ -94,7 +94,7 @@ const PICK_ROW_ON = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]"
 const PICK_TITLE = "tw:text-[13px] tw:text-[var(--bk-ink)]";
 const PICK_META = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 const PICK_LIVE = "tw:text-[11px] tw:font-medium tw:text-[var(--bk-success-text)]";
-const NOTICE = "tw:text-xs tw:text-gray-500";
+const NOTICE = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
 
 export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted, rollbackJob = null }) => {

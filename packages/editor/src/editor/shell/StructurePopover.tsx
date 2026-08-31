@@ -87,7 +87,7 @@ export const StructurePopover: React.FC<StructurePopoverProps> = ({
           size="xs"
           onClick={onClose}
           aria-label="Close structure"
-          style={{ display: "inline-grid", placeItems: "center", width: 24, height: 24, padding: 0 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          style={{ display: "inline-grid", placeItems: "center", width: 24, height: 24, padding: 0 }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
           <X size={14} />
         </Button>

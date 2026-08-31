@@ -51,9 +51,9 @@ const TAB = "tw:px-3 tw:py-1.5 tw:text-[13px] tw:rounded tw:border-b-2 tw:bg-tra
 const PANEL = "tw:px-6 tw:py-4 tw:max-h-90 tw:overflow-auto";
 const LIST = "tw:list-none tw:m-0 tw:p-0 tw:flex tw:flex-col tw:gap-1";
 const ROW = "tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-2.5 tw:py-2 tw:rounded tw:text-[13px]";
-const VERSION_CHIP = "tw:text-[11px] tw:px-1.5 tw:py-0.5 tw:rounded-sm tw:bg-gray-50 tw:text-gray-500";
-const META = "tw:text-[11px] tw:text-gray-500";
-const CENTERED_EMPTY = "tw:text-[13px] tw:text-gray-500 tw:py-8 tw:text-center";
+const VERSION_CHIP = "tw:text-[11px] tw:px-1.5 tw:py-0.5 tw:rounded-sm tw:bg-gray-50 tw:text-[var(--bk-ink-muted)]";
+const META = "tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+const CENTERED_EMPTY = "tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:py-8 tw:text-center";
 const FOOTER = "tw:flex tw:justify-end tw:px-6 tw:py-3 tw:border-t tw:border-gray-200";
 
 export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
@@ -97,8 +97,8 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
               onClick={() => setTab(t)}
               className={`${TAB} ${
                 tab === t
-                  ? "tw:font-semibold tw:text-gray-900 tw:border-b-blue-700"
-                  : "tw:font-medium tw:text-gray-500 tw:border-b-transparent"
+                  ? "tw:font-semibold tw:text-[var(--bk-ink)] tw:border-b-blue-700"
+                  : "tw:font-medium tw:text-[var(--bk-ink-muted)] tw:border-b-transparent"
               }`}
             >
               {t === "preview" ? "Preview" : t === "used" ? "Used in" : "Versions"}
@@ -119,7 +119,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                 />
               ) : (
                 <div
-                  className="tw:w-full tw:h-40 tw:flex tw:items-center tw:justify-center tw:rounded tw:border tw:border-dashed tw:border-gray-200 tw:bg-gray-50 tw:text-xs tw:text-gray-500"
+                  className="tw:w-full tw:h-40 tw:flex tw:items-center tw:justify-center tw:rounded tw:border tw:border-dashed tw:border-gray-200 tw:bg-gray-50 tw:text-xs tw:text-[var(--bk-ink-muted)]"
                 >
                   No preview thumbnail
                 </div>
@@ -154,7 +154,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                       size="xs"
                       onClick={() => onJumpToPage?.(entry.pageId)}
                       disabled={!onJumpToPage}
-                      className={`${ROW} tw:border-transparent tw:bg-transparent tw:text-gray-900`}
+                      className={`${ROW} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)]`}
                     >
                       <span className="tw:flex-1">{entry.pageName}</span>
                       {entry.version && (
@@ -198,7 +198,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             size="xs"
             type="button"
             aria-label="Close drawer"
-            onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             Close
           </Button>
@@ -231,14 +231,14 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
           data-testid="versions-current"
           className="tw:flex tw:justify-between tw:items-center tw:px-2.5 tw:py-2 tw:rounded-md tw:bg-gray-50 tw:border tw:border-gray-200 tw:text-xs"
         >
-          <span className="tw:text-gray-500">Current version</span>
+          <span className="tw:text-[var(--bk-ink-muted)]">Current version</span>
           <span className="tw:font-semibold">v{currentVersion}</span>
         </div>
       )}
 
       {timeline.length === 0 ? (
         <div
-          className="tw:text-[13px] tw:text-gray-500 tw:py-6 tw:text-center"
+          className="tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:py-6 tw:text-center"
         >
           No applies yet — when you apply this template, the history will appear here.
         </div>
@@ -252,7 +252,7 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
             return (
               <li
                 key={`${entry.pageId}-${idx}`}
-                className={`${ROW} tw:border tw:text-gray-900 ${
+                className={`${ROW} tw:border tw:text-[var(--bk-ink)] ${
                   stale
                     ? "tw:border-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]"
                     : "tw:border-transparent tw:bg-transparent"

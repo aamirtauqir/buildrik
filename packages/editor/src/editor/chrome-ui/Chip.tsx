@@ -48,7 +48,7 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip
         "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
         selected
           ? "tw:bg-blue-50 tw:text-[var(--bk-accent-text)]"
-          : "tw:bg-gray-100 tw:text-gray-900 tw:hover:bg-gray-200",
+          : "tw:bg-gray-100 tw:text-[var(--bk-ink)] tw:hover:bg-gray-200",
         className,
       ]
         .filter(Boolean)
@@ -59,7 +59,7 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip
       {typeof count === "number" ? (
         <span
           data-testid={countTestId}
-          className="tw:[font-family:var(--bk-font-mono)] tw:font-medium tw:tabular-nums tw:text-gray-600"
+          className="tw:[font-family:var(--bk-font-mono)] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-soft)]"
         >
           {count}
         </span>

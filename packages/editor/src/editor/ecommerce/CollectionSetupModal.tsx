@@ -115,7 +115,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
       </div>
     </div>
     <div className="tw:flex tw:justify-end tw:gap-2 tw:mt-4 tw:pt-4 tw:border-t tw:border-gray-200">
-      <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+      <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
         Skip for now
       </Button>
       <Button onClick={handleConfirm} disabled={isCreating}>

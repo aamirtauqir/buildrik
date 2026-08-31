@@ -41,10 +41,10 @@ export interface BindingPopoverProps {
 
 /** Popover body scrolls; the header and the footer link stay put. */
 const MENU_CLASS = "tw:max-h-70 tw:overflow-y-auto tw:min-w-0";
-const EMPTY_CLASS = "tw:px-3 tw:py-3 tw:text-xs tw:text-gray-500 tw:text-center tw:leading-normal";
+const EMPTY_CLASS = "tw:px-3 tw:py-3 tw:text-xs tw:text-[var(--bk-ink-muted)] tw:text-center tw:leading-normal";
 const BOUND_CLASS =
   "tw:flex tw:items-center tw:justify-between tw:gap-2 tw:px-2 tw:pb-2 tw:mb-1 " +
-  "tw:border-b tw:border-gray-200 tw:text-[11px] tw:text-gray-500";
+  "tw:border-b tw:border-gray-200 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const LINK_BTN_CLASS =
   "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-subtle)] tw:hover:text-[var(--bk-accent-hover)]";
 const UNBIND_BTN_CLASS =

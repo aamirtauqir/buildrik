@@ -20,8 +20,8 @@ export interface NavItemProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
    edge keeps a tighter gutter for a trailing count or chevron. */
 const BASE =
   "tw:relative tw:flex tw:items-center tw:gap-2 tw:h-8 tw:pl-4 tw:pr-3 tw:rounded-lg tw:border-0 tw:bg-transparent tw:w-full " +
-  "tw:text-left tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-500 tw:cursor-pointer " +
-  "tw:[transition:var(--bk-transition-fast)] tw:hover:bg-gray-100 tw:hover:text-gray-900 " +
+  "tw:text-left tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:cursor-pointer " +
+  "tw:[transition:var(--bk-transition-fast)] tw:hover:bg-gray-100 tw:hover:text-[var(--bk-ink)] " +
   "tw:aria-[current=page]:bg-blue-50 tw:aria-[current=page]:text-blue-700 tw:aria-[current=page]:font-medium " +
   /* The 3px accent bar the board pairs with the tint (16:24). `rounded-l-lg`
      rather than clipping with overflow-hidden, which would also clip the
@@ -44,7 +44,7 @@ export const NavItem = React.forwardRef<HTMLButtonElement, NavItemProps>(functio
       aria-current={current ? "page" : undefined}
       {...rest}
     >
-      {icon ? <span className="tw:flex-none tw:inline-flex tw:text-gray-500">{icon}</span> : null}
+      {icon ? <span className="tw:flex-none tw:inline-flex tw:text-[var(--bk-ink-muted)]">{icon}</span> : null}
       <span className={ROW_LABEL_CLASS}>{children}</span>
       {trailing}
     </button>

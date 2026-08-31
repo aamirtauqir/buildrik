@@ -61,7 +61,7 @@ export function BrandPreview({ colors }: BrandPreviewProps) {
             />
           ))}
           {more > 0 && (
-            <span className="tw:text-[11px] tw:leading-4 tw:text-gray-600 tw:tabular-nums">
+            <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:tabular-nums">
               +{more}
             </span>
           )}
@@ -74,11 +74,11 @@ export function BrandPreview({ colors }: BrandPreviewProps) {
             <span
               aria-hidden="true"
               style={{ fontFamily: `var(${s.varName})` }}
-              className="tw:flex-none tw:text-[15px] tw:leading-5 tw:text-gray-900"
+              className="tw:flex-none tw:text-[15px] tw:leading-5 tw:text-[var(--bk-ink)]"
             >
               Aa
             </span>
-            <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:text-gray-600">
+            <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
               {s.label}
             </span>
           </div>

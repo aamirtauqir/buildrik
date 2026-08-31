@@ -218,7 +218,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           size="xs"
           style={{ display: "inline-grid", placeItems: "center", width: 26, height: 22, padding: 0 }}
           onClick={() => setPaletteOpen(true)}
-          aria-label="Open command palette" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          aria-label="Open command palette" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
           <span style={{ font: "500 10px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
             ⌘K

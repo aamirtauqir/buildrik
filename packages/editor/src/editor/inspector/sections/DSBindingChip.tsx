@@ -157,7 +157,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
           color: "var(--bk-accent)",
           textDecoration: "underline dotted",
           textUnderlineOffset: 2,
-        }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
       >
         Bind to token
       </Button>

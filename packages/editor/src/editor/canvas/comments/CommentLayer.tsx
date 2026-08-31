@@ -22,7 +22,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalContent, ModalFooter, ModalRoot, ModalTitle, isModalOpen, useToast, Button, Textarea } from "@/editor/chrome-ui";
+import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, isModalOpen, useToast, Button, Textarea } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Z_LAYERS } from "@/shared/constants/canvas";
@@ -441,7 +441,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
                 onClick={() => {
                   setDraft(null);
                   setDraftBody("");
-                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
               >
                 Cancel
               </Button>
@@ -461,6 +461,9 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               ? "A comment lost its element"
               : `${orphanModal?.length ?? 0} comments lost their element`}
           </ModalTitle>
+          {/* ModalBody carries the gutter — same missing-inset family as
+              FINDING-008. */}
+          <ModalBody>
           <p style={{ fontSize: 13, color: "var(--bk-ink-muted)", margin: "8px 0 12px" }}>
             The elements these were pinned to were deleted. The comments are kept — never
             auto-deleted — and moved to the Detached group at the top of the Review panel.
@@ -482,6 +485,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               </div>
             ))}
           </div>
+          </ModalBody>
           <ModalFooter>
             <Button
               size="xs"

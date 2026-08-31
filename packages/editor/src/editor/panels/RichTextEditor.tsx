@@ -199,7 +199,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
                     background: isActive ? "var(--bk-accent)" : "transparent",
                     color: isActive ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
                     ...itemStyle,
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
                 >
                   {item.icon}
                 </Button>
@@ -221,7 +221,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             title="Text Color"
             aria-label="Change text color"
             aria-expanded={textColorOpen}
-            onClick={() => setTextColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            onClick={() => setTextColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             <span style={{ borderBottom: "2px solid var(--bk-accent)" }}>A</span>
           </Button>
@@ -240,7 +240,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             title="Background Color"
             aria-label="Change background highlight color"
             aria-expanded={bgColorOpen}
-            onClick={() => setBgColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            onClick={() => setBgColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             <span style={{ background: "var(--bk-warning)", padding: "0 4px" }}>A</span>
           </Button>
@@ -268,7 +268,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             title="Insert Link"
             aria-label="Insert link"
             aria-expanded={linkOpen}
-            onClick={() => setLinkOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            onClick={() => setLinkOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             🔗
           </Button>
@@ -292,7 +292,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             }}
           />
           <div style={{ display: "flex", gap: 8 }}>
-            <Button size="xs" color="light" onClick={() => onCommand("unlink")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <Button size="xs" color="light" onClick={() => onCommand("unlink")} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
               Remove
             </Button>
             <Button size="xs" onClick={handleLink}>
@@ -308,7 +308,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           aria-label="Clear formatting"
           onClick={() => onCommand("removeFormat")}
           style={toolbarButtonStyle}
-          className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
           ✕
         </Button>

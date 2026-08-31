@@ -102,7 +102,7 @@ const CONFIRM =
   "tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-3 tw:bg-[var(--bk-warning-tint)] " +
   "tw:border-b tw:border-[var(--bk-border)]";
 const COMPOSER = "tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 /** "2d" / "3h" / "12m" — the boards' scale, which is shorter than relTime's. */
 function shortAge(iso: string | Date): string {
@@ -501,7 +501,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
             <ChevronLeft size={14} aria-hidden="true" /> Back
           </Button>
-          <span className="tw:text-xs tw:font-semibold tw:text-gray-900">Compare with approved</span>
+          <span className="tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]">Compare with approved</span>
         </Toolbar>
         {compareState === "loading" ? (
           <EmptyState className="tw:flex-1" icon={<Spinner size="lg" />} body="Loading approved snapshot…" />

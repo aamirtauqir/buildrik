@@ -24,12 +24,12 @@ export interface RowProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "on
  *  strings, not exported symbols) by every row variant below and by
  *  NavItem (ported separately, T6 batch 1). */
 export const ROW_LABEL_CLASS = "tw:flex-1 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap";
-export const ROW_META_CLASS = "tw:text-gray-500 tw:text-[11px] tw:flex-none";
-export const ROW_CHEVRON_CLASS = "tw:text-gray-500 tw:flex-none";
-export const ROW_ICON_CLASS = "tw:flex-none tw:inline-flex tw:text-gray-500";
+export const ROW_META_CLASS = "tw:text-[var(--bk-ink-muted)] tw:text-[11px] tw:flex-none";
+export const ROW_CHEVRON_CLASS = "tw:text-[var(--bk-ink-muted)] tw:flex-none";
+export const ROW_ICON_CLASS = "tw:flex-none tw:inline-flex tw:text-[var(--bk-ink-muted)]";
 
 const BASE =
-  "tw:relative tw:flex tw:gap-2 tw:px-4 tw:[font-family:var(--bk-font-ui)] tw:text-gray-900 tw:bg-transparent " +
+  "tw:relative tw:flex tw:gap-2 tw:px-4 tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)] tw:bg-transparent " +
   "tw:border-0 tw:w-full tw:text-left tw:[transition:var(--bk-transition-fast)] " +
   "tw:data-[interactive=true]:cursor-pointer tw:data-[interactive=true]:hover:bg-gray-100 " +
   "tw:aria-selected:bg-blue-50 tw:aria-selected:text-blue-700 " +

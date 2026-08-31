@@ -55,7 +55,7 @@ export const LayersLoadingSkeleton: React.FC = () => (
 export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
   <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pb-8 tw:pt-9" data-testid="layers-load-error" role="alert">
     <p className="tw:text-[13px] tw:leading-5 tw:text-red-700">Couldn&rsquo;t load the layer tree.</p>
-    <p className="tw:text-[12px] tw:text-gray-500">The page is fine &mdash; only this list failed.</p>
+    <p className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">The page is fine &mdash; only this list failed.</p>
     <Button
       type="button"
       color="light"
@@ -77,7 +77,7 @@ export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
 */
 export const LayersNoResults: React.FC<{ search: string; onClear: () => void }> = ({ search, onClear }) => (
   <div className="tw:flex tw:flex-col tw:gap-2.5 tw:px-6 tw:pb-8 tw:pt-9 tw:text-[13px]" data-testid="layers-no-results" role="status">
-    <p className="tw:leading-5 tw:text-gray-500">Nothing matches &lsquo;{search}&rsquo;.</p>
+    <p className="tw:leading-5 tw:text-[var(--bk-ink-muted)]">Nothing matches &lsquo;{search}&rsquo;.</p>
     <Button
       type="button"
       color="light"

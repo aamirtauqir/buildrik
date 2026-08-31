@@ -838,7 +838,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                   onClick={() => {
                     setPubConfirm(false);
                     onOpenIssues?.();
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                  }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
                 >
                   +{plural(confirmMore, "more warning")}
                 </Button>
@@ -851,7 +851,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                 onClick={() => {
                   setPubConfirm(false);
                   onOpenIssues?.();
-                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
               >
                 Fix issues first
               </Button>
@@ -919,7 +919,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                 </>
               ) : (
                 <>
-                  <Button color="light" onClick={() => setExitDialog(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                  <Button color="light" onClick={() => setExitDialog(null)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                     Stay
                   </Button>
                   <Button

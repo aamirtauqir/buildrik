@@ -509,7 +509,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             <Button size="xs" onClick={() => composer?.emit("ui:switch-tab", { tab: "design" })}>
               Open Brand
             </Button>
-            <Button color="light" size="xs" onClick={() => setWholeSite(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <Button color="light" size="xs" onClick={() => setWholeSite(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
               Back to this element
             </Button>
           </div>

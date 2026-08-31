@@ -29,9 +29,9 @@ interface CatalogCardProps {
 /* Card chrome. */
 const CARD =
   "tw:flex tw:flex-col tw:items-center tw:gap-1.5 tw:px-2 tw:py-2.5 tw:border tw:border-gray-200 " +
-  "tw:rounded-md tw:bg-white tw:text-[11px] tw:text-gray-900 tw:cursor-grab tw:text-center tw:min-h-18";
+  "tw:rounded-md tw:bg-white tw:text-[11px] tw:text-[var(--bk-ink)] tw:cursor-grab tw:text-center tw:min-h-18";
 const PREVIEW_BOX = "tw:flex tw:items-center tw:justify-center tw:w-full tw:h-9 tw:bg-gray-50 tw:rounded tw:overflow-hidden";
-const LABEL = "tw:text-[11px] tw:leading-tight tw:text-gray-900 tw:w-full tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
+const LABEL = "tw:text-[11px] tw:leading-tight tw:text-[var(--bk-ink)] tw:w-full tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
 
 /* Sketch vocabulary. Tokens are written as arbitrary values rather than mapped
    to the nearest Tailwind shade, so nothing shifts colour in translation. */
@@ -113,7 +113,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
     case "list-item":
       return (
         <div className="tw:flex tw:flex-col tw:gap-px tw:w-4/5 tw:text-left">
-          <div className="tw:text-[9px] tw:text-gray-900">Title</div>
+          <div className="tw:text-[9px] tw:text-[var(--bk-ink)]">Title</div>
           <div className={`tw:text-[7px] ${MUTED}`}>Subtitle</div>
         </div>
       );

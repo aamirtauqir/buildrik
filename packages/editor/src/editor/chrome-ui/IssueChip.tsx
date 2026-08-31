@@ -93,7 +93,7 @@ const BASE_CLASS =
   "tw:rounded-md tw:cursor-pointer tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 const TONE_CLASS: Record<"neutral" | "warning" | "error", string> = {
-  neutral: "tw:text-gray-500 tw:hover:bg-gray-100",
+  neutral: "tw:text-[var(--bk-ink-muted)] tw:hover:bg-gray-100",
   warning: "tw:text-yellow-800 tw:hover:bg-yellow-50",
   error: "tw:text-red-700 tw:hover:bg-red-100",
 };

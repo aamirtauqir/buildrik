@@ -193,7 +193,7 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
         <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bk-border)" }}>
           {state.kind === "idle" && (
             <>
-              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                 Cancel
               </Button>
               <Button size="xs" type="button" onClick={handleGenerate}>
@@ -203,17 +203,17 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
           )}
 
           {isGenerating && (
-            <Button color="light" size="xs" type="button" onClick={handleCancelGeneration} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <Button color="light" size="xs" type="button" onClick={handleCancelGeneration} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
               Cancel generation
             </Button>
           )}
 
           {showSuccess && (
             <>
-              <Button color="light" size="xs" type="button" onClick={handleDiscard} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" size="xs" type="button" onClick={handleDiscard} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                 Discard
               </Button>
-              <Button color="light" size="xs" type="button" onClick={handleGenerate} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" size="xs" type="button" onClick={handleGenerate} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                 Retry
               </Button>
               {onAccept && (
@@ -226,7 +226,7 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
 
           {state.kind === "error" && (
             <>
-              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" size="xs" type="button" onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                 Cancel
               </Button>
               <Button size="xs" type="button" onClick={handleGenerate}>

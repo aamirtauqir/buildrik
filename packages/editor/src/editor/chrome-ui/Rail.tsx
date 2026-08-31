@@ -43,9 +43,9 @@ export interface RailItemProps extends React.ButtonHTMLAttributes<HTMLButtonElem
 
 const RAIL_ITEM_CLASS =
   "tw:relative tw:w-11 tw:h-11 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0.5 " +
-  "tw:border-0 tw:rounded-lg tw:bg-transparent tw:text-gray-500 tw:cursor-pointer " +
+  "tw:border-0 tw:rounded-lg tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:cursor-pointer " +
   "tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:[transition:var(--bk-transition-fast)] " +
-  "tw:hover:bg-gray-100 tw:hover:text-gray-900 " +
+  "tw:hover:bg-gray-100 tw:hover:text-[var(--bk-ink)] " +
   "tw:aria-[current=true]:bg-blue-50 tw:aria-[current=true]:text-blue-700 " +
   "tw:aria-[current=true]:before:content-[''] tw:aria-[current=true]:before:absolute tw:aria-[current=true]:before:left-[-8px] " +
   "tw:aria-[current=true]:before:top-2 tw:aria-[current=true]:before:bottom-2 tw:aria-[current=true]:before:w-[3px] " +

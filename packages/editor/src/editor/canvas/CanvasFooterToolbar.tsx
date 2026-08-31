@@ -100,7 +100,7 @@ const RedoIcon = () => (
 const EDIT_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:size-7 tw:p-0 tw:rounded " +
   "tw:border tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
-  "tw:hover:bg-gray-100 tw:hover:text-gray-900";
+  "tw:hover:bg-gray-100 tw:hover:text-[var(--bk-ink)]";
 
 /**
  * The floating bar. `max-w-full` + `min-w-0` keep it inside the canvas column
@@ -165,7 +165,7 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
       color="light"
       className={`tw:inline-flex tw:items-center tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap ${
         active
-          ? "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:font-semibold"
+          ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:font-semibold"
           : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-gray-100"
       }`}
       onClick={onClick}

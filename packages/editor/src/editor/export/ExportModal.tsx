@@ -346,7 +346,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             marginTop: 12,
           }}
         >
-          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
             Cancel
           </Button>
           <div style={{ display: "flex", gap: 8 }}>

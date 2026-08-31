@@ -153,7 +153,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
         <div className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-xs tw:font-medium">
           {asset.name}
         </div>
-        <div className="tw:mt-0.5 tw:text-xs tw:text-gray-500">
+        <div className="tw:mt-0.5 tw:text-xs tw:text-[var(--bk-ink-muted)]">
           {formatSize(asset.size)}
           {asset.width && asset.height && ` • ${asset.width}×${asset.height}`}
         </div>

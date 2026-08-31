@@ -71,14 +71,14 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         fontSize: 12.5,
         color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
         fontWeight: isActive ? 600 : 500,
-      }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+      }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
     >
       {/* Board 152:112 splits the row: name at the left margin, count muted
           at the right, like every other list in this panel. It used to read
           "Button · 3 variants" as one run of text, so the counts did not line
           up and the eye could not scan them. */}
       <span>{CATEGORY_LABELS[category]}</span>
-      <span className="tw:text-xs tw:font-normal tw:text-gray-500">
+      <span className="tw:text-xs tw:font-normal tw:text-[var(--bk-ink-muted)]">
         {variantCount} {variantCount === 1 ? "variant" : "variants"}
       </span>
     </Button>

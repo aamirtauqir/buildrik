@@ -49,8 +49,8 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues }) => {
   if (issues.length === 0) {
     return (
       <div className="tw:px-2 tw:py-6 tw:text-center">
-        <div className="tw:text-[13px] tw:text-gray-900">Nothing to fix</div>
-        <div className="tw:mt-1 tw:text-xs tw:text-gray-500">
+        <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">Nothing to fix</div>
+        <div className="tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]">
           Every token passes the brand rules.
         </div>
       </div>
@@ -81,15 +81,15 @@ export const LintSection: React.FC<LintSectionProps> = ({ issues }) => {
               }}
             />
             <span className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-              <span className="tw:text-[13px] tw:text-gray-900">{issue.message}</span>
-              <span className="tw:text-xs tw:text-gray-500">
+              <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">{issue.message}</span>
+              <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
                 {RULE_LABEL[issue.rule] ?? issue.rule} · {issue.tokenId}
               </span>
             </span>
           </li>
         ))}
       </ul>
-      <p className="tw:mt-3 tw:px-2 tw:text-xs tw:text-gray-500">
+      <p className="tw:mt-3 tw:px-2 tw:text-xs tw:text-[var(--bk-ink-muted)]">
         Auto-fix isn&apos;t available yet — the linter reports what is wrong, not
         what to replace it with. Edit the token in Tokens.
       </p>

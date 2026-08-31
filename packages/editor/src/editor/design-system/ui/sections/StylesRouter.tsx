@@ -118,7 +118,7 @@ export const StylesRouter: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 4,
-          }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
           ← Back to styles
         </Button>

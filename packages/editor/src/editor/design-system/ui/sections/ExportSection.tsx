@@ -39,14 +39,14 @@ const TOKEN_KINDS_COUNT = 14;
 const CARD = "tw:p-3 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)]";
 const FORMAT_ROW =
   "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1.5 tw:rounded-md tw:border tw:cursor-pointer " +
-  "tw:text-xs tw:text-gray-900";
+  "tw:text-xs tw:text-[var(--bk-ink)]";
 const CHIP = "tw:ml-auto tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded-full tw:border tw:text-[10px] tw:font-medium";
 const PREVIEW =
   "tw:m-0 tw:p-3 tw:max-h-80 tw:overflow-auto tw:whitespace-pre tw:rounded-md tw:border " +
   "tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:text-[11px] tw:leading-relaxed " +
   "tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
 const RADIO_LABEL = "tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer";
-const CAPTION = "tw:text-xs tw:text-gray-500";
+const CAPTION = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
 const FORMAT_OPTIONS: Array<{
   id: UIExportFormat;
@@ -227,7 +227,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
           for exactly this (SelectRow's dropdown pill), so the treatment comes
           from the design system rather than from a hardcoded height. */}
       <div className="tw:flex tw:h-[var(--bk-size-row)] tw:items-center tw:gap-2">
-        <span className="tw:flex-1 tw:text-[13px] tw:text-gray-900">Dark strategy</span>
+        <span className="tw:flex-1 tw:text-[13px] tw:text-[var(--bk-ink)]">Dark strategy</span>
         <Select
           theme={BK_SELECT_BARE_VALUE_THEME}
           className="tw:flex-none"
@@ -244,7 +244,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
       </div>
 
       <div className={CARD}>
-        <div className="tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] tw:text-gray-500">
+        <div className="tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]">
           EXPORT
         </div>
         <div className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-1" role="radiogroup" aria-label="Export format">
@@ -272,7 +272,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                       description under the title, and at this width `truncate`
                       was rendering "Custom prope…" — a subtitle that stops
                       before it says anything is worse than a second line. */}
-                  <span className="tw:text-[11px] tw:leading-snug tw:text-gray-500" title={desc}>
+                  <span className="tw:text-[11px] tw:leading-snug tw:text-[var(--bk-ink-muted)]" title={desc}>
                     {desc}
                     {id === "tailwind" && droppedCount > 0 ? ` · ${droppedCount} dropped` : ""}
                   </span>
@@ -307,14 +307,14 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
           })}
         </div>
 
-        <div data-testid="export-stats" className="tw:mt-2.5 tw:text-[11px] tw:text-gray-500">
+        <div data-testid="export-stats" className="tw:mt-2.5 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
           {statsLine}
         </div>
 
         {format === "tailwind" && (
           <div
             data-testid="tailwind-warning"
-            className="tw:mt-2.5 tw:px-2.5 tw:py-2 tw:rounded tw:border-l-[3px] tw:border-l-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:text-[11px] tw:leading-normal tw:text-gray-900"
+            className="tw:mt-2.5 tw:px-2.5 tw:py-2 tw:rounded tw:border-l-[3px] tw:border-l-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink)]"
           >
             <strong>Tailwind warning:</strong>{" "}
             {tailwindDropped} tokens drop because Tailwind doesn&apos;t model dark variants per token.
@@ -329,7 +329,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
             output before taking it is real capability. It needs a subject of
             its own now that the format rows carry no selection. */}
         <div className="tw:mb-2 tw:flex tw:items-center tw:gap-2">
-          <span className="tw:flex-1 tw:text-[13px] tw:font-medium tw:text-gray-900">Preview</span>
+          <span className="tw:flex-1 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]">Preview</span>
           <Select
             className="tw:flex-none"
             value={format}

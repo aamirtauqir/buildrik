@@ -20,7 +20,7 @@
  * There is deliberately no theme object here. One was written and removed: a
  * caller-supplied theme is not run through flowbite's `tw:` prefixing (that
  * applies to its own theme), so the override landed unprefixed, lost to
- * `tw:text-gray-900`, and left dead class names on every bubble.
+ * `tw:text-[var(--bk-ink)]`, and left dead class names on every bubble.
  *
  * KNOWN CONFLICT, recorded rather than resolved here: board `138:198` draws a
  * dark bubble ("Ink bg, white 12px" — see GroupSection's disabled-row tooltip),
@@ -34,4 +34,4 @@
  *  theme is not prefixed — see chrome-ui/Tooltip.tsx. `gray-600` IS
  *  `--bk-ink-soft`'s value; a palette class survives the prefixing round trip
  *  where an arbitrary `var()` candidate does not. */
-export const BK_TOOLTIP_TEXT_CLASS = "tw:text-gray-600";
+export const BK_TOOLTIP_TEXT_CLASS = "tw:text-[var(--bk-ink-soft)]";

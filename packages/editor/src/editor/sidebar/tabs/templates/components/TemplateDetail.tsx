@@ -152,7 +152,7 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
             <Button
               color="light"
               size="xs"
-              className="tpl-detail-info-note-link tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              className="tpl-detail-info-note-link tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
               onClick={() => onAddAsNewPage(template.id)}
             >
               Add as new page instead?

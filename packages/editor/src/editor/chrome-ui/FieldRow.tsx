@@ -27,8 +27,8 @@ const ROOT_CLASS: Record<"row" | "stacked", string> = {
   stacked: "tw:flex tw:flex-col tw:items-stretch tw:gap-1 tw:min-h-8",
 };
 const LABEL_CLASS: Record<"row" | "stacked", string> = {
-  row: "tw:w-24 tw:flex-none tw:text-gray-600 tw:[font-family:var(--bk-font-ui)] tw:text-xs",
-  stacked: "tw:w-auto tw:flex-none tw:text-gray-600 tw:[font-family:var(--bk-font-ui)] tw:text-xs",
+  row: "tw:w-24 tw:flex-none tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-ui)] tw:text-xs",
+  stacked: "tw:w-auto tw:flex-none tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-ui)] tw:text-xs",
 };
 
 export function FieldRow({ label, htmlFor, stacked, hint, className, children, ...rest }: FieldRowProps) {

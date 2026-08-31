@@ -60,21 +60,27 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
           with the topbar's own "Saved". */}
       {isDirty ? "Unsaved brand changes" : "Brand is up to date"}
     </div>
-    <Button
-      color="light"
-      size="xs"
-      onClick={onDiscard}
-      disabled={!isDirty}
-      style={{ color: isDirty ? /* @lint-hex-policy: discard-affordance red-500, off chrome palette */ "#ef4444" : undefined }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
-    >
-      Discard
-    </Button>
-    <Button
-      size="xs"
-      onClick={onReview}
-      disabled={!isDirty}
-    >
-      {APPLY_CHANGES_LABEL}
-    </Button>
+    {/* A clean panel used to show BOTH buttons disabled — two dead controls
+        announcing nothing (designer walk 2026-08-28). Board 154:78 draws only
+        the dirty state, so the clean footer is the status line alone; the
+        buttons appear when there is something for them to do. */}
+    {isDirty && (
+      <>
+        <Button
+          color="light"
+          size="xs"
+          onClick={onDiscard}
+          style={{ color: /* @lint-hex-policy: discard-affordance red-500, off chrome palette */ "#ef4444" }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+        >
+          Discard
+        </Button>
+        <Button
+          size="xs"
+          onClick={onReview}
+        >
+          {APPLY_CHANGES_LABEL}
+        </Button>
+      </>
+    )}
   </div>
 );

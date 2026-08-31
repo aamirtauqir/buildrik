@@ -88,7 +88,7 @@ export const AiPromptPopover: React.FC<AiPromptPopoverProps> = ({
         <>
           <DiffRows edit={stream.edit!} />
           <div className="bd-ai-popover-actions">
-            <Button type="button" color="light" onClick={onClose} aria-label="Discard" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <Button type="button" color="light" onClick={onClose} aria-label="Discard" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
               Discard
             </Button>
             <Button type="button" onClick={accept} aria-label="Apply changes">

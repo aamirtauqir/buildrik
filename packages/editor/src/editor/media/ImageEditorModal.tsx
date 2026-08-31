@@ -165,17 +165,17 @@ async function getCroppedImg(
 const TAB =
   "tw:border-0 tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 tw:enabled:hover:bg-transparent";
 const TAB_ACTIVE = "tw:font-semibold tw:text-[var(--bk-blue-500)]";
-const TAB_RESTING = "tw:font-medium tw:text-[var(--bk-ink-muted)] tw:enabled:hover:text-gray-900";
+const TAB_RESTING = "tw:font-medium tw:text-[var(--bk-ink-muted)] tw:enabled:hover:text-[var(--bk-ink)]";
 const CHIP =
   "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4";
 const CHIP_ACTIVE = "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
-const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:enabled:hover:bg-gray-200";
+const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-gray-200";
 const TOOL =
   "tw:flex tw:h-7 tw:w-9 tw:items-center tw:justify-center tw:rounded-md tw:border tw:border-gray-200 " +
   "tw:bg-white tw:p-0 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-gray-50";
 const GHOST =
   "tw:min-h-8 tw:border-0 tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] " +
-  "tw:enabled:hover:bg-transparent tw:enabled:hover:text-gray-900";
+  "tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]";
 const SECTION_LABEL = "tw:mb-1 tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
 const MONO_VAL =
   "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]";
@@ -315,7 +315,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
       >
         {/* Header — board: title + text-link tabs, no button chrome. */}
         <div className="tw:shrink-0 tw:px-6 tw:pt-5">
-          <h3 className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6 tw:text-gray-900">
+          <h3 className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]">
             Edit image{imageName ? ` — ${imageName}` : ""}
           </h3>
           <div className="tw:mt-3 tw:flex tw:gap-5" role="tablist" aria-label="Editor sections">
@@ -365,7 +365,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
           {imageError && (
             <div className="tw:flex tw:h-full tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:px-8 tw:text-center tw:text-[var(--bk-ink-soft)]">
               <AlertTriangle size={32} aria-hidden="true" />
-              <div className="tw:text-[14px] tw:font-semibold tw:text-gray-900">Image failed to load</div>
+              <div className="tw:text-[14px] tw:font-semibold tw:text-[var(--bk-ink)]">Image failed to load</div>
               <div className="tw:max-w-[400px] tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
                 The asset&apos;s URL may be stale or inaccessible. Try reloading the page, or re-upload the image.
               </div>

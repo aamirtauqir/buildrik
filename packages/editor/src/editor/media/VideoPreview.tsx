@@ -177,7 +177,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
   if (state.error) {
     return (
-      <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0 tw:p-10 tw:rounded-lg tw:bg-[var(--bk-bg-subtle)] tw:text-gray-500">
+      <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0 tw:p-10 tw:rounded-lg tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]">
         <span className="tw:mb-3 tw:text-3xl">⚠️</span>
         <span>{state.error}</span>
       </div>
@@ -307,7 +307,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
           <ModalBody>
             <VideoPlayerCore {...props} />
             <div className="tw:flex tw:justify-end tw:mt-4">
-              <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" onClick={props.onClose} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                 Close
               </Button>
             </div>

@@ -118,7 +118,7 @@ export const PageList: React.FC<Props> = ({
                 Create blank page
               </Button>
               {onRequestTemplates && (
-                <Button color="light" size="xs" onClick={onRequestTemplates} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                <Button color="light" size="xs" onClick={onRequestTemplates} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                   From template
                 </Button>
               )}

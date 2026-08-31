@@ -144,7 +144,7 @@ export function AssetDetailsPanel({
           ) : selectedItem.type === "ico" ? (
             <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
           ) : selectedItem.type === "fnt" ? (
-            <span className="tw:text-5xl tw:font-bold tw:text-gray-900">Aa Bb</span>
+            <span className="tw:text-5xl tw:font-bold tw:text-[var(--bk-ink)]">Aa Bb</span>
           ) : null}
         </div>
         <div className="mgr-det-tabs">

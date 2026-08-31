@@ -238,7 +238,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
               const url = new URL(window.location.href);
               url.searchParams.set("density", "full");
               window.location.assign(url.toString());
-            }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+            }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             Show all controls
           </Button>

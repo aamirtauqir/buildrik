@@ -105,7 +105,7 @@ function PanelFrameHeader({
         <>
           {subtitle ? (
             <span
-              className="tw:max-w-40 tw:truncate tw:normal-case tw:tracking-normal tw:text-gray-500"
+              className="tw:max-w-40 tw:truncate tw:normal-case tw:tracking-normal tw:text-[var(--bk-ink-muted)]"
               title={subtitle}
             >
               {subtitle}

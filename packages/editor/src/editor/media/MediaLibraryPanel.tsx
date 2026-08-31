@@ -17,7 +17,7 @@ import { fetchUrlAsFile, isFetchableUrl } from "./fetchUrlAsFile";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
 
-const EMPTY = "tw:p-15 tw:text-center tw:text-gray-500";
+const EMPTY = "tw:p-15 tw:text-center tw:text-[var(--bk-ink-muted)]";
 const PAD = "tw:p-5";
 /** Both scroll containers cap at the same height as the panel body. */
 const GRID = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(140px,1fr))] tw:gap-3 tw:p-1 tw:max-h-100 tw:overflow-auto";
@@ -204,7 +204,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 color={viewMode === "grid" ? undefined : "light"}
                 size="xs"
                 onClick={() => setViewMode("grid")}
-                className={viewMode === "grid" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+                className={viewMode === "grid" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"}
               >
                 Grid
               </Button>
@@ -212,7 +212,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 color={viewMode === "list" ? undefined : "light"}
                 size="xs"
                 onClick={() => setViewMode("list")}
-                className={viewMode === "list" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"}
+                className={viewMode === "list" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"}
               >
                 List
               </Button>
@@ -314,7 +314,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 }
                 return (
                   <div
-                    className="tw:p-10 tw:text-center tw:text-gray-500"
+                    className="tw:p-10 tw:text-center tw:text-[var(--bk-ink-muted)]"
                   >
                     Select an image to optimize
                   </div>
@@ -322,7 +322,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
               })()}
             </>
           ) : (
-            <div className="tw:p-10 tw:text-center tw:text-gray-500">
+            <div className="tw:p-10 tw:text-center tw:text-[var(--bk-ink-muted)]">
               <div className="tw:mb-3 tw:text-5xl">🖼️</div>
               <div>Select an image from the Library to optimize</div>
             </div>

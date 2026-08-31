@@ -107,7 +107,7 @@ export const BindingRow: React.FC<BindingRowProps> = ({
           aria-label={`Edit binding for ${cssProperty}`}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          style={valueButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+          style={valueButtonStyle} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
           {displayName}
         </Button>

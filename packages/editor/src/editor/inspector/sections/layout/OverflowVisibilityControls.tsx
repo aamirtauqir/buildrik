@@ -35,7 +35,7 @@ const OVERFLOW_OPTIONS = [
 ] as const;
 
 /** The X/Y axis glyph, sized to line up with the label gutter's baseline. */
-const AXIS_LABEL = "tw:w-3.5 tw:text-xs tw:text-gray-500";
+const AXIS_LABEL = "tw:w-3.5 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
 const VISIBILITY_OPTIONS = ["visible", "hidden", "collapse"] as const;
 const FLOAT_OPTIONS = ["none", "left", "right"] as const;

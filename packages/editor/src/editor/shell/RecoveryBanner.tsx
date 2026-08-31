@@ -66,7 +66,7 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
         <span style={S.strong}>Recovered your work</span> after an unexpected close · {relTime(record.at)}{scope}.
       </div>
       <div style={S.actions}>
-        <Button color="light" size="xs" onClick={discard} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Discard &amp; reload</Button>
+        <Button color="light" size="xs" onClick={discard} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Discard &amp; reload</Button>
         <Button size="xs" onClick={() => setDismissed(true)}>Keep changes</Button>
       </div>
     </div>

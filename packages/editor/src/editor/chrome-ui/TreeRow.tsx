@@ -21,7 +21,7 @@ export interface TreeRowProps extends Omit<RowProps, "children" | "size"> {
 
 const TWISTY_CLASS =
   "tw:h-4 tw:w-4 tw:inline-grid tw:place-content-center tw:bg-none tw:border-0 tw:p-0 tw:cursor-pointer " +
-  "tw:text-gray-500 tw:flex-none tw:[transition:var(--bk-transition-fast)] tw:aria-expanded:rotate-90";
+  "tw:text-[var(--bk-ink-muted)] tw:flex-none tw:[transition:var(--bk-transition-fast)] tw:aria-expanded:rotate-90";
 
 export function TreeRow({
   label, depth = 0, expandable, expanded, onToggle, icon, meta, style, ...rest

@@ -53,12 +53,12 @@ export const compactBtnClass = (active: boolean): string =>
 
 /** Collapsed-section value preview in the Section header ("flex · relative"). */
 export const SECTION_PREVIEW =
-  "tw:text-[11px] tw:text-gray-500 tw:whitespace-nowrap tw:[font-family:var(--bk-font-mono)]";
+  "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:[font-family:var(--bk-font-mono)]";
 
 /** Sub-heading inside an open section ("Size Constraints", "Overflow"). */
 export const SECTION_SUBTITLE =
   "tw:mt-0.5 tw:mb-1 tw:text-[9px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] " +
-  "tw:text-gray-500 tw:[font-family:var(--bk-font-ui)]";
+  "tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-ui)]";
 
 /**
  * Row that reveals a token-link chain button on hover or keyboard focus.
@@ -72,9 +72,9 @@ export const SECTION_SUBTITLE =
  */
 export const CHAIN_ROW = "tw:group tw:relative tw:flex tw:items-center";
 export const CHAIN_TRIGGER =
-  "tw:flex tw:items-center tw:flex-none tw:p-0.5 tw:border-0 tw:bg-transparent tw:text-gray-500 " +
+  "tw:flex tw:items-center tw:flex-none tw:p-0.5 tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-muted)] " +
   "tw:opacity-0 tw:transition-opacity tw:group-hover:opacity-100 tw:group-focus-within:opacity-100 " +
-  "tw:focus-visible:opacity-100 tw:hover:text-gray-900";
+  "tw:focus-visible:opacity-100 tw:hover:text-[var(--bk-ink)]";
 /** The chain button once a token IS bound — always visible, accent-tinted. */
 export const CHAIN_BOUND =
   "tw:flex tw:items-center tw:gap-[3px] tw:flex-none tw:whitespace-nowrap tw:px-1 tw:py-0.5 " +

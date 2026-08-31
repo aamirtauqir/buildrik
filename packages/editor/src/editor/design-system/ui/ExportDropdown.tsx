@@ -41,7 +41,7 @@ export const ExportDropdown: React.FC<{
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
-        style={{ display: "flex", alignItems: "center", gap: 4 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        style={{ display: "flex", alignItems: "center", gap: 4 }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
       >
         Export
         <svg
@@ -94,7 +94,7 @@ export const ExportDropdown: React.FC<{
                   color: "var(--bk-accent)",
                   padding: 0,
                   textDecoration: "underline",
-                }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
               >
                 Save first →
               </Button>
@@ -118,7 +118,7 @@ export const ExportDropdown: React.FC<{
                 border: "none",
                 cursor: "pointer",
                 textAlign: "left",
-              }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               <div style={{ fontSize: 12, color: "var(--bk-ink)" }}>{label}</div>
               <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 1 }}>

@@ -67,7 +67,7 @@ const PresetChip: React.FC<{
     className={`${PILL} ${
       isActive
         ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:font-semibold"
-        : "tw:border-gray-200 tw:bg-transparent tw:text-gray-500 tw:font-medium tw:hover:text-gray-900"
+        : "tw:border-gray-200 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:font-medium tw:hover:text-[var(--bk-ink)]"
     }`}
   >
     {PRESET_LABELS[preset]}
@@ -98,7 +98,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
       className={`tw:relative tw:px-3 tw:py-[5px] tw:rounded-[5px] tw:border tw:text-[11px] tw:font-medium ${MONO} ${
         isActive
           ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
-          : "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900 tw:hover:bg-gray-100"
+          : "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:hover:bg-gray-100"
       }`}
     >
       {display}
@@ -134,7 +134,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
   };
   return (
     <div className="tw:flex tw:items-center tw:gap-2 tw:mt-2 tw:p-2.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)]">
-      <span className={`tw:flex-1 tw:text-[11px] tw:font-medium tw:text-gray-900 ${MONO}`}>
+      <span className={`tw:flex-1 tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink)] ${MONO}`}>
         {token.name}
       </span>
       <TextInput
@@ -148,7 +148,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         autoFocus
         className="tw:w-15 tw:[&_input]:h-6 tw:[&_input]:py-1 tw:[&_input]:px-1.5 tw:[&_input]:text-right tw:[&_input]:text-[11px] tw:[&_input]:font-medium tw:[&_input]:[font-family:var(--bk-font-mono)]"
       />
-      <span className="tw:text-[11px] tw:text-gray-500">px</span>
+      <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">px</span>
       {num === 0 && (
         <span
           title="Zero spacing will collapse layout gaps"
@@ -190,7 +190,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         size="xs"
         onClick={onClose}
         aria-label="Close edit drawer"
-        className={`${ICON_BTN} tw:text-gray-500 tw:hover:text-gray-900`}
+        className={`${ICON_BTN} tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]`}
       >
         ×
       </Button>
@@ -241,7 +241,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           size="xs"
           onClick={onResetToDefaults}
           title="Reset all spacing to factory defaults"
-          className={`${PILL} tw:ml-auto tw:border-gray-200 tw:bg-transparent tw:text-gray-500 tw:hover:text-gray-900`}
+          className={`${PILL} tw:ml-auto tw:border-gray-200 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]`}
         >
           Reset defaults
         </Button>
@@ -261,7 +261,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
        * density even in the live editor's fullpage Design drawer. */}
       <div className="tw:max-w-80">
       <div className="tw:flex tw:items-center tw:gap-2 tw:mb-2">
-        <span className={`tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] tw:text-gray-500 ${MONO}`}>
+        <span className={`tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] tw:text-[var(--bk-ink-muted)] ${MONO}`}>
           Scale
         </span>
         <div className="tw:flex-1 tw:h-px tw:bg-gray-200" />

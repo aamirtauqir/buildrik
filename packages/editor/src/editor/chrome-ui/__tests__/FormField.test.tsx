@@ -50,7 +50,7 @@ describe("Label / HelperText overrides (labelTheme.ts)", () => {
   it("BK_LABEL_CLASS lands on the real <label>", () => {
     render(<Label htmlFor="x" className={BK_LABEL_CLASS}>Title</Label>);
     const label = screen.getByText("Title");
-    expect(label.className).toMatch(/tw:text-gray-600/);
+    expect(label.className).toMatch(/tw:text-\[var\(--bk-ink-soft\)\]/);
     expect(label.className).not.toMatch(/\btext-gray-900\b/);
   });
 

@@ -251,7 +251,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
     </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <Button color="light" onClick={onClose} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={!name.trim() || isCreating}>
@@ -267,8 +267,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 // CLASSES
 // ============================================================================
 
-const FIELD_LABEL = "tw:block tw:mb-1.5 tw:text-xs tw:font-semibold tw:text-gray-900";
-const HINT = "tw:block tw:mt-1 tw:text-xs tw:text-gray-500";
+const FIELD_LABEL = "tw:block tw:mb-1.5 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]";
+const HINT = "tw:block tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 /** Section separated by a rule — variant options, DS prefill. */
 const SUB_SECTION = "tw:mt-2 tw:pt-4 tw:border-t tw:border-gray-200";
 const CHECK_LABEL = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";

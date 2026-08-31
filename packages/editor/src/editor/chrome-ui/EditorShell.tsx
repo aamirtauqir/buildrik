@@ -32,7 +32,7 @@ export function EditorShell({
   return (
     <div
       className={[
-        "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:bg-gray-100 tw:[font-family:var(--bk-font-ui)] tw:text-gray-900",
+        "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:bg-gray-100 tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]",
         className,
       ]
         .filter(Boolean)

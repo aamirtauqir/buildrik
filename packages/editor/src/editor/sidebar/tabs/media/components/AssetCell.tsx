@@ -136,7 +136,7 @@ export function AssetCell({
       aria-pressed={selectable ? isSelected : undefined}
       data-testid="media-card"
     >
-      <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-34 tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-gray-100 tw:text-gray-500">
+      <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-34 tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-gray-100 tw:text-[var(--bk-ink-muted)]">
         {/* An image with no pre-cut thumb still IS an image — it used to fall
             through to the font branch and render "Aa" in place of the photo
             (walked live 2026-08-28: every fixture image showed the specimen).
@@ -192,7 +192,7 @@ export function AssetCell({
             ✓
           </span>
         ) : null}
-        <span className="med-asset-cell__name tw:min-w-0 tw:flex-1 tw:truncate tw:text-left tw:text-[12px] tw:font-normal tw:leading-[18px] tw:text-gray-900">
+        <span className="med-asset-cell__name tw:min-w-0 tw:flex-1 tw:truncate tw:text-left tw:text-[12px] tw:font-normal tw:leading-[18px] tw:text-[var(--bk-ink)]">
           {item.displayName ?? item.name}
         </span>
         {usageCount > 0 ? <UsagePips count={usageCount} /> : null}

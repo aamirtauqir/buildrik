@@ -171,7 +171,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           aria-live="polite"
           data-testid="media-status-pill"
         >
-          <span className="tw:pointer-events-none tw:absolute tw:left-4 tw:top-1.5 tw:z-10 tw:inline-flex tw:items-center tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-gray-900 tw:[box-shadow:var(--bk-shadow-raised)]">
+          <span className="tw:pointer-events-none tw:absolute tw:left-4 tw:top-1.5 tw:z-10 tw:inline-flex tw:items-center tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:[box-shadow:var(--bk-shadow-raised)]">
             {props.statusPill}
           </span>
         </div>
@@ -181,7 +181,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
         <TextField
           type="text"
-          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-gray-900 tw:placeholder:text-gray-500"
+          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-gray-500"
           placeholder="Search"
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
@@ -197,7 +197,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           "Nothing matches" about a file that exists. */}
       {props.serverPage && searchQuery.trim().length >= 2 && props.serverPage.total > props.serverPage.loaded ? (
         <div
-          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:text-[12px] tw:leading-4 ${props.searchState === "failed" ? "tw:text-red-700" : "tw:text-gray-500"}`}
+          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:text-[12px] tw:leading-4 ${props.searchState === "failed" ? "tw:text-red-700" : "tw:text-[var(--bk-ink-muted)]"}`}
           data-testid="media-search-scope"
           role="status"
         >
@@ -234,7 +234,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:max-w-full tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-gray-900 tw:enabled:hover:bg-transparent"
+              className="tw:min-h-6 tw:max-w-full tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
               aria-expanded={folderMenuOpen}
               data-testid="media-folder-scope"
               onClick={() => setFolderMenuOpen((v) => !v)}
@@ -243,9 +243,9 @@ export function SlimLauncher(props: SlimLauncherProps) {
               {/* flowbite's Button renders its children inside its own span,
                   so the gap has to live on that span, not on the button. */}
               <span className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
-                <Folder size={14} className="tw:text-gray-500" aria-hidden="true" />
+                <Folder size={14} className="tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
                 <span className="tw:truncate">{currentFolderName}</span>
-                <ChevronDown size={12} className="tw:text-gray-500" aria-hidden="true" />
+                <ChevronDown size={12} className="tw:text-[var(--bk-ink-muted)]" aria-hidden="true" />
               </span>
             </Button>
           }
@@ -413,7 +413,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                  and left the user to work out that the way back was a pill
                  above the grid. Same shape, same treatment. */
               <div className="sl-empty tw:px-4 tw:py-6" data-testid="media-no-results" role="status">
-                <p className="sl-empty__body tw:text-[12px] tw:text-gray-600">No assets matching this filter.</p>
+                <p className="sl-empty__body tw:text-[12px] tw:text-[var(--bk-ink-soft)]">No assets matching this filter.</p>
                 <Button
                   type="button"
                   color="light"
@@ -482,7 +482,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 either: a server-side search imports real assets without moving
                 the cursor, so counting those climbed the footer toward the total
                 while "Load more" still had the same page to fetch. */}
-            <span className="tw:text-gray-500" data-testid="media-shown-count">
+            <span className="tw:text-[var(--bk-ink-muted)]" data-testid="media-shown-count">
               Showing {props.serverPage.loaded} of {props.serverPage.total}
             </span>
             <Button

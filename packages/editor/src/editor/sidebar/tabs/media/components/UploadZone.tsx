@@ -139,7 +139,7 @@ export function UploadZone({
           // 145:250) — repeating it here doubled the message. The strip only
           // surfaces for a drag-over or a rejection flash.
           compact && (isDragOver || rejectedReason
-            ? "tw:h-9 tw:border tw:border-dashed tw:border-gray-300 tw:text-gray-600"
+            ? "tw:h-9 tw:border tw:border-dashed tw:border-gray-300 tw:text-[var(--bk-ink-soft)]"
             : "tw:h-0 tw:overflow-hidden tw:border-0 tw:p-0"),
         ].filter(Boolean).join(" ")}
         data-testid="media-upload-zone"
@@ -176,10 +176,10 @@ export function UploadZone({
           {activeItems.map((item) => (
             <li key={item.fileName} className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-1.5 tw:px-4">
               <span className="tw:flex tw:items-baseline tw:gap-2">
-                <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-gray-900">
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
                   {item.fileName}
                 </span>
-                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-gray-500">
+                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]">
                   {Math.round(item.progress)}%
                 </span>
               </span>
@@ -224,7 +224,7 @@ export function UploadZone({
               data-testid="media-upload-error-row"
             >
               <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-                <span className="med-upload-queue-item__name tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-gray-900">
+                <span className="med-upload-queue-item__name tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
                   {item.fileName}
                 </span>
                 <span className="med-upload-queue-item__reason tw:truncate tw:text-[11px] tw:leading-4 tw:text-amber-800">

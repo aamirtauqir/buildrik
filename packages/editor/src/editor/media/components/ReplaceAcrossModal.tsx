@@ -101,7 +101,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
             <ModalTitle inset={false} id="replace-across-title" className="tw:text-[15px] tw:font-semibold">
               Replace {oldName} across pages
             </ModalTitle>
-            <ModalDescription className="tw:mt-0.5 tw:text-[11px] tw:text-gray-500">
+            <ModalDescription className="tw:mt-0.5 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
               Used in {pages.length} {pages.length === 1 ? "page" : "pages"} · review before applying
             </ModalDescription>
           </div>
@@ -118,7 +118,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
 
         {/* Per-page list */}
         <div className={`tw:flex-1 tw:py-3 ${SECTION_X} tw:overflow-y-auto tw:max-h-90`}>
-          <div className="tw:flex tw:items-center tw:justify-between tw:pt-1 tw:pb-2 tw:text-[11px] tw:text-gray-500">
+          <div className="tw:flex tw:items-center tw:justify-between tw:pt-1 tw:pb-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
             <span>Choose pages</span>
             <span>
               {selectedCount} of {pages.length} selected
@@ -143,7 +143,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
         <div
           className={`tw:flex tw:items-center tw:justify-between tw:gap-2 tw:py-3 ${SECTION_X} tw:border-t ${HAIRLINE} tw:bg-[var(--bk-bg-subtle)]`}
         >
-          <span className="tw:text-xs tw:text-gray-500">
+          <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
             {selectedCount} of {pages.length} pages selected · ~{totalPlaces}{" "}
             {totalPlaces === 1 ? "element change" : "element changes"}
           </span>
@@ -151,7 +151,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
             <Button
               type="button"
               color="light"
-              onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              onClick={() => onOpenChange(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               Cancel
             </Button>
@@ -203,7 +203,7 @@ function ThumbBlock({ label, name, src, kind }: ThumbBlockProps) {
       <div>
         <div
           className={`tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${
-            isNew ? "tw:text-[var(--bk-accent-text)]" : "tw:text-gray-500"
+            isNew ? "tw:text-[var(--bk-accent-text)]" : "tw:text-[var(--bk-ink-muted)]"
           }`}
         >
           {label}
@@ -253,10 +253,10 @@ function PageRow({ page, checked, onToggle }: PageRowProps) {
         <div className="tw:text-[13px] tw:font-medium">
           {page.pageName}
           {!checked && (
-            <span className="tw:ml-1.5 tw:text-[10px] tw:font-normal tw:text-gray-500">(skipped)</span>
+            <span className="tw:ml-1.5 tw:text-[10px] tw:font-normal tw:text-[var(--bk-ink-muted)]">(skipped)</span>
           )}
         </div>
-        <div className="tw:text-[11px] tw:text-gray-500">
+        <div className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
           {page.placeCount} {page.placeCount === 1 ? "place" : "places"}
           {!checked ? " · won't change" : ""}
         </div>

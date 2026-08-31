@@ -201,7 +201,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           color="light"
           onClick={onOpenStructure}
           aria-label="Page structure"
-          className="tw:inline-flex tw:items-center tw:gap-[4px] tw:px-[6px] tw:py-[2px] tw:text-[12px] tw:text-[var(--bk-ink-muted)] tw:border-transparent tw:bg-transparent tw:hover:text-gray-900"
+          className="tw:inline-flex tw:items-center tw:gap-[4px] tw:px-[6px] tw:py-[2px] tw:text-[12px] tw:text-[var(--bk-ink-muted)] tw:border-transparent tw:bg-transparent tw:hover:text-[var(--bk-ink)]"
         >
           <ListTree size={14} />
           Structure
@@ -230,7 +230,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           aria-haspopup="menu"
           aria-expanded={zoomOpen}
           aria-label={`Zoom: ${Math.round(zoom)} percent`}
-          className="tw:border-transparent tw:bg-transparent tw:px-[6px] tw:py-[2px] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:hover:text-gray-900"
+          className="tw:border-transparent tw:bg-transparent tw:px-[6px] tw:py-[2px] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:hover:text-[var(--bk-ink)]"
           data-testid="footer-device-zoom"
         >
           {deviceLabel} · {Math.round(zoom)}%
@@ -262,7 +262,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
                 onClick={pick(preset)}
                 className={`${ZOOM_ROW} tw:justify-end ${
                   Math.round(zoom) === preset
-                    ? "tw:bg-[var(--bk-bg-subtle)] tw:text-gray-900"
+                    ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)]"
                     : ""
                 }`}
               >

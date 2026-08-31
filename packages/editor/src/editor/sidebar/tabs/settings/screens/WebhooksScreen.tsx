@@ -227,7 +227,7 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
               >
                 {submitting ? "Saving…" : status ? "Save changes" : "Connect"}
               </Button>
-              <Button color="light" size="xs" onClick={() => setEditing(false)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+              <Button color="light" size="xs" onClick={() => setEditing(false)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                 Cancel
               </Button>
             </div>
@@ -254,10 +254,10 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
             <Field label="Signing secret" hint="Verify deliveries by recomputing the HMAC with this secret">
               <div className="bd-set-webhook-secret">
                 <code>{secretVisible ? status.secret : maskSecret(status.secret)}</code>
-                <Button color="light" size="xs" onClick={() => setSecretVisible((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                <Button color="light" size="xs" onClick={() => setSecretVisible((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                   {secretVisible ? "Hide" : "Reveal"}
                 </Button>
-                <Button color="light" size="xs" onClick={() => void navigator.clipboard?.writeText(status.secret)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                <Button color="light" size="xs" onClick={() => void navigator.clipboard?.writeText(status.secret)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                   Copy
                 </Button>
               </div>
@@ -271,7 +271,7 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                 </div>
                 <div className="bd-set-webhook-actions">
                   <Button size="xs" onClick={() => void handleRegenerate()}>Regenerate</Button>
-                  <Button color="light" size="xs" onClick={() => setConfirming(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
+                  <Button color="light" size="xs" onClick={() => setConfirming(null)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Cancel</Button>
                 </div>
               </div>
             )}
@@ -283,7 +283,7 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                 </div>
                 <div className="bd-set-webhook-actions">
                   <Button size="xs" onClick={() => void handleDisconnect()}>Disconnect</Button>
-                  <Button color="light" size="xs" onClick={() => setConfirming(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Cancel</Button>
+                  <Button color="light" size="xs" onClick={() => setConfirming(null)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Cancel</Button>
                 </div>
               </div>
             )}
@@ -291,8 +291,8 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
             {confirming === null && (
               <div className="bd-set-webhook-actions">
                 <Button color="light" size="xs" onClick={() => startEdit(status)}>Edit</Button>
-                <Button color="light" size="xs" onClick={() => setConfirming("regenerate")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Regenerate secret</Button>
-                <Button color="light" size="xs" onClick={() => setConfirming("disconnect")} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Disconnect</Button>
+                <Button color="light" size="xs" onClick={() => setConfirming("regenerate")} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Regenerate secret</Button>
+                <Button color="light" size="xs" onClick={() => setConfirming("disconnect")} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Disconnect</Button>
               </div>
             )}
           </div>

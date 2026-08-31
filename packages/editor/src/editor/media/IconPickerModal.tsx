@@ -50,11 +50,11 @@ const SECTION_TITLE = "tw:text-xs tw:font-semibold tw:text-[var(--bk-ink-soft)] 
 const GRID = "tw:grid tw:[grid-template-columns:repeat(auto-fill,minmax(48px,1fr))] tw:gap-1.5 tw:overflow-auto tw:p-1";
 const ICON_BTN =
   "tw:flex tw:items-center tw:justify-center tw:size-12 tw:rounded-lg tw:bg-white tw:cursor-pointer " +
-  "tw:text-gray-900 tw:[transition:var(--bk-transition-fast)] tw:hover:bg-[var(--bk-accent-tint)] " +
+  "tw:text-[var(--bk-ink)] tw:[transition:var(--bk-transition-fast)] tw:hover:bg-[var(--bk-accent-tint)] " +
   "tw:aria-pressed:border-2 tw:aria-pressed:border-blue-700 tw:aria-pressed:bg-[var(--bk-alpha-accent-15)]";
 const CONTROL_GROUP = "tw:flex tw:flex-col tw:gap-1";
-const CONTROL_LABEL = "tw:text-xs tw:text-gray-500 tw:uppercase";
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const CONTROL_LABEL = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:uppercase";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 // ============================================
 // Component
@@ -177,7 +177,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
     <div className={CONTAINER}>
       {/* Header with icon count */}
       <div className="tw:flex tw:justify-between tw:items-center">
-        <span className="tw:text-xs tw:text-gray-500">{getIconCount()} icons available</span>
+        <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">{getIconCount()} icons available</span>
       </div>
 
       {/* Search */}
@@ -272,7 +272,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             ))}
           </div>
         ) : (
-          <div className="tw:text-center tw:text-xs tw:text-gray-500 tw:py-6">No icons found for &quot;{searchQuery}&quot;</div>
+          <div className="tw:text-center tw:text-xs tw:text-[var(--bk-ink-muted)] tw:py-6">No icons found for &quot;{searchQuery}&quot;</div>
         )}
       </div>
 
@@ -289,7 +289,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
           </div>
           <div className="tw:flex-1">
             <div className="tw:font-semibold tw:text-sm tw:mb-1">{selectedIcon.name}</div>
-            <div className="tw:text-xs tw:text-gray-500">{selectedIcon.tags.join(", ")}</div>
+            <div className="tw:text-xs tw:text-[var(--bk-ink-muted)]">{selectedIcon.tags.join(", ")}</div>
           </div>
           <div className="tw:flex tw:gap-3 tw:items-center">
             <div className={CONTROL_GROUP}>
@@ -322,7 +322,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
                     withField={false}
                   />
                 </div>
-                <span className="tw:text-[11px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-500 tw:min-w-6 tw:text-right">
+                <span className="tw:text-[11px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)] tw:min-w-6 tw:text-right">
                   {strokeWidth.toFixed(1)}
                 </span>
               </div>
@@ -342,7 +342,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
 
       {/* Footer */}
       <div className="tw:flex tw:justify-between tw:items-center tw:pt-4 tw:border-t tw:border-gray-200">
-        <span className="tw:text-xs tw:text-gray-500">Powered by Lucide Icons</span>
+        <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">Powered by Lucide Icons</span>
         <div className="tw:flex tw:gap-2">
           <Button color="light" onClick={onClose} className={GHOST}>
             Cancel

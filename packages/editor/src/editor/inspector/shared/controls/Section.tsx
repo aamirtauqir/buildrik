@@ -99,7 +99,7 @@ export const Section: React.FC<SectionProps> = ({
           {/* A summary of what is inside is worth a line only while it is shut.
               Open, the rows say it better, and the boards' expanded headers
               (807:8342, 807:8567) carry nothing but their chevron. */}
-          {!isOpen && preview && <span className="bdi-sec-preview tw:flex-[0_1_auto] tw:min-w-0 tw:overflow-hidden tw:whitespace-nowrap tw:text-ellipsis tw:text-[10.5px] tw:font-normal tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)]">{preview}</span>}
+          {!isOpen && preview && <span className="bdi-sec-preview tw:flex-[0_1_auto] tw:min-w-0 tw:overflow-hidden tw:whitespace-nowrap tw:text-ellipsis tw:text-[length:var(--bk-text-11)] tw:font-normal tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)]">{preview}</span>}
           {/* Figma 32-2: chevron sits on the RIGHT of the uppercase section label. */}
           <span className="bdi-chev">
             <ChevronDown size={11} aria-hidden="true" />

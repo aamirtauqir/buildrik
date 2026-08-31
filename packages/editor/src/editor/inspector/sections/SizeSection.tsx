@@ -318,7 +318,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           className={`tw:flex tw:items-center tw:gap-2 tw:mb-3 ${disabled("object-fit") ? "tw:opacity-50" : ""}`}
           title={reason("object-fit")}
         >
-          <label className="tw:min-w-[70px] tw:text-xs tw:font-medium tw:text-gray-500">Object Fit</label>
+          <label className="tw:min-w-[70px] tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]">Object Fit</label>
           <div className={CONTROL_SELECT_WRAP}>
           <Select
             /* The <label> beside it names nothing: no htmlFor, no wrapping —

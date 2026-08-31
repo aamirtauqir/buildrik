@@ -190,7 +190,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
         {mixedKeys?.has("z-index") && (
           <div className="tw:flex tw:items-center tw:mb-0.5">
             <MixedValueBadge compact />
-            <span className="tw:text-[11px] tw:text-gray-500">Z-Index</span>
+            <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">Z-Index</span>
           </div>
         )}
         <InputRow

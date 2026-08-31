@@ -130,7 +130,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({ composer, 
 
   if (rows.length === 0) {
     return (
-      <p className="tw:m-0 tw:px-3 tw:py-3 tw:text-xs tw:leading-normal tw:text-gray-500">
+      <p className="tw:m-0 tw:px-3 tw:py-3 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-muted)]">
         No fonts set. Pick a font family under Tokens and it appears here.
       </p>
     );

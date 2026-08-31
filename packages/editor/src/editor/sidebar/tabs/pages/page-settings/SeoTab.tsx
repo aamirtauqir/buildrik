@@ -41,7 +41,7 @@ const CARD = "tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-gray-200 tw:rounde
 const BANNER = "tw:bg-[var(--bk-warning-tint)] tw:border tw:border-[var(--bk-warning-text)] tw:rounded tw:text-[var(--bk-warning)]";
 const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
 const FIELD_HEAD = "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2";
-const COUNTER = `tw:text-[10.5px] tw:font-medium ${MONO}`;
+const COUNTER = `tw:text-[length:var(--bk-text-11)] tw:font-medium ${MONO}`;
 const GHOST_BTN = "tw:border-transparent tw:bg-transparent";
 
 export const SeoTab: React.FC<Props> = ({ s, page }) => {
@@ -69,20 +69,20 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
   return (
     <div className="tw:flex tw:flex-col tw:gap-4">
       {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
-      <div className={`tw:text-[11px] tw:font-medium tw:text-gray-500 tw:uppercase tw:tracking-[0.04em] ${UI}`}>
+      <div className={`tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:uppercase tw:tracking-[0.04em] ${UI}`}>
         How your page looks in Google Search
       </div>
       {/* Google preview — prototype .gpreview */}
       <div className={`tw:p-3.5 ${CARD}`}>
-        <div className={`tw:text-[10.5px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
+        <div className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
           {s.domain ?? "yoursite.com"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
         <div className={`tw:mt-1 tw:mb-0.5 tw:text-base tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`}>
           {s.seoTitle || page.name}
         </div>
         <div
-          className={`tw:text-[12.5px] tw:leading-snug ${UI} ${
-            s.seoDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-gray-500 tw:italic"
+          className={`tw:text-[length:var(--bk-text-13)] tw:leading-snug ${UI} ${
+            s.seoDesc ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)] tw:italic"
           }`}
         >
           {s.seoDesc || "No description — add one below to improve ranking"}
@@ -99,7 +99,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               size="xs"
               type="button"
               onClick={() => s.setAllowIndex(true)}
-              className={`tw:ml-1.5 tw:text-[11.5px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] ${GHOST_BTN} ${UI}`}
+              className={`tw:ml-1.5 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] ${GHOST_BTN} ${UI}`}
             >
               Turn indexing on →
             </Button>
@@ -117,7 +117,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               {s.seoScore}
             </div>
             <div className="tw:flex-1 tw:min-w-0">
-              <div className={`tw:text-[11.5px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${UI}`}>
+              <div className={`tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${UI}`}>
                 {s.seoScore >= 80 ? "Looks good" : "Needs work"}
               </div>
               <div className="tw:grid tw:grid-cols-2 tw:gap-x-2.5 tw:gap-y-1 tw:mt-2">
@@ -134,7 +134,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                   <div
                     key={c.label}
                     className={`tw:flex tw:items-center tw:gap-1.5 tw:text-[11px] ${UI} ${
-                      c.ok ? "tw:text-[var(--bk-ink)]" : "tw:text-gray-500"
+                      c.ok ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)]"
                     }`}
                   >
                     <span
@@ -143,7 +143,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                       }`}
                     />
                     <span>{c.label}</span>
-                    <span className={`tw:ml-auto tw:text-[10px] tw:font-medium tw:text-gray-500 ${MONO}`}>{c.pts}</span>
+                    <span className={`tw:ml-auto tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-muted)] ${MONO}`}>{c.pts}</span>
                   </div>
                 ))}
               </div>
@@ -158,7 +158,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               the item, not stacked here; the slug's lives under the slug
               field. */}
           {s.seoScore < 80 && s.allowIndex && (
-            <div className={`tw:px-2.5 tw:py-2 tw:text-[11.5px] ${UI} ${BANNER}`} role="note">
+            <div className={`tw:px-2.5 tw:py-2 tw:text-[length:var(--bk-text-12)] ${UI} ${BANNER}`} role="note">
               Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (up to +40 pts)"}
             </div>
           )}
@@ -189,7 +189,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             disabled={aiBusy}
             onClick={suggestTitle}
             aria-busy={aiBusy || undefined}
-            className={`tw:self-start tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-[3px] tw:border tw:border-[var(--bk-accent)] tw:rounded-full tw:bg-blue-50 tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-subtle)] tw:text-[10.5px] tw:font-medium ${UI}`}
+            className={`tw:self-start tw:inline-flex tw:items-center tw:gap-1 tw:px-2 tw:py-[3px] tw:border tw:border-[var(--bk-accent)] tw:rounded-full tw:bg-blue-50 tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-subtle)] tw:text-[length:var(--bk-text-11)] tw:font-medium ${UI}`}
           >
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />
@@ -223,7 +223,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                 size="xs"
                 type="button"
                 aria-label="About Meta Description"
-                className={`tw:p-0.5 tw:inline-flex tw:leading-none tw:text-gray-500 tw:hover:text-gray-900 ${GHOST_BTN}`}
+                className={`tw:p-0.5 tw:inline-flex tw:leading-none tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)] ${GHOST_BTN}`}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <circle cx="12" cy="12" r="10" />
@@ -239,7 +239,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                 ? "tw:text-[var(--bk-error)]"
                 : s.seoDesc.length > 50
                   ? "tw:text-[var(--bk-success)]"
-                  : "tw:text-gray-500"
+                  : "tw:text-[var(--bk-ink-muted)]"
             }`}
           >
             {s.seoDesc.length}/160
@@ -280,7 +280,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </div>
         {/* Slug destructive warning — shown when slug changes on a live page */}
         {s.slug !== page.slug && page.status === "live" && !s.slugError && (
-          <div className={`tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:text-[11.5px] ${UI} ${BANNER}`} role="alert">
+          <div className={`tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:text-[length:var(--bk-text-12)] ${UI} ${BANNER}`} role="alert">
             <svg className="tw:flex-none tw:mt-px" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
               <line x1="12" y1="9" x2="12" y2="13" />

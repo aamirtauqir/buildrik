@@ -39,7 +39,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
     {/* Parent button */}
     {hasParent && (
       <Tooltip content="Select Parent · ←" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
-        <Button color="light" onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+        <Button color="light" onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
           <svg
             width="12"
             height="12"
@@ -64,7 +64,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
         style={nameBtnStyles}
         aria-label="Show element path"
         aria-expanded={showAncestorMenu}
-        aria-haspopup="menu" className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+        aria-haspopup="menu" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
       >
         <span style={nameTextStyles}>{elementName}</span>
         {ancestors.length > 0 && (
@@ -97,7 +97,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
               color="light"
               role="menuitem"
               onClick={() => onSelectAncestor(ancestor.id)}
-              style={{ ...menuItemStyles, paddingLeft: 10 + i * 8 }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+              style={{ ...menuItemStyles, paddingLeft: 10 + i * 8 }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               <span aria-hidden="true" style={{ opacity: 0.5, marginRight: 6 }}>
                 ↑

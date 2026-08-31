@@ -132,7 +132,7 @@ export function DetachConfirmModal({
             ))}
           </ul>
           <div style={footerStyle}>
-            <Button color="light" onClick={onCancel} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+            <Button color="light" onClick={onCancel} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
               Cancel
             </Button>
             <Button onClick={onConfirm}>

@@ -169,7 +169,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 min={1}
                 max={100}
               />
-              <span className="tw:text-xs tw:text-gray-500">
+              <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
                 Width / height in pixels
               </span>
             </div>
@@ -216,7 +216,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
     </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
             Cancel
           </Button>
           <Button onClick={handleSave}>Save</Button>
@@ -235,7 +235,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 // 12px semibold sentence-case in `--bk-ink-soft`, which read as a second
 // heading rank instead of a label.
 const FIELD_LABEL =
-  "tw:mb-1 tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:uppercase tw:text-gray-500";
-const HINT = "tw:mt-1 tw:text-xs tw:text-gray-500";
+  "tw:mb-1 tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:uppercase tw:text-[var(--bk-ink-muted)]";
+const HINT = "tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
 export default ProjectSettingsModal;

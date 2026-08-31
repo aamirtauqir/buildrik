@@ -60,9 +60,9 @@ const BASE_CLASS =
    (and `conflict`) earn a tinted pill, because they are the only ones that
    mean "your work is not where you think it is". */
 const STATE_CLASS: Record<SaveState, string> = {
-  saved: "tw:bg-transparent tw:text-gray-500",
-  saving: "tw:bg-transparent tw:text-gray-500",
-  unsaved: "tw:bg-transparent tw:text-gray-500",
+  saved: "tw:bg-transparent tw:text-[var(--bk-ink-muted)]",
+  saving: "tw:bg-transparent tw:text-[var(--bk-ink-muted)]",
+  unsaved: "tw:bg-transparent tw:text-[var(--bk-ink-muted)]",
   conflict: "tw:bg-yellow-50 tw:text-yellow-800",
   offline: "tw:bg-yellow-50 tw:text-yellow-800",
   error: "tw:bg-red-100 tw:text-red-700",

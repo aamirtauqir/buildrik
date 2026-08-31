@@ -41,7 +41,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 type="button"
                 color="light"
                 aria-label="Discard"
-                onClick={() => onReject(message.id)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                onClick={() => onReject(message.id)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
               >Discard</Button>
               <Button
                 type="button"

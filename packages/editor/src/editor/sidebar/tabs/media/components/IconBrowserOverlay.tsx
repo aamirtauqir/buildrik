@@ -49,7 +49,7 @@ function readRecent(): string[] {
 
 const TILE =
   "tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded tw:border-0 tw:bg-[var(--bk-bg-subtle)] " +
-  "tw:p-0 tw:text-gray-900 tw:enabled:hover:bg-[var(--bk-accent-subtle,#ebf5ff)]";
+  "tw:p-0 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-accent-subtle,#ebf5ff)]";
 const GROUP_HDR =
   "tw:flex tw:h-7 tw:w-full tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] " +
   "tw:font-medium tw:leading-4 tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]";
@@ -156,7 +156,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
       <div className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:px-4">
         <TextField
           type="text"
-          className="tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-gray-900 tw:placeholder:text-gray-500"
+          className="tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-gray-500"
           placeholder={`Search ${getIconCount()} icons`}
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
@@ -176,13 +176,13 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:gap-1 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-gray-900 tw:enabled:hover:bg-transparent"
+              className="tw:min-h-6 tw:gap-1 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
               aria-expanded={catMenuOpen}
               data-testid="icon-category-scope"
               onClick={() => setCatMenuOpen((v) => !v)}
             >
               <span>{categoryLabel}</span>
-              <span aria-hidden="true" className="tw:text-[10px] tw:text-gray-500">{"▾"}</span>
+              <span aria-hidden="true" className="tw:text-[10px] tw:text-[var(--bk-ink-muted)]">{"▾"}</span>
             </Button>
           }
         >

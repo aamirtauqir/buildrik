@@ -448,15 +448,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
               <div className="tw:px-4 tw:py-3.5" data-testid="cmdk-no-results">
                 {query.trim().split(/\s+/).length > 1 ? (
                   <>
-                    <div className="tw:text-[13px] tw:text-gray-900">
+                    <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">
                       That isn&rsquo;t a command — send it to AI?
                     </div>
-                    <div className="tw:mt-1.5 tw:mb-2.5 tw:text-xs tw:text-gray-500">
+                    <div className="tw:mt-1.5 tw:mb-2.5 tw:text-xs tw:text-[var(--bk-ink-muted)]">
                       AI proposes a diff and never writes directly. Apply lands as one undo step.
                     </div>
                   </>
                 ) : (
-                  <div className="tw:mb-2.5 tw:text-[13px] tw:text-gray-900">
+                  <div className="tw:mb-2.5 tw:text-[13px] tw:text-[var(--bk-ink)]">
                     Nothing matches &lsquo;{query.trim()}&rsquo;.
                   </div>
                 )}
@@ -470,7 +470,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                 </Button>
               </div>
             ) : (
-              <div className="tw:px-4 tw:py-6 tw:text-center tw:text-[13px] tw:text-gray-500">
+              <div className="tw:px-4 tw:py-6 tw:text-center tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
                 No commands found
               </div>
             )
@@ -486,7 +486,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                     /* gray-600: these band labels are 11px on
                        --bk-bg-subtle, where gray-500 measures 4.39:1 — under
                        AA (axe, 6 nodes in this palette). */
-                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:uppercase tw:tracking-[0.5px] tw:text-gray-600 tw:bg-[var(--bk-bg-subtle)]"
+                    className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-bg-subtle)]"
                   >
                     {group}
                   </div>
@@ -513,16 +513,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                           {cmd.icon && (
                             <span
                               aria-hidden="true"
-                              className="tw:flex tw:flex-none tw:items-center tw:justify-center tw:size-4 tw:text-sm tw:text-gray-500"
+                              className="tw:flex tw:flex-none tw:items-center tw:justify-center tw:size-4 tw:text-sm tw:text-[var(--bk-ink-muted)]"
                             >
                               {cmd.icon}
                             </span>
                           )}
-                          <span className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-sm tw:text-gray-900">
+                          <span className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-sm tw:text-[var(--bk-ink)]">
                             {cmd.label}
                           </span>
                           {cmd.disabled && cmd.disabledReason && (
-                            <span className="tw:flex-none tw:whitespace-nowrap tw:text-[11px] tw:text-gray-500">
+                            <span className="tw:flex-none tw:whitespace-nowrap tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
                               {cmd.disabledReason}
                             </span>
                           )}
@@ -539,7 +539,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
         {/* Footer */}
         <div
-          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-gray-600"
+          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-[var(--bk-ink-soft)]"
         >
           <span>↑↓ navigate</span>
           <span>↵ run</span>

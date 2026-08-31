@@ -43,7 +43,7 @@ import React from "react";
 
 const BASE =
   "tw:h-9 tw:w-full tw:px-3 tw:py-0 tw:rounded-lg tw:border tw:border-gray-300 tw:bg-white " +
-  "tw:text-gray-900 tw:[font-family:var(--bk-font-ui)] tw:text-[13px] " +
+  "tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] " +
   "tw:[transition:var(--bk-transition-fast)] tw:placeholder:text-gray-500 " +
   "tw:focus:outline-none tw:focus:border-primary-700 tw:focus:[box-shadow:var(--bk-shadow-focus)] " +
   "tw:aria-invalid:border-[var(--bk-error)] tw:aria-invalid:focus:border-[var(--bk-error)] " +

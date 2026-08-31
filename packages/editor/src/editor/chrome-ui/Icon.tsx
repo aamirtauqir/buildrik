@@ -54,8 +54,8 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(f
         // clear WCAG 2.5.8's 24x24, so this is fidelity rather than a
         // violation, but nothing chose 28 either.
         "tw:inline-flex tw:items-center tw:justify-center tw:h-8 tw:w-8 tw:border-0 tw:rounded-md",
-        "tw:bg-transparent tw:text-gray-600 tw:cursor-pointer tw:[transition:var(--bk-transition-fast)]",
-        "tw:enabled:hover:bg-gray-100 tw:enabled:hover:text-gray-900",
+        "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:cursor-pointer tw:[transition:var(--bk-transition-fast)]",
+        "tw:enabled:hover:bg-gray-100 tw:enabled:hover:text-[var(--bk-ink)]",
         "tw:aria-pressed:bg-blue-50 tw:aria-pressed:text-blue-700",
         "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
         "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed",
@@ -82,7 +82,7 @@ export function Kbd({ className, children, ...rest }: KbdProps) {
       className={[
         "tw:inline-flex tw:items-center tw:justify-center tw:min-w-5 tw:h-5 tw:px-1",
         "tw:border tw:border-gray-200 tw:border-b-2 tw:rounded-sm tw:bg-gray-100",
-        "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-gray-600",
+        "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-[var(--bk-ink-soft)]",
         className,
       ]
         .filter(Boolean)

@@ -62,7 +62,7 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
         )}
       </div>
       <div style={S.actions}>
-        {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">Dismiss</Button>}
+        {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Dismiss</Button>}
         {isAuth && <Button color="light" size="xs" onClick={onSignIn}>Sign in</Button>}
         {isMissing ? (
           <Button size="xs" onClick={onSignIn}>Go to dashboard</Button>

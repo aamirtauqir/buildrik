@@ -27,10 +27,10 @@ export function SiteCard({ name, state, stateLabel, meta, thumbnail, className, 
         {thumbnail ? <img src={thumbnail} alt="" className="tw:w-full tw:h-full tw:object-cover tw:block" /> : null}
       </span>
       <span className="tw:flex tw:flex-col tw:gap-1 tw:p-3">
-        <span className="tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:font-medium tw:text-gray-900">
+        <span className="tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]">
           {name}
         </span>
-        <span className="tw:flex tw:items-center tw:gap-2 tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:text-gray-500">
+        <span className="tw:flex tw:items-center tw:gap-2 tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
           <StatusDot state={state} label={stateLabel} />
           <span>{stateLabel}</span>
           {meta ? <span className="tw:ml-auto">{meta}</span> : null}

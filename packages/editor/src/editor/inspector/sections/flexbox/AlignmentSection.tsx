@@ -10,7 +10,7 @@ import { FlexAlignmentGrid } from "./controls";
 import { Button } from "@/editor/chrome-ui";
 
 /** Caption above each alignment cluster. */
-const CAPTION = "tw:flex tw:items-center tw:mb-1 tw:text-xs tw:text-gray-500";
+const CAPTION = "tw:flex tw:items-center tw:mb-1 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 // ============================================================================
 // TYPES
 // ============================================================================

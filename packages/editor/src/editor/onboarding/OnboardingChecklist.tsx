@@ -85,7 +85,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
         <span className={PILL_TEXT}>
           {allDone ? "All done!" : `${completedCount} / ${totalCount} done`}
         </span>
-        <ChevronUp size={12} className="tw:text-gray-500 tw:flex-none" />
+        <ChevronUp size={12} className="tw:text-[var(--bk-ink-muted)] tw:flex-none" />
       </div>
     );
   }
@@ -123,7 +123,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               <Button type="button" size="xs" className="tw:border-0 tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)] tw:text-[11px] tw:font-semibold" onClick={onDismiss}>
                 Yes
               </Button>
-              <Button type="button" size="xs" color="light" className="tw:border-0 tw:bg-transparent tw:text-gray-500 tw:text-[11px]" onClick={() => setConfirmingDismiss(false)}>
+              <Button type="button" size="xs" color="light" className="tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:text-[11px]" onClick={() => setConfirmingDismiss(false)}>
                 No
               </Button>
             </div>
@@ -188,14 +188,14 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 
                 {/* Label */}
                 <span
-                  className={`${STEP_LABEL} ${isCompleted ? "tw:text-gray-500 tw:line-through" : "tw:text-gray-900 tw:no-underline"}`}
+                  className={`${STEP_LABEL} ${isCompleted ? "tw:text-[var(--bk-ink-muted)] tw:line-through" : "tw:text-[var(--bk-ink)] tw:no-underline"}`}
                 >
                   {step.label}
                 </span>
 
                 {/* Chevron */}
                 {!isCompleted && (
-                  <span className="tw:text-gray-300 tw:flex-none tw:ml-auto">
+                  <span className="tw:text-[var(--bk-ink-disabled)] tw:flex-none tw:ml-auto">
                     {isActive
                       ? <ChevronUp size={12} />
                       : <ChevronDown size={12} />
@@ -297,13 +297,13 @@ const PILL =
   "tw:[z-index:calc(var(--bk-z-topbar)_+_1)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
 const PILL_DOT = "tw:size-2 tw:rounded-full tw:flex-none";
-const PILL_TEXT = "tw:text-xs tw:font-semibold tw:text-gray-900 tw:whitespace-nowrap";
+const PILL_TEXT = "tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)] tw:whitespace-nowrap";
 const HEADER = "tw:flex tw:items-start tw:gap-2.5 tw:px-3.5 tw:pt-3.5 tw:pb-3";
-const HEADER_TITLE = "tw:text-[13px] tw:font-semibold tw:text-gray-900 tw:tracking-[-0.1px]";
-const HEADER_COUNT = "tw:text-[11px] tw:text-gray-500 tw:font-medium";
+const HEADER_TITLE = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)] tw:tracking-[-0.1px]";
+const HEADER_COUNT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:font-medium";
 const ICON_BTN =
   "tw:flex tw:items-center tw:justify-center tw:size-6.5 tw:bg-transparent tw:border-0 tw:rounded-md " +
-  "tw:text-gray-500 tw:p-0 tw:[transition:var(--bk-transition-fast)]";
+  "tw:text-[var(--bk-ink-muted)] tw:p-0 tw:[transition:var(--bk-transition-fast)]";
 const CONFIRM_TEXT = "tw:text-[11px] tw:text-[var(--bk-ink-soft)] tw:whitespace-nowrap";
 const PROGRESS_TRACK = "tw:h-0.5 tw:bg-gray-100 tw:flex-none";
 const LIST = "tw:list-none tw:m-0 tw:py-1.5 tw:overflow-y-auto tw:flex-1";
@@ -315,8 +315,8 @@ const CIRCLE =
   "tw:[transition:var(--bk-transition-fast)]";
 const STEP_LABEL = "tw:text-[13px] tw:font-medium tw:flex-1 tw:min-w-0 tw:leading-[1.35]";
 const STEP_BODY = "tw:pt-0.5 tw:pr-3.5 tw:pb-3 tw:pl-[42px] tw:flex tw:flex-col tw:gap-2.5";
-const STEP_DESC = "tw:m-0 tw:text-xs tw:leading-relaxed tw:text-gray-500";
+const STEP_DESC = "tw:m-0 tw:text-xs tw:leading-relaxed tw:text-[var(--bk-ink-muted)]";
 const FOOTER = "tw:px-4 tw:pt-3 tw:pb-4 tw:border-t tw:border-gray-200 tw:flex tw:flex-col tw:gap-2.5";
-const FOOTER_TEXT = "tw:m-0 tw:text-xs tw:text-gray-500 tw:leading-normal";
+const FOOTER_TEXT = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink-muted)] tw:leading-normal";
 
 export default OnboardingChecklist;

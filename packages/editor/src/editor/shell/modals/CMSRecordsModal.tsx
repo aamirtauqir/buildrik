@@ -37,7 +37,7 @@ const MAX_FIELD_COLUMNS = 3;
 
 /** The quiet row-action treatment, previously repeated at each of the three
  *  call sites below. */
-const GHOST_BTN = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST_BTN = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 /** "today" for same-day, else "MMM D" — the board's own two shapes. */
 function updatedLabel(iso: string): string {
@@ -57,7 +57,7 @@ function updatedLabel(iso: string): string {
  *  That is the only question a table can usefully answer about an image. */
 function MediaCell({ filled, label }: { filled: boolean; label: string }) {
   return filled ? (
-    <span className="tw:text-gray-500">✓ {label}</span>
+    <span className="tw:text-[var(--bk-ink-muted)]">✓ {label}</span>
   ) : (
     <span style={{ color: "var(--bk-warning)" }}>— missing</span>
   );
@@ -277,7 +277,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                     <Button size="xs" disabled={busy} onClick={save} aria-busy={busy || undefined}>
                       {editingId === "" ? "Add record" : "Save"}
                     </Button>
-                    <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900">
+                    <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                       Cancel
                     </Button>
                   </div>
@@ -313,12 +313,12 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                           <th
                             key={f.id}
                             scope="col"
-                            className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-gray-500"
+                            className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-[var(--bk-ink-muted)]"
                           >
                             {f.name}
                           </th>
                         ))}
-                        <th scope="col" className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-gray-500">
+                        <th scope="col" className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-[var(--bk-ink-muted)]">
                           Updated
                         </th>
                         {/* The board draws no row actions; the code has publish,
@@ -334,7 +334,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                         <tr>
                           <td
                             colSpan={columns.length + 2}
-                            className="tw:px-3 tw:py-6 tw:text-center tw:text-gray-500"
+                            className="tw:px-3 tw:py-6 tw:text-center tw:text-[var(--bk-ink-muted)]"
                           >
                             No records yet.
                           </td>
@@ -343,7 +343,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                         items.map((item) => [
                           <tr key={item.id} className="tw:hover:bg-blue-50">
                             {columns.map((f, idx) => (
-                              <td key={f.id} className="tw:px-3 tw:py-2.5 tw:text-gray-900">
+                              <td key={f.id} className="tw:px-3 tw:py-2.5 tw:text-[var(--bk-ink)]">
                                 {f.type === "image" ? (
                                   <MediaCell
                                     filled={Boolean(item.data[f.slug])}
@@ -356,7 +356,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                 )}
                               </td>
                             ))}
-                            <td className="tw:px-3 tw:py-2.5 tw:text-gray-500">
+                            <td className="tw:px-3 tw:py-2.5 tw:text-[var(--bk-ink-muted)]">
                               {updatedLabel(item.updatedAt)}
                             </td>
                             <td className="tw:px-3 tw:py-2.5">

@@ -91,7 +91,7 @@ function highlightHTML(code: string): React.ReactNode[] {
     } else if (match[5]) {
       // Comments
       parts.push(
-        <span key={key++} className="tw:italic tw:text-gray-500">
+        <span key={key++} className="tw:italic tw:text-[var(--bk-ink-muted)]">
           {match[0]}
         </span>
       );
@@ -148,7 +148,7 @@ function highlightCSS(code: string): React.ReactNode[] {
     } else if (match[4]) {
       // Comments
       parts.push(
-        <span key={key++} className="tw:italic tw:text-gray-500">
+        <span key={key++} className="tw:italic tw:text-[var(--bk-ink-muted)]">
           {match[0]}
         </span>
       );
@@ -176,7 +176,7 @@ function highlightCSS(code: string): React.ReactNode[] {
 // ============================================================================
 
 const LineNumbers: React.FC<{ count: number }> = ({ count }) => (
-  <div className="tw:pr-4 tw:text-right tw:text-xs tw:text-gray-500 tw:select-none tw:border-r tw:border-r-[#3e4451] tw:[font-family:var(--bk-font-mono)]">
+  <div className="tw:pr-4 tw:text-right tw:text-xs tw:text-[var(--bk-ink-muted)] tw:select-none tw:border-r tw:border-r-[#3e4451] tw:[font-family:var(--bk-font-mono)]">
     {Array.from({ length: count }, (_, i) => (
       <div key={i}>{i + 1}</div>
     ))}
@@ -245,7 +245,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
           onChange={(tab) => setActiveTab(tab as CodeTab)}
           label="Code language"
         />
-        <span className="tw:text-xs tw:text-gray-500">
+        <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
           {activeTab === "html"
             ? `${html.split("\n").length} lines`
             : `${cssCode.split("\n").length} lines`}

@@ -65,9 +65,9 @@ const WELL_CLASS =
    time, so branching in JS reproduces the old `.bk-bp-switcher--labelled
    .bk-bp-switcher__btn` descendant override without a modifier class. */
 const BTN_BASE_CLASS =
-  "tw:h-6 tw:rounded-md tw:border-0 tw:cursor-pointer tw:bg-transparent tw:text-gray-600 " +
+  "tw:h-6 tw:rounded-md tw:border-0 tw:cursor-pointer tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
   "tw:inline-flex tw:items-center tw:justify-center tw:font-medium tw:text-xs tw:leading-none " +
-  "tw:[font-family:var(--bk-font-ui)] tw:[transition:var(--bk-transition-fast)] tw:hover:text-gray-900 " +
+  "tw:[font-family:var(--bk-font-ui)] tw:[transition:var(--bk-transition-fast)] tw:hover:text-[var(--bk-ink)] " +
   "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] " +
   "tw:aria-[pressed=true]:bg-white tw:aria-[pressed=true]:text-blue-700 " +
   "tw:aria-[pressed=true]:[box-shadow:var(--bk-shadow-raised)]";

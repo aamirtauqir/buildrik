@@ -66,9 +66,9 @@ const MobileIcon: React.FC = () => (
    and font rows had no visible separator and two controls had no visible fill.
    Real tokens now. */
 const ROW = "tw:flex tw:items-center tw:gap-2 tw:py-2 tw:border-b tw:border-gray-200";
-const ROW_NAME = "tw:text-xs tw:font-medium tw:text-gray-900";
-const ROW_ID = "tw:text-xs tw:text-gray-500 tw:mt-px";
-const MUTED = "tw:text-xs tw:text-gray-500 tw:flex-none";
+const ROW_NAME = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink)]";
+const ROW_ID = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mt-px";
+const MUTED = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:flex-none";
 const MODE_BTN = "tw:flex tw:items-center tw:gap-1.5 tw:px-2.5 tw:py-1.5 tw:text-xs";
 
 const StyleToggle: React.FC<{
@@ -87,7 +87,7 @@ const StyleToggle: React.FC<{
     className={`${labelClass ?? ""} tw:size-6 tw:flex tw:items-center tw:justify-center tw:rounded tw:text-xs tw:font-bold tw:border ${
       active
         ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
-        : "tw:border-gray-200 tw:bg-transparent tw:text-gray-500"
+        : "tw:border-gray-200 tw:bg-transparent tw:text-[var(--bk-ink-muted)]"
     }`}
     title={`Toggle ${label}`}
   >
@@ -411,7 +411,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
         Body text — the quick brown fox jumps over the lazy dog.
       </div>
       <div
-        className="tw:text-xs tw:text-gray-500 tw:text-right tw:tracking-[0.3px]"
+        className="tw:text-xs tw:text-[var(--bk-ink-muted)] tw:text-right tw:tracking-[0.3px]"
       >
         Live preview — updates as you type
       </div>
@@ -450,7 +450,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
     <div className="tw:flex tw:flex-col">
       {/* Device hint */}
       <div
-        className="tw:text-xs tw:text-gray-500 tw:mb-1.5 tw:leading-normal"
+        className="tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mb-1.5 tw:leading-normal"
       >
         One type scale for the whole site. The toggle below previews how it
         reads on a narrow screen; it does not set separate mobile sizes.

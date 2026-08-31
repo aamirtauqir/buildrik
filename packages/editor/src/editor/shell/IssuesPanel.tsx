@@ -56,16 +56,16 @@ function isFixable(i: Issue): boolean {
 const TONE: Record<Issue["type"], { icon: React.ReactNode; className: string }> = {
   error: { icon: <AlertCircle size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-error)]" },
   warning: { icon: <AlertCircle size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-warning-text)]" },
-  info: { icon: <Info size={14} aria-hidden="true" />, className: "tw:text-gray-500" },
+  info: { icon: <Info size={14} aria-hidden="true" />, className: "tw:text-[var(--bk-ink-muted)]" },
 };
 
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
-const SUMMARY = "tw:text-xs tw:text-gray-500 tw:px-3 tw:py-1.5";
+const SUMMARY = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:py-1.5";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
 /** The fixing / fix-failed bands differ only by tint. */
 const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-gray-200";
 /** The quiet button look, previously copy-pasted onto six separate Buttons. */
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 /* Board 164:2 / 164:22 head the list with ONE line — "All · 3", "Errors only
    · 1" — where the label names what you are looking at and the number counts
@@ -135,7 +135,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
            than as clean. */
         <div className="tw:px-3 tw:pt-6 tw:text-center" role="status">
           <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No issues.</p>
-          <p className="tw:m-0 tw:mt-1 tw:text-xs tw:text-gray-500">
+          <p className="tw:m-0 tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]">
             This page is ready to publish.
           </p>
         </div>
@@ -161,7 +161,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             >
               {currentFilter.label}
             </Button>
-            <span className="tw:ml-1 tw:text-gray-500">· {visible.length}</span>
+            <span className="tw:ml-1 tw:text-[var(--bk-ink-muted)]">· {visible.length}</span>
           </div>
 
           {fixing && (
@@ -175,7 +175,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               <div className="tw:my-2">
                 <Progress progress={60} size="sm" aria-label="Applying the fix" />
               </div>
-              <div className="tw:text-[11px] tw:font-medium tw:text-gray-500">
+              <div className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">
                 Auto-fix lands as ONE undo step.
               </div>
             </div>
@@ -184,7 +184,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
           {failed && (
             <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert">
               <div className="tw:text-xs tw:text-[var(--bk-error-text)]">Couldn&apos;t fix this automatically.</div>
-              <div className="tw:text-[11px] tw:font-medium tw:text-gray-500 tw:leading-[1.45] tw:mt-1.5">
+              <div className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:leading-[1.45] tw:mt-1.5">
                 {failed.location ?? "This value"} comes from your brand tokens, so changing it here
                 would change every site using them.
               </div>
@@ -210,7 +210,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             {filter !== "all" && scoped.length > visible.length && (
               /* Board 164:22 says what the filter is keeping from you, in the
                  same breath as the filter itself. */
-              <p className="tw:m-0 tw:mb-2 tw:text-xs tw:text-gray-500">
+              <p className="tw:m-0 tw:mb-2 tw:text-xs tw:text-[var(--bk-ink-muted)]">
                 Filtered to one severity. {scoped.length - visible.length}{" "}
                 {scoped.length - visible.length === 1 ? "issue is" : "issues are"} hidden.
               </p>
@@ -237,7 +237,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                     <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
                       <span>{i.message}</span>
                       {i.location && (
-                        <span className="tw:text-[11px] tw:font-medium tw:text-gray-500 tw:mt-0.5">{i.location}</span>
+                        <span className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:mt-0.5">{i.location}</span>
                       )}
                     </span>
                   </Row>

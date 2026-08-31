@@ -38,7 +38,7 @@ const BAR =
   "tw:[font-family:var(--bk-font-ui)] tw:text-[13px]";
 const LINK =
   "tw:h-7 tw:px-2 tw:rounded tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal " +
-  "tw:text-gray-600 tw:enabled:hover:bg-white tw:enabled:hover:text-gray-900";
+  "tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-white tw:enabled:hover:text-[var(--bk-ink)]";
 const ACCENT_LINK =
   "tw:h-7 tw:px-2 tw:rounded tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal " +
   "tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-white";

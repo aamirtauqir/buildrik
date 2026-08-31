@@ -240,8 +240,8 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
             {rows.map((r) => (
               <li key={r.id} className={ROW}>
                 <div className={PATH_COL}>
-                  <div className={`${MONO_CELL} tw:text-gray-900`}>{r.fromPath}</div>
-                  <div className={`${MONO_CELL} tw:text-gray-500`}>→</div>
+                  <div className={`${MONO_CELL} tw:text-[var(--bk-ink)]`}>{r.fromPath}</div>
+                  <div className={`${MONO_CELL} tw:text-[var(--bk-ink-muted)]`}>→</div>
                   <div className={`${MONO_CELL} tw:text-[var(--bk-ink-soft)]`}>{r.toUrl}</div>
                 </div>
                 <div className="tw:flex tw:flex-none tw:items-center tw:gap-2">
@@ -278,4 +278,4 @@ const MONO_CELL =
 const TYPE_BADGE =
   "tw:px-1.5 tw:py-0.5 tw:rounded tw:border tw:border-[var(--bk-border-medium)] " +
   "tw:bg-[var(--bk-bg-panel)] tw:text-[10px] tw:font-semibold tw:tracking-[0.04em] " +
-  "tw:text-gray-900 tw:[font-family:var(--bk-font-mono)]";
+  "tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-mono)]";

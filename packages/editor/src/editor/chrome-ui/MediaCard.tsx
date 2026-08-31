@@ -47,7 +47,7 @@ export function MediaCard({ name, src, badge, badgeKind = "neutral", className, 
           </span>
         ) : null}
       </span>
-      <span className="tw:[font-family:var(--bk-font-ui)] tw:text-xs tw:text-gray-900 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap">
+      <span className="tw:[font-family:var(--bk-font-ui)] tw:text-xs tw:text-[var(--bk-ink)] tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap">
         {name}
       </span>
     </button>

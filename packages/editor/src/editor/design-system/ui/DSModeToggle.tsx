@@ -59,7 +59,7 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
                 /* gray-600: the unselected pill sits on the group's
                    --bk-bg-subtle track, where gray-500 measures 4.39:1 —
                    under AA at this size. Measured with axe. */
-                : "tw:bg-transparent tw:text-gray-600 tw:font-medium tw:border-transparent"
+                : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:border-transparent"
             }`}
           >
             {seg.label}

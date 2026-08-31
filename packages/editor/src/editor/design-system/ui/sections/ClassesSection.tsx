@@ -55,7 +55,7 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
 
   if (rows.length === 0) {
     return (
-      <p className="tw:m-0 tw:px-3 tw:py-3 tw:text-xs tw:leading-normal tw:text-gray-500">
+      <p className="tw:m-0 tw:px-3 tw:py-3 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-muted)]">
         No classes yet. A class is a name you put on elements so they can share
         one rule — add one from an element&apos;s Classes section.
       </p>
@@ -69,10 +69,10 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
           key={name}
           className="tw:flex tw:flex-col tw:gap-0.5 tw:px-3 tw:py-2 tw:border-b tw:border-gray-100"
         >
-          <span className="tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-900">
+          <span className="tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]">
             .{name}
           </span>
-          <span className="tw:text-xs tw:text-gray-500">
+          <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
             used {count}&times;
           </span>
         </li>

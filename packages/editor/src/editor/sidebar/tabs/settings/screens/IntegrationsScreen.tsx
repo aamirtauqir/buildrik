@@ -22,7 +22,7 @@ export const IntegrationsScreen: React.FC<ScreenProps> = () => (
         which is a prerequisite that does not exist: nothing on this screen
         connects anything, before or after a deploy. Every row is a link to
         the provider's own setup, which is what `status="soon"` says. */}
-    <p className="tw:text-xs tw:text-gray-500 tw:px-3 tw:pt-2 tw:leading-[1.4]">
+    <p className="tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:pt-2 tw:leading-[1.4]">
       Third-party services you can wire up yourself for now — each row opens the provider&rsquo;s
       own setup. Connecting them from here is coming.
     </p>

@@ -311,7 +311,7 @@ const GroupHeadingControl: React.FC<ControlProps<GroupHeadingField>> = ({
   field,
 }) => (
   <div
-    className={`tw:text-xs tw:text-gray-500 tw:font-medium ${
+    className={`tw:text-xs tw:text-[var(--bk-ink-muted)] tw:font-medium ${
       field.divider ? "tw:mt-3 tw:pt-3 tw:border-t tw:border-gray-200" : "tw:mt-2"
     }`}
   >

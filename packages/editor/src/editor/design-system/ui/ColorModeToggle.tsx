@@ -81,7 +81,7 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
       background: active ? "var(--bk-accent)" : "transparent",
       color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
       transition: "background 80ms",
-    }} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+    }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
   >
     {label}
   </Button>

@@ -192,7 +192,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                   opacity: undoable ? 1 : 0.4,
                   cursor: undoable ? "pointer" : "not-allowed",
                 }}
-                aria-label={`Restore ${friendly}`} className="tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900"
+                aria-label={`Restore ${friendly}`} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
               >
                 Restore
               </Button>

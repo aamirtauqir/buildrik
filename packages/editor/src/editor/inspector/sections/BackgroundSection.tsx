@@ -9,7 +9,7 @@ import { extractGradientUI, composeGradient, deriveBgType } from "../../../share
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { Button, TextInput } from "@/editor/chrome-ui";
 
-const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-gray-500";
+const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]";
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;

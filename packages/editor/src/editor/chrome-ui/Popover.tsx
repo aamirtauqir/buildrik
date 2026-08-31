@@ -36,7 +36,7 @@ const PLACEMENT_CLASS: Record<PopoverPlacement, string> = {
  *  (e.g. AddPageButton.tsx). */
 export const POPOVER_BASE_CLASS =
   "tw:absolute tw:z-40 tw:min-w-[180px] tw:p-2 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white " +
-  "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-gray-900";
+  "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]";
 
 export interface PopoverProps {
   open: boolean;
@@ -198,10 +198,10 @@ const MENU_ITEM_BASE =
 
 export function MenuItem({ icon, kbd, selected, danger, disabled, className, children, ...rest }: MenuItemProps) {
   const stateClass = disabled
-    ? "tw:cursor-default tw:pointer-events-none tw:text-gray-300 tw:focus-visible:text-gray-300"
+    ? "tw:cursor-default tw:pointer-events-none tw:text-[var(--bk-ink-disabled)] tw:focus-visible:text-gray-300"
     : danger
       ? "tw:cursor-pointer tw:hover:bg-gray-100 tw:text-red-700 tw:focus-visible:text-red-700"
-      : "tw:cursor-pointer tw:hover:bg-gray-100 tw:text-gray-900 tw:focus-visible:text-blue-700";
+      : "tw:cursor-pointer tw:hover:bg-gray-100 tw:text-[var(--bk-ink)] tw:focus-visible:text-blue-700";
 
   return (
     <button
@@ -221,7 +221,7 @@ export function MenuItem({ icon, kbd, selected, danger, disabled, className, chi
       ) : null}
       {icon ? <span className={ROW_ICON_CLASS}>{icon}</span> : null}
       <span className="tw:flex-1 tw:text-left">{children}</span>
-      {kbd ? <span className="tw:ml-auto tw:text-gray-500 tw:text-[11px]">{kbd}</span> : null}
+      {kbd ? <span className="tw:ml-auto tw:text-[var(--bk-ink-muted)] tw:text-[11px]">{kbd}</span> : null}
     </button>
   );
 }
@@ -247,7 +247,7 @@ export function MenuLabel({ className, children, ...rest }: React.HTMLAttributes
   return (
     <div
       className={[
-        "tw:pt-1 tw:px-2 tw:pb-0.5 tw:text-gray-500 tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:uppercase tw:[font-family:var(--bk-font-ui)]",
+        "tw:pt-1 tw:px-2 tw:pb-0.5 tw:text-[var(--bk-ink-muted)] tw:text-[11px] tw:font-medium tw:tracking-[0.08em] tw:uppercase tw:[font-family:var(--bk-font-ui)]",
         className,
       ]
         .filter(Boolean)

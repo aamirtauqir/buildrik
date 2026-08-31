@@ -35,13 +35,13 @@ const RATCHETS = [
     id: "offscale-font-size",
     // Sizes the 7-step scale does not define (9/10/10.5/11.5/12.5/15/17…).
     pattern: String.raw`tw:text-\[(7|8|9|10|10\.5|11\.5|12\.5|15|17|18|19)px\]`,
-    baseline: 86,
+    baseline: 67,
   },
   {
     id: "palette-gray-text",
     // tw:text-gray-* where the ink tokens are the vocabulary.
     pattern: String.raw`tw:text-gray-[0-9]{3}`,
-    baseline: 470,
+    baseline: 10,
   },
 ];
 

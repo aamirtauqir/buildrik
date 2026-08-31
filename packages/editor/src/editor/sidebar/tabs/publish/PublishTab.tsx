@@ -657,7 +657,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 </p>
               )}
               {isPublishing && (
-                <p className="tw:m-0 tw:text-[11px] tw:text-gray-500 tw:leading-[1.4]">
+                <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]">
                   {isPublished ? "Update" : "Publishing"} in progress — please wait.
                 </p>
               )}
@@ -670,7 +670,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           carry "this is a link" (WCAG 1.4.1), and axe measured these two at
           1.27:1 against their surrounding text — nowhere near the 3:1 that
           would let colour do the work on its own. */}
-      <div className="tw:px-4 tw:py-2.5 tw:text-xs tw:leading-normal tw:text-gray-600 tw:text-center">
+      <div className="tw:px-4 tw:py-2.5 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-soft)] tw:text-center">
         By publishing, your site is deployed to your connected Vercel account.{" "}
         <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-[var(--bk-accent-text)] tw:underline">
           Privacy policy
@@ -751,7 +751,7 @@ const SECTION = "tw:flex tw:flex-col tw:gap-0";
 /* The board's section label: 11px, uppercase, tracked, ink-muted. */
 const SECTION_TITLE =
   "tw:m-0 tw:mb-1 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
-const META = "tw:m-0 tw:text-xs tw:text-gray-500";
+const META = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
 /** The worker's own step statuses, said in words. `pending` is the one that
     matters and the one a raw dump would bury: it means the step never ran,

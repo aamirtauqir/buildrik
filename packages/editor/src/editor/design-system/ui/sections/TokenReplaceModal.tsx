@@ -15,7 +15,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, Button } from "@/editor/chrome-ui";
+import { ModalBody, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, Button } from "@/editor/chrome-ui";
 import type { DesignToken } from "../../types";
 
 export interface TokenReplaceModalProps {
@@ -124,6 +124,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
           replacement and Buildrick will redirect every binding via the rename
           bridge — no consumer breaks.
         </ModalDescription>
+        <ModalBody>
         <div style={listStyle} role="radiogroup" aria-label="Replacement candidates">
           {candidates.length === 0 ? (
             <div style={emptyStyle}>
@@ -155,6 +156,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
             })
           )}
         </div>
+        </ModalBody>
         <ModalFooter>
           <div style={btnRowStyle}>
             <Button

@@ -59,7 +59,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
       ) : null}
 
       <div
-        className="tw:flex tw:items-center tw:justify-between tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-gray-500 tw:bg-gray-100"
+        className="tw:flex tw:items-center tw:justify-between tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)] tw:bg-gray-100"
         data-no-dark-header
       >
         <span>No dark value</span>
@@ -67,7 +67,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
       </div>
 
       {missing.length === 0 ? (
-        <div className="tw:px-3 tw:py-6 tw:text-center tw:text-xs tw:text-gray-500">
+        <div className="tw:px-3 tw:py-6 tw:text-center tw:text-xs tw:text-[var(--bk-ink-muted)]">
           Every colour token has a dark value.
         </div>
       ) : (
@@ -93,7 +93,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
                 reader still reads something human.
               */}
               <span
-                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-gray-900"
+                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
                 title={t.name}
               >
                 {t.id}

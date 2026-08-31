@@ -41,7 +41,7 @@ export interface HelpTooltipProps {
 
 const TRIGGER_CLASS =
   "tw:inline-flex tw:items-center tw:justify-center tw:w-[18px] tw:h-[18px] tw:p-0 tw:ml-1 " +
-  "tw:border-transparent tw:bg-transparent tw:rounded-full tw:text-gray-500 tw:cursor-help tw:align-middle " +
+  "tw:border-transparent tw:bg-transparent tw:rounded-full tw:text-[var(--bk-ink-muted)] tw:cursor-help tw:align-middle " +
   "tw:[transition:color_0.15s,background_0.15s]";
 
 /**
