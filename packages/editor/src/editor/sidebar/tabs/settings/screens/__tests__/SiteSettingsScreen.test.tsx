@@ -47,7 +47,7 @@ describe("SiteSettingsScreen — field rendering", () => {
   it("renders Site Identity fields prefilled from composer projectSettings", () => {
     setup();
     expect(
-      (screen.getByPlaceholderText("My Awesome Site") as HTMLInputElement).value,
+      (screen.getByPlaceholderText("Bella Cucina") as HTMLInputElement).value,
     ).toBe("Acme Site");
     expect(
       (screen.getByPlaceholderText("https://example.com/favicon.ico") as HTMLInputElement).value,
@@ -70,7 +70,7 @@ describe("SiteSettingsScreen — field rendering", () => {
 
   it("falls back to defaults when composer settings are empty", () => {
     setup({ settings: {} });
-    expect((screen.getByPlaceholderText("My Awesome Site") as HTMLInputElement).value).toBe("");
+    expect((screen.getByPlaceholderText("Bella Cucina") as HTMLInputElement).value).toBe("");
     expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("en");
   });
 
@@ -97,7 +97,7 @@ describe("SiteSettingsScreen — edit behavior + markDirty wiring", () => {
   it("editing Site Name updates the input and marks the screen dirty (identity section)", async () => {
     const onDirtyChange = vi.fn();
     setup({ onDirtyChange });
-    const input = screen.getByPlaceholderText("My Awesome Site") as HTMLInputElement;
+    const input = screen.getByPlaceholderText("Bella Cucina") as HTMLInputElement;
     fireEvent.change(input, { target: { value: "Renamed Site" } });
     expect(input.value).toBe("Renamed Site");
     await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
@@ -123,7 +123,7 @@ describe("SiteSettingsScreen — edit behavior + markDirty wiring", () => {
 
   it("does NOT write to composer per keystroke — edits stay in the local buffer", () => {
     const { composer } = setup();
-    fireEvent.change(screen.getByPlaceholderText("My Awesome Site"), {
+    fireEvent.change(screen.getByPlaceholderText("Bella Cucina"), {
       target: { value: "Typed But Not Flushed" },
     });
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe("SiteSettingsScreen — edit behavior + markDirty wiring", () => {
     });
     await waitFor(() => {
       expect(
-        (screen.getByPlaceholderText("My Awesome Site") as HTMLInputElement).value,
+        (screen.getByPlaceholderText("Bella Cucina") as HTMLInputElement).value,
       ).toBe("External Rename");
     });
   });
@@ -160,7 +160,7 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     });
     const { composer } = setup({ registerFlushHandler });
 
-    fireEvent.change(screen.getByPlaceholderText("My Awesome Site"), {
+    fireEvent.change(screen.getByPlaceholderText("Bella Cucina"), {
       target: { value: "Flushed Name" },
     });
     fireEvent.change(screen.getByLabelText(/twitter/i), {

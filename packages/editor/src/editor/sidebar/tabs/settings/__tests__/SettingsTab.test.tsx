@@ -261,7 +261,7 @@ describe("SettingsTab v2 — Escape contract", () => {
     const { container } = render(<SettingsTab composer={makeComposer() as never} />);
     await clickRowAndAwaitPush(/general/i);
     // Drive dirty via real input edit.
-    const siteNameInput = (await screen.findByPlaceholderText(/My Awesome Site/i)) as HTMLInputElement;
+    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
     await makeSectionDirty(siteNameInput);
     // Press Escape on document body (NOT inside an input — Escape inside
     // input is handled by the input's blur/clear).
@@ -280,7 +280,7 @@ describe("SettingsTab v2 — ConfirmDialog Discard / Cancel", () => {
   it("Discard (back-attempt path): pops to root + clears dirty", async () => {
     const { container } = render(<SettingsTab composer={makeComposer() as never} />);
     await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/My Awesome Site/i)) as HTMLInputElement;
+    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
     await makeSectionDirty(siteNameInput);
     // Click DrillInHeader's back button while dirty → dialog opens.
     fireEvent.click(screen.getByRole("button", { name: /back to settings/i }));
@@ -303,7 +303,7 @@ describe("SettingsTab v2 — ConfirmDialog Discard / Cancel", () => {
     const composer = makeComposer();
     const { container } = render(<SettingsTab composer={composer as never} />);
     await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/My Awesome Site/i)) as HTMLInputElement;
+    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
     await makeSectionDirty(siteNameInput);
     // Capture mount-time snapshot for assertion (composer.getProjectSettings()
     // is the source of the snapshot, so this matches what Discard should send).
@@ -322,7 +322,7 @@ describe("SettingsTab v2 — ConfirmDialog Discard / Cancel", () => {
   it("Cancel: dialog closes + section stays + dirty preserved", async () => {
     const { container } = render(<SettingsTab composer={makeComposer() as never} />);
     await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/My Awesome Site/i)) as HTMLInputElement;
+    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
     await makeSectionDirty(siteNameInput);
     fireEvent.click(screen.getByRole("button", { name: /back to settings/i }));
     const dialog = await screen.findByRole("dialog");
@@ -349,7 +349,7 @@ describe("SettingsTab v2 — pending-nav guard", () => {
   it("dirty + jump to another section → dialog opens; Discard swaps section in-place", async () => {
     const { container } = render(<SettingsTab composer={makeComposer() as never} />);
     await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/My Awesome Site/i)) as HTMLInputElement;
+    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
     await makeSectionDirty(siteNameInput);
     // jsdom's fireEvent.click bypasses inert, so we can exercise the
     // navigate(!isRoot) dirty path via a snav row click.

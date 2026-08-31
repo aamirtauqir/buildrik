@@ -21,8 +21,12 @@ describe("publish footer links", () => {
     expect(footer).not.toMatch(/tw:no-underline/);
   });
 
+  /* The gray ladder became the ink tokens 2026-08-29 (value-identical:
+     ink-soft IS gray-600, ink-muted IS gray-500). The contract is unchanged —
+     the prose sits one step darker than muted, which is what clears AA. */
   it("darkens the surrounding prose to clear AA", () => {
-    expect(footer).toMatch(/tw:text-gray-600/);
+    expect(footer).toMatch(/tw:text-\[var\(--bk-ink-soft\)\]/);
+    expect(footer).not.toMatch(/tw:text-\[var\(--bk-ink-muted\)\]/);
     expect(footer).not.toMatch(/tw:text-gray-500/);
   });
 });
