@@ -210,7 +210,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — colour-mode: row pitch 48 vs board 32 — half as many rows per screen; token names and Set link match",
       "recipe": null
     },
     {
@@ -221,7 +221,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — components: the board PINS 'Generate with AI' to the panel foot; live renders it at y1081 in scroll flow, 674px below the fold and not even last",
       "recipe": null
     },
     {
@@ -243,7 +243,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unverified-2026-08-31 — needs a failing file import, not performed",
       "recipe": null
     },
     {
@@ -254,7 +254,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — export · exported: board shows a persistent 'Exported CSS' pill; live shows only a transient toast + a Copied! label swap",
       "recipe": null
     },
     {
@@ -265,7 +265,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unverified-2026-08-31 — needs a real file import, not performed",
       "recipe": null
     },
     {
@@ -276,7 +276,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — import-export: row pitch 66 vs 48, and TWO nested scrollers (725px hidden inside 470px hidden)",
       "recipe": null
     },
     {
@@ -342,7 +342,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:row-token-supersedes-44",
+      "authority": "walked:2026-08-31 — presets: row pitch 34 vs board 44; variant count right-aligned to x295 vs board x232",
       "recipe": null
     },
     {
@@ -364,7 +364,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unverified-2026-08-31 — no draft preset exists in the fixture; DraftChip is wired to panel-level dirty state, not a per-preset badge",
       "recipe": null
     },
     {
@@ -430,7 +430,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — token-detail: rows 54px vs board 44; adds an All/Issues filter and a section header the board lacks",
       "recipe": null
     },
     {
@@ -441,7 +441,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — tokens: an unboarded info banner pushes the first kind +89px; extra 'More token kinds' row and a second helper block",
       "recipe": null
     },
     {
@@ -3070,7 +3070,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Analytics: field order inverted — live puts the ID input above its Enable toggle, board puts the toggle first",
       "recipe": null
     },
     {
@@ -3092,7 +3092,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Custom code: the 3 cards match 1:1; only the shared full-bleed field width applies",
       "recipe": null
     },
     {
@@ -3103,7 +3103,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Domains: empty state reached; no Force-HTTPS toggle. Populated DNS table NOT verified",
       "recipe": null
     },
     {
@@ -3114,7 +3114,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Export: board draws FORMAT + PREVIEW cards; live is a paragraph and an 'Open exporter' button",
       "recipe": null
     },
     {
@@ -3125,7 +3125,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Forms: the PROVIDER card (provider select, endpoint, spam toggle) is absent. Populated inbox NOT verified",
       "recipe": null
     },
     {
@@ -3136,7 +3136,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — General: fields match; drift — the board's LEGAL card (cookie-consent toggle + privacy-page select) is replaced by two static links, and cookie consent moved to Analytics",
       "recipe": null
     },
     {
@@ -3147,7 +3147,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Headers: all 4 board cards present, plus Permissions-Policy; order differs; content overflows an 811-tall body",
       "recipe": null
     },
     {
@@ -3169,7 +3169,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "code:unreachable-2026-08-31 — fixture is on a starter plan so the screen renders LockedScreen; reaching the connected/available tables needs a billing flip, deliberately not done",
       "recipe": null
     },
     {
@@ -3180,7 +3180,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Localization: no auto-redirect toggle; locales are a chip row, not the board's 4-column table",
       "recipe": null
     },
     {
@@ -3191,7 +3191,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Redirects: the 404-SUGGESTER card is absent although the screen's own subtitle promises it",
       "recipe": null
     },
     {
@@ -3202,7 +3202,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — SEO: 3 fields vs the board's 6; the whole INDEXING card (allow-indexing toggle + robots.txt) is absent and robots.txt has no other home",
       "recipe": null
     },
     {
@@ -3213,7 +3213,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Webhooks: empty state live; the board's RECENT DELIVERIES table is one summary sentence instead",
       "recipe": null
     },
     {
@@ -3686,7 +3686,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — Custom code · locked: the gate never fired — SCREEN_PLAN_REQUIREMENTS keyed 'advanced' where the screen id is 'custom-code'. FIXED + guarded by a test",
       "recipe": null
     },
     {
@@ -4500,7 +4500,7 @@
       "width": 520,
       "height": 239,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Brand review-changes modal: 360w vs board 520 (ModalContent size='sm'); copy contract exact; buttons 32h vs 27",
       "recipe": null
     },
     {
@@ -4698,7 +4698,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Brand root (CURRENT): NEVER BUILT TO — the code cites 152:2/154:132 and this board appears nowhere in src. 140px of unboarded chrome (theme strip + mode toggle) hides 2 of 9 rows; scroller sh636/ch504",
       "recipe": null
     },
     {
@@ -4852,7 +4852,7 @@
       "width": 720,
       "height": 560,
       "status": "active",
-      "authority": "code:state-exists — live Branding screen is the pointer (S7 walk 2026-08-28)",
+      "authority": "walked:2026-08-31 — S7.2 Branding pointer: the board supersedes the field map, but live still renders it (5 rows + 3 Open buttons + a tokens block)",
       "recipe": null
     },
     {
