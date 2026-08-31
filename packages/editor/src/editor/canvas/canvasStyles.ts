@@ -74,7 +74,17 @@ export function getCanvasStyles(
       : "var(--bk-shadow-overlay)",
     overflow: "auto",
     transform: `scale(${scale})`,
-    transformOrigin: "center center",
+    /* `top left`, not `center center`, and paired with the negative-margin
+       compensation in Canvas.tsx's zoom-footprint effect.
+       `transform` is applied AFTER layout, so a scaled canvas keeps its
+       full-size layout box: at 50% the box still claimed 1024 while painting
+       512, which left the page sitting off-centre with ~312px of scroll over
+       empty grey. Centre-origin also paints outward from the middle, so the
+       overflow lands on both sides and the left half cannot be scrolled to.
+       Anchoring at top-left makes the painted box start where the layout box
+       starts, so shrinking the layout box by the scaled-away remainder is
+       enough to make footprint and paint agree. */
+    transformOrigin: "top left",
     transition: "box-shadow 0.2s, width 0.3s, height 0.3s, transform 0.3s",
     position: "relative",
   };

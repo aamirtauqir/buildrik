@@ -126,8 +126,16 @@ export type CommandCategory =
   | "debug";
 
 /**
- * Keyboard shortcut mapping
- * Maps command IDs to their keyboard shortcuts
+ * Keyboard shortcut mapping — DOCUMENTATION, not the binding.
+ *
+ * Nothing reads this map to register a key. The chords are bound by the
+ * canvas/shell keyboard hooks and by `KeybindingManager`, which builds its own
+ * chord string; `getShortcut()` below has no product consumer either. So an
+ * entry here can drift from the shipped behaviour without anything failing —
+ * and the zoom pair did exactly that, until it was measured on 2026-08-31.
+ *
+ * Treat a value here as a claim to be verified against the running editor, not
+ * as a source of truth. See `feedback_printed_chord_is_a_contract`.
  */
 export const SHORTCUTS: Record<CommandId, string | null> = {
   // Edit
@@ -152,8 +160,14 @@ export const SHORTCUTS: Record<CommandId, string | null> = {
   // View
   [COMMANDS.ZOOM_IN]: "Mod+=",
   [COMMANDS.ZOOM_OUT]: "Mod+-",
-  [COMMANDS.ZOOM_FIT]: "Mod+0",
-  [COMMANDS.ZOOM_100]: "Mod+1",
+  /* Mod+1 fits and Mod+0 resets to 100% — NOT the other way round. Measured
+     live 2026-08-31 at 1440x900: from 100%, Cmd+0 stayed at 100 and Cmd+1 went
+     to 33% (fit is height-constrained on a long page). The footer zoom flyout
+     and KeyboardShortcutsPanel both already print it this way; this map was the
+     last place still claiming the swap, and it misled a reviewer into filing
+     the correct surfaces as the broken ones. */
+  [COMMANDS.ZOOM_FIT]: "Mod+1",
+  [COMMANDS.ZOOM_100]: "Mod+0",
   [COMMANDS.TOGGLE_GRID]: "Mod+'",
   [COMMANDS.TOGGLE_GUIDES]: "Mod+;",
   [COMMANDS.TOGGLE_RULERS]: "Mod+R",

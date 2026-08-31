@@ -100,6 +100,14 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        zoom-to-selection measure against THIS box — the wrapper carries the
        padding and the pinned toolbar, and is not what the canvas scrolls in. */
     const scrollRef = React.useRef<HTMLDivElement>(null);
+    /* Declared here, not beside the JSX: the zoom-footprint layout effect below
+       lists it as a dependency, and a `const` read before its own declaration
+       is a temporal-dead-zone throw at render time, not a lint nit. */
+    const scale = zoom / 100;
+    /* The element getCanvasStyles styles — the one carrying `transform: scale`.
+       `canvasRef` is its CHILD (the content div that receives customer HTML),
+       so zoom compensation applied there styles the wrong box. */
+    const frameRef = React.useRef<HTMLDivElement>(null);
 
     // Toast notifications for drop errors and success
     const { addToast } = useToast();
@@ -338,6 +346,26 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer.setZoom(Math.round(Math.max(0.1, Math.min(4, scale)) * 100));
       el.scrollIntoView({ block: "center", inline: "center" });
     }, [composer, zoom]);
+
+    /* Make the canvas's LAYOUT footprint match what it paints when zoomed.
+       `transform: scale()` runs after layout, so the box keeps its full size
+       and the scroller sees overflow that is not there — at 50% the page sat
+       off-centre with ~312px of scroll over empty grey. With
+       `transform-origin: top left` (canvasStyles) the paint starts at the box's
+       own origin, so trimming the scaled-away remainder off the right and
+       bottom edges lines footprint up with paint. offsetWidth/offsetHeight are
+       pre-transform, which is exactly the number needed. */
+    React.useLayoutEffect(() => {
+      const el = frameRef.current;
+      if (!el) return;
+      if (scale >= 1) {
+        el.style.marginRight = "";
+        el.style.marginBottom = "";
+        return;
+      }
+      el.style.marginRight = `${-el.offsetWidth * (1 - scale)}px`;
+      el.style.marginBottom = `${-el.offsetHeight * (1 - scale)}px`;
+    }, [scale, device, canvasSize.width, canvasSize.height]);
 
     React.useEffect(() => {
       if (!composer) return;
@@ -616,7 +644,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     );
 
     const size = DEVICE_SIZES[device];
-    const scale = zoom / 100;
 
     /* readOnly withholds every handler that can change the document — inline
        edit, drop, the context menu and the keyboard (Delete, ⌘Z, ⌘D). Click and
@@ -644,6 +671,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             handleCanvasMouseLeave();
             handleMarqueeEnd();
           }}
+          ref={frameRef}
           style={{
             ...getCanvasStyles(size, device, scale, isDragOver),
             ...(pickMode ? { cursor: "crosshair" } : {}),
