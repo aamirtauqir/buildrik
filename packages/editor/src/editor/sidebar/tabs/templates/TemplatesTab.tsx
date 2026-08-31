@@ -102,10 +102,16 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
 
   const sel = useTemplateSelection(showProgress);
 
-  // P2 fix (codex A4): backup-current-page checkbox state for ReplaceModal.
-  // When checked, apply path duplicates the current page as "<Name> (backup)"
-  // before replacing content.
-  const [backupCurrentPage, setBackupCurrentPage] = React.useState(false);
+  /* P2 fix (codex A4): backup-current-page checkbox state for ReplaceModal.
+     When checked, the apply path duplicates the current page as
+     "<Name> (backup)" before replacing content.
+
+     Defaults ON. Applying a template REPLACES the page, and board 1169:4713
+     draws this box checked — on an action that destroys work, the safe option
+     is the default and the user opts out of it, not into it. This repo has
+     already paid for the other arrangement once ("one failed load + one edit
+     deleted a site"). */
+  const [backupCurrentPage, setBackupCurrentPage] = React.useState(true);
 
   // ── Derived ──
   const detailTemplate = sel.detailId

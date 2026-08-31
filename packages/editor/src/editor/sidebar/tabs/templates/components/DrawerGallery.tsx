@@ -133,7 +133,7 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
             {/* Board thumb: full-width 88h, bg-subtle + border, rounded-6 —
                 the template's gradient fills it when one exists. */}
             <div
-              className="tw:h-[88px] tw:w-full tw:rounded-6 tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)]"
+              className="tw:h-[88px] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)]"
               style={t.gradient ? { background: t.gradient } : undefined}
               aria-hidden="true"
             />
@@ -213,7 +213,7 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
             type="button"
             color="light"
             size="xs"
-            className="tw:h-7 tw:rounded-8 tw:px-3 tw:text-[13px] tw:font-medium"
+            className="tw:h-7 tw:rounded-lg tw:px-3 tw:text-[13px] tw:font-medium"
             data-testid="tpl-browse-all"
             onClick={onBrowseAll}
           >

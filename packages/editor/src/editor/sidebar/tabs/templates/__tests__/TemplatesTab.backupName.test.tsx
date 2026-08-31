@@ -68,8 +68,16 @@ async function applyWithBackup() {
      surface labels the same action "Apply template". */
   const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
   fireEvent.click(applyBtn);
+  /* Assert the state, do not toggle blindly. The box now DEFAULTS ON — board
+     1169:4713 draws it checked, because applying a template replaces the page
+     and the safe option belongs on the default. This helper used to click it
+     unconditionally, which under the new default turned backup OFF and made
+     both tests below fail with an empty rename list. */
   const checkbox = await screen.findByText(/save the current page as a backup version first/i);
-  fireEvent.click(checkbox);
+  const control = checkbox.closest("label") ?? checkbox;
+  const input = control.querySelector?.('input[type="checkbox"]') as HTMLInputElement | null;
+  if (input && !input.checked) fireEvent.click(checkbox);
+  if (input) expect(input.checked, "backup must be on before Replace").toBe(true);
   const [replace] = await screen.findAllByRole("button", { name: /^replace page$/i });
   fireEvent.click(replace);
 }
@@ -77,6 +85,22 @@ async function applyWithBackup() {
 afterEach(cleanup);
 
 describe("Templates — the backup is named what the checkbox promises", () => {
+  it("defaults the backup box ON — applying replaces the page", async () => {
+    /* The default itself, not just the naming. Board 1169:4713 draws it
+       checked: apply REPLACES the current page, so opting out of the backup
+       has to be a deliberate act. */
+    const { composer } = makeComposer(["Home"]);
+    render(<TemplatesTab composer={composer as never} isExpanded />);
+    const first = SITE_TEMPLATES[0];
+    fireEvent.click(await screen.findByText(first.name));
+    const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
+    fireEvent.click(applyBtn);
+    const label = await screen.findByText(/save the current page as a backup version first/i);
+    const input = (label.closest("label") ?? label).querySelector('input[type="checkbox"]') as HTMLInputElement | null;
+    expect(input, "backup checkbox not found").not.toBeNull();
+    expect(input!.checked).toBe(true);
+  });
+
   it('renames the duplicate to "<page> (backup)"', async () => {
     const { renames, composer } = makeComposer();
     render(<TemplatesTab composer={composer as never} isExpanded />);

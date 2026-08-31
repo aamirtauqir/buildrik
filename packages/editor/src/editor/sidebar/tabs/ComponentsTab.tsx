@@ -209,7 +209,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           <div className="tw:flex tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0">
             <Button
               size="xs"
-              className="tw:h-7 tw:rounded-8 tw:px-3 tw:text-[13px] tw:font-medium"
+              className="tw:h-7 tw:rounded-lg tw:px-3 tw:text-[13px] tw:font-medium"
               data-testid="comp-create"
               onClick={onCreateNew}
             >
@@ -289,7 +289,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         <div className="tw:flex tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0">
           <Button
             size="xs"
-            className="tw:h-7 tw:rounded-8 tw:px-3 tw:text-[13px] tw:font-medium"
+            className="tw:h-7 tw:rounded-lg tw:px-3 tw:text-[13px] tw:font-medium"
             data-testid="comp-create"
             onClick={onCreateNew}
           >

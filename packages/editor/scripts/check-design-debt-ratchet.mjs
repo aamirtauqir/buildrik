@@ -70,6 +70,26 @@ const RATCHETS = [
     baseline: 0,
   },
   {
+    id: "dead-radius-class",
+    /* `tw:rounded-6` and `tw:rounded-8` compile to NOTHING. Tailwind's radius
+       scale is named (sm/md/lg/xl/2xl…), so a bare integer is not a key and the
+       utility silently produces no rule — probed live inside `.bd-studio`:
+       rounded-6 -> 0px, rounded-8 -> 0px, rounded-md -> 6px, rounded-lg -> 8px.
+       Four sites shipped this; the Templates gallery thumb rendered square for
+       it, and three others only looked right because flowbite's Button base
+       happened to supply `rounded-lg` underneath. A class that compiles to
+       nothing is indistinguishable from a class that works, which is exactly
+       why this needs a gate rather than a reviewer. `2xl`/`3xl`/`4xl` are real
+       keys and are excluded — POSIX ERE has no lookahead, so they are excluded
+       by requiring a NON-letter after the digits (`2xl` has `x`). The first
+       version of this rule used `(?!xl)` and grep answered
+       "repetition-operator operand invalid" — which this script's `catch`
+       turned into a count of 0, i.e. a gate that passed because it had failed
+       to run. Negative-tested against a planted `tw:rounded-6`. */
+    pattern: String.raw`tw:rounded-[0-9]+[^0-9a-z]`,
+    baseline: 0,
+  },
+  {
     id: "offscale-css-font-size",
     /* The CSS layer was invisible to this gate until 2026-08-29 — it only ever
        scanned TSX — and that is where the editor's "not professional" symptom
