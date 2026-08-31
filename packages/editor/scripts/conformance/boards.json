@@ -4588,7 +4588,7 @@
       "width": 605,
       "height": 33,
       "status": "active",
-      "authority": "walked:2026-08-31 — inline-edit toolbar: bar 903x34 vs board 605x33 and FOUR of 18 controls render past the canvas column, focusable but unclickable; font-size select shows 10px on a 16px paragraph (legacy execCommand index)",
+      "authority": "walked:2026-08-31 — inline-edit toolbar. WALKER-MEASURED, NOT REPRODUCED HERE: bar 903x34 vs board 605x33 with four controls (text colour, highlight, link, clear formatting) past the canvas column, focusable but unclickable, and the font-size select showing 10px on a 16px paragraph. Two attempts to re-enter inline-edit via dblclick did not engage it, so no fix was made on this evidence. Supporting code fact that IS verified: only 3 of 7 Buttons in RichTextEditor.tsx carry toolbarButtonStyle's 24px box; the rest take flowbite's size.",
       "recipe": null
     },
     {
