@@ -107,7 +107,13 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
       {/* The board sets this block left, on plain white: no centring, and the
           benefit rows carry no tinted card behind them. */}
       <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:py-1">
-        <Badge>{requiredPlan}</Badge>
+        {/* Board 1175:4804 draws this badge purple, and DESIGN.md §Color
+            allowlists the flowbite purple ramp for exactly this — the PRO
+            badge and avatar identity tones, never an accent or CTA. With no
+            `color` it fell back to flowbite's blue, which is the accent this
+            product reserves for actions. `MediaCard`'s tone map already had
+            it right (`pro: { color: "purple" }`); this call site did not. */}
+        <Badge color="purple">{requiredPlan}</Badge>
 
         <p className="tw:m-0 tw:text-sm tw:text-[var(--bk-ink-soft)] tw:leading-normal">
           {feature

@@ -353,6 +353,20 @@ export async function getCurrentRound(siteId: string): Promise<CurrentRound | nu
 export async function getApprovedSnapshot(
   siteId: string,
 ): Promise<{ path: string; html: string }[] | null> {
+  /* `revokedAt: null` is deliberate and load-bearing — do not relax it. A
+     revoked round is no longer the site's approval, so handing back the pages
+     it approved would keep a withdrawn sign-off alive. The publish gate holds
+     the same line in its own query (`publish.service.ts:260-268`, which calls
+     its `revokedAt: null` load-bearing and blocks publish unless the latest
+     review is APPROVED), so the two must agree on what "approved" means.
+
+     Known consequence, raised by a walk on 2026-09-01 and NOT a bug to fix
+     here: every submit revokes all prior rounds (the `updateMany` above
+     matches on token + revokedAt and ignores status), so a resend withdraws an
+     existing APPROVED round and Compare then correctly reports no approved
+     snapshot. Whether Compare should be able to diff against the last
+     WITHDRAWN approval is a product question; answering it by widening this
+     query would also widen the publish gate, which is the wrong trade. */
   const r = await prisma.reviewRequest.findFirst({
     where: { siteId, status: "APPROVED", revokedAt: null },
     orderBy: { createdAt: "desc" },

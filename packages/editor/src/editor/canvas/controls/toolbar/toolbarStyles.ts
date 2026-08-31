@@ -66,6 +66,21 @@ export const nameTextStyles: React.CSSProperties = {
   whiteSpace: "nowrap",
 };
 
+/**
+ * A fixed width this narrow needs `tw:px-0` on the Button, or the icon vanishes.
+ *
+ * flowbite's Button ships `tw:px-5` — 20px each side — and the element is
+ * `box-sizing: border-box`. With `width: 24` that leaves 24 − 40 = a negative
+ * content box, which clamps to ZERO, so the `<svg>` inside gets no width at
+ * all. Measured on the selection toolbar: button 40x24 (the padding floor,
+ * which is why it still looked like a button), svg computed `width: 0px`,
+ * height 12 and fine — vertical padding is 0, so only the horizontal axis
+ * collapses. Every action icon on the on-canvas toolbar was invisible.
+ *
+ * `tw:px-0` is the fix because it is the SAME property, so twMerge drops
+ * flowbite's `px-5`. A different property (a min-width, say) does not conflict
+ * and loses. Sibling of the `tw:h-10` leak in dense chrome rows.
+ */
 export const actionBtnStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",

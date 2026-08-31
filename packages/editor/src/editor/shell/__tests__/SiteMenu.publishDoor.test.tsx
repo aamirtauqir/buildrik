@@ -58,6 +58,50 @@ describe("SiteMenu — the Publish panel's door", () => {
 });
 
 /*
+  The Review panel's door, for the same reason and found the same way.
+
+  The topbar pill was the ONLY way in, and `REVIEW_PILL.none` is null — so
+  revoking a round without sending a new one removed the pill and, with it,
+  every route to the panel: its comments, its round history, and Compare. The
+  rail has no Review tab (six tabs, none of them Review). Walked live: after a
+  revoke the panel could only be reached again by writing to the database.
+
+  A status indicator may disappear with its status. Navigation may not.
+*/
+describe("SiteMenu — the Review panel's door", () => {
+  it("opens the panel and closes the menu", () => {
+    const onOpenReview = vi.fn();
+    render(<SiteMenu onOpenReview={onOpenReview} />);
+    openMenu();
+
+    fireEvent.click(screen.getByRole("menuitem", { name: "Review" }));
+    expect(onOpenReview).toHaveBeenCalledTimes(1);
+  });
+
+  it("alone is enough to render the Site group", () => {
+    // `hasSite` gated on the other openers; a shell passing only this one
+    // would have had the whole group — and this door — hidden.
+    render(<SiteMenu onOpenReview={vi.fn()} />);
+    openMenu();
+    expect(screen.getByRole("menuitem", { name: "Review" })).toBeInTheDocument();
+  });
+
+  it("is absent when no opener is supplied — never a dead row", () => {
+    render(<SiteMenu onOpenHistory={vi.fn()} />);
+    openMenu();
+    expect(screen.queryByRole("menuitem", { name: "Review" })).not.toBeInTheDocument();
+  });
+
+  it("does not depend on there being an active review round", () => {
+    // The whole point: the row is present regardless of review state, which
+    // the pill is not. Nothing about this render implies a live round.
+    render(<SiteMenu onOpenReview={vi.fn()} onOpenHistory={vi.fn()} />);
+    openMenu();
+    expect(screen.getByRole("menuitem", { name: "Review" })).toBeInTheDocument();
+  });
+});
+
+/*
   Board 642:3401 lists "Share preview link" in the site menu. The flow exists —
   the dashboard's ShareDraftModal, on `siteDetail.sharing.create`, which mints a
   private link to the current DRAFT — and the editor had no way to reach it. A

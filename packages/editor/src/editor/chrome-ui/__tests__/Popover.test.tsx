@@ -112,3 +112,66 @@ describe("Menu", () => {
     expect(screen.queryAllByRole("menuitem")).toHaveLength(0);
   });
 });
+
+/**
+ * Viewport clamp.
+ *
+ * PLACEMENT_CLASS is a static offset from the anchor, and nothing measured the
+ * result — so a popover opened near an edge rendered outside the window with
+ * no scroll that reached it. Measured live on send-for-review, whose trigger
+ * sits low in the 320px Review panel: `x:-148, y:824, w:338, h:353` in a
+ * 1440x900 viewport — 148px past the left edge and 277px below the bottom.
+ * That is the only trigger for that flow in the shipped product.
+ *
+ * jsdom reports every rect as zero, so the rect is stubbed here: the point is
+ * the clamp arithmetic, which is what was missing.
+ */
+describe("Popover viewport clamp", () => {
+  function rectOf(left: number, top: number, right: number, bottom: number): DOMRect {
+    return {
+      left, top, right, bottom,
+      width: right - left, height: bottom - top,
+      x: left, y: top, toJSON: () => ({}),
+    } as DOMRect;
+  }
+
+  function renderAt(left: number, top: number, right: number, bottom: number) {
+    const spy = vi.spyOn(Element.prototype, "getBoundingClientRect");
+    spy.mockImplementation(function (this: Element) {
+      return this.getAttribute?.("role") === "dialog"
+        ? rectOf(left, top, right, bottom)
+        : rectOf(0, 0, 0, 0);
+    });
+    Object.defineProperty(document.documentElement, "clientWidth", { value: 1440, configurable: true });
+    Object.defineProperty(document.documentElement, "clientHeight", { value: 900, configurable: true });
+    try {
+      render(
+        <Popover open onClose={() => {}} label="Send for review" placement="bottom-end" trigger={<button>open</button>}>
+          <p>body</p>
+        </Popover>,
+      );
+      return screen.getByRole("dialog", { name: "Send for review" });
+    } finally {
+      spy.mockRestore();
+    }
+  }
+
+  it("pulls a popover that overflows left and bottom back inside", () => {
+    // The measured send-for-review geometry.
+    const el = renderAt(-148, 824, 190, 1177);
+    // left: 8 - (-148) = +156.  bottom: (900-8) - 1177 = -285.
+    expect(el.style.transform).toBe("translate(156px, -285px)");
+  });
+
+  it("leaves a popover that already fits alone", () => {
+    const el = renderAt(400, 300, 700, 500);
+    expect(el.style.transform).toBe("");
+  });
+
+  it("clamps to the top edge rather than pushing a tall popover off it", () => {
+    // Taller than the viewport: prefer showing the top, never translate it
+    // further up than the top margin.
+    const el = renderAt(400, 100, 700, 1400);
+    expect(el.style.transform).toBe("translate(0px, -92px)");
+  });
+});

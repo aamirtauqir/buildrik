@@ -760,6 +760,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           <SiteMenu
             onOpenSiteSettings={viewMode.readOnlyView ? undefined : onOpenProjectSettings}
             onOpenHistory={viewMode.readOnlyView ? undefined : onOpenHistory}
+            /* The pill (below) opens the same panel, but `REVIEW_PILL.none` is
+               null — revoke a round without sending a new one and the pill is
+               gone, and with it the only way back into Review. This row does
+               not depend on the state it navigates to. */
+            onOpenReview={viewMode.readOnlyView ? undefined : onOpenReview}
             onOpenPublish={viewMode.readOnlyView ? undefined : onOpenPublish}
             onOpenPublishHistory={viewMode.readOnlyView ? undefined : onOpenPublishHistory}
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code

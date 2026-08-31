@@ -213,7 +213,7 @@
   ],
   "_notReached": {
     "65:2": "Shell state 1 · First run — needs a site that has never been opened; the fixture has been.",
-    "66:640": "Shell state 11 · Saving → conflict — needs two writers racing; not forceable from one browser.",
+    "66:640": "Shell state 11 · Saving → conflict — REACHABLE, corrected 2026-09-01. This said \"needs two writers racing; not forceable from one browser\", which was wrong and made walkers skip it. Force it from one browser by intercepting the save: page.route('**/api/trpc/sites.saveProject**') returning a tRPC batch error {error:{json:{message:'SAVE_CONFLICT:<iso>',code:-32603,data:{code:'CONFLICT',httpStatus:409}}}} — the superjson-wrapped envelope SaveConflictError parses (services/BuildrikSyncProvider.ts:373-384). ConflictModal then opens. It DRIFTS from the board (board attributes the other writer and offers Review both; live is impersonal with a 3-way choice), which is founder-gated, not an oversight.",
     "66:225": "Shell state 9 · AI agent run — DELIBERATELY NOT RUN. Reaching it fires a paid generation call.",
     "807:8521": "Inspector · profile · MEDIA — the fixture page carries no image or video element, so the media profile cannot be reached on it."
   }

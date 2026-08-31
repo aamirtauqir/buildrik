@@ -50,8 +50,41 @@ export interface PopoverProps {
   block?: boolean;
 }
 
+/** Keep this much clear of every viewport edge when nudging back into view. */
+const VIEWPORT_MARGIN = 8;
+
 export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block }: PopoverProps) {
   const wrap = React.useRef<HTMLSpanElement | null>(null);
+  const panel = React.useRef<HTMLDivElement | null>(null);
+
+  /**
+   * PLACEMENT_CLASS is a static offset from the anchor and nothing measured
+   * the result, so a popover opened near an edge simply rendered outside the
+   * window. Measured on the send-for-review popover, whose trigger sits low in
+   * the 320px Review panel: `x:-148, y:824, w:338, h:353` in a 1440x900
+   * viewport — 148px past the left edge and 277px below the bottom, with no
+   * scroll that reaches it. That is the ONLY trigger for send-for-review in
+   * the shipped product, so the flow was unusable.
+   *
+   * The nudge is a transform, not a layout change: it cannot feed back into
+   * the measurement, so there is no oscillation. Applied imperatively rather
+   * than as a style prop because the value is measured, not authored.
+   */
+  React.useLayoutEffect(() => {
+    const el = panel.current;
+    if (!open || !el) return;
+    el.style.transform = "";
+    const r = el.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    let dx = 0;
+    let dy = 0;
+    if (r.left < VIEWPORT_MARGIN) dx = VIEWPORT_MARGIN - r.left;
+    else if (r.right > vw - VIEWPORT_MARGIN) dx = Math.max(vw - VIEWPORT_MARGIN - r.right, VIEWPORT_MARGIN - r.left);
+    if (r.top < VIEWPORT_MARGIN) dy = VIEWPORT_MARGIN - r.top;
+    else if (r.bottom > vh - VIEWPORT_MARGIN) dy = Math.max(vh - VIEWPORT_MARGIN - r.bottom, VIEWPORT_MARGIN - r.top);
+    if (dx || dy) el.style.transform = `translate(${Math.round(dx)}px, ${Math.round(dy)}px)`;
+  }, [open, placement, children]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -73,7 +106,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
     <span className={ANCHOR_CLASS[block ? "block" : "inline"]} ref={wrap}>
       {trigger}
       {open ? (
-        <div className={[POPOVER_BASE_CLASS, PLACEMENT_CLASS[placement], className].filter(Boolean).join(" ")} role="dialog" aria-label={label}>
+        <div ref={panel} className={[POPOVER_BASE_CLASS, PLACEMENT_CLASS[placement], className].filter(Boolean).join(" ")} role="dialog" aria-label={label}>
           {children}
         </div>
       ) : null}

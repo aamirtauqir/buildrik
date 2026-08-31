@@ -43,6 +43,17 @@ export interface SiteMenuProps {
   onOpenSiteSettings?: () => void;
   onOpenHistory?: () => void;
   /**
+   * Opens the Review panel — the same door the topbar pill opens.
+   *
+   * The pill was the ONLY door, and `REVIEW_PILL.none` is null: revoke a round
+   * without sending a new one and the pill disappears, taking the panel with
+   * it. The rail has no Review tab either (6 tabs, none of them Review), so
+   * the panel — its comments, its round history, Compare — became unreachable
+   * without a database write. Reached live doing exactly that. A status
+   * indicator that vanishes with the status cannot also be the navigation.
+   */
+  onOpenReview?: () => void;
+  /**
    * Opens the Publish panel — board 641:2652, a 320-wide drawer surface with
    * the environment rows, the since-last-deploy change list, the last deploy
    * and the pre-publish wizard behind its CTA.
@@ -127,6 +138,7 @@ const SHORTCUTS_KBD = IS_MAC ? "⌘/" : "Ctrl /";
 export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenSiteSettings,
   onOpenHistory,
+  onOpenReview,
   onOpenPublish,
   onOpenPublishHistory,
   onExportCode,
@@ -151,7 +163,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   };
 
   const hasSite = Boolean(
-    onOpenSiteSettings || onOpenHistory || onOpenPublish || onOpenPublishHistory || onExportCode,
+    onOpenSiteSettings || onOpenHistory || onOpenReview || onOpenPublish || onOpenPublishHistory || onExportCode,
   );
   const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
   const hasShare = Boolean(onToggleReadOnlyView || publishedUrl || siteId);
@@ -182,6 +194,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                 Version history
               </MenuItem>
             ) : null}
+            {onOpenReview ? <MenuItem onClick={run(onOpenReview)}>Review</MenuItem> : null}
             {onOpenPublish ? <MenuItem onClick={run(onOpenPublish)}>Publish panel</MenuItem> : null}
             {onOpenPublishHistory ? (
               <MenuItem onClick={run(onOpenPublishHistory)}>Publish history</MenuItem>
