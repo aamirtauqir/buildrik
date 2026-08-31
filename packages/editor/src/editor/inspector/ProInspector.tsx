@@ -440,50 +440,63 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
-      {/* Board 160:412's banner: "Editing all 12 buttons — All like this", one
-          line, no exit control of its own. It counts the peers PLUS this
-          element, because that is what "all" means to the person reading it,
-          and it stays up for as long as the mode is on. The way out is the
-          same pill that turned it on — which now reads "All like this", so the
-          banner and the control agree about where you are. */}
-      {reachAll && (
-        <p
-          className="tw:m-0 tw:border-l-2 tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-warning-text)]"
-          role="status"
-          data-testid="reach-all-banner"
-        >
-          Editing all {reachPeerIds.length + 1} {selectedElement.type}
-          {reachPeerIds.length === 0 ? "" : "s"} — All like this
-        </p>
+      {/* Every banner below annotates THE CONTROLS BELOW IT — which scope a
+          write lands on, which breakpoint it overrides, which instance it
+          follows. The two takeovers (whole-site, and an AI run) replace those
+          controls entirely, so a banner that outlives them describes nothing
+          and contradicts the takeover: measured 2026-08-31 with reach set to
+          "All like this", the panel showed "Editing all 4 paragraphs — All
+          like this" directly above "Editing the whole site — every page",
+          with zero controls between them. A banner does not outlive its
+          controls. */}
+      {!wholeSite && !agentRun.running && (
+        <>
+        {/* Board 160:412's banner: "Editing all 12 buttons — All like this", one
+            line, no exit control of its own. It counts the peers PLUS this
+            element, because that is what "all" means to the person reading it,
+            and it stays up for as long as the mode is on. The way out is the
+            same pill that turned it on — which now reads "All like this", so the
+            banner and the control agree about where you are. */}
+        {reachAll && (
+          <p
+            className="tw:m-0 tw:border-l-2 tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-warning-text)]"
+            role="status"
+            data-testid="reach-all-banner"
+          >
+            Editing all {reachPeerIds.length + 1} {selectedElement.type}
+            {reachPeerIds.length === 0 ? "" : "s"} — All like this
+          </p>
+        )}
+        {/* Board 160:105 — a bound element says what it follows, above the
+            controls that no longer decide anything. */}
+        <BindingBanner
+          composer={composer}
+          elementId={selectedElement.id}
+          elementLabel={elementLabel}
+        />
+        {/* Board 160:2 — an instance says so above its styles, not in a
+            collapsed section under Animation. */}
+        <VariantSection composer={composer ?? null} elementId={selectedElement.id ?? null} />
+        {/* Board 160:313 — a picked state is a different layer, and every write
+            from here lands on it rather than on Base. The dropdown alone said
+            which state was picked, not that the panel below it had changed
+            meaning. */}
+        {currentPseudoState !== "normal" && (
+          <p
+            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-accent)]"
+            data-testid="pseudo-state-banner"
+          >
+            Editing {pseudoStateLabel(currentPseudoState)} — not Base
+          </p>
+        )}
+        {/* Board 160:208 — what this breakpoint changes, and the way back. */}
+        <BreakpointOverrides
+          composer={composer}
+          elementId={selectedElement.id}
+          breakpoint={currentBreakpoint}
+        />
+        </>
       )}
-      {/* Board 160:105 — a bound element says what it follows, above the
-          controls that no longer decide anything. */}
-      <BindingBanner
-        composer={composer}
-        elementId={selectedElement.id}
-        elementLabel={elementLabel}
-      />
-      {/* Board 160:2 — an instance says so above its styles, not in a
-          collapsed section under Animation. */}
-      <VariantSection composer={composer ?? null} elementId={selectedElement.id ?? null} />
-      {/* Board 160:313 — a picked state is a different layer, and every write
-          from here lands on it rather than on Base. The dropdown alone said
-          which state was picked, not that the panel below it had changed
-          meaning. */}
-      {currentPseudoState !== "normal" && (
-        <p
-          className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-accent)]"
-          data-testid="pseudo-state-banner"
-        >
-          Editing {pseudoStateLabel(currentPseudoState)} — not Base
-        </p>
-      )}
-      {/* Board 160:208 — what this breakpoint changes, and the way back. */}
-      <BreakpointOverrides
-        composer={composer}
-        elementId={selectedElement.id}
-        breakpoint={currentBreakpoint}
-      />
       {/* AI agent takeover (board 160:512) — the run replaces the controls;
           the selection is kept and restored when the run ends. */}
       {agentRun.running ? (

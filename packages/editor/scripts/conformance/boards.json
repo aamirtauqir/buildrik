@@ -3763,7 +3763,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Tablet + a changed value shows the override bar (border-left), the ↺ 'Revert font size to base', and 'Overridden on Tablet — Base is …'; pill gains a dot. Fixture override reverted after.",
       "recipe": null
     },
     {
@@ -3774,7 +3774,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — Base pill → :hover shows the note 'Editing :hover — not Base', the board's exact copy",
       "recipe": null
     },
     {
@@ -3785,7 +3785,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — reach pill → All like this shows 'Editing all 4 paragraphs — All like this' (board's count is sample data)",
       "recipe": null
     },
     {
@@ -3807,7 +3807,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — whole-site takeover: 0 sections, 'Editing the whole site — every page' + Open Brand / Back to this element; back restores all 11 sections",
       "recipe": null
     },
     {
