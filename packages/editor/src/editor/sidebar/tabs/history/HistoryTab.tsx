@@ -295,6 +295,16 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
         {activeView === "saves" && savesSettled && <SavesApproval composer={composer} />}
 
+        {/* The lists scroll; the approval band above and the prune note below
+            are panel chrome and stay put (SavesChrome's own contract). Without
+            this region the whole column was `overflow: hidden` and simply cut
+            off — measured 586 of content in 547 of panel, which sliced the last
+            version row in half and put the retention rule outside the panel
+            entirely, with no scrollbar to reach it. */}
+        {/* tw:min-h-0 is the load-bearing half — a flex child defaults to a
+            min-content floor, so without it this grows past the panel and
+            overflows instead of scrolling. */}
+        <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col" data-testid="history-list-scroll">
         {activeView === "saves" && savesFilter === "changes" && (
           <ActivityView
             composer={composer}
@@ -320,8 +330,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           </>
         )}
 
-        {activeView === "saves" && savesSettled && <SavesPruneNote composer={composer} />}
-
         {/* M2 — the published-version list's canonical home. Same component the
             Publish panel embeds; rollback stays ADMIN-gated inside it. */}
         {activeView === "published" &&
@@ -337,6 +345,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                This fires only when the editor was opened without one. */
             <div className={HISTORY_EMPTY}>Open this site from the dashboard to see its publish history.</div>
           ))}
+        </div>
+
+        {activeView === "saves" && savesSettled && <SavesPruneNote composer={composer} />}
       </div>
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       {showScrubber && (

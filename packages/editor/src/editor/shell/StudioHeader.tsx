@@ -156,6 +156,12 @@ const SAVE_ANNOUNCEMENTS: Partial<Record<SaveState, { assertive: boolean; msg: s
   offline: { assertive: false, msg: "Offline — changes not saved" },
 };
 
+/** The strings the save effect owns, so it clears only its own stale text. */
+const SAVE_MSGS = new Set<string>([
+  ...Object.values(SAVE_ANNOUNCEMENTS).map((a) => a.msg),
+  "Saved",
+]);
+
 /** "· 2d ago" suffix on the approved pill (S5.6 board 131:2). */
 function pillAgo(at?: string | Date | null): string {
   if (!at) return "";
@@ -588,8 +594,19 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (prev === save) return;
     prevSaveRef.current = save;
     const a = SAVE_ANNOUNCEMENTS[save];
-    if (a) (a.assertive ? setAlertMsg : setPoliteMsg)(a.msg);
-    else if (save === "saved" && prev === "saving") setPoliteMsg("Saved");
+    /* One save state, one announcement. Setting only the matching region left
+       the OTHER one holding the previous save state's text, and both regions
+       are live: going offline then failing was read out as "Offline — changes
+       not saved" AND "Save failed" at once — two answers to one question.
+       Only save-owned strings are cleared, so a publish message in the sibling
+       region survives (that effect owns its own text). */
+    if (a) {
+      (a.assertive ? setAlertMsg : setPoliteMsg)(a.msg);
+      (a.assertive ? setPoliteMsg : setAlertMsg)((m) => (SAVE_MSGS.has(m) ? "" : m));
+    } else if (save === "saved" && prev === "saving") {
+      setPoliteMsg("Saved");
+      setAlertMsg((m) => (SAVE_MSGS.has(m) ? "" : m));
+    }
     // `unsaved` and `saving` are not announced — they fire on every keystroke.
   }, [save]);
   React.useEffect(() => {

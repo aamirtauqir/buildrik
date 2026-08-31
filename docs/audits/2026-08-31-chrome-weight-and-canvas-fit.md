@@ -278,3 +278,62 @@ full-shell boards, and 11 of its 18 need nothing but clicking an element.
 One caution for whoever continues: **Shell states' 12 boards all carry
 `authority: code:topbar`** — the founder already ruled the shipped topbar beats
 those boards, so a whole-board comparison there will manufacture false drift.
+
+---
+
+## 8. Later walk rounds — Media/Brand/Settings, then History, Issues, Notifications, S1 flows
+
+§7's counts are a snapshot and have been overtaken. Current census, active rows
+only (355): **`walked:` 173 · `code:` 145 · `board:` 33 · undecided 55 ·
+blocked 11 · founder 4.** So **173 of 355 are proven and 145 still are not** —
+again, not "done", and not counted as such.
+
+### Defects found, fixed and live-verified in these rounds
+
+| Where | Defect | Verified |
+|---|---|---|
+| History · Saves | The retention rule was **clipped out of the panel**. `.list-container` was `overflow: hidden` with 586 of content in 547 of panel, so the last version row was sliced in half and "50 versions kept…" rendered at y844 against a panel bottom of 836 — outside it, with no scrollbar to reach it. | Note now measures y805–836, inside a panel ending at 836 |
+| Time-Travel | **`Ctrl+Shift+T` opened Templates.** `ui-open-templates` claimed the chord, and the registry's `KeybindingManager` listens on window in the *capture* phase, so it beat `HistoryTab`'s own bubble-phase listener — which was then unmounted with the panel. The scrubber's button prints the chord in both its `aria-label` and its `title`. | Chord dropped from the command; Templates keeps its working `T` door |
+| Notifications | "Mark all read" rendered **directly above "You're all caught up"** — it gated on `state === "ready"`, and *loaded* is not *non-empty*. | Gated on `ordered.length > 0` |
+| Save states | A save that failed **while online** announced **"Offline — not saved"**. The classifier treated a network-*shaped* error string (`failed to fetch`) as proof of being offline, then set `status: "error"` anyway — one event, two causes named, and the named one false. | `isOffline` (navigator) now gates the copy; `isNetwork` still gates the handling |
+| Save states · a11y | The two live regions **never cleared each other**, so offline→error was announced as "Offline — changes not saved" *and* "Save failed" together. Four strings for two states. | One save state now yields one message; publish messages in the sibling region survive |
+
+The chord defect is the third of its kind, so it now has a gate:
+`history/__tests__/timeTravelChord.test.ts` — negative-tested by re-planting the
+`ctrl+shift+t` binding and watching it fail.
+
+### Deliberately NOT fixed — and why
+
+- **Issues filter-note position (164:22).** The walker reads the board as
+  putting the note *below* the list; the code's own comment cites *the same
+  board* for placing it *with the filter*. One of the two misread it, and I
+  cannot settle it without the board in front of me. Recorded, not flipped.
+- **`SECTION TEMPLATES` renders zero rows.** Real, but it is a **content gap,
+  not dead UI**: all 10 `SITE_TEMPLATES` are `category: "site-pages"`, and the
+  header is already guarded so nothing empty paints. Deleting the branch would
+  remove the surface those templates belong in.
+- **History row redundancy.** Rows print the time twice ("11:47 PM" *and* "Just
+  now") and carry an "Auto" chip under a title that already reads "Auto-save";
+  the hover actions then cover that chip. The overlay is a deliberate
+  gradient-scrim pattern, and the rest is a board question.
+
+### Boards that instruct the product to lie
+
+Two, both found by driving the failure states rather than reading them:
+
+- **`294:1976` session-expired** says *"Your work is saved."* For a `siteId`
+  site it is not — the save is a bare `saveProject` RPC that writes no
+  localStorage. The shipped modal already refuses the claim. **Redraw the
+  board; do not build it.**
+- **`807:7000` connection-restored** says *"Back online. Syncing your
+  changes…"*. `OfflineBanner` watches `navigator.onLine` and has no view of the
+  save queue, so nothing behind that sentence could back it. Live says only
+  "Back online", which is the honest half.
+
+### Unreachable, stated rather than quietly counted
+
+`163:220` (restoring) and `163:269` (pruned-notice) need fixture mutation;
+`949:4474` populated and the five `History · Published · *` boards need a real
+deploy, which is out of scope by founder call; `807:6965` (save conflict) needs
+two writers racing; Issues `164:42`/`164:57` have **no producer** — no lint rule
+sets `autoFixHint`, so `Fix ›` cannot render.

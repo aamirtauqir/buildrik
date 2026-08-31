@@ -848,7 +848,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "board:949-4474",
+      "authority": "walked:unreachable-no-published-versions",
       "recipe": null
     },
     {
@@ -914,7 +914,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "board:162-2-prune-rule",
+      "authority": "walked:drift-prune-note-clipped-FIXED",
       "recipe": null
     },
     {
@@ -925,7 +925,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "board:163-2-as-filter",
+      "authority": "walked:drift-undo-empty-branch-only",
       "recipe": null
     },
     {
@@ -947,7 +947,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -969,7 +969,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "board:163-167",
+      "authority": "walked:match-minor-button-height",
       "recipe": null
     },
     {
@@ -991,7 +991,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "board:163-113",
+      "authority": "walked:partial-scrubber-opens-by-button",
       "recipe": null
     },
     {
@@ -1585,7 +1585,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-copy-and-markall-FIXED",
       "recipe": null
     },
     {
@@ -1607,7 +1607,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-error-copy-and-action",
       "recipe": null
     },
     {
@@ -1618,7 +1618,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-spinner-not-skeletons",
       "recipe": null
     },
     {
@@ -2168,7 +2168,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-coach-never-mounts",
       "recipe": null
     },
     {
@@ -2179,7 +2179,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-drawer-side",
       "recipe": null
     },
     {
@@ -2201,7 +2201,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:unreachable-by-choice-would-mutate",
       "recipe": null
     },
     {
@@ -2212,7 +2212,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-modal-vs-full-page",
       "recipe": null
     },
     {
@@ -2223,7 +2223,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:copy-wins — board copy contradicts shipped mechanism, walked 2026-08-25",
+      "authority": "code:copy-wins-VERIFIED-LIVE",
       "recipe": null
     },
     {
@@ -2234,7 +2234,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-banner-position",
       "recipe": null
     },
     {
@@ -2245,7 +2245,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:code-wins-syncing-claim-unbacked",
       "recipe": null
     },
     {
@@ -2256,7 +2256,7 @@
       "width": 1440,
       "height": 360,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-7-states-board-draws-5",
       "recipe": null
     },
     {
@@ -2278,7 +2278,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-no-modal",
       "recipe": null
     },
     {
@@ -2289,7 +2289,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:unreachable-toast-only",
       "recipe": null
     },
     {
@@ -2300,7 +2300,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:unreachable-create-is-synchronous",
       "recipe": null
     },
     {
@@ -2311,7 +2311,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-no-search-no-tabs",
       "recipe": null
     },
     {
@@ -2322,7 +2322,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-checklist-floor-3-unreachable",
       "recipe": null
     },
     {
@@ -2333,7 +2333,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-seeded-4-rendered-5",
       "recipe": null
     },
     {
@@ -2344,7 +2344,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift",
       "recipe": null
     },
     {
@@ -2377,7 +2377,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-banner-over-live-shell-deliberate",
       "recipe": null
     },
     {
@@ -2388,7 +2388,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-no-reconnecting-state",
       "recipe": null
     },
     {
@@ -2399,7 +2399,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "founder:board-asks-product-to-lie-REDRAW",
       "recipe": null
     },
     {
@@ -3642,7 +3642,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-skeleton-pitch-18-vs-32",
       "recipe": null
     },
     {
@@ -3829,7 +3829,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-filter-note-position-BOARD-CONFLICT",
       "recipe": null
     },
     {
@@ -3840,7 +3840,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-empty-text-20px-high",
       "recipe": null
     },
     {
@@ -3851,7 +3851,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:unreachable-no-autofix-producer",
       "recipe": null
     },
     {
@@ -3862,7 +3862,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:unreachable-no-autofix-producer",
       "recipe": null
     },
     {
@@ -3972,7 +3972,7 @@
       "width": 1440,
       "height": 140,
       "status": "active",
-      "authority": "code:copy-wins — DUPLICATE of S1.2 · crash-recovery (297:2027), same state, banner-only crop",
+      "authority": "code:copy-wins-VERIFIED-LIVE",
       "recipe": null
     },
     {
@@ -3983,7 +3983,7 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:unreachable-needs-two-writers",
       "recipe": null
     },
     {

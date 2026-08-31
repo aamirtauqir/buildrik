@@ -104,7 +104,10 @@ describe("useSaveCallback", () => {
 
   it("on a network error with NO siteId, says the edit is on this device", async () => {
     /* Only this branch runs `composer.saveProject()`, which is the one that
-       writes localStorage — so only here may the copy promise the device. */
+       writes localStorage — so only here may the copy promise the device.
+       jsdom reports `navigator.onLine === true`, so this is the ONLINE case:
+       the transport died but the browser never left the network, and the
+       title must name that cause rather than claiming "Offline". */
     opts.saveProject.mockRejectedValueOnce(new Error("fetch failed: network"));
     const { result } = renderHook(() =>
       useSaveCallback({
@@ -122,7 +125,7 @@ describe("useSaveCallback", () => {
     expect(opts.addToast).toHaveBeenCalledWith(
       expect.objectContaining({
         tone: "info",
-        title: "Offline — saved on this device",
+        title: "Couldn't reach the server — saved on this device",
       }),
     );
     // never the scary failed toast for a network error
@@ -156,13 +159,54 @@ describe("useSaveCallback", () => {
         outcome = await result.current();
       });
       expect(outcome).toBe("error");
+      // Online (jsdom's default) — the server was unreachable, not the user.
       expect(opts.addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ tone: "warning", title: "Offline — not saved" }),
+        expect.objectContaining({
+          tone: "warning",
+          title: "Couldn't reach the server — not saved",
+        }),
       );
       expect(opts.addToast).not.toHaveBeenCalledWith(
         expect.objectContaining({ title: expect.stringContaining("on this device") }),
       );
     } finally {
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+
+  it("says Offline only when the browser is actually offline", async () => {
+    /* The bug this locks: `isNetwork` was true for ANY network-shaped error
+       text, and that one boolean picked the copy. A server that refused while
+       the browser was online produced "Failed to fetch", matched the regex,
+       and the toast said "Offline — not saved" beside a pill reading "Save
+       failed — retry" — one event, two causes named, and the named one false.
+       Only `navigator.onLine` may decide this word. */
+    const url = new URL("http://localhost:3000/edit/site_abc");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    /* Shadow the prototype getter with an OWN property, and delete that own
+       property in the finally — restoring the prototype descriptor instead
+       leaves the instance shadow in place, and every later test in this file
+       then runs "offline". */
+    Object.defineProperty(navigator, "onLine", { value: false, configurable: true });
+    try {
+      svc.saveProject.mockRejectedValueOnce(new Error("fetch failed: network"));
+      const { result } = renderHook(() =>
+        useSaveCallback({
+          composer: opts.composer,
+          addToast: opts.addToast,
+          setSaveState: opts.setSaveState,
+          setIsDirty: opts.setIsDirty,
+        }),
+      );
+      await act(async () => {
+        await result.current();
+      });
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "warning", title: "Offline — not saved" }),
+      );
+    } finally {
+      delete (navigator as unknown as Record<string, unknown>).onLine;
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
   });

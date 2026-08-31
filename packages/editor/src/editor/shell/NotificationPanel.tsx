@@ -165,8 +165,11 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
     <div ref={panelRef} tabIndex={-1} className="bk-notifications" role="dialog" aria-label="Notifications">
       <div className="bk-notifications__head">
         <span className="bk-notifications__title">Notifications</span>
-        {/* F5: no mark-all while there is nothing loaded to mark. */}
-        {state === "ready" ? (
+        {/* F5: no mark-all while there is nothing to mark. This gated on
+            `state === "ready"` alone, but "loaded" is not "non-empty" — the
+            button rendered directly above the "You're all caught up" empty
+            state, offering to mark zero rows read. */}
+        {state === "ready" && ordered.length > 0 ? (
           <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
             Mark all read
           </Button>

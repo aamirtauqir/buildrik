@@ -147,9 +147,15 @@ export function useSaveCallback({
         // edit stays in the local project and syncs on reconnect. Don't show the
         // scary "Save failed" + Retry; clear the spinner (the topbar's offline
         // indicator already says "changes queued") and nudge once, calmly.
+        /* Two facts, not one. `isNetwork` says the save died in transport;
+           `isOffline` says WHY. They were conflated, so a server that refused
+           while the browser was online (error text "Failed to fetch", which
+           this regex matches) produced the toast "Offline — not saved" beside
+           a pill reading "Save failed — retry" — one event, two causes named,
+           and the named one was false. Only navigator can answer "offline". */
+        const isOffline = typeof navigator !== "undefined" && !navigator.onLine;
         const isNetwork =
-          (typeof navigator !== "undefined" && !navigator.onLine) ||
-          /network|fetch|offline|failed to fetch|connection/i.test(errorMessage);
+          isOffline || /network|fetch|offline|failed to fetch|connection/i.test(errorMessage);
         if (isNetwork) {
           /* This copy used to promise, for every project, that the edit was
              "saved on this device and will sync when you're back". For a
@@ -167,14 +173,17 @@ export function useSaveCallback({
           addToast(
             siteId
               ? {
-                  title: "Offline — not saved",
-                  description:
-                    "Your changes are still open in this tab. Keep it open and save again once you're back online.",
+                  title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
+                  description: isOffline
+                    ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
+                    : "Your changes are still open in this tab. Keep it open and try saving again.",
                   tone: "warning",
                 }
               : {
-                  title: "Offline — saved on this device",
-                  description: "Your edits are in this browser and will go up when you're back.",
+                  title: isOffline
+                    ? "Offline — saved on this device"
+                    : "Couldn't reach the server — saved on this device",
+                  description: "Your edits are in this browser and will go up when they can.",
                   tone: "info",
                 },
           );

@@ -424,9 +424,14 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // UI Toggles (emit events, UI listens)
     // ============================================
     {
+      /* No shortcut. `ctrl+shift+t` used to live here, and it won — the
+         KeybindingManager listens on window in the CAPTURE phase, so it beat
+         HistoryTab's own bubble-phase listener for the same chord and the
+         History panel was replaced by Templates. That chord is printed on the
+         Time-Travel button's label AND title, so it is a contract; Templates
+         already has its own working door (`T`) and needed no second one. */
       id: "ui-open-templates",
       label: "Open templates",
-      shortcut: "ctrl+shift+t",
       run: () => composer.emit(EVENTS.UI_TOGGLE_TEMPLATES),
     },
     {
