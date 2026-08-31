@@ -1,9 +1,9 @@
 {
   "inline_literal": 702,
   "inline_hoisted": 284,
-  "css_lines": 8853,
+  "css_lines": 8863,
   "css_files": {
-    "inspector/styles/inspector.css": 1036,
+    "inspector/styles/inspector.css": 1046,
     "media/LibraryManager.css": 1129,
     "panels/layers/styles/layers-v2.css": 621,
     "rail/LayoutShell.css": 403,
