@@ -134,7 +134,27 @@ pair value-identical, ratchet **470 → 10**); the nineteen half-pixel sizes
 (10.5/11.5/12.5px) snapped onto the 11/12/13 scale (**86 → 67**); the two
 modals that were genuinely flush (CommentLayer's orphan dialog,
 TokenReplaceModal) got their `ModalBody` gutter — the other eleven from the
-inventory carry their own padding, checked rather than assumed. What is left
-under the ratchet is the ghost-link recipe (44 sites whose class strings
-carry layout extras beyond the recipe, so each is a judgment call) and 67
-off-scale sizes.
+inventory carry their own padding, checked rather than assumed. **Third pass, same day** — the judgment-call tail was walked too, one shape
+at a time:
+
+- **Ghost-link 44 → 19.** Five shared forms now live in
+  `chrome-ui/linkButton.ts` (row · tight · small · on-dark · inline) and 15
+  call sites across 12 files reference one. The migration is a rename, not a
+  restyle — constant + each site's own extras reproduces its exact shipped
+  class string, so no utility competes with itself (the twMerge trap). The 19
+  counted now are those five DEFINITIONS plus 14 single-use shapes (an h-9 nav
+  row, a w-fit chip, an 11px modal link). New links use `variant="link"`.
+- **Off-scale 67 → 42, and the rest is named.** Six near-scale chrome headings
+  (15px h2/h3, a 17px ModalTitle) snapped to `--bk-text-16`. Three paths are
+  excluded with the reason written into the gate, the way `avatarTone` is:
+  CatalogCard draws a component MINIATURE (7/8px is the thumbnail's scale),
+  and BrandPreview / TypographySection render the user's typefaces as
+  specimens where the size IS the sample.
+- **Gray-text 470 → 10, also named.** What remains is `gray-400` on decoration
+  chevrons and a drag handle: the ink scale has no 400 step, and snapping them
+  to 300 or 500 would be a visible change made to satisfy a counter. They wait
+  for Figma to publish that step.
+
+Nothing under the ratchet is now un-explained: every surviving occurrence is
+either a single definition, a documented non-chrome surface, or a value the
+token scale does not yet carry.
