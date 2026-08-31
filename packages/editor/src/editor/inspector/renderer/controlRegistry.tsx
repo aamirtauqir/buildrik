@@ -35,7 +35,7 @@ import { Button, Checkbox, Select, TextInput, FieldRow } from "@/editor/chrome-u
    one panel. inputStyle re-declared height, padding, border, radius and
    background on controls the TextInput/Select wrappers already theme. */
 const LINKED_BTN =
-  "tw:h-6 tw:px-2 tw:text-[11px] tw:bg-transparent tw:border tw:border-gray-200 tw:rounded";
+  "tw:h-6 tw:px-2 tw:text-[11px] tw:bg-transparent tw:border tw:border-[var(--bk-gray-200)] tw:rounded";
 
 // File-local so the value lives near the style it drives, and so the chrome
 // gate's TSX bare-number check doesn't see a magic literal.
@@ -312,7 +312,7 @@ const GroupHeadingControl: React.FC<ControlProps<GroupHeadingField>> = ({
 }) => (
   <div
     className={`tw:text-xs tw:text-[var(--bk-ink-muted)] tw:font-medium ${
-      field.divider ? "tw:mt-3 tw:pt-3 tw:border-t tw:border-gray-200" : "tw:mt-2"
+      field.divider ? "tw:mt-3 tw:pt-3 tw:border-t tw:border-[var(--bk-gray-200)]" : "tw:mt-2"
     }`}
   >
     {field.label}

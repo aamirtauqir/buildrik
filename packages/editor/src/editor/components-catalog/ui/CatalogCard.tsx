@@ -28,16 +28,16 @@ interface CatalogCardProps {
 
 /* Card chrome. */
 const CARD =
-  "tw:flex tw:flex-col tw:items-center tw:gap-1.5 tw:px-2 tw:py-2.5 tw:border tw:border-gray-200 " +
+  "tw:flex tw:flex-col tw:items-center tw:gap-1.5 tw:px-2 tw:py-2.5 tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:rounded-md tw:bg-white tw:text-[11px] tw:text-[var(--bk-ink)] tw:cursor-grab tw:text-center tw:min-h-18";
-const PREVIEW_BOX = "tw:flex tw:items-center tw:justify-center tw:w-full tw:h-9 tw:bg-gray-50 tw:rounded tw:overflow-hidden";
+const PREVIEW_BOX = "tw:flex tw:items-center tw:justify-center tw:w-full tw:h-9 tw:bg-[var(--bk-gray-50)] tw:rounded tw:overflow-hidden";
 const LABEL = "tw:text-[11px] tw:leading-tight tw:text-[var(--bk-ink)] tw:w-full tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
 
 /* Sketch vocabulary. Tokens are written as arbitrary values rather than mapped
    to the nearest Tailwind shade, so nothing shifts colour in translation. */
 const MUTED = "tw:text-[var(--bk-ink-soft)]";
-const OUTLINE = "tw:border tw:border-gray-200 tw:rounded-sm";
-const FILL = "tw:bg-gray-200";
+const OUTLINE = "tw:border tw:border-[var(--bk-gray-200)] tw:rounded-sm";
+const FILL = "tw:bg-[var(--bk-gray-200)]";
 const PILL = "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success)] tw:text-[8px]";
 
 /** Per-id mini sketch — matches the prototype s06 visual vocabulary. */
@@ -51,7 +51,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     case "input":
     case "search-bar":
-      return <div className={`${OUTLINE} tw:w-4/5 tw:h-[18px] tw:bg-gray-50`} />;
+      return <div className={`${OUTLINE} tw:w-4/5 tw:h-[18px] tw:bg-[var(--bk-gray-50)]`} />;
     case "select":
       return (
         <div className={`${OUTLINE} tw:w-4/5 tw:h-[18px] tw:flex tw:items-center tw:justify-end tw:pr-1 tw:text-[9px] ${MUTED}`}>
@@ -59,9 +59,9 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
         </div>
       );
     case "checkbox":
-      return <div className="tw:size-3.5 tw:border tw:border-gray-200 tw:rounded-[2px]" />;
+      return <div className="tw:size-3.5 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-[2px]" />;
     case "radio":
-      return <div className="tw:size-3.5 tw:border tw:border-gray-200 tw:rounded-full" />;
+      return <div className="tw:size-3.5 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-full" />;
     case "switch":
       return (
         <div className={`tw:w-7 tw:h-3.5 ${FILL} tw:rounded-full tw:relative`}>
@@ -71,14 +71,14 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
     case "label":
       return <div className={`tw:text-[10px] ${MUTED}`}>Label</div>;
     case "spinner":
-      return <div className="tw:size-3.5 tw:border-2 tw:border-gray-200 tw:border-t-blue-700 tw:rounded-full" />;
+      return <div className="tw:size-3.5 tw:border-2 tw:border-[var(--bk-gray-200)] tw:border-t-blue-700 tw:rounded-full" />;
     case "card":
-      return <div className={`tw:bg-gray-50 ${OUTLINE} tw:w-4/5 tw:h-[22px]`} />;
+      return <div className={`tw:bg-[var(--bk-gray-50)] ${OUTLINE} tw:w-4/5 tw:h-[22px]`} />;
     case "form-field":
       return (
         <div className="tw:flex tw:flex-col tw:gap-0.5 tw:w-4/5">
           <div className={`tw:text-[8px] tw:text-left ${MUTED}`}>Label</div>
-          <div className="tw:border tw:border-gray-200 tw:h-3 tw:rounded-[2px]" />
+          <div className="tw:border tw:border-[var(--bk-gray-200)] tw:h-3 tw:rounded-[2px]" />
         </div>
       );
     case "alert":
@@ -119,18 +119,18 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       );
     case "tooltip":
       return (
-        <div className="tw:bg-gray-900 tw:text-gray-50 tw:text-[8px] tw:px-1.5 tw:py-0.5 tw:rounded-sm">Tip</div>
+        <div className="tw:bg-[var(--bk-gray-900)] tw:text-[var(--bk-gray-50)] tw:text-[8px] tw:px-1.5 tw:py-0.5 tw:rounded-sm">Tip</div>
       );
     case "modal":
       return (
-        <div className={`tw:bg-gray-50 ${OUTLINE} tw:w-[70%] tw:h-[22px] tw:[box-shadow:var(--bk-shadow-raised)]`} />
+        <div className={`tw:bg-[var(--bk-gray-50)] ${OUTLINE} tw:w-[70%] tw:h-[22px] tw:[box-shadow:var(--bk-shadow-raised)]`} />
       );
     case "section":
       return <div className={`tw:text-[9px] ${MUTED}`}>§ Section</div>;
     case "hero":
       return <div className={`tw:text-[8px] ${MUTED}`}>Hero block</div>;
     case "footer":
-      return <div className="tw:w-4/5 tw:h-2.5 tw:bg-gray-900 tw:opacity-70 tw:rounded-[2px]" />;
+      return <div className="tw:w-4/5 tw:h-2.5 tw:bg-[var(--bk-gray-900)] tw:opacity-70 tw:rounded-[2px]" />;
     case "pricing":
       return (
         <div className={`tw:flex tw:gap-[3px] tw:text-[8px] ${MUTED}`}>

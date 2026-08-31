@@ -65,7 +65,7 @@ const MobileIcon: React.FC = () => (
    white at 3-5% opacity on a white panel is nothing at all, so the type-scale
    and font rows had no visible separator and two controls had no visible fill.
    Real tokens now. */
-const ROW = "tw:flex tw:items-center tw:gap-2 tw:py-2 tw:border-b tw:border-gray-200";
+const ROW = "tw:flex tw:items-center tw:gap-2 tw:py-2 tw:border-b tw:border-[var(--bk-gray-200)]";
 const ROW_NAME = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink)]";
 const ROW_ID = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mt-px";
 const MUTED = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:flex-none";
@@ -87,7 +87,7 @@ const StyleToggle: React.FC<{
     className={`${labelClass ?? ""} tw:size-6 tw:flex tw:items-center tw:justify-center tw:rounded tw:text-xs tw:font-bold tw:border ${
       active
         ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
-        : "tw:border-gray-200 tw:bg-transparent tw:text-[var(--bk-ink-muted)]"
+        : "tw:border-[var(--bk-gray-200)] tw:bg-transparent tw:text-[var(--bk-ink-muted)]"
     }`}
     title={`Toggle ${label}`}
   >
@@ -376,7 +376,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
 
   return (
     <div
-      className="tw:p-3 tw:bg-gray-50 tw:rounded-lg tw:border tw:border-gray-200 tw:flex tw:flex-col tw:gap-2"
+      className="tw:p-3 tw:bg-[var(--bk-gray-50)] tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:flex tw:flex-col tw:gap-2"
     >
       <div
         style={{

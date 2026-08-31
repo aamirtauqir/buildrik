@@ -226,7 +226,7 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
 
   return (
     /* gray-700 on the gray-200 chip: gray-500 measured 3.9:1 there (axe). */
-    <span className="tw:flex-none tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded tw:bg-gray-200 tw:text-[11px] tw:text-gray-700 tw:[font-family:var(--bk-font-mono)]">
+    <span className="tw:flex-none tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded tw:bg-[var(--bk-gray-200)] tw:text-[11px] tw:text-[var(--bk-gray-700)] tw:[font-family:var(--bk-font-mono)]">
       {display}
     </span>
   );
@@ -385,11 +385,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         aria-label="Command Palette"
         aria-modal="true"
         onKeyDown={handleKeyDown}
-        className="tw:flex tw:flex-col tw:gap-0 tw:fixed tw:top-1/5 tw:left-1/2 tw:-translate-x-1/2 tw:w-140 tw:max-w-[90vw] tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
+        className="tw:flex tw:flex-col tw:gap-0 tw:fixed tw:top-1/5 tw:left-1/2 tw:-translate-x-1/2 tw:w-140 tw:max-w-[90vw] tw:overflow-hidden tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-modal)]"
       >
         {/* Search row */}
         <div
-          className="tw:flex tw:items-center tw:h-13 tw:px-4 tw:gap-2.5 tw:border-b tw:border-gray-200"
+          className="tw:flex tw:items-center tw:h-13 tw:px-4 tw:gap-2.5 tw:border-b tw:border-[var(--bk-gray-200)]"
         >
           {/* Search icon */}
           <svg
@@ -539,7 +539,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
         {/* Footer */}
         <div
-          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-[var(--bk-ink-soft)]"
+          className="tw:flex tw:items-center tw:justify-center tw:h-9 tw:gap-4 tw:border-t tw:border-[var(--bk-gray-200)] tw:text-[11px] tw:text-[var(--bk-ink-soft)]"
         >
           <span>↑↓ navigate</span>
           <span>↵ run</span>

@@ -199,7 +199,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
         onPlay={() => setState((s) => ({ ...s, isPlaying: true }))}
         onPause={() => setState((s) => ({ ...s, isPlaying: false }))}
         onEnded={() => setState((s) => ({ ...s, isPlaying: false }))}
-        className="tw:block tw:w-full tw:max-h-100 tw:bg-gray-900"
+        className="tw:block tw:w-full tw:max-h-100 tw:bg-[var(--bk-gray-900)]"
       />
       {/* Loading overlay */}
       {state.isLoading && (

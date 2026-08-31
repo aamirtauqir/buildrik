@@ -93,7 +93,7 @@ function elementDims(id: string | undefined): string | null {
 const ZOOM_ROW =
   "tw:flex tw:w-full tw:h-7 tw:min-h-0 tw:items-center tw:justify-between tw:gap-6 tw:rounded tw:border-0 " +
   "tw:px-3 tw:py-0 tw:text-xs tw:font-medium tw:leading-5 tw:whitespace-nowrap tw:bg-transparent " +
-  "tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100";
+  "tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]";
 const ZOOM_KEY = "tw:text-[10px] tw:text-[var(--bk-gray-400)]";
 
 export const StudioFooter: React.FC<StudioFooterProps> = ({
@@ -254,7 +254,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
               <span>Zoom to 100%</span>
               <span className={ZOOM_KEY}>⌘0</span>
             </Button>
-            <div className="tw:my-1 tw:h-px tw:bg-gray-200" />
+            <div className="tw:my-1 tw:h-px tw:bg-[var(--bk-gray-200)]" />
             {ZOOM_PRESETS.map((preset) => (
               <Button
                 key={preset}
@@ -269,7 +269,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
                 {preset}%
               </Button>
             ))}
-            <div className="tw:my-1 tw:h-px tw:bg-gray-200" />
+            <div className="tw:my-1 tw:h-px tw:bg-[var(--bk-gray-200)]" />
             <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_IN)}>
               <span>Zoom in</span>
               <span className={ZOOM_KEY}>⌘+</span>

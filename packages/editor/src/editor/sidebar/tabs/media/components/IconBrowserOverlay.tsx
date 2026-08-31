@@ -156,7 +156,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
       <div className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:px-4">
         <TextField
           type="text"
-          className="tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-gray-500"
+          className="tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)] tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
           placeholder={`Search ${getIconCount()} icons`}
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}

@@ -67,8 +67,8 @@ const TYPES: Array<{ id: "img" | "vid"; label: string }> = [
 const MAX_AUTO_LOADS = 3;
 
 const DROPDOWN =
-  "tw:min-h-7 tw:w-[88px] tw:shrink-0 tw:justify-between tw:gap-0.5 tw:rounded-md tw:border tw:border-gray-200 " +
-  "tw:bg-white tw:px-1.5 tw:text-[11px] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-gray-50";
+  "tw:min-h-7 tw:w-[88px] tw:shrink-0 tw:justify-between tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] " +
+  "tw:bg-white tw:px-1.5 tw:text-[11px] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-50)]";
 
 function FilterDropdown<T extends string>({
   label,
@@ -205,7 +205,7 @@ export function StockBrowserOverlay({
       <div className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:px-4">
         <TextField
           type="text"
-          className="tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-gray-500"
+          className="tw:h-7 tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)] tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
           placeholder="Search free stock"
           value={draft}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}

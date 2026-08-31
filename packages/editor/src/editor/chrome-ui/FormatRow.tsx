@@ -34,7 +34,7 @@ export interface FormatRowProps extends Omit<React.HTMLAttributes<HTMLLabelEleme
 /* min-height, not height: a description wraps once the row is narrow (the
    export picker lays these out two per column). Same fix as Row's `comment`. */
 const BASE =
-  "tw:flex tw:items-center tw:gap-3 tw:min-h-16 tw:py-2 tw:px-4 tw:w-full tw:text-left tw:border tw:border-gray-200 " +
+  "tw:flex tw:items-center tw:gap-3 tw:min-h-16 tw:py-2 tw:px-4 tw:w-full tw:text-left tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)] " +
   "tw:[transition:var(--bk-transition-fast)] " +
   "tw:aria-[checked=true]:border-blue-700 tw:aria-[checked=true]:bg-blue-50 " +
@@ -57,7 +57,7 @@ export function FormatRow({
       {disabled ? (
         /* Holds the radio's column so a disabled row still lines up with its
            pickable siblings in the same grid. */
-        <span className="tw:size-4 tw:flex-none tw:rounded-full tw:border tw:border-gray-200" aria-hidden="true" />
+        <span className="tw:size-4 tw:flex-none tw:rounded-full tw:border tw:border-[var(--bk-gray-200)]" aria-hidden="true" />
       ) : (
         <Radio
           color="blue"

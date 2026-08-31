@@ -100,7 +100,7 @@ const RedoIcon = () => (
 const EDIT_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:size-7 tw:p-0 tw:rounded " +
   "tw:border tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
-  "tw:hover:bg-gray-100 tw:hover:text-[var(--bk-ink)]";
+  "tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)]";
 
 /**
  * The floating bar. `max-w-full` + `min-w-0` keep it inside the canvas column
@@ -126,10 +126,10 @@ const EDIT_BTN =
  */
 const BAR =
   "tw:flex tw:flex-wrap tw:items-center tw:justify-start tw:gap-x-3 tw:gap-y-1 tw:min-h-10 tw:px-4 tw:py-1 tw:rounded-lg " +
-  "tw:border tw:border-gray-200 tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)] " +
+  "tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:[box-shadow:var(--bk-shadow-drag)] " +
   "tw:whitespace-nowrap tw:max-w-full tw:min-w-0";
 const GROUP = "tw:flex tw:items-center tw:gap-1";
-const DIVIDER = "tw:w-px tw:h-5 tw:mx-1 tw:bg-gray-200";
+const DIVIDER = "tw:w-px tw:h-5 tw:mx-1 tw:bg-[var(--bk-gray-200)]";
 
 // ============================================
 // Overlay Button Component
@@ -166,7 +166,7 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
       className={`tw:inline-flex tw:items-center tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap ${
         active
           ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:font-semibold"
-          : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-gray-100"
+          : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]"
       }`}
       onClick={onClick}
       aria-pressed={active}

@@ -348,7 +348,7 @@ export function AssetDetailOverlay({
               </label>
               <TextField
                 id="med-alt-input"
-                className="tw:mt-1 tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-gray-400 tw:bg-white tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]"
+                className="tw:mt-1 tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]"
                 value={altDraft}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAltDraft(e.target.value)}
                 onBlur={commitAltText}
@@ -450,7 +450,7 @@ export function AssetDetailOverlay({
             return (
               <React.Fragment key={v.id}>
                 <div className="tw:flex tw:h-14 tw:w-full tw:items-start hover:tw:bg-[var(--bk-bg-subtle)]" role="listitem">
-                  <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-gray-300" aria-hidden="true" />
+                  <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-gray-300)]" aria-hidden="true" />
                   <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
                     {formatRelativeTime(ts, { fallback: "daysShort" })}
                   </span>

@@ -89,6 +89,28 @@ describe("versionSync", () => {
     expect(saveVersion.mock.calls[0][0]).toMatchObject({ id: "srv1", projectId: "site-123" });
   });
 
+  /* The server stamps `createdBy` from the session and refuses a client-supplied
+     one ("attribution spoofing in version history", site-version.ts:30). So the
+     LIST ROW is the authority on who made a version, and the payload — which is
+     whatever the originating client sent — is not. Before this, the editor had
+     no reference to `createdBy` anywhere: the author was recorded on the server
+     and never read back, so every row in the panel was anonymous. */
+  it("takes the author off the server row, not the client's payload", async () => {
+    list.mockResolvedValueOnce([{ versionId: "srv1", createdBy: "user-42" }]);
+    loadVersions.mockResolvedValueOnce([]);
+    get.mockResolvedValueOnce({ id: "srv1", name: "Server one", snapshot: {}, createdAt: 0, userId: null });
+    await hydrateVersionsFromServer();
+    expect(saveVersion.mock.calls[0][0]).toMatchObject({ id: "srv1", userId: "user-42" });
+  });
+
+  it("leaves the author null when the server has none, rather than inventing one", async () => {
+    list.mockResolvedValueOnce([{ versionId: "srv2" }]);
+    loadVersions.mockResolvedValueOnce([]);
+    get.mockResolvedValueOnce({ id: "srv2", name: "Old", snapshot: {}, createdAt: 0, userId: "stale-client-value" });
+    await hydrateVersionsFromServer();
+    expect(saveVersion.mock.calls[0][0]).toMatchObject({ id: "srv2", userId: null });
+  });
+
   it("no-ops when not on an /edit/<siteId> URL", async () => {
     window.history.replaceState({}, "", "/dashboard");
     await mirrorVersionCreate(ver("v1"), false);

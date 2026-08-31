@@ -169,10 +169,10 @@ const TAB_RESTING = "tw:font-medium tw:text-[var(--bk-ink-muted)] tw:enabled:hov
 const CHIP =
   "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4";
 const CHIP_ACTIVE = "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
-const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-gray-200";
+const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]";
 const TOOL =
-  "tw:flex tw:h-7 tw:w-9 tw:items-center tw:justify-center tw:rounded-md tw:border tw:border-gray-200 " +
-  "tw:bg-white tw:p-0 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-gray-50";
+  "tw:flex tw:h-7 tw:w-9 tw:items-center tw:justify-center tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] " +
+  "tw:bg-white tw:p-0 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-gray-50)]";
 const GHOST =
   "tw:min-h-8 tw:border-0 tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] " +
   "tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]";
@@ -380,7 +380,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
               tab gets it (a B&W preview compare is an Adjust job). */}
           {!imageError && (
             <Button
-              className={`tw:absolute tw:right-2 tw:top-2 tw:flex tw:min-h-7 tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:border-gray-200 tw:bg-white tw:px-2 tw:text-[12px] tw:font-medium ${comparing ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-ink-soft)]"} tw:enabled:hover:bg-gray-50`}
+              className={`tw:absolute tw:right-2 tw:top-2 tw:flex tw:min-h-7 tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:px-2 tw:text-[12px] tw:font-medium ${comparing ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-ink-soft)]"} tw:enabled:hover:bg-[var(--bk-gray-50)]`}
               onPointerDown={() => setComparing(true)}
               onPointerUp={() => setComparing(false)}
               onPointerLeave={() => setComparing(false)}

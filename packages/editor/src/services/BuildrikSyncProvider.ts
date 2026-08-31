@@ -396,6 +396,28 @@ export async function saveProject(
 }
 
 /**
+ * Who is editing, for attribution on versions and history entries.
+ *
+ * Both `VersionTimelineManager.setCurrentUserId` and
+ * `HistoryManager.setCurrentUserId` existed with **zero callers**, so
+ * `currentUserId` was permanently null and six write sites stamped that null
+ * into stored rows (`VersionTimelineManager.ts:172,238`,
+ * `HistoryManager.ts:203,213,302`). Board 162:2 attributes rows; nothing could,
+ * because nothing was ever recorded.
+ *
+ * Returns null rather than throwing: attribution is additive, and a signed-out
+ * or offline editor must still save versions.
+ */
+export async function loadCurrentUserId(): Promise<string | null> {
+  try {
+    const profile = await getClient().account.profile.get.query();
+    return profile?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Phase B3: fetch server assets + folders for hydration into MediaManager.
  *
  * Returns null on auth fail, offline, dashboard unconfigured, or any RPC

@@ -37,7 +37,7 @@ const TAB_CLASS =
   "tw:h-8 tw:py-0 tw:px-2.5 tw:border-0 tw:rounded-md tw:bg-transparent tw:cursor-pointer " +
   "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink-muted)] " +
   "tw:[transition:var(--bk-transition-fast)] " +
-  "tw:hover:text-[var(--bk-ink)] tw:hover:bg-gray-100 " +
+  "tw:hover:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-100)] " +
   "tw:aria-selected:text-[var(--bk-accent-text)] tw:aria-selected:bg-[var(--bk-accent-tint)] " +
   "tw:aria-selected:font-medium tw:aria-selected:hover:bg-[var(--bk-accent-tint)] " +
   "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:hover:bg-transparent " +

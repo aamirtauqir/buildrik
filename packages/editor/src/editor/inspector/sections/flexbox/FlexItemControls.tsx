@@ -41,7 +41,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
   reason,
   mixedKeys,
 }) => (
-  <div className="tw:mt-2.5 tw:pt-2.5 tw:border-t tw:border-gray-200">
+  <div className="tw:mt-2.5 tw:pt-2.5 tw:border-t tw:border-[var(--bk-gray-200)]">
     <div className="tw:mb-2 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink-muted)] tw:uppercase">
       Flex Item (Self)
     </div>

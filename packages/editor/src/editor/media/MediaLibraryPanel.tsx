@@ -333,7 +333,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
 
     {/* Footer with selection info */}
     {selectedIds.size > 0 && (
-      <div className="tw:flex tw:items-center tw:justify-between tw:mt-4 tw:pt-4 tw:border-t tw:border-gray-200">
+      <div className="tw:flex tw:items-center tw:justify-between tw:mt-4 tw:pt-4 tw:border-t tw:border-[var(--bk-gray-200)]">
         <span className="tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
           {selectedIds.size} selected
         </span>

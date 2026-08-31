@@ -139,7 +139,7 @@ export function UploadZone({
           // 145:250) — repeating it here doubled the message. The strip only
           // surfaces for a drag-over or a rejection flash.
           compact && (isDragOver || rejectedReason
-            ? "tw:h-9 tw:border tw:border-dashed tw:border-gray-300 tw:text-[var(--bk-ink-soft)]"
+            ? "tw:h-9 tw:border tw:border-dashed tw:border-[var(--bk-gray-300)] tw:text-[var(--bk-ink-soft)]"
             : "tw:h-0 tw:overflow-hidden tw:border-0 tw:p-0"),
         ].filter(Boolean).join(" ")}
         data-testid="media-upload-zone"
@@ -184,7 +184,7 @@ export function UploadZone({
                 </span>
               </span>
               <span
-                className="tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-sm tw:bg-gray-100"
+                className="tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-sm tw:bg-[var(--bk-gray-100)]"
                 role="progressbar"
                 aria-label={`Uploading ${item.fileName}`}
                 aria-valuenow={Math.round(item.progress)}

@@ -58,7 +58,7 @@ function widthHint(id: Breakpoint): string {
 }
 
 const WELL_CLASS =
-  "tw:inline-flex tw:p-0.5 tw:gap-0.5 tw:bg-gray-100 tw:rounded-lg tw:border tw:border-gray-200";
+  "tw:inline-flex tw:p-0.5 tw:gap-0.5 tw:bg-[var(--bk-gray-100)] tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)]";
 
 /* Icon-only cells are fixed-size (w-8); labelled cells hug their text
    (w-auto + horizontal padding) — the `labelled` prop is known at render

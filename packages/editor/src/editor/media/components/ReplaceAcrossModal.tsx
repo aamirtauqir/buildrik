@@ -42,7 +42,7 @@ const TINT_WARM = "tw:[background-image:linear-gradient(135deg,#fff4e8,#fde9d2)]
 const TINT_ACCENT = "tw:[background-image:linear-gradient(135deg,var(--bk-accent-subtle),#e9f0fc)]";
 
 const SECTION_X = "tw:px-5";
-const HAIRLINE = "tw:border-gray-200";
+const HAIRLINE = "tw:border-[var(--bk-gray-200)]";
 /** Hero thumb (square) and per-row thumb (4:3-ish) — the two fixed art sizes. */
 const HERO_THUMB = "tw:size-14 tw:rounded";
 const ROW_THUMB = "tw:w-14 tw:h-10 tw:rounded-[3px] tw:flex-none";

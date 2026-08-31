@@ -80,7 +80,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
               Type <strong>DELETE</strong> to confirm:
             </p>
             <TextField
-              className="tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[13px]"
+              className="tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[13px]"
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
               placeholder="DELETE"
@@ -93,7 +93,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
         {/* Actions */}
         <div className="tw:mt-4 tw:flex tw:justify-end tw:gap-2">
           <Button
-            className="tw:min-h-8 tw:rounded-md tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
+            className="tw:min-h-8 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
             onClick={onCancel}
           >
             Cancel

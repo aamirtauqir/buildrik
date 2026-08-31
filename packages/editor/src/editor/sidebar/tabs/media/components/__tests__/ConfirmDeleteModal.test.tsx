@@ -70,7 +70,7 @@ describe("ConfirmDeleteModal", () => {
     const input = screen.getByLabelText("Type DELETE to confirm");
     // TextField's ported .bk-input rules: box, border, focus ring, invalid,
     // disabled. If the teardown ever strips them again this fails loudly.
-    expect(input.className).toMatch(/tw:border-gray-300/);
+    expect(input.className).toMatch(/tw:border-\[var\(--bk-gray-300\)\]/);
     expect(input.className).toMatch(/tw:rounded-lg/);
     expect(input.className).toMatch(/tw:h-9/);
     expect(input.className).toMatch(/tw:bg-white/);

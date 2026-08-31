@@ -136,7 +136,7 @@ export function AssetCell({
       aria-pressed={selectable ? isSelected : undefined}
       data-testid="media-card"
     >
-      <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-34 tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-gray-100 tw:text-[var(--bk-ink-muted)]">
+      <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-34 tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-muted)]">
         {/* An image with no pre-cut thumb still IS an image — it used to fall
             through to the font branch and render "Aa" in place of the photo
             (walked live 2026-08-28: every fixture image showed the specimen).
@@ -166,7 +166,7 @@ export function AssetCell({
             /* 40x14 at (6, 56) per `I218:686;218:6` — fixed, not padded: a
                badge that grows with its word would shift the thumb's focal
                point between STOCK and AI. */
-            className="tw:absolute tw:left-1.5 tw:top-14 tw:flex tw:h-3.5 tw:w-10 tw:items-center tw:justify-center tw:rounded tw:bg-gray-900 tw:text-[11px] tw:leading-4 tw:text-white"
+            className="tw:absolute tw:left-1.5 tw:top-14 tw:flex tw:h-3.5 tw:w-10 tw:items-center tw:justify-center tw:rounded tw:bg-[var(--bk-gray-900)] tw:text-[11px] tw:leading-4 tw:text-white"
             data-testid="media-card-badge"
           >
             {badge}
@@ -184,7 +184,7 @@ export function AssetCell({
           <span
             className={[
               "tw:flex tw:h-4 tw:w-4 tw:flex-none tw:items-center tw:justify-center tw:rounded tw:border tw:text-[10px]",
-              isSelected ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] tw:text-white" : "tw:border-gray-300 tw:text-transparent",
+              isSelected ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] tw:text-white" : "tw:border-[var(--bk-gray-300)] tw:text-transparent",
             ].join(" ")}
             aria-hidden="true"
             data-testid="media-card-check"

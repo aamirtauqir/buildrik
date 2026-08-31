@@ -22,7 +22,7 @@ export interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {
   edge?: "bottom" | "top";
 }
 
-const BASE = "tw:flex tw:items-center tw:flex-wrap tw:gap-1.5 tw:px-3 tw:py-2 tw:border-gray-200";
+const BASE = "tw:flex tw:items-center tw:flex-wrap tw:gap-1.5 tw:px-3 tw:py-2 tw:border-[var(--bk-gray-200)]";
 
 /* Each edge supplies its own single border side — never both at once, so no
    two utilities set a border-width for the same box edge (Row/PanelFrame

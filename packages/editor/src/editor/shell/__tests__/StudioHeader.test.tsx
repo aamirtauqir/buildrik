@@ -969,7 +969,7 @@ describe("T8 status grammar", () => {
     );
     const label = await screen.findByText("Changes requested");
     // Demoted, not hidden — the copy is unchanged, only the shouting stops.
-    expect(toneOf(label)).toContain("tw:bg-gray-100");
+    expect(toneOf(label)).toContain("tw:bg-[var(--bk-gray-100)]");
     expect(isWarningTone(label)).toBe(false);
   });
 

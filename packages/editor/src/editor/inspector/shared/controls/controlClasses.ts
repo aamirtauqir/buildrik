@@ -48,7 +48,7 @@ export const compactBtnClass = (active: boolean): string =>
     "tw:[font-family:var(--bk-font-ui)]",
     active
       ? "tw:bg-[var(--bk-accent-tint)] tw:border-[var(--bk-alpha-accent-30)] tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
-      : "tw:bg-[var(--bk-bg-subtle)] tw:border-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100",
+      : "tw:bg-[var(--bk-bg-subtle)] tw:border-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]",
   ].join(" ");
 
 /** Collapsed-section value preview in the Section header ("flex · relative"). */

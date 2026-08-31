@@ -226,7 +226,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           reversible way back to full controls — density is a preference, never
           a permission (so this is a "hidden", not a "locked", affordance). */}
       {density === "fewer" && visibleIds.length > renderIds.length && (
-        <div className="tw:flex tw:flex-col tw:gap-2 tw:divide-y tw:divide-gray-200 tw:[&>*+*]:pt-3">
+        <div className="tw:flex tw:flex-col tw:gap-2 tw:divide-y tw:divide-[var(--bk-gray-200)] tw:[&>*+*]:pt-3">
           <HelperText className={BK_HELPER_CLASS}>
             Simplified view — {visibleIds.length - renderIds.length} more control
             {visibleIds.length - renderIds.length === 1 ? "" : "s"} hidden. It&apos;s a preference, not a limit.

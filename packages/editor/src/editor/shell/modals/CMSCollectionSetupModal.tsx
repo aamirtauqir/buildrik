@@ -58,7 +58,7 @@ function makeId(): string {
    the `step` base — so two of the three step states were never distinguishable.
    Done reads as done now (a tick on a filled dot, muted label); the pretence of
    a third style is gone rather than invented. */
-const STEP_BAR = "tw:flex tw:items-center tw:gap-2 tw:pb-4 tw:mb-4 tw:border-b tw:border-gray-200";
+const STEP_BAR = "tw:flex tw:items-center tw:gap-2 tw:pb-4 tw:mb-4 tw:border-b tw:border-[var(--bk-gray-200)]";
 const STEP = "tw:flex tw:items-center tw:gap-1.5 tw:text-xs";
 const STEP_LABEL_ON = "tw:text-[var(--bk-accent-text)] tw:font-semibold";
 const STEP_LABEL_OFF = "tw:text-[var(--bk-ink-muted)]";
@@ -67,10 +67,10 @@ const STEP_DOT =
 const STEP_DOT_ON = "tw:bg-[var(--bk-accent)] tw:text-white";
 /* The board marks a finished step with success green, not another blue. */
 const STEP_DOT_DONE = "tw:bg-[var(--bk-success)] tw:text-white";
-const STEP_DOT_OFF = "tw:bg-gray-200 tw:text-[var(--bk-ink-muted)]";
-const STEP_DIVIDER = "tw:flex-1 tw:h-px tw:bg-gray-200";
+const STEP_DOT_OFF = "tw:bg-[var(--bk-gray-200)] tw:text-[var(--bk-ink-muted)]";
+const STEP_DIVIDER = "tw:flex-1 tw:h-px tw:bg-[var(--bk-gray-200)]";
 const LABEL = "tw:block tw:text-xs tw:font-medium tw:text-[var(--bk-ink-soft)] tw:mb-1.5";
-const FIELD_ROW = "tw:flex tw:items-center tw:gap-2 tw:py-1.5 tw:border-b tw:border-gray-200";
+const FIELD_ROW = "tw:flex tw:items-center tw:gap-2 tw:py-1.5 tw:border-b tw:border-[var(--bk-gray-200)]";
 const COL_HEAD = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:font-medium";
 /* Board 1170:4713 — every measurement below is read off that frame. */
 const BOARD_CAPTION = "tw:text-[10px] tw:text-[var(--bk-ink-muted)]";
@@ -83,7 +83,7 @@ const BOARD_ROW =
    so this uses the utility that IS that colour rather than inventing a token.
    Caught by gate:token-resolution, which fails an undefined ref with no
    fallback: it would have rendered no colour at all. */
-const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[10px] tw:text-gray-400";
+const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[10px] tw:text-[var(--bk-gray-400)]";
 const BOARD_LINK =
   "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
 const BOARD_BLOCK =
@@ -94,7 +94,7 @@ const SUCCESS_BANNER =
 const ERROR_BANNER =
   "tw:mt-2.5 tw:px-3 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 " +
   "tw:rounded-lg tw:text-[var(--bk-error)] tw:text-xs";
-const FOOTER = "tw:flex tw:justify-end tw:gap-2 tw:pt-4 tw:mt-2 tw:border-t tw:border-gray-200";
+const FOOTER = "tw:flex tw:justify-end tw:gap-2 tw:pt-4 tw:mt-2 tw:border-t tw:border-[var(--bk-gray-200)]";
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 // =============================================================================

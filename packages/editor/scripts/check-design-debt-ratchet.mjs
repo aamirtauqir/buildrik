@@ -52,16 +52,15 @@ const RATCHETS = [
     baseline: 42,
   },
   {
-    id: "palette-gray-text",
-    /* 470 → 10 on 2026-08-29: every shade with an exact ink twin was
-       codemodded (900=ink, 600=ink-soft, 500=ink-muted, 300=ink-disabled —
-       verified against tokens.generated.css, so nothing moved). What remains
-       is gray-400 on decoration glyphs (the › chevrons, a drag handle) plus
-       two thumbnail/presence chips: the ink scale has no 400 step, and
-       snapping them to 300 or 500 would be a visible change made to satisfy
-       a counter. They stay until Figma publishes that step. */
-    pattern: String.raw`tw:text-gray-[0-9]{3}`,
-    baseline: 10,
+    id: "palette-gray-any",
+    /* 470 → 0 on 2026-08-29. Every shade mapped: the four with an exact ink
+       twin (900/600/500/300) to the semantic tokens, and the rest — gray-400
+       on decoration chevrons, a drag handle, a presence chip — to the
+       GENERATED --bk-gray-* scale, which the token file has carried all
+       along (CanvasBreadcrumb was already using it). Locked at zero: chrome
+       has no reason to reach for a Tailwind palette class again. */
+    pattern: String.raw`tw:[a-z:-]*-gray-[0-9]{2,3}`,
+    baseline: 0,
   },
 ];
 

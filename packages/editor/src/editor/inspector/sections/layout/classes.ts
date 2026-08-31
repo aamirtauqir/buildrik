@@ -18,12 +18,12 @@ export const cardBtnClass = (active: boolean): string =>
     "tw:[font-family:var(--bk-font-ui)] tw:[transition:var(--bk-transition-fast)]",
     active
       ? "tw:bg-[var(--bk-accent-tint)] tw:border-[var(--bk-alpha-accent-30)] tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
-      : "tw:bg-[var(--bk-bg-subtle)] tw:border-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100",
+      : "tw:bg-[var(--bk-bg-subtle)] tw:border-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]",
   ].join(" ");
 
 /** Sub-panel holding the top/right/bottom/left offset inputs. */
 export const OFFSET_PANEL =
-  "tw:p-2 tw:mb-1.5 tw:rounded-md tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)]";
+  "tw:p-2 tw:mb-1.5 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)]";
 
 /** The element stand-in at the centre of the offset cross. */
 export const OFFSET_ANCHOR =

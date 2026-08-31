@@ -85,7 +85,7 @@ function StarterCard({ starter, selected, onSelect, showDescription = true }: St
       className={`tw:h-auto tw:items-stretch tw:justify-start tw:text-left tw:font-normal tw:rounded-lg tw:overflow-hidden tw:flex tw:flex-col tw:bg-white tw:p-0 ${
         selected
           ? "tw:border-2 tw:border-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-accent-subtle)]"
-          : "tw:border tw:border-gray-200 tw:shadow-none"
+          : "tw:border tw:border-[var(--bk-gray-200)] tw:shadow-none"
       }`}
     >
       <div

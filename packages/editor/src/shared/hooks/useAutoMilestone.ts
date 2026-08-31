@@ -170,11 +170,17 @@ export function useAutoMilestone(
         }));
 
         const pageCount = composer.exportProject().pages.length;
+        /* `elementCount: 0` was pinned here while `pageCount` beside it was
+           computed, and it is not cosmetic: `ai.service.ts:418` puts the pair
+           straight into the prompt as "Current page structure: N pages,
+           approximately 0 elements." Every milestone name was suggested by a
+           model told the site has pages and nothing on them. */
+        const elementCount = composer.elements.getAllElements().length;
 
         const response = await fetch("/api/trpc/ai.milestoneSuggest", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ recentChanges, pageStructure: { pageCount, elementCount: 0 } }),
+          body: JSON.stringify({ recentChanges, pageStructure: { pageCount, elementCount } }),
         });
 
         if (!response.ok) throw new Error("AI unavailable");

@@ -194,7 +194,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
       </div>
       {/* CMS Export Options - only show if project has CMS bindings */}
       {hasCMSBindings && onCMSChange && (
-        <div className="tw:border-t tw:border-gray-200 tw:pt-4">
+        <div className="tw:border-t tw:border-[var(--bk-gray-200)] tw:pt-4">
           <Label className={`${FIELD_LABEL} tw:font-semibold`}>CMS Content</Label>
           <div className={`${SEGMENTED} tw:mb-3`}>
             {(["none", "static", "template"] as CMSExportMode[]).map((mode) => (

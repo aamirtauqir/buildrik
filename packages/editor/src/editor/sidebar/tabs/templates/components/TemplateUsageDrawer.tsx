@@ -45,16 +45,16 @@ function formatRelative(iso: string): string {
    button styling — including its focus ring — and then re-adds padding and
    colour by hand, which is how a control ends up with no visible keyboard
    focus. Both are ordinary Buttons now. */
-const HEAD = "tw:px-6 tw:py-5 tw:border-b tw:border-gray-200";
-const TABLIST = "tw:flex tw:gap-1 tw:px-3 tw:py-2 tw:border-b tw:border-gray-200";
+const HEAD = "tw:px-6 tw:py-5 tw:border-b tw:border-[var(--bk-gray-200)]";
+const TABLIST = "tw:flex tw:gap-1 tw:px-3 tw:py-2 tw:border-b tw:border-[var(--bk-gray-200)]";
 const TAB = "tw:px-3 tw:py-1.5 tw:text-[13px] tw:rounded tw:border-b-2 tw:bg-transparent";
 const PANEL = "tw:px-6 tw:py-4 tw:max-h-90 tw:overflow-auto";
 const LIST = "tw:list-none tw:m-0 tw:p-0 tw:flex tw:flex-col tw:gap-1";
 const ROW = "tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-2.5 tw:py-2 tw:rounded tw:text-[13px]";
-const VERSION_CHIP = "tw:text-[11px] tw:px-1.5 tw:py-0.5 tw:rounded-sm tw:bg-gray-50 tw:text-[var(--bk-ink-muted)]";
+const VERSION_CHIP = "tw:text-[11px] tw:px-1.5 tw:py-0.5 tw:rounded-sm tw:bg-[var(--bk-gray-50)] tw:text-[var(--bk-ink-muted)]";
 const META = "tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const CENTERED_EMPTY = "tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:py-8 tw:text-center";
-const FOOTER = "tw:flex tw:justify-end tw:px-6 tw:py-3 tw:border-t tw:border-gray-200";
+const FOOTER = "tw:flex tw:justify-end tw:px-6 tw:py-3 tw:border-t tw:border-[var(--bk-gray-200)]";
 
 export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
   open,
@@ -115,11 +115,11 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                 <img
                   src={templateThumbnail}
                   alt={`${templateName} preview`}
-                  className="tw:w-full tw:max-h-60 tw:object-contain tw:rounded tw:border tw:border-gray-200 tw:bg-gray-50"
+                  className="tw:w-full tw:max-h-60 tw:object-contain tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)]"
                 />
               ) : (
                 <div
-                  className="tw:w-full tw:h-40 tw:flex tw:items-center tw:justify-center tw:rounded tw:border tw:border-dashed tw:border-gray-200 tw:bg-gray-50 tw:text-xs tw:text-[var(--bk-ink-muted)]"
+                  className="tw:w-full tw:h-40 tw:flex tw:items-center tw:justify-center tw:rounded tw:border tw:border-dashed tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)] tw:text-xs tw:text-[var(--bk-ink-muted)]"
                 >
                   No preview thumbnail
                 </div>
@@ -229,7 +229,7 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
       {currentVersion && (
         <div
           data-testid="versions-current"
-          className="tw:flex tw:justify-between tw:items-center tw:px-2.5 tw:py-2 tw:rounded-md tw:bg-gray-50 tw:border tw:border-gray-200 tw:text-xs"
+          className="tw:flex tw:justify-between tw:items-center tw:px-2.5 tw:py-2 tw:rounded-md tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-gray-200)] tw:text-xs"
         >
           <span className="tw:text-[var(--bk-ink-muted)]">Current version</span>
           <span className="tw:font-semibold">v{currentVersion}</span>

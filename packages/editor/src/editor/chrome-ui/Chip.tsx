@@ -48,7 +48,7 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip
         "tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
         selected
           ? "tw:bg-blue-50 tw:text-[var(--bk-accent-text)]"
-          : "tw:bg-gray-100 tw:text-[var(--bk-ink)] tw:hover:bg-gray-200",
+          : "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-200)]",
         className,
       ]
         .filter(Boolean)

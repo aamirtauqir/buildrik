@@ -179,7 +179,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                       ? "tw:bg-[var(--bk-success)] tw:border-[var(--bk-success)]"
                       : isActive
                         ? "tw:bg-[var(--bk-accent)] tw:border-[var(--bk-accent)]"
-                        : "tw:bg-transparent tw:border-gray-300"
+                        : "tw:bg-transparent tw:border-[var(--bk-gray-300)]"
                   }`}
                   aria-hidden="true"
                 >
@@ -283,7 +283,7 @@ const CHIP_RIGHT = "tw:right-[160px]";
 
 const PANEL =
   `tw:fixed ${CHIP_RIGHT} tw:bottom-10 tw:w-80 tw:max-h-[540px] tw:bg-white ` +
-  "tw:border tw:border-gray-200 " +
+  "tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:rounded-xl tw:[box-shadow:var(--bk-shadow-overlay)] tw:[z-index:var(--bk-z-drawer)] tw:overflow-hidden tw:flex " +
   "tw:flex-col tw:[font-family:var(--bk-font-ui)]";
 /* One above the footer, which is `--bk-z-topbar` (LayoutShell.css). At drawer
@@ -293,7 +293,7 @@ const PANEL =
    progress helper does not outrank an open menu. */
 const PILL =
   `tw:fixed ${CHIP_RIGHT} tw:bottom-0.5 tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-0.5 tw:bg-white ` +
-  "tw:border tw:border-gray-200 tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] " +
+  "tw:border tw:border-[var(--bk-gray-200)] tw:rounded-full tw:[box-shadow:var(--bk-shadow-overlay)] " +
   "tw:[z-index:calc(var(--bk-z-topbar)_+_1)] " +
   "tw:cursor-pointer tw:[font-family:var(--bk-font-ui)] tw:select-none";
 const PILL_DOT = "tw:size-2 tw:rounded-full tw:flex-none";
@@ -305,7 +305,7 @@ const ICON_BTN =
   "tw:flex tw:items-center tw:justify-center tw:size-6.5 tw:bg-transparent tw:border-0 tw:rounded-md " +
   "tw:text-[var(--bk-ink-muted)] tw:p-0 tw:[transition:var(--bk-transition-fast)]";
 const CONFIRM_TEXT = "tw:text-[11px] tw:text-[var(--bk-ink-soft)] tw:whitespace-nowrap";
-const PROGRESS_TRACK = "tw:h-0.5 tw:bg-gray-100 tw:flex-none";
+const PROGRESS_TRACK = "tw:h-0.5 tw:bg-[var(--bk-gray-100)] tw:flex-none";
 const LIST = "tw:list-none tw:m-0 tw:py-1.5 tw:overflow-y-auto tw:flex-1";
 const STEP_ROW =
   "tw:flex tw:items-center tw:gap-2.5 tw:w-full tw:px-3.5 tw:py-2 tw:bg-transparent tw:border-0 " +
@@ -316,7 +316,7 @@ const CIRCLE =
 const STEP_LABEL = "tw:text-[13px] tw:font-medium tw:flex-1 tw:min-w-0 tw:leading-[1.35]";
 const STEP_BODY = "tw:pt-0.5 tw:pr-3.5 tw:pb-3 tw:pl-[42px] tw:flex tw:flex-col tw:gap-2.5";
 const STEP_DESC = "tw:m-0 tw:text-xs tw:leading-relaxed tw:text-[var(--bk-ink-muted)]";
-const FOOTER = "tw:px-4 tw:pt-3 tw:pb-4 tw:border-t tw:border-gray-200 tw:flex tw:flex-col tw:gap-2.5";
+const FOOTER = "tw:px-4 tw:pt-3 tw:pb-4 tw:border-t tw:border-[var(--bk-gray-200)] tw:flex tw:flex-col tw:gap-2.5";
 const FOOTER_TEXT = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink-muted)] tw:leading-normal";
 
 export default OnboardingChecklist;

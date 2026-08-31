@@ -32,7 +32,7 @@ export function EditorShell({
   return (
     <div
       className={[
-        "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:bg-gray-100 tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]",
+        "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:bg-[var(--bk-gray-100)] tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]",
         className,
       ]
         .filter(Boolean)
@@ -43,7 +43,7 @@ export function EditorShell({
       <div className="tw:flex-1 tw:flex tw:min-h-0">
         {rail}
         {drawer}
-        <main className="tw:flex-1 tw:min-w-0 tw:flex tw:flex-col tw:bg-gray-100 tw:overflow-hidden" aria-label={canvasLabel}>
+        <main className="tw:flex-1 tw:min-w-0 tw:flex tw:flex-col tw:bg-[var(--bk-gray-100)] tw:overflow-hidden" aria-label={canvasLabel}>
           {children}
         </main>
         {inspector}

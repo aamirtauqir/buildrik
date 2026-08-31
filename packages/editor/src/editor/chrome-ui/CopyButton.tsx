@@ -24,9 +24,9 @@ const SIZE: Record<NonNullable<CopyButtonProps["size"]>, string> = {
  *  CSS, where `.bk-copy-btn--copied`'s later source position deterministically
  *  won over `.bk-copy-btn--{variant}`'s colour). */
 const VARIANT: Record<NonNullable<CopyButtonProps["variant"]>, { base: string; text: string }> = {
-  ghost: { base: "tw:bg-transparent tw:hover:bg-gray-100", text: "tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]" },
-  outline: { base: "tw:bg-transparent tw:border-gray-400", text: "tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]" },
-  solid: { base: "tw:bg-gray-100 tw:hover:bg-[rgba(17,24,39,0.08)]", text: "tw:text-[var(--bk-ink)]" },
+  ghost: { base: "tw:bg-transparent tw:hover:bg-[var(--bk-gray-100)]", text: "tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]" },
+  outline: { base: "tw:bg-transparent tw:border-[var(--bk-gray-400)]", text: "tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]" },
+  solid: { base: "tw:bg-[var(--bk-gray-100)] tw:hover:bg-[rgba(17,24,39,0.08)]", text: "tw:text-[var(--bk-ink)]" },
 };
 
 const COPIED_TEXT = "tw:text-green-500 tw:hover:text-green-500";

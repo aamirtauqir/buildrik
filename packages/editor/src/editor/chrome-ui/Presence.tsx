@@ -98,7 +98,7 @@ export function Presence({ users, connection = "live", max = 3, className, ...re
           <span
             className={
               "tw:inline-flex tw:items-center tw:justify-center tw:w-5 tw:h-5 tw:rounded-full " +
-              "tw:bg-gray-200 tw:text-gray-700 tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)] " +
+              "tw:bg-[var(--bk-gray-200)] tw:text-[var(--bk-gray-700)] tw:[box-shadow:0_0_0_2px_var(--bk-bg-card)] " +
               "tw:[font-family:var(--bk-font-ui)] tw:text-[11px] tw:font-medium tw:flex-none"
             }
             aria-label={`${overflow} more`}

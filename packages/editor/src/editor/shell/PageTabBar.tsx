@@ -437,7 +437,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
  *  proud of it. Both were bg-card before, which left the active page marked
  *  only by a 500 weight and a 5%-alpha shadow — invisible in practice.
  *  Figma board B9.7 is the record. */
-const BAR = "tw:relative tw:border-y tw:border-gray-200 tw:bg-[var(--bk-bg-app)]";
+const BAR = "tw:relative tw:border-y tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-app)]";
 const ROW = "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1";
 const TABS = "tw:flex tw:min-w-0 tw:items-center tw:gap-0.5 tw:overflow-x-auto";
 const TAB =
@@ -445,7 +445,7 @@ const TAB =
   "tw:rounded-t-md tw:rounded-b-none tw:text-[13px]";
 const TAB_RESTING = "tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-soft)]";
 const TAB_ACTIVE =
-  "tw:border tw:border-b-0 tw:border-gray-200 tw:bg-white tw:font-medium tw:text-[var(--bk-ink)] " +
+  "tw:border tw:border-b-0 tw:border-[var(--bk-gray-200)] tw:bg-white tw:font-medium tw:text-[var(--bk-ink)] " +
   "tw:[box-shadow:var(--bk-shadow-raised)]";
 /** inline-block is required for overflow+ellipsis to trigger on a span. */
 const TAB_NAME = "tw:inline-block tw:max-w-30 tw:overflow-hidden tw:text-ellipsis tw:align-middle";
@@ -453,10 +453,10 @@ const DIRTY_DOT = "tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--bk-blue
 const RENAME_INPUT = "tw:w-25 tw:[&_input]:px-1 tw:[&_input]:py-0.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded";
 const ADD_BTN =
   "tw:flex tw:items-center tw:justify-center tw:size-6 tw:ml-1 tw:p-0 tw:rounded tw:text-sm tw:font-medium " +
-  "tw:border tw:border-dashed tw:border-gray-400 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:bg-gray-100";
+  "tw:border tw:border-dashed tw:border-[var(--bk-gray-400)] tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:bg-[var(--bk-gray-100)]";
 const RENAME_FEEDBACK =
   "tw:fixed tw:z-[10000] tw:px-2 tw:py-1 tw:whitespace-nowrap " +
-  "tw:rounded tw:border tw:border-gray-200 tw:bg-white tw:text-xs tw:leading-snug " +
+  "tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:text-xs tw:leading-snug " +
   "tw:[box-shadow:var(--bk-shadow-drag)]";
 
 export default PageTabBar;

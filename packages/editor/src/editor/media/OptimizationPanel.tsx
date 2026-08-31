@@ -53,7 +53,7 @@ const MONO =
 const CHIP = "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-3 tw:py-0.5 tw:text-[12px] tw:leading-4";
 const CHIP_ACTIVE =
   "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
-const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-gray-200";
+const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]";
 const ROW = "tw:flex tw:items-center tw:justify-between tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 // ============================================================================

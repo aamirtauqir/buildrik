@@ -136,7 +136,7 @@ const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
   field: {
     select: {
       colors: {
-        gray: "tw:border-gray-200 tw:bg-white tw:text-[var(--bk-ink)] tw:font-medium tw:focus:border-blue-700 tw:focus:ring-[3px] tw:focus:ring-blue-50 tw:focus:outline-none",
+        gray: "tw:border-[var(--bk-gray-200)] tw:bg-white tw:text-[var(--bk-ink)] tw:font-medium tw:focus:border-blue-700 tw:focus:ring-[3px] tw:focus:ring-blue-50 tw:focus:outline-none",
       },
       sizes: {
         md: "tw:py-[7px] tw:px-[9px] tw:text-[length:var(--bk-text-12)]",
@@ -314,7 +314,7 @@ export const SCREEN_SUCCESS =
 
 /** Neutral explanatory box. */
 export const SCREEN_INFO =
-  "tw:px-3 tw:py-2.5 tw:rounded tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:px-3 tw:py-2.5 tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] " +
   "tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-normal tw:text-[var(--bk-ink)]";
 
 /** Accent-edged "saved, not live yet" banner. */

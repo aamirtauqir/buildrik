@@ -79,7 +79,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         now?
       </p>
 
-      <div className="tw:p-3 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white">
+      <div className="tw:p-3 tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-white">
         <label className="tw:flex tw:items-start tw:gap-3 tw:cursor-pointer">
           <Checkbox
             color="blue"
@@ -114,7 +114,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         </div>
       </div>
     </div>
-    <div className="tw:flex tw:justify-end tw:gap-2 tw:mt-4 tw:pt-4 tw:border-t tw:border-gray-200">
+    <div className="tw:flex tw:justify-end tw:gap-2 tw:mt-4 tw:pt-4 tw:border-t tw:border-[var(--bk-gray-200)]">
       <Button color="light" onClick={handleSkip} disabled={isCreating} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
         Skip for now
       </Button>

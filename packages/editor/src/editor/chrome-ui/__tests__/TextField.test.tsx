@@ -24,7 +24,7 @@ describe("TextField", () => {
     expect(input.className).toMatch(/\bbk-input\b/);
     // ...but the actual box now comes from real tw: utilities recreating
     // the deleted `.bk-input` CSS block.
-    expect(input.className).toMatch(/tw:border-gray-300/);
+    expect(input.className).toMatch(/tw:border-\[var\(--bk-gray-300\)\]/);
     expect(input.className).toMatch(/tw:bg-white/);
     expect(input.className).toMatch(/tw:rounded-lg/);
     expect(input.className).toMatch(/tw:focus:border-primary-700/);

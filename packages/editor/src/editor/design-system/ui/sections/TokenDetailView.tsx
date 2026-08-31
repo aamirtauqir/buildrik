@@ -66,7 +66,7 @@ export interface TokenDetailViewProps {
    re-declaring five times. */
 
 const CONTAINER = "tw:flex tw:flex-col tw:gap-4 tw:px-1 tw:py-3";
-const FIELD_ROW = "tw:border-t tw:border-gray-200 tw:py-2";
+const FIELD_ROW = "tw:border-t tw:border-[var(--bk-gray-200)] tw:py-2";
 const MONO = "tw:[font-family:var(--bk-font-mono)]";
 const NAME = "tw:text-base tw:font-semibold tw:text-[var(--bk-ink)] tw:leading-tight";
 const ID_MONO = `tw:text-xs tw:text-[var(--bk-ink-muted)] ${MONO}`;
@@ -80,7 +80,7 @@ const LINK_BTN = `${GHOST} tw:p-0 tw:text-left tw:inline-flex tw:items-center tw
 /* Each swatch is static chrome plus ONE genuinely computed value — the token's
    own colour, font or size. The static half is classes; only the computed half
    stays inline, which is exactly the exception CLAUDE.md carves out. */
-const SWATCH = "tw:inline-block tw:size-6 tw:rounded tw:border tw:border-gray-200 tw:flex-none";
+const SWATCH = "tw:inline-block tw:size-6 tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:flex-none";
 
 const previewSlot = (token: DesignToken): React.ReactNode => {
   if (token.kind === "color" || token.category === "colors") {
@@ -103,7 +103,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
     return (
       <span
         aria-hidden="true"
-        className="tw:inline-block tw:w-6 tw:h-2 tw:bg-gray-200 tw:rounded-sm tw:flex-none tw:relative"
+        className="tw:inline-block tw:w-6 tw:h-2 tw:bg-[var(--bk-gray-200)] tw:rounded-sm tw:flex-none tw:relative"
       >
         <span
           className="tw:absolute tw:left-0 tw:top-0 tw:h-full tw:bg-[var(--bk-accent)] tw:rounded-sm"
@@ -113,7 +113,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
     );
   }
   // Default — neutral chip. Nothing computed here at all.
-  return <span aria-hidden="true" className={`${SWATCH} tw:bg-gray-50`} />;
+  return <span aria-hidden="true" className={`${SWATCH} tw:bg-[var(--bk-gray-50)]`} />;
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────

@@ -35,7 +35,7 @@ const PLACEMENT_CLASS: Record<PopoverPlacement, string> = {
  *  box in the popover "look" without using the Popover component itself
  *  (e.g. AddPageButton.tsx). */
 export const POPOVER_BASE_CLASS =
-  "tw:absolute tw:z-40 tw:min-w-[180px] tw:p-2 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white " +
+  "tw:absolute tw:z-40 tw:min-w-[180px] tw:p-2 tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-white " +
   "tw:[box-shadow:var(--bk-shadow-overlay)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]";
 
 export interface PopoverProps {
@@ -198,10 +198,10 @@ const MENU_ITEM_BASE =
 
 export function MenuItem({ icon, kbd, selected, danger, disabled, className, children, ...rest }: MenuItemProps) {
   const stateClass = disabled
-    ? "tw:cursor-default tw:pointer-events-none tw:text-[var(--bk-ink-disabled)] tw:focus-visible:text-gray-300"
+    ? "tw:cursor-default tw:pointer-events-none tw:text-[var(--bk-ink-disabled)] tw:focus-visible:text-[var(--bk-gray-300)]"
     : danger
-      ? "tw:cursor-pointer tw:hover:bg-gray-100 tw:text-red-700 tw:focus-visible:text-red-700"
-      : "tw:cursor-pointer tw:hover:bg-gray-100 tw:text-[var(--bk-ink)] tw:focus-visible:text-blue-700";
+      ? "tw:cursor-pointer tw:hover:bg-[var(--bk-gray-100)] tw:text-red-700 tw:focus-visible:text-red-700"
+      : "tw:cursor-pointer tw:hover:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)] tw:focus-visible:text-blue-700";
 
   return (
     <button
@@ -231,7 +231,7 @@ export function MenuGroup({ className, children, ...rest }: React.HTMLAttributes
     <div
       role="group"
       className={[
-        "tw:mt-1 tw:pt-1 tw:border-t tw:border-gray-200 tw:first:mt-0 tw:first:pt-0 tw:first:border-t-0",
+        "tw:mt-1 tw:pt-1 tw:border-t tw:border-[var(--bk-gray-200)] tw:first:mt-0 tw:first:pt-0 tw:first:border-t-0",
         className,
       ]
         .filter(Boolean)
@@ -260,5 +260,5 @@ export function MenuLabel({ className, children, ...rest }: React.HTMLAttributes
 }
 
 export function MenuSeparator() {
-  return <div className="tw:h-px tw:my-1 tw:bg-gray-200" role="separator" />;
+  return <div className="tw:h-px tw:my-1 tw:bg-[var(--bk-gray-200)]" role="separator" />;
 }

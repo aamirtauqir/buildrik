@@ -12,8 +12,8 @@ import * as React from "react";
 
 /** The accent block every diagram is built from, and its muted counterpart. */
 const BOX = "tw:bg-[var(--bk-accent)] tw:rounded-[1px]";
-const GRAY = "tw:bg-gray-400 tw:rounded-[1px]";
-const GHOST = "tw:border tw:border-dashed tw:border-gray-400 tw:opacity-50";
+const GRAY = "tw:bg-[var(--bk-gray-400)] tw:rounded-[1px]";
+const GHOST = "tw:border tw:border-dashed tw:border-[var(--bk-gray-400)] tw:opacity-50";
 
 // ============================================================================
 // DISPLAY PREVIEW
@@ -71,7 +71,7 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
 // POSITION PREVIEW
 // ============================================================================
 
-const FRAME = "tw:w-6 tw:h-4 tw:bg-gray-50 tw:rounded-sm tw:relative tw:border tw:border-gray-200";
+const FRAME = "tw:w-6 tw:h-4 tw:bg-[var(--bk-gray-50)] tw:rounded-sm tw:relative tw:border tw:border-[var(--bk-gray-200)]";
 const DOT = "tw:w-2 tw:h-1.5 tw:rounded-[1px] tw:absolute";
 
 export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {

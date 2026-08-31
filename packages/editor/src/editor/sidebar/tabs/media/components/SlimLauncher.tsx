@@ -181,7 +181,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
         <TextField
           type="text"
-          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-gray-500"
+          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)] tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
           placeholder="Search"
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
@@ -506,7 +506,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
            and adding while choosing among what is already there is a different
            job. */
         <div
-          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:bg-gray-900 tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-white"
+          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:bg-[var(--bk-gray-900)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-white"
           data-testid="media-bulk-bar"
         >
           <span data-testid="media-bulk-count">{props.selectedKeys?.size ?? 0} selected</span>

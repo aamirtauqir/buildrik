@@ -42,12 +42,12 @@
 import React from "react";
 
 const BASE =
-  "tw:h-9 tw:w-full tw:px-3 tw:py-0 tw:rounded-lg tw:border tw:border-gray-300 tw:bg-white " +
+  "tw:h-9 tw:w-full tw:px-3 tw:py-0 tw:rounded-lg tw:border tw:border-[var(--bk-gray-300)] tw:bg-white " +
   "tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-ui)] tw:text-[13px] " +
-  "tw:[transition:var(--bk-transition-fast)] tw:placeholder:text-gray-500 " +
+  "tw:[transition:var(--bk-transition-fast)] tw:placeholder:text-[var(--bk-gray-500)] " +
   "tw:focus:outline-none tw:focus:border-primary-700 tw:focus:[box-shadow:var(--bk-shadow-focus)] " +
   "tw:aria-invalid:border-[var(--bk-error)] tw:aria-invalid:focus:border-[var(--bk-error)] " +
-  "tw:disabled:bg-gray-100 tw:disabled:text-gray-300 tw:disabled:cursor-not-allowed";
+  "tw:disabled:bg-[var(--bk-gray-100)] tw:disabled:text-[var(--bk-gray-300)] tw:disabled:cursor-not-allowed";
 
 export interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;

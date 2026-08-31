@@ -216,7 +216,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   className={`${CHIP} ${
                     selectedVariantProps.includes(preset.name)
                       ? "tw:bg-[var(--bk-accent)] tw:text-white"
-                      : "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100"
+                      : "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]"
                   }`}
                 >
                   {preset.name}
@@ -270,8 +270,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 const FIELD_LABEL = "tw:block tw:mb-1.5 tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]";
 const HINT = "tw:block tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 /** Section separated by a rule — variant options, DS prefill. */
-const SUB_SECTION = "tw:mt-2 tw:pt-4 tw:border-t tw:border-gray-200";
+const SUB_SECTION = "tw:mt-2 tw:pt-4 tw:border-t tw:border-[var(--bk-gray-200)]";
 const CHECK_LABEL = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
-const CHIP = "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-2xl tw:border tw:border-gray-200 tw:text-xs tw:font-medium";
+const CHIP = "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:rounded-2xl tw:border tw:border-[var(--bk-gray-200)] tw:text-xs tw:font-medium";
 
 export default CreateComponentModal;

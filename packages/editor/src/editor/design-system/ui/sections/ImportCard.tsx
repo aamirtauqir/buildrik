@@ -51,17 +51,17 @@ interface ParsedState {
   errors: string[];
 }
 
-const CARD = "tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3";
+const CARD = "tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:p-3";
 const TITLE = "tw:text-[13px] tw:font-medium tw:mb-2 tw:text-[var(--bk-ink)]";
 /* base/active supply their own border-colour and background together — never
    two competing utilities for the same property (Row precedent). */
 const DROP_BASE =
   "tw:border-[1.5px] tw:border-dashed tw:rounded-lg tw:px-4 tw:py-8 tw:text-center tw:cursor-pointer " +
   "tw:text-[var(--bk-ink-soft)] tw:text-xs tw:leading-relaxed tw:[transition:var(--bk-transition-fast)]";
-const DROP_IDLE = "tw:border-gray-200 tw:bg-gray-50";
+const DROP_IDLE = "tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)]";
 const DROP_ACTIVE = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
 const DETAIL_BLOCK =
-  "tw:mt-3 tw:p-3 tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-md tw:flex tw:flex-col tw:gap-1.5";
+  "tw:mt-3 tw:p-3 tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded-md tw:flex tw:flex-col tw:gap-1.5";
 const DETAIL_ROW = "tw:flex tw:items-baseline tw:justify-between tw:gap-2 tw:text-xs";
 const DETAIL_KEY = "tw:text-[var(--bk-ink-muted)]";
 const DETAIL_VALUE = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-right tw:text-[var(--bk-ink)]";
@@ -72,7 +72,7 @@ const CONFLICT_BOX =
 const ERROR_BOX =
   "tw:mt-2 tw:p-2 tw:rounded-md tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:text-[var(--bk-ink)] tw:text-xs";
 const PASTE_AREA =
-  "tw:w-full tw:min-h-25 tw:mt-1.5 tw:bg-gray-50 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] " +
+  "tw:w-full tw:min-h-25 tw:mt-1.5 tw:bg-[var(--bk-gray-50)] tw:[font-family:var(--bk-font-mono)] tw:text-[11px] " +
   "tw:leading-relaxed tw:resize-y";
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 

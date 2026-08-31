@@ -63,7 +63,7 @@ const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
 const SUMMARY = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:py-1.5";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
 /** The fixing / fix-failed bands differ only by tint. */
-const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-gray-200";
+const BAND = "tw:px-3 tw:py-2.5 tw:border-b tw:border-[var(--bk-gray-200)]";
 /** The quiet button look, previously copy-pasted onto six separate Buttons. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 

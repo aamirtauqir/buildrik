@@ -36,14 +36,14 @@ type UIExportFormat = ExportFormat | "figma";
 
 const TOKEN_KINDS_COUNT = 14;
 
-const CARD = "tw:p-3 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)]";
+const CARD = "tw:p-3 tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)]";
 const FORMAT_ROW =
   "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1.5 tw:rounded-md tw:border tw:cursor-pointer " +
   "tw:text-xs tw:text-[var(--bk-ink)]";
 const CHIP = "tw:ml-auto tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded-full tw:border tw:text-[10px] tw:font-medium";
 const PREVIEW =
   "tw:m-0 tw:p-3 tw:max-h-80 tw:overflow-auto tw:whitespace-pre tw:rounded-md tw:border " +
-  "tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)] tw:text-[11px] tw:leading-relaxed " +
+  "tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:text-[11px] tw:leading-relaxed " +
   "tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
 const RADIO_LABEL = "tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer";
 const CAPTION = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
@@ -254,7 +254,8 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
             return (
               <div
                 key={id}
-                className={`${FORMAT_ROW} tw:border-gray-200 ${disabled ? "tw:opacity-60" : ""}`}
+                data-testid={`format-row-${id}`}
+                className={`${FORMAT_ROW} tw:border-[var(--bk-gray-200)] ${disabled ? "tw:opacity-60" : ""}`}
               >
                 {/* No radio: board 153:120 gives each format its own Copy
                     and Download, so there is nothing to "select" — and the

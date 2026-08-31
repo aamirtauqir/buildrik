@@ -67,7 +67,7 @@ const PresetChip: React.FC<{
     className={`${PILL} ${
       isActive
         ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:font-semibold"
-        : "tw:border-gray-200 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:font-medium tw:hover:text-[var(--bk-ink)]"
+        : "tw:border-[var(--bk-gray-200)] tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:font-medium tw:hover:text-[var(--bk-ink)]"
     }`}
   >
     {PRESET_LABELS[preset]}
@@ -98,7 +98,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
       className={`tw:relative tw:px-3 tw:py-[5px] tw:rounded-[5px] tw:border tw:text-[11px] tw:font-medium ${MONO} ${
         isActive
           ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
-          : "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:hover:bg-gray-100"
+          : "tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-100)]"
       }`}
     >
       {display}
@@ -133,7 +133,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
     if (!Number.isNaN(next) && next >= 0) onChange(token.id, `${next}px`);
   };
   return (
-    <div className="tw:flex tw:items-center tw:gap-2 tw:mt-2 tw:p-2.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-subtle)]">
+    <div className="tw:flex tw:items-center tw:gap-2 tw:mt-2 tw:p-2.5 tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)]">
       <span className={`tw:flex-1 tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink)] ${MONO}`}>
         {token.name}
       </span>
@@ -241,7 +241,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           size="xs"
           onClick={onResetToDefaults}
           title="Reset all spacing to factory defaults"
-          className={`${PILL} tw:ml-auto tw:border-gray-200 tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]`}
+          className={`${PILL} tw:ml-auto tw:border-[var(--bk-gray-200)] tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]`}
         >
           Reset defaults
         </Button>
@@ -264,7 +264,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
         <span className={`tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] tw:text-[var(--bk-ink-muted)] ${MONO}`}>
           Scale
         </span>
-        <div className="tw:flex-1 tw:h-px tw:bg-gray-200" />
+        <div className="tw:flex-1 tw:h-px tw:bg-[var(--bk-gray-200)]" />
         <span className={`tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
           4-pt grid
         </span>

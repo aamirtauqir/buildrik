@@ -97,9 +97,23 @@ export async function hydrateVersionsFromServer(): Promise<number> {
       if (localIds.has(r.versionId)) continue;
       const payload = await client().siteVersions.get.query({ siteId, versionId: r.versionId });
       if (!payload) continue;
-      // Force projectId to this site so loadVersions(siteId) finds it regardless
-      // of what the originating device stored.
-      await saveVersion({ ...(payload as NamedVersion), projectId: siteId });
+      /* Force projectId to this site so loadVersions(siteId) finds it regardless
+         of what the originating device stored.
+
+         `userId` comes off the LIST ROW, not the payload. The payload is
+         whatever the originating client sent, and until 2026-08-25 that was
+         always null — nothing ever called `setCurrentUserId`. The server does
+         not trust it either way: `site-version.ts:30` stamps `createdBy` from
+         the session and says so ("never trust a client-supplied createdBy —
+         attribution spoofing in version history"). So the authoritative author
+         was on the server the whole time and simply never read back; the editor
+         has no other reference to `createdBy` anywhere. Taking it here is what
+         gives a version made on someone else's machine an author at all. */
+      await saveVersion({
+        ...(payload as NamedVersion),
+        projectId: siteId,
+        userId: r.createdBy ?? null,
+      });
       added++;
     }
   } catch (e) {

@@ -195,7 +195,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       </div>
 
       {/* Categories */}
-      <div className="tw:flex tw:gap-1 tw:flex-wrap tw:pb-3 tw:border-b tw:border-gray-200">
+      <div className="tw:flex tw:gap-1 tw:flex-wrap tw:pb-3 tw:border-b tw:border-[var(--bk-gray-200)]">
         <Button
           size="xs"
           color={selectedCategory === "all" ? undefined : "light"}
@@ -278,11 +278,11 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
 
       {/* Preview & Controls */}
       {selectedIcon && (
-        <div className="tw:flex tw:items-center tw:gap-4 tw:p-4 tw:bg-gray-50 tw:rounded-lg">
+        <div className="tw:flex tw:items-center tw:gap-4 tw:p-4 tw:bg-[var(--bk-gray-50)] tw:rounded-lg">
           {/* The picked colour is the user's live choice — the one value here
               that genuinely cannot be a class. */}
           <div
-            className="tw:size-16 tw:flex tw:items-center tw:justify-center tw:bg-white tw:rounded-lg tw:border tw:border-gray-200"
+            className="tw:size-16 tw:flex tw:items-center tw:justify-center tw:bg-white tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)]"
             style={{ color: iconColor }}
           >
             {renderIcon(selectedIcon, iconSize)}
@@ -341,7 +341,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       )}
 
       {/* Footer */}
-      <div className="tw:flex tw:justify-between tw:items-center tw:pt-4 tw:border-t tw:border-gray-200">
+      <div className="tw:flex tw:justify-between tw:items-center tw:pt-4 tw:border-t tw:border-[var(--bk-gray-200)]">
         <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">Powered by Lucide Icons</span>
         <div className="tw:flex tw:gap-2">
           <Button color="light" onClick={onClose} className={GHOST}>

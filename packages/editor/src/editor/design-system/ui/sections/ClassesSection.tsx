@@ -67,7 +67,7 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
       {rows.map(([name, count]) => (
         <li
           key={name}
-          className="tw:flex tw:flex-col tw:gap-0.5 tw:px-3 tw:py-2 tw:border-b tw:border-gray-100"
+          className="tw:flex tw:flex-col tw:gap-0.5 tw:px-3 tw:py-2 tw:border-b tw:border-[var(--bk-gray-100)]"
         >
           <span className="tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]">
             .{name}

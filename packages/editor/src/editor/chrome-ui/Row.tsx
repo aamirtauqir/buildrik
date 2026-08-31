@@ -41,7 +41,7 @@ const BASE =
      rail's, flush-left here because a Row is full-bleed and not rounded. */
   "tw:aria-selected:before:content-[''] tw:aria-selected:before:absolute tw:aria-selected:before:left-0 " +
   "tw:aria-selected:before:inset-y-0 tw:aria-selected:before:w-[3px] tw:aria-selected:before:bg-blue-700 " +
-  "tw:aria-disabled:text-gray-300 tw:aria-disabled:pointer-events-none " +
+  "tw:aria-disabled:text-[var(--bk-gray-300)] tw:aria-disabled:pointer-events-none " +
   "tw:outline-none tw:focus-visible:[box-shadow:inset_var(--bk-shadow-focus)]";
 
 /** Each entry supplies its OWN height/font-size/align-items so no two size

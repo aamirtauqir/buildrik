@@ -34,7 +34,7 @@ export interface IntegrationRowProps extends React.HTMLAttributes<HTMLDivElement
 /** Self-contained recreation of the former `.bk-row` + `.bk-integration-row`
  *  combined effect (same rationale as FormatRow's BASE, in the same commit). */
 const BASE =
-  "tw:flex tw:items-center tw:gap-3 tw:h-16 tw:px-4 tw:w-full tw:text-left tw:border tw:border-gray-200 " +
+  "tw:flex tw:items-center tw:gap-3 tw:h-16 tw:px-4 tw:w-full tw:text-left tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:rounded-lg tw:bg-white tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)] " +
   "tw:[transition:var(--bk-transition-fast)]";
 

@@ -23,7 +23,7 @@ const ROWS: ReadonlyArray<{ pl: string; bar: string }> = [
 ];
 
 const SK_BOX =
-  "tw:size-4 tw:shrink-0 tw:animate-pulse tw:rounded-[4px] tw:bg-gray-100 tw:motion-reduce:animate-none";
+  "tw:size-4 tw:shrink-0 tw:animate-pulse tw:rounded-[4px] tw:bg-[var(--bk-gray-100)] tw:motion-reduce:animate-none";
 
 export const PagesLoadingSkeleton: React.FC = () => (
   <div data-testid="pages-loading" aria-busy="true" aria-label="Loading pages">

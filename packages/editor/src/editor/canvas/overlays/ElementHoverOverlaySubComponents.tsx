@@ -224,7 +224,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       )}
     </div>
     <div className="tw:flex tw:items-center tw:gap-2 tw:text-xs">
-      {info.parentName && <span className="tw:text-gray-400">in {info.parentName}</span>}
+      {info.parentName && <span className="tw:text-[var(--bk-gray-400)]">in {info.parentName}</span>}
       <span className="tw:text-[#a5f3fc] tw:[font-family:var(--bk-font-mono)]">
         {info.dimensions.width} × {info.dimensions.height}
       </span>

@@ -148,7 +148,7 @@ const GroupHeader: React.FC<{ label: string; mini?: string; subtext?: string }> 
   <div className="tw:mt-3 tw:mb-2">
     <div className="tw:flex tw:items-center tw:gap-2">
       <h3 className={GROUP_HEAD}>{label}</h3>
-      <div className="tw:flex-1 tw:h-px tw:bg-gray-200" />
+      <div className="tw:flex-1 tw:h-px tw:bg-[var(--bk-gray-200)]" />
       {mini && <span className={MONO_MINI}>{mini}</span>}
     </div>
     {subtext && <div className="tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:mt-1 tw:leading-[1.4]">{subtext}</div>}
@@ -163,7 +163,7 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
   return (
     <span
       aria-hidden="true"
-      className={`tw:relative tw:inline-block tw:size-4 tw:rounded tw:border ${isLight ? "tw:border-gray-300" : "tw:border-gray-200"}`}
+      className={`tw:relative tw:inline-block tw:size-4 tw:rounded tw:border ${isLight ? "tw:border-[var(--bk-gray-300)]" : "tw:border-[var(--bk-gray-200)]"}`}
       style={{ background: value }}
     >
       {isDirty && (
@@ -487,7 +487,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                         {t.name} · {ratio.toFixed(1)}:1 → 4.5:1
                       </span>
                       <span
-                        className="tw:inline-block tw:size-3 tw:rounded-sm tw:border tw:border-gray-200"
+                        className="tw:inline-block tw:size-3 tw:rounded-sm tw:border tw:border-[var(--bk-gray-200)]"
                         style={{ background: fix }}
                         aria-hidden="true"
                       />
@@ -514,7 +514,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         type="button"
         color="light"
         onClick={onAddToken}
-        className={`${GHOST} tw:mt-4 tw:w-full tw:border tw:border-dashed tw:border-gray-300 tw:text-xs`}
+        className={`${GHOST} tw:mt-4 tw:w-full tw:border tw:border-dashed tw:border-[var(--bk-gray-300)] tw:text-xs`}
       >
         + Add token
       </Button>

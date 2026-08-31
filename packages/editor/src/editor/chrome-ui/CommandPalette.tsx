@@ -86,9 +86,9 @@ export function CommandPalette({
   return (
     <OverlayMount open={open} onClose={onClose} align="top">
       <div className="tw:z-[70] tw:w-[640px] tw:max-w-[calc(100vw-32px)] tw:max-h-[420px] tw:flex tw:flex-col tw:bg-white tw:rounded-lg tw:[box-shadow:var(--bk-shadow-overlay)] tw:overflow-hidden tw:[font-family:var(--bk-font-ui)]">
-        <div className="tw:h-14 tw:flex-none tw:flex tw:items-center tw:px-4 tw:border-b tw:border-gray-200">
+        <div className="tw:h-14 tw:flex-none tw:flex tw:items-center tw:px-4 tw:border-b tw:border-[var(--bk-gray-200)]">
           <input
-            className="tw:flex-1 tw:border-0 tw:bg-transparent tw:outline-none tw:[font-family:var(--bk-font-ui)] tw:text-base tw:text-[var(--bk-ink)] tw:placeholder:text-gray-300"
+            className="tw:flex-1 tw:border-0 tw:bg-transparent tw:outline-none tw:[font-family:var(--bk-font-ui)] tw:text-base tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-300)]"
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}

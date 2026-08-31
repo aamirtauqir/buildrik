@@ -44,7 +44,9 @@ describe("ExportSection", () => {
     const { container } = render(wrap(<ExportSection />));
     /* Scoped to the EXPORT card: the preview's own format select repeats
        three of these names in its options. */
-    const rows = Array.from(container.querySelectorAll("[data-testid^='format-row-'], .tw\\:border-gray-200"));
+    /* The class half of this selector chased a raw Tailwind border that
+       became a token on 2026-08-29; testids are the durable half. */
+    const rows = Array.from(container.querySelectorAll("[data-testid^='format-row-']"));
     const text = container.textContent ?? "";
     for (const label of ["CSS", "JSON", "Tailwind", "Figma Variables JSON"]) {
       expect(text.includes(label), label).toBe(true);

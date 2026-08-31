@@ -27,7 +27,7 @@ const SKELETON_ROWS: ReadonlyArray<{ pl: string; bar: string }> = [
 ];
 
 const SK_ICON =
-  "tw:size-3 tw:shrink-0 tw:animate-pulse tw:rounded-[3px] tw:bg-gray-100 tw:motion-reduce:animate-none";
+  "tw:size-3 tw:shrink-0 tw:animate-pulse tw:rounded-[3px] tw:bg-[var(--bk-gray-100)] tw:motion-reduce:animate-none";
 
 export const LayersLoadingSkeleton: React.FC = () => (
   <div data-testid="layers-loading" aria-busy="true" aria-label="Loading layers">

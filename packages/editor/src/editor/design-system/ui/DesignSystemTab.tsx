@@ -79,11 +79,11 @@ import { useDSLint } from "../state/useDSLint";
 const PANEL = "tw:relative tw:flex tw:flex-col tw:h-full tw:bg-[var(--bk-bg-subtle)]";
 const SECTION_BODY = "tw:flex-1 tw:overflow-auto tw:p-3";
 /** Header strip shared by the brand banner, the toolbar and the crumb. */
-const STRIP = "tw:flex tw:items-center tw:flex-none tw:border-b tw:border-gray-200";
+const STRIP = "tw:flex tw:items-center tw:flex-none tw:border-b tw:border-[var(--bk-gray-200)]";
 /** Square icon button in the toolbar (themes, AI). */
 const TOOL_BTN =
   "tw:inline-flex tw:items-center tw:justify-center tw:w-7 tw:h-6 tw:p-0 tw:rounded-md " +
-  "tw:border tw:border-gray-200 tw:bg-transparent tw:text-sm tw:text-[var(--bk-ink-soft)] tw:hover:bg-gray-100";
+  "tw:border tw:border-[var(--bk-gray-200)] tw:bg-transparent tw:text-sm tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]";
 /** Back crumb inside a destination — board 153:2 draws `‹ <Section>` in accent. */
 const CRUMB =
   "tw:flex tw:items-center tw:gap-[5px] tw:h-auto tw:px-0 tw:border-0 tw:bg-transparent " +
@@ -716,7 +716,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                       color="light"
                       data-section-id={s.id}
                       onClick={() => handleSectionClick(s.id)}
-                      className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100"
+                      className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
                     >
                       {/* `hint` has been written for all nine rows since the
                           board landed and rendered for none of them — the row
@@ -743,7 +743,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                             {s.id === "lint" ? lintIssues.length : sectionCounts[s.id]}
                           </span>
                         ) : null}
-                        <span aria-hidden="true" className="tw:text-gray-400">›</span>
+                        <span aria-hidden="true" className="tw:text-[var(--bk-gray-400)]">›</span>
                       </span>
                     </Button>
                   </li>

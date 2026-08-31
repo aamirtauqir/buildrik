@@ -37,7 +37,7 @@ const rangeLabel: Record<TitleRange, string> = {
 
 const UI = "tw:[font-family:var(--bk-font-ui)]";
 const MONO = "tw:[font-family:var(--bk-font-mono)]";
-const CARD = "tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-gray-200 tw:rounded";
+const CARD = "tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded";
 const BANNER = "tw:bg-[var(--bk-warning-tint)] tw:border tw:border-[var(--bk-warning-text)] tw:rounded tw:text-[var(--bk-warning)]";
 const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
 const FIELD_HEAD = "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2";
@@ -139,7 +139,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                   >
                     <span
                       className={`tw:size-1.5 tw:rounded-full tw:flex-none ${
-                        c.ok ? "tw:bg-[var(--bk-success)]" : "tw:bg-gray-400"
+                        c.ok ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-gray-400)]"
                       }`}
                     />
                     <span>{c.label}</span>
@@ -261,7 +261,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <Label htmlFor="seo-slug" className={BK_LABEL_CLASS}>URL Slug</Label>
         <div className="tw:flex tw:items-stretch">
           <span
-            className={`tw:inline-flex tw:items-center tw:px-2 tw:border tw:border-r-0 tw:border-gray-200 tw:rounded-l tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] tw:font-medium ${MONO}`}
+            className={`tw:inline-flex tw:items-center tw:px-2 tw:border tw:border-r-0 tw:border-[var(--bk-gray-200)] tw:rounded-l tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] tw:font-medium ${MONO}`}
           >
             {domain}/
           </span>

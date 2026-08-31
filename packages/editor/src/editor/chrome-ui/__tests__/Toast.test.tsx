@@ -174,7 +174,7 @@ describe("Toast — board 1177:4859's catalog", () => {
 
   it("gives the neutral tone the grey card, not a coloured one", () => {
     const card = fire({ description: "Deleted 'Button'", title: "Undo", tone: "neutral" });
-    expect(card.outerHTML).toContain("tw:bg-gray-100");
+    expect(card.outerHTML).toContain("tw:bg-[var(--bk-gray-100)]");
   });
 });
 

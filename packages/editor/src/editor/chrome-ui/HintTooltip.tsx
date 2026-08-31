@@ -56,7 +56,7 @@ export interface HintTooltipProps {
    DESIGN.md's favour; see chrome-ui/tooltipTheme.ts. */
 const BUBBLE_CLASS =
   "tw:fixed tw:max-w-[280px] tw:whitespace-normal tw:rounded-lg tw:px-3 tw:py-2 " +
-  "tw:border tw:border-gray-200 tw:bg-white tw:text-[color:var(--bk-ink-soft)] " +
+  "tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:text-[color:var(--bk-ink-soft)] " +
   "tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-16)] tw:font-medium " +
   "tw:[box-shadow:var(--bk-shadow-overlay)] " +
   "tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";

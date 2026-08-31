@@ -44,10 +44,10 @@ const CONTAINER = "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:overflow-y-auto";
    Brand root already made — the whole panel is one nav model now. */
 const ROW =
   "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-auto tw:px-2 tw:py-2 " +
-  "tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-100";
-const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-gray-200 tw:rounded-lg tw:bg-white tw:min-h-29";
+  "tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-[var(--bk-gray-100)]";
+const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:bg-white tw:min-h-29";
 const PREVIEW_BOX =
-  "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-gray-50 tw:text-[10px] tw:text-[var(--bk-ink-muted)]";
+  "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-[var(--bk-gray-50)] tw:text-[10px] tw:text-[var(--bk-ink-muted)]";
 const CARD_NAME = "tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink)] tw:mb-0.5";
 const CARD_META = "tw:text-[10px] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]";
 const AI_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-4 tw:pb-1 tw:gap-2";
@@ -56,12 +56,12 @@ const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const SAVED_HEADER =
   "tw:px-3 tw:pt-2 tw:pb-1.5 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)] tw:uppercase tw:tracking-[0.04em]";
 const EMPTY_SAVED =
-  "tw:mx-3 tw:mb-4 tw:p-3 tw:border tw:border-dashed tw:border-gray-200 tw:rounded-lg tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:text-center";
+  "tw:mx-3 tw:mb-4 tw:p-3 tw:border tw:border-dashed tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:text-center";
 const FOOTER_CALLOUT =
   "tw:m-4 tw:mx-3 tw:px-3 tw:py-2.5 tw:bg-[var(--bk-accent-tint)] tw:border tw:border-[var(--bk-accent-subtle)] " +
   "tw:rounded-lg tw:text-[11px] tw:text-[var(--bk-ink-soft)] tw:leading-normal";
 /** The sketch vocabulary — a fake control on a muted plate. */
-const SKETCH = "tw:bg-gray-50 tw:border tw:border-gray-200 tw:rounded-sm";
+const SKETCH = "tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded-sm";
 
 // ─── Mini preview swatches per catalog id ────────────────────────────────────
 
@@ -76,7 +76,7 @@ function CatalogPreview({ component }: { component: ComponentType }): React.Reac
     case "modal":
       return <div className={`${SKETCH} tw:w-[70%] tw:h-7 tw:rounded tw:[box-shadow:var(--bk-shadow-raised)]`} />;
     case "section":
-      return <div className="tw:w-4/5 tw:h-5.5 tw:bg-gray-100 tw:rounded-sm" />;
+      return <div className="tw:w-4/5 tw:h-5.5 tw:bg-[var(--bk-gray-100)] tw:rounded-sm" />;
     default:
       return <span>{component.name.slice(0, 4)}</span>;
   }
@@ -150,7 +150,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
                   {variantCount} variant{variantCount === 1 ? "" : "s"}
                   {instanceCount > 0 ? ` · ${instanceCount} in use` : ""}
                 </span>
-                <span aria-hidden="true" className="tw:text-gray-400">›</span>
+                <span aria-hidden="true" className="tw:text-[var(--bk-gray-400)]">›</span>
               </span>
             </Button>
           );
@@ -203,7 +203,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
                     1 master · {instanceCount} instance{instanceCount === 1 ? "" : "s"}
                   </span>
                 </span>
-                <span aria-hidden="true" className="tw:flex-none tw:text-gray-400">›</span>
+                <span aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-gray-400)]">›</span>
               </Button>
             );
           })}

@@ -22,7 +22,7 @@ describe("CopyButton", () => {
       </ToastProvider>,
     );
     const btn = screen.getByRole("button", { name: "Copy HTML" });
-    expect(btn.className).toContain("tw:bg-gray-100");
+    expect(btn.className).toContain("tw:bg-[var(--bk-gray-100)]");
     fireEvent.click(btn);
     expect(writeText).toHaveBeenCalledWith("hello");
     const copiedBtn = await screen.findByRole("button", { name: "Copied" });

@@ -59,7 +59,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
       ) : null}
 
       <div
-        className="tw:flex tw:items-center tw:justify-between tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)] tw:bg-gray-100"
+        className="tw:flex tw:items-center tw:justify-between tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)] tw:bg-[var(--bk-gray-100)]"
         data-no-dark-header
       >
         <span>No dark value</span>

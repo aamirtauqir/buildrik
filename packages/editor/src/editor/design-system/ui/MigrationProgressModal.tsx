@@ -100,7 +100,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
             {steps.map((step) => (
               <li
                 key={step.version}
-                className="tw:flex tw:items-center tw:gap-2 tw:py-2 tw:border-b tw:border-gray-200 tw:text-[13px]"
+                className="tw:flex tw:items-center tw:gap-2 tw:py-2 tw:border-b tw:border-[var(--bk-gray-200)] tw:text-[13px]"
               >
                 <span className="tw:flex-1 tw:text-[var(--bk-ink)]">
                   v{step.version} · {step.label}

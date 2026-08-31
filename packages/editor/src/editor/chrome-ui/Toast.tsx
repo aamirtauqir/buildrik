@@ -35,7 +35,7 @@ export type ToastTone = "info" | "success" | "warning" | "error" | "neutral";
  * tone carries its own complete pair rather than layering on a base.
  */
 const TONE_CLASS: Record<ToastTone, string> = {
-  neutral: "tw:bg-gray-100",
+  neutral: "tw:bg-[var(--bk-gray-100)]",
   info: "tw:bg-[var(--bk-accent-tint)]",
   success: "tw:bg-[var(--bk-success-tint)]",
   warning: "tw:bg-[var(--bk-warning-tint)]",

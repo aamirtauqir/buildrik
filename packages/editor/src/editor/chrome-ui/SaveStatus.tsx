@@ -70,7 +70,7 @@ const STATE_CLASS: Record<SaveState, string> = {
 
 const DOT_CLASS: Record<SaveState, string> = {
   saved: "tw:bg-green-500",
-  saving: "tw:bg-gray-500",
+  saving: "tw:bg-[var(--bk-gray-500)]",
   unsaved: "tw:bg-yellow-500",
   conflict: "tw:bg-yellow-500",
   offline: "tw:bg-yellow-500",

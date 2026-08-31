@@ -68,7 +68,7 @@ const TOGGLE_ROW = "tw:flex tw:items-center tw:justify-between tw:p-3";
 /* Board 149:108 tints the save bar with the warning wash, not neutral grey —
    the bar exists to say something is unsaved, and grey says nothing. */
 const SAVEBAR =
-  "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5 tw:border-t tw:border-gray-200 " +
+  "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5 tw:border-t tw:border-[var(--bk-gray-200)] " +
   "tw:bg-[var(--bk-warning-tint)]";
 /* …and it draws Save as accent TEXT, not a filled button. The Button doc on the
    same Figma page is explicit that the one filled accent button belongs to the
@@ -80,7 +80,7 @@ const SAVE_LINK =
 const INLINE_HINT = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:leading-normal tw:px-3 tw:pb-3";
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-[var(--bk-accent-text)]";
 const SUB = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
-const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-gray-200";
+const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-[var(--bk-gray-200)]";
 const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
 const SPACER = "tw:flex-1";
 /** Two stacked lines inside a row (name over type, key over value). */
@@ -235,7 +235,7 @@ export function CollectionView({
         ))}
         {records.length === 0 && <div className={`${SUB} tw:p-3`}>No records yet — add the first one.</div>}
       </div>
-      <div className="tw:border-t tw:border-gray-200">
+      <div className="tw:border-t tw:border-[var(--bk-gray-200)]">
         <ListRow label="Fields" count={collection.fields.length} chevron onClick={onOpenFields} />
         {onOpenDynamicPages && <ListRow label="Dynamic pages" chevron onClick={onOpenDynamicPages} />}
       </div>

@@ -59,7 +59,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
     ? "tw:bg-red-600"
     : isNearLimit
       ? "tw:bg-amber-500"
-      : "tw:bg-gray-400";
+      : "tw:bg-[var(--bk-gray-400)]";
 
   return (
     <div
@@ -80,7 +80,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
         {isExhausted ? " — upload is off until you free space" : null}
       </div>
       {!isExhausted && (
-        <div className="med-quota-track tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-gray-100">
+        <div className="med-quota-track tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-full tw:bg-[var(--bk-gray-100)]">
           <div className={`med-quota-fill tw:h-full ${fill}`} style={{ width: `${clampedPct}%` }} />
         </div>
       )}

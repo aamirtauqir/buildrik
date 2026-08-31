@@ -27,7 +27,7 @@ const WIDTH_CLASS: Record<PanelWidth, string> = {
   // fixed w-80 froze every panel at 320 no matter what the drawer did.
   narrow: "tw:w-full tw:flex-none tw:bg-white",
   wide: "tw:w-[360px] tw:flex-none tw:bg-white",
-  fullpage: "tw:flex-1 tw:bg-gray-100",
+  fullpage: "tw:flex-1 tw:bg-[var(--bk-gray-100)]",
 };
 
 function PanelFrameRoot({ width = "narrow", bordered, className, children, ...rest }: PanelFrameProps) {
@@ -36,7 +36,7 @@ function PanelFrameRoot({ width = "narrow", bordered, className, children, ...re
       className={[
         "tw:flex tw:flex-col tw:min-h-0",
         WIDTH_CLASS[width],
-        bordered && "tw:border tw:border-gray-200 tw:rounded-lg",
+        bordered && "tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg",
         className,
       ]
         .filter(Boolean)

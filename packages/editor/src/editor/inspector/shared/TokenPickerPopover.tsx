@@ -188,12 +188,12 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
 
   return (
     <div
-      className={`tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[var(--bk-bg-panel)] tw:[box-shadow:var(--bk-shadow-overlay)] ${
+      className={`tw:overflow-hidden tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-panel)] tw:[box-shadow:var(--bk-shadow-overlay)] ${
         showSwatch ? "tw:w-57" : "tw:w-60"
       }`}
     >
       {/* Tab strip */}
-      <div className="tw:flex tw:border-b tw:border-gray-200">
+      <div className="tw:flex tw:border-b tw:border-[var(--bk-gray-200)]">
         {(allowCustom ? (["tokens", "custom"] as const) : (["tokens"] as const)).map((t) => (
           <Button
             key={t}

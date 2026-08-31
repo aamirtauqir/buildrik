@@ -32,14 +32,14 @@ export interface ReviewModalProps {
 /* Four `rgba(255,255,255,0.0x)` values in here were dark-theme leftovers —
    white at 3-10% on a white panel is nothing, so the diff rows had no plate and
    the swatches had no outline. Real tokens now. */
-const DIFF_ROW = "tw:flex tw:items-center tw:gap-2 tw:px-2.5 tw:py-1.5 tw:bg-gray-50 tw:rounded-md tw:mb-1";
+const DIFF_ROW = "tw:flex tw:items-center tw:gap-2 tw:px-2.5 tw:py-1.5 tw:bg-[var(--bk-gray-50)] tw:rounded-md tw:mb-1";
 const SECTION_HEAD =
   "tw:text-xs tw:font-bold tw:text-[var(--bk-ink-muted)] tw:mb-2 tw:uppercase tw:tracking-[0.07em]";
 const SECTION = "tw:mb-3.5";
 const NAME = "tw:text-xs tw:text-[var(--bk-ink)] tw:flex-1";
 const WAS = "tw:text-xs tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)] tw:line-through";
 const NOW = "tw:text-xs tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-success)]";
-const SWATCH = "tw:size-5 tw:rounded tw:border tw:border-gray-200 tw:flex-none";
+const SWATCH = "tw:size-5 tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:flex-none";
 
 /** Typography and Spacing rendered byte-identical blocks. One component. */
 function ValueDiffSection({

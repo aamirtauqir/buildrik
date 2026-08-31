@@ -145,7 +145,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
       } ${
         isSelected
           ? "tw:border-2 tw:border-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-alpha-accent-15)]"
-          : "tw:border tw:border-gray-200"
+          : "tw:border tw:border-[var(--bk-gray-200)]"
       }`}
     >
       <AssetThumbnail asset={asset} onPreviewVideo={onPreviewVideo} />

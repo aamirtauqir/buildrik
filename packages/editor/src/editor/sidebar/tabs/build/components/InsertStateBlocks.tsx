@@ -32,7 +32,7 @@ const SKELETON_ROWS: ReadonlyArray<{ pl: string; bar: string }> = [
 ];
 
 const SK_ICON =
-  "tw:size-3 tw:shrink-0 tw:animate-pulse tw:rounded-[3px] tw:bg-gray-100 tw:motion-reduce:animate-none";
+  "tw:size-3 tw:shrink-0 tw:animate-pulse tw:rounded-[3px] tw:bg-[var(--bk-gray-100)] tw:motion-reduce:animate-none";
 
 export const InsertLoadingSkeleton: React.FC = () => (
   <div data-testid="insert-loading" aria-busy="true" aria-label="Loading element library">
