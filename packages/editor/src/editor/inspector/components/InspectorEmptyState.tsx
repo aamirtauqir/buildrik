@@ -43,7 +43,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
   // Phase 7: Post-apply state
   if (appliedName) {
     return (
-      <div role="status" aria-live="polite" className={CONTAINER}>
+      <div role="status" aria-live="polite" className={CONTAINER_APPLIED}>
         <div className={APPLIED_BANNER}>
           <h3 className={`${TITLE} tw:mb-1 tw:text-[var(--bk-success)]`}>Template applied.</h3>
           {/* was color: var(--bk-success-tint) — a BACKGROUND tone used as text,
@@ -53,6 +53,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           </p>
           {composer && (
             <Button
+              size="xs"
               onClick={() => composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {})}
               className={APPLIED_ACTION}
               aria-label="Set brand colors in Global Styles"
@@ -108,10 +109,21 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
    action, the template banner, the tip. Measured live 2026-08-31 after the
    change: sentence x17 y64, action x17 y92, against the board's x16 y64 / y92.
    Horizontally centred, the single action rendered as a 62px link adrift
-   mid-panel above 700px of void; left-aligned it reads as the next step. */
-const CONTAINER =
-  "tw:flex tw:flex-col tw:items-start tw:px-4 tw:pt-16 tw:pb-6 " +
+   mid-panel above 700px of void; left-aligned it reads as the next step.
+
+   The TOP padding is not shared: 159:99 opens its sentence at y64, while
+   1175:4841 opens its banner at y14, so the template-applied branch overrides
+   `pt-16` with `pt-4`. Applying one padding to both pushed the banner 63px
+   down its own board. */
+const CONTAINER_BASE =
+  "tw:flex tw:flex-col tw:items-start tw:px-4 tw:pb-6 " +
   "tw:text-left tw:text-[var(--bk-ink-soft)]";
+/* Exactly ONE `pt-*` per state, never a base plus an override. Appending
+   `tw:pt-4` to a string already carrying `tw:pt-16` changes nothing: both
+   compile, neither is more specific, and the stylesheet's order decides —
+   measured, the element carried both classes and computed 64px. */
+const CONTAINER = `${CONTAINER_BASE} tw:pt-16`;          // 159:99, sentence at y64
+const CONTAINER_APPLIED = `${CONTAINER_BASE} tw:pt-4`;   // 1175:4841, banner at y14
 const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)]";
 /* No max-width: the board's sentence sits on one line inside the panel's
    own padding; capping it at 220px broke it across two. */
@@ -125,6 +137,9 @@ const APPLIED_BANNER =
    a pale tint of it. */
 /* Sized to its label, not to the banner: board 1175:4841 draws it 113px wide
    inside a 288px banner. Full-width it read as a section footer. */
+/* `size="xs"` on the Button, not a height class here: flowbite ships its own
+   `h-10`, and a competing `h-*` in this string loses on stylesheet order the
+   same way the padding did. */
 const APPLIED_ACTION =
-  "tw:inline-block tw:px-3 tw:py-2 tw:rounded-md tw:text-[12px] tw:font-medium tw:text-center " +
+  "tw:inline-block tw:min-h-0 tw:rounded-md tw:text-[12px] tw:font-medium tw:text-center " +
   "tw:border-transparent tw:bg-[var(--bk-accent)] tw:text-white";
