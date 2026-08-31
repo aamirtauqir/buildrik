@@ -686,6 +686,21 @@ wrapper (its contract is `className`-based — `BK_LABEL_CLASS`/
 - **New component:** compose a flowbite-react primitive where one fits; mirror a Figma node where one exists; `--bk-*` tokens via `var(--bk-*)` inside `tw:` utilities, weights ≤600, focus `var(--bk-shadow-focus)`; export from `index.ts`; add contract tests. Importing a flowbite-react component for the first time? Run `pnpm flowbite:classlist` (see DS SSOT table above) so its classes reach the Tailwind build.
 - **Cascade:** `@layer reset, components, overrides;` (declared in `themes/default.css`). `tw.css` (Tailwind utilities, `tw` prefix) + `chrome-reset.css` (preflight replacement, scoped to `.bd-studio` and excluding the canvas subtree) load unlayered before `legacy-components.css`; tokens + engine selectors win over all layers per CSS spec.
 - **Tokens:** `var(--bk-*)` only, values changed in Figma → re-export → `node scripts/tokens/generate.mjs`.
+- **A competing utility in the SAME class string does not win.** flowbite's
+  `Button` ships `tw:h-10` and its `TextInput` ships its own box; appending
+  `tw:h-7` / `tw:pt-4` / `min-h-0` next to them compiles BOTH, neither is more
+  specific, and the STYLESHEET's order decides. Measured 2026-08-31: an element
+  carrying both `tw:pt-16` and `tw:pt-4` computed 64px. Ask the component for a
+  `size` instead, or write a CSS rule one class deeper (`.row .control`, not
+  `.control`). Four separate defects in one day came from this: 40px eye/lock
+  buttons in 28px Layers rows (which made a click act on the WRONG layer), the
+  Layers toolbar, the Pages bulk bar, and the inspector's align row overflowing
+  its panel by 2px.
+- **`className` and `style` reach DIFFERENT elements on flowbite inputs.**
+  `className` lands on the OUTER wrapper, `style` on the real `<input>`. A
+  `flex: 1` passed via `style` therefore never grows the wrapper — the sidebar
+  search field used 168px of its own 287px box until the growth moved to
+  `className`.
 
 ### CI gates relevant to the library
 
