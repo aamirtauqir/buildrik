@@ -164,6 +164,26 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     });
   }, [commands, query, recentIds]);
 
+  const groupedCommands = filteredCommands.reduce(
+    (acc, cmd) => {
+      if (!acc[cmd.category]) acc[cmd.category] = [];
+      acc[cmd.category].push(cmd);
+      return acc;
+    },
+    {} as Record<string, CommandAction[]>
+  );
+
+  /* The list the KEYBOARD walks, in the order the eye reads.
+     `filteredCommands` is sorted recent-then-alphabetical, but the list RENDERS
+     grouped by CATEGORY_ORDER — so indexing selection into the flat sorted
+     array pointed at a different row than the one highlighted. Measured: on
+     open, `selectedIndex` 0 landed on "Add button" ~420px down inside INSERT
+     while the visually-first row sat unhighlighted, and Enter ran it. Board
+     1177:4804 highlights the first VISIBLE row. Same mismatch broke the
+     scroll-into-view below, which indexed `list.children` — those are the
+     group wrappers, not the rows. */
+  const visibleCommands = orderedGroups(groupedCommands).flatMap(([, cmds]) => cmds);
+
   // Reset selection when filtered list changes
   React.useEffect(() => {
     setSelectedIndex(0);
@@ -173,7 +193,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   React.useEffect(() => {
     const list = listRef.current;
     if (!list) return;
-    const selected = list.children[selectedIndex] as HTMLElement;
+    /* Query the row by id. `list.children` are the CATEGORY wrappers, so
+       indexing them scrolled to the wrong place (or nowhere). */
+    const selected = list.querySelector(`#${CANVAS_LIST_ID}-${selectedIndex}`) as HTMLElement | null;
     if (selected && typeof selected.scrollIntoView === "function") {
       selected.scrollIntoView({ block: "nearest" });
     }
@@ -202,7 +224,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setSelectedIndex((i) => Math.min(i + 1, filteredCommands.length - 1));
+          setSelectedIndex((i) => Math.min(i + 1, visibleCommands.length - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
@@ -210,8 +232,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           break;
         case "Enter":
           e.preventDefault();
-          if (filteredCommands[selectedIndex]) {
-            executeCommand(filteredCommands[selectedIndex]);
+          if (visibleCommands[selectedIndex]) {
+            executeCommand(visibleCommands[selectedIndex]);
           }
           break;
         case "Escape":
@@ -226,14 +248,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   if (!isOpen) return null;
 
   // Group commands by category
-  const groupedCommands = filteredCommands.reduce(
-    (acc, cmd) => {
-      if (!acc[cmd.category]) acc[cmd.category] = [];
-      acc[cmd.category].push(cmd);
-      return acc;
-    },
-    {} as Record<string, CommandAction[]>
-  );
 
   return (
     <>
@@ -286,7 +300,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             aria-controls={CANVAS_LIST_ID}
             aria-autocomplete="list"
             aria-activedescendant={
-              filteredCommands[selectedIndex] ? `${CANVAS_LIST_ID}-${selectedIndex}` : undefined
+              visibleCommands[selectedIndex] ? `${CANVAS_LIST_ID}-${selectedIndex}` : undefined
             }
             aria-label="Type a command or search"
             style={{
@@ -313,7 +327,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             padding: "8px 12px",
           }}
         >
-          {filteredCommands.length === 0 ? (
+          {visibleCommands.length === 0 ? (
             <div
               style={{
                 padding: 24,
@@ -343,7 +357,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                 {/* Commands */}
                 {cmds.map((cmd) => {
-                  const globalIndex = filteredCommands.indexOf(cmd);
+                  /* Index into the VISUAL list, which is what selection walks.
+                     This read `filteredCommands.indexOf(cmd)` — the flat
+                     recent-then-alphabetical array — so a row's id and its
+                     highlight came from a different ordering than the arrow
+                     keys and Enter used. */
+                  const globalIndex = visibleCommands.indexOf(cmd);
                   const isSelected = globalIndex === selectedIndex;
                   const isRecent = recentIds.includes(cmd.id);
                   const isDisabled = Boolean(cmd.requiresSelection && selectedId === null);
