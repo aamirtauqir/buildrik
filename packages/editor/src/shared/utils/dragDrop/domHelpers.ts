@@ -163,6 +163,34 @@ export function getScrollableParent(el: HTMLElement): HTMLElement | null {
 }
 
 /**
+ * The nearest element that can actually scroll `el` in one axis — `el` itself
+ * included, unlike `getScrollableParent`, which starts at the parent.
+ *
+ * The two axes are not the same element in the editor. The canvas owns its own
+ * VERTICAL overflow (`height: 100%; overflow: auto`, long page), while
+ * HORIZONTAL overflow lives one level up on `.bd-canvas-scroll` — the desktop
+ * canvas carries a `minWidth` of the desktop breakpoint and is routinely wider
+ * than the column it sits in. Auto-scroll that writes `canvas.scrollLeft` moves
+ * nothing, because the canvas has no horizontal overflow to give.
+ */
+export function getAxisScroller(el: HTMLElement, axis: "x" | "y"): HTMLElement {
+  let node: HTMLElement | null = el;
+  while (node) {
+    const overflows =
+      axis === "x"
+        ? node.scrollWidth > node.clientWidth + 1
+        : node.scrollHeight > node.clientHeight + 1;
+    if (overflows) {
+      const style = getComputedStyle(node);
+      const o = axis === "x" ? style.overflowX : style.overflowY;
+      if (o === "auto" || o === "scroll") return node;
+    }
+    node = node.parentElement;
+  }
+  return el;
+}
+
+/**
  * Clean up all drop indicator attributes from a container
  * Call this on drag end, drag leave, and drop to ensure consistent cleanup
  */

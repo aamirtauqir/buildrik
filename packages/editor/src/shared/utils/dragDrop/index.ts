@@ -87,6 +87,7 @@ export {
   getDescendantIds,
   isDescendantOf,
   getScrollableParent,
+  getAxisScroller,
   cleanupDropIndicators,
 } from "./domHelpers";
 

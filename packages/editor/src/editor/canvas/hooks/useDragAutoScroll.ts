@@ -56,8 +56,12 @@ export function useDragAutoScroll({
     (clientX: number, clientY: number) => {
       if (!canvasRef.current) return;
 
-      const rect = canvasRef.current.getBoundingClientRect();
+      /* The visible viewport's rect, not the canvas's. The desktop canvas is
+         routinely wider than the column it sits in (it carries a minWidth of
+         the desktop breakpoint), so measuring the edge zone against the canvas
+         describes a band the pointer can never reach. */
       const scrollContainer = getScrollableParent(canvasRef.current) || canvasRef.current;
+      const rect = scrollContainer.getBoundingClientRect();
 
       // Stop any existing auto-scroll before potentially starting a new one
       if (autoScrollTimerRef.current !== null) {

@@ -46,6 +46,7 @@ export const dragDropHelpers = {
   getDescendantIds: domHelpers.getDescendantIds,
   isDescendantOf: domHelpers.isDescendantOf,
   getScrollableParent: domHelpers.getScrollableParent,
+  getAxisScroller: domHelpers.getAxisScroller,
 
   // Drag data
   parseDragData: dragData.parseDragData,

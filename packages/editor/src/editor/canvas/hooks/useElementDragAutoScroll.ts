@@ -11,6 +11,7 @@
 
 import * as React from "react";
 import { AUTO_SCROLL_CONFIG } from "./elementDragTypes";
+import { getAxisScroller } from "@/shared/utils/dragDrop";
 
 // =============================================================================
 // TYPES
@@ -81,18 +82,28 @@ export function useElementDragAutoScroll({
         autoScrollIntervalRef.current = null;
       }
 
-      const canvasRect = canvas.getBoundingClientRect();
-      const scrollSpeedX = calculateScrollSpeed(clientX, canvasRect.left, canvasRect.right);
-      const scrollSpeedY = calculateScrollSpeed(clientY, canvasRect.top, canvasRect.bottom);
+      /* Edges are the VISIBLE viewport's, not the canvas's. The desktop canvas
+         carries a minWidth of the desktop breakpoint and is routinely wider
+         than the column it sits in, so its own left/right edges are off screen
+         — thresholds measured against them describe a trigger zone the pointer
+         can never enter, and auto-scroll simply never fires. And the two axes
+         scroll DIFFERENT elements: the canvas owns its vertical overflow, the
+         horizontal lives on .bd-canvas-scroll. */
+      const hx = getAxisScroller(canvas, "x");
+      const vy = getAxisScroller(canvas, "y");
+      const box = hx === canvas ? canvas.getBoundingClientRect() : hx.getBoundingClientRect();
+      const vbox = vy === canvas ? canvas.getBoundingClientRect() : vy.getBoundingClientRect();
+      const scrollSpeedX = calculateScrollSpeed(clientX, box.left, box.right);
+      const scrollSpeedY = calculateScrollSpeed(clientY, vbox.top, vbox.bottom);
 
       // Only start interval if we need to scroll
       if (scrollSpeedX !== 0 || scrollSpeedY !== 0) {
         autoScrollIntervalRef.current = window.setInterval(() => {
           if (scrollSpeedX !== 0) {
-            canvas.scrollLeft += scrollSpeedX;
+            hx.scrollLeft += scrollSpeedX;
           }
           if (scrollSpeedY !== 0) {
-            canvas.scrollTop += scrollSpeedY;
+            vy.scrollTop += scrollSpeedY;
           }
         }, AUTO_SCROLL_CONFIG.INTERVAL);
       }
