@@ -122,7 +122,51 @@ moved nothing.
   a `counts` of 35, so any tool iterating that array silently skipped a family
   of 10 boards.
 
-## 5. Two things I got wrong, recorded
+## 4-bis. What the reviews then found — and it was a lot
+
+Two independent adversarial reviews ran against the commits above. Both were
+right about things I had verified and still got wrong, which is the point of
+running them.
+
+**The desktop fix covered one third of its own finding.** `DEVICE_SIZES` gives
+wide 1920, tablet 768, mobile 375 — but the canvas is a flex item, so
+`min-width: auto` resolves to 0 and the default `flex-shrink: 1` pulled every
+one of them down to the container anyway. Measured live: **tablet declared 768
+and rendered 712**, below `BREAKPOINTS.tablet.minWidth`, i.e. exactly the
+"layout that ships on no screen" §1 describes — unfixed, in the same function,
+while §1 asserted "every other one carries a real device width". Desktop only
+escaped because its `minWidth` floors it. `flexShrink: 0`; re-measured desktop
+1024, tablet 768, mobile 375, wide 1920.
+
+**"One place to change it" was true only for the tab that happened to be open.**
+Templates and Media emitted their DEFAULT width as a literal `320` into
+`--drawer-w`, which beats the token by construction — so 2 of the 6
+destinations were pinned regardless of `--bk-size-drawer`. They now emit
+`null`. Re-verified across all six: forcing the token to 260 moves Insert,
+Layers, Pages, Media, Content and Brand together.
+
+**The canvas change put the multi-select align toolbar off screen.** Its
+overlay root is `inset: 0` against the canvas box, so `right: 12` meant 12px
+from the far edge of the *page*. Measured: align/distribute at x1319 and x1355
+against a column ending at 1140 — rendered, focusable, invisible. Removed
+rather than repositioned: the inspector already carries Align ×6 and
+Distribute ×2, matches board `159:123`, and was walked live.
+
+**And the inspector's own align row overflowed its panel** — six buttons at
+flowbite's intrinsic width on a wider pitch put the sixth at 302 inside a
+300-wide panel. Now matches the board; the last button ends at 266.
+
+Also: the width test I wrote asserted `size.drawer === 320`, which would have
+failed the first time anyone did the thing this arc exists to enable — it now
+asserts the generated CSS *agrees with* the token source. The Settings card
+briefly read a width token for a `minHeight`, trading a stale copy for a wrong
+coupling. The CSS ratchet was being satisfied by jamming declarations onto
+existing lines rather than draining anything; un-jammed, with the baseline
+updated honestly (two populations ratcheted down, one up by five comment
+lines). `getCanvasStyles` had no tests at all while the lower-risk change got a
+whole file; it now has seven, negative-tested.
+
+## 5. Things I got wrong, recorded
 
 - **I read "Typography" from the DOM and called it drift** against a board
   saying "TYPOGRAPHY". The CSS applies `text-transform: uppercase`; it renders
@@ -132,9 +176,26 @@ moved nothing.
   `overflow: visible`) and re-captured at 4×: the glyph is fine. A downscaled
   screenshot is not evidence.
 
-Both were caught before any code changed for them. The plan this arc started
-from was also wrong at its core, and its correction is recorded in
+- **The chrome gate reads comment prose.** Writing "36px" and "300px" in a
+  measurement note tripped the layout-literal check on an allowlisted file.
+  Third time this class has bitten this repo — the same shape as the hex
+  ratchet reading `#1A56DB` out of a comment. Name the token, not the value.
+
+The first two were caught before any code changed for them. The plan this arc
+started from was also wrong at its core, and its correction is recorded in
 `docs/plans/2026-08-31-figma-implementation-and-chrome-weight.md` §0-bis.
+
+### Still not fixed, and stated rather than discovered later
+
+- **Fit-to-screen leaves the canvas off-centre with dead scroll when zoomed
+  out.** `transform` is post-layout, so the canvas's layout box stays full-size
+  at every zoom while `justify-content: safe center` keys off layout overflow.
+  At 50% the painted page sits left of centre with ~312px of scroll over empty
+  grey. Known, unfixed, and recorded in `canvasStyles.test.ts` so the next
+  reader meets it as a documented property rather than a surprise.
+- **No real drag was driven to a canvas edge.** The auto-scroll repair is
+  proven by measuring the elements and their overflow, not by dragging.
+- **The DeviceFramePreview path and the `watch` device were not walked.**
 
 ## 6. Open — genuinely the founder's call
 
