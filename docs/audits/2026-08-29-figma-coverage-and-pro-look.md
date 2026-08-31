@@ -58,11 +58,13 @@ tail at the top end.
 12/13, 18/28/32 → 16/24). Live re-measure: the inspector now reads
 **11/12/13/16 and nothing else**.
 
-**And one real defect surfaced on the way**: `.bdi-sec-preview` shipped as an
-EMPTY CSS rule while the comment above it described exactly what it should
-do. Every collapsed inspector section — 34 of them — drew its value readout
-("16px · solid") at the panel's default 13px ink, flush against the chevron.
-It is mono, muted and truncating now, as its own comment always said.
+**One false alarm worth recording**: `.bdi-sec-preview` is an EMPTY CSS rule
+under a comment describing what it should do, so this pass "fixed" it — and
+then found `Section.tsx:102` already carries the entire style in `tw:`
+classes (mono, ink-muted, 11px, truncating). The CSS was empty because the
+styling had MOVED, not because it was missing. The duplicate was reverted and
+the selector now says so in one line. Read the component before believing a
+stylesheet's own comment about itself.
 
 ## 4. What now guards it
 

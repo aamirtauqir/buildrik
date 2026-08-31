@@ -183,20 +183,8 @@
    flush against the chevron. Every Section in the inspector draws it — 34 call
    sites — which is why one missing rule was visible everywhere and traceable
    nowhere. Muted, mono, and truncating, because it is a value not a label. */
+/* Empty ON PURPOSE — Section.tsx:102 styles this in `tw:` classes. */
 .bdi-sec-h .bdi-sec-preview {
-  /* The rule its own comment describes was never written — the selector shipped
-     with an empty body, so all 34 sections drew their value readout at the
-     panel's default 13px ink, flush against the chevron (measured live
-     2026-08-29). Mono because it is a value, muted because it is not the
-     label, truncating because a long one must not push the chevron. */
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font: 400 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-muted);
-  letter-spacing: -0.01em;
 }
 
 .bdi-sec-h .bdi-ind {
