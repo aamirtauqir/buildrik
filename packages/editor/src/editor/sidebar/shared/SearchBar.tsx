@@ -85,6 +85,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         value={inputValue}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}
+        /* `className` reaches flowbite's OUTER wrapper; `style` reaches the
+           real <input>. The growth has to be on the wrapper — `flex: 1` in
+           `inputStyles` landed on the input while both wrapper divs stayed
+           `flex: 0 1 auto`, so the whole stack sat at 168px inside a 287px
+           box and the kbd hint below was stranded 89px from its right edge.
+           Same wrapper/className split documented in settings/shared.tsx. */
+        className="tw:flex-1 tw:min-w-0"
         style={inputStyles}
         aria-label={ariaLabel}
       />
@@ -115,7 +122,7 @@ const containerStyles: React.CSSProperties = {
 };
 
 const inputStyles: React.CSSProperties = {
-  flex: 1,
+  width: "100%",
   background: "transparent",
   border: "none",
   color: "var(--bk-ink)",
