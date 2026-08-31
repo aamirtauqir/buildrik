@@ -14,7 +14,7 @@
 export const cardBtnClass = (active: boolean): string =>
   [
     "tw:flex tw:flex-1 tw:flex-col tw:items-center tw:justify-center tw:gap-[3px]",
-    "tw:px-1 tw:py-[7px] tw:rounded-[5px] tw:border tw:text-[9.5px] tw:font-medium",
+    "tw:px-1 tw:py-[7px] tw:rounded-[5px] tw:border tw:text-[11px] tw:font-medium",
     "tw:[font-family:var(--bk-font-ui)] tw:[transition:var(--bk-transition-fast)]",
     active
       ? "tw:bg-[var(--bk-accent-tint)] tw:border-[var(--bk-alpha-accent-30)] tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"

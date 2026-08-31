@@ -322,7 +322,7 @@ export function StockSourceModal({
                       style={{ padding: 8 }}
                     >
                       <img src={ico.svgDataUrl} alt={ico.name} style={{ width: 24, height: 24 }} />
-                      <span style={{ fontSize: 10, color: "var(--bk-ink-disabled)", marginTop: 4 }}>{ico.name}</span>
+                      <span style={{ fontSize: 11, color: "var(--bk-ink-disabled)", marginTop: 4 }}>{ico.name}</span>
                     </div>
                   ))}
                 </div>

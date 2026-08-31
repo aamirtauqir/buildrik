@@ -110,7 +110,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           {/* Score row + checks grid — prototype .seo-score-row + .seo-checks */}
           <div className={`tw:flex tw:items-center tw:gap-3.5 tw:p-3 ${CARD}`}>
             <div
-              className={`tw:text-[28px] tw:font-medium tw:tabular-nums tw:min-w-12 ${MONO} ${
+              className={`tw:text-[24px] tw:font-medium tw:tabular-nums tw:min-w-12 ${MONO} ${
                 s.seoScore >= 80 ? "tw:text-[var(--bk-success)]" : "tw:text-[var(--bk-warning)]"
               }`}
             >

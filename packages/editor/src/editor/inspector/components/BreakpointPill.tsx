@@ -137,7 +137,7 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
                 {bpMeta.maxWidth !== undefined && (
                   <span
                     style={{
-                      fontSize: 10,
+                      fontSize: 11,
                       color: "var(--bk-ink-muted)",
                       fontVariantNumeric: "tabular-nums",
                     }}

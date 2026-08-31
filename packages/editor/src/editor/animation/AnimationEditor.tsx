@@ -203,7 +203,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             border: "1px solid var(--bk-border)",
             borderRadius: "var(--bk-radius-sm)",
             fontFamily: "var(--bk-font-mono)",
-            fontSize: 10,
+            fontSize: 11,
             color: "var(--bk-ink-soft)",
           }}
         >

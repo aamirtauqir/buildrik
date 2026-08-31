@@ -339,7 +339,7 @@ const localeInfoStyles: React.CSSProperties = {
 const codeChipStyles: React.CSSProperties = {
   padding: "2px 6px",
   fontFamily: "var(--bk-font-mono)",
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 600,
   letterSpacing: "0.04em",
   textTransform: "uppercase",
@@ -360,7 +360,7 @@ const localeLabelStyles: React.CSSProperties = {
 const defaultBadgeStyles: React.CSSProperties = {
   padding: "2px 6px",
   fontFamily: "var(--bk-font-mono)",
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 600,
   textTransform: "uppercase",
   letterSpacing: "0.04em",
@@ -417,7 +417,7 @@ const enforcementNoteStyles: React.CSSProperties = {
   marginTop: 8,
   marginBottom: 8,
   padding: "10px 12px",
-  font: "500 11.5px var(--bk-font-ui)",
+  font: "500 12px var(--bk-font-ui)",
   color: "var(--bk-ink-soft)",
   background: "var(--bk-bg-subtle)",
   border: "1px dashed var(--bk-border-medium)",

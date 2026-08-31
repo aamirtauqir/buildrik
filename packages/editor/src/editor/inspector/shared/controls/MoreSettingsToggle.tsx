@@ -44,7 +44,7 @@ export const MoreSettingsToggle: React.FC<MoreSettingsToggleProps> = ({
       {!isOpen && advancedCount && advancedCount > 0 && (
         <span
           style={{
-            font: "500 9.5px var(--bk-font-mono)",
+            font: "500 11px var(--bk-font-mono)",
             color: "var(--bk-ink-muted)",
             background: "var(--bk-bg-subtle)",
             padding: "0 4px",

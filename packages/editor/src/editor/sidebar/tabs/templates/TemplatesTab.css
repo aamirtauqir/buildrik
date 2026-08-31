@@ -270,7 +270,7 @@
   padding: 2px 6px;
   background: var(--bk-accent);
   color: var(--bk-bg-card, var(--bk-bg-card));
-  font-size: 9px;
+  font-size: var(--bk-text-11);
   font-weight: var(--bk-weight-semibold);
   letter-spacing: 0.04em;
   border-radius: 3px;
@@ -303,7 +303,7 @@
   padding: 0 var(--bk-space-12) 6px;
 }
 .tpl-card-category {
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-muted, var(--bk-ink-soft));
   margin-top: 1px;
 }
@@ -423,7 +423,7 @@
   background: var(--bk-accent, var(--bk-accent));
   color: var(--bk-bg-card, var(--bk-bg-card));
   font-family: var(--bk-font-mono, ui-monospace, "Geist Mono", monospace);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;

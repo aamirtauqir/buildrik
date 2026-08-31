@@ -34,7 +34,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
                 border: 0,
                 background: s.visibility === v ? "var(--bk-bg-card)" : "transparent",
                 color: s.visibility === v ? "var(--bk-ink)" : "var(--bk-ink-soft)",
-                font: "500 11.5px var(--bk-font-ui)",
+                font: "500 12px var(--bk-font-ui)",
                 cursor: "pointer",
                 borderRadius: 3,
                 transition: "background 100ms, color 100ms",

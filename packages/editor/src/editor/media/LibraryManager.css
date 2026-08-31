@@ -34,7 +34,7 @@
 .mgr-title .mgr-tag {
   background: var(--bk-accent-tint);
   color: var(--bk-ink);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 700;
   padding: 2px 7px;
   border-radius: var(--bk-radius-lg);
@@ -79,7 +79,7 @@
 .mgr-search input::placeholder { color: var(--bk-ink-disabled); }
 
 .mgr-search .mgr-kbd {
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-disabled);
   border: 1px solid var(--bk-border);
   padding: 1px 5px;
@@ -210,7 +210,7 @@
 
 .mgr-tree-section {
   margin: 0 var(--bk-space-8) var(--bk-space-8);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 700;
   color: var(--bk-ink-disabled);
   text-transform: uppercase;
@@ -759,7 +759,7 @@
   color: var(--bk-ink);
   padding: 2px 7px;
   border-radius: var(--bk-radius-lg);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
 }
 
 .mgr-det-actions {
@@ -831,7 +831,7 @@
   background: var(--bk-warning-tint);
   color: var(--bk-warning);
   border-radius: var(--bk-radius-lg);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 600;
 }
 
@@ -944,13 +944,13 @@
   border-radius: var(--bk-radius-sm);
   background: var(--bk-bg-overlay, rgba(17, 24, 39, 0.5));
   color: var(--bk-ink-inverse, #fff);
-  font: 500 10px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
 }
 .mgr-asset-use {
   display: flex;
   align-items: center;
   gap: var(--bk-space-4);
-  font: 400 9px var(--bk-font-ui);
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
 .mgr-use-dot {
@@ -975,7 +975,7 @@
   border-radius: var(--bk-radius-sm);
   background: transparent;
   color: var(--bk-ink-muted);
-  font: 500 9px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   cursor: pointer;
 }
 .mgr-fmt.active {
@@ -990,7 +990,7 @@
   border-radius: var(--bk-radius-sm);
   background: transparent;
   color: var(--bk-ink-muted);
-  font: 400 10px var(--bk-font-ui);
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
   cursor: pointer;
 }
 .mgr-gridn-btn.active {

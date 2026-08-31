@@ -31,16 +31,16 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           )}
         </div>
         <div className="tw:flex tw:flex-col tw:gap-0.5 tw:px-3 tw:py-[10px]">
-          <div style={{ font: "500 10px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{domain}</div>
-          <div style={{ font: "500 12.5px var(--bk-font-ui)", color: "var(--bk-ink)" }}>{title}</div>
-          <div style={{ font: "400 11.5px var(--bk-font-ui)", color: "var(--bk-ink)", lineHeight: 1.4 }}>{desc || "Add a description to preview here"}</div>
+          <div style={{ font: "500 11px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{domain}</div>
+          <div style={{ font: "500 13px var(--bk-font-ui)", color: "var(--bk-ink)" }}>{title}</div>
+          <div style={{ font: "400 12px var(--bk-font-ui)", color: "var(--bk-ink)", lineHeight: 1.4 }}>{desc || "Add a description to preview here"}</div>
         </div>
       </div>
       {/* OG Title */}
       <div className="tw:flex tw:flex-col tw:gap-1.5">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
           <Label htmlFor="og-title" className={BK_LABEL_CLASS}>Open Graph Title</Label>
-          <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
+          <span style={{ font: "500 11px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
         </div>
         <TextInput
           id="og-title"
@@ -54,7 +54,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       <div className="tw:flex tw:flex-col tw:gap-1.5">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
           <Label htmlFor="og-desc" className={BK_LABEL_CLASS}>Open Graph Description</Label>
-          <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
+          <span style={{ font: "500 11px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
         </div>
         <Textarea
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"

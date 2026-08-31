@@ -58,7 +58,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
         hiddenCount > 0 ? (
           <span
             style={{
-              font: "500 9.5px var(--bk-font-mono)",
+              font: "500 11px var(--bk-font-mono)",
               color: "var(--bk-warning)",
               background: "rgba(217, 119, 6, 0.12)",
               padding: "1px 5px",

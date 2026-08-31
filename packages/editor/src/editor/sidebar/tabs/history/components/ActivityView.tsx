@@ -86,7 +86,7 @@ const STYLE_USER_CHIP: React.CSSProperties = {
   borderRadius: "var(--bk-radius-full)",
   background: "var(--bk-accent-tint)",
   color: "var(--bk-accent)",
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 600,
   lineHeight: 1,
 };

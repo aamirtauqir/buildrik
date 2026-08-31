@@ -220,7 +220,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onClick={() => setPaletteOpen(true)}
           aria-label="Open command palette" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
-          <span style={{ font: "500 10px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
+          <span style={{ font: "500 11px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
             ⌘K
           </span>
         </Button>

@@ -387,7 +387,7 @@ const ErrorState: React.FC<{ error: string }> = ({ error }) => (
     className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
     style={{ height: 300, color: "var(--bk-error)" }}
   >
-    <span style={{ fontSize: 32 }}>Error</span>
+    <span style={{ fontSize: 24 }}>Error</span>
     <span>{error}</span>
   </div>
 );
@@ -427,7 +427,7 @@ const NoPreviewMessage: React.FC<{ format: string }> = ({ format }) => (
     className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-4"
     style={{ height: 300, color: "var(--bk-ink-muted)" }}
   >
-    <span style={{ fontSize: 32 }}>⚛</span>
+    <span style={{ fontSize: 24 }}>⚛</span>
     <span>{format} components cannot be previewed directly.</span>
     <span style={{ fontSize: 12 }}>Download and run locally to preview.</span>
   </div>

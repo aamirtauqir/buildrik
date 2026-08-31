@@ -68,7 +68,7 @@
  * `sizes.md` merge call, in the site's own font, so they participate in
  * tailwind-merge's real conflict resolution instead of relying on
  * inheritance reaching an element that already declares its own value:
- * `tw:text-[9.5px] tw:[font-family:var(--bk-font-mono)]` (unit select,
+ * `tw:text-[11px] tw:[font-family:var(--bk-font-mono)]` (unit select,
  * matching `.bdi-fld .bdi-u`'s `font: 500 9.5px var(--bk-font-mono)`
  * exactly) and `tw:text-[11px] tw:[font-family:var(--bk-font-ui)]` (value
  * select, matching `.bdi-ddn`'s `font: 500 11px var(--bk-font-ui)`, which
@@ -108,7 +108,7 @@ export const BK_SELECT_BARE_UNIT_THEME: NonNullable<CustomFlowbiteTheme["select"
         gray: BK_SELECT_BARE_COLORS,
       },
       sizes: {
-        md: "tw:p-0 tw:text-[9.5px] tw:[font-family:var(--bk-font-mono)]",
+        md: "tw:p-0 tw:text-[11px] tw:[font-family:var(--bk-font-mono)]",
       },
     },
   },

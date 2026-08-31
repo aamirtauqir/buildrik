@@ -110,7 +110,7 @@
 /* Inline tag/id/class/component/bp badges (display-settings controlled) */
 .bdc-lr-tag,
 .bdc-lr-id {
-  font: 500 9.5px var(--bk-font-mono);
+  font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink-muted);
   padding: 0 3px;
   border-radius: 3px;
@@ -120,7 +120,7 @@
 }
 
 .bdc-lr-cmp {
-  font: 500 10px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-accent);
   flex-shrink: 0;
 }
@@ -141,7 +141,7 @@
 /* Eye + lock — board 244:1580 draws them ALWAYS, at gray-300; hover/state
    darkens. (Was hover-reveal, which the board contradicts.) */
 .bdc-lr-comp {
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   line-height: 16px;
   color: var(--bk-success);
   flex-shrink: 0;
@@ -387,7 +387,7 @@
 }
 
 .bdc-layers-settings .bdc-popover-h {
-  font: 600 10px var(--bk-font-mono);
+  font: 600 var(--bk-text-11) var(--bk-font-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--bk-ink-muted);
@@ -450,7 +450,7 @@
 }
 .bdc-layers-empty p {
   margin: 0;
-  font: 500 11.5px var(--bk-font-ui);
+  font: 500 var(--bk-text-12) var(--bk-font-ui);
   color: var(--bk-ink-soft);
 }
 
@@ -488,7 +488,7 @@
 
 .bdc-layers-confirm .bdc-btn {
   padding: var(--bk-space-4) 10px;
-  font: 500 10.5px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   border-radius: 5px;
   border: 1px solid transparent;
   cursor: pointer;

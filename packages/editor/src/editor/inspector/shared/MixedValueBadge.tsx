@@ -28,7 +28,7 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
         display: "inline-flex",
         alignItems: "center",
         gap: 4,
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: 500,
         color: "var(--bk-warning)",
         background: "var(--bk-warning-tint)",

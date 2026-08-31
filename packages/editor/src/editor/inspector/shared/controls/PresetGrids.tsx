@@ -37,7 +37,7 @@ export const TemplateButtonGrid: React.FC<TemplateButtonGridProps> = ({
         type="button"
         onClick={() => onChange(tpl.value)}
         className={`bdi-qa${currentValue === tpl.value ? " on" : ""}`}
-        style={{ padding: "5px 0", fontSize: 9 }}
+        style={{ padding: "5px 0", fontSize: 11 }}
         aria-pressed={currentValue === tpl.value}
       >
         {tpl.label}

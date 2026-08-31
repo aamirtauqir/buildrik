@@ -90,7 +90,7 @@ export const FeatureCardGrid: React.FC<FeatureCardGridProps> = ({ children, colu
         <div
           style={{
             padding: "12px 12px 4px",
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 600,
             letterSpacing: "0.08em",
             color: "var(--bk-ink-muted)",
@@ -228,7 +228,7 @@ const badgeStyles: React.CSSProperties = {
 const planBadgeStyles: React.CSSProperties = {
   background: "var(--bk-accent-tint)",
   color: "var(--bk-accent)",
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 700,
   textTransform: "uppercase",
   letterSpacing: "0.08em",

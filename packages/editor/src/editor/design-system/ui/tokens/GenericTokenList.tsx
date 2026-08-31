@@ -106,7 +106,7 @@ const lintDescStyle: React.CSSProperties = {
 };
 
 const lintTagStyle: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 11,
   fontWeight: 500,
   padding: "1px 6px",
   borderRadius: 4,

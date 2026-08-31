@@ -113,7 +113,7 @@
      nowrap: at 12px in a 300px panel the three pills wrapped to two lines. */
   background: var(--bk-bg-subtle);
   border-bottom: 1px solid var(--bk-border);
-  font: 500 10px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
 .bdi-bpr .bdi-bpr-pill {
@@ -172,7 +172,7 @@
 /* Figma 32-2: uppercase, letter-spaced, muted section label (LAYOUT / SPACING …). */
 .bdi-sec-h .bdi-sec-name {
   flex: 1;
-  font: 600 10.5px var(--bk-font-ui);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -184,10 +184,23 @@
    sites — which is why one missing rule was visible everywhere and traceable
    nowhere. Muted, mono, and truncating, because it is a value not a label. */
 .bdi-sec-h .bdi-sec-preview {
+  /* The rule its own comment describes was never written — the selector shipped
+     with an empty body, so all 34 sections drew their value readout at the
+     panel's default 13px ink, flush against the chevron (measured live
+     2026-08-29). Mono because it is a value, muted because it is not the
+     label, truncating because a long one must not push the chevron. */
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 400 var(--bk-text-11) var(--bk-font-mono);
+  color: var(--bk-ink-muted);
+  letter-spacing: -0.01em;
 }
 
 .bdi-sec-h .bdi-ind {
-  font: 500 9.5px var(--bk-font-mono);
+  font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink-soft);
   background: var(--bk-bg-subtle);
   padding: 1px 5px;
@@ -232,7 +245,7 @@
 
 /* ── Sub-label inside section body ────────────────────── */
 .bdi-sub-label {
-  font: 600 9px var(--bk-font-ui);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
   letter-spacing: 0.08em;
   color: var(--bk-ink-muted);
   text-transform: uppercase;
@@ -311,7 +324,7 @@
   align-items: center;
   justify-content: center;
   color: var(--bk-ink-muted);
-  font: 600 10px var(--bk-font-ui);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
 }
 .bdi-fld input {
   flex: 1;
@@ -329,7 +342,7 @@
   font-style: italic;
 }
 .bdi-fld .bdi-u {
-  font: 500 9.5px var(--bk-font-mono);
+  font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink-soft);
   padding: 0 6px 0 0;
   text-transform: lowercase;
@@ -414,7 +427,7 @@
   border-radius: 5px;
   cursor: pointer;
   color: var(--bk-ink-soft);
-  font: 500 9.5px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
 }
 .bdi-qa:hover {
   background: var(--bk-bg-card, var(--bk-bg-card));
@@ -462,7 +475,7 @@
   top: -1px;
   left: 6px;
   transform: translateY(-50%);
-  font: 600 8px var(--bk-font-ui);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
   letter-spacing: 0.08em;
   background: var(--bk-bg-card, var(--bk-bg-card));
   padding: 0 var(--bk-space-4);
@@ -474,7 +487,7 @@
 }
 .bdi-ax {
   position: absolute;
-  font: 500 10.5px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink);
   font-variant-numeric: tabular-nums;
   background: transparent;
@@ -533,7 +546,7 @@
   border: 1px solid var(--bk-border-medium);
   border-radius: 3px;
   padding: 5px 14px;
-  font: 600 9px var(--bk-font-ui);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-soft);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -580,10 +593,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font: 500 10px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
 }
 .bdi-pad-kv .bdi-pk {
-  font: 500 9px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--bk-ink-muted);
@@ -616,7 +629,7 @@
   justify-content: center;
   padding: 0;
   gap: 3px;
-  font: 500 10px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   min-width: 0;
 }
 .bdi-seg button:hover {
@@ -754,7 +767,7 @@
   gap: 3px;
 }
 .bdi-chip {
-  font: 500 10px var(--bk-font-mono);
+  font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink);
   background: var(--bk-bg-card, var(--bk-bg-card));
   border: 1px solid var(--bk-border);
@@ -784,7 +797,7 @@
   color: var(--bk-ink);
 }
 .bdi-chip-add {
-  font: 500 10px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
   background: transparent;
   border: 1px dashed var(--bk-border);
@@ -800,7 +813,7 @@
   padding: 1px var(--bk-space-4) 1px 6px;
 }
 .bdi-chip-input input {
-  font: 500 10px var(--bk-font-mono);
+  font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink);
   background: transparent;
   border: none;
@@ -828,7 +841,7 @@
   width: 100%;
   text-align: left;
   padding: var(--bk-space-4) 6px;
-  font: 500 10px var(--bk-font-mono);
+  font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink);
   background: transparent;
   border: none;
@@ -845,7 +858,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--bk-space-4);
-  font: 500 10px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-soft);
   background: transparent;
   border: none;
@@ -885,7 +898,7 @@
 }
 .bdi-text.mono {
   font-family: var(--bk-font-mono);
-  font-size: 10.5px;
+  font-size: var(--bk-text-11);
 }
 textarea.bdi-text {
   height: auto;
@@ -968,7 +981,7 @@ textarea.bdi-text {
   color: var(--bk-ink-muted);
 }
 .bdi-num .bdi-u {
-  font: 500 9.5px var(--bk-font-mono);
+  font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink-soft);
   padding: 0 6px 0 2px;
   height: 100%;
@@ -995,7 +1008,7 @@ textarea.bdi-text {
   left: 4px;
   top: 50%;
   transform: translateY(-50%);
-  font: 600 9px var(--bk-font-ui);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
   letter-spacing: 0.08em;
   color: var(--bk-ink-muted);
   text-transform: uppercase;

@@ -331,7 +331,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <div
                   style={{
                     padding: "8px 2px 3px",
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: 600,
                     color: "var(--bk-ink-muted)",
                     textTransform: "uppercase",
@@ -387,7 +387,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         {isRecent && !isDisabled && (
                           <span
                             style={{
-                              fontSize: 8,
+                              fontSize: 11,
                               fontWeight: 500,
                               color: "var(--bk-ink-muted)",
                               background: "var(--bk-bg-subtle)",
@@ -402,7 +402,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           <span
                             data-testid="selection-hint"
                             style={{
-                              fontSize: 9,
+                              fontSize: 11,
                               color: "var(--bk-gray-400)",
                             }}
                           >
@@ -427,7 +427,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             display: "flex",
             alignItems: "center",
             gap: 12,
-            fontSize: 9,
+            fontSize: 11,
             color: "var(--bk-ink-muted)",
           }}
         >
@@ -469,7 +469,7 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
   return (
     <span
       style={{
-        fontSize: 9,
+        fontSize: 11,
         color: "var(--bk-gray-400)",
         fontFamily: "var(--bk-font-ui)",
       }}

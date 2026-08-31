@@ -260,7 +260,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
             onMouseOver={(e) => (e.currentTarget.style.background = tokens.colors.surface3)}
             onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
           >
-            <span style={{ fontSize: 18 }}>✕</span>
+            <span style={{ fontSize: 16 }}>✕</span>
           </Button>
         </div>
 

@@ -68,7 +68,7 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         cursor: enabled ? "pointer" : "not-allowed",
         opacity: enabled ? 1 : 0.4,
         textAlign: "left",
-        fontSize: 12.5,
+        fontSize: 13,
         color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
         fontWeight: isActive ? 600 : 500,
       }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"

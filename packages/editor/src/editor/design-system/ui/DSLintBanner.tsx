@@ -102,7 +102,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
               size="xs"
               type="button"
               onClick={onReviewAll}
-              style={{ fontSize: 10 }}
+              style={{ fontSize: 11 }}
             >
               Review all
             </Button>
@@ -113,7 +113,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
               size="xs"
               type="button"
               onClick={onDismiss}
-              style={{ fontSize: 10 }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+              style={{ fontSize: 11 }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               Dismiss
             </Button>

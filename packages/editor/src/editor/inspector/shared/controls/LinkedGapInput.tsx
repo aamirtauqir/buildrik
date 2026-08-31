@@ -140,14 +140,14 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
               onChange={(v) => onChange("row-gap", v)}
               disabled={disabled}
               ariaLabel="Row gap"
-              icon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>R</span>}
+              icon={<span style={{ font: "600 11px var(--bk-font-ui)" }}>R</span>}
             />
             <NumField
               value={elementStyles["column-gap"] || ""}
               onChange={(v) => onChange("column-gap", v)}
               disabled={disabled}
               ariaLabel="Column gap"
-              icon={<span style={{ font: "600 10px var(--bk-font-ui)" }}>C</span>}
+              icon={<span style={{ font: "600 11px var(--bk-font-ui)" }}>C</span>}
             />
           </div>
         )}

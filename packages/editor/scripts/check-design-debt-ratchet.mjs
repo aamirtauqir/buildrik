@@ -51,7 +51,11 @@ const RATCHETS = [
            thumbnail's own scale, not chrome type;
          · BrandPreview / TypographySection render the USER's typefaces as
            specimens, where the size is the sample, not a chrome decision. */
-    pattern: String.raw`tw:text-\[(7|8|9|10|10\.5|11\.5|12\.5|15|17|18|19)px\]`,
+    /* THREE spellings, one rule (2026-08-29): a `tw:text-[Npx]` class, an
+       inline `fontSize: N`, and a `font: "500 Npx …"` shorthand string all say
+       the same thing, and the first version of this gate counted only the
+       first — which is how 47 off-scale sizes survived two "zero" passes. */
+    pattern: String.raw`tw:text-\[(7|8|9|9\.5|10|10\.5|11\.5|12\.5|15|17|18|19|28|32)px\]|fontSize: ?(7|8|9|9\.5|10|10\.5|11\.5|12\.5|15|17|18|19|28|32)\b|font: "[^"]*\b(7|8|9|9\.5|10|10\.5|11\.5|12\.5|15|17|18|19|28|32)px`,
     baseline: 0,
   },
   {
@@ -65,12 +69,23 @@ const RATCHETS = [
     pattern: String.raw`tw:[a-z:-]*-gray-[0-9]{2,3}`,
     baseline: 0,
   },
+  {
+    id: "offscale-css-font-size",
+    /* The CSS layer was invisible to this gate until 2026-08-29 — it only ever
+       scanned TSX — and that is where the editor's "not professional" symptom
+       actually lived: 9.5px and 10.5px type in the inspector, settings and
+       layers stylesheets, below the scale's 11px floor and below what anyone
+       reads comfortably. All snapped onto var(--bk-text-11). Locked at 0. */
+    pattern: String.raw`font(-size)?:[^;]*\b(7|8|9|9\.5|10|10\.5|11\.5|12\.5)px`,
+    baseline: 0,
+    css: true,
+  },
 ];
 
-function count(pattern) {
+function count(pattern, css = false) {
   try {
     const out = execSync(
-      `grep -rEn ${JSON.stringify(pattern)} src/editor --include='*.tsx' --include='*.ts' | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx | wc -l`,
+      `grep -rEn ${JSON.stringify(pattern)} src/editor ${css ? "src/themes --include='*.css'" : "--include='*.tsx' --include='*.ts'"} | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx | wc -l`,
       { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
     );
     return parseInt(out.trim(), 10);
@@ -81,7 +96,7 @@ function count(pattern) {
 
 let failed = false;
 for (const r of RATCHETS) {
-  const n = count(r.pattern);
+  const n = count(r.pattern, r.css);
   if (n > r.baseline) {
     console.error(
       `[design-debt-ratchet] FAIL — ${r.id}: ${n} > baseline ${r.baseline}. ` +
@@ -100,4 +115,4 @@ for (const r of RATCHETS) {
 }
 
 if (failed) process.exit(1);
-console.log("[design-debt-ratchet] PASS — all four populations at or below baseline.");
+console.log("[design-debt-ratchet] PASS — every population at or below baseline.");

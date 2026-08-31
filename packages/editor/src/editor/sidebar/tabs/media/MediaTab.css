@@ -292,7 +292,7 @@
   left: 0;
   right: 0;
   padding: 4px 8px;
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-bg-card);
   background: linear-gradient(180deg, transparent, var(--bk-alpha-ink-40));
   display: flex;
@@ -366,7 +366,7 @@
   right: 8px;
   background: var(--bk-alpha-ink-50);
   color: white;
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 4px;
@@ -568,7 +568,7 @@
   padding: var(--bk-space-4) var(--bk-space-8);
   border: none;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 600;
   cursor: pointer;
   background: transparent;
@@ -607,7 +607,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-disabled);
   box-sizing: border-box;
 }
@@ -731,7 +731,7 @@
   letter-spacing: 0.04em;
 }
 .med-sec-count {
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-muted);
   background: var(--bk-bg-subtle, var(--bk-bg-subtle));
   padding: 1px 6px;
@@ -960,7 +960,7 @@
   gap: 4px;
 }
 .med-quota-text {
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-muted, var(--bk-ink-soft));
 }
 .med-quota-track {

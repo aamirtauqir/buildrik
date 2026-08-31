@@ -93,7 +93,7 @@ export function ScopeDropdown({
     lineHeight: 1.2,
   };
   const optTop: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "var(--bk-ink)" };
-  const optSub: React.CSSProperties = { fontSize: 10, color: "var(--bk-ink-muted)" };
+  const optSub: React.CSSProperties = { fontSize: 11, color: "var(--bk-ink-muted)" };
 
   return (
     <div ref={ref} style={{ position: "relative", display: "inline-block" }}>

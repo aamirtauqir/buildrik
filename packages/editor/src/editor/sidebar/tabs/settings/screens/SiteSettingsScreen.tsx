@@ -180,7 +180,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ font: "500 11.5px var(--bk-font-ui)", color: "var(--bk-accent)", textDecoration: "none" }}
+            style={{ font: "500 12px var(--bk-font-ui)", color: "var(--bk-accent)", textDecoration: "none" }}
           >
             Privacy Policy →
           </a>
@@ -188,7 +188,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ font: "500 11.5px var(--bk-font-ui)", color: "var(--bk-accent)", textDecoration: "none" }}
+            style={{ font: "500 12px var(--bk-font-ui)", color: "var(--bk-accent)", textDecoration: "none" }}
           >
             Terms of Service →
           </a>
