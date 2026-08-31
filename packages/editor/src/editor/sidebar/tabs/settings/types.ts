@@ -58,7 +58,16 @@ export interface ScreenProps {
 // Constants
 // ============================================
 
+/**
+ * Keys MUST be screen ids from `SETTINGS_SCREENS` (SettingsTab.tsx). This is a
+ * plain `Record<string, …>`, so a key that matches no screen fails silently:
+ * `SCREEN_PLAN_REQUIREMENTS[screenId]` is simply `undefined` and the screen
+ * renders ungated. That is what `advanced` did — no screen has ever had that
+ * id; the screen is `custom-code`. Board 1138:13436 draws it Pro-locked, and
+ * on a starter plan it rendered its editors with no badge and no gate while
+ * Integrations (whose key does match) gated correctly.
+ */
 export const SCREEN_PLAN_REQUIREMENTS: Record<string, "pro" | "enterprise"> = {
-  advanced: "pro",
+  "custom-code": "pro",
   integrations: "pro",
 };
