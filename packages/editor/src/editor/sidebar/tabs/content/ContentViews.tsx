@@ -54,8 +54,12 @@ const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
    at 16px tall — under WCAG 2.5.8's 24x24 target minimum. `min-h-6` is 24
    exactly; `items-center` already centres the label, so the glyph does not
    move, only the hit area grows. */
+/* `tw:h-8`, not just `tw:min-h-6`. flowbite's Button ships `tw:h-10`, and
+   `min-h-*` does not conflict with `h-*` so the 40px stood — these rows
+   measured 40 against boards that draw 32-36. An `h-*` DOES conflict, so
+   twMerge drops flowbite's. */
 const LINK_BTN =
-  "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 tw:min-h-6 " +
+  "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 tw:h-8 tw:min-h-0 " +
   "tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] tw:enabled:hover:bg-transparent";
 /** The quiet row-action button, previously copy-pasted at eleven call sites. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";

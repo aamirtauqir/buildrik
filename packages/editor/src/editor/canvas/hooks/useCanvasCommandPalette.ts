@@ -118,7 +118,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "select-all",
-        label: "Select All",
+        label: "Select all",
         category: "Edit",
         shortcut: "Cmd+A",
         icon: "\u2610",
@@ -126,7 +126,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "deselect",
-        label: "Deselect All",
+        label: "Deselect all",
         category: "Edit",
         shortcut: "Esc",
         icon: "\u2612",
@@ -134,7 +134,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "zoom-in",
-        label: "Zoom In",
+        label: "Zoom in",
         category: "View",
         shortcut: "Cmd++",
         icon: "\ud83d\udd0d",
@@ -142,7 +142,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "zoom-out",
-        label: "Zoom Out",
+        label: "Zoom out",
         category: "View",
         shortcut: "Cmd+-",
         icon: "\ud83d\udd0e",
@@ -150,15 +150,20 @@ export function useCanvasCommandPalette({
       },
       {
         id: "zoom-fit",
-        label: "Zoom to Fit",
+        /* Cmd+1, not Cmd+0. Measured live 2026-08-31: from 50%, Cmd+0 goes to
+           100% and Cmd+1 fits (33% on a long page). The footer zoom flyout and
+           KeyboardShortcutsPanel both already print it this way; this row and
+           `shared/constants/commands.ts` were the two places still claiming
+           the swap. A printed chord is a contract. */
+        label: "Zoom to fit",
         category: "View",
-        shortcut: "Cmd+0",
+        shortcut: "Cmd+1",
         icon: "\u26f6",
         handler: () => composer.emit(EVENTS.ZOOM_FIT, {}),
       },
       {
         id: "cms-records",
-        label: "Manage CMS Records",
+        label: "Manage CMS records",
         category: "Tools",
         icon: "\u{1F5C3}",
         keywords: ["cms", "content", "collection", "records", "data"],
@@ -185,7 +190,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "add-text",
-        label: "Add Text",
+        label: "Add text",
         category: "Insert",
         icon: "T",
         keywords: ["paragraph", "heading"],
@@ -193,7 +198,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "add-image",
-        label: "Add Image",
+        label: "Add image",
         category: "Insert",
         icon: "\ud83d\uddbc",
         keywords: ["picture", "photo"],
@@ -201,7 +206,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "add-button",
-        label: "Add Button",
+        label: "Add button",
         category: "Insert",
         icon: "\u25fb",
         keywords: ["cta", "link"],
@@ -209,7 +214,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "add-container",
-        label: "Add Container",
+        label: "Add container",
         category: "Insert",
         icon: "\u25a2",
         keywords: ["div", "section", "box"],
@@ -217,7 +222,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "browse-templates",
-        label: "Browse Templates",
+        label: "Browse templates",
         category: "Tools",
         shortcut: "T",
         icon: "\ud83d\udcd0",
@@ -227,7 +232,7 @@ export function useCanvasCommandPalette({
       // Settings navigation
       {
         id: "open-analytics",
-        label: "Open Analytics Settings",
+        label: "Open analytics settings",
         category: "Tools",
         icon: "\ud83d\udcca",
         keywords: ["analytics", "google", "tracking", "pixel"],
@@ -238,7 +243,7 @@ export function useCanvasCommandPalette({
         // Settings \u2192 SEO). Opening Pages is the honest target; deep-linking
         // straight to the SEO drawer needs PagesTab drawer-routing (follow-up).
         id: "open-seo",
-        label: "Open Page Settings (SEO, slug, status)",
+        label: "Open page settings (SEO, slug, status)",
         category: "Tools",
         icon: "\ud83d\udd0d",
         keywords: ["seo", "meta", "title", "description", "search", "page", "settings", "slug"],
@@ -246,7 +251,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "open-export",
-        label: "Open Export Settings",
+        label: "Open export settings",
         category: "Tools",
         icon: "\ud83d\udce6",
         keywords: ["export", "code", "download"],
@@ -254,7 +259,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "open-integrations",
-        label: "Open Integrations",
+        label: "Open integrations",
         category: "Tools",
         icon: "\ud83d\udd17",
         keywords: ["integrations", "api", "connect", "third-party"],
@@ -262,7 +267,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "toggle-layers",
-        label: "Toggle Layers Panel",
+        label: "Toggle layers panel",
         category: "View",
         icon: "\u2630",
         keywords: ["layers", "tree", "structure"],
@@ -270,7 +275,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "toggle-preview",
-        label: "Preview Site",
+        label: "Preview site",
         category: "View",
         shortcut: "Cmd+P",
         icon: "\u25b6",
@@ -280,7 +285,7 @@ export function useCanvasCommandPalette({
       // Media commands
       {
         id: "open-media",
-        label: "Open Media Library",
+        label: "Open media library",
         category: "Tools",
         icon: "\ud83d\uddbc",
         keywords: ["assets", "images", "videos", "library"],
@@ -288,7 +293,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "replace-media",
-        label: "Replace Selected Media",
+        label: "Replace selected media",
         category: "Tools",
         icon: "\ud83d\udd04",
         requiresSelection: true,
@@ -304,7 +309,7 @@ export function useCanvasCommandPalette({
       },
       {
         id: "search-stock",
-        label: "Search Stock Photos",
+        label: "Search stock photos",
         category: "Tools",
         icon: "\ud83d\udd0d",
         keywords: ["unsplash", "stock", "find", "discovery"],
