@@ -159,6 +159,20 @@ at a time:
   scale. The ratchet's fourth rule widened to `tw:*-gray-*` in ANY utility
   position, locked at 0, negative-tested with a planted `hover:border-gray-200`.
 
-Nothing under the ratchet is now un-explained: every surviving occurrence is
-either a single definition, a documented non-chrome surface, or a value the
-token scale does not yet carry.
+**Fourth pass — all four rules reach ZERO.**
+
+- **Off-scale → 0.** The 9/10px micro furniture (badge chips, inspector unit
+  glyphs, breadcrumb separators) snapped onto `--bk-text-11`, the scale's own
+  floor, then measured live for overflow: the single hit was the header's
+  visually-hidden aria-live pipe (clientWidth 1). No real overflow anywhere.
+- **Ghost-link → 0.** Every call site is `variant="link"`. The recipe lives
+  once, in Button's theme; the five class constants this arc introduced on the
+  way are deleted, because a vocabulary with two spellings is the thing the
+  audits were complaining about. Sites that differ keep only what they add.
+- The gate now excludes only DEFINITIONS (`buttonTheme`, `avatarTone`) and
+  non-chrome surfaces (the CatalogCard miniature, the two type specimens).
+  All four rules locked at 0 — one violation planted per rule, all four
+  watched to fail, before the commit.
+
+Live after every pass: "Browse stock" still renders accent 13px / 24px
+min-height / 0 padding — identical to the day the audit started.
