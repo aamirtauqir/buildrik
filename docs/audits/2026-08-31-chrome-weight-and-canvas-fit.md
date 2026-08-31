@@ -102,8 +102,8 @@ Editing `figma-tokens.json` and regenerating — the documented, gated,
 "correct" way to change a chrome dimension — **would have changed nothing on
 screen.** A request to make the drawer narrower would have silently no-opped.
 
-**Fixed.** `.ls-panel` now takes `width: var(--ls-panel-w, var(--bk-size-drawer))`;
-per-flow widths set `--ls-panel-w`. `SIDEBAR_WIDE`, `RAIL_W`, `INSPECTOR_W`,
+**Fixed.** `.ls-panel` now takes `width: var(--drawer-w, var(--bk-size-drawer))`;
+per-flow widths set `--drawer-w`. `SIDEBAR_WIDE`, `RAIL_W`, `INSPECTOR_W`,
 `getTabWidth` and the `panelWidth` field are deleted — two of those constants
 had no consumer but the test asserting their own values back at them.
 

@@ -84,7 +84,7 @@ token — the one `gate:tokens-generated` protects — was the copy nothing rend
 |---|---|---|
 | 1 | Desktop canvas floored at `BREAKPOINTS.desktop.minWidth` so the page can never render below its own breakpoint | live: mount 712 → **1024** |
 | 2 | Canvas scroll moved to an inner element; the footer toolbar had been an absolute child of the scrolling box and slid away with the page | live: toolbar pinned while scrolled |
-| 3 | Drawer width sourced from `--bk-size-drawer` in CSS; `--ls-panel-w` carries the per-flow overrides | live: token forced 260/440 → panel follows |
+| 3 | Drawer width sourced from `--bk-size-drawer` in CSS; `--drawer-w` carries the per-flow overrides | live: token forced 260/440 → panel follows |
 | 4 | `SIDEBAR_WIDE`, `RAIL_W`, `INSPECTOR_W`, `getTabWidth`, `panelWidth` deleted — one width source, not five | tsc clean; tests rewritten |
 | 5 | Inspector unit control `flex-shrink: 0` — "px" was clipped at **every** panel width, 11px of box for 14px of glyph | live: `clipped: 0` |
 | 6 | Census `activeFamilies` was missing `Client sign-off`, so any tool iterating it skipped 10 boards | 35 = 35 |

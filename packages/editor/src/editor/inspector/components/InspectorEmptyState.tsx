@@ -89,7 +89,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           size="xs"
           data-testid="inspector-empty-ask-ai"
           onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
-          variant="link" className="tw:min-h-6 tw:mt-1 tw:font-normal"
+          variant="link" className="tw:min-h-6 tw:mt-2 tw:font-normal"
         >
           ✦ Ask AI ›
         </Button>
@@ -102,13 +102,16 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
 // CLASSES
 // ============================================================================
 
-/* Board 159:99 sets this line where the first row of a real inspector would
-   be — near the top, not floating in the middle of an 812px column. Centring
-   it made the panel read as a placeholder screen rather than a panel waiting
-   for a selection. */
+/* Top-left, at the panel's own 16px margin — where the first row of a real
+   inspector would be, not floating in the middle of an 812px column.
+   Boards 159:99 and 1175:4841 set every child at x=16: the sentence, the AI
+   action, the template banner, the tip. Measured live 2026-08-31 after the
+   change: sentence x17 y64, action x17 y92, against the board's x16 y64 / y92.
+   Horizontally centred, the single action rendered as a 62px link adrift
+   mid-panel above 700px of void; left-aligned it reads as the next step. */
 const CONTAINER =
-  "tw:flex tw:flex-col tw:items-center tw:px-4 tw:pt-12 tw:pb-6 " +
-  "tw:text-center tw:text-[var(--bk-ink-soft)]";
+  "tw:flex tw:flex-col tw:items-start tw:px-4 tw:pt-16 tw:pb-6 " +
+  "tw:text-left tw:text-[var(--bk-ink-soft)]";
 const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)]";
 /* No max-width: the board's sentence sits on one line inside the panel's
    own padding; capping it at 220px broke it across two. */
@@ -116,10 +119,12 @@ const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-i
 const TIP = "tw:mt-5 tw:px-3 tw:py-2 tw:rounded-md tw:bg-blue-50 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 /** Success banner after a template applies — success tokens, not a hand-mixed green. */
 const APPLIED_BANNER =
-  "tw:w-full tw:max-w-55 tw:px-4 tw:py-3 tw:rounded-lg tw:text-center " +
+  "tw:w-full tw:max-w-55 tw:px-4 tw:py-3 tw:rounded-lg tw:text-left " +
   "tw:border tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)]";
 /* Board 1175:4841 draws this as the primary action it is — solid accent, not
    a pale tint of it. */
+/* Sized to its label, not to the banner: board 1175:4841 draws it 113px wide
+   inside a 288px banner. Full-width it read as a section footer. */
 const APPLIED_ACTION =
-  "tw:block tw:px-3 tw:py-2 tw:rounded-md tw:text-[12px] tw:font-medium tw:text-center " +
+  "tw:inline-block tw:px-3 tw:py-2 tw:rounded-md tw:text-[12px] tw:font-medium tw:text-center " +
   "tw:border-transparent tw:bg-[var(--bk-accent)] tw:text-white";
