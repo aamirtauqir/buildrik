@@ -109,14 +109,14 @@ describe("InputWithUnit — keyword units", () => {
 });
 
 describe("InputWithUnit — unit select compact font (fix round 1)", () => {
-  it("resolves an explicit 9.5px mono font-size on the real <select>, not flowbite's default text-sm", () => {
+  it("resolves an explicit small mono font-size on the real <select>, not flowbite's default text-sm", () => {
     // Regression coverage: BK_SELECT_BARE_UNIT_THEME's `sizes.md` override
     // used to be just `tw:p-0` — that knocks out flowbite's default
     // `p-2.5` (same padding conflict-group) but does nothing to the
     // `text-sm` living in that same default string, because tailwind-merge
     // treats `text-sm` (font-size) and `text-inherit` (the color-reset
     // this theme also carries) as different conflict groups. Result before
-    // the fix: the ambient `.bdi-fld .bdi-u` 9.5px/mono styling landed on
+    // the fix: the ambient `.bdi-fld .bdi-u` mono styling landed on
     // the OUTER wrapper div (where flowbite puts `className`), and the
     // real <select> — which only ever receives `field.select.*` classes —
     // kept flowbite's own directly-declared `text-sm` (14px), which always
@@ -124,7 +124,10 @@ describe("InputWithUnit — unit select compact font (fix round 1)", () => {
     // assertion would have failed against that old single-theme state.
     renderInput({ value: "10rem", units: ["px", "rem"] });
     const unitSelect = screen.getByRole("combobox", { name: "Width unit" });
-    expect(unitSelect.className).toMatch(/tw:text-\[9\.5px\]/);
+    /* The value moved onto the scale 2026-08-29 (9.5px → --bk-text-11);
+       the contract is that an EXPLICIT size beats flowbite's inherited
+       text-sm, which is what this asserts. */
+    expect(unitSelect.className).toMatch(/tw:text-\[11px\]/);
     expect(unitSelect.className).not.toMatch(/\btext-sm\b/);
   });
 });
