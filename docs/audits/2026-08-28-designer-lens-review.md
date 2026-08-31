@@ -150,10 +150,14 @@ at a time:
   CatalogCard draws a component MINIATURE (7/8px is the thumbnail's scale),
   and BrandPreview / TypographySection render the user's typefaces as
   specimens where the size IS the sample.
-- **Gray-text 470 → 10, also named.** What remains is `gray-400` on decoration
-  chevrons and a drag handle: the ink scale has no 400 step, and snapping them
-  to 300 or 500 would be a visible change made to satisfy a counter. They wait
-  for Figma to publish that step.
+- **Gray 470 → ZERO.** The first pass stopped at 10 on a false premise —
+  "the ink scale has no 400 step". It doesn't, but `--bk-gray-50…900` has been
+  in `tokens.generated.css` all along and CanvasBreadcrumb was already using
+  it; I had only grepped the semantic ink names. Every Tailwind gray utility
+  in chrome (text, bg, border, placeholder, and the hover/focus/enabled
+  variants the first codemod's regex missed) now reads through the generated
+  scale. The ratchet's fourth rule widened to `tw:*-gray-*` in ANY utility
+  position, locked at 0, negative-tested with a planted `hover:border-gray-200`.
 
 Nothing under the ratchet is now un-explained: every surviving occurrence is
 either a single definition, a documented non-chrome surface, or a value the
