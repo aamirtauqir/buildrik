@@ -96,6 +96,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
   ) => {
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const wrapperRef = React.useRef<HTMLDivElement>(null);
+    /* The scrolling viewport, one level inside the wrapper. Zoom-to-fit and
+       zoom-to-selection measure against THIS box — the wrapper carries the
+       padding and the pinned toolbar, and is not what the canvas scrolls in. */
+    const scrollRef = React.useRef<HTMLDivElement>(null);
 
     // Toast notifications for drop errors and success
     const { addToast } = useToast();
@@ -292,7 +296,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // the unscaled device width — measure against the wrapper's client box.
     const handleFitToScreen = React.useCallback(() => {
       const content = canvasRef.current;
-      const viewport = wrapperRef.current;
+      const viewport = scrollRef.current;
       if (!content || !viewport || !composer) return;
       const cw = content.offsetWidth;
       const ch = content.offsetHeight;
@@ -315,7 +319,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        is the question people actually have. Measured off the selected
        element's own box, since that is the only thing that knows its size. */
     const handleZoomToSelection = React.useCallback(() => {
-      const viewport = wrapperRef.current;
+      const viewport = scrollRef.current;
       const id = composer?.selection?.getSelected?.()?.getId?.();
       if (!viewport || !id || !composer) return;
       const el = canvasRef.current?.querySelector(`[data-buildrick-id="${id}"]`);
@@ -620,6 +624,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        drive, and comment pinning needs the pointer. */
     return (
       <div ref={wrapperRef} tabIndex={0} onKeyDown={readOnly ? undefined : handleKeyDown} style={wrapperStyles}>
+        <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         <div
           onDragOver={readOnly ? undefined : handleDragOver}
@@ -750,6 +755,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           <CommentLayer composer={composer} canvasRef={canvasRef} />
         </div>
         </DeviceFramePreview>
+        </div>
 
         {/* Canvas Footer Toolbar - Overlays & Zoom (IA Redesign 2026) */}
         {showFooterToolbar && onZoomChange && onOverlayChange && (

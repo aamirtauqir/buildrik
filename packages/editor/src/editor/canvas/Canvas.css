@@ -753,3 +753,24 @@
   display: none !important;
 }
 
+
+/* The canvas viewport. This scrolls; its parent (the padded wrapper) does not.
+ * The footer toolbar is an absolute child of that wrapper, and an absolute
+ * child of a SCROLLING box is positioned against the scroll content box — so
+ * `right: 0` meant the far edge of a 1024px canvas, not the visible edge, and
+ * the toolbar slid out of view with the page. Keeping the scroll one level in
+ * gives the toolbar a still containing block.
+ *
+ * `safe center` rather than `center`: the desktop canvas now carries a real
+ * minWidth (the desktop breakpoint) and can exceed this box, and a plain
+ * centred flex item overflows equally on BOTH sides — the left half then
+ * cannot be scrolled to at all. `safe` falls back to start-alignment exactly
+ * when overflow would otherwise strand content. */
+.bd-canvas-scroll {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: safe center;
+  overflow: auto;
+}
