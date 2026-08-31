@@ -219,11 +219,14 @@ export const PageFolder: React.FC<Props> = ({
             </span>
           )}
 
+          {/* `.bd-pg-folder-count` pushes itself right with `margin-left: auto`
+              (PagesTab.css:328). A second `flex: 1` spacer used to follow it,
+              so the free space was split between the NAME's flex:1 and that
+              spacer and the count parked mid-row — measured at x187 against
+              board 141:2's x290. One flex child, one auto margin. */}
           <span className="bd-pg-folder-count" aria-label={`${pages.length} pages in folder`}>
             {pages.length}
           </span>
-
-          <span style={{ flex: 1 }} aria-hidden="true" />
 
           <div className="bd-pg-folder-actions">
             <IconButton

@@ -74,8 +74,17 @@
   width: 12px;
   height: 12px;
   border-radius: 2px;
-  background: var(--bk-ink-muted);
+  /* Glyph, not a filled block: this was `background: var(--bk-ink-muted)` and
+     the svg inside is stroked in currentColor, which inherits the same token,
+     so every row drew a grey square and the per-type icon was invisible. */
+  background: transparent;
+  color: var(--bk-ink-muted);
   flex-shrink: 0;
+}
+
+/* A row with no artwork of its own keeps the square it always had. */
+.bdc-lr-ic:empty {
+  background: var(--bk-ink-muted);
 }
 
 .bdc-lr-ic svg {
@@ -463,9 +472,10 @@
   align-items: center;
   padding: 6px 16px;
   background: var(--bk-ink);
+  /* ONE colour: `color` was declared twice, so `--bk-error` won and this read
+     red on near-black ink at 3.76:1 — under AA for 12px. */
   color: var(--bk-accent-on);
   font: 400 12px/16px var(--bk-font-ui);
-  color: var(--bk-error);
 }
 
 /* ==========================================================================

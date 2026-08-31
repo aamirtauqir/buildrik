@@ -171,10 +171,14 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
       />
     ))}
     {/* Board 138:2: BLOCKS is a CARD GRID, not rows — `Card / media` (17:6):
-        136×104, 136×76 thumb (4:3) on bg-subtle + a 12px label. Two columns at
-        320w: 16+136+16+136+16 = 320 EXACTLY ("140 was tried and overflows by
-        8"). Thumb is the block's preview when it has one, empty until then —
-        the board names it "thumb/site-preview (empty until first publish)". */}
+        136×104, 136×76 thumb (4:3) on bg-subtle + a 12px label. Thumb is the
+        block's preview when it has one, empty until then — the board names it
+        "thumb/site-preview (empty until first publish)".
+
+        The note here used to read "Two columns at 320w: 16+136+16+136+16 = 320
+        EXACTLY". That arithmetic is right about the PANEL and wrong about its
+        content box, and being one pixel out cost the grid entirely — see the
+        note on the grid container below. */}
     {/* Board 1069:4790 (components-expanded): registry component blocks as
         plain rows — same Row treatment, same onBlockClick insert path
         (BlockDefinition extends BlockData). */}
@@ -197,14 +201,23 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         onClick={() => onMineInsert?.(c)}
       />
     ))}
+    {/* A GRID, because the flex-wrap version missed two columns by ONE pixel
+        and nobody could see why. Board 138:2 draws two cards side by side and
+        the arithmetic under it reads 16 + 136 + 16 + 136 + 16 = 320 — right
+        about the panel, wrong about its content box: `.ls-panel` carries a
+        `border-right: 1px`, so clientWidth is 319 and the content box 287, one
+        short of the 288 two fixed cards need. Measured live: 50 cards, 50
+        rows, one card per row, a 5700px column. `auto-fill` with a min under
+        the card width cannot lose that way, and it earns the expanded drawer
+        (560/700) more columns instead of two marooned cards. */}
     {isOpen && group.id === "blocks" && (
-      <div className="tw:flex tw:flex-wrap tw:gap-[16px] tw:px-[16px] tw:py-[8px]">
+      <div className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[16px] tw:px-[16px] tw:py-[8px]">
         {blocks?.map((b) => (
           <div
             key={b.id}
             role="button"
             tabIndex={0}
-            className="tw:flex tw:flex-col tw:gap-[4px] tw:w-[136px] tw:cursor-pointer tw:select-none"
+            className="tw:flex tw:flex-col tw:gap-[4px] tw:min-w-0 tw:cursor-pointer tw:select-none"
             data-testid={`insert-block-${b.id}`}
             onClick={() => onBlockInsert?.(b)}
             onKeyDown={(e) => {
