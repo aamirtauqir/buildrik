@@ -36,7 +36,7 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
-import { Button, PanelFrame, TextField } from "@/editor/chrome-ui";
+import { Button, PanelFrame, TextField, BK_LINK_BUTTON_CLASS, BK_LINK_BUTTON_SM_CLASS } from "@/editor/chrome-ui";
 
 type View = "hub" | "used" | "versions" | "optimize";
 
@@ -310,7 +310,7 @@ export function AssetDetailOverlay({
               type="button"
               color="light"
               size="xs"
-              className="tw:mt-2 tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              className={`${BK_LINK_BUTTON_CLASS} tw:mt-2`}
               onClick={() => setMetaError(false)}
             >
               Retry
@@ -366,7 +366,7 @@ export function AssetDetailOverlay({
                 type="button"
                 color="light"
                 size="xs"
-                className="tw:mt-1.5 tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                className={`${BK_LINK_BUTTON_SM_CLASS} tw:mt-1.5`}
                 data-testid="media-alt-generate"
                 disabled={altBusy}
                 aria-busy={altBusy || undefined}
@@ -486,7 +486,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      className="tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                      className={BK_LINK_BUTTON_SM_CLASS}
                       data-testid="media-restore-go"
                       onClick={() => confirmRestore(v.id)}
                     >
@@ -538,7 +538,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      className="tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                      className={`${BK_LINK_BUTTON_CLASS} tw:shrink-0`}
                       data-testid={`media-jump-${hit.elementId}`}
                       onClick={() => handleJump(pg.pageId, hit.elementId)}
                     >

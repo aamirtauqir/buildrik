@@ -19,7 +19,7 @@
  */
 
 import * as React from "react";
-import { Button, PanelHeader, SectionHeader, SkeletonBlock } from "@/editor/chrome-ui";
+import { Button, PanelHeader, SectionHeader, SkeletonBlock, BK_LINK_BUTTON_CLASS } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
 import type { Composer } from "@/engine";
 import type { ConditionExpression } from "@/shared/types/data";
@@ -198,7 +198,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
             type="button"
             color="light"
             size="xs"
-            className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+            className={`${BK_LINK_BUTTON_CLASS} tw:self-start`}
             data-testid="content-load-retry"
             onClick={() => void retryCmsHydration()}
           >

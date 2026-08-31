@@ -292,7 +292,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      cannot say different things about the same failure. */
   const failureSection = (
           <section className={SECTION} aria-label="Publish failure">
-            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-error-text)]">
+            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-error-text)]">
               Publish failed.
             </h2>
             <p className={META}>
@@ -380,7 +380,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             that matters and offers the one action that changes it. */}
         {noPublishPath ? (
           <section className={SECTION}>
-            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]">
+            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]">
               Connect Vercel to publish.
             </h2>
             <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
@@ -394,7 +394,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             reassurance: nothing went out, and the work is not lost. */}
         {snapshot.error ? (
           <section className={SECTION} aria-label="Deploy service unreachable">
-            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-error-text)]">
+            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-error-text)]">
               Couldn&apos;t reach the deploy service.
             </h2>
             <p className={META}>Nothing was published. Your work is saved.</p>
@@ -421,7 +421,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             to see it, and what changed against the version it replaced. */}
         {justPublished && (
           <section className={SECTION} aria-label="Publish result">
-            <h2 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-success-text)]">
+            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-success-text)]">
               Published to production.
             </h2>
             <p className={META}>

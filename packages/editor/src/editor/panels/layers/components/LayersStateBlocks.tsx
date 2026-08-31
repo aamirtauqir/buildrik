@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, SkeletonBlock } from "@/editor/chrome-ui";
+import { Button, SkeletonBlock, BK_LINK_BUTTON_CLASS } from "@/editor/chrome-ui";
 
 /*
   Board `775:4130`. Seven rows on the tree's own row height (h-8), indent ladder
@@ -60,7 +60,7 @@ export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
       type="button"
       color="light"
       size="xs"
-      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      className={`${BK_LINK_BUTTON_CLASS} tw:self-start`}
       data-testid="layers-load-retry"
       onClick={onRetry}
     >
@@ -82,7 +82,7 @@ export const LayersNoResults: React.FC<{ search: string; onClear: () => void }> 
       type="button"
       color="light"
       size="xs"
-      className="tw:min-h-6 tw:self-start tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      className={`${BK_LINK_BUTTON_CLASS} tw:self-start`}
       data-testid="layers-clear-search"
       onClick={onClear}
     >

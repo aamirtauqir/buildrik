@@ -22,7 +22,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { Button, TextInput, BK_LINK_BUTTON_INLINE_CLASS } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine/Composer";
 import { useColorRegistry } from "../../state/TokenRegistryContext";
 import { ColorModeToggle } from "../ColorModeToggle";
@@ -120,7 +120,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
                     setDraft(t.value);
                     setEditing(t.id);
                   }}
-                  className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  className={BK_LINK_BUTTON_INLINE_CLASS}
                 >
                   Set
                 </Button>

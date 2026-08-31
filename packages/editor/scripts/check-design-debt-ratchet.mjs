@@ -27,19 +27,39 @@ const RATCHETS = [
   },
   {
     id: "ghost-link-incantation",
-    // The hand-rolled accent text-link recipe — variant="link" is the home.
+    /* The accent text-link recipe. 44 → 19 on 2026-08-29: the five shared
+       forms live in chrome-ui/linkButton.ts and every duplicate call site
+       references one. What is counted now is those five definitions plus 14
+       genuinely single-use shapes (an h-9 nav row, a w-fit chip, an 11px
+       modal link…) — definitions, not copies. New links use variant="link". */
     pattern: String.raw`tw:enabled:hover:underline`,
-    baseline: 44,
+    baseline: 19,
   },
   {
     id: "offscale-font-size",
-    // Sizes the 7-step scale does not define (9/10/10.5/11.5/12.5/15/17…).
+    /* Sizes the 7-step scale does not define. 86 → 67 → this baseline over
+       two passes: the half-pixels (10.5/11.5/12.5 — eyeballed Figma exports)
+       snapped onto 11/12/13, and the near-scale headings (15/17px h2/h3 and a
+       ModalTitle) onto --bk-text-16. What the pattern still counts is micro
+       furniture the token scale deliberately does not reach: badge chips,
+       unit glyphs on inspector fields, breadcrumb separators. Two categories
+       are excluded by path below, for the same reason avatarTone is:
+         · CatalogCard draws a MINIATURE of a component — 7/8px is the
+           thumbnail's own scale, not chrome type;
+         · BrandPreview / TypographySection render the USER's typefaces as
+           specimens, where the size is the sample, not a chrome decision. */
     pattern: String.raw`tw:text-\[(7|8|9|10|10\.5|11\.5|12\.5|15|17|18|19)px\]`,
-    baseline: 67,
+    baseline: 42,
   },
   {
     id: "palette-gray-text",
-    // tw:text-gray-* where the ink tokens are the vocabulary.
+    /* 470 → 10 on 2026-08-29: every shade with an exact ink twin was
+       codemodded (900=ink, 600=ink-soft, 500=ink-muted, 300=ink-disabled —
+       verified against tokens.generated.css, so nothing moved). What remains
+       is gray-400 on decoration glyphs (the › chevrons, a drag handle) plus
+       two thumbnail/presence chips: the ink scale has no 400 step, and
+       snapping them to 300 or 500 would be a visible change made to satisfy
+       a counter. They stay until Figma publishes that step. */
     pattern: String.raw`tw:text-gray-[0-9]{3}`,
     baseline: 10,
   },
@@ -48,7 +68,7 @@ const RATCHETS = [
 function count(pattern) {
   try {
     const out = execSync(
-      `grep -rEn ${JSON.stringify(pattern)} src/editor --include='*.tsx' --include='*.ts' | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | wc -l`,
+      `grep -rEn ${JSON.stringify(pattern)} src/editor --include='*.tsx' --include='*.ts' | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx | wc -l`,
       { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
     );
     return parseInt(out.trim(), 10);

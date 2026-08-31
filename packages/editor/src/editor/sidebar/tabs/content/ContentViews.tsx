@@ -31,6 +31,7 @@ import {
   Textarea,
   TextInput,
   ToggleSwitch,
+  BK_LINK_BUTTON_CLASS,
 } from "@/editor/chrome-ui";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
@@ -150,7 +151,7 @@ export function RootView({
             <Button
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              className={`${BK_LINK_BUTTON_CLASS} tw:font-normal`}
               data-testid="content-empty-cta"
               onClick={onCreateCollection}
             >

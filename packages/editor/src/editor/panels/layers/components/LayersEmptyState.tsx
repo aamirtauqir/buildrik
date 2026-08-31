@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/chrome-ui";
+import { Button, BK_LINK_BUTTON_TIGHT_CLASS } from "@/editor/chrome-ui";
 
 interface LayersEmptyStateProps {
   onAddBlockClick?: () => void;
@@ -25,7 +25,7 @@ export const LayersEmptyState: React.FC<LayersEmptyStateProps> = ({ onAddBlockCl
           type="button"
           color="light"
           size="xs"
-          className="tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          className={BK_LINK_BUTTON_TIGHT_CLASS}
           data-testid="layers-open-insert"
           onClick={onAddBlockClick}
         >

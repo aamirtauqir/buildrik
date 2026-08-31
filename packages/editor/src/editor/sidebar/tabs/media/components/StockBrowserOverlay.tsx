@@ -15,7 +15,7 @@
  */
 
 import * as React from "react";
-import { Button, Menu, MenuItem, PanelFrame, Popover, TextField } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, PanelFrame, Popover, TextField, BK_LINK_BUTTON_CLASS } from "@/editor/chrome-ui";
 import type {
   DiscColor,
   DiscOrientation,
@@ -291,7 +291,7 @@ export function StockBrowserOverlay({
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              className={BK_LINK_BUTTON_CLASS}
               data-testid="stock-load-more"
               onClick={() => onLoadMore(type)}
             >

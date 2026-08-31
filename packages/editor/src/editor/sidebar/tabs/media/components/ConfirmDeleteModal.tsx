@@ -36,7 +36,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
   return (
     <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }}>
       <ModalContent srTitle="Delete files" className="tw:p-5">
-        <h3 className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)]" id="med-del-title">
+        <h3 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]" id="med-del-title">
           {/* `isBulk` means "reached from selection mode", not "more than one" —
               selecting a single asset and hitting Delete printed "Delete 1
               files?" directly above a warning line that says "1 file is

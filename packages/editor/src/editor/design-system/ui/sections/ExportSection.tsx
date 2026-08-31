@@ -27,7 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, CopyButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui";
+import { Button, CopyButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME, BK_LINK_BUTTON_INLINE_CLASS } from "@/editor/chrome-ui";
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
 // exporter contract. Figma JSON download emits a minimal envelope until a
@@ -296,7 +296,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
                       onExported?.(label);
                     }}
-                    className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                    className={BK_LINK_BUTTON_INLINE_CLASS}
                   >
                     Download
                   </Button>
