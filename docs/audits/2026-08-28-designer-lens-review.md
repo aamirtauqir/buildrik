@@ -30,7 +30,32 @@ Screenshots: `~/.gstack/projects/aamirtauqir-buildrik/designs/design-audit-20260
 - Brand "Starters" row unreachable — both misses were probe bugs (rail
   re-click toggles the drawer; leaf-click heuristic), not the product.
 
-## Founder DECISIONS (logged, not acted)
+## The six DECISIONS — walked to the end 2026-08-29
+
+Four were **false findings**, killed by reading the code that owns them:
+
+- **D1 Insert list** — the panel already groups (ELEMENTS / BLOCKS / …,
+  board 137:2 taxonomy, `catalog/groups.ts`). It read as a flat 53-row list
+  in the screenshot only because ELEMENTS is the one group open by default.
+- **D3 Pages checkboxes** — the row checkbox is CSS-gated on
+  `.bd-pg-panel.bulk-mode`; the walk caught the panel in bulk mode.
+- **D4 "Listings"** — board 141:207's own name for the SEO listings table
+  (PAGE · TITLE · DESC · SCORE). Board authority, not jargon drift.
+- **D6 breakpoint feedback** — the footer has always said "Tablet · 100%".
+  It was invisible because the **cookie banner covered the footer** — the
+  same F1 bug, wearing a second hat. Confirmed live after F1 shipped.
+
+Two were real and are **fixed**:
+
+- **D5 Brand footer** — a clean panel rendered Discard + Save both disabled.
+  Board 154:78 draws only the dirty state; clean is now the status line
+  alone. Live: "Brand is up to date", no buttons.
+- **D2 Layers labels** — twelve rows reading "Heading" named nothing. Text-ish
+  layers now show their own first 32 characters (`Element.getContent`, tags
+  stripped); containers keep type labels; a rename still wins. Live: rows
+  read "Lorem ipsum dolor sit amet, cons…", "HEADING", "Click Me".
+
+## Founder DECISIONS (original log — see the section above for outcomes)
 
 - **D1 Insert list**: 53 elements in one flat group. Grouped categories
   (Typography / Layout / Media / Forms) would scan faster; current list is
@@ -101,6 +126,15 @@ auditors' own order:
 
 **And a floor under the rest**: `gate:design-debt-ratchet` (wired into
 verify:ds, negative-tested with a planted violation) locks offbrand-blue at
-ZERO and ratchets the ghost-link recipe (44), off-scale font sizes (86) and
-palette-gray text (470) strictly downward. The long tail drains against
-those baselines the way the hex ratchet drained.
+ZERO and ratchets the remaining populations strictly downward.
+
+**Second pass, 2026-08-29** — the tail drained rather than waiting:
+`tw:text-gray-{900,600,500,300}` → the ink tokens across 460 sites (every
+pair value-identical, ratchet **470 → 10**); the nineteen half-pixel sizes
+(10.5/11.5/12.5px) snapped onto the 11/12/13 scale (**86 → 67**); the two
+modals that were genuinely flush (CommentLayer's orphan dialog,
+TokenReplaceModal) got their `ModalBody` gutter — the other eleven from the
+inventory carry their own padding, checked rather than assumed. What is left
+under the ratchet is the ghost-link recipe (44 sites whose class strings
+carry layout extras beyond the recipe, so each is a judgment call) and 67
+off-scale sizes.
