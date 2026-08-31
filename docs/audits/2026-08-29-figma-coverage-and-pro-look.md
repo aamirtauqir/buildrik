@@ -76,7 +76,29 @@ zero**, each negative-tested by planting a violation and watching it fail:
 4. off-scale sizes in TSX, **all three spellings** — 47 → 0
 5. off-scale sizes in stylesheets — 63 → 0
 
-## 5. What is left, and what it would take
+## 5. "Flows kaafi broken hain" — what that actually was
+
+The flows are not broken now, but the instinct was right about *why* it felt
+that way. Since 2026-08-18 this repo has taken 573 commits, and the pattern
+in them is not "sloppy screens" — it is **surfaces that were wired at both
+ends and dead in the middle**. A dozen commit subjects say it outright:
+
+- **Templates' new-page mode could NEVER turn on.** The event fired before
+  the listener's tab was mounted, so "From template" opened the gallery —
+  whose apply REPLACES the current page instead of adding one. Since ship.
+- **The client could not see "Approve"** — the cookie banner sat on the
+  button the whole review page exists for.
+- **Media folders you could create but never file anything into.**
+- **The button gate could not see half its population, and ran in no chain.**
+- **53 insertable element types, 46 of which nobody had ever looked at.**
+- **Reviews could not tell "off" from "never sent"** — one `=== null`.
+
+That is the shape of the problem: not ugly, *unproven*. Every one of these
+was found by driving the app, and none by reading the code — which is why
+§2's 262 `code:`-only boards is the number that matters, and §5 is a walking
+plan, not a redesign plan.
+
+## 6. What is left, and what it would take
 
 **Not a look problem any more — a proof problem.** The work that remains is
 ranked by what it buys:
