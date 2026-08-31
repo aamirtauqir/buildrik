@@ -47,11 +47,11 @@ export interface ApprovedCompareViewProps {
 type Mode = "split" | "overlay" | "list";
 
 const KIND: Record<CompareChangeKind, { icon: LucideIcon; className: string; label: string }> = {
-  content: { icon: File, className: "tw:text-blue-700", label: "Content" },
+  content: { icon: File, className: "tw:text-[var(--bk-accent-text)]", label: "Content" },
   style: { icon: Palette, className: "tw:text-[var(--bk-warning-text)]", label: "Style" },
   added: { icon: Plus, className: "tw:text-[var(--bk-success)]", label: "Added" },
   removed: { icon: Minus, className: "tw:text-[var(--bk-error)]", label: "Removed" },
-  moved: { icon: GripVertical, className: "tw:text-gray-400", label: "Moved" },
+  moved: { icon: GripVertical, className: "tw:text-[var(--bk-gray-400)]", label: "Moved" },
 };
 
 const KIND_ORDER: CompareChangeKind[] = ["added", "removed", "moved", "content", "style"];
@@ -59,26 +59,26 @@ const KIND_ORDER: CompareChangeKind[] = ["added", "removed", "moved", "content",
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
 const STAGE = "tw:flex-1 tw:min-h-0 tw:flex tw:gap-2 tw:p-2 tw:overflow-hidden";
 const PANE =
-  "tw:flex-1 tw:min-w-0 tw:flex tw:flex-col tw:border tw:border-gray-200 tw:rounded-lg " +
-  "tw:overflow-hidden tw:bg-gray-50";
+  "tw:flex-1 tw:min-w-0 tw:flex tw:flex-col tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg " +
+  "tw:overflow-hidden tw:bg-[var(--bk-gray-50)]";
 const PANE_LABEL =
-  "tw:text-[11px] tw:font-semibold tw:text-gray-500 tw:px-2.5 tw:py-1.5 tw:border-b tw:border-gray-200 " +
+  "tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-muted)] tw:px-2.5 tw:py-1.5 tw:border-b tw:border-[var(--bk-gray-200)] " +
   "tw:uppercase tw:tracking-[0.04em]";
 /** The sandboxed iframe fills its pane. White, because it is the customer's
  *  page — not a chrome surface that should follow a chrome background. */
 const FRAME = "tw:flex-1 tw:min-h-0 tw:border-0 tw:w-full tw:bg-white";
 const OVERLAY_FRAME = "tw:absolute tw:inset-0 tw:border-0 tw:w-full tw:h-full tw:bg-white";
 const PLACEHOLDER =
-  "tw:flex-1 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:text-gray-500 " +
+  "tw:flex-1 tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:text-[var(--bk-ink-muted)] " +
   "tw:text-[13px] tw:text-center tw:p-6";
 const LEGEND =
-  "tw:flex tw:gap-3 tw:flex-wrap tw:px-3 tw:py-1.5 tw:border-t tw:border-gray-200 tw:text-[11px] tw:text-gray-500";
+  "tw:flex tw:gap-3 tw:flex-wrap tw:px-3 tw:py-1.5 tw:border-t tw:border-[var(--bk-gray-200)] tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const LIST_SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:pb-3";
-const LIST_ROW = "tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:border tw:border-gray-200 tw:rounded-lg tw:mb-1.5 tw:items-start";
-const LIST_DETAIL = "tw:text-xs tw:text-gray-500";
-const SUMMARY = "tw:text-xs tw:text-gray-500 tw:px-3 tw:py-1.5";
+const LIST_ROW = "tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:mb-1.5 tw:items-start";
+const LIST_DETAIL = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
+const SUMMARY = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:py-1.5";
 /** The quiet button look, previously copy-pasted onto four separate Buttons. */
-const GHOST = "tw:border-transparent tw:bg-transparent tw:text-gray-600 tw:hover:text-gray-900";
+const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 function findPage(pages: ComparePage[] | null, path: string): ComparePage | undefined {
   return pages?.find((p) => p.path === path);
 }
@@ -202,7 +202,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
                     {KIND[c.kind].label}
                   </span>
                   <div className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-                    <span className="tw:text-[13px] tw:font-medium tw:text-gray-900">{c.label}</span>
+                    <span className="tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]">{c.label}</span>
                     <span className={LIST_DETAIL}>{c.detail}</span>
                   </div>
                 </div>

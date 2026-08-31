@@ -109,7 +109,8 @@ interface VersionRowProps {
   onDeleteConfirm: () => void;
   onDeleteCancel: () => void;
   onCompare: () => void;
-  elementCount?: number;
+  /** Changes this version captured since the previous one. Absent = not known. */
+  changeCount?: number;
 }
 
 export function VersionRow({
@@ -121,7 +122,7 @@ export function VersionRow({
   onDeleteConfirm,
   onDeleteCancel,
   onCompare,
-  elementCount = 0,
+  changeCount,
 }: VersionRowProps) {
   const rowRef = React.useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -167,7 +168,10 @@ export function VersionRow({
             <div className="version-meta">
               <span className="version-time">{formatTime(version.createdAt)}</span>
               <span>{relative}</span>
-              {elementCount > 0 && (
+              {/* Board 162:2 — "Auto-save · 3 changes · 16:20". Omitted rather
+                  than shown as 0 when the undo stack does not reach back that
+                  far: see versionChangeCounts. */}
+              {changeCount !== undefined && (
                 <span
                   className="entry-badge"
                   style={{
@@ -175,7 +179,7 @@ export function VersionRow({
                     color: "var(--bk-accent)",
                   }}
                 >
-                  {elementCount} el
+                  {changeCount} change{changeCount === 1 ? "" : "s"}
                 </span>
               )}
               {version.isAutoCheckpoint && (
@@ -252,6 +256,8 @@ export interface VersionListProps {
   onDeleteConfirm: (versionId: string) => void;
   onDeleteCancel: () => void;
   onCompare: (versionId: string) => void;
+  /** version id -> changes captured. Ids absent mean "not known". */
+  changeCounts?: Map<string, number>;
 }
 
 export function VersionList({
@@ -264,6 +270,7 @@ export function VersionList({
   onDeleteConfirm,
   onDeleteCancel,
   onCompare,
+  changeCounts,
 }: VersionListProps) {
   const listWrapperRef = React.useRef<HTMLDivElement>(null);
   const [listHeight, setListHeight] = React.useState(0);
@@ -332,13 +339,14 @@ export function VersionList({
             onDeleteConfirm={() => onDeleteConfirm(v.id)}
             onDeleteCancel={onDeleteCancel}
             onCompare={() => onCompare(v.id)}
-            elementCount={0}
+            changeCount={changeCounts?.get(v.id)}
           />
         </div>
       );
     },
     [
       flatRows,
+      changeCounts,
       restoringId,
       deleteConfirmId,
       onRestoreRequest,

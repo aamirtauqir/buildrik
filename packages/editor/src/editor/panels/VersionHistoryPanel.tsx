@@ -26,6 +26,8 @@ import { CompareView } from "./version-history/CompareView";
 import { useAISummary } from "./version-history/useAISummary";
 import { Button, TextField, useToast } from "@/editor/chrome-ui";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
+import { versionChangeCounts } from "@/shared/utils/versionChangeCounts";
+import { useHistoryState } from "@/shared/hooks/useHistoryState";
 
 // CompareView + toggle-pill style constants moved to
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
@@ -259,6 +261,18 @@ export function VersionHistoryPanel({
     return versions.filter((v) => v.name.toLowerCase().includes(query));
   }, [versions, searchQuery]);
 
+  /* Board 162:2 puts a change count on every row. It is derived, not stored:
+     the undo stack is the same source the board's sibling view (Saves ·
+     changes) lists, and a version's count is the entries taken between the
+     previous version and this one. Absent ids mean "the stack does not reach
+     back that far", which is why the row omits the badge rather than printing
+     a 0 it cannot stand behind. */
+  const { historyStack } = useHistoryState(composer);
+  const changeCounts = React.useMemo(
+    () => versionChangeCounts(versions, historyStack),
+    [versions, historyStack]
+  );
+
   // Build the expanded version (if any) for rendering below the list.
   const expandedVersion = expandedId
     ? filteredVersions.find((v) => v.id === expandedId) ?? null
@@ -379,6 +393,7 @@ export function VersionHistoryPanel({
       {/* Version List — virtualization + row rendering owned by VersionList.
           See ./version-history/VersionList.tsx (D3 Stage 1). */}
       <VersionList
+        changeCounts={changeCounts}
         filteredVersions={filteredVersions}
         totalCount={versions.length}
         restoringId={restoringId}

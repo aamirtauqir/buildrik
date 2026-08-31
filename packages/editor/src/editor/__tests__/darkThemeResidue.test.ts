@@ -18,6 +18,11 @@
  *     design calls for had drawn nothing since the flip
  *   - `CanvasButton`'s default variant — `rgba(255,255,255,0.06)` on a light card
  *
+ * The matcher covers the four ways CSS lets you write the same colour —
+ * comma `rgba()`, the space/slash `rgb(255 255 255 / 4%)` of CSS Color 4, and
+ * both `hsl` twins. A guard that only reads one spelling is a guard you evade
+ * by preference, not by intent.
+ *
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
@@ -49,13 +54,31 @@ const EXT = /\.(tsx?|css)$/;
    misses the exact bug it was written for is worse than no guard, so the
    property anchor is gone: below 0.5 alpha, white has no legitimate use on this
    chrome's surfaces, whatever it is assigned to. */
-const WHITE_VEIL = /rgba\(\s*255\s*,\s*255\s*,\s*255\s*,\s*0?\.[0-4]\d*\s*\)/;
+const WHITE_VEIL = new RegExp(
+  [
+    // rgba(255, 255, 255, 0.04)
+    String.raw`rgba?\(\s*255\s*,\s*255\s*,\s*255\s*,\s*0?\.[0-4]\d*\s*\)`,
+    // rgb(255 255 255 / 4%)  ·  the space/slash form CSS Color 4 allows
+    String.raw`rgba?\(\s*255\s+255\s+255\s*\/\s*(?:0?\.[0-4]\d*|[0-4]?\d%)\s*\)`,
+    // hsl(0, 0%, 100%, .04)  ·  and its space/slash twin
+    String.raw`hsla?\(\s*0\s*,\s*0%\s*,\s*100%\s*,\s*0?\.[0-4]\d*\s*\)`,
+    String.raw`hsla?\(\s*0\s+0%\s+100%\s*\/\s*(?:0?\.[0-4]\d*|[0-4]?\d%)\s*\)`,
+  ].join("|")
+);
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
-      if (entry === "__tests__" || entry === "design-system") continue;
+      /* `design-system` was skipped here on the first draft, on the reading
+         that the folder is the SITE-BUILDER token domain and therefore not
+         chrome. Half right: its subject is the customer's tokens, but its
+         surface is the editor's own Brand panel and modals, styled from the
+         `--bk-*` chrome namespace. Skipping it hid five more of exactly this
+         bug — including two input fields on a white modal with no ground —
+         and two files in there already carried comments from an earlier,
+         incomplete drain of the same class. (Codex review, 2026-08-25.) */
+      if (entry === "__tests__") continue;
       walk(full, out);
     } else if (EXT.test(entry)) out.push(full);
   }
