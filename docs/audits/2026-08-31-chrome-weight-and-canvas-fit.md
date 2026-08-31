@@ -230,10 +230,44 @@ side-by-side walk. Every one of the 51 was queried in Figma: **all have real
 frames and real dimensions** (the Inspector family is uniformly 300×812). It is
 a data gap in `boards.json`, not a missing drawing. Backfill map collected.
 
-**Walked this session: 2 boards** — `159:99` (Inspector · no-selection) and
-`807:8342` (Inspector · profile · TEXT). Both match their boards structurally;
-the deltas found were sample-data or superseded-by-founder-decision, not drift.
-That is two of 262. It is not "the walk is done", and it is not counted as such.
+**Walked this session: 38 boards.** Active authority moved `code:` 262 → 225,
+`walked:` 49 → 87. That is **87 of 355 proven, and 225 still are not.** This is
+not "the walk is done" and is not counted as such.
+
+Families covered: Inspector (13 — profiles, scope, pseudo-state, breakpoint
+override, reach, empty states), Insert (6 + 5 unreachable), Layers (11),
+Pages (10 + 1 unreachable).
+
+**Defects found and fixed** (each re-measured live after the fix):
+
+| Where | Defect |
+|---|---|
+| Insert · BLOCKS | Grid rendered **one card per row** — 50 cards, a 5700px column. Two 136px cards + a 16 gap need 288; the content box is 287, because `.ls-panel` has a `border-right: 1px` the board's arithmetic ignores. A flex-wrap that loses by a pixel loses completely. Now a grid; 2 per row. |
+| Layers · every row | **The type icon was invisible.** `.bdc-lr-ic` painted the ink token as a *background* while the svg inside is stroked in the same token. All 66 rows drew an identical grey square, in the one panel whose job is telling elements apart. |
+| Layers · invalid-drop | `color` declared **twice** in one rule, so red-on-near-black won: 3.76:1, under AA. |
+| Pages · folders | The page count parked mid-row (x187 vs board x290) — a trailing `flex: 1` spacer split the free space and defeated `margin-left: auto`. |
+| Inspector · takeovers | A scope banner **outlived its controls**: with reach set to "All like this", the whole-site prompt showed "Editing all 4 paragraphs" directly above "Editing the whole site", with zero controls between them. |
+
+**Six states are recorded as UNREACHABLE, not walked**, because nothing can
+produce them: the Insert `disabled-item` (no `disabled: true` entry exists),
+Insert `loading`/`load-error` (the catalog is static; `InsertLoadError` has zero
+production callers), and Pages `loading` (`PagesLoadingSkeleton` has zero
+importers). Two more are a **board-set conflict** — `1069:*` is drawn on a grid
+the `137/138` boards contradict, and they disagree on group membership. That is
+a founder call, not a fix.
+
+**One systemic cause showed up in four independent places**: flowbite's
+`Button` ships `tw:h-10`, so icon buttons land 40px tall in 28-32px chrome rows.
+In Layers this is not cosmetic — hit-testing at `rowBottom − 3` returns the
+*next* row's button, so the last few pixels of the eye/lock column act on the
+wrong layer. And a competing height class in the same string does not fix it:
+both compile and the stylesheet's order decides.
+
+**Two reported defects did not survive checking**, and are recorded as such
+rather than fixed: the unsaved-page modal's "missing space" (a render test
+prints the space — the walker's scraper dropped it), and the Pages bulk ✕
+being off-panel (not reproducible here; no checkbox inputs exist at rest, so
+bulk mode is gated and the route in is unclear).
 
 The ranked plan, families by unproven count, Publish excluded: S1 flows 20,
 Inspector 18, S5 flows 17, Content 14, S7 14, Brand 12, Review panel 12, Shell
