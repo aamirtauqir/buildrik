@@ -166,7 +166,7 @@ export default [
           selector:
             "Property[key.type='Identifier'][key.name=/^(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)$/][value.type='Literal'][value.raw=/^(28|32|36|40|44|48|56|60|240|300|320)$/]",
           message:
-            "Survivor #3: magic layout literal banned. Import from src/shared/constants/layout.ts (RAIL_W / SIDEBAR_W / INSPECTOR_W / TOPBAR_H / HEADER_H / TOOLBAR_H / FOOTER_H / ROW_SM / ROW_MD / ROW_LG).",
+            "Survivor #3: magic layout literal banned. Chrome WIDTHS live in the generated tokens \u2014 read them with var(--bk-size-rail/drawer/inspector). RAIL_W, SIDEBAR_WIDE and INSPECTOR_W were deleted 2026-08-31 as second copies of those. Heights and row sizes still come from src/shared/constants/layout.ts (TOPBAR_H / HEADER_H / TOOLBAR_H / FOOTER_H / ROW_SM / ROW_MD / ROW_LG).",
         },
         // String-px form: `height: "44px"` — Literal.raw is `"44px"` (with quotes).
         // Common in TSX files where CSS-property strings are used. Gate 14 counts

@@ -133,12 +133,19 @@ describe("useMediaState — §12 panelExpanded", () => {
     expect(composer.emit).toHaveBeenCalledWith("ui:media-panel-width", { width: 560, expanded: true });
   });
 
-  it("setPanelExpanded(false) emits width 320", () => {
+  /* Collapsing emits `null`, not 320. Rewritten 2026-08-31 with the change it
+     describes: a literal 320 here SET `--drawer-w: 320px` on the panel, which
+     beats `var(--bk-size-drawer)` by construction — so Media (and Templates,
+     which did the same) stayed at 320 no matter what the token said, while the
+     other four rail destinations moved. `null` clears the override and hands
+     the width back to the token. Verified live across all six destinations:
+     forcing the token to 260 now moves every one of them. */
+  it("setPanelExpanded(false) clears the override so the token wins", () => {
     const composer = makeFakeComposer();
     const { result } = renderHook(() => useMediaState(composer as never));
     act(() => result.current.setPanelExpanded(true));
     act(() => result.current.setPanelExpanded(false));
-    expect(composer.emit).toHaveBeenLastCalledWith("ui:media-panel-width", { width: 320, expanded: false });
+    expect(composer.emit).toHaveBeenLastCalledWith("ui:media-panel-width", { width: null, expanded: false });
   });
 
   /*

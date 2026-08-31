@@ -55,6 +55,16 @@ export function getCanvasStyles(
        drawn in a layout that ships on no screen. Floor it at the breakpoint
        the rest of the product already agrees on and let the wrapper scroll. */
     minWidth: device === "desktop" ? `${BREAKPOINTS.desktop.minWidth}px` : undefined,
+    /* The canvas is a flex item, so `min-width: auto` resolves to 0 and the
+       default `flex-shrink: 1` pulled EVERY device down to the column width.
+       Measured live at 1440 with a drawer open (712px of viewport): tablet
+       declared 768px and rendered 712 — below `BREAKPOINTS.tablet.minWidth`,
+       i.e. the customer's page laid out at mobile width while StyleEngine was
+       applying the tablet overrides — and wide declared 1920px and also
+       rendered 712. Desktop only escaped because its minWidth above happens to
+       floor it. A device frame that silently becomes the column is not a device
+       frame; let it keep its width and let .bd-canvas-scroll scroll. */
+    flexShrink: 0,
     maxWidth: device === "desktop" ? "100%" : safe.width,
     maxHeight: device === "desktop" ? "100%" : safe.height,
     background: "var(--bk-bg-card)",
@@ -105,13 +115,6 @@ export const spotsOverlayStyles: React.CSSProperties = {
   zIndex: 1000,
 };
 
-export const alignmentToolbarStyles: React.CSSProperties = {
-  position: "absolute",
-  top: 60,
-  right: 12,
-  zIndex: Z_LAYERS.floatingToolbar,
-  pointerEvents: "auto",
-};
 
 export function getMarqueeStyles(marquee: {
   start: { x: number; y: number };

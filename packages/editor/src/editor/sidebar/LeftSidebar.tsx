@@ -537,9 +537,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const [mediaPanelOverride, setMediaPanelOverride] = React.useState<number | null>(null);
   React.useEffect(() => {
     if (!composer) return;
+    /* `null` means "no flow width" and CLEARS the override, so the panel falls
+       back to `--bk-size-drawer`. Emitting the default as a literal 320 pinned
+       Media and Templates to that number regardless of the token — which
+       quietly made the token non-authoritative for 2 of the 6 destinations. */
     const handler = (payload: unknown) => {
-      const p = payload as { width?: number };
-      if (typeof p?.width === "number") setMediaPanelOverride(p.width);
+      const p = payload as { width?: number | null };
+      setMediaPanelOverride(typeof p?.width === "number" ? p.width : null);
     };
     composer.on("ui:media-panel-width", handler);
     return () => {
@@ -558,8 +562,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const handler = (payload: unknown) => {
-      const p = payload as { width?: number };
-      if (typeof p?.width === "number") setTemplatesPanelOverride(p.width);
+      const p = payload as { width?: number | null };
+      setTemplatesPanelOverride(typeof p?.width === "number" ? p.width : null);
     };
     composer.on("ui:templates-panel-width", handler);
     return () => {

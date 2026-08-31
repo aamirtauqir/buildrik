@@ -74,13 +74,24 @@ describe("drawer width — one source of truth", () => {
     }
   });
 
-  it("the token still carries the width the panels were measured against", () => {
+  it("the generated CSS carries whatever the token source says", () => {
+    /* Asserts AGREEMENT, not a value. An earlier version of this test pinned
+       `size.drawer === 320`, which would have failed the moment anyone did the
+       thing this whole change exists to enable — edit figma-tokens.json and
+       regenerate. That is two places to change, which is the problem, not the
+       fix. The 320 floor is a MEASUREMENT (see this file's header), and it
+       belongs in the header and in the panels' own tests, not as a lock here. */
     const tokens = JSON.parse(read("scripts/tokens/figma-tokens.json")) as {
       size: Record<string, number>;
     };
-    // Not a style preference — see the 320 floor in this file's header.
-    expect(tokens.size.drawer).toBe(320);
-    expect(tokens.size.inspector).toBe(300);
-    expect(tokens.size.rail).toBe(60);
+    const css = read("src/themes/tokens.generated.css");
+    for (const name of ["drawer", "inspector", "rail"]) {
+      expect(tokens.size[name], `size/${name} missing from figma-tokens.json`).toBeTypeOf("number");
+      expect(
+        css,
+        `--bk-size-${name} in the generated CSS disagrees with figma-tokens.json ` +
+          `(source says ${tokens.size[name]}px). Re-run scripts/tokens/generate.mjs.`,
+      ).toContain(`--bk-size-${name}: ${tokens.size[name]}px;`);
+    }
   });
 });

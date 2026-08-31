@@ -17,7 +17,6 @@ import { RichTextEditor } from "../../panels/RichTextEditor";
 import {
   guidesContainerStyles,
   spotsOverlayStyles,
-  alignmentToolbarStyles,
   getMarqueeStyles,
 } from "../canvasStyles";
 import { UnifiedSelectionToolbar } from "../controls";
@@ -29,14 +28,12 @@ import type { CursorState } from "../hooks/useCursorIntelligence";
 import type { SectionBoundary, SectionDragState } from "../hooks/useSectionReorder";
 import { GuideLines } from "../shared";
 import { CanvasSpotSpacing } from "../spots";
-import { AlignmentToolbar } from "../toolbars";
 import {
   SelectionBoxOverlay,
   ElementHoverOverlay,
   DropFeedbackOverlay,
   RulersOverlay,
   GuidesOverlay,
-  MultiSelectBadge,
   GridOverlay,
   RemoteCursorsOverlay,
   CanvasBreadcrumb,
@@ -84,7 +81,6 @@ export interface CanvasOverlayGroupProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onUndo: () => void;
-  onClear: () => void;
 
   // Hover
   shouldShowHover: boolean;
@@ -165,7 +161,6 @@ export function CanvasOverlayGroup({
   onMoveUp,
   onMoveDown,
   onUndo,
-  onClear,
   shouldShowHover,
   hoveredElementId,
   isInspectorEnabled,
@@ -312,12 +307,20 @@ export function CanvasOverlayGroup({
               onUndo={onUndo}
             />
           )}
-          {selectedIds.length > 1 && (
-            <div style={alignmentToolbarStyles}>
-              <AlignmentToolbar composer={composer} selectedIds={selectedIds} />
-              <MultiSelectBadge selectedIds={selectedIds} onClear={onClear} />
-            </div>
-          )}
+          {/* The canvas-anchored align toolbar + count badge were REMOVED here
+              on 2026-08-31. This overlay root is `inset: 0` against the canvas
+              box, so `right: 12` meant 12px from the far edge of the PAGE, not
+              of the visible viewport. Once the desktop canvas gained a real
+              minWidth it is routinely wider than its column, and the whole
+              cluster rendered off screen — measured at 1440 with a drawer open:
+              align/distribute buttons at x 1319 and 1355 against a column that
+              ends at 1140, still focusable, never visible.
+
+              Restoring it to the viewport would have put a SECOND align
+              toolbar on screen: the inspector's multi-select state already
+              carries Align x6 and Distribute x2, it is what board 159:123
+              draws, and it was walked live on 2026-08-31 (measured visible at
+              x 1170-1308). One concept, one home. */}
         </div>
       )}
 

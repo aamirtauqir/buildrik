@@ -42,7 +42,11 @@ File: `rail/tabsConfig.ts` — `GROUPED_TABS_CONFIG`
 | `publish`    | Rocket     | Publish   | bottom  | panel    | 280   | —         | U        |
 | `history`    | Timer      | History   | bottom  | panel    | 280   | config    | H        |
 
-Helpers in same file: `getTabMode()`, `getTabWidth()`, `getTabConfig()`, `getTabsByZone()`.
+Helpers in same file: `getTabMode()`, `getTabConfig()`, `getTabsByZone()`.
+(`getTabWidth()` was deleted 2026-08-31 — it only ever returned a constant. The
+drawer's width comes from `--bk-size-drawer` in `LeftSidebar.css`; per-flow
+widths set `--drawer-w` on the panel element. The Width column below is
+historical.)
 
 Rule: any new tab → add here first. Everything else (routers, keyboard handler, rail renderer) reads from this registry.
 

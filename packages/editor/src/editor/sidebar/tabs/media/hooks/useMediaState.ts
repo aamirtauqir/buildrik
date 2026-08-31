@@ -39,12 +39,13 @@ export function useMediaState(composer: Composer): MediaStateResult {
   >(null);
 
 
-  // §12 — expanded panel mode (320 ↔ 560). Composer event fires on change so
+  // §12 — expanded panel mode (default ↔ 560). null restores the token width.
+  // Composer event fires on change so
   // LeftSidebar can re-read the live width without coupling to media state.
   const [panelExpanded, setPanelExpandedRaw] = useState(false);
   const setPanelExpanded = useCallback((v: boolean) => {
     setPanelExpandedRaw(v);
-    composer.emit("ui:media-panel-width", { width: v ? 560 : 320, expanded: v });
+    composer.emit("ui:media-panel-width", { width: v ? 560 : null, expanded: v });
   }, [composer]);
 
   /*

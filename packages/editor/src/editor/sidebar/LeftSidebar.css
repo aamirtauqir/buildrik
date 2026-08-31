@@ -225,7 +225,10 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%; width: var(--drawer-w, var(--bk-size-drawer)); /* ONE source = the token; --drawer-w carries per-flow widths. tabsConfig.width.test.ts */
+  height: 100%;
+  /* ONE width source: the generated token. --drawer-w carries the per-flow
+     widths (Media 560, Templates/expand 700). See tabsConfig.width.test.ts. */
+  width: var(--drawer-w, var(--bk-size-drawer));
   background: var(--bk-bg-card);
   border-right: 1px solid var(--bk-border);
   overflow: hidden;

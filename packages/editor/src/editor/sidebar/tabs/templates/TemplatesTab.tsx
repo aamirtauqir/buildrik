@@ -123,17 +123,18 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     !!activePageInfo && !!detailUsage?.some((u) => u.pageId === activePageInfo.id);
 
   // prototype-v3 §2 — emit panel width override based on detail mode.
-  // 320 (default) when no card selected, 700 (320 grid + 380 detail) when
-  // a card is selected. LeftSidebar listens and widens the panel.
+  // null (fall back to --bk-size-drawer) when no card is selected, 700
+  // (grid + 380 detail) when one is. Emitting the default as a literal pinned
+  // this panel to that number and made the token non-authoritative here.
   React.useEffect(() => {
     if (!composer) return;
     composer.emit("ui:templates-panel-width", {
-      width: sel.detailId ? 700 : 320,
+      width: sel.detailId ? 700 : null,
       expanded: !!sel.detailId,
     });
     return () => {
       composer.emit("ui:templates-panel-width", {
-        width: 320,
+        width: null,
         expanded: false,
       });
     };

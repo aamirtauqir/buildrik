@@ -15,7 +15,6 @@ export { RulersOverlay } from "./RulersOverlay";
 export type { RulersOverlayProps } from "./RulersOverlay";
 export { GuidesOverlay } from "./GuidesOverlay";
 export type { GuidesOverlayProps } from "./GuidesOverlay";
-export { MultiSelectBadge } from "./MultiSelectBadge";
 export { GridOverlay } from "./GridOverlay";
 export { RemoteCursorsOverlay } from "./RemoteCursorsOverlay";
 // Canvas UX enhancements

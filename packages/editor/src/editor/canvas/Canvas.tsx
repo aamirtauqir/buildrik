@@ -725,7 +725,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             onMoveUp={handleToolbarMoveUp}
             onMoveDown={handleToolbarMoveDown}
             onUndo={handleToolbarUndo}
-            onClear={clear}
             shouldShowHover={shouldShowHover}
             hoveredElementId={hoveredElementId}
             cursorState={cursorState}
