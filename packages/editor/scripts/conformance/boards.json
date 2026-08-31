@@ -1068,7 +1068,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — default state live; drift: ⌘F hint at x201 not flush-right in the 287 box (shared SearchBar, 7 drawers)",
       "recipe": null
     },
     {
@@ -1079,7 +1079,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — zero `disabled: true` entries exist in catalog/catalog.ts, so the state cannot render",
       "recipe": null
     },
     {
@@ -1090,7 +1090,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — dragging: scrollTop held across 6 dragover steps, rows stayed mounted",
       "recipe": null
     },
     {
@@ -1101,7 +1101,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — BLOCKS grid was 1 card/row (287 box vs 288 needed); FIXED to auto-fill grid, re-measured 2/row, 25 rows",
       "recipe": null
     },
     {
@@ -1112,7 +1112,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — same static catalog; InsertLoadError has zero production callers",
       "recipe": null
     },
     {
@@ -1123,7 +1123,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — useBuildTab has no async path; the catalog is module-level static",
       "recipe": null
     },
     {
@@ -1134,7 +1134,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — no-results: text y128, link y158 — exact to the board",
       "recipe": null
     },
     {
@@ -1145,7 +1145,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — searching: flat cross-source list, 32h rows, ⌘F persists — matches",
       "recipe": null
     },
     {
@@ -1156,7 +1156,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — tip-dismissed: Paste-HTML lands exactly on the panel bottom (732)",
       "recipe": null
     },
     {
@@ -1255,7 +1255,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — dragging: ghost .5 opacity + 2px accent line; drift: line is 298w inside the 10px-inset row, board is full-bleed 320",
       "recipe": null
     },
     {
@@ -1266,7 +1266,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — empty: unreachable by its own trigger — useLayerTree always seeds one root row, so the panel says '1 layer' on an empty page",
       "recipe": null
     },
     {
@@ -1288,7 +1288,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — hidden: name/icon dim, aria gains ', hidden', canvas gets data-hidden",
       "recipe": null
     },
     {
@@ -1299,7 +1299,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — invalid-drop: contrast FIXED (was red-on-ink 3.76:1, duplicate color decl); drift remains — alert sits at panel top not the drop point, and copy is raw type names",
       "recipe": null
     },
     {
@@ -1310,7 +1310,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — load-error: copy/colour/position match; drift: footer still reads '66 layers' where the board has no count",
       "recipe": null
     },
     {
@@ -1321,7 +1321,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — loading: skeleton NEVER renders — composer exists before the payload, so the empty state shows during a 25s stall; LayersTab.tsx:182 false branch is dead",
       "recipe": null
     },
     {
@@ -1332,7 +1332,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — locked: lock darkens, aria gains ', locked', draggable flips false",
       "recipe": null
     },
     {
@@ -1695,7 +1695,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — bulk-select: reported by a walker as band-colour/order drift with the ✕ 25px outside the panel; NOT reproduced here (no checkbox inputs at rest — bulk mode is gated), so the ✕ claim is unconfirmed",
       "recipe": null
     },
     {
@@ -1706,7 +1706,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — empty (1-page site): row + note + centred Add page, both texts on the panel centre",
       "recipe": null
     },
     {
@@ -1717,7 +1717,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — folders-collapsed: folder count was parked at x187 (a trailing flex:1 spacer beat margin-left:auto) — FIXED; rows still 28h vs board 32",
       "recipe": null
     },
     {
@@ -1728,7 +1728,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — listings: columns and rows match; drift — 'Open full listings ›' renders at y722-754 in a 732 panel, clipped out of sight",
       "recipe": null
     },
     {
@@ -1739,7 +1739,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — load-error: copy character-exact and Try again recovers; drift — the search band and Add-page footer both vanish, board keeps both",
       "recipe": null
     },
     {
@@ -1750,7 +1750,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:unreachable-2026-08-31 — PagesLoadingSkeleton has zero importers repo-wide; usePages hydrates synchronously",
       "recipe": null
     },
     {
@@ -1761,7 +1761,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — no-results: copy exact incl. curly quotes, Clear search in accent, footer retained",
       "recipe": null
     },
     {
@@ -1772,7 +1772,7 @@
       "width": 1080,
       "height": 920,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — page tab bar: rename validation popovers and delete-confirm copy exact; drift — active tab not flush with the bar bottom (4px py-1)",
       "recipe": null
     },
     {
@@ -1783,7 +1783,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — searching: 2 flat results, unindented, footer retained — matches",
       "recipe": null
     },
     {
@@ -1794,7 +1794,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — tree: drift — rows 28h not 32, names 19px left of the board column, footer carries 3 controls where the board has 1",
       "recipe": null
     },
     {
@@ -3521,7 +3521,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:board-conflict-2026-08-31 — drawn on a 28h/12-inset grid the 137/138 boards contradict; membership also disagrees (Button under COMPONENTS vs ELEMENTS)",
       "recipe": null
     },
     {
@@ -3532,7 +3532,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:board-conflict-2026-08-31 — same 28h/12-inset grid conflict as 1069:4790",
       "recipe": null
     },
     {
@@ -3543,7 +3543,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:copy-link-ships-move-deferred",
+      "authority": "walked:2026-08-31 — context-menu: 180w, radius 8, 28h items — matches; only .bdc-menu-sep has 4px margins the board lacks",
       "recipe": null
     },
     {
@@ -3565,7 +3565,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — expanded: 66 rows; drift: indent step 14px vs board 16, rows inset 10px, pitch 29 vs 28",
       "recipe": null
     },
     {
@@ -3576,7 +3576,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — component-instance: drift — TWO badges (◇ green + ⚡ accent) for one fact, both ~40px left of the board's single badge",
       "recipe": null
     },
     {
@@ -3587,7 +3587,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:2026-08-31 — scroll-overflow: header/toolbar/footer pin correctly; drift — no scrollbar drawn at rest on a 66-row tree (board draws a 4px thumb)",
       "recipe": null
     },
     {
@@ -4456,7 +4456,7 @@
       "width": 440,
       "height": 117,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — unsaved-warning: modal is 720w vs board 440 and buttons 40h vs 27 (flowbite h-10). A reported missing space in 'image but' did NOT reproduce — a render test prints the space; the walker's scraper dropped it",
       "recipe": null
     },
     {
