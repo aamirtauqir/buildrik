@@ -100,7 +100,7 @@ export const BK_SELECT_BASE_THEME: NonNullable<CustomFlowbiteTheme["select"]> = 
 
 const BK_SELECT_BARE_COLORS = "tw:border-0 tw:bg-transparent tw:bg-none tw:shadow-none tw:text-inherit tw:focus:outline-none tw:focus:ring-0 tw:focus:border-0";
 
-/** `.bdi-fld .bdi-u` unit select (e.g. `InputWithUnit`'s "px"/"rem" picker) — 9.5px mono. */
+/** `.bdi-fld .bdi-u` unit select (e.g. `InputWithUnit`'s "px"/"rem" picker) — 11px mono. */
 export const BK_SELECT_BARE_UNIT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
   field: {
     select: {

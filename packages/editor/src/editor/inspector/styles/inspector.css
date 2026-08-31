@@ -337,7 +337,7 @@
   letter-spacing: -0.02em;
   background: transparent;
   border: none;
-  cursor: pointer;
+  cursor: pointer; flex-shrink: 0; /* unshrinkable: "px" clipped at every width; the input absorbs the row */
 }
 
 /* ── Pair row (field | link | field) ──────────────────── */
@@ -978,7 +978,7 @@ textarea.bdi-text {
   text-transform: lowercase;
   background: transparent;
   border: none;
-  cursor: pointer;
+  cursor: pointer; flex-shrink: 0; /* see `.bdi-fld .bdi-u` */
 }
 .bdi-num .bdi-u.select {
   padding-right: var(--bk-space-4);
