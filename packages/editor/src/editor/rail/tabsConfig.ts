@@ -9,7 +9,6 @@
  * @license BSD-3-Clause
  */
 
-import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 
 // ─── Tab Types ────────────────────────────────────────────────────────────────
 
@@ -59,28 +58,9 @@ export interface GroupedTabConfig {
   pattern: TabPattern;
   shortcut?: string;
   accent?: boolean;
-  /** Whether this tab opens a 280px panel or replaces the canvas with a full-page view */
+  /** Whether this tab opens the drawer (width: `--bk-size-drawer`) or replaces
+   *  the canvas with a full-page view. */
   mode: TabMode;
-  /** Panel width in pixels (only for mode="panel").
-   *
-   *  Omit it. Defaults to `SIDEBAR_WIDE`, which is ONE width for every panel.
-   *
-   *  The two-width rule that lived here ("locked 2026-05-22": 280 for list/tree
-   *  surfaces, 320 for browse surfaces) was superseded by the founder-approved
-   *  convergence on 2026-07-24 and removed from DESIGN.md's §Sidebar table, but
-   *  this file kept enforcing it — and since it is written as an INLINE style on
-   *  the panel element, it beat `--bk-size-drawer` (320) every time.
-   *
-   *  What that cost, visibly: the Insert drawer rendered 40px narrow and clipped
-   *  its own search field ("Describe or search to in") and the right column of
-   *  its card grid. Figma board 20:6 is named "GATE A — does 320 hold?" and its
-   *  two 320-wide panels answer yes — the Media grid is 16 + 136 + 16 + 136 + 16,
-   *  which is exactly 320 and cannot fit in 280.
-   *
-   *  Set this ONLY for a genuine exception, and say why. mode="fullpage" remains
-   *  the answer for page-shaped surfaces (Settings), which is what the old 700px
-   *  outlier was really asking for. */
-  panelWidth?: number;
   /** Which rail zone this tab appears in. undefined = no rail button (design, publish). */
   zone?: TabZone;
   /** E3 target home — which of the 4 rail tools (or assistant/structure) this tab folds into. */
@@ -215,7 +195,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // P5: graduated from a 320px drawer to a full-page surface (authoritative
     // IA 14-screen-specs.md:8 — "Site full-page = settings×11 …"). SettingsTab's
     // 140px-snav + 1fr-pane now renders full-width via FullPageRouter; the drawer
-    // path is retired. panelWidth kept as the fallback the width helper reads.
+    // path is retired.
     mode: "fullpage",
     zone: "config",
   },
@@ -288,13 +268,6 @@ const TAB_CONFIG_MAP = new Map(GROUPED_TABS_CONFIG.map((t) => [t.id, t]));
 /** Get the mode (panel or fullpage) for a given tab */
 export function getTabMode(tabId: GroupedTabId): TabMode {
   return TAB_CONFIG_MAP.get(tabId)?.mode ?? "panel";
-}
-
-/** Get the panel width for a given tab (only meaningful for panel-mode tabs).
- *  Falls back to the single canonical drawer width rather than a local literal:
- *  SIDEBAR_WIDE tracks `--bk-size-drawer`, which is generated from Figma. */
-export function getTabWidth(tabId: GroupedTabId): number {
-  return TAB_CONFIG_MAP.get(tabId)?.panelWidth ?? SIDEBAR_WIDE;
 }
 
 /** Get full config for a tab by id */

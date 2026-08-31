@@ -11,7 +11,7 @@ import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId, GroupedTabConfig, TabZone, RailTool } from "../rail/tabsConfig";
-import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailGroups } from "../rail/tabsConfig";
+import { getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailGroups } from "../rail/tabsConfig";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
@@ -530,7 +530,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
   // Panel header info
   const tabConfig = getTabConfig(activeTab);
-  const configPanelWidth = getTabWidth(activeTab);
   const panelTitle = tabConfig?.label ?? "Panel";
 
   // §12 — assets tab supports runtime width override (320 ↔ 560) via
@@ -574,13 +573,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Header expand (board 16:6) widens ANY drawer to 700; the media/templates
   // runtime overrides keep winning on their tabs — they carry flow-specific
   // widths (560 detail, 700 gallery) the generic toggle must not fight.
-  const panelWidth = activeTab === "assets" && mediaPanelOverride !== null
+  // `null` means "no flow width" — the default comes from `--bk-size-drawer`
+  // in LeftSidebar.css, so the generated token is the single source.
+  const panelWidthOverride = activeTab === "assets" && mediaPanelOverride !== null
     ? mediaPanelOverride
     : activeTab === "templates" && templatesPanelOverride !== null
     ? templatesPanelOverride
     : isExpanded
     ? 700
-    : configPanelWidth;
+    : null;
 
   const commonTabProps = {
     isExpanded,
@@ -642,7 +643,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       {/* Panel */}
       <div
         className={`ls-panel${!drawerOpen ? " ls-panel--closed" : ""}`}
-        style={{ width: drawerOpen ? panelWidth : 0 }}
+        style={
+          panelWidthOverride !== null
+            ? ({ "--drawer-w": `${panelWidthOverride}px` } as React.CSSProperties)
+            : undefined
+        }
         data-testid="sidebar-panel"
         role="tabpanel"
         aria-hidden={!drawerOpen}

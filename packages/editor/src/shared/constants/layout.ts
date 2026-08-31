@@ -16,23 +16,24 @@
 // ============================================================================
 // HORIZONTAL — rails and panels
 // ============================================================================
-
-/** Left icon rail width. Canonical across DESIGN.md + CSS + prior layout.ts. */
-export const RAIL_W = 60;
-
-/**
- * Left sidebar drawer width — ONE width for every panel.
- * Converged 2026-07-24 (founder-approved): LayoutShell.css `--layout-drawer-width`
- * sources `--bk-size-drawer` (320), matching this + Figma 32-2 drawer.
- * A `SIDEBAR_W = 240` "nav mode" companion sat here until 2026-08-03 with zero
- * consumers — only its own assertion in layout.test.ts kept it alive. The
- * two-width rule it encoded left DESIGN.md's §Sidebar table the same day.
- */
-export const SIDEBAR_WIDE = 320;
-
-/** Right inspector panel width. Figma 32-2 inspector = 300 (was 320; converged
- *  with LayoutShell.css `--layout-inspector-width` = `--buildrick-size-inspector`). */
-export const INSPECTOR_W = 300;
+//
+// There are no width constants here any more, and that is the point.
+//
+// `RAIL_W = 60`, `SIDEBAR_WIDE = 320` and `INSPECTOR_W = 300` were each a
+// SECOND copy of a number the generated token file already carried
+// (`--bk-size-rail` / `--bk-size-drawer` / `--bk-size-inspector`). Two of them
+// had no product consumer at all — only `layout.test.ts` asserting their own
+// values back at them, which is the same shape as the `SIDEBAR_W = 240` that
+// was deleted on 2026-08-03 for that exact reason.
+//
+// `SIDEBAR_WIDE` was worse than unused: it was the one the shipping drawer
+// actually read, via an inline `style={{width}}` in LeftSidebar, so editing
+// `figma-tokens.json` and regenerating moved nothing on screen while
+// `gate:tokens-generated` guarded the copy nobody rendered. The drawer now
+// takes its width from `--bk-size-drawer` in CSS, so the token is load-bearing
+// and there is exactly one place to change it.
+//
+// Layout dimensions belong in the tokens. Read them with `var(--bk-size-*)`.
 
 // ============================================================================
 // VERTICAL — bars, headers, footers

@@ -2,14 +2,12 @@ import { describe, it, expect } from "vitest";
 import {
   GROUPED_TABS_CONFIG,
   getTabMode,
-  getTabWidth,
   getTabConfig,
   getTabsByZone,
 } from "../tabsConfig";
 // ONE width for every panel (founder-approved 2026-07-24). These assertions
 // used to hardcode 280, which is how the superseded two-width rule survived
 // its own removal from DESIGN.md — the test kept the defect alive.
-import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 
 describe("tabsConfig helpers", () => {
   describe("getTabMode", () => {
@@ -31,28 +29,6 @@ describe("tabsConfig helpers", () => {
 
     it("returns 'panel' for unknown tab ID (fallback)", () => {
       expect(getTabMode("nonexistent" as any)).toBe("panel");
-    });
-  });
-
-  describe("getTabWidth", () => {
-    it("returns the canonical drawer width for Add tab", () => {
-      expect(getTabWidth("add")).toBe(SIDEBAR_WIDE);
-    });
-
-    it("returns the canonical drawer width for Layers tab", () => {
-      expect(getTabWidth("layers")).toBe(SIDEBAR_WIDE);
-    });
-
-    it("returns the canonical drawer width for Pages tab", () => {
-      expect(getTabWidth("pages")).toBe(SIDEBAR_WIDE);
-    });
-
-    it("returns the canonical drawer width for Components tab", () => {
-      expect(getTabWidth("components")).toBe(SIDEBAR_WIDE);
-    });
-
-    it("falls back to the canonical drawer width for an unknown tab", () => {
-      expect(getTabWidth("nonexistent" as any)).toBe(SIDEBAR_WIDE);
     });
   });
 
@@ -113,14 +89,13 @@ describe("tabsConfig helpers", () => {
       }
     });
 
-    it("panel-mode tabs have panelWidth defined", () => {
-      // Asserts the RESOLVED width, not a declared one. Requiring every panel
-      // tab to carry its own panelWidth was the old two-width rule expressed as
-      // a test; now a tab omits it and inherits SIDEBAR_WIDE, so a declaration
-      // is the exception rather than the requirement.
+    it("no panel-mode tab carries its own width", () => {
+      // Width left tabsConfig entirely on 2026-08-31 — `.ls-panel` reads
+      // `--bk-size-drawer`. See tabsConfig.width.test.ts for the real lock.
       const panelTabs = GROUPED_TABS_CONFIG.filter((t) => t.mode === "panel");
+      expect(panelTabs.length).toBeGreaterThan(0);
       for (const tab of panelTabs) {
-        expect(getTabWidth(tab.id)).toBe(SIDEBAR_WIDE);
+        expect((tab as unknown as Record<string, unknown>).panelWidth).toBeUndefined();
       }
     });
   });

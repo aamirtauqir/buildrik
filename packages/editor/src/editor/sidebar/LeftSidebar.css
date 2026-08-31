@@ -225,7 +225,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100%; width: var(--drawer-w, var(--bk-size-drawer)); /* ONE source = the token; --drawer-w carries per-flow widths. tabsConfig.width.test.ts */
   background: var(--bk-bg-card);
   border-right: 1px solid var(--bk-border);
   overflow: hidden;

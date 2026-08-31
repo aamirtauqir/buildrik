@@ -18,7 +18,6 @@
  */
 
 import * as React from "react";
-import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
 import { Button, type CustomFlowbiteTheme, Select as FlowbiteSelect, Textarea as FlowbiteTextarea, TextInput as FlowbiteTextInput } from "@/editor/chrome-ui";
 // ─────────────────────────────────────────────────────────────────────────────
@@ -210,11 +209,12 @@ export const Screen: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 // Locked primitives — token migration only, layout preserved
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Locked-screen card dimensions — reuse SIDEBAR_WIDE (320) for both vertical
-// anchor and copy max-width. These intentionally match the wide-sidebar width
-// so the card occupies a full column width when shown in a 320-wide panel.
-const LOCKED_MIN_HEIGHT = SIDEBAR_WIDE;
-const LOCKED_MAX_WIDTH = SIDEBAR_WIDE;
+// Locked-screen card dimensions. The intent is "occupy a full column width",
+// so these read the drawer's own token rather than a JS copy of its number —
+// the copy (`SIDEBAR_WIDE`) was a second hardcoded 320 that would have drifted
+// silently the first time the drawer width moved.
+const LOCKED_MIN_HEIGHT = "var(--bk-size-drawer)";
+const LOCKED_MAX_WIDTH = "var(--bk-size-drawer)";
 // Vertical padding for the locked card (top/bottom) — content-internal, no
 // SSOT match. Arithmetic form keeps the bash grep gate (literal-number scan)
 // from false-flagging while the @lint-layout-policy comment satisfies the
