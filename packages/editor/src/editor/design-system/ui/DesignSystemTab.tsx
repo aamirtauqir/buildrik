@@ -602,7 +602,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {/* gray-600, not gray-500: on this strip's --bk-bg-subtle background,
               gray-500 measures 4.39:1 — under AA for text this size. Measured
               with axe on the live Brand panel. */}
-          <div className="tw:text-[10px] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
+          <div className="tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
             Everyday styling lives here. The brand syncs from your workspace shared theme.
           </div>
         </div>

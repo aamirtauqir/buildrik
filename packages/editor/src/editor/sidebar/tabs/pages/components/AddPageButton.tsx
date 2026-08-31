@@ -1,4 +1,4 @@
-import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS, Button, BK_LINK_BUTTON_TIGHT_CLASS } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS, Button} from "@/editor/chrome-ui";
 /**
  * AddPageButton — sticky cobalt CTA in pages footer.
  *
@@ -43,7 +43,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
         size="xs"
         onClick={onAddBlank}
         aria-label="Add new page"
-        className={BK_LINK_BUTTON_TIGHT_CLASS}
+        variant="link"
       >
         +&nbsp;&nbsp;Add page
       </Button>
@@ -53,7 +53,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
           color="light"
           size="xs"
           onClick={onFromTemplate}
-          className="tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:enabled:hover:underline"
+          variant="link" className="tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)]"
         >
           From template
         </Button>

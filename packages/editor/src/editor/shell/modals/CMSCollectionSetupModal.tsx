@@ -73,9 +73,9 @@ const LABEL = "tw:block tw:text-xs tw:font-medium tw:text-[var(--bk-ink-soft)] t
 const FIELD_ROW = "tw:flex tw:items-center tw:gap-2 tw:py-1.5 tw:border-b tw:border-[var(--bk-gray-200)]";
 const COL_HEAD = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:font-medium";
 /* Board 1170:4713 — every measurement below is read off that frame. */
-const BOARD_CAPTION = "tw:text-[10px] tw:text-[var(--bk-ink-muted)]";
-const BOARD_GROUP_LABEL = "tw:text-[9px] tw:font-semibold tw:text-[var(--bk-ink-muted)]";
-const BOARD_FIELD_LABEL = "tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-muted)]";
+const BOARD_CAPTION = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]";
+const BOARD_GROUP_LABEL = "tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:text-[var(--bk-ink-muted)]";
+const BOARD_FIELD_LABEL = "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-muted)]";
 const BOARD_ROW =
   "tw:flex tw:items-center tw:gap-2 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-1.5";
 /* The board calls this colour ink-placeholder (#9ca3af); the generated token
@@ -83,9 +83,10 @@ const BOARD_ROW =
    so this uses the utility that IS that colour rather than inventing a token.
    Caught by gate:token-resolution, which fails an undefined ref with no
    fallback: it would have rendered no colour at all. */
-const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[10px] tw:text-[var(--bk-gray-400)]";
-const BOARD_LINK =
-  "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
+const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-gray-400)]";
+/* Button's `link` variant supplies the recipe; 11px medium is this modal's
+   own board size. */
+const BOARD_LINK = "tw:min-h-6 tw:text-[length:var(--bk-text-11)] tw:font-medium";
 const BOARD_BLOCK =
   "tw:flex tw:flex-col tw:gap-1.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-2";
 const SUCCESS_BANNER =
@@ -418,7 +419,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           type="button"
           color="light"
           size="xs"
-          className={`${BOARD_LINK} tw:mt-1.5`}
+          variant="link" className={`${BOARD_LINK} tw:mt-1.5`}
           data-testid="cms-add-field"
           onClick={addField}
         >

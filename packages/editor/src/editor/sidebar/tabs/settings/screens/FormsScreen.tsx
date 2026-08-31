@@ -443,13 +443,13 @@ const ROW_BTN =
   "tw:block tw:w-full tw:px-2.5 tw:py-2 tw:text-left tw:bg-transparent tw:border-0 tw:cursor-pointer tw:font-inherit";
 const SUMMARY_ROW = "tw:flex tw:justify-between tw:items-center tw:gap-2";
 const SUBJECT = "tw:text-xs tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
-const MONO_MICRO = "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-[var(--bk-ink-muted)] tw:flex-none";
+const MONO_MICRO = "tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:flex-none";
 const SOURCE =
-  "tw:mt-0.5 tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
+  "tw:mt-0.5 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis";
 const DETAIL = "tw:px-2.5 tw:pt-2 tw:pb-2.5 tw:border-t tw:border-[var(--bk-gray-300)] tw:bg-white";
 const DL = "tw:grid tw:[grid-template-columns:minmax(80px,25%)_1fr] tw:gap-x-2 tw:gap-y-1 tw:m-0 tw:p-0";
 const DT =
-  "tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)] tw:pt-0.5";
+  "tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)] tw:pt-0.5";
 const DD = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink)] tw:break-words";
 const ACTIONS = "tw:flex tw:gap-1 tw:mt-2.5 tw:flex-wrap";
 const PAGINATION = "tw:flex tw:items-center tw:justify-center tw:gap-2 tw:mt-2.5";

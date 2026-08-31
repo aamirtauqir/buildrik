@@ -66,7 +66,7 @@ const DETAIL_ROW = "tw:flex tw:items-baseline tw:justify-between tw:gap-2 tw:tex
 const DETAIL_KEY = "tw:text-[var(--bk-ink-muted)]";
 const DETAIL_VALUE = "tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:text-right tw:text-[var(--bk-ink)]";
 const RECENT_LABEL =
-  "tw:mt-3 tw:[font-family:var(--bk-font-mono)] tw:text-[10px] tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
+  "tw:mt-3 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-11)] tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
 const CONFLICT_BOX =
   "tw:mt-3 tw:p-3 tw:bg-[var(--bk-warning-tint)] tw:border tw:border-yellow-200 tw:rounded-md tw:flex tw:flex-col tw:gap-2";
 const ERROR_BOX =

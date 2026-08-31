@@ -60,7 +60,7 @@ const BAR =
    plain tw: utilities, so the board's 10px pill has to restate geometry,
    padding and border here rather than rely on defaults. */
 const SEG_BASE =
-  "tw:shrink-0 tw:h-auto tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[10px] tw:leading-none " +
+  "tw:shrink-0 tw:h-auto tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[length:var(--bk-text-11)] tw:leading-none " +
   "tw:whitespace-nowrap tw:border-0 tw:font-normal tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const SEG =
   SEG_BASE + " tw:bg-white tw:text-[color:var(--bk-ink-muted)] tw:cursor-pointer " +
@@ -70,7 +70,7 @@ const SEG_CURRENT =
 /* `--bk-ink-muted` is tuned for text on a light panel. On this bar — ink at 50%
    over the canvas — it measured 3.67:1, under AA's 4.5 for normal text. The
    gray-400 the hints already use measures 6.99:1 against the same bar. */
-const SEP = "tw:shrink-0 tw:text-[10px] tw:text-[color:var(--bk-gray-400)]";
+const SEP = "tw:shrink-0 tw:text-[length:var(--bk-text-11)] tw:text-[color:var(--bk-gray-400)]";
 /* Was 9px. The type ramp bottoms out at `--bk-text-11`, and these are the two
    controls that move the selection up and down the tree — not decoration. */
 const HINTS =

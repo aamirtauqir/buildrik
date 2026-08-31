@@ -183,7 +183,7 @@ export function AssetCell({
         {selectable ? (
           <span
             className={[
-              "tw:flex tw:h-4 tw:w-4 tw:flex-none tw:items-center tw:justify-center tw:rounded tw:border tw:text-[10px]",
+              "tw:flex tw:h-4 tw:w-4 tw:flex-none tw:items-center tw:justify-center tw:rounded tw:border tw:text-[length:var(--bk-text-11)]",
               isSelected ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] tw:text-white" : "tw:border-[var(--bk-gray-300)] tw:text-transparent",
             ].join(" ")}
             aria-hidden="true"

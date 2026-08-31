@@ -34,7 +34,7 @@ import {
 } from "@/editor/chrome-ui";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
-const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[10px]";
+const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
 const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
@@ -219,7 +219,7 @@ export function AssetDetailsPanel({
                       {v.thumb ? (
                         <img src={v.thumb || v.src} alt={v.name} />
                       ) : (
-                        <span className="tw:text-[10px]">{v.type.toUpperCase()}</span>
+                        <span className="tw:text-[length:var(--bk-text-11)]">{v.type.toUpperCase()}</span>
                       )}
                     </span>
                   }
@@ -423,7 +423,7 @@ function AltTextSection({
         placeholder="Describe this image for screen readers"
         onChange={(e) => onUpdateAltText(item.key, e.target.value)}
       />
-      <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[10px] tw:text-[var(--bk-ink-disabled)]">
+      <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
         {provenance ? (
           <span data-testid="alt-text-provenance" className="tw:flex tw:items-center tw:gap-1">
             <Sparkles size={10} />

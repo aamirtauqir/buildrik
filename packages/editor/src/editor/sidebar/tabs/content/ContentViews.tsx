@@ -31,7 +31,6 @@ import {
   Textarea,
   TextInput,
   ToggleSwitch,
-  BK_LINK_BUTTON_CLASS,
 } from "@/editor/chrome-ui";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
@@ -73,9 +72,9 @@ const SAVEBAR =
 /* …and it draws Save as accent TEXT, not a filled button. The Button doc on the
    same Figma page is explicit that the one filled accent button belongs to the
    screen's primary action; a drawer's save bar is not where that is spent. */
-const SAVE_LINK =
-  "tw:min-h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal " +
-  "tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
+/* The recipe moved into Button's `link` variant (2026-08-29); what stays
+   here is the one class this row adds on top. */
+const SAVE_LINK = "tw:min-h-6 tw:font-normal";
 /** A note that belongs to the row above it, not to the panel's foot. */
 const INLINE_HINT = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:leading-normal tw:px-3 tw:pb-3";
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-[var(--bk-accent-text)]";
@@ -151,7 +150,7 @@ export function RootView({
             <Button
               color="light"
               size="xs"
-              className={`${BK_LINK_BUTTON_CLASS} tw:font-normal`}
+              variant="link" className="tw:min-h-6 tw:font-normal"
               data-testid="content-empty-cta"
               onClick={onCreateCollection}
             >
@@ -393,7 +392,7 @@ export function RecordView({
           <Button
             color="light"
             size="xs"
-            className={SAVE_LINK}
+            variant="link" className={SAVE_LINK}
             disabled={saving}
             aria-busy={saving || undefined}
             onClick={() => {
@@ -688,7 +687,7 @@ export function DynamicPagesView({
           <Button
             color="light"
             size="xs"
-            className={SAVE_LINK}
+            variant="link" className={SAVE_LINK}
             disabled={saving}
             aria-busy={saving || undefined}
             onClick={() => {

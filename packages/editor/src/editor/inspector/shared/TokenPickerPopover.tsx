@@ -68,7 +68,7 @@ const extractVarName = (v: string) => {
 
 const VALUE_BADGE =
   "tw:flex-none tw:max-w-20 tw:px-[5px] tw:py-px tw:rounded tw:overflow-hidden tw:text-ellipsis " +
-  "tw:whitespace-nowrap tw:text-[10px] tw:text-[var(--bk-accent-text)] tw:bg-[var(--bk-accent-subtle)] " +
+  "tw:whitespace-nowrap tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-accent-text)] tw:bg-[var(--bk-accent-subtle)] " +
   "tw:[font-family:var(--bk-font-mono)]";
 
 /** Selected / keyboard-focused / resting frame, shared by both layouts. */
@@ -234,7 +234,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               <div className="tw:mb-1 tw:text-[11px] tw:text-[var(--bk-ink-soft)]">
                 No {tokenLabel} tokens yet
               </div>
-              <div className="tw:text-[10px] tw:text-[var(--bk-ink-muted)]">Add tokens in the Design tab</div>
+              <div className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">Add tokens in the Design tab</div>
             </div>
           )}
 
@@ -279,7 +279,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       {/* Swatch */}
                       <div className={SWATCH} style={{ background: token.value }} />
                       {/* Name */}
-                      <span className="tw:max-w-11 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-center tw:text-[9px] tw:leading-tight tw:text-[var(--bk-ink-muted)]">
+                      <span className="tw:max-w-11 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-center tw:text-[length:var(--bk-text-11)] tw:leading-tight tw:text-[var(--bk-ink-muted)]">
                         {token.name}
                       </span>
                     </div>
@@ -327,7 +327,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               className={`tw:flex-1 ${PICKER_INPUT} tw:[&_input]:text-xs`}
             />
           </div>
-          <div className="tw:mt-2 tw:text-[10px] tw:text-[var(--bk-ink-muted)]">
+          <div className="tw:mt-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">
             Accepts hex, rgb(), hsl(), or any CSS keyword
           </div>
         </div>

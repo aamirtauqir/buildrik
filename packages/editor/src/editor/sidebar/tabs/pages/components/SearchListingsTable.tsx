@@ -14,7 +14,7 @@
  */
 
 import * as React from "react";
-import { Button, BK_LINK_BUTTON_TIGHT_CLASS } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 import type { PageItem } from "../types";
 
 interface SearchListingsTableProps {
@@ -123,7 +123,7 @@ export const SearchListingsTable: React.FC<SearchListingsTableProps> = ({
           <Button
             color="light"
             size="xs"
-            className={BK_LINK_BUTTON_TIGHT_CLASS}
+            variant="link"
             data-testid="listings-open-full"
             onClick={onOpenFull}
           >

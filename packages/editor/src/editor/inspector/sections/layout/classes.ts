@@ -31,6 +31,6 @@ export const OFFSET_ANCHOR =
 
 /** Fixed / Fill / Hug segmented control — same card shape, one step denser. */
 export const constraintBtnClass = (active: boolean): string =>
-  `${cardBtnClass(active)} tw:py-1.5 tw:rounded tw:text-[10px]`;
+  `${cardBtnClass(active)} tw:py-1.5 tw:rounded tw:text-[length:var(--bk-text-11)]`;
 /** Small caption above a control cluster ("Position", "Position Offset"). */
 export const CLUSTER_CAPTION = "tw:flex tw:items-center tw:mb-1.5 tw:text-xs tw:text-[var(--bk-ink-muted)]";

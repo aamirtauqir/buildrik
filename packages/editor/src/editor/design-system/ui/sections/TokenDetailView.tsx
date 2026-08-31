@@ -452,7 +452,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             disabled={usageCount === 0}
             data-used-by-toggle
           >
-            <span aria-hidden="true" className="tw:inline-block tw:w-2.5 tw:text-[10px] tw:text-[var(--bk-ink-muted)]">
+            <span aria-hidden="true" className="tw:inline-block tw:w-2.5 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">
               {usageCount === 0 ? "" : usageExpanded ? "▾" : "▸"}
             </span>
             <span data-used-count={usageCount}>

@@ -47,13 +47,6 @@ export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, t
 export { CopyButton, type CopyButtonProps } from "./CopyButton";
 export { SectionHeader, type SectionHeaderProps } from "./SectionHeader";
 export {
-  BK_LINK_BUTTON_CLASS,
-  BK_LINK_BUTTON_TIGHT_CLASS,
-  BK_LINK_BUTTON_SM_CLASS,
-  BK_LINK_BUTTON_ON_DARK_CLASS,
-  BK_LINK_BUTTON_INLINE_CLASS,
-} from "./linkButton";
-export {
   TYPE_PANEL_TITLE_CLASS,
   TYPE_SECTION_CAPTION_CLASS,
   TYPE_BODY_CLASS,

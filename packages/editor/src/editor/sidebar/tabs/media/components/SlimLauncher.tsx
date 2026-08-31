@@ -22,7 +22,7 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock, TextField, BK_LINK_BUTTON_CLASS, BK_LINK_BUTTON_ON_DARK_CLASS } from "@/editor/chrome-ui";
+import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
 import { Upload, Cloud, Shapes, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
@@ -310,7 +310,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 type="button"
                 color="light"
                 size="xs"
-                className={`${BK_LINK_BUTTON_CLASS} tw:font-normal`}
+                variant="link" className="tw:min-h-6 tw:font-normal"
                 data-testid="media-load-retry"
                 onClick={props.onRetryLoad}
               >
@@ -320,7 +320,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 type="button"
                 color="light"
                 size="xs"
-                className={`${BK_LINK_BUTTON_CLASS} tw:font-normal`}
+                variant="link" className="tw:min-h-6 tw:font-normal"
                 onClick={onOpenStock}
               >
                 Browse stock
@@ -379,7 +379,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                   type="button"
                   color="light"
                   size="xs"
-                  className={`${BK_LINK_BUTTON_CLASS} tw:font-normal`}
+                  variant="link" className="tw:min-h-6 tw:font-normal"
                   data-testid="media-empty-cta"
                   onClick={onOpenStock}
                 >
@@ -397,7 +397,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                   type="button"
                   color="light"
                   size="xs"
-                  className={`${BK_LINK_BUTTON_CLASS} tw:mt-1.5 tw:font-normal`}
+                  variant="link" className="tw:min-h-6 tw:mt-1.5 tw:font-normal"
                   data-testid="media-clear-search"
                   onClick={() => onSearchChange("")}
                 >
@@ -418,7 +418,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                   type="button"
                   color="light"
                   size="xs"
-                  className={`${BK_LINK_BUTTON_CLASS} tw:mt-1.5 tw:font-normal`}
+                  variant="link" className="tw:min-h-6 tw:mt-1.5 tw:font-normal"
                   data-testid="media-clear-filter"
                   onClick={() => activeTypes.forEach((tKey) => onToggleType(tKey))}
                 >
@@ -489,7 +489,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              className={`${BK_LINK_BUTTON_CLASS} tw:font-normal`}
+              variant="link" className="tw:min-h-6 tw:font-normal"
               data-testid="media-load-more"
               disabled={props.loadingMore || !props.serverPage.nextCursor}
               onClick={() => void props.onLoadMore?.()}
@@ -514,7 +514,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            className={BK_LINK_BUTTON_ON_DARK_CLASS}
+            variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
             onClick={props.onBulkMove}
             disabled={!props.selectedKeys?.size}
           >
@@ -524,7 +524,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            className={BK_LINK_BUTTON_ON_DARK_CLASS}
+            variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
             onClick={props.onBulkDelete}
             disabled={!props.selectedKeys?.size}
           >
@@ -534,7 +534,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            className={`${BK_LINK_BUTTON_ON_DARK_CLASS} tw:ml-auto`}
+            variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white tw:ml-auto"
             data-testid="media-bulk-done"
             onClick={props.onExitSelection}
           >
@@ -565,7 +565,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            className={`${BK_LINK_BUTTON_CLASS} tw:gap-1.5 tw:font-normal`}
+            variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
             data-testid="media-upload-action"
             onClick={() => uploadInputRef.current?.click()}
             disabled={props.storage.used >= props.storage.total}
@@ -577,7 +577,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             type="button"
             color="light"
             size="xs"
-            className={`${BK_LINK_BUTTON_CLASS} tw:gap-1.5 tw:font-normal`}
+            variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
             data-testid="media-stock-action"
             onClick={onOpenStock}
           >
@@ -593,7 +593,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              className={`${BK_LINK_BUTTON_CLASS} tw:gap-1.5 tw:font-normal`}
+              variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
               data-testid="media-icons-action"
               onClick={props.onOpenIconPicker}
             >

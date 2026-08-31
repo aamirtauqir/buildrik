@@ -377,7 +377,7 @@ export function FolderTree({
                 }
               }}
             />
-            <p className="tw:mt-1 tw:text-[10px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+            <p className="tw:mt-1 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
               Enter to create · Esc to cancel
             </p>
           </div>

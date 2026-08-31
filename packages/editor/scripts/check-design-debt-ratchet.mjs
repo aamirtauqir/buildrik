@@ -27,29 +27,32 @@ const RATCHETS = [
   },
   {
     id: "ghost-link-incantation",
-    /* The accent text-link recipe. 44 → 19 on 2026-08-29: the five shared
-       forms live in chrome-ui/linkButton.ts and every duplicate call site
-       references one. What is counted now is those five definitions plus 14
-       genuinely single-use shapes (an h-9 nav row, a w-fit chip, an 11px
-       modal link…) — definitions, not copies. New links use variant="link". */
+    /* The accent text-link recipe: 44 → 19 → ZERO on 2026-08-29. Every call
+       site is `variant="link"` now, and the recipe itself lives once, in
+       Button's own theme (chrome-ui/buttonTheme.ts — excluded below as the
+       DEFINITION). Sites that differ keep only what they add: a min-height, a
+       12px step, a full-width nav row's geometry. The interim class constants
+       this arc introduced are deleted; a vocabulary with two spellings is the
+       thing the audits were complaining about. */
     pattern: String.raw`tw:enabled:hover:underline`,
-    baseline: 19,
+    baseline: 0,
   },
   {
     id: "offscale-font-size",
-    /* Sizes the 7-step scale does not define. 86 → 67 → this baseline over
-       two passes: the half-pixels (10.5/11.5/12.5 — eyeballed Figma exports)
-       snapped onto 11/12/13, and the near-scale headings (15/17px h2/h3 and a
-       ModalTitle) onto --bk-text-16. What the pattern still counts is micro
-       furniture the token scale deliberately does not reach: badge chips,
-       unit glyphs on inspector fields, breadcrumb separators. Two categories
-       are excluded by path below, for the same reason avatarTone is:
+    /* Sizes the 7-step scale does not define — 86 → 67 → 42 → ZERO across
+       three passes. The half-pixels (10.5/11.5/12.5, eyeballed Figma exports)
+       snapped onto 11/12/13; the near-scale headings (15/17px h2/h3 and a
+       ModalTitle) onto --bk-text-16; and the micro furniture (9/10px badge
+       chips, inspector unit glyphs, breadcrumb separators) onto --bk-text-11,
+       the scale's own floor — measured live afterwards for overflow, since a
+       fixed-width badge is the one place a size bump can break a layout.
+       Two paths stay excluded, for the same reason avatarTone is:
          · CatalogCard draws a MINIATURE of a component — 7/8px is the
            thumbnail's own scale, not chrome type;
          · BrandPreview / TypographySection render the USER's typefaces as
            specimens, where the size is the sample, not a chrome decision. */
     pattern: String.raw`tw:text-\[(7|8|9|10|10\.5|11\.5|12\.5|15|17|18|19)px\]`,
-    baseline: 42,
+    baseline: 0,
   },
   {
     id: "palette-gray-any",
@@ -67,7 +70,7 @@ const RATCHETS = [
 function count(pattern) {
   try {
     const out = execSync(
-      `grep -rEn ${JSON.stringify(pattern)} src/editor --include='*.tsx' --include='*.ts' | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx | wc -l`,
+      `grep -rEn ${JSON.stringify(pattern)} src/editor --include='*.tsx' --include='*.ts' | grep -v __tests__ | grep -v '\\.test\\.' | grep -v avatarTone.ts | grep -v buttonTheme.ts | grep -v CatalogCard.tsx | grep -v BrandPreview.tsx | grep -v TypographySection.tsx | wc -l`,
       { cwd: ROOT, encoding: "utf8", shell: "/bin/bash" },
     );
     return parseInt(out.trim(), 10);

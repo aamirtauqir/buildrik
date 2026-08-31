@@ -4,7 +4,7 @@
    celebration state. */
 
 import * as React from "react";
-import { Button, BK_LINK_BUTTON_CLASS } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 
@@ -89,7 +89,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           size="xs"
           data-testid="inspector-empty-ask-ai"
           onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
-          className={`${BK_LINK_BUTTON_CLASS} tw:mt-1 tw:font-normal`}
+          variant="link" className="tw:min-h-6 tw:mt-1 tw:font-normal"
         >
           ✦ Ask AI ›
         </Button>

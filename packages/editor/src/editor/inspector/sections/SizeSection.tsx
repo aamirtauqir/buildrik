@@ -109,8 +109,8 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
 };
 
 /** The W/H/min/max glyph inside a field — 600-weight, tiny. */
-const FIELD_GLYPH = "tw:text-[10px] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
-const FIELD_GLYPH_SM = "tw:text-[9px] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
+const FIELD_GLYPH = "tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
+const FIELD_GLYPH_SM = "tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:[font-family:var(--bk-font-ui)]";
 
 // ============================================================================
 // SIZE SECTION

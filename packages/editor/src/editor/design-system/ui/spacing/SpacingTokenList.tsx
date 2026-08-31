@@ -261,11 +261,11 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
        * density even in the live editor's fullpage Design drawer. */}
       <div className="tw:max-w-80">
       <div className="tw:flex tw:items-center tw:gap-2 tw:mb-2">
-        <span className={`tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] tw:text-[var(--bk-ink-muted)] ${MONO}`}>
+        <span className={`tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.08em] tw:text-[var(--bk-ink-muted)] ${MONO}`}>
           Scale
         </span>
         <div className="tw:flex-1 tw:h-px tw:bg-[var(--bk-gray-200)]" />
-        <span className={`tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
+        <span className={`tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${MONO}`}>
           4-pt grid
         </span>
       </div>

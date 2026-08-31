@@ -27,7 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, CopyButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME, BK_LINK_BUTTON_INLINE_CLASS } from "@/editor/chrome-ui";
+import { Button, CopyButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui";
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
 // exporter contract. Figma JSON download emits a minimal envelope until a
@@ -40,7 +40,7 @@ const CARD = "tw:p-3 tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:b
 const FORMAT_ROW =
   "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1.5 tw:rounded-md tw:border tw:cursor-pointer " +
   "tw:text-xs tw:text-[var(--bk-ink)]";
-const CHIP = "tw:ml-auto tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded-full tw:border tw:text-[10px] tw:font-medium";
+const CHIP = "tw:ml-auto tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded-full tw:border tw:text-[length:var(--bk-text-11)] tw:font-medium";
 const PREVIEW =
   "tw:m-0 tw:p-3 tw:max-h-80 tw:overflow-auto tw:whitespace-pre tw:rounded-md tw:border " +
   "tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:text-[11px] tw:leading-relaxed " +
@@ -297,7 +297,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
                       onExported?.(label);
                     }}
-                    className={BK_LINK_BUTTON_INLINE_CLASS}
+                    variant="link" className="tw:font-normal"
                   >
                     Download
                   </Button>

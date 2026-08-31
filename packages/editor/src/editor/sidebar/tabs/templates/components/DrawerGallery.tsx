@@ -68,7 +68,7 @@ const TemplateLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
       type="button"
       color="light"
       size="xs"
-      className="tw:mt-0.5 tw:h-5 tw:w-fit tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+      variant="link" className="tw:mt-0.5 tw:h-5 tw:w-fit tw:font-normal tw:text-[var(--bk-accent)]"
       data-testid="tpl-load-retry"
       onClick={onRetry}
     >

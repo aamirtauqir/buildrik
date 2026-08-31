@@ -769,7 +769,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           {roundsError ? (
             <span className={META}>
               Couldn't load the history.{" "}
-              <Button color="light" size="xs" className="tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline" onClick={() => void loadRounds()}>
+              <Button color="light" size="xs" variant="link" className="tw:text-[12px]" onClick={() => void loadRounds()}>
                 Try again
               </Button>
             </span>

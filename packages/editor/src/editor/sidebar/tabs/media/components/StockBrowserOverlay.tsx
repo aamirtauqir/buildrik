@@ -15,7 +15,7 @@
  */
 
 import * as React from "react";
-import { Button, Menu, MenuItem, PanelFrame, Popover, TextField, BK_LINK_BUTTON_CLASS } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, PanelFrame, Popover, TextField } from "@/editor/chrome-ui";
 import type {
   DiscColor,
   DiscOrientation,
@@ -106,7 +106,7 @@ function FilterDropdown<T extends string>({
           onClick={() => setOpen((v) => !v)}
         >
           <span className="tw:truncate">{shown}</span>
-          <span aria-hidden="true" className="tw:text-[10px] tw:text-[var(--bk-ink-muted)]">{"▾"}</span>
+          <span aria-hidden="true" className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">{"▾"}</span>
         </Button>
       }
     >
@@ -195,7 +195,7 @@ export function StockBrowserOverlay({
       <PanelFrame.Header title="Media" onClose={onClose} />
 
       <Button
-        className="tw:flex tw:h-9 tw:w-full tw:shrink-0 tw:items-center tw:justify-start tw:border-0 tw:bg-transparent tw:px-4 tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+        variant="link" className="tw:flex tw:h-9 tw:w-full tw:shrink-0 tw:items-center tw:justify-start tw:px-4 tw:text-left"
         onClick={onClose}
         aria-label="Back to media grid"
       >
@@ -291,7 +291,7 @@ export function StockBrowserOverlay({
               type="button"
               color="light"
               size="xs"
-              className={BK_LINK_BUTTON_CLASS}
+              variant="link" className="tw:min-h-6"
               data-testid="stock-load-more"
               onClick={() => onLoadMore(type)}
             >

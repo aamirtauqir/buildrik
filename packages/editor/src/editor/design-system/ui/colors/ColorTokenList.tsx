@@ -133,7 +133,7 @@ const FALLBACK_BG = "#FFFFFF";
 const GROUP_HEAD =
   "tw:m-0 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:text-[var(--bk-ink-muted)] tw:uppercase tw:tracking-[0.08em] " +
   "tw:[font-family:var(--bk-font-mono)]";
-const MONO_MINI = "tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
+const MONO_MINI = "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
 const TOOLBAR = "tw:flex tw:items-center tw:gap-1.5 tw:pt-2 tw:pb-2.5 tw:flex-wrap";
 const PILL = "tw:px-2.5 tw:py-1 tw:rounded-[20px] tw:text-[11px] tw:font-semibold";
 const BANNER = "tw:px-2.5 tw:py-2 tw:bg-[var(--bk-error-tint)] tw:border tw:border-red-200 tw:rounded-md tw:mb-2";

@@ -277,5 +277,5 @@ const MONO_CELL =
   "tw:[font-family:var(--bk-font-mono)]";
 const TYPE_BADGE =
   "tw:px-1.5 tw:py-0.5 tw:rounded tw:border tw:border-[var(--bk-border-medium)] " +
-  "tw:bg-[var(--bk-bg-panel)] tw:text-[10px] tw:font-semibold tw:tracking-[0.04em] " +
+  "tw:bg-[var(--bk-bg-panel)] tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:tracking-[0.04em] " +
   "tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-mono)]";

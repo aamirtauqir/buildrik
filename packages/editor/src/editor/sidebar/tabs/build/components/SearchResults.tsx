@@ -48,7 +48,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           type="button"
           color="light"
           size="xs"
-          className="tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-accent-text)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          variant="link"
           data-testid="insert-clear-search"
           onClick={onClearSearch}
         >

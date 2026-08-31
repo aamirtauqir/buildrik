@@ -47,9 +47,9 @@ const ROW =
   "tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-[var(--bk-gray-100)]";
 const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:bg-white tw:min-h-29";
 const PREVIEW_BOX =
-  "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-[var(--bk-gray-50)] tw:text-[10px] tw:text-[var(--bk-ink-muted)]";
+  "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-[var(--bk-gray-50)] tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]";
 const CARD_NAME = "tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink)] tw:mb-0.5";
-const CARD_META = "tw:text-[10px] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]";
+const CARD_META = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]";
 const AI_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-4 tw:pb-1 tw:gap-2";
 const AI_CTA = "tw:text-xs tw:font-medium tw:text-[var(--bk-accent-text)]";
 const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
@@ -68,7 +68,7 @@ const SKETCH = "tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-gray-200
 function CatalogPreview({ component }: { component: ComponentType }): React.ReactElement {
   switch (component.id) {
     case "button":
-      return <div className="tw:px-2.5 tw:py-[3px] tw:bg-[var(--bk-accent)] tw:text-white tw:rounded tw:text-[10px]">Btn</div>;
+      return <div className="tw:px-2.5 tw:py-[3px] tw:bg-[var(--bk-accent)] tw:text-white tw:rounded tw:text-[length:var(--bk-text-11)]">Btn</div>;
     case "input":
       return <div className={`${SKETCH} tw:w-[70%] tw:h-4`} />;
     case "card":
@@ -168,7 +168,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
           onClick={onOpenAIAssist}
           disabled={!onOpenAIAssist}
           data-open-ai-assist
-          className="tw:w-full tw:justify-start tw:gap-1.5 tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+          variant="link" className="tw:w-full tw:justify-start tw:gap-1.5 tw:font-normal"
         >
           ✨ Generate with AI
         </Button>

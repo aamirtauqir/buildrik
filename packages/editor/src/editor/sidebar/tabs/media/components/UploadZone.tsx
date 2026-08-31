@@ -236,7 +236,7 @@ export function UploadZone({
                   type="button"
                   color="light"
                   size="xs"
-                  className="med-upload-queue-item__retry tw:min-h-6 tw:shrink-0 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                  variant="link" className="med-upload-queue-item__retry tw:shrink-0 tw:text-[12px]"
                   onClick={() => onRetryUpload(item.fileName)}
                   aria-label={`Retry ${item.fileName}`}
                 >

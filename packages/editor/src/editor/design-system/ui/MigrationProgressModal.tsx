@@ -123,7 +123,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                 {/* width is the live value — the one thing here that is data */}
                 <div className="tw:h-full tw:bg-[var(--bk-accent)] tw:transition-[width]" style={{ width: `${progress}%` }} />
               </div>
-              <div className="tw:mt-1 tw:text-center tw:text-[10px] tw:text-[var(--bk-ink-muted)]">
+              <div className="tw:mt-1 tw:text-center tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">
                 {completedCount} of {total}
               </div>
             </>

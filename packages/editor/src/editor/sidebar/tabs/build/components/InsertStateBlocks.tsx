@@ -13,7 +13,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, SkeletonBlock, BK_LINK_BUTTON_CLASS } from "@/editor/chrome-ui";
+import { Button, SkeletonBlock } from "@/editor/chrome-ui";
 
 /*
   Board `775:4053`. Six rows on the list's own row height (h-8). Indent ladder
@@ -66,7 +66,7 @@ export const InsertLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
       type="button"
       color="light"
       size="xs"
-      className={`${BK_LINK_BUTTON_CLASS} tw:self-start`}
+      variant="link" className="tw:min-h-6 tw:self-start"
       data-testid="insert-load-retry"
       onClick={onRetry}
     >

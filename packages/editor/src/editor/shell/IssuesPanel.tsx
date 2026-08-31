@@ -155,7 +155,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             <Button
               color="light"
               size="xs"
-              className="tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-xs tw:font-normal tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+              variant="link" className="tw:text-xs tw:font-normal"
               title={`Showing ${currentFilter.label.toLowerCase()} — click for ${nextFilter.label.toLowerCase()}`}
               onClick={() => setFilter(nextFilter.key)}
             >

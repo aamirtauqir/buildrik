@@ -253,7 +253,7 @@ function PageRow({ page, checked, onToggle }: PageRowProps) {
         <div className="tw:text-[13px] tw:font-medium">
           {page.pageName}
           {!checked && (
-            <span className="tw:ml-1.5 tw:text-[10px] tw:font-normal tw:text-[var(--bk-ink-muted)]">(skipped)</span>
+            <span className="tw:ml-1.5 tw:text-[length:var(--bk-text-11)] tw:font-normal tw:text-[var(--bk-ink-muted)]">(skipped)</span>
           )}
         </div>
         <div className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">

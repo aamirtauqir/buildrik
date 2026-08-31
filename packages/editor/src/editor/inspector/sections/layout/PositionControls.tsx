@@ -85,7 +85,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
             aria-label={option.tooltip}
           >
             <PositionPreview type={option.value} />
-            <span className="tw:text-[9px]">{option.label}</span>
+            <span className="tw:text-[length:var(--bk-text-11)]">{option.label}</span>
           </Button>
         ))}
       </div>

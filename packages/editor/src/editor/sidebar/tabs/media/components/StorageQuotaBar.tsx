@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 
-import { Button, BK_LINK_BUTTON_SM_CLASS } from "@/editor/chrome-ui";
+import { Button} from "@/editor/chrome-ui";
 
 interface StorageQuotaBarProps {
   used: number;
@@ -95,7 +95,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
           type="button"
           color="light"
           size="xs"
-          className={`${BK_LINK_BUTTON_SM_CLASS} tw:self-start`}
+          variant="link" className="tw:min-h-5 tw:text-[length:var(--bk-text-12)] tw:self-start"
           data-testid="media-quota-optimize"
           onClick={onOptimize}
         >

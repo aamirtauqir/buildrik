@@ -143,7 +143,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                       }`}
                     />
                     <span>{c.label}</span>
-                    <span className={`tw:ml-auto tw:text-[10px] tw:font-medium tw:text-[var(--bk-ink-muted)] ${MONO}`}>{c.pts}</span>
+                    <span className={`tw:ml-auto tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-muted)] ${MONO}`}>{c.pts}</span>
                   </div>
                 ))}
               </div>

@@ -36,7 +36,7 @@ import {
   restoreAssetVersion,
   type AssetVersion,
 } from "../../../../../services/MediaVersionService";
-import { Button, PanelFrame, TextField, BK_LINK_BUTTON_CLASS, BK_LINK_BUTTON_SM_CLASS } from "@/editor/chrome-ui";
+import { Button, PanelFrame, TextField } from "@/editor/chrome-ui";
 
 type View = "hub" | "used" | "versions" | "optimize";
 
@@ -78,9 +78,10 @@ function isCoveredByModal(el: HTMLElement): boolean {
   return false;
 }
 
+/* Button's `link` variant supplies the recipe; the row's own geometry
+   (full-width 36h nav row) stays here. */
 const BACK_ROW =
-  "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:border-0 tw:bg-transparent tw:px-4 tw:text-left " +
-  "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline";
+  "tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left";
 
 export function AssetDetailOverlay({
   item,
@@ -292,7 +293,7 @@ export function AssetDetailOverlay({
 
       {/* Back row — ‹ pops one level, exactly like ESC. */}
       <Button
-        className={BACK_ROW}
+        variant="link" className={BACK_ROW}
         onClick={() => (view === "hub" ? onClose() : setView("hub"))}
         aria-label={view === "hub" ? "Back to media grid" : `Back to ${display}`}
       >
@@ -310,7 +311,7 @@ export function AssetDetailOverlay({
               type="button"
               color="light"
               size="xs"
-              className={`${BK_LINK_BUTTON_CLASS} tw:mt-2`}
+              variant="link" className="tw:min-h-6 tw:mt-2"
               onClick={() => setMetaError(false)}
             >
               Retry
@@ -366,7 +367,7 @@ export function AssetDetailOverlay({
                 type="button"
                 color="light"
                 size="xs"
-                className={`${BK_LINK_BUTTON_SM_CLASS} tw:mt-1.5`}
+                variant="link" className="tw:min-h-5 tw:text-[length:var(--bk-text-12)] tw:mt-1.5"
                 data-testid="media-alt-generate"
                 disabled={altBusy}
                 aria-busy={altBusy || undefined}
@@ -477,7 +478,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      className="tw:min-h-5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-ink-muted)] tw:enabled:hover:bg-transparent tw:enabled:hover:underline"
+                      variant="link" className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]"
                       onClick={() => setPendingRestore(null)}
                     >
                       Cancel
@@ -486,7 +487,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      className={BK_LINK_BUTTON_SM_CLASS}
+                      variant="link" className="tw:min-h-5 tw:text-[length:var(--bk-text-12)]"
                       data-testid="media-restore-go"
                       onClick={() => confirmRestore(v.id)}
                     >
@@ -538,7 +539,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      className={`${BK_LINK_BUTTON_CLASS} tw:shrink-0`}
+                      variant="link" className="tw:min-h-6 tw:shrink-0"
                       data-testid={`media-jump-${hit.elementId}`}
                       onClick={() => handleJump(pg.pageId, hit.elementId)}
                     >

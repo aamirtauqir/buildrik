@@ -57,7 +57,7 @@ export const SECTION_PREVIEW =
 
 /** Sub-heading inside an open section ("Size Constraints", "Overflow"). */
 export const SECTION_SUBTITLE =
-  "tw:mt-0.5 tw:mb-1 tw:text-[9px] tw:font-semibold tw:uppercase tw:tracking-[0.08em] " +
+  "tw:mt-0.5 tw:mb-1 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.08em] " +
   "tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-ui)]";
 
 /**
@@ -78,6 +78,6 @@ export const CHAIN_TRIGGER =
 /** The chain button once a token IS bound — always visible, accent-tinted. */
 export const CHAIN_BOUND =
   "tw:flex tw:items-center tw:gap-[3px] tw:flex-none tw:whitespace-nowrap tw:px-1 tw:py-0.5 " +
-  "tw:rounded tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)] tw:text-[9px]";
+  "tw:rounded tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)] tw:text-[length:var(--bk-text-11)]";
 /** Absolute slot the chain button sits in, vertically centred in the field. */
 export const CHAIN_SLOT = "tw:absolute tw:right-1.5 tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]";
