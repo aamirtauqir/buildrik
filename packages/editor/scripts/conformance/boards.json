@@ -1178,7 +1178,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "board:807-8567",
+      "authority": "walked:2026-08-31 — 13 sections in board order, exact match",
       "recipe": null
     },
     {
@@ -1200,7 +1200,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — 13 sections in board order, exact match",
       "recipe": null
     },
     {
@@ -1211,7 +1211,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — 13 sections in board order, exact match",
       "recipe": null
     },
     {
@@ -1222,7 +1222,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — 12 sections in board order, exact match",
       "recipe": null
     },
     {
@@ -1244,7 +1244,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — section order matches EXCEPT the board's LINK section, which LinkSection.tsx:78 gates to link/button/a/cta; text links only inline",
       "recipe": null
     },
     {
@@ -3694,8 +3694,8 @@
       "name": "Inspector · single-selection",
       "family": "Inspector",
       "state": "single-selection",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "board:159-2",
       "recipe": null
@@ -3705,10 +3705,10 @@
       "name": "Inspector · no-selection",
       "family": "Inspector",
       "state": "no-selection",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — empty state live at 300w: sentence + AI action; board's x16/full-width action vs live x24/centred link is the only delta",
       "recipe": null
     },
     {
@@ -3716,8 +3716,8 @@
       "name": "Inspector · loading",
       "family": "Inspector",
       "state": "loading",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3727,10 +3727,10 @@
       "name": "Inspector · multi-select",
       "family": "Inspector",
       "state": "multi-select",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:2026-08-31 — align x6 + distribute x2 + Background/Text color/Radius/Padding/Font size + mixed-field explainer; superset of the board",
       "recipe": null
     },
     {
@@ -3738,8 +3738,8 @@
       "name": "Inspector · instance-selected",
       "family": "Inspector",
       "state": "instance-selected",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3749,8 +3749,8 @@
       "name": "Inspector · bound-to-CMS",
       "family": "Inspector",
       "state": "bound-to-CMS",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3760,8 +3760,8 @@
       "name": "Inspector · breakpoint-override",
       "family": "Inspector",
       "state": "breakpoint-override",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3771,8 +3771,8 @@
       "name": "Inspector · pseudo-state",
       "family": "Inspector",
       "state": "pseudo-state",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3782,8 +3782,8 @@
       "name": "Inspector · reach-all-like-this",
       "family": "Inspector",
       "state": "reach-all-like-this",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3793,8 +3793,8 @@
       "name": "Inspector · ai-agent-run",
       "family": "Inspector",
       "state": "ai-agent-run",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3804,8 +3804,8 @@
       "name": "Inspector · reach-whole-site",
       "family": "Inspector",
       "state": "reach-whole-site",
-      "width": 0,
-      "height": 0,
+      "width": 300,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3815,8 +3815,8 @@
       "name": "Issues · all",
       "family": "Issues",
       "state": "all",
-      "width": 0,
-      "height": 0,
+      "width": 360,
+      "height": 776,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3826,8 +3826,8 @@
       "name": "Issues · filtered",
       "family": "Issues",
       "state": "filtered",
-      "width": 0,
-      "height": 0,
+      "width": 360,
+      "height": 776,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3837,8 +3837,8 @@
       "name": "Issues · empty",
       "family": "Issues",
       "state": "empty",
-      "width": 0,
-      "height": 0,
+      "width": 360,
+      "height": 776,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3848,8 +3848,8 @@
       "name": "Issues · fixing",
       "family": "Issues",
       "state": "fixing",
-      "width": 0,
-      "height": 0,
+      "width": 360,
+      "height": 776,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3859,8 +3859,8 @@
       "name": "Issues · fix-failed",
       "family": "Issues",
       "state": "fix-failed",
-      "width": 0,
-      "height": 0,
+      "width": 360,
+      "height": 776,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3870,8 +3870,8 @@
       "name": "Modal · open",
       "family": "Modal",
       "state": "open",
-      "width": 0,
-      "height": 0,
+      "width": 1440,
+      "height": 900,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3881,8 +3881,8 @@
       "name": "Modal · dirty",
       "family": "Modal",
       "state": "dirty",
-      "width": 0,
-      "height": 0,
+      "width": 1440,
+      "height": 900,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3914,8 +3914,8 @@
       "name": "Modal · success-then-close",
       "family": "Modal",
       "state": "success-then-close",
-      "width": 0,
-      "height": 0,
+      "width": 1440,
+      "height": 900,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -3925,8 +3925,8 @@
       "name": "Content · data · no-source",
       "family": "Content",
       "state": "data · no-source",
-      "width": 0,
-      "height": 0,
+      "width": 320,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3936,8 +3936,8 @@
       "name": "Content · data · watching",
       "family": "Content",
       "state": "data · watching",
-      "width": 0,
-      "height": 0,
+      "width": 320,
+      "height": 812,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -3947,8 +3947,8 @@
       "name": "S3.14 · cmdk · recent",
       "family": "CmdK",
       "state": "recent",
-      "width": 0,
-      "height": 0,
+      "width": 640,
+      "height": 420,
       "status": "active",
       "authority": "walked:2026-08-18",
       "recipe": null
@@ -3958,8 +3958,8 @@
       "name": "Site menu (⋯)",
       "family": "Shell",
       "state": "site-menu",
-      "width": 0,
-      "height": 0,
+      "width": 1440,
+      "height": 900,
       "status": "active",
       "authority": "walked:2026-08-18",
       "recipe": null
@@ -3969,8 +3969,8 @@
       "name": "C6 · Recovery banner",
       "family": "S1 flows",
       "state": "recovery-banner",
-      "width": 0,
-      "height": 0,
+      "width": 1440,
+      "height": 140,
       "status": "active",
       "authority": "code:copy-wins — DUPLICATE of S1.2 · crash-recovery (297:2027), same state, banner-only crop",
       "recipe": null
@@ -3980,8 +3980,8 @@
       "name": "S1.2d - Conflict - Review both (Compare opens with conflict context)",
       "family": "S1 flows",
       "state": "Conflict · review-both",
-      "width": 0,
-      "height": 0,
+      "width": 1080,
+      "height": 776,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -4322,7 +4322,7 @@
       "family": "Publish",
       "state": "stale-approval",
       "width": 520,
-      "height": 0,
+      "height": 262,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4333,7 +4333,7 @@
       "family": "Publish",
       "state": "issues-confirm",
       "width": 500,
-      "height": 0,
+      "height": 247,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4344,7 +4344,7 @@
       "family": "Templates",
       "state": "replace-confirm",
       "width": 480,
-      "height": 0,
+      "height": 140,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4354,8 +4354,8 @@
       "name": "Templates · create-page — confirm · success · error",
       "family": "Templates",
       "state": "create-page tri-state",
-      "width": 0,
-      "height": 0,
+      "width": 1068,
+      "height": 102,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4366,7 +4366,7 @@
       "family": "Templates",
       "state": "save-as-template",
       "width": 460,
-      "height": 0,
+      "height": 142,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4377,7 +4377,7 @@
       "family": "Templates",
       "state": "usage-drawer",
       "width": 380,
-      "height": 0,
+      "height": 139,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4388,7 +4388,7 @@
       "family": "Content",
       "state": "collection-setup",
       "width": 500,
-      "height": 0,
+      "height": 407,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4399,7 +4399,7 @@
       "family": "Content",
       "state": "records",
       "width": 640,
-      "height": 0,
+      "height": 222,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4410,7 +4410,7 @@
       "family": "Components",
       "state": "create-modal",
       "width": 480,
-      "height": 0,
+      "height": 175,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -4420,8 +4420,8 @@
       "name": "Components · variant-picker · detach-confirm",
       "family": "Components",
       "state": "variant-detach",
-      "width": 0,
-      "height": 0,
+      "width": 684,
+      "height": 154,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -4454,7 +4454,7 @@
       "family": "Pages",
       "state": "unsaved-warning",
       "width": 440,
-      "height": 0,
+      "height": 117,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4475,8 +4475,8 @@
       "name": "Exit · guard — dirty · risky-offline · stranded",
       "family": "Exit",
       "state": "guard dual-state",
-      "width": 0,
-      "height": 0,
+      "width": 1308,
+      "height": 117,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4487,7 +4487,7 @@
       "family": "Shell",
       "state": "export-html",
       "width": 560,
-      "height": 0,
+      "height": 293,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -4498,7 +4498,7 @@
       "family": "Brand",
       "state": "review-changes",
       "width": 520,
-      "height": 0,
+      "height": 239,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4509,7 +4509,7 @@
       "family": "Shell",
       "state": "project-settings-modal",
       "width": 560,
-      "height": 0,
+      "height": 244,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4519,8 +4519,8 @@
       "name": "Media · modal · replace-across · result-states",
       "family": "Media",
       "state": "replace-across results",
-      "width": 0,
-      "height": 0,
+      "width": 948,
+      "height": 80,
       "status": "active",
       "authority": "walked:2026-08-16",
       "recipe": null
@@ -4530,8 +4530,8 @@
       "name": "Upgrade modal (403 gate)",
       "family": "Shell",
       "state": "upgrade-modal",
-      "width": 0,
-      "height": 0,
+      "width": 420,
+      "height": 225,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -4541,8 +4541,8 @@
       "name": "Media · delete-confirm · bulk type-DELETE (>20)",
       "family": "Media",
       "state": "bulk delete-confirm",
-      "width": 0,
-      "height": 0,
+      "width": 440,
+      "height": 199,
       "status": "active",
       "authority": "walked:2026-08-16",
       "recipe": null
@@ -4552,8 +4552,8 @@
       "name": "Inspector · empty · template-applied",
       "family": "Inspector",
       "state": "empty · template-applied",
-      "width": 0,
-      "height": 0,
+      "width": 320,
+      "height": 158,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4563,8 +4563,8 @@
       "name": "Canvas · breadcrumb bar",
       "family": "Canvas",
       "state": "breadcrumb",
-      "width": 0,
-      "height": 0,
+      "width": 720,
+      "height": 36,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4574,8 +4574,8 @@
       "name": "Inspector · token-picker popover",
       "family": "Inspector",
       "state": "token-picker",
-      "width": 0,
-      "height": 0,
+      "width": 236,
+      "height": 184,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -4585,8 +4585,8 @@
       "name": "Canvas · inline-edit toolbar (18 controls)",
       "family": "Canvas",
       "state": "inline-edit toolbar",
-      "width": 0,
-      "height": 0,
+      "width": 605,
+      "height": 33,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4596,8 +4596,8 @@
       "name": "Canvas · context-menu · submenu anatomy",
       "family": "Canvas",
       "state": "ctx-menu submenus",
-      "width": 0,
-      "height": 0,
+      "width": 402,
+      "height": 238,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4607,8 +4607,8 @@
       "name": "Canvas · hover levels — minimal · Alt · Alt+Shift · clone",
       "family": "Canvas",
       "state": "hover levels",
-      "width": 0,
-      "height": 0,
+      "width": 980,
+      "height": 145,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
@@ -4618,8 +4618,8 @@
       "name": "Canvas · command palette (⌘⇧P)",
       "family": "Canvas",
       "state": "command palette",
-      "width": 0,
-      "height": 0,
+      "width": 520,
+      "height": 426,
       "status": "active",
       "authority": "code:cites-board",
       "recipe": null
@@ -4629,8 +4629,8 @@
       "name": "Reference · toast catalog — 5 tones · sticky class",
       "family": "Shell",
       "state": "toast catalog",
-      "width": 0,
-      "height": 0,
+      "width": 460,
+      "height": 445,
       "status": "active",
       "authority": "code:state-exists",
       "recipe": null
