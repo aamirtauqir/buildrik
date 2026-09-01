@@ -3933,8 +3933,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — load-error: line rhythm 22px matches; drift — inset 16 vs 24 and top-pad 12 where sibling states use 20",
-      "verified": "drift-open"
+      "verifiedNote": "live-measured 2026-09-01 EXACT: lines 134/156/177 @x24, 13/12/13px, error-text #C81E1E, ink-muted, accent-text. Drawer renders 279 (= --bk-size-drawer 280 less its 1px border) vs board frame 320; that token is GENERATED FROM FIGMA, so Figma's token and Figma's frames disagree — settle in Figma, not here.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "778:4102",
@@ -3958,8 +3958,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — no-results: message→button delta 26px matches; drift — text inset 16 vs board 24",
-      "verified": "drift-open"
+      "verifiedNote": "live-measured 2026-09-01 EXACT: 134 and 160 @x24, 13px, gap 10, pt 36. Drawer renders 279 (= --bk-size-drawer 280 less its 1px border) vs board frame 320; that token is GENERATED FROM FIGMA, so Figma's token and Figma's frames disagree — settle in Figma, not here.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "642:2556",

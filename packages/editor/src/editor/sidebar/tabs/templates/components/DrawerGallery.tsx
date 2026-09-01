@@ -53,22 +53,27 @@ const sectionLabel = (t: TemplateItem): string => {
   it shows comes from the code contract.
 */
 const TemplateLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+  /* Frame 781:4429 verbatim: pt-36 pb-32 px-24, 6px gaps, and three lines at
+     13 / 12 / 13 on 16px boxes. The middle line was 13 like its neighbours,
+     and the first used `--bk-error` (#E02424) where the board names
+     `--color/error-text` — a token this system already has at exactly its
+     value, #C81E1E. */
   <div
-    className="tw:flex tw:flex-col tw:gap-0.5 tw:px-4 tw:py-3"
+    className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pt-9 tw:pb-8"
     role="alert"
     data-testid="tpl-load-error"
   >
-    <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error)]">
+    <span className="tw:text-[13px] tw:leading-4 tw:text-[var(--bk-error-text)]">
       Couldn&apos;t load templates.
     </span>
-    <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+    <span className="tw:text-[12px] tw:leading-[15px] tw:text-[var(--bk-ink-muted)]">
       You can keep building from Insert.
     </span>
     <Button
       type="button"
       color="light"
       size="xs"
-      variant="link" className="tw:mt-0.5 tw:h-5 tw:w-fit tw:font-normal tw:text-[var(--bk-accent)]"
+      variant="link" className="tw:h-4 tw:w-fit tw:px-0 tw:text-[13px] tw:leading-4 tw:font-normal tw:text-[var(--bk-accent-text)]"
       data-testid="tpl-load-retry"
       onClick={onRetry}
     >
@@ -175,8 +180,8 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
             The message alone left the user to work out that clearing the box
             was their move. */}
         {q && pages.length === 0 && sections.length === 0 && (
-          <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-4 tw:pt-5">
-            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+          <div className="tw:flex tw:flex-col tw:gap-2.5 tw:px-6 tw:pt-9 tw:pb-8">
+            <p className="tw:m-0 tw:text-[13px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
               Nothing matches &lsquo;{searchQ.trim()}&rsquo;.
             </p>
             <Button
@@ -184,7 +189,7 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
               color="light"
               size="xs"
               data-testid="tpl-clear-search"
-              className="tw:self-start tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline"
+              className="tw:self-start tw:h-4 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[13px] tw:leading-4 tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline"
               onClick={() => onSearchChange("")}
             >
               Clear search
