@@ -1673,7 +1673,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "code:dismiss-offered-needs-live-orphan-to-confirm",
       "recipe": null
     },
     {
@@ -1684,7 +1684,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "code:reattach-service+event-exist-needs-live-orphan",
       "recipe": null
     },
     {
@@ -2014,7 +2014,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:detached-present-INCONCLUSIVE-not-reproduced",
+      "authority": "code:detached-group-wired-fixture-has-no-orphan-now",
       "recipe": null
     },
     {
@@ -3279,7 +3279,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:topbar + founder-gate",
+      "authority": "walked:drift-impersonal-3button-vs-attributed-2button-founder-gated",
       "recipe": null
     },
     {
@@ -4863,7 +4863,7 @@
       "width": 1440,
       "height": 480,
       "status": "active",
-      "authority": "code:state-exists — chat composer + agent plan shipped; brief-form family superseded",
+      "authority": "walked:unbuilt-model-is-hardcoded-DEFAULT_MODEL-no-picker",
       "recipe": null
     },
     {
