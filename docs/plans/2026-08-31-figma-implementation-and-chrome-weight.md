@@ -1,3 +1,4 @@
+<!-- /autoplan restore point: /Users/shahg/.gstack/projects/aamirtauqir-buildrik/main-autoplan-restore-20260901-090425.md -->
 # Figma implementation, chrome weight, and the walk that proves it
 
 2026-08-31. Founder directive: implement the Figma design into the current
@@ -318,4 +319,6 @@ count of walked boards is reported as a number, not as "the walk is done".
 | 4 | Design | Keep drawer 320 / inspector 300 despite the founder asking for smaller | User challenge → evidence | P1 completeness | Measured: Media's grid is exactly 320, Brand's header already cramped, inspector hex clips at 280. Narrowing breaks two panels. |
 | 5 | Eng | Consolidate five width sources to the CSS token | Mechanical | P4 DRY | The token the build gates protect was the one nothing rendered. |
 | 6 | Eng | Delete `getTabWidth` rather than keep it for future per-tab widths | Mechanical | P4 DRY | No tab set `panelWidth`; it returned a constant. Repo bans pass-through wrappers. |
+| 7 | CEO | REJECT codex's "the active denominator is polluted by 41 design-ahead boards" | Mechanical | evidence | Checked: `status` counts are `active:355, design-ahead:41, out-of-scope:43`. design-ahead is a SEPARATE status already excluded from 355. The claim is false as stated. |
+| 8 | CEO | ACCEPT the smaller true version: 7 ACTIVE boards draw things with no code path | Mechanical | evidence | Verified by scanning active rows for unbuilt/never-built markers: 433:2391, 169:60, 169:92, 641:2599, 807:8663, 1333:7162, 1345:7162. These do sit in the active denominator. |
 | 7 | Eng | Drop `gate:` for code==token==board geometry (plan §2.4) | Taste → decided | P3 pragmatic | It would lock a value the plan itself called a judgement call, and contradicts any future resizable panel. A relationship assertion (canvas ≥ N% with drawer closed) survives; the value lock does not. |

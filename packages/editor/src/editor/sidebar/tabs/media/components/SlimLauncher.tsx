@@ -335,7 +335,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             rendered UI that has gone wrong, not as one still arriving.
           */
           <div
-            className="tw:grid tw:grid-cols-2 tw:justify-items-start tw:gap-4 tw:px-4 tw:py-3"
+            className="tw:grid tw:grid-cols-2 tw:justify-items-stretch tw:gap-4 tw:px-4 tw:py-3"
             data-testid="media-grid-skeleton"
             aria-busy="true"
             aria-label="Loading media"
@@ -344,8 +344,8 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 classes rather than an inline width — these are six fixed
                 values from the design, not a computed one. */}
             {["tw:w-24", "tw:w-18", "tw:w-[110px]", "tw:w-21", "tw:w-25", "tw:w-[66px]"].map((w, i) => (
-              <span key={i} className="tw:flex tw:h-26 tw:w-34 tw:flex-col tw:gap-1">
-                <SkeletonBlock className="tw:h-19 tw:w-34 tw:rounded-md" />
+              <span key={i} className="tw:flex tw:h-26 tw:w-full tw:flex-col tw:gap-1">
+                <SkeletonBlock className="tw:h-19 tw:w-full tw:rounded-md" />
                 <SkeletonBlock className={`tw:h-2.5 ${w}`} />
               </span>
             ))}
@@ -428,9 +428,14 @@ export function SlimLauncher(props: SlimLauncherProps) {
             )
           )
         ) : (
-          /* Two 136px columns with 16px gutters: 16+136+16+136+16 = 320. */
+          /* Two FRACTIONAL columns. These were two fixed 136px cells, which
+             made 320 arithmetic rather than a constraint: 16+136+16+136+16.
+             The drawer could not narrow without clipping a cell, and that
+             number was then cited as the reason the drawer could not narrow —
+             circular. Fractional tracks reflow, so the panel width is free
+             (founder decision D2, 2026-09-01). */
           <div
-            className="med-asset-grid tw:grid tw:grid-cols-2 tw:justify-items-start tw:gap-4 tw:px-4 tw:py-3"
+            className="med-asset-grid tw:grid tw:grid-cols-2 tw:justify-items-stretch tw:gap-4 tw:px-4 tw:py-3"
             role="listbox"
             aria-label="Asset library"
             data-testid="media-grid"

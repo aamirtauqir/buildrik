@@ -1,5 +1,5 @@
 {
-  "_note": "Generated from Figma g4GzQFqzNYz5sosz1QtZXC page 1:3 (Editor), 2026-08-06.,Regeneration is an agent step (get_metadata), same reason extraction is — see README.,status: active = must have a recipe eventually. design-ahead = drawn, no backend, no code.,out-of-scope = reference/spec/archive boards, file hygiene not product.,authority: which artefact wins on conflict. undecided until someone reads both. 12 boards appended 2026-08-07 from a live page-1:3 census (Insert x4, Layers x6, S3.6 x2) — drawn after the 2026-08-06 generation. Phase-1 sync 2026-08-07: +6 drawn boards, +27 section-child product boards (dims 0 = not yet captured), +4 design-ahead, +14 reference out-of-scope; Headers·locked superseded by Custom-code·locked (founder Pro-lock decision); [dashboard-flow]/[not-implemented] markers synced. 2026-08-08: Media fullpage library surface designed — 5 fullpage boards + 2 modals (code was ahead of Figma; founder catch). 2026-08-08 G-sweep complete: 16 more surface boards (Templates/CMS/Components/Pages/Layers/Shell modals+menus); G17 BlockPicker marked covered-by-Insert. Deep-audit remediation: 6 boards corrected to code evidence + 11 gap boards (G-verdict A+B closed). 2026-08-14 T4 re-census (phase-0 close): +3 Media boards drawn after 2026-08-08 (import-url x2, new-folder inline), +2 [superseded] frames catalogued out-of-scope, 9 rows renamed to current Figma titles (suffix drift only, same boards). 2026-08-17 Shell-states topbar conflict resolved (authority=code:topbar on the 12 'Shell state N' boards): they all draw the topbar as Exit | name | Saved pill | review pill | bell | Publish(disabled) | ..., with no Quick preview, no Comments and no Issues chip. The shipped topbar has all three (Topbar F1-F9 arc, 2026-07-30). The boards lose because they contradict the board set, not just the code: board 200:2 is named 'Comment mode' and its own topbar has no comments control, and the Issues chip is what opens board 1168:4732 ('Publish with N open errors?'), which was walked live on 2026-08-17. Conforming the topbar backwards would make an active board unreachable. Everything else on these 12 — rail, drawer, canvas toolbar, status bar, per-state content — is still walked against them. (Measured 2026-08-17: the same 12 frames also draw the Publish button GREY/disabled — 65:2, 199:2, 200:2 and 66:441 all read #F2F3F5 — including on a returning user with content, which would mean nobody could ever publish. Same snapshot, same verdict: code:topbar. `StudioHeader` disables publish for a reason it can state — publishing off, viewer, offline — and shows it enabled otherwise.) 2026-08-17 board 1172:4867 walked and conformed (tinted-pill tabs, uppercase field labels, Save) EXCEPT one delta, recorded as authority=open:input-fill: the board fills its text inputs #F3F4F6, board 1205:4804 fills the same control #F9FAFB, and chrome-ui/textInputTheme.ts overrides flowbite's own gray-50 to white on purpose to match --bk-bg-card. Two boards that disagree cannot settle a chrome-ui-wide primitive — do not change BK_TEXT_INPUT_THEME off one screen board. 2026-08-17 board 202:2 set authority=code:expand-not-pin: its whole subject is a drawer PIN that a founder decision retired (commit 1c8f759d — board 16:6 draws corner brackets, not a pin, and the founder confirmed expand; isPinned/onPinToggle became isExpanded/onExpandToggle across 30 files). Its toast, 'Widen past 1380 to pin it again', names a control that no longer exists, and the shipped shell already floats a panel at narrow widths — the INSPECTOR, at max-width:1366px in LayoutShell.css. Walked live at 1280 anyway, which found the real defect the board's own layout avoids: the canvas footer toolbar scrolled X-Ray and the shortcuts button out of sight. Fixed by wrapping the bar. 2026-08-17 board 65:2 walked: everything on it matches live except the drawer, which the board draws CLOSED on first run while the shell opens Insert (useStudioState.ts:234 — 'Always open on session start', an incident fix after persisting closed stranded users with an invisible panel). Left open deliberately, marked authority=open:first-run-drawer: the same board answers 'where did everything go?' with a rail coach mark ('Everything you build lives behind these six' · Got it) that belongs to the S1 flows family (297:1972, 807:4299, 807:6558) and is not built. Closing the drawer without the coach mark ships half the design and is worse than either half. The two land together. 2026-08-17 board 66:4 walked. Its inspector, status bar ('3 elements selected' + dimensions) and layers drawer all match live. Its ANNOTATION does not: 'Per-element properties are hidden while more than one thing is selected — editing them would silently apply to all three' is contradicted by board 159:123 (Inspector · multi-select), read directly, which draws Background / Text colour / Radius / Padding / Font size with 'Mixed' placeholders and the line 'Editing a Mixed field applies it to all three.' — i.e. the properties ARE shown, and nothing about it is silent. The code follows 159:123 (BatchStylePanel), so authority=board:159-123 for that annotation. Two things NOT changed and why: (1) the canvas keeps its floating count badge and alignment toolbar — 66:4 draws neither, but it also draws only ONE selection ring for a 3-element selection, so its canvas art is the single-select frame reused and is not evidence; (2) 159:123 spells the row 'Text colour' while board 807:8342 spells the same control 'Color' and so does every other colour row in the inspector — the boards disagree with each other, the inspector is internally consistent, so the code keeps 'Text color'. 2026-08-17 board 200:213 built: its review bar (open count · Next › · Compare · Re-send) did not exist — the only review chrome in the shell was the topbar pill, which says a review EXISTS and nothing about working through it. Live-verified against a seeded PENDING round with agency_layer on for the test workspace (both reverted after). ONE delta left, authority=open:pill-count: the board's pill reads 'In review · 3 open' and the shipped pill reads 'In review'. Adding the count means `reviews.status` returning it — a tRPC + shared-schema change that belongs to the Review panel family's own walk, not to a Shell-states board; the count is on screen directly below the pill meanwhile. 2026-08-17 board 66:225 walked, no change needed. Its placement claim is already true — 'Ask AI' swaps the RIGHT panel to the AI surface with a '‹ Inspector' back chevron and a tinted Scope strip, measured live at l=1140 w=300. Its RUN state is superseded by the AI family's own board 170:70, read directly: 'RUNNING · 2 OF 3' over numbered step rows with a Stop under them, which is what AgentPlan implements — not 66:225's 'Still working on: Hero' card with bullets. Shell thumbnail loses to the family board, same as 66:4 vs 159:123. 2026-08-17 board 66:640 walked and left alone, founder gate confirmed on the evidence rather than inherited from the plan doc. The board offers two ways out — 'Review both' and 'Keep mine' — where the shipped ConflictModal offers three: Reload latest, Save a backup, Overwrite. Conforming literally would DELETE two data-safety exits in exchange for a compare surface that does not exist. Its copy ('Sara saved a change to this page 40 seconds ago') also names the other writer and the elapsed time, and nothing in the conflict path carries either — the modal's props are four callbacks. So even the copy cannot be adopted honestly until the save path returns who and when. 2026-08-17 Review panel family walked live against a seeded round (3 rounds, 12 comments, agency_layer on for the test workspace). Conform as drawn: 156:2 open, 157:58 all-resolved, 157:221 empty, 158:2 re-send-confirm, 158:105 revoke-confirm, 157:2 detached (after this walk filled its band). Three rows re-marked. 157:169 older-round is authority=blocked:no-round-linkage: the `Comment` model carries siteId/pageId and NO reviewRequestId or roundId at all (prisma/schema.prisma:471), so an older round's comments cannot be fetched — the panel's missing ‹ › arrows are a data-model gap, not a missing endpoint, and ReviewTab already says so inline. 158:213 review-closed is authority=open:panel-absence: it is a frame that documents an ABSENCE ('the panel and the 7th rail icon both disappear'), half of which is already moot — the shipped rail has no Review icon — and removing the panel on approval would take Compare and the resolved history with it, with no other door. 158:162 revoked is authority=code:keeps-open-group: the board hides the OPEN group while its own counter reads '9 of 12' and its copy promises 'earlier comments are kept below', so the frame contradicts itself; the panel keeps both groups. Every board's foot draws Compare + one primary only, and the shipped foot adds a reply composer and 'Revoke link' — no board draws a revoke ENTRY anywhere, though 158:105 boards its confirm, so the entry has to live somewhere and the foot is where it is. 2026-08-17 Templates family started. 782:4402 no-results matches live exactly ('Nothing matches ‘q’.' + Clear search + Browse all). 1138:13413 empty carries the board's copy verbatim in DrawerGallery. 642:2556 preview matches in shape, and the one copy defect it exposed is fixed here: the consequence line interpolated the page name in front of the word 'page', which reads only for noun-named pages ('the current Home page content') and breaks on the default every new site has ('the current Page 1 page content'). 641:2487 gallery is authority=open:no-section-catalog: the board draws a SECTION TEMPLATES group under the page cards, DrawerGallery implements it (pageCount == null → section), and the catalog has 10 entries of which 10 carry pageCount — so the group is code-complete with nothing to show. Authoring section templates is content, not code. (The board's 'updated 12 Jun' fact line stays unbuilt for the reason TemplateApplyModal already states: the catalog has no date and a made-up one is worse than a missing one.) 2026-08-17 board 1169:4753 save-as-template: it was the ONE Templates board no file cited. The modal exists and is reachable (canvas command palette), but drew three fields where the board draws one, and omitted the board's hint — 'Tokens are snapshotted — applying it later re-maps them to that site's brand' — because the hint was not TRUE. The apply half of that round trip was wired (TemplatesTab runs resolveTokens against a live snapshot); the save half was not: inverseResolveTokens was written, tested and imported by nothing, so a saved template carried this project's literal hexes and applying it into another site painted that site in these colours. Save now runs it against the same snapshot source, so the hint is printed because it holds. The Category select is gone: getUserTemplates parses the stored row as {id,name,description,html} and hardcodes category:'my-templates', so the user chose from six options nothing read. Description stays despite the board's single field — unlike category it IS read, by the drawer's search and TemplateDetail. 1169:4713 replace-confirm and the other four remaining rows are cited in code with tests. 778:4102 loading is authority=blocked:static-catalog: the board draws a full skeleton — three placeholder page cards and three section rows — but the built-in catalog is a static module array that is already on screen when the only fetch (the user's saved templates) starts, so a skeleton over it would state that the visible cards are still loading. 781:4372's load-error IS built, in DrawerGallery, because that pull can genuinely fail; TemplateDetail's comment claimed both were unbuilt and was stale on the error half. 2026-08-18 AI family started with a live BEHAVIOUR walk (boards unavailable, Figma MCP down). 170:2 idle and 170:17 scoped verified live: the panel opens in the RIGHT slot with a '‹ Inspector' chevron and the scope band reads 'Scope: Whole page' / 'Scope: heading' off the real selection. Driving a real prompt found a defect no board could show: tRPC 11 lists INTERNAL_SERVER_ERROR in retryableRpcCodes, so a provider failure never reached onError — the SSE stream reopened forever (measured: 1 EventSource, 5 opens, 5 errors, 0 data) and the panel sat on 'Thinking…'. Only PRECONDITION_FAILED (171:136) and TOO_MANY_REQUESTS (171:105) could ever surface, which is exactly why those are the only two error states drawn. Both are genuinely reachable now (authority=code:reachable-now) and a third state carries everything else.,1 board appended 2026-08-24: a from-code capture of the shipped SEO panel, parked beside 302:1978. That board predates the score block, checks grid and banner entirely — it draws four plain fields — so it cannot adjudicate their visuals. The capture is reference, not a target: status out-of-scope, authority code:capture.",
+  "_note": "Generated from Figma g4GzQFqzNYz5sosz1QtZXC page 1:3 (Editor), 2026-08-06.,Regeneration is an agent step (get_metadata), same reason extraction is — see README.,status: active = must have a recipe eventually. design-ahead = drawn, no backend, no code.,out-of-scope = reference/spec/archive boards, file hygiene not product.,authority: which artefact wins on conflict. undecided until someone reads both. 12 boards appended 2026-08-07 from a live page-1:3 census (Insert x4, Layers x6, S3.6 x2) — drawn after the 2026-08-06 generation. Phase-1 sync 2026-08-07: +6 drawn boards, +27 section-child product boards (dims 0 = not yet captured), +4 design-ahead, +14 reference out-of-scope; Headers·locked superseded by Custom-code·locked (founder Pro-lock decision); [dashboard-flow]/[not-implemented] markers synced. 2026-08-08: Media fullpage library surface designed — 5 fullpage boards + 2 modals (code was ahead of Figma; founder catch). 2026-08-08 G-sweep complete: 16 more surface boards (Templates/CMS/Components/Pages/Layers/Shell modals+menus); G17 BlockPicker marked covered-by-Insert. Deep-audit remediation: 6 boards corrected to code evidence + 11 gap boards (G-verdict A+B closed). 2026-08-14 T4 re-census (phase-0 close): +3 Media boards drawn after 2026-08-08 (import-url x2, new-folder inline), +2 [superseded] frames catalogued out-of-scope, 9 rows renamed to current Figma titles (suffix drift only, same boards). 2026-08-17 Shell-states topbar conflict resolved (authority=code:topbar on the 12 'Shell state N' boards): they all draw the topbar as Exit | name | Saved pill | review pill | bell | Publish(disabled) | ..., with no Quick preview, no Comments and no Issues chip. The shipped topbar has all three (Topbar F1-F9 arc, 2026-07-30). The boards lose because they contradict the board set, not just the code: board 200:2 is named 'Comment mode' and its own topbar has no comments control, and the Issues chip is what opens board 1168:4732 ('Publish with N open errors?'), which was walked live on 2026-08-17. Conforming the topbar backwards would make an active board unreachable. Everything else on these 12 — rail, drawer, canvas toolbar, status bar, per-state content — is still walked against them. (Measured 2026-08-17: the same 12 frames also draw the Publish button GREY/disabled — 65:2, 199:2, 200:2 and 66:441 all read #F2F3F5 — including on a returning user with content, which would mean nobody could ever publish. Same snapshot, same verdict: code:topbar. `StudioHeader` disables publish for a reason it can state — publishing off, viewer, offline — and shows it enabled otherwise.) 2026-08-17 board 1172:4867 walked and conformed (tinted-pill tabs, uppercase field labels, Save) EXCEPT one delta, recorded as authority=open:input-fill: the board fills its text inputs #F3F4F6, board 1205:4804 fills the same control #F9FAFB, and chrome-ui/textInputTheme.ts overrides flowbite's own gray-50 to white on purpose to match --bk-bg-card. Two boards that disagree cannot settle a chrome-ui-wide primitive — do not change BK_TEXT_INPUT_THEME off one screen board. 2026-08-17 board 202:2 set authority=code:expand-not-pin: its whole subject is a drawer PIN that a founder decision retired (commit 1c8f759d — board 16:6 draws corner brackets, not a pin, and the founder confirmed expand; isPinned/onPinToggle became isExpanded/onExpandToggle across 30 files). Its toast, 'Widen past 1380 to pin it again', names a control that no longer exists, and the shipped shell already floats a panel at narrow widths — the INSPECTOR, at max-width:1366px in LayoutShell.css. Walked live at 1280 anyway, which found the real defect the board's own layout avoids: the canvas footer toolbar scrolled X-Ray and the shortcuts button out of sight. Fixed by wrapping the bar. 2026-08-17 board 65:2 walked: everything on it matches live except the drawer, which the board draws CLOSED on first run while the shell opens Insert (useStudioState.ts:234 — 'Always open on session start', an incident fix after persisting closed stranded users with an invisible panel). Left open deliberately, marked authority=open:first-run-drawer: the same board answers 'where did everything go?' with a rail coach mark ('Everything you build lives behind these six' · Got it) that belongs to the S1 flows family (297:1972, 807:4299, 807:6558) and is not built. Closing the drawer without the coach mark ships half the design and is worse than either half. The two land together. 2026-08-17 board 66:4 walked. Its inspector, status bar ('3 elements selected' + dimensions) and layers drawer all match live. Its ANNOTATION does not: 'Per-element properties are hidden while more than one thing is selected — editing them would silently apply to all three' is contradicted by board 159:123 (Inspector · multi-select), read directly, which draws Background / Text colour / Radius / Padding / Font size with 'Mixed' placeholders and the line 'Editing a Mixed field applies it to all three.' — i.e. the properties ARE shown, and nothing about it is silent. The code follows 159:123 (BatchStylePanel), so authority=board:159-123 for that annotation. Two things NOT changed and why: (1) the canvas keeps its floating count badge and alignment toolbar — 66:4 draws neither, but it also draws only ONE selection ring for a 3-element selection, so its canvas art is the single-select frame reused and is not evidence; (2) 159:123 spells the row 'Text colour' while board 807:8342 spells the same control 'Color' and so does every other colour row in the inspector — the boards disagree with each other, the inspector is internally consistent, so the code keeps 'Text color'. 2026-08-17 board 200:213 built: its review bar (open count · Next › · Compare · Re-send) did not exist — the only review chrome in the shell was the topbar pill, which says a review EXISTS and nothing about working through it. Live-verified against a seeded PENDING round with agency_layer on for the test workspace (both reverted after). ONE delta left, authority=open:pill-count: the board's pill reads 'In review · 3 open' and the shipped pill reads 'In review'. Adding the count means `reviews.status` returning it — a tRPC + shared-schema change that belongs to the Review panel family's own walk, not to a Shell-states board; the count is on screen directly below the pill meanwhile. 2026-08-17 board 66:225 walked, no change needed. Its placement claim is already true — 'Ask AI' swaps the RIGHT panel to the AI surface with a '‹ Inspector' back chevron and a tinted Scope strip, measured live at l=1140 w=300. Its RUN state is superseded by the AI family's own board 170:70, read directly: 'RUNNING · 2 OF 3' over numbered step rows with a Stop under them, which is what AgentPlan implements — not 66:225's 'Still working on: Hero' card with bullets. Shell thumbnail loses to the family board, same as 66:4 vs 159:123. 2026-08-17 board 66:640 walked and left alone, founder gate confirmed on the evidence rather than inherited from the plan doc. The board offers two ways out — 'Review both' and 'Keep mine' — where the shipped ConflictModal offers three: Reload latest, Save a backup, Overwrite. Conforming literally would DELETE two data-safety exits in exchange for a compare surface that does not exist. Its copy ('Sara saved a change to this page 40 seconds ago') also names the other writer and the elapsed time, and nothing in the conflict path carries either — the modal's props are four callbacks. So even the copy cannot be adopted honestly until the save path returns who and when. 2026-08-17 Review panel family walked live against a seeded round (3 rounds, 12 comments, agency_layer on for the test workspace). Conform as drawn: 156:2 open, 157:58 all-resolved, 157:221 empty, 158:2 re-send-confirm, 158:105 revoke-confirm, 157:2 detached (after this walk filled its band). Three rows re-marked. 157:169 older-round is authority=blocked:no-round-linkage: the `Comment` model carries siteId/pageId and NO reviewRequestId or roundId at all (prisma/schema.prisma:471), so an older round's comments cannot be fetched — the panel's missing ‹ › arrows are a data-model gap, not a missing endpoint, and ReviewTab already says so inline. 158:213 review-closed is authority=open:panel-absence: it is a frame that documents an ABSENCE ('the panel and the 7th rail icon both disappear'), half of which is already moot — the shipped rail has no Review icon — and removing the panel on approval would take Compare and the resolved history with it, with no other door. 158:162 revoked is authority=code:keeps-open-group: the board hides the OPEN group while its own counter reads '9 of 12' and its copy promises 'earlier comments are kept below', so the frame contradicts itself; the panel keeps both groups. Every board's foot draws Compare + one primary only, and the shipped foot adds a reply composer and 'Revoke link' — no board draws a revoke ENTRY anywhere, though 158:105 boards its confirm, so the entry has to live somewhere and the foot is where it is. 2026-08-17 Templates family started. 782:4402 no-results matches live exactly ('Nothing matches ‘q’.' + Clear search + Browse all). 1138:13413 empty carries the board's copy verbatim in DrawerGallery. 642:2556 preview matches in shape, and the one copy defect it exposed is fixed here: the consequence line interpolated the page name in front of the word 'page', which reads only for noun-named pages ('the current Home page content') and breaks on the default every new site has ('the current Page 1 page content'). 641:2487 gallery is authority=open:no-section-catalog: the board draws a SECTION TEMPLATES group under the page cards, DrawerGallery implements it (pageCount == null → section), and the catalog has 10 entries of which 10 carry pageCount — so the group is code-complete with nothing to show. Authoring section templates is content, not code. (The board's 'updated 12 Jun' fact line stays unbuilt for the reason TemplateApplyModal already states: the catalog has no date and a made-up one is worse than a missing one.) 2026-08-17 board 1169:4753 save-as-template: it was the ONE Templates board no file cited. The modal exists and is reachable (canvas command palette), but drew three fields where the board draws one, and omitted the board's hint — 'Tokens are snapshotted — applying it later re-maps them to that site's brand' — because the hint was not TRUE. The apply half of that round trip was wired (TemplatesTab runs resolveTokens against a live snapshot); the save half was not: inverseResolveTokens was written, tested and imported by nothing, so a saved template carried this project's literal hexes and applying it into another site painted that site in these colours. Save now runs it against the same snapshot source, so the hint is printed because it holds. The Category select is gone: getUserTemplates parses the stored row as {id,name,description,html} and hardcodes category:'my-templates', so the user chose from six options nothing read. Description stays despite the board's single field — unlike category it IS read, by the drawer's search and TemplateDetail. 1169:4713 replace-confirm and the other four remaining rows are cited in code with tests. 778:4102 loading is authority=blocked:static-catalog: the board draws a full skeleton — three placeholder page cards and three section rows — but the built-in catalog is a static module array that is already on screen when the only fetch (the user's saved templates) starts, so a skeleton over it would state that the visible cards are still loading. 781:4372's load-error IS built, in DrawerGallery, because that pull can genuinely fail; TemplateDetail's comment claimed both were unbuilt and was stale on the error half. 2026-08-18 AI family started with a live BEHAVIOUR walk (boards unavailable, Figma MCP down). 170:2 idle and 170:17 scoped verified live: the panel opens in the RIGHT slot with a '‹ Inspector' chevron and the scope band reads 'Scope: Whole page' / 'Scope: heading' off the real selection. Driving a real prompt found a defect no board could show: tRPC 11 lists INTERNAL_SERVER_ERROR in retryableRpcCodes, so a provider failure never reached onError — the SSE stream reopened forever (measured: 1 EventSource, 5 opens, 5 errors, 0 data) and the panel sat on 'Thinking…'. Only PRECONDITION_FAILED (171:136) and TOO_MANY_REQUESTS (171:105) could ever surface, which is exactly why those are the only two error states drawn. Both are genuinely reachable now (authority=code:reachable-now) and a third state carries everything else.,1 board appended 2026-08-24: a from-code capture of the shipped SEO panel, parked beside 302:1978. That board predates the score block, checks grid and banner entirely — it draws four plain fields — so it cannot adjudicate their visuals. The capture is reference, not a target: status out-of-scope, authority code:capture. 2026-09-01 FIELD SPLIT: `authority` was being used for two different jobs — which artefact wins a conflict (its documented meaning) AND whether anyone had checked the screen. One column held `walked:match`, `walked:drift-...` and `walked:unreachable-...` as if they were the same statement, so \"281 walked\" read as coverage when only 50 of those rows asserted a clean pass. `verified` now carries the check (no | driven | match | drift-open | drift-fixed | unreachable) with the detail in `verifiedNote`; `authority` is back to board|code|founder|blocked|open|superseded|undecided. Founder decision D1, /autoplan 2026-09-01.",
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "page": "1:3",
   "generatedAt": "2026-08-14",
@@ -8,7 +8,15 @@
     "active": 355,
     "designAhead": 41,
     "outOfScope": 43,
-    "activeFamilies": 35
+    "activeFamilies": 35,
+    "verifiedActive": {
+      "drift-open": 68,
+      "match": 52,
+      "driven": 116,
+      "drift-fixed": 23,
+      "no": 67,
+      "unreachable": 29
+    }
   },
   "activeFamilies": [
     "AI",
@@ -56,8 +64,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-applied-not-proposed-no-discard",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-applied-not-proposed-no-discard",
+      "verified": "drift-open"
     },
     {
       "nodeId": "171:105",
@@ -67,8 +77,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "170:2",
@@ -78,8 +90,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-scopechip-always-shown-board-has-none",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-scopechip-always-shown-board-has-none",
+      "verified": "drift-open"
     },
     {
       "nodeId": "171:136",
@@ -89,8 +103,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "170:41",
@@ -100,8 +116,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-no-plan-review-gate-auto-advances",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-no-plan-review-gate-auto-advances",
+      "verified": "drift-open"
     },
     {
       "nodeId": "170:70",
@@ -111,8 +129,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "170:17",
@@ -122,8 +142,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "171:2",
@@ -133,8 +155,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-run-continued-past-failure-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-run-continued-past-failure-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "170:97",
@@ -144,8 +168,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "171:36",
@@ -155,8 +181,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "170:29",
@@ -166,8 +194,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-chat-transcript-vs-prompt-in-input",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-chat-transcript-vs-prompt-in-input",
+      "verified": "drift-open"
     },
     {
       "nodeId": "429:2350",
@@ -178,7 +208,8 @@
       "height": 701,
       "status": "active",
       "authority": "code:state-exists",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "433:2391",
@@ -189,7 +220,8 @@
       "height": 470,
       "status": "active",
       "authority": "open:migration-ui-unbuilt",
-      "recipe": null
+      "recipe": null,
+      "verified": "unreachable"
     },
     {
       "nodeId": "153:2",
@@ -200,7 +232,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:153-2-no-menu",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "153:92",
@@ -210,8 +243,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — colour-mode: row pitch 48 vs board 32 — half as many rows per screen; token names and Set link match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — colour-mode: row pitch 48 vs board 32 — half as many rows per screen; token names and Set link match",
+      "verified": "driven"
     },
     {
       "nodeId": "153:29",
@@ -221,8 +256,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — components: the board PINS 'Generate with AI' to the panel foot; live renders it at y1081 in scroll flow, 674px below the fold and not even last",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — components: the board PINS 'Generate with AI' to the panel foot; live renders it at y1081 in scroll flow, 674px below the fold and not even last",
+      "verified": "driven"
     },
     {
       "nodeId": "154:78",
@@ -233,7 +270,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:154-78-save-bar",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "306:2298",
@@ -243,8 +281,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "306:2232",
@@ -254,8 +294,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — export · exported: board shows a persistent 'Exported CSS' pill; live shows only a transient toast + a Copied! label swap",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — export · exported: board shows a persistent 'Exported CSS' pill; live shows only a transient toast + a Copied! label swap",
+      "verified": "driven"
     },
     {
       "nodeId": "306:2265",
@@ -265,8 +307,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "153:120",
@@ -276,8 +320,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — import-export: row pitch 66 vs 48, and TWO nested scrollers (725px hidden inside 470px hidden)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — import-export: row pitch 66 vs 48, and TWO nested scrollers (725px hidden inside 470px hidden)",
+      "verified": "driven"
     },
     {
       "nodeId": "154:2",
@@ -288,7 +334,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:no-autofix-producer",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "306:2217",
@@ -299,7 +346,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:306-2217",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "154:26",
@@ -310,7 +358,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:154-26",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "781:4311",
@@ -321,7 +370,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:781-4311",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "775:4305",
@@ -332,7 +382,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:sync-load",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "152:112",
@@ -342,8 +393,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — presets: row pitch 34 vs board 44; variant count right-aligned to x295 vs board x232",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — presets: row pitch 34 vs board 44; variant count right-aligned to x295 vs board x232",
+      "verified": "driven"
     },
     {
       "nodeId": "306:2111",
@@ -354,7 +407,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:no-element-preset-reference",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "306:2161",
@@ -365,7 +419,8 @@
       "height": 812,
       "status": "active",
       "authority": "code:draft-badge-shipped-needs-token-picker-pass",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "306:2136",
@@ -376,7 +431,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:no-element-preset-reference",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "154:132",
@@ -387,7 +443,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:154-132",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "152:2",
@@ -398,7 +455,8 @@
       "height": 812,
       "status": "out-of-scope",
       "authority": "superseded:1333-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "152:137",
@@ -409,7 +467,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:152-137",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "306:2186",
@@ -420,7 +479,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:306-2186",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "152:83",
@@ -430,8 +490,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — token-detail: rows 54px vs board 44; adds an All/Issues filter and a section header the board lacks",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — token-detail: rows 54px vs board 44; adds an All/Issues filter and a section header the board lacks",
+      "verified": "driven"
     },
     {
       "nodeId": "152:52",
@@ -441,8 +503,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — tokens: an unboarded info banner pushes the first kind +89px; extra 'More token kinds' row and a second helper block",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — tokens: an unboarded info banner pushes the first kind +89px; extra 'More token kinds' row and a second helper block",
+      "verified": "driven"
     },
     {
       "nodeId": "306:2049",
@@ -453,7 +517,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:306-2049-modal",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "306:2080",
@@ -464,7 +529,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:306-2080-modal",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "153:57",
@@ -475,7 +541,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:no-font-upload",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:4649",
@@ -485,8 +552,10 @@
       "width": 1440,
       "height": 500,
       "status": "active",
-      "authority": "walked:2026-08-31 — toolbar states: 6 of 7 toggles on the bar, all chords honoured; Comments has no bar control (chord works, lives in topbar); active pill grey vs board blue",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — toolbar states: 6 of 7 toggles on the bar, all chords honoured; Comments has no bar control (chord works, lives in topbar); active pill grey vs board blue",
+      "verified": "driven"
     },
     {
       "nodeId": "817:4723",
@@ -496,8 +565,10 @@
       "width": 900,
       "height": 480,
       "status": "active",
-      "authority": "walked:2026-08-31 — zoom flyout: all 5 chords correct; presets right-aligned where the board left-aligns; active preset grey vs board pale-blue",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — zoom flyout: all 5 chords correct; presets right-aligned where the board left-aligns; active preset grey vs board pale-blue",
+      "verified": "driven"
     },
     {
       "nodeId": "166:51",
@@ -507,8 +578,10 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "walked:2026-08-31 — CmdK ai-offer: the full-width tinted band is missing and the modal collapses to 210px vs the board's fixed 420",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — CmdK ai-offer: the full-width tinted band is missing and the modal collapses to 210px vs the board's fixed 420",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "166:58",
@@ -518,8 +591,10 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "walked:2026-08-31 — CmdK disabled-command: reason text is inline after the label, board uses a fixed column; two duplicate Undo rows (hardcoded + registry)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — CmdK disabled-command: reason text is inline after the label, board uses a fixed column; two duplicate Undo rows (hardcoded + registry)",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "166:2",
@@ -529,8 +604,10 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "walked:2026-08-31 — CmdK empty: modal 560x450 vs 640x420; renders all 55 commands where the board shows a short head; chord chip reads ⌘+I vs board ⌘I",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — CmdK empty: modal 560x450 vs 640x420; renders all 55 commands where the board shows a short head; chord chip reads ⌘+I vs board ⌘I",
+      "verified": "driven"
     },
     {
       "nodeId": "166:45",
@@ -540,8 +617,10 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "walked:2026-08-31 — CmdK no-results: left-aligned (board centres); 'Ask AI instead' is a tinted pill with an emoji where the board draws a plain blue link",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — CmdK no-results: left-aligned (board centres); 'Ask AI instead' is a tinted pill with an emoji where the board draws a plain blue link",
+      "verified": "driven"
     },
     {
       "nodeId": "166:27",
@@ -551,8 +630,10 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "walked:2026-08-31 — CmdK results: band order reversed — live GO TO → ACTIONS, board ACTIONS → GO TO",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — CmdK results: band order reversed — live GO TO → ACTIONS, board ACTIONS → GO TO",
+      "verified": "driven"
     },
     {
       "nodeId": "166:18",
@@ -562,8 +643,10 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "168:48",
@@ -573,8 +656,10 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-compare-in-320-drawer",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-compare-in-320-drawer",
+      "verified": "drift-open"
     },
     {
       "nodeId": "169:28",
@@ -585,7 +670,8 @@
       "height": 776,
       "status": "active",
       "authority": "code:loading-transient-source-only",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "168:82",
@@ -596,7 +682,8 @@
       "height": 776,
       "status": "active",
       "authority": "founder:resend-withdraws-approval-so-compare-has-no-reference",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "168:26",
@@ -606,8 +693,10 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-overlay-is-opacity-blend-not-highlights",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-overlay-is-opacity-blend-not-highlights",
+      "verified": "drift-open"
     },
     {
       "nodeId": "169:92",
@@ -617,8 +706,10 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "walked:unbuilt-no-resend-action-in-compare",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unbuilt-no-resend-action-in-compare",
+      "verified": "unreachable"
     },
     {
       "nodeId": "169:60",
@@ -628,8 +719,10 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "walked:unbuilt-no-restore-action-in-compare",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unbuilt-no-restore-action-in-compare",
+      "verified": "unreachable"
     },
     {
       "nodeId": "168:2",
@@ -639,8 +732,10 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-compare-in-320-drawer-not-1080-surface",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-compare-in-320-drawer-not-1080-surface",
+      "verified": "drift-open"
     },
     {
       "nodeId": "169:2",
@@ -650,8 +745,10 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "642:3112",
@@ -661,8 +758,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-modal-structure-differs-wholesale",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-modal-structure-differs-wholesale",
+      "verified": "drift-open"
     },
     {
       "nodeId": "641:2599",
@@ -672,8 +771,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:drift-unstyled-STYLED-properties+usedon-unbuilt",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-unstyled-STYLED-properties+usedon-unbuilt",
+      "verified": "unreachable"
     },
     {
       "nodeId": "641:2546",
@@ -683,8 +784,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:drift-extra-header-add-button",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-extra-header-add-button",
+      "verified": "drift-open"
     },
     {
       "nodeId": "781:4433",
@@ -694,8 +797,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-error-never-set-plus-missing-title-prop",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-error-never-set-plus-missing-title-prop",
+      "verified": "unreachable"
     },
     {
       "nodeId": "778:4173",
@@ -705,8 +810,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-loading-state-cannot-be-entered",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-loading-state-cannot-be-entered",
+      "verified": "unreachable"
     },
     {
       "nodeId": "149:50",
@@ -716,8 +823,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — collection: reached by creating one; drift — back row / +Add 40h (FIXED to 32 via LINK_BTN), inset 12 vs 16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — collection: reached by creating one; drift — back row / +Add 40h (FIXED to 32 via LINK_BTN), inset 12 vs 16",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "151:87",
@@ -727,8 +836,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — conditions: empty-state copy matches; populated rows NOT reached (needs a canvas element pick)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — conditions: empty-state copy matches; populated rows NOT reached (needs a canvas element pick)",
+      "verified": "driven"
     },
     {
       "nodeId": "151:46",
@@ -738,8 +849,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — data-sources: row 64=64, green dot and note copy all match — MATCH",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — data-sources: row 64=64, green dot and note copy all match — MATCH",
+      "verified": "driven"
     },
     {
       "nodeId": "149:7",
@@ -749,8 +862,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — Content empty: MATCH",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Content empty: MATCH",
+      "verified": "driven"
     },
     {
       "nodeId": "151:2",
@@ -760,8 +875,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — fields: field row 64 vs board 44 (Row size='comment' is 64 min-height but the boards use three different two-line heights)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — fields: field row 64 vs board 44 (Row size='comment' is 64 min-height but the boards use three different two-line heights)",
+      "verified": "driven"
     },
     {
       "nodeId": "453:4010",
@@ -771,8 +888,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — Content load-error: reached via a 500 on the cms.collections.list batch; copy and x/y exact",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Content load-error: reached via a 500 on the cms.collections.list batch; copy and x/y exact",
+      "verified": "driven"
     },
     {
       "nodeId": "775:4241",
@@ -782,8 +901,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — Content loading: reached by delaying the batch; within 2-4px throughout",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Content loading: reached by delaying the batch; within 2-4px throughout",
+      "verified": "driven"
     },
     {
       "nodeId": "149:84",
@@ -793,8 +914,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — record: toggle 44x24 exact; back row 40h; field inputs NOT verified (0-field collection)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — record: toggle 44x24 exact; back row 40h; field inputs NOT verified (0-field collection)",
+      "verified": "driven"
     },
     {
       "nodeId": "148:2",
@@ -804,8 +927,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — Content root: section bands lose their tint (the panel's OWN skeleton passes tint and matches the board) and rows carry no leading glyph, so data landing reflows 18px — the exact thing the skeleton exists to prevent",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Content root: section bands lose their tint (the panel's OWN skeleton passes tint and matches the board) and rows carry no leading glyph, so data landing reflows 18px — the exact thing the skeleton exists to prevent",
+      "verified": "driven"
     },
     {
       "nodeId": "149:108",
@@ -816,7 +941,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:149-108",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "151:62",
@@ -826,8 +952,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — variables: var row 64 vs 44, same Row-size cause as fields",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — variables: var row 64 vs 44, same Row-size cause as fields",
+      "verified": "driven"
     },
     {
       "nodeId": "927:4474",
@@ -837,8 +965,10 @@
       "width": 520,
       "height": 216,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "949:4474",
@@ -848,8 +978,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:unreachable-no-published-versions",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-no-published-versions",
+      "verified": "unreachable"
     },
     {
       "nodeId": "453:4064",
@@ -860,7 +992,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:cites-board",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "184:37",
@@ -871,7 +1004,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:cites-board",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "184:24",
@@ -882,7 +1016,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:cites-board",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "184:45",
@@ -893,7 +1028,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:cites-board",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "184:2",
@@ -904,7 +1040,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:cites-board",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "162:2",
@@ -914,8 +1051,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-prune-note-clipped-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-prune-note-clipped-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "163:2",
@@ -925,8 +1064,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-undo-empty-branch-only",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-undo-empty-branch-only",
+      "verified": "drift-open"
     },
     {
       "nodeId": "163:64",
@@ -937,7 +1078,8 @@
       "height": 776,
       "status": "active",
       "authority": "board:163-64",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "453:4031",
@@ -947,8 +1089,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "163:269",
@@ -959,7 +1103,8 @@
       "height": 776,
       "status": "active",
       "authority": "board:163-269",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "163:167",
@@ -969,8 +1114,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:match-minor-button-height",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-minor-button-height",
+      "verified": "match"
     },
     {
       "nodeId": "163:220",
@@ -981,7 +1128,8 @@
       "height": 776,
       "status": "active",
       "authority": "code:cites-board",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "163:113",
@@ -991,8 +1139,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:partial-scrubber-opens-by-button",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-scrubber-opens-by-button",
+      "verified": "drift-open"
     },
     {
       "nodeId": "433:2348",
@@ -1003,7 +1153,8 @@
       "height": 402,
       "status": "active",
       "authority": "board:433-2348",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "950:4474",
@@ -1014,7 +1165,8 @@
       "height": 776,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "879:4536",
@@ -1025,7 +1177,8 @@
       "height": 121,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "879:4518",
@@ -1036,7 +1189,8 @@
       "height": 185,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "879:4531",
@@ -1047,7 +1201,8 @@
       "height": 169,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "879:4526",
@@ -1058,7 +1213,8 @@
       "height": 141,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "137:2",
@@ -1068,8 +1224,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — default state live; drift: ⌘F hint at x201 not flush-right in the 287 box (shared SearchBar, 7 drawers)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — default state live; drift: ⌘F hint at x201 not flush-right in the 287 box (shared SearchBar, 7 drawers)",
+      "verified": "drift-open"
     },
     {
       "nodeId": "138:198",
@@ -1079,8 +1237,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-no-disabled-catalog-entry",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-no-disabled-catalog-entry",
+      "verified": "unreachable"
     },
     {
       "nodeId": "138:153",
@@ -1090,8 +1250,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — dragging: scrollTop held across 6 dragover steps, rows stayed mounted",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — dragging: scrollTop held across 6 dragover steps, rows stayed mounted",
+      "verified": "driven"
     },
     {
       "nodeId": "138:2",
@@ -1101,8 +1263,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — BLOCKS grid was 1 card/row (287 box vs 288 needed); FIXED to auto-fill grid, re-measured 2/row, 25 rows",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — BLOCKS grid was 1 card/row (287 box vs 288 needed); FIXED to auto-fill grid, re-measured 2/row, 25 rows",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "781:4154",
@@ -1112,8 +1276,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-insertloaderror-zero-callers",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-insertloaderror-zero-callers",
+      "verified": "unreachable"
     },
     {
       "nodeId": "775:4053",
@@ -1123,8 +1289,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-catalog-is-static",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-catalog-is-static",
+      "verified": "unreachable"
     },
     {
       "nodeId": "138:106",
@@ -1134,8 +1302,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — no-results: text y128, link y158 — exact to the board",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — no-results: text y128, link y158 — exact to the board",
+      "verified": "driven"
     },
     {
       "nodeId": "138:53",
@@ -1145,8 +1315,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — searching: flat cross-source list, 32h rows, ⌘F persists — matches",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — searching: flat cross-source list, 32h rows, ⌘F persists — matches",
+      "verified": "driven"
     },
     {
       "nodeId": "138:244",
@@ -1156,8 +1328,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — tip-dismissed: Paste-HTML lands exactly on the panel bottom (732)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — tip-dismissed: Paste-HTML lands exactly on the panel bottom (732)",
+      "verified": "driven"
     },
     {
       "nodeId": "824:5095",
@@ -1168,7 +1342,8 @@
       "height": 552,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:8567",
@@ -1178,8 +1353,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — 13 sections in board order, exact match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — 13 sections in board order, exact match",
+      "verified": "driven"
     },
     {
       "nodeId": "32:2",
@@ -1189,8 +1366,10 @@
       "width": 300,
       "height": 776,
       "status": "active",
-      "authority": "walked:match-drift-header-icon-cluster",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-drift-header-icon-cluster",
+      "verified": "drift-open"
     },
     {
       "nodeId": "807:8412",
@@ -1200,8 +1379,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — 13 sections in board order, exact match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — 13 sections in board order, exact match",
+      "verified": "driven"
     },
     {
       "nodeId": "807:8475",
@@ -1211,8 +1392,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — 13 sections in board order, exact match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — 13 sections in board order, exact match",
+      "verified": "driven"
     },
     {
       "nodeId": "807:8614",
@@ -1222,8 +1405,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — 12 sections in board order, exact match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — 12 sections in board order, exact match",
+      "verified": "driven"
     },
     {
       "nodeId": "807:8521",
@@ -1233,8 +1418,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:match-partial-link-section-absent-for-icon",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-partial-link-section-absent-for-icon",
+      "verified": "drift-open"
     },
     {
       "nodeId": "807:8342",
@@ -1244,8 +1431,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — section order matches EXCEPT the board's LINK section, which LinkSection.tsx:78 gates to link/button/a/cta; text links only inline",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — section order matches EXCEPT the board's LINK section, which LinkSection.tsx:78 gates to link/button/a/cta; text links only inline",
+      "verified": "driven"
     },
     {
       "nodeId": "143:60",
@@ -1255,8 +1444,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — dragging: ghost .5 opacity + 2px accent line; drift: line is 298w inside the 10px-inset row, board is full-bleed 320",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — dragging: ghost .5 opacity + 2px accent line; drift: line is 298w inside the 10px-inset row, board is full-bleed 320",
+      "verified": "drift-open"
     },
     {
       "nodeId": "143:355",
@@ -1266,8 +1457,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — empty: unreachable by its own trigger — useLayerTree always seeds one root row, so the panel says '1 layer' on an empty page",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — empty: unreachable by its own trigger — useLayerTree always seeds one root row, so the panel says '1 layer' on an empty page",
+      "verified": "unreachable"
     },
     {
       "nodeId": "143:2",
@@ -1278,7 +1471,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:143-2",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "143:179",
@@ -1288,8 +1482,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — hidden: name/icon dim, aria gains ', hidden', canvas gets data-hidden",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — hidden: name/icon dim, aria gains ', hidden', canvas gets data-hidden",
+      "verified": "driven"
     },
     {
       "nodeId": "143:119",
@@ -1299,8 +1495,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — invalid-drop: contrast FIXED (was red-on-ink 3.76:1, duplicate color decl); drift remains — alert sits at panel top not the drop point, and copy is raw type names",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — invalid-drop: contrast FIXED (was red-on-ink 3.76:1, duplicate color decl); drift remains — alert sits at panel top not the drop point, and copy is raw type names",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "781:4217",
@@ -1310,8 +1508,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — load-error: copy/colour/position match; drift: footer still reads '66 layers' where the board has no count",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — load-error: copy/colour/position match; drift: footer still reads '66 layers' where the board has no count",
+      "verified": "drift-open"
     },
     {
       "nodeId": "775:4130",
@@ -1321,8 +1521,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — loading: skeleton NEVER renders — composer exists before the payload, so the empty state shows during a 25s stall; LayersTab.tsx:182 false branch is dead",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — loading: skeleton NEVER renders — composer exists before the payload, so the empty state shows during a 25s stall; LayersTab.tsx:182 false branch is dead",
+      "verified": "driven"
     },
     {
       "nodeId": "143:237",
@@ -1332,8 +1534,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — locked: lock darkens, aria gains ', locked', draggable flips false",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — locked: lock darkens, aria gains ', locked', draggable flips false",
+      "verified": "driven"
     },
     {
       "nodeId": "143:295",
@@ -1344,7 +1548,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:143-295",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "782:4260",
@@ -1355,7 +1560,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:782-4260",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "142:2",
@@ -1366,7 +1572,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:142-2",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "145:300",
@@ -1376,8 +1583,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "146:2",
@@ -1387,8 +1596,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "147:2",
@@ -1398,8 +1609,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "147:55",
@@ -1409,8 +1622,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "146:68",
@@ -1420,8 +1635,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "146:32",
@@ -1431,8 +1648,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "145:359",
@@ -1442,8 +1661,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "145:2",
@@ -1453,8 +1674,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "145:49",
@@ -1464,8 +1687,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "144:2",
@@ -1475,8 +1700,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "453:3931",
@@ -1486,8 +1713,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "777:4093",
@@ -1497,8 +1726,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "782:4353",
@@ -1508,8 +1739,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "145:250",
@@ -1519,8 +1752,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "145:199",
@@ -1530,8 +1765,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "145:148",
@@ -1541,8 +1778,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "145:96",
@@ -1552,8 +1791,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "75:2",
@@ -1564,7 +1805,8 @@
       "height": 992,
       "status": "active",
       "authority": "code:cites-board",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "165:24",
@@ -1574,8 +1816,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "165:44",
@@ -1585,8 +1829,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-copy-and-markall-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-copy-and-markall-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "165:71",
@@ -1597,7 +1843,8 @@
       "height": 776,
       "status": "active",
       "authority": "board:165-71",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "453:4051",
@@ -1607,8 +1854,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-error-copy-and-action",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-error-copy-and-action",
+      "verified": "drift-open"
     },
     {
       "nodeId": "165:51",
@@ -1618,8 +1867,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-spinner-not-skeletons",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-spinner-not-skeletons",
+      "verified": "drift-open"
     },
     {
       "nodeId": "165:2",
@@ -1629,8 +1880,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:2026-08-31 — Notifications · unread: panel 360 wide; day section headers (AUG 21 / AUG 20) at x1 and relative times ('9 days ago') right-aligned ~x280. Board groups under one Section header instance and shows a short time ('2h') at x312 — the shape matches, the time format and grouping differ",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Notifications · unread: panel 360 wide; day section headers (AUG 21 / AUG 20) at x1 and relative times ('9 days ago') right-aligned ~x280. Board groups under one Section header instance and shows a short time ('2h') at x312 — the shape matches, the time format and grouping differ",
+      "verified": "driven"
     },
     {
       "nodeId": "430:2375",
@@ -1641,7 +1894,8 @@
       "height": 852,
       "status": "active",
       "authority": "code:state-exists",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "430:2348",
@@ -1652,7 +1906,8 @@
       "height": 852,
       "status": "active",
       "authority": "code:state-exists",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "184:56",
@@ -1662,8 +1917,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:partial-copy+action-confirmed-geometry-not-measured",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-copy+action-confirmed-geometry-not-measured",
+      "verified": "drift-open"
     },
     {
       "nodeId": "184:87",
@@ -1674,7 +1931,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:dismiss-offered-needs-live-orphan-to-confirm",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "184:70",
@@ -1685,7 +1943,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:reattach-service+event-exist-needs-live-orphan",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "141:78",
@@ -1695,8 +1954,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — bulk-select: reported by a walker as band-colour/order drift with the ✕ 25px outside the panel; NOT reproduced here (no checkbox inputs at rest — bulk mode is gated), so the ✕ claim is unconfirmed",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — bulk-select: reported by a walker as band-colour/order drift with the ✕ 25px outside the panel; NOT reproduced here (no checkbox inputs at rest — bulk mode is gated), so the ✕ claim is unconfirmed",
+      "verified": "drift-open"
     },
     {
       "nodeId": "141:124",
@@ -1706,8 +1967,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — empty (1-page site): row + note + centred Add page, both texts on the panel centre",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — empty (1-page site): row + note + centred Add page, both texts on the panel centre",
+      "verified": "driven"
     },
     {
       "nodeId": "141:2",
@@ -1717,8 +1980,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — folders-collapsed: folder count was parked at x187 (a trailing flex:1 spacer beat margin-left:auto) — FIXED; rows still 28h vs board 32",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — folders-collapsed: folder count was parked at x187 (a trailing flex:1 spacer beat margin-left:auto) — FIXED; rows still 28h vs board 32",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "141:207",
@@ -1728,8 +1993,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — listings: columns and rows match; drift — 'Open full listings ›' renders at y722-754 in a 732 panel, clipped out of sight",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — listings: columns and rows match; drift — 'Open full listings ›' renders at y722-754 in a 732 panel, clipped out of sight",
+      "verified": "drift-open"
     },
     {
       "nodeId": "141:165",
@@ -1739,8 +2006,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — load-error: copy character-exact and Try again recovers; drift — the search band and Add-page footer both vanish, board keeps both",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — load-error: copy character-exact and Try again recovers; drift — the search band and Add-page footer both vanish, board keeps both",
+      "verified": "drift-open"
     },
     {
       "nodeId": "774:4044",
@@ -1750,8 +2019,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-skeleton-zero-importers",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-skeleton-zero-importers",
+      "verified": "unreachable"
     },
     {
       "nodeId": "782:4212",
@@ -1761,8 +2032,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — no-results: copy exact incl. curly quotes, Clear search in accent, footer retained",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — no-results: copy exact incl. curly quotes, Clear search in accent, footer retained",
+      "verified": "driven"
     },
     {
       "nodeId": "435:2348",
@@ -1772,8 +2045,10 @@
       "width": 1080,
       "height": 920,
       "status": "active",
-      "authority": "walked:2026-08-31 — page tab bar: rename validation popovers and delete-confirm copy exact; drift — active tab not flush with the bar bottom (4px py-1)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — page tab bar: rename validation popovers and delete-confirm copy exact; drift — active tab not flush with the bar bottom (4px py-1)",
+      "verified": "drift-open"
     },
     {
       "nodeId": "141:40",
@@ -1783,8 +2058,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — searching: 2 flat results, unindented, footer retained — matches",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — searching: 2 flat results, unindented, footer retained — matches",
+      "verified": "driven"
     },
     {
       "nodeId": "140:2",
@@ -1794,8 +2071,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — tree: drift — rows 28h not 32, names 19px left of the board column, footer carries 3 controls where the board has 1",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — tree: drift — rows 28h not 32, names 19px left of the board column, footer carries 3 controls where the board has 1",
+      "verified": "drift-open"
     },
     {
       "nodeId": "817:4899",
@@ -1806,7 +2085,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:4856",
@@ -1817,7 +2097,8 @@
       "height": 540,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:4774",
@@ -1828,7 +2109,8 @@
       "height": 560,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:4950",
@@ -1839,7 +2121,8 @@
       "height": 632,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "879:6901",
@@ -1850,7 +2133,8 @@
       "height": 259,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "879:6896",
@@ -1861,7 +2145,8 @@
       "height": 141,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "914:4507",
@@ -1872,7 +2157,8 @@
       "height": 361,
       "status": "active",
       "authority": "board:914-4507",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "784:4403",
@@ -1882,8 +2168,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match-prejob-variant-viewlog-subcase-untested",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-prejob-variant-viewlog-subcase-untested",
+      "verified": "match"
     },
     {
       "nodeId": "784:4326",
@@ -1893,8 +2181,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "781:4489",
@@ -1904,8 +2194,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match-shape-drift-disabled-cta-blue-not-grey",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-shape-drift-disabled-cta-blue-not-grey",
+      "verified": "drift-open"
     },
     {
       "nodeId": "778:4238",
@@ -1915,8 +2207,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "784:4480",
@@ -1926,8 +2220,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-canPublish-always-true",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-canPublish-always-true",
+      "verified": "unreachable"
     },
     {
       "nodeId": "641:2652",
@@ -1937,8 +2233,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "833:4518",
@@ -1948,8 +2246,10 @@
       "width": 520,
       "height": 439,
       "status": "active",
-      "authority": "walked:drift-checkrow-overlap-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-checkrow-overlap-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "893:4518",
@@ -1959,8 +2259,10 @@
       "width": 520,
       "height": 439,
       "status": "active",
-      "authority": "walked:drift-checkrow-overlap-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-checkrow-overlap-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "784:4250",
@@ -1970,8 +2272,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match-drift-disabled-cta-colour",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-drift-disabled-cta-colour",
+      "verified": "drift-open"
     },
     {
       "nodeId": "912:4520",
@@ -1982,7 +2286,8 @@
       "height": 617,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "876:4532",
@@ -1993,7 +2298,8 @@
       "height": 1163,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "157:58",
@@ -2003,8 +2309,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "157:2",
@@ -2015,7 +2323,8 @@
       "height": 812,
       "status": "active",
       "authority": "code:detached-group-wired-fixture-has-no-orphan-now",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "157:221",
@@ -2025,8 +2334,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "453:3974",
@@ -2036,8 +2347,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match-minor-summary-also-hides",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-minor-summary-also-hides",
+      "verified": "match"
     },
     {
       "nodeId": "157:169",
@@ -2048,7 +2361,8 @@
       "height": 812,
       "status": "active",
       "authority": "code:rounds-list-ships-comment-linkage-blocked",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "156:2",
@@ -2058,8 +2372,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "158:2",
@@ -2069,8 +2385,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "158:57",
@@ -2080,8 +2398,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "157:109",
@@ -2091,8 +2411,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:drift-resolved-row-never-names-resolver",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-resolved-row-never-names-resolver",
+      "verified": "drift-open"
     },
     {
       "nodeId": "158:213",
@@ -2103,7 +2425,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:158-213-toast",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "158:105",
@@ -2113,8 +2436,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "158:162",
@@ -2124,8 +2449,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "52:2",
@@ -2135,8 +2462,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "58:2",
@@ -2147,7 +2476,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "55:2",
@@ -2158,7 +2488,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "297:1972",
@@ -2168,8 +2499,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-coach-never-mounts",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-coach-never-mounts",
+      "verified": "drift-open"
     },
     {
       "nodeId": "807:4299",
@@ -2179,8 +2512,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-drawer-side",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-drawer-side",
+      "verified": "drift-open"
     },
     {
       "nodeId": "807:6558",
@@ -2191,7 +2526,8 @@
       "height": 900,
       "status": "active",
       "authority": "founder:no-templates-in-insert",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:6694",
@@ -2201,8 +2537,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:unreachable-by-choice-would-mutate",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-by-choice-would-mutate",
+      "verified": "unreachable"
     },
     {
       "nodeId": "813:4489",
@@ -2212,8 +2550,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-modal-vs-full-page",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-modal-vs-full-page",
+      "verified": "drift-open"
     },
     {
       "nodeId": "297:2027",
@@ -2224,7 +2564,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:copy-wins-VERIFIED-LIVE",
-      "recipe": null
+      "recipe": null,
+      "verified": "match"
     },
     {
       "nodeId": "297:2139",
@@ -2234,8 +2575,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-banner-position",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-banner-position",
+      "verified": "drift-open"
     },
     {
       "nodeId": "807:7000",
@@ -2245,8 +2588,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:code-wins-syncing-claim-unbacked",
-      "recipe": null
+      "authority": "code",
+      "recipe": null,
+      "verifiedNote": "code-wins-syncing-claim-unbacked",
+      "verified": "driven"
     },
     {
       "nodeId": "813:4836",
@@ -2256,8 +2601,10 @@
       "width": 1440,
       "height": 360,
       "status": "active",
-      "authority": "walked:drift-7-states-board-draws-5",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-7-states-board-draws-5",
+      "verified": "drift-open"
     },
     {
       "nodeId": "813:4888",
@@ -2268,7 +2615,8 @@
       "height": 900,
       "status": "design-ahead",
       "authority": "blocked:no-version-detect",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "295:1972",
@@ -2278,8 +2626,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-no-modal",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-no-modal",
+      "verified": "drift-open"
     },
     {
       "nodeId": "295:1994",
@@ -2289,8 +2639,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:unreachable-toast-only",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-toast-only",
+      "verified": "unreachable"
     },
     {
       "nodeId": "295:1989",
@@ -2300,8 +2652,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:unreachable-create-is-synchronous",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-create-is-synchronous",
+      "verified": "unreachable"
     },
     {
       "nodeId": "807:7252",
@@ -2311,8 +2665,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-no-search-no-tabs",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-no-search-no-tabs",
+      "verified": "drift-open"
     },
     {
       "nodeId": "296:1972",
@@ -2322,8 +2678,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-checklist-floor-3-unreachable",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-checklist-floor-3-unreachable",
+      "verified": "unreachable"
     },
     {
       "nodeId": "296:1999",
@@ -2333,8 +2691,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-seeded-4-rendered-5",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-seeded-4-rendered-5",
+      "verified": "drift-open"
     },
     {
       "nodeId": "296:2030",
@@ -2344,8 +2704,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift",
+      "verified": "drift-open"
     },
     {
       "nodeId": "296:2069",
@@ -2356,7 +2718,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "superseded:1342-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "296:2064",
@@ -2367,7 +2730,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "superseded:1342-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "294:1984",
@@ -2377,8 +2741,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-banner-over-live-shell-deliberate",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-banner-over-live-shell-deliberate",
+      "verified": "drift-open"
     },
     {
       "nodeId": "294:1992",
@@ -2388,8 +2754,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-no-reconnecting-state",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-no-reconnecting-state",
+      "verified": "drift-open"
     },
     {
       "nodeId": "294:1976",
@@ -2400,7 +2768,8 @@
       "height": 900,
       "status": "active",
       "authority": "founder:board-asks-product-to-lie-REDRAW",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "813:4870",
@@ -2411,7 +2780,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "superseded:1347-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "813:4676",
@@ -2422,7 +2792,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "superseded:1343-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "299:1973",
@@ -2433,7 +2804,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "299:2021",
@@ -2444,7 +2816,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "299:1997",
@@ -2455,7 +2828,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "396:2371",
@@ -2466,7 +2840,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "300:1972",
@@ -2477,7 +2852,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "396:2338",
@@ -2488,7 +2864,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "299:2042",
@@ -2499,7 +2876,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "299:2029",
@@ -2510,7 +2888,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "299:2052",
@@ -2521,7 +2900,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "300:2001",
@@ -2532,7 +2912,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "300:2018",
@@ -2543,7 +2924,8 @@
       "height": 776,
       "status": "out-of-scope",
       "authority": "superseded:1345-7162",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "301:1979",
@@ -2554,7 +2936,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:state-exists",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "301:2393",
@@ -2564,8 +2947,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match-contenteditable-accent-outline-focused",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-contenteditable-accent-outline-focused",
+      "verified": "match"
     },
     {
       "nodeId": "301:2186",
@@ -2575,8 +2960,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:partial-trigger-exists-cursor-not-on-body",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-trigger-exists-cursor-not-on-body",
+      "verified": "drift-open"
     },
     {
       "nodeId": "815:4518",
@@ -2587,7 +2974,8 @@
       "height": 934,
       "status": "active",
       "authority": "board:815-4518",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "815:4608",
@@ -2598,7 +2986,8 @@
       "height": 680,
       "status": "active",
       "authority": "code:state-exists",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:7301",
@@ -2609,7 +2998,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:state-exists",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:7775",
@@ -2619,8 +3009,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match-all-11-printed-chords-honoured",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-all-11-printed-chords-honoured",
+      "verified": "match"
     },
     {
       "nodeId": "807:8069",
@@ -2631,7 +3023,8 @@
       "height": 900,
       "status": "active",
       "authority": "board:807:8069",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "303:1997",
@@ -2641,8 +3034,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "303:2032",
@@ -2652,8 +3047,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "302:2026",
@@ -2663,8 +3060,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "302:1978",
@@ -2674,8 +3073,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "1306:2",
@@ -2686,7 +3087,8 @@
       "height": 520,
       "status": "out-of-scope",
       "authority": "code:capture",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "302:2004",
@@ -2696,8 +3098,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "807:8663",
@@ -2707,8 +3111,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:unbuilt-previewoverlay-has-no-device-frame",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unbuilt-previewoverlay-has-no-device-frame",
+      "verified": "unreachable"
     },
     {
       "nodeId": "814:7027",
@@ -2719,7 +3125,8 @@
       "height": 320,
       "status": "active",
       "authority": "board:814-7027",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "128:2",
@@ -2729,8 +3136,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-popover-not-modal-offviewport-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-popover-not-modal-offviewport-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "129:451",
@@ -2740,8 +3149,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-inline-warning-not-modal",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-inline-warning-not-modal",
+      "verified": "drift-open"
     },
     {
       "nodeId": "129:2",
@@ -2751,8 +3162,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-no-sending-modal",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-no-sending-modal",
+      "verified": "drift-open"
     },
     {
       "nodeId": "129:223",
@@ -2762,8 +3175,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-no-success-link-shown",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-no-success-link-shown",
+      "verified": "drift-open"
     },
     {
       "nodeId": "817:5114",
@@ -2773,8 +3188,10 @@
       "width": 360,
       "height": 812,
       "status": "active",
-      "authority": "walked:drift-severe-wrong-surface",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-severe-wrong-surface",
+      "verified": "drift-open"
     },
     {
       "nodeId": "130:798",
@@ -2784,8 +3201,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-25 — client Approve flipped DB to APPROVED; editor topbar read 'Approved by Fixture Reviewer · just now'",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-25 — client Approve flipped DB to APPROVED; editor topbar read 'Approved by Fixture Reviewer · just now'",
+      "verified": "driven"
     },
     {
       "nodeId": "130:997",
@@ -2795,8 +3214,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "130:599",
@@ -2806,8 +3227,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "130:2",
@@ -2817,8 +3240,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "130:400",
@@ -2828,8 +3253,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "130:201",
@@ -2839,8 +3266,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-25 — round observed PENDING before the client resolved it",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-25 — round observed PENDING before the client resolved it",
+      "verified": "driven"
     },
     {
       "nodeId": "133:2",
@@ -2851,7 +3280,8 @@
       "height": 900,
       "status": "active",
       "authority": "superseded:by-review-panel-156-158",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "132:2",
@@ -2862,7 +3292,8 @@
       "height": 900,
       "status": "active",
       "authority": "superseded:by-review-panel-156-158",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "133:212",
@@ -2873,7 +3304,8 @@
       "height": 900,
       "status": "active",
       "authority": "superseded:by-review-panel-156-158",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "133:422",
@@ -2884,7 +3316,8 @@
       "height": 900,
       "status": "active",
       "authority": "superseded:by-review-panel-156-158",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "133:630",
@@ -2895,7 +3328,8 @@
       "height": 900,
       "status": "active",
       "authority": "superseded:by-review-panel-156-158",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "307:2203",
@@ -2906,7 +3340,8 @@
       "height": 900,
       "status": "active",
       "authority": "board:307:2203",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "307:2213",
@@ -2917,7 +3352,8 @@
       "height": 900,
       "status": "active",
       "authority": "board:307:2213",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "307:2193",
@@ -2928,7 +3364,8 @@
       "height": 900,
       "status": "active",
       "authority": "board:307:2193",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:8723",
@@ -2938,8 +3375,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-25 — /review/<token> opened anonymously, 200, pages listed, Approve taken",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-25 — /review/<token> opened anonymously, 200, pages listed, Approve taken",
+      "verified": "driven"
     },
     {
       "nodeId": "131:2",
@@ -2949,8 +3388,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "131:201",
@@ -2961,7 +3402,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:stale-approval-modal-source-only-NOT-LIVE",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "131:415",
@@ -2971,8 +3413,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match-inferred-same-path-as-130:400",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-inferred-same-path-as-130:400",
+      "verified": "match"
     },
     {
       "nodeId": "817:5006",
@@ -2983,7 +3427,8 @@
       "height": 520,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:5195",
@@ -2994,7 +3439,8 @@
       "height": 360,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:8756",
@@ -3005,7 +3451,8 @@
       "height": 900,
       "status": "active",
       "authority": "code:state-exists",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:8787",
@@ -3016,7 +3463,8 @@
       "height": 900,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:5220",
@@ -3027,7 +3475,8 @@
       "height": 548,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:5262",
@@ -3038,7 +3487,8 @@
       "height": 548,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "878:4518",
@@ -3049,7 +3499,8 @@
       "height": 548,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "878:4543",
@@ -3060,7 +3511,8 @@
       "height": 169,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "639:3443",
@@ -3070,8 +3522,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Analytics: field order inverted — live puts the ID input above its Enable toggle, board puts the toggle first",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Analytics: field order inverted — live puts the ID input above its Enable toggle, board puts the toggle first",
+      "verified": "driven"
     },
     {
       "nodeId": "638:2732",
@@ -3082,7 +3536,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "superseded:1344-7165",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "639:4144",
@@ -3092,8 +3547,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Custom code: the 3 cards match 1:1; only the shared full-bleed field width applies",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Custom code: the 3 cards match 1:1; only the shared full-bleed field width applies",
+      "verified": "driven"
     },
     {
       "nodeId": "639:3092",
@@ -3103,8 +3560,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Domains: empty state reached; no Force-HTTPS toggle. Populated DNS table NOT verified",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Domains: empty state reached; no Force-HTTPS toggle. Populated DNS table NOT verified",
+      "verified": "driven"
     },
     {
       "nodeId": "639:2754",
@@ -3114,8 +3573,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Export: board draws FORMAT + PREVIEW cards; live is a paragraph and an 'Open exporter' button",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Export: board draws FORMAT + PREVIEW cards; live is a paragraph and an 'Open exporter' button",
+      "verified": "driven"
     },
     {
       "nodeId": "640:3135",
@@ -3125,8 +3586,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Forms: the PROVIDER card (provider select, endpoint, spam toggle) is absent. Populated inbox NOT verified",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Forms: the PROVIDER card (provider select, endpoint, spam toggle) is absent. Populated inbox NOT verified",
+      "verified": "driven"
     },
     {
       "nodeId": "638:2378",
@@ -3136,8 +3599,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — General: fields match; drift — the board's LEGAL card (cookie-consent toggle + privacy-page select) is replaced by two static links, and cookie consent moved to Analytics",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — General: fields match; drift — the board's LEGAL card (cookie-consent toggle + privacy-page select) is replaced by two static links, and cookie consent moved to Analytics",
+      "verified": "drift-open"
     },
     {
       "nodeId": "640:2789",
@@ -3147,8 +3612,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Headers: all 4 board cards present, plus Permissions-Policy; order differs; content overflows an 811-tall body",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Headers: all 4 board cards present, plus Permissions-Policy; order differs; content overflows an 811-tall body",
+      "verified": "driven"
     },
     {
       "nodeId": "640:4202",
@@ -3159,7 +3626,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "640:3488",
@@ -3170,7 +3638,8 @@
       "height": 900,
       "status": "active",
       "authority": "blocked:integrations-is-pro-gated-needs-pro-fixture",
-      "recipe": null
+      "recipe": null,
+      "verified": "unreachable"
     },
     {
       "nodeId": "639:3795",
@@ -3180,8 +3649,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Localization: no auto-redirect toggle; locales are a chip row, not the board's 4-column table",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Localization: no auto-redirect toggle; locales are a chip row, not the board's 4-column table",
+      "verified": "driven"
     },
     {
       "nodeId": "640:2440",
@@ -3191,8 +3662,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Redirects: the 404-SUGGESTER card is absent although the screen's own subtitle promises it",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Redirects: the 404-SUGGESTER card is absent although the screen's own subtitle promises it",
+      "verified": "driven"
     },
     {
       "nodeId": "638:3070",
@@ -3202,8 +3675,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — SEO: 3 fields vs the board's 6; the whole INDEXING card (allow-indexing toggle + robots.txt) is absent and robots.txt has no other home",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — SEO: 3 fields vs the board's 6; the whole INDEXING card (allow-indexing toggle + robots.txt) is absent and robots.txt has no other home",
+      "verified": "driven"
     },
     {
       "nodeId": "640:3849",
@@ -3213,8 +3688,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Webhooks: empty state live; the board's RECENT DELIVERIES table is one summary sentence instead",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Webhooks: empty state live; the board's RECENT DELIVERIES table is one summary sentence instead",
+      "verified": "driven"
     },
     {
       "nodeId": "817:5289",
@@ -3225,7 +3702,8 @@
       "height": 480,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "202:2",
@@ -3235,8 +3713,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:partial-rail60-drawer320-canvas552-inspector-not-measured",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-rail60-drawer320-canvas552-inspector-not-measured",
+      "verified": "drift-open"
     },
     {
       "nodeId": "963:4474",
@@ -3247,7 +3727,8 @@
       "height": 900,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "65:2",
@@ -3257,8 +3738,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:partial-cta-half-only-coach-not-co-verified",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-cta-half-only-coach-not-co-verified",
+      "verified": "drift-open"
     },
     {
       "nodeId": "66:441",
@@ -3268,8 +3751,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match-code-ahead-of-board",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-code-ahead-of-board",
+      "verified": "match"
     },
     {
       "nodeId": "66:640",
@@ -3279,8 +3764,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-impersonal-3button-vs-attributed-2button-founder-gated",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-impersonal-3button-vs-attributed-2button-founder-gated",
+      "verified": "drift-open"
     },
     {
       "nodeId": "65:412",
@@ -3290,8 +3777,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-canvas-skeleton-unreachable-on-real-load",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-canvas-skeleton-unreachable-on-real-load",
+      "verified": "unreachable"
     },
     {
       "nodeId": "199:2",
@@ -3301,8 +3790,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "199:205",
@@ -3312,8 +3803,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-toolbar-icons-zero-width-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-toolbar-icons-zero-width-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "66:4",
@@ -3323,8 +3816,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:partial-mixed-fields-shown-board-says-hide",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-mixed-fields-shown-board-says-hide",
+      "verified": "drift-open"
     },
     {
       "nodeId": "199:409",
@@ -3334,8 +3829,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "200:2",
@@ -3345,8 +3842,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:partial-comment-pins-not-reproduced",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-comment-pins-not-reproduced",
+      "verified": "drift-open"
     },
     {
       "nodeId": "65:211",
@@ -3356,8 +3855,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "200:213",
@@ -3367,8 +3868,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "66:225",
@@ -3379,7 +3882,8 @@
       "height": 900,
       "status": "active",
       "authority": "blocked:unreachable-by-design-paid-openai-call",
-      "recipe": null
+      "recipe": null,
+      "verified": "unreachable"
     },
     {
       "nodeId": "642:3696",
@@ -3390,7 +3894,8 @@
       "height": 900,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "642:2832",
@@ -3400,8 +3905,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-4-generic-phases-vs-6-per-section",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-4-generic-phases-vs-6-per-section",
+      "verified": "drift-open"
     },
     {
       "nodeId": "641:2487",
@@ -3411,8 +3918,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — gallery: card geometry exact (130h, thumb 288x88); thumb rendered SQUARE because tw:rounded-6 compiles to nothing — FIXED to rounded-md + gated",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — gallery: card geometry exact (130h, thumb 288x88); thumb rendered SQUARE because tw:rounded-6 compiles to nothing — FIXED to rounded-md + gated",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "781:4372",
@@ -3422,8 +3931,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — load-error: line rhythm 22px matches; drift — inset 16 vs 24 and top-pad 12 where sibling states use 20",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — load-error: line rhythm 22px matches; drift — inset 16 vs 24 and top-pad 12 where sibling states use 20",
+      "verified": "drift-open"
     },
     {
       "nodeId": "778:4102",
@@ -3434,7 +3945,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:static-catalog",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "782:4402",
@@ -3444,8 +3956,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — no-results: message→button delta 26px matches; drift — text inset 16 vs board 24",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — no-results: message→button delta 26px matches; drift — text inset 16 vs board 24",
+      "verified": "drift-open"
     },
     {
       "nodeId": "642:2556",
@@ -3455,8 +3969,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — preview modal: 720 wide at x360 exact; drift — preview iframe 260h vs board 320",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — preview modal: 720 wide at x360 exact; drift — preview iframe 260h vs board 320",
+      "verified": "drift-open"
     },
     {
       "nodeId": "862:6860",
@@ -3467,7 +3983,8 @@
       "height": 19723,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "862:6859",
@@ -3478,7 +3995,8 @@
       "height": 28298,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "957:4474",
@@ -3489,7 +4007,8 @@
       "height": 1100,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1069:4529",
@@ -3500,7 +4019,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:1069-4529",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1069:4707",
@@ -3511,7 +4031,8 @@
       "height": 812,
       "status": "active",
       "authority": "founder:no-templates-in-insert",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1069:4790",
@@ -3522,7 +4043,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:conflict-list-vs-grid-measured-32h-16inset",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1069:4970",
@@ -3533,7 +4055,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:conflict-list-vs-grid-measured-32h-16inset",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1082:4527",
@@ -3543,8 +4066,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — context-menu: 180w, radius 8, 28h items — matches; only .bdc-menu-sep has 4px margins the board lacks",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — context-menu: 180w, radius 8, 28h items — matches; only .bdc-menu-sep has 4px margins the board lacks",
+      "verified": "driven"
     },
     {
       "nodeId": "1082:4589",
@@ -3555,7 +4080,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:1082-4589",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1082:4640",
@@ -3565,8 +4091,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — expanded: 66 rows; drift: indent step 14px vs board 16, rows inset 10px, pitch 29 vs 28",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — expanded: 66 rows; drift: indent step 14px vs board 16, rows inset 10px, pitch 29 vs 28",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1082:4739",
@@ -3576,8 +4104,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — component-instance: drift — TWO badges (◇ green + ⚡ accent) for one fact, both ~40px left of the board's single badge",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — component-instance: drift — TWO badges (◇ green + ⚡ accent) for one fact, both ~40px left of the board's single badge",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1082:4835",
@@ -3587,8 +4117,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — scroll-overflow: header/toolbar/footer pin correctly; drift — no scrollbar drawn at rest on a 66-row tree (board draws a 4px thumb)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — scroll-overflow: header/toolbar/footer pin correctly; drift — no scrollbar drawn at rest on a 66-row tree (board draws a 4px thumb)",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1082:5004",
@@ -3599,7 +4131,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:no-list-view",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1124:4527",
@@ -3609,8 +4142,10 @@
       "width": 1000,
       "height": 700,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1124:4562",
@@ -3620,8 +4155,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1138:4527",
@@ -3631,8 +4168,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1138:4573",
@@ -3642,8 +4181,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-skeleton-pitch-18-vs-32",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-skeleton-pitch-18-vs-32",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1138:13376",
@@ -3654,7 +4195,8 @@
       "height": 812,
       "status": "design-ahead",
       "authority": "blocked:defaults-always-staged",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1138:13394",
@@ -3664,8 +4206,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-by-choice-shared-fixture",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-by-choice-shared-fixture",
+      "verified": "unreachable"
     },
     {
       "nodeId": "1138:13413",
@@ -3675,8 +4219,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:partial-search-empty-reachable-copy-stale",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-search-empty-reachable-copy-stale",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1138:13436",
@@ -3686,8 +4232,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-31 — Custom code · locked: the gate never fired — SCREEN_PLAN_REQUIREMENTS keyed 'advanced' where the screen id is 'custom-code'. FIXED + guarded by a test",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Custom code · locked: the gate never fired — SCREEN_PLAN_REQUIREMENTS keyed 'advanced' where the screen id is 'custom-code'. FIXED + guarded by a test",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "159:2",
@@ -3698,7 +4246,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:159-2",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "159:99",
@@ -3708,8 +4257,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — empty state live at 300w: sentence + AI action; board's x16/full-width action vs live x24/centred link is the only delta",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — empty state live at 300w: sentence + AI action; board's x16/full-width action vs live x24/centred link is the only delta",
+      "verified": "driven"
     },
     {
       "nodeId": "159:102",
@@ -3719,8 +4270,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:partial-skeleton-title-and-row-metrics-differ",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-skeleton-title-and-row-metrics-differ",
+      "verified": "drift-open"
     },
     {
       "nodeId": "159:123",
@@ -3730,8 +4283,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — align x6 + distribute x2 + Background/Text color/Radius/Padding/Font size + mixed-field explainer; superset of the board",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — align x6 + distribute x2 + Background/Text color/Radius/Padding/Font size + mixed-field explainer; superset of the board",
+      "verified": "driven"
     },
     {
       "nodeId": "160:2",
@@ -3741,8 +4296,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:drift-instance-band-gated-on-variants-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-instance-band-gated-on-variants-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "160:105",
@@ -3752,8 +4309,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "160:208",
@@ -3763,8 +4322,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — Tablet + a changed value shows the override bar (border-left), the ↺ 'Revert font size to base', and 'Overridden on Tablet — Base is …'; pill gains a dot. Fixture override reverted after.",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Tablet + a changed value shows the override bar (border-left), the ↺ 'Revert font size to base', and 'Overridden on Tablet — Base is …'; pill gains a dot. Fixture override reverted after.",
+      "verified": "driven"
     },
     {
       "nodeId": "160:313",
@@ -3774,8 +4335,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — Base pill → :hover shows the note 'Editing :hover — not Base', the board's exact copy",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Base pill → :hover shows the note 'Editing :hover — not Base', the board's exact copy",
+      "verified": "driven"
     },
     {
       "nodeId": "160:412",
@@ -3785,8 +4348,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — reach pill → All like this shows 'Editing all 4 paragraphs — All like this' (board's count is sample data)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — reach pill → All like this shows 'Editing all 4 paragraphs — All like this' (board's count is sample data)",
+      "verified": "driven"
     },
     {
       "nodeId": "160:512",
@@ -3796,8 +4361,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:unreachable-selection-cleared-on-ai-tab-entry",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-selection-cleared-on-ai-tab-entry",
+      "verified": "unreachable"
     },
     {
       "nodeId": "189:2",
@@ -3807,8 +4374,10 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — whole-site takeover: 0 sections, 'Editing the whole site — every page' + Open Brand / Back to this element; back restores all 11 sections",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — whole-site takeover: 0 sections, 'Editing the whole site — every page' + Open Brand / Back to this element; back restores all 11 sections",
+      "verified": "driven"
     },
     {
       "nodeId": "164:2",
@@ -3818,8 +4387,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:2026-08-31 — Issues · all: panel 360 wide, title x17 y13 — matches. The filter head rendered as TWO lines ('All' y50, '· 2' y82) because the label is a block-level Button and the count a sibling span with no flex on the container; board draws one string 'All · 3'. FIXED, re-measured on one line and confirmed by eye. Remaining drift: issue subtitle x51 vs board x32; ✕ at x316 y6 vs board x332 y14",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Issues · all: panel 360 wide, title x17 y13 — matches. The filter head rendered as TWO lines ('All' y50, '· 2' y82) because the label is a block-level Button and the count a sibling span with no flex on the container; board draws one string 'All · 3'. FIXED, re-measured on one line and confirmed by eye. Remaining drift: issue subtitle x51 vs board x32; ✕ at x316 y6 vs board x332 y14",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "164:22",
@@ -3829,8 +4400,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-filter-note-position-BOARD-CONFLICT",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-filter-note-position-BOARD-CONFLICT",
+      "verified": "drift-open"
     },
     {
       "nodeId": "164:35",
@@ -3840,8 +4413,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:drift-empty-text-20px-high",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-empty-text-20px-high",
+      "verified": "drift-open"
     },
     {
       "nodeId": "164:42",
@@ -3851,8 +4426,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:unreachable-no-autofix-producer",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-no-autofix-producer",
+      "verified": "unreachable"
     },
     {
       "nodeId": "164:57",
@@ -3862,8 +4439,10 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "walked:unreachable-no-autofix-producer",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-no-autofix-producer",
+      "verified": "unreachable"
     },
     {
       "nodeId": "183:2",
@@ -3873,8 +4452,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:match-720x441-tabs-cancel-save",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-720x441-tabs-cancel-save",
+      "verified": "match"
     },
     {
       "nodeId": "183:16",
@@ -3884,8 +4465,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:drift-no-dirty-guard-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-no-dirty-guard-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "183:31",
@@ -3896,7 +4479,8 @@
       "height": 0,
       "status": "design-ahead",
       "authority": "blocked:sync-delete",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "183:43",
@@ -3907,7 +4491,8 @@
       "height": 0,
       "status": "design-ahead",
       "authority": "blocked:sync-delete",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "183:60",
@@ -3917,8 +4502,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:partial-save-closes-modal-success-toast",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-save-closes-modal-success-toast",
+      "verified": "drift-open"
     },
     {
       "nodeId": "303:2067",
@@ -3928,8 +4515,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — data · no-source: copy exact; drawn as a full-width empty state rather than the board's pill",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — data · no-source: copy exact; drawn as a full-width empty state rather than the board's pill",
+      "verified": "driven"
     },
     {
       "nodeId": "303:2083",
@@ -3939,8 +4528,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — data · watching: green pill real (140 vs 146 wide); board pill has a border, live does not",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — data · watching: green pill real (140 vs 146 wide); board pill has a border, live does not",
+      "verified": "driven"
     },
     {
       "nodeId": "303:1978",
@@ -3950,8 +4541,10 @@
       "width": 640,
       "height": 420,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "642:3401",
@@ -3961,8 +4554,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-18",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-18",
+      "verified": "driven"
     },
     {
       "nodeId": "307:2223",
@@ -3973,7 +4568,8 @@
       "height": 140,
       "status": "active",
       "authority": "code:copy-wins-VERIFIED-LIVE",
-      "recipe": null
+      "recipe": null,
+      "verified": "match"
     },
     {
       "nodeId": "807:6965",
@@ -3983,8 +4579,10 @@
       "width": 1080,
       "height": 776,
       "status": "active",
-      "authority": "walked:unreachable-needs-two-writers",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-needs-two-writers",
+      "verified": "unreachable"
     },
     {
       "nodeId": "304:2048",
@@ -3995,7 +4593,8 @@
       "height": 0,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "304:2081",
@@ -4006,7 +4605,8 @@
       "height": 0,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "304:2103",
@@ -4017,7 +4617,8 @@
       "height": 0,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "817:5069",
@@ -4028,7 +4629,8 @@
       "height": 0,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "46:2",
@@ -4039,7 +4641,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "57:2",
@@ -4050,7 +4653,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "58:215",
@@ -4061,7 +4665,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "59:2",
@@ -4072,7 +4677,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "70:2",
@@ -4083,7 +4689,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "72:2",
@@ -4094,7 +4701,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "74:2",
@@ -4105,7 +4713,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "96:6",
@@ -4116,7 +4725,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "396:3777",
@@ -4127,7 +4737,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:7298",
@@ -4138,7 +4749,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:8660",
@@ -4149,7 +4761,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "807:8838",
@@ -4160,7 +4773,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "962:4474",
@@ -4171,7 +4785,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "821:4520",
@@ -4182,7 +4797,8 @@
       "height": 0,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1156:4593",
@@ -4193,7 +4809,8 @@
       "height": 548,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1156:4620",
@@ -4204,7 +4821,8 @@
       "height": 776,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1156:4665",
@@ -4215,7 +4833,8 @@
       "height": 169,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1157:4593",
@@ -4226,7 +4845,8 @@
       "height": 340,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1157:4649",
@@ -4237,7 +4857,8 @@
       "height": 480,
       "status": "design-ahead",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1159:4593",
@@ -4247,8 +4868,10 @@
       "height": 900,
       "family": "Media",
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1162:4617",
@@ -4258,8 +4881,10 @@
       "height": 900,
       "family": "Media",
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1163:4641",
@@ -4269,8 +4894,10 @@
       "height": 900,
       "family": "Media",
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1163:13695",
@@ -4280,8 +4907,10 @@
       "height": 900,
       "family": "Media",
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1163:13948",
@@ -4291,8 +4920,10 @@
       "height": 900,
       "family": "Media",
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1164:4713",
@@ -4302,8 +4933,10 @@
       "height": 520,
       "family": "Media",
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1164:4738",
@@ -4313,8 +4946,10 @@
       "height": 300,
       "family": "Media",
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1168:4713",
@@ -4325,7 +4960,8 @@
       "height": 262,
       "status": "active",
       "authority": "code:safe-action-underemphasised-FIXED-source-only",
-      "recipe": null
+      "recipe": null,
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "1168:4732",
@@ -4336,7 +4972,8 @@
       "height": 247,
       "status": "active",
       "authority": "code:safe-risky-emphasis-inverted-FIXED-source-only",
-      "recipe": null
+      "recipe": null,
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "1169:4713",
@@ -4346,8 +4983,10 @@
       "width": 480,
       "height": 140,
       "status": "active",
-      "authority": "walked:2026-08-31 — replace-confirm: backup checkbox defaulted OFF against a board that draws it checked — FIXED to ON + test; footer buttons 40h (board's 27 is a compressed schematic)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — replace-confirm: backup checkbox defaulted OFF against a board that draws it checked — FIXED to ON + test; footer buttons 40h (board's 27 is a compressed schematic)",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "1169:4725",
@@ -4357,8 +4996,10 @@
       "width": 1068,
       "height": 102,
       "status": "active",
-      "authority": "walked:partial-confirm-only-success-error-unconfirmed",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-confirm-only-success-error-unconfirmed",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1169:4753",
@@ -4368,8 +5009,10 @@
       "width": 460,
       "height": 142,
       "status": "active",
-      "authority": "walked:match-reachable-via-cmd-shift-p",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match-reachable-via-cmd-shift-p",
+      "verified": "match"
     },
     {
       "nodeId": "1169:4764",
@@ -4380,7 +5023,8 @@
       "height": 139,
       "status": "active",
       "authority": "code:usage-drawer-reachable-but-not-visually-confirmed",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1170:4713",
@@ -4390,8 +5034,10 @@
       "width": 500,
       "height": 407,
       "status": "active",
-      "authority": "walked:2026-08-31 — collection-setup modal: 560 wide vs 500, inputs 42 vs 29, field rows 42 vs 25; dynamic-pages block expands to ~192px where the board draws 49",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — collection-setup modal: 560 wide vs 500, inputs 42 vs 29, field rows 42 vs 25; dynamic-pages block expands to ~192px where the board draws 49",
+      "verified": "driven"
     },
     {
       "nodeId": "1170:4749",
@@ -4401,8 +5047,10 @@
       "width": 640,
       "height": 222,
       "status": "active",
-      "authority": "walked:2026-08-31 — records modal: 720 wide vs 640; adds a collection select the board lacks; thead 32 vs 20",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — records modal: 720 wide vs 640; adds a collection select the board lacks; thead 32 vs 20",
+      "verified": "driven"
     },
     {
       "nodeId": "1170:4777",
@@ -4412,8 +5060,10 @@
       "width": 480,
       "height": 175,
       "status": "active",
-      "authority": "walked:drift-same-modal-two-triggers-neither-matches",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-same-modal-two-triggers-neither-matches",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1170:4792",
@@ -4423,8 +5073,10 @@
       "width": 684,
       "height": 154,
       "status": "active",
-      "authority": "walked:drift-detach-copy-rewritten",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-detach-copy-rewritten",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1171:4713",
@@ -4435,7 +5087,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:1171-4713",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1171:4767",
@@ -4446,7 +5099,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:1171-4767",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1171:4820",
@@ -4456,8 +5110,10 @@
       "width": 440,
       "height": 117,
       "status": "active",
-      "authority": "walked:2026-08-31 — unsaved-warning: modal is 720w vs board 440 and buttons 40h vs 27 (flowbite h-10). A reported missing space in 'image but' did NOT reproduce — a render test prints the space; the walker's scraper dropped it",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — unsaved-warning: modal is 720w vs board 440 and buttons 40h vs 27 (flowbite h-10). A reported missing space in 'image but' did NOT reproduce — a render test prints the space; the walker's scraper dropped it",
+      "verified": "driven"
     },
     {
       "nodeId": "1171:4829",
@@ -4468,7 +5124,8 @@
       "height": 812,
       "status": "active",
       "authority": "board:1171-4829-entry",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1172:4804",
@@ -4478,8 +5135,10 @@
       "width": 1308,
       "height": 117,
       "status": "active",
-      "authority": "walked:unreachable-exit-guard-did-not-fire-on-nudge",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-exit-guard-did-not-fire-on-nudge",
+      "verified": "unreachable"
     },
     {
       "nodeId": "1172:4825",
@@ -4489,8 +5148,10 @@
       "width": 560,
       "height": 293,
       "status": "active",
-      "authority": "walked:drift-export-modal-cards-not-pills-oversized",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-export-modal-cards-not-pills-oversized",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1172:4840",
@@ -4500,8 +5161,10 @@
       "width": 520,
       "height": 239,
       "status": "active",
-      "authority": "walked:2026-08-31 — Brand review-changes modal: 360w vs board 520 (ModalContent size='sm'); copy contract exact; buttons 32h vs 27",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Brand review-changes modal: 360w vs board 520 (ModalContent size='sm'); copy contract exact; buttons 32h vs 27",
+      "verified": "driven"
     },
     {
       "nodeId": "1172:4867",
@@ -4511,8 +5174,10 @@
       "width": 560,
       "height": 244,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1174:4849",
@@ -4522,8 +5187,10 @@
       "width": 948,
       "height": 80,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1175:4804",
@@ -4533,8 +5200,10 @@
       "width": 420,
       "height": 225,
       "status": "active",
-      "authority": "walked:drift-pro-badge-not-purple-FIXED",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-pro-badge-not-purple-FIXED",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "1175:4827",
@@ -4544,8 +5213,10 @@
       "width": 440,
       "height": 199,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1175:4841",
@@ -4555,8 +5226,10 @@
       "width": 320,
       "height": 158,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1175:4849",
@@ -4566,8 +5239,10 @@
       "width": 720,
       "height": 36,
       "status": "active",
-      "authority": "walked:2026-08-31 — breadcrumb bar: live prints ← Parent / → Child and BOTH WORK; the board's Alt+↑/Alt+↓ are dead — the board is stale here, not the code",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — breadcrumb bar: live prints ← Parent / → Child and BOTH WORK; the board's Alt+↑/Alt+↓ are dead — the board is stale here, not the code",
+      "verified": "driven"
     },
     {
       "nodeId": "1176:4804",
@@ -4577,8 +5252,10 @@
       "width": 236,
       "height": 184,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1176:4824",
@@ -4588,8 +5265,10 @@
       "width": 605,
       "height": 33,
       "status": "active",
-      "authority": "walked:2026-08-31 — inline-edit toolbar. WALKER-MEASURED, NOT REPRODUCED HERE: bar 903x34 vs board 605x33 with four controls (text colour, highlight, link, clear formatting) past the canvas column, focusable but unclickable, and the font-size select showing 10px on a 16px paragraph. Two attempts to re-enter inline-edit via dblclick did not engage it, so no fix was made on this evidence. Supporting code fact that IS verified: only 3 of 7 Buttons in RichTextEditor.tsx carry toolbarButtonStyle's 24px box; the rest take flowbite's size.",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — inline-edit toolbar. WALKER-MEASURED, NOT REPRODUCED HERE: bar 903x34 vs board 605x33 with four controls (text colour, highlight, link, clear formatting) past the canvas column, focusable but unclickable, and the font-size select showing 10px on a 16px paragraph. Two attempts to re-enter inline-edit via dblclick did not engage it, so no fix was made on this evidence. Supporting code fact that IS verified: only 3 of 7 Buttons in RichTextEditor.tsx carry toolbarButtonStyle's 24px box; the rest take flowbite's size.",
+      "verified": "driven"
     },
     {
       "nodeId": "1176:4866",
@@ -4599,8 +5278,10 @@
       "width": 402,
       "height": 238,
       "status": "active",
-      "authority": "walked:2026-08-31 — context-menu anatomy: structure matches 1:1; all four submenu chords the board prints are absent from insertActions.ts; rows 40h vs 27",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — context-menu anatomy: structure matches 1:1; all four submenu chords the board prints are absent from insertActions.ts; rows 40h vs 27",
+      "verified": "driven"
     },
     {
       "nodeId": "1176:4925",
@@ -4610,8 +5291,10 @@
       "width": 980,
       "height": 145,
       "status": "active",
-      "authority": "walked:2026-08-31 — hover levels: all four reproduced (dashed+pill+handle · solid+breadcrumb · box model + InfoBadge · green ⊕) — MATCH",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — hover levels: all four reproduced (dashed+pill+handle · solid+breadcrumb · box model + InfoBadge · green ⊕) — MATCH",
+      "verified": "driven"
     },
     {
       "nodeId": "1177:4804",
@@ -4621,8 +5304,10 @@
       "width": 520,
       "height": 426,
       "status": "active",
-      "authority": "walked:2026-08-31 — canvas palette: 'Zoom to Fit ⌘0' was a wrong chord — FIXED to ⌘1; 19 Title Case labels FIXED to sentence case; highlight indexes the sorted array while the list renders grouped, so Enter on open runs the wrong command (NOT fixed)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — canvas palette: 'Zoom to Fit ⌘0' was a wrong chord — FIXED to ⌘1; 19 Title Case labels FIXED to sentence case; highlight indexes the sorted array while the list renders grouped, so Enter on open runs the wrong command (NOT fixed)",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "1177:4859",
@@ -4632,8 +5317,10 @@
       "width": 460,
       "height": 445,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1205:4829",
@@ -4643,8 +5330,10 @@
       "width": 240,
       "height": 330,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1205:4804",
@@ -4654,8 +5343,10 @@
       "width": 520,
       "height": 177,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "1205:4816",
@@ -4665,8 +5356,10 @@
       "width": 520,
       "height": 202,
       "status": "active",
-      "authority": "walked:2026-08-16",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-16",
+      "verified": "driven"
     },
     {
       "nodeId": "434:2348",
@@ -4677,7 +5370,8 @@
       "height": 399,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "71:2",
@@ -4688,7 +5382,8 @@
       "height": 796,
       "status": "out-of-scope",
       "authority": "undecided",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1333:7162",
@@ -4698,8 +5393,10 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "walked:2026-08-31 — Brand root (CURRENT): NEVER BUILT TO — the code cites 152:2/154:132 and this board appears nowhere in src. 140px of unboarded chrome (theme strip + mode toggle) hides 2 of 9 rows; scroller sh636/ch504",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — Brand root (CURRENT): NEVER BUILT TO — the code cites 152:2/154:132 and this board appears nowhere in src. 140px of unboarded chrome (theme strip + mode toggle) hides 2 of 9 rows; scroller sh636/ch504",
+      "verified": "driven"
     },
     {
       "nodeId": "1339:7162",
@@ -4709,8 +5406,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1339:7171",
@@ -4720,8 +5419,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1339:7186",
@@ -4731,8 +5432,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1339:7193",
@@ -4742,8 +5445,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1339:7200",
@@ -4753,8 +5458,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1339:7207",
@@ -4764,8 +5471,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1339:7214",
@@ -4775,8 +5484,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:match",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "match",
+      "verified": "match"
     },
     {
       "nodeId": "1339:7221",
@@ -4786,8 +5497,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:unreachable-resolve-error-never-read-by-client",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unreachable-resolve-error-never-read-by-client",
+      "verified": "unreachable"
     },
     {
       "nodeId": "1340:7162",
@@ -4797,8 +5510,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:partial-comment-card-below-not-above",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "partial-comment-card-below-not-above",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1340:7174",
@@ -4808,8 +5523,10 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "walked:drift-warning-has-no-callout-weight",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "drift-warning-has-no-callout-weight",
+      "verified": "drift-open"
     },
     {
       "nodeId": "1342:7162",
@@ -4819,8 +5536,10 @@
       "width": 1440,
       "height": 360,
       "status": "active",
-      "authority": "walked:2026-08-28 — footer chip \"● 2/7 done\" live in this arc’s screenshots",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-28 — footer chip \"● 2/7 done\" live in this arc’s screenshots",
+      "verified": "driven"
     },
     {
       "nodeId": "1343:7162",
@@ -4830,8 +5549,10 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "walked:2026-08-28 — ?view=readonly verified live; founder call 2026-08-23",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-28 — ?view=readonly verified live; founder call 2026-08-23",
+      "verified": "driven"
     },
     {
       "nodeId": "1344:7162",
@@ -4842,7 +5563,8 @@
       "height": 400,
       "status": "active",
       "authority": "founder:drill-in — standing preference reconfirmed 2026-08-28",
-      "recipe": null
+      "recipe": null,
+      "verified": "no"
     },
     {
       "nodeId": "1344:7165",
@@ -4852,8 +5574,10 @@
       "width": 720,
       "height": 560,
       "status": "active",
-      "authority": "walked:2026-08-31 — S7.2 Branding pointer: the board supersedes the field map, but live still renders it (5 rows + 3 Open buttons + a tokens block)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-31 — S7.2 Branding pointer: the board supersedes the field map, but live still renders it (5 rows + 3 Open buttons + a tokens block)",
+      "verified": "driven"
     },
     {
       "nodeId": "1345:7162",
@@ -4863,8 +5587,10 @@
       "width": 1440,
       "height": 480,
       "status": "active",
-      "authority": "walked:unbuilt-model-is-hardcoded-DEFAULT_MODEL-no-picker",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "unbuilt-model-is-hardcoded-DEFAULT_MODEL-no-picker",
+      "verified": "unreachable"
     },
     {
       "nodeId": "1347:7162",
@@ -4874,8 +5600,10 @@
       "width": 720,
       "height": 520,
       "status": "active",
-      "authority": "walked:2026-08-28 — SessionExpiredModal live: cookie kill + ⌘S opened it, Keep editing closed it; honest copy (no cache/24h claims)",
-      "recipe": null
+      "authority": "board",
+      "recipe": null,
+      "verifiedNote": "2026-08-28 — SessionExpiredModal live: cookie kill + ⌘S opened it, Keep editing closed it; honest copy (no cache/24h claims)",
+      "verified": "driven"
     }
   ],
   "coveredFloor": 9

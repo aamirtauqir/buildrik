@@ -2,7 +2,7 @@
   "$comment": "Exported from Figma via MCP. Source of truth for chrome design tokens. Re-export with the use_figma script in scripts/tokens/README.md, then run `node scripts/tokens/generate.mjs`.",
   "source": {
     "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
-    "fileName": "Buildrick \u2014 Product",
+    "fileName": "Buildrick — Product",
     "collections": [
       "Package (modes: Editor, Dashboard)",
       "Primitives (mode: Default)"
@@ -116,7 +116,7 @@
     "topbar": 56,
     "row-tall": 64,
     "rail": 60,
-    "drawer": 320,
+    "drawer": 280,
     "panel-right": 360,
     "inspector": 300,
     "nav": 240,
@@ -199,7 +199,7 @@
     "on-dark-15": "rgba(255, 255, 255, 0.15)",
     "on-dark-40": "rgba(255, 255, 255, 0.40)"
   },
-  "$boxmodelComment": "Canvas box-model overlay colours (DevTools-style). Feature-semantic, not brand \u2014 they stay stable when the brand changes.",
+  "$boxmodelComment": "Canvas box-model overlay colours (DevTools-style). Feature-semantic, not brand — they stay stable when the brand changes.",
   "boxmodel": {
     "margin": "rgba(246, 178, 107, 0.45)",
     "border": "rgba(255, 229, 153, 0.45)",

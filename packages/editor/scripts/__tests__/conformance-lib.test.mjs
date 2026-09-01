@@ -10,12 +10,17 @@
  * sub-pixel noise and one that ignores a real regression.
  */
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   figmaTokenToBk, figmaTokenValue,
   normalizeColor, normalizeLength,
   compareValue, toleranceClass, validateRecipe,
   TOLERANCE, EXTRACTOR_VERSION,
 } from '../conformance/lib.mjs';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
 
 describe('figmaTokenToBk — board token names map onto generated --bk-* names', () => {
   // Every token the topbar board (681:26) actually references. If the naming
@@ -51,7 +56,15 @@ describe('figmaTokenToBk — board token names map onto generated --bk-* names',
     // size/drawer exists only in the token source; if the map were hand-written
     // for the colour cases above it would not know about it.
     expect(figmaTokenToBk('--size/drawer')).toBe('--bk-size-drawer');
-    expect(figmaTokenValue('--size/drawer')).toBe('320px');
+    /* Read the expected value OUT of the source rather than pinning a literal.
+       This asserted '320px', so changing the drawer width in figma-tokens.json
+       failed the one test whose whole point is that the value is DERIVED — the
+       literal made the test a second hardcoded copy of the thing it guards.
+       Now it fails only if the lookup stops tracking the source. */
+    const src = JSON.parse(
+      readFileSync(join(HERE, '..', 'tokens', 'figma-tokens.json'), 'utf8'),
+    );
+    expect(figmaTokenValue('--size/drawer')).toBe(`${src.size.drawer}px`);
   });
 });
 

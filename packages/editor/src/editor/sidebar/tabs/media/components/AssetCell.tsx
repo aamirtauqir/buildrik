@@ -119,7 +119,7 @@ export function AssetCell({
         isApplied && "med-asset-cell--applied",
         isLocked && "med-asset-cell--locked",
         isSelected && "med-asset-cell--selected",
-        "tw:relative tw:flex tw:flex-col tw:items-start tw:gap-1 tw:w-34 tw:h-26 tw:p-0",
+        "tw:relative tw:flex tw:flex-col tw:items-start tw:gap-1 tw:w-full tw:h-26 tw:p-0",
         "tw:border-0 tw:bg-transparent tw:enabled:hover:bg-transparent",
         "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
         isSelected && "tw:[box-shadow:var(--bk-shadow-focus)]",
@@ -136,7 +136,7 @@ export function AssetCell({
       aria-pressed={selectable ? isSelected : undefined}
       data-testid="media-card"
     >
-      <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-34 tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-muted)]">
+      <span className="med-asset-cell__thumb tw:relative tw:flex tw:items-center tw:justify-center tw:w-full tw:h-19 tw:shrink-0 tw:overflow-hidden tw:rounded tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-muted)]">
         {/* An image with no pre-cut thumb still IS an image — it used to fall
             through to the font branch and render "Aa" in place of the photo
             (walked live 2026-08-28: every fixture image showed the specimen).
@@ -179,7 +179,7 @@ export function AssetCell({
         ) : null}
       </span>
 
-      <span className="tw:flex tw:w-34 tw:items-center tw:gap-1">
+      <span className="tw:flex tw:w-full tw:items-center tw:gap-1">
         {selectable ? (
           <span
             className={[

@@ -107,11 +107,37 @@ for (const key of Object.keys(readBaseline())) {
   }
 }
 
+/* 4. Every active board must carry a `verified` field.
+      `authority` answers WHICH ARTEFACT WINS a conflict. It was also being used
+      to record whether anyone had looked at the screen, so one column held
+      `walked:match`, `walked:drift-...` and `walked:unreachable-...` as if they
+      were the same statement — and "281 walked" read as coverage when only 50
+      of those rows claimed a clean pass. The two questions are now two fields;
+      this keeps them that way. */
+const VERIFIED = new Set(["no", "driven", "match", "drift-open", "drift-fixed", "unreachable"]);
+const missingVerified = manifest.boards.filter((b) => b.status === "active" && !VERIFIED.has(b.verified));
+if (missingVerified.length) {
+  fail(`${missingVerified.length} active board(s) carry no valid \`verified\` field ` +
+       `(e.g. ${missingVerified.slice(0, 3).map((b) => b.nodeId).join(", ")}).\n` +
+       `         cause: verification status was folded back into \`authority\`, which cannot hold both.\n` +
+       `         fix:   set verified to one of ${[...VERIFIED].join(" | ")}.`);
+}
+
 if (failed) process.exit(1);
 const pct = ((placed.size / manifest.counts.active) * 100).toFixed(1);
+const vc = {};
+for (const b of manifest.boards) if (b.status === "active") vc[b.verified] = (vc[b.verified] || 0) + 1;
+const driven = manifest.counts.active - (vc.no ?? 0);
 console.log(
   `[boards] PASS — ${recipeIds.length} recipe(s) (floor ${floor}) · ` +
   `${placed.size}/${manifest.counts.active} active board(s) measured (${pct}%) across ` +
   `${manifest.counts.activeFamilies} famil(ies) · ` +
   `${manifest.counts.designAhead} design-ahead · ${manifest.counts.outOfScope} out-of-scope.`,
+);
+/* Print the honest split, not one soft number: driven is not passed. */
+console.log(
+  `[boards] verified — ${driven}/${manifest.counts.active} driven · ` +
+  `${vc.match ?? 0} match · ${vc["drift-fixed"] ?? 0} drift-fixed · ` +
+  `${vc["drift-open"] ?? 0} drift-OPEN · ${vc.unreachable ?? 0} unreachable · ` +
+  `${vc.driven ?? 0} no-verdict · ${vc.no ?? 0} unchecked.`,
 );
