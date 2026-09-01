@@ -178,12 +178,14 @@ describe("SlimLauncher — the scope line only claims what happened", () => {
     /* One line. Two lines of error copy in a 320 drawer pushed the footer off
        board `782:4353` entirely — the panel is a fixed height. */
     expect(el.textContent).toBe("Couldn't reach the rest of your library");
-    expect(el.className).toMatch(/text-red-700/);
+    /* The board names `--color/error-text` (#C81E1E), not Tailwind's red-700,
+       which is a different and more saturated red (~#c10007). */
+    expect(el.className).toMatch(/bk-error-text/);
   });
 
   it("does not paint the ordinary case as an error", () => {
     mount({ serverPage: paged, searchQuery: "logo", searchState: "whole" });
-    expect(screen.getByTestId("media-search-scope").className).not.toMatch(/text-red-700/);
+    expect(screen.getByTestId("media-search-scope").className).not.toMatch(/bk-error-text/);
   });
 
   /* The line is keyed on the PAGING position, not on how many assets happen to

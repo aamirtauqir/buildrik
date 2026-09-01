@@ -190,7 +190,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
     body =
       hydration === "error" ? (
         <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pb-8 tw:pt-9" data-testid="content-load-error" role="alert">
-          <p className="tw:text-[13px] tw:leading-5 tw:text-red-700">Couldn&apos;t load your collections.</p>
+          <p className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]">Couldn&apos;t load your collections.</p>
           <p className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
             This is a connection problem, not a change to your data.
           </p>

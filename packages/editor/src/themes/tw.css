@@ -29,6 +29,10 @@
 @source "../../.flowbite-react/class-list.json";
 
 @theme {
-  --font-sans: "Inter Tight", Inter, system-ui, sans-serif;
+  /* Inter leads (chrome moved off Inter Tight 2026-07-26) and no system
+     fallback is named — DESIGN.md anti-slop rule 8 bans system-ui here.
+     Nothing uses `tw:font-sans` today; this is the trap disarmed, not a
+     defect fixed. Mirrors --bk-font-ui. */
+  --font-sans: Inter, "Inter Tight", sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 }

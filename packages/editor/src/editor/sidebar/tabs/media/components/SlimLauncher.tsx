@@ -197,7 +197,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           "Nothing matches" about a file that exists. */}
       {props.serverPage && searchQuery.trim().length >= 2 && props.serverPage.total > props.serverPage.loaded ? (
         <div
-          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:text-[12px] tw:leading-4 ${props.searchState === "failed" ? "tw:text-red-700" : "tw:text-[var(--bk-ink-muted)]"}`}
+          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:text-[12px] tw:leading-4 ${props.searchState === "failed" ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`}
           data-testid="media-search-scope"
           role="status"
         >
@@ -304,7 +304,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
             browser, and only one of them is worth a retry.
           */
           <div className="tw:h-35 tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-load-error" role="alert">
-            <p className="tw:text-red-700">Couldn&apos;t load your media.</p>
+            <p className="tw:text-[var(--bk-error-text)]">Couldn&apos;t load your media.</p>
             <p className="tw:mt-2 tw:flex tw:justify-center tw:gap-10">
               <Button
                 type="button"

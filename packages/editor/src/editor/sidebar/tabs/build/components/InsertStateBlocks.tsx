@@ -60,7 +60,7 @@ export const InsertLoadingSkeleton: React.FC = () => (
 */
 export const InsertLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
   <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pb-8 tw:pt-9" data-testid="insert-load-error" role="alert">
-    <p className="tw:text-[13px] tw:leading-5 tw:text-red-700">Couldn&rsquo;t load the element library.</p>
+    <p className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]">Couldn&rsquo;t load the element library.</p>
     <p className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">You can still edit what&rsquo;s already on the canvas.</p>
     <Button
       type="button"
