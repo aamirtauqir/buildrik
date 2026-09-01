@@ -217,15 +217,32 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
       ) : null}
 
       {state === "error" ? (
-        <EmptyState
-          title="Couldn't load notifications"
-          body="The list didn't come back. Nothing was lost."
-          action={
-            <Button color="light" size="xs" onClick={() => void load()}>
-              Retry
-            </Button>
-          }
-        />
+        /* Board 453:4055 — two CENTRED lines then a LEFT-anchored link at the
+           panel's 24 gutter. EmptyState ships `center` and `start`; this is
+           neither, so it is built here the way board 164:35 was.
+
+           The body copy is the board's and it earns its place: "the list
+           didn't come back, nothing was lost" reassures about the wrong
+           thing. What a user needs to know is what they might be missing
+           while it is down — the same error-fact / harm-scope / recovery
+           shape the layers and templates blocks already use. */
+        <div className="tw:pt-10" role="alert">
+          <p className="tw:m-0 tw:px-6 tw:text-center tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]">
+            Couldn&rsquo;t load notifications.
+          </p>
+          <p className="tw:m-0 tw:mt-1 tw:px-6 tw:text-center tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+            Client replies and publish results may be waiting.
+          </p>
+          <Button
+            color="light"
+            size="xs"
+            variant="link"
+            className="tw:mt-2 tw:ml-6 tw:h-4 tw:px-0 tw:text-[13px] tw:leading-4 tw:font-normal tw:text-[var(--bk-accent-text)]"
+            onClick={() => void load()}
+          >
+            Try again
+          </Button>
+        </div>
       ) : null}
 
       {state === "ready" && ordered.length === 0 ? (

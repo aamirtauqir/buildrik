@@ -1856,8 +1856,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "drift-error-copy-and-action",
-      "verified": "drift-open"
+      "verifiedNote": "live-measured 2026-09-02 EXACT: panel 360, lines at 89/113/137 (board 88/112/136 +1 border), 13/12/13px, #C81E1E / #6B7280 / #1A56DB, copy centred and 'Try again' left at x25 (board 24). Board copy adopted: body names what is waiting rather than reassuring.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "165:51",
