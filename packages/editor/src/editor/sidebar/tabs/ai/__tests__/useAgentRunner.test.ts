@@ -145,6 +145,31 @@ describe("useAgentRunner", () => {
      the user was told the run stopped, shown no failure, and given no way
      back. Walked live 2026-09-01: band said stopped at step 1 with step 2
      still showing a running dot. */
+  /* Stop pressed DURING the apply await, in auto-apply mode. A review reported
+     this as a live race — that the run carries on to the next step after the
+     user stopped it. It does not: `advance` re-checks `cancelledRef` and
+     returns. This test exists because the claim was plausible enough to be
+     worth pinning, so the behaviour cannot regress into being true. */
+  it("stop during an auto-apply await does not advance to the next step", async () => {
+    let calls = 0;
+    runPromptOnce.mockImplementation(async (args: { intent: string }) => {
+      if (args.intent === "plan") return { plan: PLAN, edit: null, text: "" };
+      calls += 1;
+      return { plan: null, edit: editWithRows(1), text: "" };
+    });
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    // Stop lands while applyAiEdit is in flight.
+    applyAiEdit.mockImplementation(async () => {
+      act(() => { result.current.stop(); });
+      return { applied: 1, proposals: [] };
+    });
+    act(() => { result.current.setAutoApply(true); });
+    await act(async () => { result.current.start("x"); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+    // Step 1 was generated; step 2 must never have been.
+    expect(calls).toBe(1);
+  });
+
   it("a failed step stops the run instead of quietly continuing", async () => {
     let call = 0;
     runPromptOnce.mockImplementation(async (args: { intent: string }) => {

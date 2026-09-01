@@ -180,6 +180,12 @@ export function useAgentRunner(
             } catch {
               setStep(i, { status: "failed", edit });
             }
+            /* No cancel re-check needed here, and one was tried. A review
+               reported that pressing Stop during the await above lets the run
+               continue; verified false — `advance` checks `cancelledRef` first
+               and returns without generating the next step. The in-flight edit
+               does still land and is marked `applied`, which is correct: it
+               applied, and hiding it would keep it out of Undo-all. */
             advance(i + 1);
           } else {
             setStep(i, { status: "awaiting", edit });
