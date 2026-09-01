@@ -116,10 +116,26 @@ describe("LayoutShell — slot rendering contract", () => {
     expect(shell.style.getPropertyValue("--layout-drawer-width")).toBe("320px");
   });
 
-  it("defaults --layout-drawer-width to 280px", () => {
+  /* This asserted the shell writes `--layout-drawer-width: 280px` by default,
+     which is the bug it was protecting. The inline property BEATS
+     LayoutShell.css:26 (`--layout-drawer-width: var(--bk-size-drawer)`), so the
+     grid TRACK was pinned to a hardcoded 280 while `.ls-panel` sized itself
+     from the token — 320 in a 280 track, overflowing by 40 for five months,
+     with the conformance baseline recording the overflow as expected.
+
+     The contract now: write NOTHING by default so the token resolves, and
+     write the property only for a caller that genuinely overrides. Verified
+     live by moving the token to 300 — track and panel both followed. */
+  it("writes no inline drawer width by default, so the token resolves", () => {
     const { container } = renderFullShell();
     const shell = container.querySelector(".layout-shell") as HTMLElement;
-    expect(shell.style.getPropertyValue("--layout-drawer-width")).toBe("280px");
+    expect(shell.style.getPropertyValue("--layout-drawer-width")).toBe("");
+  });
+
+  it("still writes it when a caller overrides", () => {
+    const { container } = renderFullShell({ drawerWidth: 420 });
+    const shell = container.querySelector(".layout-shell") as HTMLElement;
+    expect(shell.style.getPropertyValue("--layout-drawer-width")).toBe("420px");
   });
 });
 

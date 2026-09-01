@@ -198,7 +198,7 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
   children,
   drawerOpen,
   drawerPinned = true,
-  drawerWidth = 280,
+  drawerWidth,
   fullPageMode = false,
   inspectorOpen = true,
   className = "",
@@ -291,9 +291,17 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
     .filter(Boolean)
     .join(" ");
 
+  /* Only write the custom property when a caller actually overrides the width.
+     This defaulted to 280 and wrote it INLINE, which beats LayoutShell.css:26's
+     `--layout-drawer-width: var(--bk-size-drawer)` — so the grid TRACK was
+     pinned to a hardcoded 280 while `.ls-panel` sized itself from the token.
+     The panel was 320 in a 280 track and overflowed it by 40 for five months,
+     and the conformance baseline recorded the overflow AS the expected value.
+     Narrowing the token to 280 made the two agree by coincidence; this makes
+     them agree by construction, so moving the token moves both. */
   const shellStyle = {
     ...style,
-    "--layout-drawer-width": `${drawerWidth}px`,
+    ...(drawerWidth == null ? {} : { "--layout-drawer-width": `${drawerWidth}px` }),
   } as React.CSSProperties;
 
   return (

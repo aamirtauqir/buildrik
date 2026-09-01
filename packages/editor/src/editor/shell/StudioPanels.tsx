@@ -173,7 +173,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   canvasRef,
   composerContainerRef,
   isFullPageMode = false,
-  drawerWidth = 280,
+  drawerWidth,
   publishJob,
   onVercelPublish,
 }) => {
