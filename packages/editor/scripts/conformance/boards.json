@@ -1662,7 +1662,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:partial-copy+action-confirmed-geometry-not-measured",
       "recipe": null
     },
     {
@@ -2619,7 +2619,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:match-all-11-printed-chords-honoured",
       "recipe": null
     },
     {
