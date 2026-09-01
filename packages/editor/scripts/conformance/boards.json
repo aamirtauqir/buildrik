@@ -1446,8 +1446,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-09-02 the ROOT CAUSE of the recorded drift is gone: .bdc-layers-tree had 10px side padding, so rows were 298 inside the panel where every Layers board draws them full-bleed at 320. Rows now 318. The drag line itself has NOT been re-measured — do not close on this note alone.",
-      "verified": "drift-open"
+      "verifiedNote": "2026-09-02 measured: row 318 at x0 in a 319 panel (full-bleed; 320 less the panel's 2x1px border), drop line 318x2 in rgb(26,86,219)=#1A56DB, dragging ghost opacity 0.5 — all four board facts. Fixed by removing .bdc-layers-tree's 10px side padding in the drawer-320 change; the line is left:0/right:0 on the row, so the inset was the whole drift. HOW: data-drop was set directly rather than synthesising a drag — this measures the CSS rule the drag triggers, NOT the drag interaction.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "143:355",
