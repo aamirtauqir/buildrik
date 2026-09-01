@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { EmptyState, ROW_META_CLASS, Row, Spinner, StatusDot, Button, type ToastInput } from "@/editor/chrome-ui";
+import { EmptyState, ROW_META_CLASS, Row, SkeletonBlock, StatusDot, Button, type ToastInput } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {
@@ -177,8 +177,25 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
       </div>
 
       {state === "loading" ? (
-        <div className="bk-notifications__center">
-          <Spinner size="lg" />
+        /* Board 165:51 draws four 44h skeleton rows under a live day band,
+           and carries its own note: "Rows keep their 44h so the panel does
+           not jump when they fill." A centred spinner did the opposite —
+           it collapsed the panel to one short row and the list shoved it
+           down 421px on arrival. The band is the same markup the loaded
+           list renders, which is what makes the swap free of movement. */
+        <div role="status" aria-label="Loading notifications">
+          <div
+            aria-hidden="true"
+            className="tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-ink-muted)]"
+          >
+            {dayBand(new Date())}
+          </div>
+          {[0, 1, 2, 3].map((row) => (
+            <div key={row} className="tw:flex tw:h-11 tw:items-center tw:gap-2 tw:pl-4">
+              <SkeletonBlock circle className="tw:h-2 tw:w-2 tw:shrink-0" />
+              <SkeletonBlock className="tw:h-2.5 tw:w-[220px]" />
+            </div>
+          ))}
         </div>
       ) : null}
 

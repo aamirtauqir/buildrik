@@ -64,12 +64,6 @@
   font-weight: var(--bk-weight-semibold);
 }
 
-.bk-notifications__center {
-  display: flex;
-  justify-content: center;
-  padding: var(--bk-space-28);
-}
-
 .bk-notif-row {
   align-items: flex-start;
   gap: var(--bk-space-8);

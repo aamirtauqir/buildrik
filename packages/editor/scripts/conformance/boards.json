@@ -1869,7 +1869,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "drift-spinner-not-skeletons",
+      "verifiedNote": "skeletons-conformed-live-2026-09-01; header 36.5 vs board 48 remains (family-wide)",
       "verified": "drift-open"
     },
     {
@@ -4415,8 +4415,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "drift-empty-text-20px-high",
-      "verified": "drift-open"
+      "verifiedNote": "empty-state-unreachable: DEFAULT_TOKENS and all 6 starters each emit 1-2 contrast issues",
+      "verified": "unreachable"
     },
     {
       "nodeId": "164:42",

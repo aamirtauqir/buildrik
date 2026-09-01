@@ -138,8 +138,10 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
         /* Board 164:35: two lines under the header — the verdict in green, and
            what it means for publishing under it. No icon, and not floating in
            the middle of an 844px panel, where the panel read as empty rather
-           than as clean. */
-        <div className="tw:px-3 tw:pt-6 tw:text-center" role="status">
+           than as clean. The board puts the first line 40px below the 48px
+           header and insets both to the panel's 24px gutter; the pair sat one
+           spacing step high and one step narrow until 2026-09-01. */
+        <div className="tw:px-6 tw:pt-10 tw:text-center" role="status">
           <p className="tw:m-0 tw:text-[13px] tw:text-[var(--bk-success-text)]">No issues.</p>
           <p className="tw:m-0 tw:mt-1 tw:text-xs tw:text-[var(--bk-ink-muted)]">
             This page is ready to publish.
