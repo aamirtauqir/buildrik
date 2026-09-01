@@ -10,7 +10,7 @@
 .bd-pg-panel {
   /* File-local design knobs — keep the four most-coupled dimensions in one place
      so density tweaks and footer-clearance edits stay coherent. */
-  --pg-row-h: 28px;
+  --pg-row-h: 32px;        /* board 140:2 — uniform; see PagesTab.rowHeight.test.ts */
   --pg-row-h-active: 32px;
   --pg-icon-box: 22px;
   --pg-icon-glyph: 12px;

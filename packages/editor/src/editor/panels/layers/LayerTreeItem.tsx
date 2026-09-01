@@ -106,8 +106,14 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   // stands in: success marks the instance.
   const isInstance = !!composer?.components?.isInstance?.(layer.id);
 
+  /* Board 1082:4640's indent ladder, read off the frame: chevrons sit at
+     12 / 28 / 44 / 60 / 76 and labels at 40 / 56 / 72 — base 12, step 16.
+     This was `16 + depth * 14`, so every row started 4px too far in and each
+     level closed the gap by 2 until they crossed. At depth 3 the live ladder
+     was 58 against the board's 60, and the deeper the tree the wider the drift
+     ran in the other direction. */
   const rowStyle: React.CSSProperties = {
-    paddingLeft: `${16 + layer.depth * 14}px`,
+    paddingLeft: `${12 + layer.depth * 16}px`, // board 1082:4640 — see LayerTreeItem.indent.test.tsx
   };
 
   const rowClassNames = [
