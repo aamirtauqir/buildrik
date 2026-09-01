@@ -101,7 +101,7 @@ export const size = {
   "topbar": 56,
   "row-tall": 64,
   "rail": 60,
-  "drawer": 280,
+  "drawer": 320,
   "panel-right": 360,
   "inspector": 300,
   "nav": 240,

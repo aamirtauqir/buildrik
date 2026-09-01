@@ -24,7 +24,7 @@
      compressing them below the 28px above — their apparent height was an
      accident of how tall the eye/lock buttons happened to be. */
   flex-shrink: 0;
-  padding: 0 var(--bk-space-16);
+  padding: 0 8px;  /* board: lock ends 8 from the row's right edge; the LEFT gutter is LayerTreeItem's depth ladder (12 + depth*16) */
   border-radius: 4px;
   font: 500 11px var(--bk-font-ui);
   color: var(--bk-ink);
@@ -229,7 +229,11 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  padding: var(--bk-space-4) 10px 10px;
+  /* Boards 1082:4739 / 143:60 draw tree rows FULL-BLEED — `x=0 width=320`,
+     with the row's own gutters doing the insetting. The 10 here inset every
+     row inside the panel, so the trailing eye/lock cluster sat ~10 short of
+     where every Layers board puts it. */
+  padding: var(--bk-space-4) 0 10px;
   overflow-y: auto;
   flex: 1;
   min-height: 0;

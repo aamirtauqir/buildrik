@@ -1366,9 +1366,9 @@
       "width": 300,
       "height": 776,
       "status": "active",
-      "authority": "board",
+      "authority": "founder",
       "recipe": null,
-      "verifiedNote": "match-drift-header-icon-cluster",
+      "verifiedNote": "2026-09-02 live inventory — FOUNDER CALL, not a conformance fix. Board draws TWO header controls (btn/ai @226 39x22, ⋯ @273); live ships FIVE: Pick element @136, Select parent @160, Ask AI @184 (36.5x22, the board's one), Bind to collection @223, Element actions @257. ProInspector documents pick+select-parent as deliberate. Removing three working affordances because a board omits them is behaviour, not visual — precedence says the CODE contract wins unless the founder decides otherwise. Also: board renders the icon inline as a glyph ('⬚ Section', 14/21) where live uses a 26x26 accent-tinted square.",
       "verified": "drift-open"
     },
     {
@@ -1446,7 +1446,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — dragging: ghost .5 opacity + 2px accent line; drift: line is 298w inside the 10px-inset row, board is full-bleed 320",
+      "verifiedNote": "2026-09-02 the ROOT CAUSE of the recorded drift is gone: .bdc-layers-tree had 10px side padding, so rows were 298 inside the panel where every Layers board draws them full-bleed at 320. Rows now 318. The drag line itself has NOT been re-measured — do not close on this note alone.",
       "verified": "drift-open"
     },
     {
@@ -1995,8 +1995,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-09-01 OVERFLOW FIXED + live-measured: footer strip 36h pinned to the panel bottom (link 20h at +8) = board 141:265; band 28, rows 32, col1 16, col2 110 all match. REMAINS: col3 renders 151 vs board 210 and col4 is 48 wide vs the board's ~28 — the panel is 279 vs the board's 320, so the board's absolute column x cannot be reproduced at this width. Same drawer-width question as 781:4372. Earlier note said 'columns and rows match', which measurement does not support.",
-      "verified": "drift-open"
+      "verifiedNote": "2026-09-02 EXACT after drawer 320: panel 319, cols 16/110/209/275 vs board 16/110/210/276 (-1 = border), band 28, rows 32, footer strip 36 pinned to the bottom, no overflow. Grid template was 86/1fr/56/48; the board's SCORE column is 28, not 48, which had pushed DESC 19 left.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "141:165",
@@ -3933,7 +3933,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "live-measured 2026-09-01 EXACT: lines 134/156/177 @x24, 13/12/13px, error-text #C81E1E, ink-muted, accent-text. Drawer renders 279 (= --bk-size-drawer 280 less its 1px border) vs board frame 320; that token is GENERATED FROM FIGMA, so Figma's token and Figma's frames disagree — settle in Figma, not here.",
+      "verifiedNote": "2026-09-02 EXACT: lines 134/156/177 @x24, 13/12/13px, error-text #C81E1E, ink-muted, accent-text. Drawer now renders 319 against the board's 320 (was 279) — width blocker resolved by the token change.",
       "verified": "drift-fixed"
     },
     {
@@ -3958,7 +3958,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "live-measured 2026-09-01 EXACT: 134 and 160 @x24, 13px, gap 10, pt 36. Drawer renders 279 (= --bk-size-drawer 280 less its 1px border) vs board frame 320; that token is GENERATED FROM FIGMA, so Figma's token and Figma's frames disagree — settle in Figma, not here.",
+      "verifiedNote": "2026-09-02 EXACT: 134 and 160 @x24, 13px, gap 10, pt 36. Drawer 319 vs board 320 (was 279).",
       "verified": "drift-fixed"
     },
     {
@@ -4106,7 +4106,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-09-02 DUPLICATE BADGE FIXED (live: 4 instance rows, 1 'Component instance' label each, 0 .bdc-lr-cmp nodes; was 2 glyphs sharing one aria-label for two DIFFERENT facts — isInstance = instance root vs isComponentInstance = root + descendants). REMAINS: badge x 199 vs board 269 — row renders 258 wide against the board's 320, so absolute x is unreachable. Same drawer-width blocker as 141:207 and 781:4372.",
+      "verifiedNote": "2026-09-02 duplicate badge fixed + rows now full-bleed (row 298->318, badge 199->259). REMAINS: badge 259 vs board 269. Cause identified: the board draws the eye/lock as 10x10 GLYPHS while the code ships ~20px BUTTONS, so the trailing cluster is wider than the board's. Closing the last 10 means shrinking a visibility/lock click target to 10px — an a11y call, not a layout one. Founder.",
       "verified": "drift-open"
     },
     {

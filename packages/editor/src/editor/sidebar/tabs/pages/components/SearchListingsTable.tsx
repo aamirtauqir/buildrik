@@ -60,7 +60,10 @@ function buildRows(pages: PageItem[]): Row[] {
   });
 }
 
-const GRID = "tw:grid tw:grid-cols-[86px_1fr_56px_48px] tw:items-center tw:gap-2 tw:px-4";
+/* Board 141:207 puts the four columns at x 16 / 110 / 210 / 276 in a 320
+   panel: 86, the rest, 58, 28 with 8 between. SCORE was 48 wide, which
+   pushed DESC 19 to the left of where the board draws it. */
+const GRID = "tw:grid tw:grid-cols-[86px_1fr_58px_28px] tw:items-center tw:gap-2 tw:px-4";
 
 export const SearchListingsTable: React.FC<SearchListingsTableProps> = ({
   pages,
