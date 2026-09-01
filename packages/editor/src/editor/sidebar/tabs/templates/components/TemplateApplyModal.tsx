@@ -64,17 +64,17 @@ export const TemplateApplyModal: React.FC<TemplateApplyModalProps> = ({
   return (
     <ModalRoot open={open} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg" srTitle={template.name} className="tw:px-0 tw:py-0">
-        <div className="tw:flex tw:flex-col tw:gap-1 tw:px-6 tw:pt-5">
+        <div className="tw:flex tw:flex-col tw:gap-1 tw:px-5 tw:pt-[18px]">
           <h2 className="tw:m-0 tw:text-[16px] tw:font-semibold tw:text-[var(--bk-ink)]">
             {template.name}
           </h2>
-          <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+          <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
             {factLine(template)}
           </span>
         </div>
 
-        <div className="tw:px-6 tw:pt-4">
-          <div className="tw:h-[260px] tw:w-full tw:overflow-hidden tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white">
+        <div className="tw:px-5 tw:pt-4">
+          <div className="tw:h-80 tw:w-full tw:overflow-hidden tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white">
             <iframe
               className="tw:h-full tw:w-full tw:border-0"
               title={`Preview: ${template.name}`}
@@ -92,18 +92,18 @@ export const TemplateApplyModal: React.FC<TemplateApplyModalProps> = ({
             named like a noun ("the current Home page content") and breaks on
             the default name every new site has: "the current Page 1 page
             content". */}
-        <p className="tw:m-0 tw:px-6 tw:pt-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+        <p className="tw:m-0 tw:px-5 tw:pt-3 tw:text-[13px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
           {pageName
             ? `Applying replaces the content of ${pageName}.`
             : "Applying replaces the current page content."}{" "}
           Your version history keeps the previous state.
         </p>
 
-        <div className="tw:mt-4 tw:flex tw:items-center tw:justify-end tw:gap-3 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-3">
-          <Button color="light" onClick={onClose} className="tw:border-transparent tw:bg-transparent">
+        <div className="tw:mt-4 tw:flex tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:px-5 tw:py-3.5">
+          <Button color="light" onClick={onClose} className="tw:h-7 tw:border-transparent tw:bg-transparent">
             Cancel
           </Button>
-          <Button onClick={() => onApply(template)} data-testid="tpl-apply">
+          <Button onClick={() => onApply(template)} data-testid="tpl-apply" className="tw:h-7">
             Apply template
           </Button>
         </div>

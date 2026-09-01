@@ -3971,8 +3971,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — preview modal: 720 wide at x360 exact; drift — preview iframe 260h vs board 320",
-      "verified": "drift-open"
+      "verifiedNote": "live-measured 2026-09-01: modal 720x503 @x360, title 18, sub 46, preview 680x320 @20/80, note 412, apply btn 28h @461 — board 720x502/18/46/680x320/412/28@460, the +1 being the footer's real 1px border.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "862:6860",
