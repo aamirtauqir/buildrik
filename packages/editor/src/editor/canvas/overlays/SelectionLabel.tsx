@@ -160,6 +160,9 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
           <Button
             onClick={onSelectParent}
             style={parentBtnStyles}
+            /* px-0: 24 wide against flowbite's 40 of horizontal padding, which
+               clamps the content box to zero and hides the svg below. */
+            className="tw:px-0"
             title={`Go to parent: ${parentName} (Alt+↑)`}
           >
             <svg

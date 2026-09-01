@@ -2,7 +2,7 @@
   "name": "@buildrik/editor",
   "version": "1.0.0",
   "type": "module",
-  "description": "Aquibra Editor \u2014 L2 production-wired extraction",
+  "description": "Aquibra Editor — L2 production-wired extraction",
   "exports": {
     ".": "./src/index.ts",
     "./src/*": "./src/*",
@@ -17,7 +17,7 @@
     "test:coverage": "vitest run --coverage",
     "check:no-legacy-settings-path": "grep -r 'components/Panels/LeftSidebar/tabs/settings' src/ --include='*.ts' --include='*.tsx' && echo 'FAIL: legacy settings path found' && exit 1 || echo 'PASS: no legacy settings path'",
     "lint:ds": "bash scripts/ds-grep-gates.sh",
-    "verify:ds": "node scripts/conformance/check-hooks.mjs && node scripts/conformance/seam-scan.mjs && node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh && node scripts/check-ds-ssot.mjs && node scripts/conformance/check-token-resolution.mjs && node scripts/conformance/check-anchors.mjs && node scripts/conformance/check-boards.mjs && node scripts/conformance/check-hex-drift.mjs && node scripts/conformance/check-copy.mjs && node scripts/check-tsc-baseline.mjs && npm run gate:tokens-generated && npm run gate:vibcoder-ratchet && npm run gate:editor-ui-gone && npm run gate:chrome-ui-surface && pnpm run gate:styling-ratchet && npm run gate:buildrick && npm run gate:design-debt-ratchet",
+    "verify:ds": "node scripts/conformance/check-hooks.mjs && node scripts/conformance/seam-scan.mjs && node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh && node scripts/check-ds-ssot.mjs && node scripts/conformance/check-token-resolution.mjs && node scripts/conformance/check-anchors.mjs && node scripts/conformance/check-boards.mjs && node scripts/conformance/check-hex-drift.mjs && node scripts/conformance/check-copy.mjs && node scripts/check-tsc-baseline.mjs && npm run gate:tokens-generated && npm run gate:vibcoder-ratchet && npm run gate:editor-ui-gone && npm run gate:chrome-ui-surface && pnpm run gate:styling-ratchet && npm run gate:buildrick && npm run gate:design-debt-ratchet && npm run gate:narrow-control-padding",
     "gate:anchors": "node scripts/conformance/check-anchors.mjs",
     "gate:tokens": "node scripts/conformance/check-token-resolution.mjs",
     "gate:tsc": "node scripts/check-tsc-baseline.mjs",
@@ -47,7 +47,8 @@
     "gate:hex-drift": "node scripts/conformance/check-hex-drift.mjs",
     "gate:copy": "node scripts/conformance/check-copy.mjs",
     "gate:hooks": "node scripts/conformance/check-hooks.mjs",
-    "gate:design-debt-ratchet": "node scripts/check-design-debt-ratchet.mjs"
+    "gate:design-debt-ratchet": "node scripts/check-design-debt-ratchet.mjs",
+    "gate:narrow-control-padding": "node scripts/check-narrow-control-padding.mjs"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",

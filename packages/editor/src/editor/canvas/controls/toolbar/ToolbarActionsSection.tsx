@@ -97,7 +97,12 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
           }}
           aria-label="More actions menu"
           aria-expanded={showMoreMenu}
-          aria-haspopup="menu" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+          /* px-0 like its seven siblings: actionBtnStyles is 24 wide and
+             flowbite adds 40 of horizontal padding, which clamps the content
+             box to zero and renders the svg below at width:0. This one spreads
+             the style into an object literal, which is why the first cut of
+             `gate:narrow-control-padding` walked straight past it. */
+          aria-haspopup="menu" className="tw:px-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <circle cx="5" cy="12" r="2" />
