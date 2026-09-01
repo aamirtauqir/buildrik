@@ -290,6 +290,37 @@ Written before the work, per the standing rule. This arc is done when:
 1. Drawer and inspector widths are decided by a recorded measurement, applied
    through the token SSOT, and the canvas measures ≥58% of a 1440 viewport
    **live**.
+
+   **EVALUATED 2026-09-01 — partly met, and the unmet half is unreachable as
+   written.** Measured live at 1440: drawer OPEN (the editor's default, see
+   `useStudioState.ts:234` "Always open on session start") gives a canvas lane
+   of **752 = 52.2%**; drawer CLOSED gives **1031 = 71.6%**. The condition does
+   not say which state it means.
+
+   With the drawer open it cannot be met without changing the DRAWN chrome:
+   ≥58% needs an 835 lane, and rail (60) + inspector (300) leave at most 1080,
+   so the drawer would have to be ≤245 — under the 240 that DESIGN.md already
+   rejected because it cannot hold the Pages SEO table or a deep Layers tree.
+   Narrowing 320 -> 280 bought 40 (49.4% -> 52.2%) and that is the whole budget
+   available from the drawer.
+
+   Two ways to close it, both founder calls:
+   (a) read the condition as "drawer closed" — already met at 71.6%;
+   (b) reclaim the inspector's 300. Both design voices recommended collapsing
+       it when nothing is selected. NOT done, and deliberately: the no-selection
+       inspector is a DRAWN board (2 lines + ✦ Ask AI), the founder's own
+       precedence gives visual conflicts to the board, and `StudioPanels.tsx:406`
+       records that gating on `selectedElement` was tried before and collapsed
+       the column to 1px, rendering that drawn state off-viewport. A separate
+       user-operated collapse control would respect both, and is new product
+       work rather than drift-fixing.
+
+   Consequence worth stating plainly: at the default, the canvas frame is 1024
+   (floored at the desktop breakpoint) inside a 752 lane, so **27% of the
+   customer's page is off-screen and needs horizontal scrolling**. That is the
+   honest cost of flooring the canvas, and it is still better than the bug it
+   replaced — pages rendering at 712, below the breakpoint, with tablet and
+   mobile overrides withheld, i.e. a WRONG layout rather than a clipped one.
 2. The Figma boards draw the same numbers, each write read back.
 3. A negative-tested gate holds code, tokens and board in agreement.
 4. Every §3 drawer issue is either fixed or explicitly killed with the
