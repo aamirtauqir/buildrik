@@ -10,6 +10,24 @@
 
 ---
 
+> **CORRECTION 2026-09-01 — the drawer is 280, not 320.**
+> DESIGN.md names this file "the canonical source for every chrome dimension",
+> so its numbers are load-bearing. The drawer token shipped 320 until
+> 2026-09-01 and now ships **280** (`--bk-size-drawer`). The old "320 is a
+> floor" argument was circular: Media's asset cells were fixed at 136px, so the
+> grid needed 320 — and that number was then cited as the reason the drawer
+> could not narrow. The cells are fluid now; measured live at 280 with no
+> overflow.
+>
+> Two consequences this file states are NOT recomputed below, deliberately.
+> The canvas formula `vw − 360 − 320` and the "pin auto-releases below 1380"
+> threshold both describe the drawer **pin**, a mechanism a founder decision
+> retired (commit `1c8f759d`; the shell expands, it does not pin). Recomputing
+> arithmetic for a control that no longer exists would make this file look
+> current while describing something unreachable. Read those two sections as
+> history.
+
+
 ## 1. Viewport + chrome arithmetic
 
 **Design viewport 1440 × 900. Minimum supported 1280 × 720.**
@@ -97,7 +115,7 @@ Multi-page site, no recovery banner, drawer transient-and-open, nothing selected
 | Recovery banner | **40h**, conditional | dismiss persists for the session |
 | Page tabs | **36h**, conditional (>1 page) | scoped to the *working set*, not the site tree. Each tab: label + dirty-dot + close ✕; F2 renames; horizontal scroll past ~8. Spans the **canvas column only** — it must not read as global nav (see §5 A5). |
 | Rail | **60w** | icon 24 in a 44 hit-target, 8 gap; active = 3px cobalt left bar + `--accent-tint` background + cobalt icon (DESIGN.md:272) |
-| Drawer | **320w**, all six panels | header 44h (title · ⇥ pin · ✕); overlay by default, push when pinned |
+| Drawer | **280w**, all six panels | header 44h (title · ⇥ pin · ✕); overlay by default, push when pinned |
 | Canvas | fills — **1080** transient / **760** pinned | 24 padding; page frame centred in the *visible* area; shadow `0 1px 3px rgba(15,23,42,.08)` |
 | Canvas toolbar | **floating pill 44h**, bottom-centred, 24 from the bottom | never consumes canvas height |
 | Inspector | **300w** | header 48h · **one 32h context bar** (`This ▾ · Desktop ▾ · Base ▾`) · section rows 32h. **No tab strip** — §5.6 removes it; this row previously listed one and contradicted §5.6 in the same file. The ASCII above still draws the old 3-strip + tabs anatomy and is superseded by this row. |
@@ -107,7 +125,7 @@ Multi-page site, no recovery banner, drawer transient-and-open, nothing selected
 
 ## 3. The drawer — one frame, three cargo layouts
 
-All six panels share the 320w frame and the 44h header. The **body** has three layouts; a panel picks one.
+All six panels share the 280w frame and the 44h header. The **body** has three layouts; a panel picks one.
 
 ```
 ┌─ 320 ─────────────────┐

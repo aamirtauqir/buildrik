@@ -25,7 +25,7 @@
     {
       "nodeId": "782:4350",
       "name": "No results",
-      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[10px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-[13px] text-left w-[320px]",
+      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[10px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-[13px] text-left w-[280px]",
       "props": {
         "gap": {
           "value": "10px"
@@ -49,7 +49,7 @@
           "value": "13px"
         },
         "width": {
-          "value": "320px"
+          "value": "280px"
         }
       }
     },

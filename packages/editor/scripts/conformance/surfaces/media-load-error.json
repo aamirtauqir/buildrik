@@ -3,10 +3,23 @@
   "board": "Media · load-error (Figma 453:3931)",
   "_note": "Reachable only when storage refuses to open, which no click can produce — the probe injects it.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-load-error",
-  "viewport": { "width": 320, "height": 812 },
-  "steps": [{ "action": "waitFor", "testId": "media-load-error" }],
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-load-error"
+    }
+  ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "error-block", "testId": "media-load-error", "spec": "media-load-error", "nodeId": "453:3952" }
+    {
+      "name": "error-block",
+      "testId": "media-load-error",
+      "spec": "media-load-error",
+      "nodeId": "453:3952"
+    }
   ]
 }

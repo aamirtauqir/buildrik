@@ -228,7 +228,7 @@ Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/b
 - **Scale:** 2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64.
 
 ## Layout
-- **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / **Drawer 320px — all six panels** / canvas (flex) / **right inspector 300px**. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
+- **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / **Drawer 280px — all six panels** / canvas (flex) / **right inspector 300px**. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
 - **Border radius scale (Flowbite):** `sm: 4px` (row corners, small chips), `md: 6px` (icon tiles, compact controls), `lg: 8px` (buttons, inputs, panels, cards, modals — Flowbite rounded-lg), `full: 9999px` (pills, avatars).
 - **Topbar height:** 56px — canonical. All other chrome heights flow from this rhythm.
 - **Panel header height:** 44px — matches sidebar contract.
@@ -286,7 +286,7 @@ The live editor layout is:
 | Retired from the rail | Templates (dissolved into the New-Page flow + Insert) · AI (⌘K + canvas selection toolbar) · Settings & Publish (the separate Site full-page) · History (the save-status pill → Versions) |
 | Comments | a canvas **mode** (💬, key `C`), not a panel |
 | Shortcuts | `A` Insert · `P` Pages · `L` Layers · `M` Media · `D` Content · `B` Brand · `C` comment · `⌘P` preview · `⌘K` palette |
-| Panel width | **320 for all six** (declared override of the 240/320 Width Rule below — 240 cannot hold the Pages SEO table or a deep Layers tree) |
+| Panel width | **280 for all six** (declared override of the 240/320 Width Rule below — 240 cannot hold the Pages SEO table or a deep Layers tree. Was 320 until 2026-09-01: the "320 floor" came from Media's fixed 136px asset cells, and that number was then cited as the reason the drawer could not narrow. Cells made fluid, measured live at 280 with no overflow.) |
 
 **Authoritative layout specs — build from these, not from the sections below:**
 - `docs/designs/2026-07-17-editor-product-redesign-complete.md` **§4.3** — the placement map (what goes where)
@@ -335,12 +335,15 @@ header canonicalization (commits `0a2410a4`..`f9377302`).
 
 | Width | Mode | Tabs | Purpose |
 |-------|------|------|---------|
-| **320px** | drawer | every drawer panel | One drawer width, one token: `--bk-size-drawer: 320px`. |
+| **280px** | drawer | every drawer panel | One drawer width, one token: `--bk-size-drawer: 280px`. Change it in Figma, re-export, regenerate — never by hand. |
 | **Fullpage** | surface | Templates, Media, Settings, Design | Grids, forms, token editors. |
 
 *(A 240px "nav mode" row sat here until 2026-08-03, contradicting §Layout above
-— which already said "Drawer 320px — all six panels" — and the shipped shell,
-which resolves `--layout-drawer-width` from the single 320 token. The matching
+— which said "Drawer 320px — all six panels" until 2026-09-01 — and the shipped
+shell, which resolves `--layout-drawer-width` from the single token. That
+resolution was itself broken until the same date: `LayoutShell` wrote an inline
+`--layout-drawer-width: 280px` that beat the CSS rule, so the grid track was
+pinned to a hardcoded number while the panel sized from the token. The matching
 `SIDEBAR_W = 240` constant had no consumers left.)*
 
 ### Row Density
@@ -366,14 +369,14 @@ Never 40px. Desktop power users want density.
 
 | # | Tab | Width | Header | Toolbar | Content | Footer |
 |---|-----|-------|--------|---------|---------|--------|
-| 1 | Add | 320 | "Add" | search + category chips | 48px element cards, 2-col | — |
+| 1 | Add | 280 | "Add" | search + category chips | 48px element cards, 2-col | — |
 | 2 | Templates | fullpage | "Templates" | search + category tabs | thumb grid, 3-col | — |
 | 3 | Media | fullpage | "Media Library" | tabs + search + "+ Upload" | thumb grid, 4-col | batch |
 | 4 | Layers | 240 | "Layers" | search | 28px tree rows | — |
 | 5 | Pages | 240 | "Pages" | search + "+ New" | 32px rows + mono slug | status |
 | 6 | Components | 240 | "Components" | search + "+ New" | 32px rows + mono usage | — |
 | 7 | Settings | fullpage | "Settings" | — | nav + form | save/discard |
-| 8 | History | 320 | "History" | search + filter | 32px timeline rows | status |
+| 8 | History | 280 | "History" | search + filter | 32px timeline rows | status |
 
 ### Rail Rules
 

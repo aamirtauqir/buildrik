@@ -3,18 +3,59 @@
   "board": "Media · grid @320 (Figma 144:2)",
   "_note": "Measured against the PROBE, not the running editor (plan D3). The states this board draws — a populated library, an empty one, a failed upload — are not reachable by clicking the live app, and a demo library that happens to be empty would measure the wrong screen. measure.mjs honours a per-recipe `url`, so this recipe points at the probe case that mounts the real component with fixtures.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-grid",
-  "viewport": { "width": 320, "height": 812 },
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
   "steps": [
-    { "action": "waitFor", "testId": "media-panel" }
+    {
+      "action": "waitFor",
+      "testId": "media-panel"
+    }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "panel", "testId": "media-panel", "spec": "media-drawer", "nodeId": "144:2" },
-    { "name": "panel-header", "testId": "panel-header", "spec": "media-drawer", "nodeId": "208:271" },
-    { "name": "search", "testId": "media-search", "spec": "media-drawer", "nodeId": "144:7" },
-    { "name": "folder-row", "testId": "media-folder-row", "spec": "media-drawer", "nodeId": "144:10" },
-    { "name": "type-chips", "testId": "media-type-chips", "spec": "media-drawer", "nodeId": "144:13" },
-    { "name": "asset-grid", "testId": "media-grid", "spec": "media-drawer", "nodeId": "144:26" },
-    { "name": "footer", "testId": "media-footer", "spec": "media-drawer", "nodeId": "144:46" }
+    {
+      "name": "panel",
+      "testId": "media-panel",
+      "spec": "media-drawer",
+      "nodeId": "144:2"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-drawer",
+      "nodeId": "208:271"
+    },
+    {
+      "name": "search",
+      "testId": "media-search",
+      "spec": "media-drawer",
+      "nodeId": "144:7"
+    },
+    {
+      "name": "folder-row",
+      "testId": "media-folder-row",
+      "spec": "media-drawer",
+      "nodeId": "144:10"
+    },
+    {
+      "name": "type-chips",
+      "testId": "media-type-chips",
+      "spec": "media-drawer",
+      "nodeId": "144:13"
+    },
+    {
+      "name": "asset-grid",
+      "testId": "media-grid",
+      "spec": "media-drawer",
+      "nodeId": "144:26"
+    },
+    {
+      "name": "footer",
+      "testId": "media-footer",
+      "spec": "media-drawer",
+      "nodeId": "144:46"
+    }
   ]
 }

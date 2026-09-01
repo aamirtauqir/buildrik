@@ -112,13 +112,13 @@
     {
       "nodeId": "775:4220",
       "name": "skeleton 0",
-      "className": "h-[32px] relative shrink-0 w-[320px]",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
       "props": {
         "height": {
           "value": "32px"
         },
         "width": {
-          "value": "320px"
+          "value": "280px"
         }
       }
     },
@@ -157,13 +157,13 @@
     {
       "nodeId": "775:4223",
       "name": "skeleton 1",
-      "className": "h-[32px] relative shrink-0 w-[320px]",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
       "props": {
         "height": {
           "value": "32px"
         },
         "width": {
-          "value": "320px"
+          "value": "280px"
         }
       }
     },
@@ -202,13 +202,13 @@
     {
       "nodeId": "775:4226",
       "name": "skeleton 2",
-      "className": "h-[32px] relative shrink-0 w-[320px]",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
       "props": {
         "height": {
           "value": "32px"
         },
         "width": {
-          "value": "320px"
+          "value": "280px"
         }
       }
     },

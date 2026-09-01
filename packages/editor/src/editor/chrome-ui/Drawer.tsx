@@ -1,6 +1,9 @@
 /**
  * Drawer — Figma component set 19:46 (Layout: list | grid | table).
- * The 320px left panel every rail tool opens into.
+ * The left panel every rail tool opens into. Its width comes from
+ * `--bk-size-drawer`, NOT from a class here — this docstring said "320px"
+ * and the class below pinned `tw:w-80` (320) while the token shipped 280,
+ * so the library disagreed with the design system it belongs to.
  * @license BSD-3-Clause
  */
 import React from "react";
@@ -27,7 +30,7 @@ const BODY_CLASS: Record<DrawerLayout, string> = {
 export function Drawer({ title, layout = "list", actions, footer, className, children, ...rest }: DrawerProps) {
   return (
     <aside
-      className={["tw:w-80 tw:flex-none tw:flex tw:flex-col tw:bg-white tw:border-r tw:border-[var(--bk-gray-200)] tw:overflow-hidden", className]
+      className={["tw:w-[var(--bk-size-drawer)] tw:flex-none tw:flex tw:flex-col tw:bg-white tw:border-r tw:border-[var(--bk-gray-200)] tw:overflow-hidden", className]
         .filter(Boolean)
         .join(" ")}
       aria-label={title}

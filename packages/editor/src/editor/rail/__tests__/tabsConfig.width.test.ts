@@ -23,12 +23,22 @@ import { GROUPED_TABS_CONFIG } from "../tabsConfig";
  * `getTabWidth` are gone — a field no tab set and a helper that only ever
  * returned a constant.
  *
- * 320 is a FLOOR, not a preference. Media's asset grid is
- * 16 + 136 + 16 + 136 + 16 = exactly 320 and cannot fit in 280 (Figma board
- * 20:6, "GATE A — does 320 hold?"). A 2026-08-31 measurement pass confirmed it
- * independently: at 300 the Media footer's "Browse stock" wraps to two lines,
- * and at 280 the 136px asset cells overflow their columns. Narrow this and you
- * break Media and Brand before anything else.
+ * 320 was NOT a floor, and this comment used to say it was. The argument ran:
+ * Media's asset grid is 16 + 136 + 16 + 136 + 16 = exactly 320, therefore the
+ * drawer cannot narrow. It was circular. Those cells were fixed `w-34`, so the
+ * grid needed 320 because the cells were pinned — and that number was then
+ * cited as the reason the drawer could not narrow. The founder had asked twice
+ * for narrower drawers and been told no on this basis.
+ *
+ * 2026-09-01: the cells were made fluid (`w-full` in fractional tracks) and the
+ * token moved to 280. Measured live: Media grid 279 wide, `overflowX` false,
+ * cells reflowed 136 -> 116, Brand with zero overflowing elements. The token
+ * ships 280 today, so a comment claiming 320 is a hard minimum would describe
+ * a product that does not exist.
+ *
+ * The tests below assert AGREEMENT BETWEEN SOURCES, never a literal width —
+ * which is why they stayed green while this prose was false. Read the token if
+ * you want the number.
  */
 
 const EDITOR_ROOT = join(__dirname, "..", "..", "..", "..");

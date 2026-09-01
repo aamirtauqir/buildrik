@@ -3,10 +3,23 @@
   "board": "Layers · no-results (Figma 782:4260)",
   "_note": "A live search over a real tree needs the engine; the probe mounts the shared block (LayersStateBlocks) with the board's own query ('hero') — the same component LayersPanel renders when the filter comes back empty.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-no-results",
-  "viewport": { "width": 320, "height": 812 },
-  "steps": [{ "action": "waitFor", "testId": "layers-no-results" }],
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "layers-no-results"
+    }
+  ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "no-results-block", "testId": "layers-no-results", "spec": "layers-no-results", "nodeId": "782:4350" }
+    {
+      "name": "no-results-block",
+      "testId": "layers-no-results",
+      "spec": "layers-no-results",
+      "nodeId": "782:4350"
+    }
   ]
 }

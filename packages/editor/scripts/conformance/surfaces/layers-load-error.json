@@ -3,10 +3,23 @@
   "board": "Layers · load-error (Figma 781:4217)",
   "_note": "Reachable only when the tree render throws — the LayersTreeBoundary in LayersTab catches it. No click produces that, so the probe mounts the shared block (LayersStateBlocks) the boundary itself renders.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-load-error",
-  "viewport": { "width": 320, "height": 812 },
-  "steps": [{ "action": "waitFor", "testId": "layers-load-error" }],
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "layers-load-error"
+    }
+  ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "error-block", "testId": "layers-load-error", "spec": "layers-load-error", "nodeId": "781:4307" }
+    {
+      "name": "error-block",
+      "testId": "layers-load-error",
+      "spec": "layers-load-error",
+      "nodeId": "781:4307"
+    }
   ]
 }

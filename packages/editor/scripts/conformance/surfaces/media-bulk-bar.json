@@ -2,10 +2,23 @@
   "surface": "media-bulk-bar",
   "board": "Media · bulk-select bar (Figma 145:347)",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-bulk-select",
-  "viewport": { "width": 320, "height": 812 },
-  "steps": [{ "action": "waitFor", "testId": "media-bulk-bar" }],
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-bulk-bar"
+    }
+  ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "bulk-bar", "testId": "media-bulk-bar", "spec": "media-bulk-bar", "nodeId": "145:347" }
+    {
+      "name": "bulk-bar",
+      "testId": "media-bulk-bar",
+      "spec": "media-bulk-bar",
+      "nodeId": "145:347"
+    }
   ]
 }

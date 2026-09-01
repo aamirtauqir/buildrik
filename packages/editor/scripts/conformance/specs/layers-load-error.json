@@ -26,7 +26,7 @@
     {
       "nodeId": "781:4307",
       "name": "Load error",
-      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[6px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-left w-[320px]",
+      "className": "[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular'] font-normal gap-[6px] items-start leading-[normal] not-italic pb-[32px] pt-[36px] px-[24px] relative shrink-0 text-left w-[280px]",
       "props": {
         "gap": {
           "value": "6px"
@@ -47,7 +47,7 @@
           "value": "24px"
         },
         "width": {
-          "value": "320px"
+          "value": "280px"
         }
       }
     },

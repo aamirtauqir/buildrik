@@ -3,12 +3,35 @@
   "board": "Layers · loading (Figma 775:4130)",
   "_note": "The real path: composer is null while the engine boots, which no measurement pause can catch in the live app — the probe mounts LayersTab with composer={null}, the exact production branch.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-loading",
-  "viewport": { "width": 320, "height": 812 },
-  "steps": [{ "action": "waitFor", "testId": "layers-loading" }],
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "layers-loading"
+    }
+  ],
   "contrastScope": "[data-probe]",
   "targets": [
-    { "name": "skeleton-row", "testId": "layers-sk-row", "spec": "layers-loading", "nodeId": "775:4220" },
-    { "name": "skeleton-icon", "testId": "layers-sk-icon", "spec": "layers-loading", "nodeId": "775:4221" },
-    { "name": "skeleton-bar", "testId": "layers-sk-bar", "spec": "layers-loading", "nodeId": "775:4222" }
+    {
+      "name": "skeleton-row",
+      "testId": "layers-sk-row",
+      "spec": "layers-loading",
+      "nodeId": "775:4220"
+    },
+    {
+      "name": "skeleton-icon",
+      "testId": "layers-sk-icon",
+      "spec": "layers-loading",
+      "nodeId": "775:4221"
+    },
+    {
+      "name": "skeleton-bar",
+      "testId": "layers-sk-bar",
+      "spec": "layers-loading",
+      "nodeId": "775:4222"
+    }
   ]
 }
