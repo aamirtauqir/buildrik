@@ -2693,7 +2693,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "drift-seeded-4-rendered-5",
+      "verifiedNote": "2026-09-01 COPY+HEADER CONFORMED: labels now match board exactly (Connect first client, Publish); title+counter on one row as 3/7. REMAINS a founder call: board draws a FLAT 7-row list at 30px pitch, code is an accordion (one active step expanded with description + CTA, documented as deliberate). Accordion is what makes it actionable.",
       "verified": "drift-open"
     },
     {
@@ -2706,7 +2706,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "drift",
+      "verifiedNote": "2026-09-01 all-done copy conformed to board: You’re all set (was: All done — keep building!). Same flat-vs-accordion structural call as 296:1999.",
       "verified": "drift-open"
     },
     {

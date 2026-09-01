@@ -65,7 +65,7 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     id: "connect-client",
-    label: "Connect your client",
+    label: "Connect first client",
     description:
       "Invite your client by email when you send the site for review — they get their own link.",
     actionLabel: "Open Review",
@@ -92,7 +92,7 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     id: "publish",
-    label: "Publish your site",
+    label: "Publish",
     /* Was "Hit Publish to make your site live. Your site gets a free URL
        instantly." Sites deploy into the WORKSPACE'S OWN Vercel account —
        `runPrePublishChecks` hard-fails with "Sites deploy to your own Vercel

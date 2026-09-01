@@ -95,12 +95,18 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
     <div ref={containerRef} className={PANEL} role="region" aria-label="Getting started checklist">
       {/* Header */}
       <div className={HEADER}>
-        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:flex-1 tw:min-w-0">
-          <span className={HEADER_TITLE}>
-            {allDone ? "All done — keep building!" : "Get started"}
+        {/* Boards 296:1999 / 296:2030 put the title and the counter on ONE
+            row — "Get started" left, "4/7" right-aligned in the same 300-wide
+            frame — and read "You're all set" when everything is done. This
+            stacked them as two lines and spelled the count out as
+            "4 of 7 complete". The spoken form stays on the aria-label above,
+            where it belongs; the visible one follows the board. */}
+        <div className="tw:flex tw:items-center tw:gap-2 tw:flex-1 tw:min-w-0">
+          <span className={`${HEADER_TITLE} tw:flex-1 tw:min-w-0 tw:truncate`}>
+            {allDone ? "You’re all set" : "Get started"}
           </span>
-          <span className={HEADER_COUNT}>
-            {completedCount} of {totalCount} complete
+          <span className={`${HEADER_COUNT} tw:flex-none`}>
+            {completedCount}/{totalCount}
           </span>
         </div>
 

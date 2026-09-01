@@ -87,7 +87,10 @@ describe("full panel header + progress", () => {
 
     expect(screen.getByRole("region", { name: "Getting started checklist" })).toBeInTheDocument();
     expect(screen.getByText("Get started")).toBeInTheDocument();
-    expect(screen.getByText("2 of 7 complete")).toBeInTheDocument();
+    /* Boards 296:1999 / 296:2030 print the counter as "2/7" beside the
+       title, not spelled out on a second line. The spoken form stays on the
+       trigger's aria-label, asserted separately above. */
+    expect(screen.getByText("2/7")).toBeInTheDocument();
 
     for (const step of DEFAULT_ONBOARDING_STEPS) {
       expect(screen.getByText(step.label)).toBeInTheDocument();
@@ -111,7 +114,8 @@ describe("full panel header + progress", () => {
     const props = makeProps({ completedCount: 7, steps: stepsWithCompleted(7) });
     render(<OnboardingChecklist {...props} />);
 
-    expect(screen.getByText("All done — keep building!")).toBeInTheDocument();
+    // Board 296:2030's all-done copy.
+    expect(screen.getByText("You\u2019re all set")).toBeInTheDocument();
     expect(
       screen.getByText(/You have completed all the getting started steps/)
     ).toBeInTheDocument();
