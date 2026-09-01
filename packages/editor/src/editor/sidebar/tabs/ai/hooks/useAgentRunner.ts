@@ -188,13 +188,33 @@ export function useAgentRunner(
           setStep(i, { status: "nochange" });
           advance(i + 1);
         }
-      } catch {
+      } catch (e) {
         if (cancelledRef.current) return;
+        /* A failed step STOPS the run. This used to mark the step failed and
+           then `advance(i + 1)`, so the agent quietly carried on editing the
+           user's page after a step had already failed — while the band above
+           it read "STOPPED AT STEP N", which it computes from `steps` alone.
+           Walked live: the band said stopped at step 1 with step 2 still
+           showing a running dot, the run finished "0 changes applied", and no
+           error, Retry or Undo-all ever appeared, because AgentPlan's error
+           card is gated on `error` and nothing here ever set it.
+
+           Continuing past a failure is the wrong default for an agent that
+           writes to the page: later steps are planned against a state the
+           failed step was supposed to produce. Stop, say so, and leave the
+           user the Undo-all the board promises. */
+        cancelledRef.current = true;
         setStep(i, { status: "failed" });
-        advance(i + 1);
+        setError(e instanceof Error ? e.message : "That step failed.");
+        setPhase("done");
+        setCurrentIndex(-1);
+        composer?.emit("ai:agent-run", { running: false, summary: "" });
+        /* `advance` reports the run when it ends; this path no longer goes
+           through it, and a run that failed is the one most worth measuring. */
+        reportRun();
       }
     },
-    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, onProposal],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, onProposal, reportRun],
   );
   generateStepRef.current = generateStep;
 

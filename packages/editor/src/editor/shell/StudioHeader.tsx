@@ -866,18 +866,32 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
                 </Button>
               ) : null}
             </div>
+            {/* Board 1168:4732 makes "Fix issues first" the strong primary and
+                "Publish anyway" the amber secondary. This footer had it exactly
+                backwards: the safe action carried `color="light"` PLUS a
+                transparent/ghost class string, while the risky one was a bare
+                `<Button>` — which buttonTheme.ts documents as already being the
+                brand accent. So the destructive choice was the solid blue CTA
+                and the safe one read as a faint text link, on a dialog opened
+                *because* the site has unresolved errors. Same amber treatment
+                as StaleApprovalModal's "Publish anyway", which was already
+                right. autoFocus stays on the safe action. */}
             <ModalFooter>
               <Button
-                color="light"
                 autoFocus
                 onClick={() => {
                   setPubConfirm(false);
                   onOpenIssues?.();
-                }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+                }}
               >
                 Fix issues first
               </Button>
               <Button
+                /* Same properties flowbite sets, so twMerge drops its accent
+                   fill for the warning tone. Utilities rather than a `style`
+                   object — the ratchet counts inline styles, and this value is
+                   authored, not measured. */
+                className="tw:bg-[var(--bk-warning)] tw:border-[var(--bk-warning)] tw:hover:bg-[var(--bk-warning)]"
                 onClick={() => {
                   setPubConfirm(false);
                   publishNow();

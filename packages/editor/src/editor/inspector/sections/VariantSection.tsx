@@ -93,11 +93,14 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
 
   const variantProperties = componentInfo.component.variantProperties || [];
   const variants = componentInfo.component.variants || [];
-
-  // Don't show section if component has no variant properties
-  if (variantProperties.length === 0) {
-    return null;
-  }
+  /* This used to `return null` when a component had no variant properties,
+     which is the NORMAL case — most components define none. The whole band
+     went with it, including "Reset to master", so an element that genuinely
+     WAS an instance showed nothing at all: the inspector ran straight from the
+     pill row into TYPOGRAPHY with no sign the element was linked to anything.
+     Board 160:2 is exactly that state. Only the pickers depend on variants;
+     being an instance does not. */
+  const hasVariants = variantProperties.length > 0;
 
   const currentValue = (propertyName: string): string => {
     if (!componentInfo.currentVariant || variants.length === 0) {
@@ -111,8 +114,13 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
   return (
     <div className="tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2" data-testid="variant-band">
       <div className="tw:mb-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-accent)]">
-        VARIANT
+        {hasVariants ? "VARIANT" : "COMPONENT INSTANCE"}
       </div>
+      {!hasVariants && (
+        <div className="tw:mb-1 tw:text-[12px] tw:text-[var(--bk-ink-soft)]">
+          Linked to {componentInfo.component.name}. Edits here apply to this copy only.
+        </div>
+      )}
       {variantProperties.map((prop) => (
         <div key={prop.name} className="bdi-row-ctrl">
           <label className="bdi-lb">{prop.name}</label>

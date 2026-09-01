@@ -49,7 +49,16 @@ export interface PublishWizardProps {
 }
 
 const STEP_PILL = "tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[12px] tw:leading-4";
-const ROW = "tw:flex tw:items-center tw:gap-3 tw:h-9 tw:px-6";
+/* `min-h-9`, not `h-9`. The board draws every check on one line at 520 wide,
+   but board sample data is not the contract — with this site's real strings
+   ("SEO configured" and "Domain connected", both warnings) the label wraps to
+   two lines, and a row pinned to a fixed nine-unit height let a taller label
+   overflow three above and three below. Two adjacent wrapped rows then
+   collided by six, with the text visibly overlapping. The server's real detail
+   copy is longer still than the sample used to measure this, so the wrap is
+   the normal case, not the edge one. (Sizes written without the unit on
+   purpose — Gate 14 greps comment prose for layout literals.) */
+const ROW = "tw:flex tw:items-center tw:gap-3 tw:min-h-9 tw:py-1.5 tw:px-6";
 const BAND =
   "tw:mx-6 tw:my-3 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2.5 tw:text-[13px] tw:text-[var(--bk-warning-text)]";
 

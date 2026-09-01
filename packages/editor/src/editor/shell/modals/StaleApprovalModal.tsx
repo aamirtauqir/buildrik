@@ -184,7 +184,11 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
         )}
         </ModalBody>
         <ModalFooter>
-          <Button color="light" size="xs" disabled={resending} onClick={() => void handleResend()}>
+          {/* Board 1168:4713 draws this as the strong primary — it is the safe
+              choice, and the amber "Publish anyway" beside it is not. It shipped
+              as `color="light"`, which maps to flowbite's white/grey secondary,
+              so the recovery path was quieter than the risky one. */}
+          <Button size="xs" disabled={resending} onClick={() => void handleResend()}>
             {resending ? "Requesting…" : "Request fresh review"}
           </Button>
           <Button

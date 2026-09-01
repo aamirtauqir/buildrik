@@ -56,7 +56,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-applied-not-proposed-no-discard",
       "recipe": null
     },
     {
@@ -67,7 +67,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:reachable-now",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -78,7 +78,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-scopechip-always-shown-board-has-none",
       "recipe": null
     },
     {
@@ -89,7 +89,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:reachable-now",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -100,7 +100,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-no-plan-review-gate-auto-advances",
       "recipe": null
     },
     {
@@ -111,7 +111,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -133,7 +133,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-run-continued-past-failure-FIXED",
       "recipe": null
     },
     {
@@ -144,7 +144,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -155,7 +155,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -166,7 +166,7 @@
       "width": 360,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-chat-transcript-vs-prompt-in-input",
       "recipe": null
     },
     {
@@ -243,7 +243,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unverified-2026-08-31 — needs a failing file import, not performed",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -265,7 +265,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unverified-2026-08-31 — needs a real file import, not performed",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -364,7 +364,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unverified-2026-08-31 — no draft preset exists in the fixture; DraftChip is wired to panel-level dirty state, not a per-preset badge",
+      "authority": "code:draft-badge-shipped-needs-token-picker-pass",
       "recipe": null
     },
     {
@@ -661,7 +661,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-modal-structure-differs-wholesale",
       "recipe": null
     },
     {
@@ -672,7 +672,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-unstyled-STYLED-properties+usedon-unbuilt",
       "recipe": null
     },
     {
@@ -683,7 +683,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-extra-header-add-button",
       "recipe": null
     },
     {
@@ -694,7 +694,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:unreachable-error-never-set-plus-missing-title-prop",
       "recipe": null
     },
     {
@@ -705,7 +705,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:unreachable-loading-state-cannot-be-entered",
       "recipe": null
     },
     {
@@ -1079,7 +1079,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — zero `disabled: true` entries exist in catalog/catalog.ts, so the state cannot render",
+      "authority": "walked:unreachable-no-disabled-catalog-entry",
       "recipe": null
     },
     {
@@ -1112,7 +1112,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — same static catalog; InsertLoadError has zero production callers",
+      "authority": "walked:unreachable-insertloaderror-zero-callers",
       "recipe": null
     },
     {
@@ -1123,7 +1123,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — useBuildTab has no async path; the catalog is module-level static",
+      "authority": "walked:unreachable-catalog-is-static",
       "recipe": null
     },
     {
@@ -1189,7 +1189,7 @@
       "width": 300,
       "height": 776,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match-drift-header-icon-cluster",
       "recipe": null
     },
     {
@@ -1233,7 +1233,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match-partial-link-section-absent-for-icon",
       "recipe": null
     },
     {
@@ -1750,7 +1750,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — PagesLoadingSkeleton has zero importers repo-wide; usePages hydrates synchronously",
+      "authority": "walked:unreachable-skeleton-zero-importers",
       "recipe": null
     },
     {
@@ -1882,7 +1882,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match-prejob-variant-viewlog-subcase-untested",
       "recipe": null
     },
     {
@@ -1893,7 +1893,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -1904,7 +1904,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match-shape-drift-disabled-cta-blue-not-grey",
       "recipe": null
     },
     {
@@ -1915,7 +1915,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -1926,7 +1926,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:unreachable-canPublish-always-true",
       "recipe": null
     },
     {
@@ -1937,7 +1937,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -1948,7 +1948,7 @@
       "width": 520,
       "height": 439,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-checkrow-overlap-FIXED",
       "recipe": null
     },
     {
@@ -1959,7 +1959,7 @@
       "width": 520,
       "height": 439,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-checkrow-overlap-FIXED",
       "recipe": null
     },
     {
@@ -1970,7 +1970,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match-drift-disabled-cta-colour",
       "recipe": null
     },
     {
@@ -3400,7 +3400,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:unverified-2026-08-31 — reaching 'applying' requires actually applying a template, which replaces the fixture page",
+      "authority": "walked:drift-4-generic-phases-vs-6-per-section",
       "recipe": null
     },
     {
@@ -3521,7 +3521,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:board-conflict-2026-08-31 — drawn on a 28h/12-inset grid the 137/138 boards contradict; membership also disagrees (Button under COMPONENTS vs ELEMENTS)",
+      "authority": "board:conflict-list-vs-grid-measured-32h-16inset",
       "recipe": null
     },
     {
@@ -3532,7 +3532,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:board-conflict-2026-08-31 — same 28h/12-inset grid conflict as 1069:4790",
+      "authority": "board:conflict-list-vs-grid-measured-32h-16inset",
       "recipe": null
     },
     {
@@ -3664,7 +3664,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:unreachable-by-choice-shared-fixture",
       "recipe": null
     },
     {
@@ -3675,7 +3675,7 @@
       "width": 320,
       "height": 812,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — the template catalog is a static array, so the empty branch cannot fire live",
+      "authority": "walked:partial-search-empty-reachable-copy-stale",
       "recipe": null
     },
     {
@@ -3719,7 +3719,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:partial-skeleton-title-and-row-metrics-differ",
       "recipe": null
     },
     {
@@ -3741,7 +3741,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-instance-band-gated-on-variants-FIXED",
       "recipe": null
     },
     {
@@ -3752,7 +3752,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -3796,7 +3796,7 @@
       "width": 300,
       "height": 812,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:unreachable-selection-cleared-on-ai-tab-entry",
       "recipe": null
     },
     {
@@ -4324,7 +4324,7 @@
       "width": 520,
       "height": 262,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:safe-action-underemphasised-FIXED-source-only",
       "recipe": null
     },
     {
@@ -4335,7 +4335,7 @@
       "width": 500,
       "height": 247,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "code:safe-risky-emphasis-inverted-FIXED-source-only",
       "recipe": null
     },
     {
@@ -4357,7 +4357,7 @@
       "width": 1068,
       "height": 102,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — needs newPageMode, a prop that only the Pages › New page route supplies",
+      "authority": "walked:partial-confirm-only-success-error-unconfirmed",
       "recipe": null
     },
     {
@@ -4368,7 +4368,7 @@
       "width": 460,
       "height": 142,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — the ⌘K door does not surface 'Save page as template'; the palette answers 'That isn't a command' for the exact registered label. Chain is wired (useCanvasCommandPalette → useEditorEventListeners → StudioModals); cause unverified",
+      "authority": "walked:match-reachable-via-cmd-shift-p",
       "recipe": null
     },
     {
@@ -4379,7 +4379,7 @@
       "width": 380,
       "height": 139,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — the usage-drawer door is gated on a usage count and nothing was applied on the fixture",
+      "authority": "code:usage-drawer-reachable-but-not-visually-confirmed",
       "recipe": null
     },
     {
@@ -4412,7 +4412,7 @@
       "width": 480,
       "height": 175,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-same-modal-two-triggers-neither-matches",
       "recipe": null
     },
     {
@@ -4423,7 +4423,7 @@
       "width": 684,
       "height": 154,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:drift-detach-copy-rewritten",
       "recipe": null
     },
     {
@@ -4555,7 +4555,7 @@
       "width": 320,
       "height": 158,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match",
       "recipe": null
     },
     {
@@ -4577,7 +4577,7 @@
       "width": 236,
       "height": 184,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:match",
       "recipe": null
     },
     {

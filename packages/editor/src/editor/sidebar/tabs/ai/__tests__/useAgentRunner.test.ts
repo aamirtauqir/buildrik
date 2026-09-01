@@ -130,4 +130,33 @@ describe("useAgentRunner", () => {
     act(() => { result.current.stop(); });
     expect(result.current.phase).toBe("done");
   });
+
+  /* Board 171:2 — "Nothing after step N ran."
+     It DID run. The catch marked the step failed and then called
+     `advance(i + 1)`, so the agent carried on editing the page after a step
+     had already failed, while the band above it read "STOPPED AT STEP N"
+     (computed from `steps` alone). Nothing ever set `error`, and AgentPlan's
+     error card — with its Retry and Undo-all — is gated on exactly that, so
+     the user was told the run stopped, shown no failure, and given no way
+     back. Walked live 2026-09-01: band said stopped at step 1 with step 2
+     still showing a running dot. */
+  it("a failed step stops the run instead of quietly continuing", async () => {
+    let call = 0;
+    runPromptOnce.mockImplementation(async (args: { intent: string }) => {
+      if (args.intent === "plan") return { plan: PLAN, edit: null, text: "" };
+      call += 1;
+      if (call === 1) throw new Error("model refused");
+      return { plan: null, edit: editWithRows(1), text: "" };
+    });
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    await act(async () => { result.current.start("x"); });
+
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+    expect(result.current.steps[0].status).toBe("failed");
+    // The second step must never have been attempted.
+    expect(call).toBe(1);
+    expect(result.current.steps[1].status).not.toBe("applied");
+    // And the failure has to be sayable, or the error card cannot render.
+    expect(result.current.error).toBeTruthy();
+  });
 });

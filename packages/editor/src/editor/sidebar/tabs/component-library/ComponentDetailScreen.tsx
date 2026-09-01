@@ -41,6 +41,30 @@ export interface ComponentDetailScreenProps {
   /** Callback to swap component */
 }
 
+/* This screen shipped as raw unstyled HTML — every wrapper was a bare `<div>`
+   with no className, so the four action buttons stacked flush at a 0px gap
+   (measured y=247/287/327/367, each 40 tall) at four different widths, and the
+   `<img>` carried an empty attribute slot where a class had been stripped.
+   Delete was marked `className="danger"`, which is not a class this codebase
+   has — Tailwind is `tw:`-prefixed here — so the destructive action rendered
+   identically to its neighbours. Restyled with `tw:` utilities and `--bk-*`
+   tokens, matching the other drill-in panels.
+
+   Board 641:2599 also draws a PROPERTIES section (per-binding rows) and a
+   USED ON section (per-page instance counts). Neither exists in this component
+   at all — that is unbuilt feature work, recorded on the census, not styling. */
+const PREVIEW =
+  "tw:h-[120px] tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:p-2 tw:flex tw:items-center tw:justify-center tw:overflow-hidden";
+const INFO_ROW = "tw:flex tw:items-baseline tw:gap-2 tw:text-[12px]";
+const INFO_KEY = "tw:w-[76px] tw:flex-none tw:text-[var(--bk-ink-muted)]";
+const INFO_VAL = "tw:flex-1 tw:min-w-0 tw:text-[var(--bk-ink)] tw:break-words";
+const SECTION = "tw:flex tw:flex-col tw:gap-2 tw:pt-3 tw:border-t tw:border-[var(--bk-border)]";
+const SECTION_TITLE =
+  "tw:m-0 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
+/* px-0 so flowbite's own px-5 cannot squeeze the icon+label out of a narrow
+   grid cell — the same collapse that made the canvas toolbar icons invisible. */
+const ACTION_BTN = "tw:w-full tw:px-0 tw:gap-1.5 tw:justify-center";
+
 // ============================================
 // Component
 // ============================================
@@ -257,7 +281,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   };
 
   return (
-    <div>
+    <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0">
       {/* Header with breadcrumb */}
       <DrillInHeader
         title={component.name}
@@ -265,56 +289,60 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         onBack={onBack}
       />
       {/* Scrollable content */}
-      <div>
+      <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col tw:gap-4 tw:px-4 tw:py-3">
         {/* Large Preview */}
-        <div>
+        <div className={PREVIEW}>
           {component.thumbnail ? (
             <img
               src={component.thumbnail}
               alt={component.name}
-             
+              className="tw:max-h-full tw:max-w-full tw:object-contain"
             />
           ) : (
-            <div>
-              <span>No Preview</span>
+            <div className="tw:flex tw:items-center tw:justify-center tw:h-full">
+              <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">No Preview</span>
             </div>
           )}
         </div>
 
         {/* Info Section */}
-        <div>
-          <div>
-            <span>Type:</span>
-            <span>{displayType}</span>
+        <div className="tw:flex tw:flex-col tw:gap-1.5">
+          <div className={INFO_ROW}>
+            <span className={INFO_KEY}>Type</span>
+            <span className={INFO_VAL}>{displayType}</span>
           </div>
-          <div>
-            <span>Tags:</span>
-            <span>{displayTags}</span>
+          <div className={INFO_ROW}>
+            <span className={INFO_KEY}>Tags</span>
+            <span className={INFO_VAL}>{displayTags}</span>
           </div>
           {component.description && (
-            <div>
-              <span>Description:</span>
-              <span>{component.description}</span>
+            <div className={INFO_ROW}>
+              <span className={INFO_KEY}>Description</span>
+              <span className={INFO_VAL}>{component.description}</span>
             </div>
           )}
         </div>
 
         {/* Primary Action */}
-        <Button onClick={handleInsert}>
+        <Button size="sm" onClick={handleInsert} className="tw:w-full">
           Insert Component
         </Button>
 
-        {/* Secondary Actions */}
-        <div>
+        {/* Secondary Actions — one row, equal widths, so they read as peers. */}
+        <div className="tw:grid tw:grid-cols-3 tw:gap-2">
           <Button
-           
+            size="xs"
+            color="light"
             onClick={handleDuplicate}
             title="Duplicate component"
+            className={ACTION_BTN}
           >
             <Copy size={14} />
             <span>Duplicate</span>
           </Button>
           <Button
+            size="xs"
+            color="light"
             onClick={() => setShowUpdateConfirm(true)}
             disabled={!selectedElementId}
             title={
@@ -322,14 +350,21 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
                 ? "Replace this component with the element selected on canvas"
                 : "Select an element on the canvas to update this component from"
             }
+            className={ACTION_BTN}
           >
             <RefreshCw size={14} />
             <span>Update</span>
           </Button>
+          {/* `className="danger"` used to sit here. There is no such class in
+              this codebase — Tailwind is `tw:`-prefixed — so Delete rendered
+              identically to its two neighbours, with nothing marking it
+              destructive. */}
           <Button
-            className="danger"
+            size="xs"
+            color="failure"
             onClick={handleDelete}
             title="Delete component"
+            className={ACTION_BTN}
           >
             <Trash2 size={14} />
             <span>Delete</span>
@@ -344,11 +379,14 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             removed — it had no completion path (no engine swap API), so it
             only toasted and never swapped. */}
         {isInstanceSelected && isProMode && (
-          <div>
-            <h4>Instance Actions</h4>
+          <div className={SECTION}>
+            <h4 className={SECTION_TITLE}>Instance Actions</h4>
             <Button
+              size="xs"
+              color="light"
               onClick={handleDetach}
               title="Detach this instance from the component"
+              className={ACTION_BTN}
             >
               <Unlink size={14} />
               <span>Detach instance</span>
@@ -358,8 +396,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
         {/* Variants Section */}
         {component.variantProperties && component.variantProperties.length > 0 && (
-          <div>
-            <h4>Variants</h4>
+          <div className={SECTION}>
+            <h4 className={SECTION_TITLE}>Variants</h4>
             {component.variantProperties.map((prop) => (
               <VariantPicker
                 key={prop.name}
