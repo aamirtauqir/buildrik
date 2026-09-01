@@ -68,6 +68,38 @@ describe("startPublish · approval gate enforcement", () => {
     expect(jobCreate).not.toHaveBeenCalled(); // gate fires before queueing
   });
 
+  /* The gate must ask the SITE's workspace, not the caller's session one.
+     `sites.publish` authorises with `checkSiteRole` (the SITE's workspace) and
+     then passes `resolveWorkspaceId(ctx)` — the caller's SESSION workspace — to
+     startPublish. Those legitimately differ: every signup owns a personal
+     workspace, so an EDITOR on someone else's site can have their session
+     resolve to their own. Reading `editsRequireApproval` off the caller's
+     workspace asked the wrong one whether this site needs review, and a
+     workspace with the flag OFF skipped the gate entirely — publish went out
+     with no approval and no error.
+
+     Every other test here passes "ws-1" AND mocks the site as "ws-1", so the
+     two never diverge and none of them can see this. */
+  it("reads the SITE's workspace, not the caller's session workspace", async () => {
+    baseHappyMocks();
+    // Site lives in ws-1, which DOES require approval.
+    siteFindUnique.mockResolvedValue({
+      name: "Acme", deletedAt: null, publishedUrl: null, workspaceId: "ws-1", lastEditedAt: null,
+    });
+    // Caller's session resolves to their own ws-2, which does NOT.
+    workspaceFindUnique.mockImplementation((args: { where: { id: string } }) =>
+      Promise.resolve({ editsRequireApproval: args.where.id === "ws-1" }),
+    );
+    memberFindUnique.mockResolvedValue({ role: "EDITOR" });
+
+    await expect(startPublish("site-1", "ws-2", "user-editor")).rejects.toThrow("APPROVAL_NONE");
+    expect(jobCreate).not.toHaveBeenCalled();
+    // And it asked about the SITE's workspace.
+    expect(workspaceFindUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "ws-1" } }),
+    );
+  });
+
   // §13-C1: the actual bug. sites.publish already requires ADMIN+, so this is the
   // realistic actor. An Admin was previously exempt → the gate blocked nobody.
   it("Admin + gate ON + never sent for review → throws APPROVAL_NONE (no job queued) (§13-C1)", async () => {

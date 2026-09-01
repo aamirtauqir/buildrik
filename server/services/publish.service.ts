@@ -246,13 +246,25 @@ export async function startPublish(
   // below OWNER, which is exactly its point. Previously `editsRequireApproval`
   // was read only in settings and never enforced.
   if (!opts?.bypassApproval) {
+    /* SECURITY: ask the SITE's workspace, never the caller's.
+       `workspaceId` here is `resolveWorkspaceId(ctx)` — the caller's SESSION
+       workspace (workspace-ctx.ts:44, any ACTIVE membership). The route above
+       authorises with `checkSiteRole`, which resolves the role on the SITE. So
+       the two can legitimately differ: every signup owns a personal workspace,
+       and a user who is an EDITOR on someone else's site can have their session
+       resolve to their own. Reading `editsRequireApproval` off that one asked
+       the wrong workspace whether this site needs review — and a workspace with
+       the flag off skipped the gate entirely, so the publish went out with no
+       approval and no error. The deploy 50 lines below already uses
+       `site.workspaceId`; only the gate was reading the session value. */
+    const gateWorkspaceId = site.workspaceId;
     const [workspace, member] = await Promise.all([
       prisma.workspace.findUnique({
-        where: { id: workspaceId },
+        where: { id: gateWorkspaceId },
         select: { editsRequireApproval: true },
       }),
       prisma.workspaceMember.findUnique({
-        where: { userId_workspaceId: { userId, workspaceId } },
+        where: { userId_workspaceId: { userId, workspaceId: gateWorkspaceId } },
         select: { role: true },
       }),
     ]);
