@@ -1510,8 +1510,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — load-error: copy/colour/position match; drift: footer still reads '66 layers' where the board has no count",
-      "verified": "drift-open"
+      "verifiedNote": "2026-09-02: count footer no longer survives the tree it counts — board draws no count here. Boundary raises onFailedChange; footer is gated on it and returns on retry. Pinned by LayersTab.boundary.test.tsx, watched to FAIL with the guard removed. Error line moved off tw:text-red-700 to --bk-error-text (#C81E1E), the token the board names.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "775:4130",

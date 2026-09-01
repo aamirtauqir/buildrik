@@ -54,7 +54,7 @@ export const LayersLoadingSkeleton: React.FC = () => (
 */
 export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
   <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pb-8 tw:pt-9" data-testid="layers-load-error" role="alert">
-    <p className="tw:text-[13px] tw:leading-5 tw:text-red-700">Couldn&rsquo;t load the layer tree.</p>
+    <p className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]">Couldn&rsquo;t load the layer tree.</p>
     <p className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">The page is fine &mdash; only this list failed.</p>
     <Button
       type="button"

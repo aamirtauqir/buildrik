@@ -22,16 +22,30 @@ import type { SelectedElementInfo } from "../../../panels/layers/types";
   only this list failed." Retry remounts the tree (key bump), nothing else.
 */
 class LayersTreeBoundary extends React.Component<
-  { children: React.ReactNode },
+  { children: React.ReactNode; onFailedChange?: (failed: boolean) => void },
   { failed: boolean; attempt: number }
 > {
   state = { failed: false, attempt: 0 };
   static getDerivedStateFromError() {
     return { failed: true };
   }
+  /* The count footer is the boundary's SIBLING, so it survives the failure
+     and kept reporting the last good total — "66 layers" printed under
+     "Couldn't load the layer tree." Board 781:4217 draws no count in this
+     state, and it should not: the tree that number described is gone. */
+  componentDidCatch() {
+    this.props.onFailedChange?.(true);
+  }
   render() {
     if (this.state.failed) {
-      return <LayersLoadError onRetry={() => this.setState((s) => ({ failed: false, attempt: s.attempt + 1 }))} />;
+      return (
+        <LayersLoadError
+          onRetry={() => {
+            this.props.onFailedChange?.(false);
+            this.setState((s) => ({ failed: false, attempt: s.attempt + 1 }));
+          }}
+        />
+      );
     }
     return <React.Fragment key={this.state.attempt}>{this.props.children}</React.Fragment>;
   }
@@ -91,6 +105,9 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   // Local state (lifted from LayersPanel per spec §6)
   const [search, setSearch] = React.useState("");
   const [displaySettingsOpen, setDisplaySettingsOpen] = React.useState(false);
+  /* Raised by the tree boundary so the count footer, which is its sibling,
+     can stand down with it. */
+  const [treeFailed, setTreeFailed] = React.useState(false);
   const [stats, setStats] = React.useState<{ total: number; selected: number }>({ total: 0, selected: 0 });
 
   // Subscribe to stats event from LayersPanel
@@ -166,7 +183,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       </div>
       <div className="bdc-pbody bdc-pbody-scroll">
         {composer ? (
-          <LayersTreeBoundary>
+          <LayersTreeBoundary onFailedChange={setTreeFailed}>
             <LayersPanel
               composer={composer}
               selectedElement={selectedElement}
@@ -184,12 +201,16 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         )}
       </div>
       {/* Board 142:58 Count footer — the node count lives here, not in the
-          header subtitle; the header stays a bare label. */}
-      <div className="bdc-lcount" aria-live="polite">
-        {stats.selected >= 2
-          ? `${stats.selected} selected of ${stats.total}`
-          : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
-      </div>
+          header subtitle; the header stays a bare label. Gone when the tree
+          failed (781:4217), because a count of a list that did not load is
+          not a fact. */}
+      {!treeFailed && (
+        <div className="bdc-lcount" aria-live="polite">
+          {stats.selected >= 2
+            ? `${stats.selected} selected of ${stats.total}`
+            : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+        </div>
+      )}
     </PanelFrame>
   );
 };
