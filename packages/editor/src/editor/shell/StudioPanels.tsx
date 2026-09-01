@@ -225,6 +225,22 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   }, [readOnlyView]);
 
   const [aiInInspector, setAiInInspector] = React.useState(false);
+  /* Inspector visibility, user-operated and remembered. Defaults to SHOWN so
+     the drawn no-selection board is still the default state — collapsing it
+     automatically was tried before and rendered that board off-viewport
+     (see the `inspectorOpen` comment below). This is the opt-out. */
+  const [inspectorShown, setInspectorShown] = React.useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    try { return localStorage.getItem("buildrick-inspector-shown") !== "false"; }
+    catch { return true; }
+  });
+  const toggleInspector = React.useCallback(() => {
+    setInspectorShown((v) => {
+      const next = !v;
+      try { localStorage.setItem("buildrick-inspector-shown", String(next)); } catch { /* private mode */ }
+      return next;
+    });
+  }, []);
 
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
@@ -405,7 +421,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
-        inspectorOpen={!readOnlyView && !effectiveFullPageMode}
+        inspectorOpen={!readOnlyView && !effectiveFullPageMode && inspectorShown}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel. Absent in view mode. */}
@@ -440,6 +456,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
+              inspectorOpen={inspectorShown}
+              onToggleInspector={toggleInspector}
               ref={canvasRef as React.Ref<CanvasRef>}
               /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
                  tools, so they go with the rest of the editing chrome. */

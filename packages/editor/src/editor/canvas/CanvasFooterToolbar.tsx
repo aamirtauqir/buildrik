@@ -64,6 +64,20 @@ export interface CanvasFooterToolbarProps {
   onUndo?: () => void;
   /** Perform redo. */
   onRedo?: () => void;
+
+  /* Inspector visibility. The inspector is 300 of a 1440 viewport and the
+     canvas lane is 752 with both panels open — 52.2%, under the plan's own
+     >=58% — so the customer's 1024 page frame needs horizontal scrolling for
+     27% of its width. Collapsing it by DEFAULT is not an option: the
+     no-selection inspector is a drawn board, and StudioPanels records that
+     gating it on `selectedElement` collapsed the column to 1px and rendered
+     that drawn state off-viewport. A control the user operates respects the
+     drawn default and still gives the space back on demand. Sits with the
+     other view toggles because that is what it is. */
+  /** Whether the inspector column is showing. Renders the toggle when provided. */
+  inspectorOpen?: boolean;
+  /** Show or hide the inspector column. */
+  onToggleInspector?: () => void;
 }
 
 // ============================================
@@ -185,6 +199,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   overlays,
   zoom,
   onOverlayChange,
+  inspectorOpen,
+  onToggleInspector,
   onZoomChange,
   onHelpClick,
   onFitToScreen,
@@ -356,6 +372,17 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           active={overlays.xray}
           onClick={() => onOverlayChange("xray", !overlays.xray)}
         />
+        {/* Inspector is 300 of 1440; hiding it takes the canvas lane from 752
+            to 1052, which clears the 1024 page frame and removes the
+            horizontal scroll. Active = showing, matching every other toggle
+            here (pressed means the thing is ON). */}
+        {onToggleInspector && (
+          <OverlayButton
+            label="Inspector"
+            active={inspectorOpen ?? true}
+            onClick={onToggleInspector}
+          />
+        )}
       </div>
       {/* Help Button */}
       {onHelpClick && (

@@ -10,6 +10,10 @@ import type { CanvasOverlayState } from "./CanvasFooterToolbar";
 
 export interface CanvasProps {
   composer: Composer | null;
+  /** Inspector column visibility — forwarded to the footer's view toggles. */
+  inspectorOpen?: boolean;
+  /** Show or hide the inspector column. */
+  onToggleInspector?: () => void;
   device: DeviceType;
   zoom: number;
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;

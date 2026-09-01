@@ -69,6 +69,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer,
       device,
       zoom,
+      inspectorOpen,
+      onToggleInspector,
       onAIRequest,
       showComponentView = false,
       showSpacing = false,
@@ -802,6 +804,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
               onHelpClick={openCheatSheet}
+              inspectorOpen={inspectorOpen}
+              onToggleInspector={onToggleInspector}
               device={device === "watch" ? "mobile" : device}
               onDeviceChange={onDeviceChange}
               canUndo={canUndo}
