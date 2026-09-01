@@ -63,24 +63,34 @@ describe("DSLintMount", () => {
        fix"). The registry lints the FULL palette; the colour list's chip
        counts only its Beginner-visible subset — superset, never contradiction.
        Two contrast findings, not four: the page colour ships under three ids
-       in the default palette and comparing it to itself is not a finding. */
-    expect(queryByText("1 DS error · 3 warnings")).toBeTruthy();
+       in the default palette and comparing it to itself is not a finding.
+
+       ZERO contrast findings as of 2026-09-02 — the two that used to be here
+       were accent and success at #22C55E, 2.18 against the page, and both are
+       green-700 now. So the count is the two mocked findings alone. */
+    expect(queryByText("1 DS error · 1 warning")).toBeTruthy();
   });
 
-  /* Renamed from "renders nothing when lint returns an empty list": with
-     contrast merged, an empty DSLinter result no longer means a clean brand —
-     the default palette carries real WCAG failures (accent and success, both
-     #22C55E at 2.18 against the page) and the banner must say so.
-     Suppressing them was the bug. */
-  it("surfaces contrast findings even when DSLinter returns nothing", () => {
+  /* This asserted "2 DS warnings" from an empty DSLinter result, because the
+     default palette carried two real WCAG failures and the banner had to say
+     so — suppressing them was the original bug. The palette passes now
+     (green-700), so the honest assertion is the opposite one: a fresh brand
+     with nothing to report shows no banner.
+
+     COVERAGE NOTE, stated rather than glossed: this test no longer exercises
+     the contrast MERGE, because the merge's input is computed from the
+     provider's palette and there is no seam here to hand it a failing one. The
+     rule itself is covered directly in contrastLint.test.ts. */
+  it("shows no banner when a fresh brand has nothing to report", () => {
     const composer = makeComposer([]);
-    const { queryByText } = render(wrap(<DSLintMount composer={composer as any} />));
+    const { queryByText, container } = render(wrap(<DSLintMount composer={composer as any} />));
 
     act(() => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(queryByText("2 DS warnings")).toBeTruthy();
+    expect(queryByText(/DS warning/)).toBeNull();
+    expect(container.firstChild).toBeNull();
   });
 
 

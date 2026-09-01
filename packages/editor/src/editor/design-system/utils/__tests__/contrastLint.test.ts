@@ -9,8 +9,11 @@
  *
  * `contrastFails` already carried the rule ("never compare it to itself") but
  * enforced it by ID, and the palette ships the same colour under three ids.
- * Comparing by value keeps the two real warnings (accent and success are both
- * #22C55E at 2.18 against the page) and drops the two impossible ones.
+ * Comparing by value kept the two real warnings and dropped the two impossible
+ * ones. Those two real warnings are gone as of 2026-09-02: accent and success
+ * were both #22C55E, 2.18 against the page, and are now green-700 #15803D at
+ * 4.79. A fresh site opens clean, so the "genuinely fails" case below builds
+ * its own failing token instead of leaning on the shipped palette being wrong.
  *
  * @license BSD-3-Clause
  */
@@ -28,14 +31,21 @@ describe("contrast lint — a surface colour is not a foreground colour", () => 
     expect(ids).not.toContain("color-surface");
   });
 
-  it("still flags foreground colours that genuinely fail", () => {
-    const ids = buildContrastIssues(colors, "light").map((i) => i.tokenId);
-    expect(ids).toContain("color-accent");
-    expect(ids).toContain("color-success");
+  it("still flags a foreground colour that genuinely fails", () => {
+    /* Built here rather than taken from DEFAULT_TOKENS: the shipped palette
+       passes now, and a test that needs the product to be broken in order to
+       prove the rule stops proving it the moment the product is fixed. */
+    const tooPale: DesignToken = { ...(colors[0] as DesignToken), id: "color-pale", value: "#DDEEDD" };
+    const ids = buildContrastIssues([...colors, tooPale], "light").map((i) => i.tokenId);
+    expect(ids).toContain("color-pale");
   });
 
-  it("leaves a fresh site with only the fixable warnings", () => {
-    expect(buildContrastIssues(colors, "light")).toHaveLength(2);
+  it("opens a fresh site with no contrast warnings at all", () => {
+    /* Was `toHaveLength(2)` — accent and success, both #22C55E at 2.18. That
+       assertion pinned a defect as an invariant: every new site opened on two
+       warnings its owner had not caused, and board 164:35's "No issues." was
+       unreachable by construction. */
+    expect(buildContrastIssues(colors, "light")).toHaveLength(0);
   });
 
   it("matches on value regardless of hex case", () => {

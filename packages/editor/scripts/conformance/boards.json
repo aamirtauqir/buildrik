@@ -4415,8 +4415,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "empty-state-unreachable: DEFAULT_TOKENS and all 6 starters each emit 1-2 contrast issues",
-      "verified": "unreachable"
+      "verifiedNote": "2026-09-02 REACHABLE AND MATCHING. Was 'unreachable': color-accent and color-success were both #22C55E, 2.18:1 on the #F8FAFC page, under the linter's own 3.0 floor, so every new site opened on two warnings nobody caused and this board could not exist. Both are green-700 #15803D (4.79) on founder's 'follow the board' call — option A, because leaving success at 2.18 keeps one issue and the board stays unreachable. Live: chip reads 'No issues', empty state renders at 88 / 111.5 vs board 88 / 112, centred, 13px. Dark was never affected (#4ADE80 on #0F172A = 10.25).",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "164:42",

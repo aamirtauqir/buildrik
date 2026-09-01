@@ -12,12 +12,12 @@
   /* COLORS (9 — user-editable) */
   --buildrick-design-color-primary: #1A56DB;
   --buildrick-design-color-secondary: #64748B;
-  --buildrick-design-color-accent: #22C55E;
+  --buildrick-design-color-accent: #15803D;
   --buildrick-design-color-background: #F8FAFC;
   --buildrick-design-color-text: #334155;
   --buildrick-design-color-muted: #71717A;
   --buildrick-design-color-border: #27272A;
-  --buildrick-design-color-success: #22C55E;
+  --buildrick-design-color-success: #15803D;
   --buildrick-design-color-error: #EF4444;
 
   /* COLORS — v4 migration (4 primitives + 4 semantic aliases, added via

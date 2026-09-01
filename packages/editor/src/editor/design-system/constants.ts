@@ -35,7 +35,14 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "color-accent",
     name: "Accent",
-    value: "#22C55E",
+    /* green-700. Was green-500 #22C55E, which is 2.18:1 on the default
+       #F8FAFC page — under the linter's own 3.0 floor (colorUtils
+       calcWcagLevel). Every new site therefore opened on two contrast
+       warnings nobody had caused, and board 164:35's "No issues." was
+       unreachable by construction. 4.79:1 here. Dark mode was never
+       affected: #4ADE80 on #0F172A is 10.25:1 and is seeded separately by
+       projectMigrations/0002. */
+    value: "#15803D",
     category: "colors",
     cssVar: "--buildrick-design-color-accent",
     type: "color",
@@ -85,7 +92,10 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "color-success",
     name: "Success",
-    value: "#22C55E",
+    /* Same move, same reason. Both tokens have to clear the floor or the
+       panel still shows an issue and 164:35 stays unreachable — which is
+       why this is not the accent alone. */
+    value: "#15803D",
     category: "colors",
     cssVar: "--buildrick-design-color-success",
     type: "color",
