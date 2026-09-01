@@ -7,6 +7,10 @@ vi.mock("../hooks/runPromptOnce", () => ({
 }));
 const applyAiEdit = vi.fn();
 vi.mock("../applySetStyle", () => ({ applyAiEdit: (...a: unknown[]) => applyAiEdit(...a) }));
+const trackAgentRun = vi.fn();
+vi.mock("@/services/ai/adoptionTracker", () => ({
+  trackAgentRun: (...a: unknown[]) => trackAgentRun(...a),
+}));
 
 import { useAgentRunner } from "../hooks/useAgentRunner";
 
@@ -38,6 +42,7 @@ const editWithRows = (n: number) => ({
 beforeEach(() => {
   runPromptOnce.mockReset();
   applyAiEdit.mockReset();
+  trackAgentRun.mockReset();
   // applyAiEdit returns { applied, proposals } — the runner destructures proposals.
   applyAiEdit.mockResolvedValue({ applied: 1, proposals: [] });
 });
@@ -158,5 +163,13 @@ describe("useAgentRunner", () => {
     expect(result.current.steps[1].status).not.toBe("applied");
     // And the failure has to be sayable, or the error card cannot render.
     expect(result.current.error).toBeTruthy();
+
+    /* Telemetry must see the failure. `stepsRef.current` is assigned during
+       render, so marking the step failed with `setStep` and calling reportRun
+       synchronously after reported stepsFailed: 0 for the run that just
+       failed. Nothing asserted this, which is why review caught it and the
+       suite did not. */
+    expect(trackAgentRun).toHaveBeenCalledTimes(1);
+    expect(trackAgentRun.mock.calls[0][0]).toMatchObject({ stepsFailed: 1 });
   });
 });

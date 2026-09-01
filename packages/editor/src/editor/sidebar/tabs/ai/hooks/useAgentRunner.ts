@@ -204,7 +204,16 @@ export function useAgentRunner(
            failed step was supposed to produce. Stop, say so, and leave the
            user the Undo-all the board promises. */
         cancelledRef.current = true;
-        setStep(i, { status: "failed" });
+        /* Write the ref in the same breath as the state. `stepsRef.current` is
+           assigned during RENDER, and `reportRun` reads it synchronously — so
+           marking the step failed with `setStep` alone and reporting straight
+           after logged `stepsFailed: 0` for the very run that just failed.
+           (Caught in review, not by the suite: nothing asserts telemetry.) */
+        const failed = stepsRef.current.map((s, idx) =>
+          idx === i ? { ...s, status: "failed" as const } : s,
+        );
+        stepsRef.current = failed;
+        setSteps(failed);
         setError(e instanceof Error ? e.message : "That step failed.");
         setPhase("done");
         setCurrentIndex(-1);
