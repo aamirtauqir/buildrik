@@ -2196,7 +2196,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "match-shape-drift-disabled-cta-blue-not-grey",
+      "verifiedNote": "2026-09-02 live-measured (panel reached via ⋯ site menu > 'Publish panel'; publishHistory aborted for the error state, publish mutations blocked, CTA never clicked). Disabled CTA was brand blue #1A56DB white-on-blue at 50%%, h40, full-width; board draws bg-subtle #F3F4F6 / ink-muted #6B7280 / h28 / label-width. NOW: bg rgb(243,244,246), text rgb(107,114,128), h28, w166 (board 157). REMAINS: opacity 0.5, whose source is NOT this button — themes/ux-fixes.css:95 has a global `button:disabled{opacity:.5}` dimming all 207 disabled buttons. The board's disabled component has no dimming. Removing it is systemic and needs its own change.",
       "verified": "drift-open"
     },
     {
@@ -2274,7 +2274,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "match-drift-disabled-cta-colour",
+      "verifiedNote": "2026-09-02 live-measured (panel reached via ⋯ site menu > 'Publish panel'; publishHistory aborted for the error state, publish mutations blocked, CTA never clicked). Disabled CTA was brand blue #1A56DB white-on-blue at 50%%, h40, full-width; board draws bg-subtle #F3F4F6 / ink-muted #6B7280 / h28 / label-width. NOW: bg rgb(243,244,246), text rgb(107,114,128), h28, w166 (board 157). REMAINS: opacity 0.5, whose source is NOT this button — themes/ux-fixes.css:95 has a global `button:disabled{opacity:.5}` dimming all 207 disabled buttons. The board's disabled component has no dimming. Removing it is systemic and needs its own change.",
       "verified": "drift-open"
     },
     {

@@ -643,7 +643,39 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 /* Board 784:4326 greys the CTA right after a deploy: with no
                    pending change there is nothing to publish. */
                 disabled={isPublishing || justPublished || snapshot.error}
-                className="tw:w-full"
+                /* Boards 781:4526 / 784:4287 draw "Button · disabled" as a
+                   GREY chip — bg-subtle fill, ink-muted text, 28 tall, sized
+                   to its label. Flowbite's own disabled is
+                   `pointer-events-none opacity-50`, which left the brand blue
+                   showing at half strength: a dead control that still reads as
+                   the primary action. `disabled:opacity-100` is load-bearing —
+                   without it the greys render at 50% too.
+
+                   Height and width are the board's as well: this was h-10
+                   (flowbite's default, the same leak as the layers rows and
+                   the apply modal) and full-width, where the board sizes it to
+                   the label. */
+                /* Boards 781:4526 / 784:4287 draw "Button · disabled" as a grey
+                   chip: bg-subtle fill, ink-muted text, 28 tall, sized to its
+                   label. It rendered as the brand blue at half strength — a
+                   dead control that still read as the primary action.
+
+                   The fill, the text, the height and the padding are the
+                   board's now and measured. The remaining 50% is NOT from this
+                   button: `themes/ux-fixes.css` carries a global
+                   `button:disabled { opacity: .5 }` that dims all 207 disabled
+                   buttons in the editor. Three attempts to outrank it from here
+                   (a `disabled:opacity-100` utility, an arbitrary `opacity-[1]`,
+                   and a `theme.disabled` override) all still measured 0.5, and
+                   the utility never appeared in the dev stylesheet at all — the
+                   gap tw.css itself documents. Left global, deliberately: the
+                   board's grey already reads as disabled without the dimming,
+                   but dropping it changes 207 buttons and belongs in its own
+                   change. */
+                className={
+                  "tw:h-7 tw:w-auto tw:self-start tw:px-3 " +
+                  "tw:disabled:bg-[var(--bk-bg-subtle)] tw:disabled:text-[var(--bk-ink-muted)]"
+                }
               >
                 {/* One label, in every state. Board 641:2652 and 784:4326 both name the
                     destination and neither draws an "Update" variant — the
