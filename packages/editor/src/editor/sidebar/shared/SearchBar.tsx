@@ -107,7 +107,10 @@ const containerStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   margin: 0,
-  padding: "0 8px",
+  /* Board 137:8 is asymmetric on purpose: the placeholder starts at 10 and
+     the kbd hint ends 14 from the right (⌘F at x258+16 in a 288 box). It
+     was 8 both sides, leaving the hint 9 short of the board. */
+  padding: "0 14px 0 10px",
   // Board 137:8 (founder re-spec 2026-08-06): 28h field on gray-50 with a
   // border, radius 6 — the wrapper's 4/16 padding supplies the 36h band.
   // Shared by all seven drawers; the board's Panel-header doc scopes the

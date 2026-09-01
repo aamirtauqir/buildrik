@@ -1226,8 +1226,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — default state live; drift: ⌘F hint at x201 not flush-right in the 287 box (shared SearchBar, 7 drawers)",
-      "verified": "drift-open"
+      "verifiedNote": "2026-09-02 live-measured: search box x16 w287 (board x16 w288), kbd hint xInBox 258.8 and 15 from the box's right edge — board 258 / 14, the 1px being the border. SearchBar's gutters were 8 both sides; the board is asymmetric (10 left, 14 right). Shared component, so this lands in all four drawers that use it.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "138:198",
