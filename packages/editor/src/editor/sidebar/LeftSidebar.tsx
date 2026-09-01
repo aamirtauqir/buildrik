@@ -373,8 +373,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
 
-  // Expand state (board 16:6 header action): 320 ↔ 700 drawer width.
-  // Collapsed by default — the boards draw the 320 drawer. Controlled or
+  // Expand state (board 16:6 header action): 280 ↔ 700 drawer width.
+  // Collapsed by default — the boards draw the 280 drawer (redrawn 2026-09-02). Controlled or
   // internal fallback, same shape the pin state had.
   const [internalExpanded, setInternalExpanded] = React.useState(false);
   const isExpanded = controlledExpanded ?? internalExpanded;

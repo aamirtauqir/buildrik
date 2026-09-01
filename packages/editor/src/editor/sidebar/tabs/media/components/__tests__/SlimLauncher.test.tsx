@@ -1,5 +1,5 @@
 /**
- * SlimLauncher — §10 default 320px experience tests.
+ * SlimLauncher — §10 default 280px experience tests.
  *
  * Phase 1 Task 9 (TDD red phase) — asserts the new layout:
  * panel header + TypePills + real search + 3-col asset grid + UploadZone.
@@ -50,7 +50,7 @@ const baseProps = () => ({
   onOpenStock: vi.fn(),
 });
 
-describe("SlimLauncher — §10 default 320px experience", () => {
+describe("SlimLauncher — §10 default 280px experience", () => {
   it("renders panel header with 'Media' title", () => {
     render(<SlimLauncher {...baseProps()} />);
     expect(screen.getByRole("heading", { name: /^Media$/ })).toBeInTheDocument();

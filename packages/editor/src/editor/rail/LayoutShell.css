@@ -7,7 +7,7 @@
  * │                      TopBar (56px)                       │
  * ├──────┬──────────┬───────────────────────────┬───────────┤
  * │ Rail │  Drawer  │         Canvas            │ Inspector │
- * │ 60px │  320px   │          1fr              │   300px   │
+ * │ 60px │  280px   │          1fr              │   300px   │
  * │      │ (or 0)   │      + footer 32px        │  (or 0)   │
  * └──────┴──────────┴───────────────────────────┴───────────┘
  *
@@ -73,7 +73,7 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
 .layout-shell--drawer-open {
   grid-template-columns:
     var(--layout-rail-width, 60px)
-    var(--layout-drawer-width, 320px)
+    var(--layout-drawer-width, 280px)
     1fr
     0px;
 }
@@ -91,7 +91,7 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
 .layout-shell--drawer-open.layout-shell--inspector-open {
   grid-template-columns:
     var(--layout-rail-width, 60px)
-    var(--layout-drawer-width, 320px)
+    var(--layout-drawer-width, 280px)
     1fr
     var(--layout-inspector-width, 300px);
 }
@@ -119,7 +119,7 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
   top: var(--layout-topbar-height, 56px);
   left: var(--layout-rail-width, 60px);
   bottom: 0;
-  width: var(--layout-drawer-width, 320px);
+  width: var(--layout-drawer-width, 280px);
   z-index: calc(var(--bk-z-drawer) + 6);
   box-shadow: var(--bk-shadow-overlay);
   border-right: none;
@@ -368,7 +368,7 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
   .layout-shell--drawer-open.layout-shell--inspector-open {
     grid-template-columns:
       var(--layout-rail-width, 60px)
-      var(--layout-drawer-width, 320px)
+      var(--layout-drawer-width, 280px)
       1fr
       0px;
   }

@@ -1,7 +1,7 @@
 /**
  * DesignSystemTab — panel-mode layout test
  *
- * Verifies the tab renders within the 320px LeftSidebar panel chrome without
+ * Verifies the tab renders within the 280px LeftSidebar panel chrome without
  * horizontal overflow. Width is enforced by `.ls-panel` parent + the tab's
  * own inline flex-column container; this suite asserts the tab mounts and
  * does not force an intrinsic wider width.
@@ -69,25 +69,25 @@ beforeEach(() => {
 });
 
 describe("DesignSystemTab — panel mode", () => {
-  it("mounts inside a 320px container", () => {
+  it("mounts inside a 280px container", () => {
     const composer = makeFakeComposer();
     const { container } = render(
       wrap(
-        <div style={{ width: 320 }}>
+        <div style={{ width: 280 }}>
           <DesignSystemTab composer={composer} />
         </div>,
       ),
     );
-    // The 320px wrapper is the outer div; DesignSystemTab's root sits inside.
+    // The 280px wrapper is the outer div; DesignSystemTab's root sits inside.
     const root = container.firstElementChild?.firstElementChild as HTMLElement | null;
     expect(root).toBeTruthy();
   });
 
-  it("renders without horizontal overflow inside a 320px container", () => {
+  it("renders without horizontal overflow inside a 280px container", () => {
     const composer = makeFakeComposer();
     const { container } = render(
       wrap(
-        <div style={{ width: 320 }}>
+        <div style={{ width: 280 }}>
           <DesignSystemTab composer={composer} />
         </div>,
       ),
@@ -112,7 +112,7 @@ describe("DesignSystemTab — panel mode", () => {
     const composer = makeFakeComposer();
     const { getByRole } = render(
       wrap(
-        <div style={{ width: 320 }}>
+        <div style={{ width: 280 }}>
           <DesignSystemTab composer={composer} />
         </div>,
       ),
