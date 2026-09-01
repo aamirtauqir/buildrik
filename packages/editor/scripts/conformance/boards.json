@@ -4272,8 +4272,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "partial-skeleton-title-and-row-metrics-differ",
-      "verified": "drift-open"
+      "verifiedNote": "live-measured 2026-09-01: panel 299 (token --bk-size-inspector IS the board's 300; the 1px is border chrome the frame does not draw), header 48, 6 rows at pitch 32, label 88x10 @x17, value bar the remainder @x113 — board 300/48/6x32/88@16/172@112.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "159:123",

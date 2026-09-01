@@ -10,33 +10,43 @@
  * The row count is the board's shape, not a measurement: nothing here knows
  * what will be selected, or whether anything will be.
  *
+ * The board's header reads "Section". That is sample data: the header this
+ * stands in for (board 32:2) names the SELECTED element, and at this moment
+ * nothing is selected. So the 48-tall bar is drawn for real — it is chrome,
+ * like the day band in the notifications skeleton — and only the name inside
+ * it stays a placeholder. Before this the title was a bare grey bar floating
+ * in the panel's padding, with no header bar at all.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { SkeletonBlock } from "@/editor/chrome-ui";
 
-/** Board: label bar + field bar, seven times. */
-const ROWS = 7;
+/** Board 159:102 draws six rows, not seven. */
+const ROWS = 6;
 
 export function InspectorLoading(): React.ReactElement {
   return (
     <div
-      className="bdi-panel tw:flex tw:flex-col tw:gap-3 tw:p-4"
+      className="bdi-panel"
       role="status"
       aria-live="polite"
       aria-label="Loading"
       data-testid="inspector-loading"
     >
-      <SkeletonBlock style={{ width: 72, height: 14 }} />
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        {Array.from({ length: ROWS }, (_, i) => (
-          <div key={i} className="tw:flex tw:items-center tw:gap-2">
-            <SkeletonBlock style={{ width: 72, height: 12, flexShrink: 0 }} />
-            <SkeletonBlock style={{ height: 12, flex: 1 }} />
-          </div>
-        ))}
+      <div className="tw:flex tw:h-12 tw:items-center tw:border-b tw:border-[var(--bk-border)] tw:px-4">
+        <SkeletonBlock className="tw:h-2.5 tw:w-[52px]" />
       </div>
+      {/* 32-tall rows, butted together the way the board stacks them: an 88
+          label bar at the 16 gutter, then the field bar out to the matching
+          gutter on the right. */}
+      {Array.from({ length: ROWS }, (_, i) => (
+        <div key={i} className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4">
+          <SkeletonBlock className="tw:h-2.5 tw:w-[88px] tw:shrink-0" />
+          <SkeletonBlock className="tw:h-2.5 tw:flex-1" />
+        </div>
+      ))}
     </div>
   );
 }
