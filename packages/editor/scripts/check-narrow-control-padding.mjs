@@ -56,14 +56,43 @@ for (const f of files) {
   }
 }
 
-/* 2. Any Button spending one of them must zero its padding.
+/* 2a. Buttons carrying a narrow width INLINE — `style={{ width: 16, ... }}`.
+       This is the dominant idiom in this codebase and the first two cuts of the
+       gate were blind to it, so the gate reported PASS over four live
+       instances. A gate with a false negative is worse than no gate: it turns
+       "unchecked" into "checked and clean". */
+const violations = [];
+for (const f of files) {
+  const src = readFileSync(f, "utf8");
+  const re = /<Button\b[^>]*?style=\{\{([\s\S]{0,240}?)\}\}/g;
+  let m;
+  while ((m = re.exec(src))) {
+    const w = m[1].match(/\bwidth:\s*(\d+)\b/);
+    if (!w || Number(w[1]) >= FLOWBITE_PX) continue;
+    if (/tw:px-0|tw:p-0/.test(m[0])) continue;
+    /* An INLINE `padding: 0` also neutralises it, and beats the class outright
+       — inline styles win over any utility. Two controls (StructurePopover,
+       PagesTab) carry exactly that and are fine; flagging them was a false
+       positive that nearly "fixed" two working buttons and added a duplicate
+       className. A gate that cries wolf gets muted, which costs more than the
+       misses. */
+    if (/\bpadding(?:Left|Right|Inline)?:\s*0\b/.test(m[1])) continue;
+    violations.push({
+      file: f.replace(SRC, "src"),
+      line: src.slice(0, m.index).split("\n").length,
+      name: `inline width: ${w[1]}`,
+      width: Number(w[1]),
+    });
+  }
+}
+
+/* 2b. Any Button spending a hoisted narrow style object must zero its padding.
       BOTH call shapes count:
         style={name}                       — direct
         style={{ ...name, background: x }} — spread into an object literal
       The first cut of this gate only matched the direct form and passed over a
       live instance (the toolbar's "More actions" button), so the spread
       alternative is spelled out rather than assumed. */
-const violations = [];
 for (const f of files) {
   const src = readFileSync(f, "utf8");
   for (const [name, info] of narrow) {

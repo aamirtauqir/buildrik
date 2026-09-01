@@ -114,7 +114,7 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
           aria-pressed={linked}
           aria-label={linked ? "Unlink row and column gap" : "Link row and column gap"}
           disabled={disabled}
-          className="bdi-mini"
+          className="tw:px-0 bdi-mini"
           style={{
             width: 16,
             height: 16,

@@ -188,7 +188,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
           onClick={onLinkToggle}
           title={linked ? "Unlink corners" : "Link all corners"}
           aria-label={linked ? "Unlink corners" : "Link all corners"}
-          className="bdi-icon-btn"
+          className="tw:px-0 bdi-icon-btn"
           style={{
             width: 18,
             height: 18,
