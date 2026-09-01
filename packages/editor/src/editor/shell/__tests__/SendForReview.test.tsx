@@ -33,6 +33,37 @@ function sendNow() {
   fireEvent.click(screen.getByRole("button", { name: "Send" }));
 }
 
+describe("SendForReview — the outcome the user never saw (boards 129:223 / 129:451)", () => {
+  /* `setOpen(inviteEmailSent === false)` meant the popover CLOSED on success,
+     so the review link the user had just created was reachable only when the
+     invite email FAILED. All three S5.1 boards draw the link with Copy and
+     Open. */
+  it("shows the link on SUCCESS, where it used to just close", async () => {
+    (submitForReview as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      inviteEmailSent: true, reviewUrl: "https://app.buildrick.io/review/9fA2kQ7xLm",
+    });
+    render(<SendForReview composer={null} />);
+    fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    await waitFor(() =>
+      expect(screen.getByText("https://app.buildrick.io/review/9fA2kQ7xLm")).toBeTruthy());
+    expect(screen.getByRole("button", { name: "Copy" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Open" })).toBeTruthy();
+  });
+
+  it("shows the link on email failure too, with the retry", async () => {
+    (submitForReview as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      inviteEmailSent: false, reviewUrl: "https://app.buildrick.io/review/9fA2kQ7xLm",
+    });
+    render(<SendForReview composer={null} />);
+    fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    await waitFor(() => expect(screen.getByText(/We couldn't send the email\./)).toBeTruthy());
+    expect(screen.getByText("https://app.buildrick.io/review/9fA2kQ7xLm")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Try email again/ })).toBeTruthy();
+  });
+});
+
 describe("SendForReview (F4)", () => {
   it("double-click on Send submits once (sending guard)", async () => {
     render(<SendForReview composer={null} />);

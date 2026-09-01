@@ -14,6 +14,7 @@
 
 import * as React from "react";
 import { FormField, Popover, Button, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { ReviewSentModal, type ReviewSendState } from "./modals/ReviewSentModal";
 import type { Composer } from "../../engine";
 import { EVENTS } from "@/shared/constants/events";
 import { submitForReview, type ReviewStatus } from "../../services/ReviewService";
@@ -72,6 +73,11 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
   /** The round landed but its invite mail did not. */
   const [inviteFailed, setInviteFailed] = React.useState(false);
   const [reviewUrl, setReviewUrl] = React.useState<string | null>(null);
+  /* Boards 129:2 / 129:223 / 129:451 all draw the outcome as a MODAL carrying
+     the link with Copy and Open. The popover used to just close on success
+     (`setOpen(inviteEmailSent === false)`), so the link the user had just
+     created was reachable only by the email failing. */
+  const [outcomeModal, setOutcomeModal] = React.useState<ReviewSendState | null>(null);
   const [linkCopied, setLinkCopied] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
@@ -93,6 +99,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
   const send = React.useCallback(async () => {
     atBeforeSendRef.current = reviewStatus?.at ? String(reviewStatus.at) : null;
     setState("sending");
+    setOutcomeModal("sending");
     try {
       let snapshotPages;
       if (composer) {
@@ -113,19 +120,32 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
          server is the same lie the 2026-08-25 pass spent a day removing, and
          it is the failure most likely to hit a real pilot invite: an unset
          SMTP_HOST throws straight into the server's catch. */
-      setInviteFailed(outcome?.inviteEmailSent === false);
+      const mailFailed = outcome?.inviteEmailSent === false;
+      setInviteFailed(mailFailed);
       setReviewUrl(outcome?.reviewUrl ?? null);
       setState("sent");
-      setOpen(outcome?.inviteEmailSent === false);
+      /* The popover's job is done either way; the outcome modal carries the
+         link now, so success no longer disappears without showing it. */
+      setOpen(false);
+      setOutcomeModal(mailFailed ? "email-failed" : "sent");
       // The onboarding checklist's send-review / connect-client wires.
       composer?.emit(EVENTS.REVIEW_SENT, { invitedEmail: email.trim() || null });
       onSent?.({ inviteEmailSent: outcome?.inviteEmailSent ?? null });
     } catch {
       setState("error");
+      setOutcomeModal(null);
     }
   }, [composer, note, summary, email, onSent, reviewStatus?.at]);
 
   return (
+    <>
+    <ReviewSentModal
+      state={outcomeModal}
+      reviewUrl={reviewUrl}
+      invitedEmail={email.trim() || null}
+      onClose={() => setOutcomeModal(null)}
+      onResend={() => { setOutcomeModal(null); void send(); }}
+    />
     <Popover
       open={open}
       onClose={() => setOpen(false)}
@@ -234,6 +254,7 @@ export const SendForReview: React.FC<SendForReviewProps> = ({
         </div>
       </div>
     </Popover>
+    </>
   );
 };
 
