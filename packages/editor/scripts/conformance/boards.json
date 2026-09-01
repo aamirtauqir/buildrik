@@ -2413,8 +2413,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "drift-resolved-row-never-names-resolver",
-      "verified": "drift-open"
+      "verifiedNote": "2026-09-02 live-verified end to end: resolved rows now read 'resolved by <name> · <age>' (measured: 'resolved by QA Tester · 1d'), board 157:157's shape. The column was there all along — comment.service writes resolvedById/resolvedAt on every resolve and nothing read them; Comment declares no User relation, so the name is resolved in one extra query rather than a migration. NOTED, not done: the board's resolved row is a 56-tall ellipse+quote+meta shape where the code reuses the 64-tall avatar CommentRow.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "158:213",

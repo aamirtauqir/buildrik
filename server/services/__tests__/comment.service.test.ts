@@ -9,6 +9,7 @@ const create = vi.fn();
 const findMany = vi.fn();
 const findFirst = vi.fn();
 const update = vi.fn();
+const userFindMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -17,6 +18,12 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...a: unknown[]) => findMany(...a),
       findFirst: (...a: unknown[]) => findFirst(...a),
       update: (...a: unknown[]) => update(...a),
+    },
+    /* listComments resolves resolver NAMES here. Absent from this mock until
+       2026-09-02, which is why every test passed over a branch none of them
+       entered: no fixture row carried a resolvedById. */
+    user: {
+      findMany: (...a: unknown[]) => userFindMany(...a),
     },
   },
 }));
@@ -30,7 +37,10 @@ import {
 } from "@server/services/comment.service";
 
 beforeEach(() => {
-  [create, findMany, findFirst, update].forEach((m) => m.mockReset());
+  /* An explicit list invites exactly one mistake: adding a mock above and
+     forgetting it here. `userFindMany` was missed, and the "skips the
+     lookup" test failed on the previous test's call count. */
+  [create, findMany, findFirst, update, userFindMany].forEach((m) => m.mockReset());
 });
 
 describe("createComment", () => {
@@ -65,6 +75,34 @@ describe("listComments", () => {
     expect(rows[0].reviewerId).toBe("rv1");
     expect(rows[1].reviewer).toBeNull();
     expect(rows[1].authorId).toBe("u1");
+  });
+
+  /* Board 157:157 names who closed a comment. `resolvedById` has been stamped
+     on every resolve since E7 and read by nobody, so the panel could only ever
+     say THAT a comment was closed. */
+  it("names the resolver on a resolved comment, and asks for each id once", async () => {
+    findMany.mockResolvedValueOnce([
+      { id: "c1", status: "RESOLVED", resolvedById: "u9", reviewer: null },
+      { id: "c2", status: "RESOLVED", resolvedById: "u9", reviewer: null },
+      { id: "c3", status: "OPEN", resolvedById: null, reviewer: null },
+    ]);
+    userFindMany.mockResolvedValueOnce([{ id: "u9", fullName: "QA Tester" }]);
+
+    const rows = await listComments("s1");
+
+    expect(rows[0].resolvedByName).toBe("QA Tester");
+    expect(rows[1].resolvedByName).toBe("QA Tester");
+    expect(rows[2].resolvedByName).toBeNull();
+    // the duplicate id is de-duplicated, not fetched twice
+    expect(userFindMany).toHaveBeenCalledTimes(1);
+    expect(userFindMany.mock.calls[0][0]).toMatchObject({ where: { id: { in: ["u9"] } } });
+  });
+
+  it("skips the lookup entirely when nothing is resolved", async () => {
+    findMany.mockResolvedValueOnce([{ id: "c1", status: "OPEN", resolvedById: null, reviewer: null }]);
+    const rows = await listComments("s1");
+    expect(rows[0].resolvedByName).toBeNull();
+    expect(userFindMany).not.toHaveBeenCalled();
   });
 });
 

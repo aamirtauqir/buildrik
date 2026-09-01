@@ -542,7 +542,18 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     else groups.push({ key, label: pageName(c.pageId), comments: [c] });
   }
 
-  const rowMeta = (c: ReviewComment) => `${pageName(c.pageId)} · ${shortAge(c.createdAt)}`;
+  /* Board 157:157 gives a RESOLVED row a different second line from an open
+     one: not where the pin lives and how old it is, but who closed it and
+     when. The panel had the resolver's id all along — `resolvedById` is
+     written on every resolve — and no name to put with it, so every resolved
+     row read the same as an open one. Falls back to the open-row meta when the
+     resolver cannot be named (a comment resolved before this shipped). */
+  const rowMeta = (c: ReviewComment) => {
+    if (c.status === "RESOLVED" && c.resolvedByName) {
+      return `resolved by ${c.resolvedByName} · ${shortAge(c.resolvedAt ?? c.createdAt)}`;
+    }
+    return `${pageName(c.pageId)} · ${shortAge(c.createdAt)}`;
+  };
 
   const resolveButton = (c: ReviewComment) => (
     <Button color="light" size="xs" onClick={() => void onResolve(c)} className={GHOST}>

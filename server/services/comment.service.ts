@@ -47,11 +47,29 @@ export async function createComment(
  * comment-preview consumer reads only the scalar pin fields.
  */
 export async function listComments(siteId: string, status?: "OPEN" | "RESOLVED") {
-  return prisma.comment.findMany({
+  const rows = await prisma.comment.findMany({
     where: { siteId, ...(status ? { status } : {}) },
     orderBy: { createdAt: "asc" },
     include: { reviewer: { select: { name: true } } },
   });
+
+  /* `resolvedById` is written on every resolve and has been read by nobody, so
+     board 157:157's "resolved by Ali · 1d" was unrenderable: the panel had the
+     id and no name for it. `Comment` declares no relation to User for that
+     column, so this resolves the names in one extra query rather than asking
+     for a migration. Additive, like the reviewer join above. */
+  const resolverIds = [...new Set(rows.map((r) => r.resolvedById).filter((id): id is string => !!id))];
+  const resolvers = resolverIds.length
+    ? await prisma.user.findMany({ where: { id: { in: resolverIds } }, select: { id: true, fullName: true } })
+    : [];
+  /* `fullName`, matching site-detail.service.ts's actor lookup — User has no
+     `name` column, which tsc caught before this ever ran. */
+  const nameById = new Map(resolvers.map((u) => [u.id, u.fullName]));
+
+  return rows.map((r) => ({
+    ...r,
+    resolvedByName: r.resolvedById ? (nameById.get(r.resolvedById) ?? null) : null,
+  }));
 }
 
 /** Re-anchor an orphaned comment to a new element. Site-scoped like resolve —

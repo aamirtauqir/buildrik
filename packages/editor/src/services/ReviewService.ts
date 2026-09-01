@@ -149,6 +149,11 @@ export interface ReviewComment {
   authorKind: "client" | "internal";
   authorName: string | null;
   createdAt: string | Date;
+  /** Board 157:157 names who closed a comment, not just that it is closed.
+   *  Both are written on every resolve (`comment.service.ts`) and were read by
+   *  nobody until 2026-09-02. */
+  resolvedByName: string | null;
+  resolvedAt: string | Date | null;
 }
 
 /** The current review round for the panel header (status, invited email, round
@@ -190,6 +195,8 @@ export async function fetchReviewComments(status?: "OPEN" | "RESOLVED"): Promise
     authorKind: r.reviewerId ? "client" : "internal",
     authorName: r.reviewer?.name ?? null,
     createdAt: r.createdAt,
+    resolvedByName: r.resolvedByName ?? null,
+    resolvedAt: r.resolvedAt ?? null,
   }));
 }
 
