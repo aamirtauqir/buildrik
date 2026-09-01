@@ -2564,7 +2564,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:match-contenteditable-accent-outline-focused",
       "recipe": null
     },
     {
@@ -2575,7 +2575,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:partial-trigger-exists-cursor-not-on-body",
       "recipe": null
     },
     {
@@ -2707,7 +2707,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:unbuilt-previewoverlay-has-no-device-frame",
       "recipe": null
     },
     {
@@ -3169,7 +3169,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:unreachable-2026-08-31 — fixture is on a starter plan so the screen renders LockedScreen; reaching the connected/available tables needs a billing flip, deliberately not done",
+      "authority": "blocked:integrations-is-pro-gated-needs-pro-fixture",
       "recipe": null
     },
     {
@@ -3235,7 +3235,7 @@
       "width": 1280,
       "height": 720,
       "status": "active",
-      "authority": "code:expand-not-pin",
+      "authority": "walked:partial-rail60-drawer320-canvas552-inspector-not-measured",
       "recipe": null
     },
     {
@@ -3873,7 +3873,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:match-720x441-tabs-cancel-save",
       "recipe": null
     },
     {
@@ -3884,7 +3884,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:drift-no-dirty-guard-FIXED",
       "recipe": null
     },
     {
@@ -3917,7 +3917,7 @@
       "width": 1440,
       "height": 900,
       "status": "active",
-      "authority": "code:state-exists",
+      "authority": "walked:partial-save-closes-modal-success-toast",
       "recipe": null
     },
     {
@@ -4478,7 +4478,7 @@
       "width": 1308,
       "height": 117,
       "status": "active",
-      "authority": "code:cites-board",
+      "authority": "walked:unreachable-exit-guard-did-not-fire-on-nudge",
       "recipe": null
     },
     {

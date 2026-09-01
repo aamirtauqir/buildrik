@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Tabs, TextInput, useToast } from "@/editor/chrome-ui";
+import { Button, Checkbox, ConfirmDialog, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Tabs, TextInput, useToast } from "@/editor/chrome-ui";
 
 /* Board 1172:4867 fills this modal's inputs with `bg-subtle` — `--bk-bg-subtle` — not the
    white every other chrome input uses. That is a deliberate difference on a
@@ -59,6 +59,12 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
   const [snapToGrid, setSnapToGrid] = React.useState(false);
   const [siteTitle, setSiteTitle] = React.useState("");
 
+  /* What the form held when it opened, so "did the user change anything" is a
+     comparison and not a guess. */
+  const initialRef = React.useRef<string>("");
+  const snapshot = JSON.stringify({ projectName, projectDescription, gridSize, snapToGrid, siteTitle });
+  const isDirty = initialRef.current !== "" && snapshot !== initialRef.current;
+
   // Initialize form when opening
   React.useEffect(() => {
     if (isOpen && composer) {
@@ -66,13 +72,35 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
       const settings = composer.getProjectSettings?.() || {};
       const state = composer.getState();
 
-      setProjectName(metadata.name || "Untitled Project");
-      setProjectDescription(metadata.author || "");
-      setGridSize(state.gridSize || 10);
-      setSnapToGrid(state.snapToGrid || false);
-      setSiteTitle(settings.seo?.siteName || "");
+      const name = metadata.name || "Untitled Project";
+      const author = metadata.author || "";
+      const grid = state.gridSize || 10;
+      const snap = state.snapToGrid || false;
+      const title = settings.seo?.siteName || "";
+
+      setProjectName(name);
+      setProjectDescription(author);
+      setGridSize(grid);
+      setSnapToGrid(snap);
+      setSiteTitle(title);
+      initialRef.current = JSON.stringify({
+        projectName: name, projectDescription: author,
+        gridSize: grid, snapToGrid: snap, siteTitle: title,
+      });
     }
+    if (!isOpen) initialRef.current = "";
   }, [isOpen, composer]);
+
+  /* Board 183:16 draws this modal's DIRTY state. It had none: `onOpenChange`
+     called `onClose()` unconditionally, so Escape or a scrim click threw away
+     whatever had been typed without a word. Walked live — typed into Project
+     name, pressed Escape, edit gone. Cancel still discards on purpose; what
+     was missing is the question before an ACCIDENTAL close. */
+  const [confirmDiscard, setConfirmDiscard] = React.useState(false);
+  const requestClose = React.useCallback(() => {
+    if (!isDirty) { onClose(); return; }
+    setConfirmDiscard(true);
+  }, [isDirty, onClose]);
 
   const handleSave = () => {
     if (!composer) return;
@@ -99,6 +127,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
       });
 
       addToast({ description: "Project settings updated successfully", tone: "success" });
+      initialRef.current = "";
       onClose();
     } catch (error) {
       addToast({ description: "Failed to update project settings", tone: "error" });
@@ -107,7 +136,8 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
   };
 
   return (
-    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && requestClose()}>
       <ModalContent size="lg">
         <ModalTitle>Project settings</ModalTitle>
         <ModalClose aria-label="Close modal">
@@ -223,6 +253,18 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         </ModalFooter>
       </ModalContent>
     </ModalRoot>
+    {/* The question the accidental close was missing. Discard is still one
+        click — it just is not silent any more. */}
+    <ConfirmDialog
+      open={confirmDiscard}
+      onClose={() => setConfirmDiscard(false)}
+      onConfirm={() => { setConfirmDiscard(false); initialRef.current = ""; onClose(); }}
+      title="Discard these settings?"
+      message="You changed project settings and haven't saved them. Closing now throws those edits away."
+      confirmLabel="Discard"
+      tone="destructive"
+    />
+    </>
   );
 };
 
