@@ -54,11 +54,17 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
     }),
     prisma.formSubmission.count({ where: { siteId } }),
     prisma.formSubmission.count({ where: { siteId, isRead: false } }),
+    /* `actorId` is selected now. It was not, so the surface could not name who
+       did anything and every row read as if the system did it — while board
+       817:5114 puts the actor on every row. Taking 20 rather than 5 because
+       consecutive identical entries collapse below, and 96% of this table is
+       `site.settings.updated`: without headroom the de-duped list would often
+       be one row long. */
     prisma.activityLog.findMany({
       where: { siteId },
       orderBy: { createdAt: "desc" },
-      take: 5,
-      select: { id: true, action: true, description: true, createdAt: true },
+      take: 20,
+      select: { id: true, action: true, description: true, createdAt: true, actorId: true },
     }),
     /* SEO health used to count pages whose `seoTitle` AND `seoDescription`
        COLUMNS were set. The editor writes a page's SEO into its `settings`
@@ -128,6 +134,41 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
       healthBreakdown: { seo: seoScore, content: contentScore, ssl: sslScore, favicon: faviconScore },
     },
     formBlocks,
-    recentActivity,
+    recentActivity: await shapeActivity(recentActivity),
   };
+}
+
+/**
+ * Resolve actor names and collapse consecutive identical entries.
+ *
+ * Board 817:5114 draws an actor on every row; this surface could not show one
+ * because the query dropped `actorId`. And 96% of `activity_logs` is
+ * `site.settings.updated`, so the un-collapsed list rendered the same sentence
+ * five times — observed live as "Updated 2 settings" repeated down the panel.
+ * Same collapse rule the dashboard's ActivityFeed already uses: same actor AND
+ * same visible text, consecutive only, so a genuine repeat later still shows.
+ */
+async function shapeActivity(
+  rows: Array<{ id: string; action: string; description: string | null; createdAt: Date; actorId: string | null }>,
+) {
+  const actorIds = [...new Set(rows.map((r) => r.actorId).filter(Boolean))] as string[];
+  const actors = actorIds.length
+    ? await prisma.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, fullName: true } })
+    : [];
+  const names = new Map(actors.map((a) => [a.id, a.fullName]));
+
+  const out: Array<{
+    id: string; action: string; description: string | null;
+    createdAt: Date; actorName: string | null; count: number;
+  }> = [];
+  for (const r of rows) {
+    const actorName = r.actorId ? (names.get(r.actorId) ?? null) : null;
+    const last = out[out.length - 1];
+    if (last && last.actorName === actorName && (last.description ?? last.action) === (r.description ?? r.action)) {
+      last.count += 1;
+      continue;
+    }
+    out.push({ id: r.id, action: r.action, description: r.description, createdAt: r.createdAt, actorName, count: 1 });
+  }
+  return out.slice(0, 5);
 }

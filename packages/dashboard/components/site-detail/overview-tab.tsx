@@ -19,6 +19,7 @@ import {
   FileCheck,
 } from "lucide-react";
 import { Button, StatCard, SectionCard, MetricValue, Pill } from "@/components/dashboard/primitives";
+import type { SiteOverview } from "@buildrik/shared/schemas/site-detail";
 
 export const HEALTH_METRICS = [
   { label: "SEO", key: "seo" as const, icon: Search, tab: "settings" },
@@ -45,12 +46,13 @@ interface OverviewStats {
   healthBreakdown: HealthBreakdown;
 }
 
-interface ActivityEntry {
-  id: string;
-  action: string;
-  description: string | null;
-  createdAt: Date;
-}
+/* Derived from the schema, not hand-copied. This was a local interface listing
+   id/action/description/createdAt, so when `recentActivity` gained `actorName`
+   and `count` the component could not see them — a second definition of a
+   shape the schema already owns, which is the SSOT violation the repo bans.
+   The dashboard tsc gate caught it; the editor's did not, because the editor
+   does not compile this package. */
+type ActivityEntry = SiteOverview["recentActivity"][number];
 
 interface FormBlock {
   id: string;
@@ -310,7 +312,17 @@ export function OverviewTab({
               <div key={a.id} className="flex items-start gap-2">
                 <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "var(--color-primary)" }} />
                 <div>
-                  <p className="text-body" style={{ color: "var(--color-text-primary)" }}>{a.description ?? a.action}</p>
+                  {/* Board 817:5114 names the actor on every row. This surface
+                      could not: the query dropped actorId, so every entry read
+                      as if the system did it. `×N` collapses consecutive
+                      identical entries — 96% of the table is
+                      `site.settings.updated`, which rendered the same sentence
+                      five times down the panel. */}
+                  <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
+                    {a.actorName ? <span className="font-semibold">{a.actorName} </span> : null}
+                    {a.description ?? a.action}
+                    {a.count > 1 ? <span style={{ color: "var(--color-text-muted)" }}> ×{a.count}</span> : null}
+                  </p>
                   <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}><MetricValue>{timeAgo(a.createdAt)}</MetricValue></p>
                 </div>
               </div>

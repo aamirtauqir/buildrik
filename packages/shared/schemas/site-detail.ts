@@ -31,11 +31,20 @@ export const siteOverviewSchema = z.object({
     name: z.string(),
     _count: z.object({ submissions: z.number() }),
   })),
+  /* `actorName` and `count` exist because the surface could not show WHO did
+     anything: the query selected id/action/description/createdAt and dropped
+     actorId, so "Alex edited the hero" was structurally impossible and every
+     row read as if the system did it. Board 817:5114 puts the actor at x=80 on
+     every row. `count` collapses consecutive identical entries — the site
+     Overview showed "Updated 2 settings" five times in a row because nothing
+     de-duplicated them. */
   recentActivity: z.array(z.object({
     id: z.string(),
     action: z.string(),
     description: z.string().nullable(),
     createdAt: z.date(),
+    actorName: z.string().nullable(),
+    count: z.number().int().positive().default(1),
   })),
 });
 
