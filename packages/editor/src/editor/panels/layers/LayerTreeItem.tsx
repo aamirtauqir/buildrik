@@ -98,12 +98,20 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   const displayName = customNames.get(layer.id) || layer.preview || typeLabel;
   const canDrag = !!(composer && layer.depth > 0 && !isLocked);
 
-  // Board 1082:4739 (Layers · component-instance): a diamond badge sits
+  // Board 1082:4739 (Layers · component-instance): ONE diamond badge sits
   // between the label and the eye on component-linked rows. Only the
   // INSTANCE link (◇) exists in the registry today — the board's ◆ master
   // badge needs a persisted master↔element link the model doesn't carry
   // yet. Board badge colors are off-palette for chrome, so the token
   // stands in: success marks the instance.
+  //
+  // There used to be a second badge (⚡) beside it carrying the IDENTICAL
+  // aria-label, so the row announced "Component instance" twice. They were
+  // not the same fact: this one is `ComponentManager.isInstance`, true only
+  // for the instance ROOT, while the other was `element.isComponentInstance()`
+  // — true for the root and every descendant inside it. Two different facts,
+  // one label, two glyphs, where the board draws one. The descendant signal
+  // is not on any board and is gone with it.
   const isInstance = !!composer?.components?.isInstance?.(layer.id);
 
   /* Board 1082:4640's indent ladder, read off the frame: chevrons sit at
@@ -264,9 +272,6 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
               // exposing the full id via title disambiguates the layer
               // tree without ballooning row width.
               <span className="bdc-lr-id" title={layer.id} aria-hidden>#{layer.id.slice(0, 12)}</span>
-            )}
-            {layer.isComponent && (
-              <span className="bdc-lr-cmp" title="Component instance" aria-label="Component instance">⚡</span>
             )}
             {layer.breakpointOverrides?.mobile?.hidden && (
               <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>

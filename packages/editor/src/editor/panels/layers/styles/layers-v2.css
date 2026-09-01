@@ -132,12 +132,6 @@
   flex-shrink: 0;
 }
 
-.bdc-lr-cmp {
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-accent);
-  flex-shrink: 0;
-}
-
 .bdc-lr-bp {
   width: 14px;
   height: 14px;

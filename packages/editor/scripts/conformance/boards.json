@@ -4106,7 +4106,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — component-instance: drift — TWO badges (◇ green + ⚡ accent) for one fact, both ~40px left of the board's single badge",
+      "verifiedNote": "2026-09-02 DUPLICATE BADGE FIXED (live: 4 instance rows, 1 'Component instance' label each, 0 .bdc-lr-cmp nodes; was 2 glyphs sharing one aria-label for two DIFFERENT facts — isInstance = instance root vs isComponentInstance = root + descendants). REMAINS: badge x 199 vs board 269 — row renders 258 wide against the board's 320, so absolute x is unreachable. Same drawer-width blocker as 141:207 and 781:4372.",
       "verified": "drift-open"
     },
     {

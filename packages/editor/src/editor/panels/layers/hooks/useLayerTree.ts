@@ -91,7 +91,6 @@ export function useLayerTree(
       tagName: (element.getTagName() || "div").toLowerCase(),
       depth,
       preview: previewOf(element),
-      isComponent: element.isComponentInstance(),
       children: element.getChildren().map((child: Element) => buildTree(child, depth + 1)),
     });
 

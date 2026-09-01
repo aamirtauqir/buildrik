@@ -45,7 +45,6 @@ export interface LayerItem {
    *  Never overrides a custom name. */
   preview?: string;
   /** Whether this layer is a component instance */
-  isComponent?: boolean;
   /** Breakpoint-specific visibility overrides */
   breakpointOverrides?: Record<string, { hidden?: boolean }>;
 }
