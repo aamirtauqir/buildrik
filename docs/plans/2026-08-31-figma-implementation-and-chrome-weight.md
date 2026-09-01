@@ -307,6 +307,77 @@ count of walked boards is reported as a number, not as "the walk is done".
 
 ---
 
+---
+
+## /autoplan — review report (2026-09-01)
+
+UI scope: YES (drawer 26, panel 20, canvas 15). DX scope: NO — the only matches
+were the word "rest". Phase 3.5 skipped, logged.
+
+### CEO dual voices — consensus
+
+| Dimension | Claude | Codex | Consensus |
+|---|---|---|---|
+| 1. Premises valid? | NO | NO | **CONFIRMED** — §0-bis already voids the original premise |
+| 2. Right problem to solve? | NO | NO | **CONFIRMED** — board coverage is an audit metric, not a product one |
+| 3. Scope calibration correct? | NO | NO | **CONFIRMED** — 7 active boards draw features with no code path |
+| 4. Alternatives explored? | partial | NO | DISAGREE → taste |
+| 5. Competitive/market risk | n/a | n/a | not applicable to an internal conformance arc |
+| 6. 6-month trajectory sound? | NO | NO | **CONFIRMED** — "281 walked" would be re-audited and found soft |
+
+One codex claim REJECTED on evidence: "41 design-ahead boards pollute the active
+denominator." `status` counts are `active:355, design-ahead:41, out-of-scope:43`
+— design-ahead is a separate status, already excluded. The smaller true version
+is 7 active boards drawing unbuilt features.
+
+### Design dual voices — consensus
+
+| Dimension | Claude | Codex | Consensus |
+|---|---|---|---|
+| 1. Information hierarchy right? | NO | NO | **CONFIRMED** — canvas is 800 of 1440 (55.6%), under the plan's own ≥58% |
+| 2. Missing states specified? | NO | NO | **CONFIRMED** — 29 unreachable, 7 unbuilt |
+| 3. User journey coherent? | NO | NO | **CONFIRMED** — silent discard, invisible icons, doorless panel |
+| 4. Specific vs generic? | NO | NO | **CONFIRMED** — governance gaps left ambiguous |
+| 5. DS coherence | mixed | mixed | DISAGREE → taste |
+| 6. Conform code to boards? | NO | NO | **CONFIRMED** — boards record decayed intent, not authority |
+| 7. Drawer/inspector defaults | NO | NO | **CONFIRMED** → founder call, still open |
+
+### Eng dual voices — consensus
+
+| Dimension | Claude | Codex | Consensus |
+|---|---|---|---|
+| 1. Architecture sound? | partial | partial | DISAGREE → the desktop floor is a fix, not a device model |
+| 2. Test coverage sufficient? | NO | NO | **CONFIRMED** — harness measures 6/355 (1.7%), `recipe: null` on all 439 |
+| 3. Performance risks | n/a | n/a | not raised |
+| 4. Security threats covered? | **NO** | partial | **CONFIRMED** — publish approval gate read the caller's workspace |
+| 5. Error paths handled? | NO | NO | **CONFIRMED** — flowbite padding class ungated (6 live instances) |
+| 6. Deployment risk manageable? | NO | NO | **CONFIRMED** — Playwright specs sit outside `verify:ds` and the push hook |
+
+### Cross-phase theme
+
+**Instruments beat eyes, and the arc's own data proves it.** Board `199:205` was
+recorded `verified: drift-fixed` — the census's strongest verdict — while the ⋯
+button's icon was still invisible on screen. Flagged independently in the CEO,
+Design and Eng phases. High-confidence signal.
+
+### Shipped out of this review
+
+| Fix | Evidence |
+|---|---|
+| Publish approval gate read the CALLER's workspace, not the site's | auth bypass; test added that lets the two ids differ, negative-tested |
+| `gate:narrow-control-padding` + 6 live invisible-icon instances | gate found 4 its author missed; blind twice, then a false positive, all corrected |
+| Drawer grid track pinned to a hardcoded 280 | panel overflowed its column by 40 for 5 months; proven by moving the token to 300 and watching both follow |
+| ~20 surviving copies of 320 | skeleton (wrong in 4 dimensions), chrome-ui Drawer, 8 probes, 10 specs, DESIGN.md, canonical wireframes |
+| `authority` / `verified` census split | "281 walked" → 288 driven · 52 match · 23 drift-fixed · 68 drift-OPEN · 29 unreachable · 116 no-verdict · 67 unchecked |
+
+### Claims checked and REJECTED
+
+1. 41 design-ahead boards pollute the denominator — separate status, excluded.
+2. Stop-during-await continues the run — `advance` already re-checks `cancelledRef`.
+
+Both were plausible. The negative test is what separated them from the real ones:
+a fix whose test still passes with the fix removed is not a fix.
+
 ## Decision Audit Trail
 
 <!-- AUTONOMOUS DECISION LOG -->
@@ -321,4 +392,11 @@ count of walked boards is reported as a number, not as "the walk is done".
 | 6 | Eng | Delete `getTabWidth` rather than keep it for future per-tab widths | Mechanical | P4 DRY | No tab set `panelWidth`; it returned a constant. Repo bans pass-through wrappers. |
 | 7 | CEO | REJECT codex's "the active denominator is polluted by 41 design-ahead boards" | Mechanical | evidence | Checked: `status` counts are `active:355, design-ahead:41, out-of-scope:43`. design-ahead is a SEPARATE status already excluded from 355. The claim is false as stated. |
 | 8 | CEO | ACCEPT the smaller true version: 7 ACTIVE boards draw things with no code path | Mechanical | evidence | Verified by scanning active rows for unbuilt/never-built markers: 433:2391, 169:60, 169:92, 641:2599, 807:8663, 1333:7162, 1345:7162. These do sit in the active denominator. |
+| 9 | CEO | Split `authority` into `authority` + `verified` (founder D1) | User challenge → founder | evidence | One column held "who wins" and "was it checked". 281 walked read as coverage while 50 rows claimed a clean pass. |
+| 10 | Design | Narrow the drawer to 280 after making Media's cells fluid (founder D2) | User challenge → founder | P1 completeness | The 320 "floor" was circular: cells were fixed at 136, so the grid needed 320, and 320 was then the reason the drawer could not narrow. |
+| 11 | Eng | Fix the publish approval gate to read `site.workspaceId` | Mechanical | evidence | The gate read the caller's SESSION workspace, so a caller whose own workspace had approval off skipped it entirely. |
+| 12 | Eng | Build `gate:narrow-control-padding` rather than fix case-by-case | Taste → decided | P1 completeness | Six live instances of one class. The gate found four its author had missed, including one on a board recorded `verified: drift-fixed`. |
+| 13 | Eng | Delete both JS `drawerWidth = 280` defaults | Mechanical | P4 DRY | An inline custom property beat the CSS rule, pinning the grid track. Proven by moving the token to 300 and watching track and panel follow. |
+| 14 | Eng | REJECT the stop-during-await race | Mechanical | evidence | The negative test passed with the guard removed — `advance` already re-checks `cancelledRef`. A redundant guard plus a comment describing a bug that is not there. |
+| 15 | Design | Do NOT recompute the pin arithmetic in the wireframes doc | Taste → decided | P5 explicit | The formula and the 1380 threshold describe a retired mechanism. Recomputing them would make the file look current while describing something unreachable. |
 | 7 | Eng | Drop `gate:` for code==token==board geometry (plan §2.4) | Taste → decided | P3 pragmatic | It would lock a value the plan itself called a judgement call, and contradicts any future resizable panel. A relationship assertion (canvas ≥ N% with drawer closed) survives; the value lock does not. |
