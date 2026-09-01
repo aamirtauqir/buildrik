@@ -70,7 +70,7 @@ export const SearchListingsTable: React.FC<SearchListingsTableProps> = ({
   const rows = buildRows(pages);
 
   return (
-    <div className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0 tw:h-full" data-testid="pages-listings">
+    <div className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0" data-testid="pages-listings">
       {/* Board header band: caps 11 on gray. */}
       <div
         className={`${GRID} tw:h-7 tw:bg-[var(--bk-gray-50)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]`}
@@ -119,11 +119,15 @@ export const SearchListingsTable: React.FC<SearchListingsTableProps> = ({
 
       {/* Board footer: accent link — the 700 drawer is the full table. */}
       {onOpenFull && (
-        <div className="tw:px-4 tw:py-2.5 tw:shrink-0">
+        /* Board 141:265 pins a 36-tall strip to the panel's bottom edge: 8,
+           a 20 link, 8. The link rendered 32 tall (flowbite's own height), so
+           the strip was 52. */
+        <div className="tw:px-4 tw:py-2 tw:shrink-0">
           <Button
             color="light"
             size="xs"
             variant="link"
+            className="tw:h-5 tw:px-0"
             data-testid="listings-open-full"
             onClick={onOpenFull}
           >

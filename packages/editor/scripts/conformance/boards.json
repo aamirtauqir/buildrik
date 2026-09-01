@@ -1995,7 +1995,7 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — listings: columns and rows match; drift — 'Open full listings ›' renders at y722-754 in a 732 panel, clipped out of sight",
+      "verifiedNote": "2026-09-01 OVERFLOW FIXED + live-measured: footer strip 36h pinned to the panel bottom (link 20h at +8) = board 141:265; band 28, rows 32, col1 16, col2 110 all match. REMAINS: col3 renders 151 vs board 210 and col4 is 48 wide vs the board's ~28 — the panel is 279 vs the board's 320, so the board's absolute column x cannot be reproduced at this width. Same drawer-width question as 781:4372. Earlier note said 'columns and rows match', which measurement does not support.",
       "verified": "drift-open"
     },
     {

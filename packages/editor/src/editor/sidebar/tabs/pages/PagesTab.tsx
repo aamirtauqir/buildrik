@@ -241,7 +241,16 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       ) : (
         <PanelFrame.Body noScroll>
           {view === "listings" ? (
-            <>
+            /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
+               CHILD, but it is not itself display:flex, so these two stack as
+               blocks. The table then took h-full (the WHOLE body) while
+               starting below the back link, and ran 32 pixels past the panel: the
+               "Open full listings" footer, which board 141:207 pins to the
+               panel's bottom edge, sat 22px below it and out of reach. The
+               back link's own `flex-shrink:0` / `align-self:flex-start` were
+               inert for the same reason — written for a flex parent it never
+               had. */
+            <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
               <Button
                 color="light"
                 size="xs"
@@ -252,7 +261,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 {"\u2039"} Pages
               </Button>
               <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
-            </>
+            </div>
           ) : (
           <PageList
             pages={p.pages}
