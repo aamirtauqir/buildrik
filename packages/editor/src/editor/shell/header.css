@@ -45,23 +45,13 @@
   box-shadow: var(--bk-shadow-overlay);
 }
 
-.bk-notifications__head {
+/* PanelHeader draws the bar (size="panel", board 165:52). The panel scrolls
+   its own rows, so the only thing left here is keeping the bar pinned. Two
+   classes deep so it beats the component's own single-class utilities. */
+.bk-notifications .bk-notifications__head {
   position: sticky;
   top: 0;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--bk-space-8);
-  padding: var(--bk-space-8) var(--bk-space-12);
-  background: var(--bk-bg-panel);
-  border-bottom: 1px solid var(--bk-border);
-}
-
-.bk-notifications__title {
-  color: var(--bk-ink);
-  font-size: var(--bk-text-13);
-  font-weight: var(--bk-weight-semibold);
 }
 
 .bk-notif-row {

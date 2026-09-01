@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { EmptyState, ROW_META_CLASS, Row, SkeletonBlock, StatusDot, Button, type ToastInput } from "@/editor/chrome-ui";
+import { EmptyState, PanelHeader, ROW_META_CLASS, Row, SkeletonBlock, StatusDot, Button, type ToastInput } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {
@@ -37,6 +37,17 @@ function relTime(iso: string | Date): string {
 /** Board 165:2 bands the list by day — TODAY, YESTERDAY, then the date. A
  *  flat list made "2h" and "1d" sit in the same column with nothing saying
  *  where one day ended. */
+/* Board component 220:919 ("Section header"), the band both the loading
+   skeleton and the loaded list render: 28h, inset 16, bg-subtle, Inter Medium
+   11/16 at 0.5px tracking in ink-muted. It is ONE constant because the two
+   states have to draw it identically — that identity is what keeps the swap
+   from moving anything above the rows, which is the whole point of board
+   165:51's note. It was 24.5h at a 12px inset with Tailwind's own `wide`
+   tracking (0.275px at this size). */
+const DAY_BAND_CLASS =
+  "tw:flex tw:h-7 tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 " +
+  "tw:text-[11px] tw:font-medium tw:leading-4 tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]";
+
 function dayBand(iso: string | Date): string {
   const then = new Date(iso);
   if (Number.isNaN(then.getTime())) return "EARLIER";
@@ -163,18 +174,27 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
 
   return (
     <div ref={panelRef} tabIndex={-1} className="bk-notifications" role="dialog" aria-label="Notifications">
-      <div className="bk-notifications__head">
-        <span className="bk-notifications__title">Notifications</span>
-        {/* F5: no mark-all while there is nothing to mark. This gated on
-            `state === "ready"` alone, but "loaded" is not "non-empty" — the
-            button rendered directly above the "You're all caught up" empty
-            state, offering to mark zero rows read. */}
-        {state === "ready" && ordered.length > 0 ? (
-          <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
-            Mark all read
-          </Button>
-        ) : null}
-      </div>
+      {/* Board 165:52 is the same 48-pixel bar Issues draws, down to the x=16
+          title and the close glyph at x=332 — so it is PanelHeader's `panel`
+          size, not a second hand-built header. The panel had neither the
+          height nor the ✕ before. Only the sticky behaviour is local. */}
+      <PanelHeader
+        title="Notifications"
+        size="panel"
+        onClose={onClose}
+        className="bk-notifications__head"
+        actions={
+          /* F5: no mark-all while there is nothing to mark. This gated on
+             `state === "ready"` alone, but "loaded" is not "non-empty" — the
+             button rendered directly above the "You're all caught up" empty
+             state, offering to mark zero rows read. */
+          state === "ready" && ordered.length > 0 ? (
+            <Button color="light" size="xs" onClick={() => void markAll()} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+              Mark all read
+            </Button>
+          ) : null
+        }
+      />
 
       {state === "loading" ? (
         /* Board 165:51 draws four 44h skeleton rows under a live day band,
@@ -184,10 +204,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
            down 421px on arrival. The band is the same markup the loaded
            list renders, which is what makes the swap free of movement. */
         <div role="status" aria-label="Loading notifications">
-          <div
-            aria-hidden="true"
-            className="tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-ink-muted)]"
-          >
+          <div aria-hidden="true" className={DAY_BAND_CLASS}>
             {dayBand(new Date())}
           </div>
           {[0, 1, 2, 3].map((row) => (
@@ -225,9 +242,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
           return (
             <React.Fragment key={n.id}>
             {showBand && (
-              <div className="tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:tracking-wide tw:text-[var(--bk-ink-muted)]">
-                {band}
-              </div>
+              <div className={DAY_BAND_CLASS}>{band}</div>
             )}
             <Row
               size="comment"

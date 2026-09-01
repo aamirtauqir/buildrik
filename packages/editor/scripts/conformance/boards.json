@@ -1869,8 +1869,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "skeletons-conformed-live-2026-09-01; header 36.5 vs board 48 remains (family-wide)",
-      "verified": "drift-open"
+      "verifiedNote": "live-measured 2026-09-01: header 48, band 28, 4x44h rows, dot 8@16, bar 220x10@32",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "165:2",

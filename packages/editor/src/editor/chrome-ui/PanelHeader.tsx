@@ -1,6 +1,14 @@
 /**
  * PanelHeader — Figma 16:6.
- * The 44px bar at the top of every drawer panel: title left, actions right.
+ * The bar at the top of a panel: title left, actions right.
+ *
+ * It comes in the two sizes the boards actually draw. `drawer` (the default)
+ * is molecule 16:6 itself — 44px with an 11px ink-soft label, worn by the
+ * left-hand drawers. `panel` is the 360-wide right-hand surfaces (Issues
+ * 164:36, Notifications 165:52, History), which board a 48px bar carrying the
+ * design system's own `ui/14 · panel title`: Inter Medium 14/21 in ink, at
+ * x=16. Those are different type styles, not one style at two heights, which
+ * is why this is a variant and not a height override.
  * @license BSD-3-Clause
  */
 import React from "react";
@@ -88,9 +96,23 @@ export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void;
   /** See PanelHeaderActionsProps.closeLabel. */
   closeLabel?: string;
+  /** `drawer` = molecule 16:6 (44h, 11px label). `panel` = the 360-wide
+   *  right-hand panels (48h, `ui/14 · panel title`). */
+  size?: "drawer" | "panel";
 }
 
-export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, className, ...rest }: PanelHeaderProps) {
+/* Each size supplies BOTH its height and its type. They are listed whole
+   rather than diffed because a Tailwind utility on a plain element does not
+   merge — two `tw:h-*` classes would both compile and source order, not
+   intent, would pick the winner. */
+const SIZE_CLASS: Record<"drawer" | "panel", string> = {
+  drawer:
+    "tw:h-11 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:tracking-[0.08em] tw:text-[var(--bk-ink-soft)]",
+  panel:
+    "tw:h-12 tw:text-[length:var(--bk-text-14)] tw:font-medium tw:leading-[21px] tw:text-[var(--bk-ink)]",
+};
+
+export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, size = "drawer", className, ...rest }: PanelHeaderProps) {
   return (
     <div
       className={[
@@ -106,8 +128,9 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
         // screen on page `1:3` overrules it (founder decision D2: the screens
         // win). The tracking survives the case change deliberately: the screen
         // keeps 0.88px on Title Case text.
-        "tw:flex tw:items-center tw:gap-2 tw:h-11 tw:py-0 tw:pl-4 tw:pr-3 tw:bg-[var(--bk-bg-panel)] tw:border-b tw:border-[var(--bk-border)] " +
-          "tw:[font-family:var(--bk-font-ui)] tw:text-[length:var(--bk-text-11)] tw:font-medium tw:tracking-[0.08em] tw:text-[var(--bk-ink-soft)] tw:flex-none",
+        "tw:flex tw:items-center tw:gap-2 tw:py-0 tw:pl-4 tw:pr-3 tw:bg-[var(--bk-bg-panel)] tw:border-b tw:border-[var(--bk-border)] " +
+          "tw:[font-family:var(--bk-font-ui)] tw:flex-none",
+        SIZE_CLASS[size],
         className,
       ]
         .filter(Boolean)
