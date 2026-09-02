@@ -456,7 +456,7 @@
       "width": 280,
       "status": "fix-figma",
       "owner": "verifier-brand",
-      "evidence": "G6 (founder verbatim in-session 2026-09-02: 'Modal (code), routed through chrome-ui') | A+B verifier-brand: replace modal only from Delete with consumerCount>0; all 17 fixture colours unused; board pill vs code modal",
+      "evidence": "G6 (founder verbatim in-session 2026-09-02: 'Modal (code), routed through chrome-ui') | A+B verifier-brand: replace modal only from Delete with consumerCount>0; all 17 fixture colours unused; board pill vs code modal | A14 correction 2026-09-03: this row's unreachable half rested on a usage count that was STRUCTURALLY zero for UI-bound tokens — TokenUsageTracker.recompute matched only the {{token....}} syntax, never var(--buildrick-design-<id>), which is what the UI actually writes. Fixed 2026-09-03. The replace-across modal IS reachable once a token has real consumers; re-verify live before treating it as blocked. The board-vs-code shape half is separate and already answered by G6 (modal, routed through chrome-ui). [correction reported by session editor-ed]",
       "authority": "founder:token-add-replace-is-a-modal"
     },
     {

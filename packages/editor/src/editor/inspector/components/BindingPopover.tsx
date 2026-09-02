@@ -13,6 +13,7 @@ import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";
+import { EVENTS } from "../../../shared/constants/events";
 import {
   Button,
   IconButton,
@@ -66,6 +67,48 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
   const [records, setRecords] = React.useState<CMSContentItem[]>([]);
   const [isBound, setIsBound] = React.useState(false);
   const [boundLabel, setBoundLabel] = React.useState<string | null>(null);
+
+  /**
+   * Seed the bound state from the composer, not from whatever this component
+   * last did. These two were plain `useState` written only by `handleBind` /
+   * `handleUnbind`, so the header chip and BindingBanner stayed correct while
+   * the popover forgot: bind a field, reselect the element, reopen — the bound
+   * row was gone even though the element was still bound (blocker A-EC1).
+   *
+   * Same read BindingBanner uses, formatted the way this surface names it
+   * (`Collection › Field`, not `Collection.field`), with the field's display
+   * name recovered from the collection when it defines one.
+   */
+  React.useEffect(() => {
+    const sync = () => {
+      const bindings = elementId
+        ? composer?.cms?.bindings?.getBindings?.(elementId) ?? []
+        : [];
+      const first = bindings[0];
+      if (!first) {
+        setIsBound(false);
+        setBoundLabel(null);
+        return;
+      }
+      const collection = composer?.cms?.collections?.getCollection?.(first.collectionId);
+      const field = collection?.fields?.find((f) => f.slug === first.fieldSlug);
+      setIsBound(true);
+      setBoundLabel(`${collection?.name ?? first.collectionId} › ${field?.name ?? first.fieldSlug}`);
+    };
+    sync();
+    if (!composer) return;
+    /* Optional-call, like every other composer read in this file: the popover
+       is mounted against partial mocks on purpose ("provide the cms facade
+       shape so optional chaining doesn't explode on partial mocks",
+       BindingPopover.createCollection.test.tsx:13-14), and a stub with no
+       emitter is a legitimate caller here. */
+    composer.on?.(EVENTS.BINDING_CREATED, sync);
+    composer.on?.(EVENTS.BINDING_REMOVED, sync);
+    return () => {
+      composer.off?.(EVENTS.BINDING_CREATED, sync);
+      composer.off?.(EVENTS.BINDING_REMOVED, sync);
+    };
+  }, [composer, elementId]);
 
   // Load collections when popover opens
   React.useEffect(() => {

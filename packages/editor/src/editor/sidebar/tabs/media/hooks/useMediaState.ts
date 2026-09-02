@@ -391,6 +391,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     discFonts: discovery.discFonts,
     discLoading: discovery.discLoading,
     discoverySearch: discovery.discoverySearch,
+    searchFailed: discovery.searchFailed,
     isDiscoveryEmpty: discovery.isDiscoveryEmpty,
     discSearchAll: discovery.discSearchAll,
     discOrientation: discovery.discOrientation,

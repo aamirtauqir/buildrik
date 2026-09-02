@@ -20,10 +20,21 @@ import { GOOGLE_FONT_CATALOGUE } from "../../shared/constants/googleFonts";
  * site set in Lora previewed in whatever serif the viewer's machine had while
  * the published page fetched the real face.
  */
+/**
+ * `designTokens` arrives from a server payload, so it is whatever that payload
+ * says — and a default parameter only fires on `undefined`. A `null` or an
+ * object reached `.find` / `for…of` and threw, which is why the Brand panel's
+ * load-error board had no producer: the throw happened here, on the preview
+ * path, before `DesignSystemTab`'s own catch could render it (blocker A12).
+ */
+function tokenList<T>(tokens: ReadonlyArray<T> | null | undefined): ReadonlyArray<T> {
+  return Array.isArray(tokens) ? tokens : [];
+}
+
 export function siteFontsFromTokens(
-  tokens: ReadonlyArray<{ id?: string; value?: string }> = []
+  tokens: ReadonlyArray<{ id?: string; value?: string }> | null = []
 ): { heading?: string; body?: string; mono?: string; text?: string } {
-  const value = (id: string) => tokens.find((t) => t.id === id)?.value;
+  const value = (id: string) => tokenList(tokens).find((t) => t.id === id)?.value;
   return {
     heading: value("font-heading"),
     body: value("font-body"),

@@ -46,6 +46,9 @@ export function useDiscoveryState(
   const [discIcons, setDiscIcons] = useState<DiscIcon[]>([]);
   const [discFonts, setDiscFonts] = useState<DiscFont[]>([]);
   const [discoverySearch, setDiscoverySearch] = useState("");
+  /** True when the last stock search threw. Distinguishes "the request failed"
+      from "there are genuinely no results" — the modal rendered both the same. */
+  const [searchFailed, setSearchFailed] = useState(false);
   const [discOrientation, setDiscOrientation_] = useState<DiscOrientation>("all");
   const [discColor, setDiscColor_] = useState<DiscColor>("all");
   const [discSource, setDiscSource_] = useState<DiscSource>("unsplash");
@@ -86,10 +89,12 @@ export function useDiscoveryState(
       if (!query.trim()) {
         setStockPhotos([]);
         setStockVideos([]);
+        setSearchFailed(false);
         setPageState({ img: 1, vid: 1 });
         return;
       }
 
+      setSearchFailed(false);
       setPageState({ img: 1, vid: 1 });
       setDiscLoading((prev) => ({ ...prev, img: true, vid: true }));
       // P5: stockService expects "landscape"|"portrait"|"squarish"|undefined.
@@ -108,6 +113,12 @@ export function useDiscoveryState(
         setStockVideos(videos as StockVideo[]);
       } catch (err) {
         if (isAbortError(err) || controller.signal.aborted) return;
+        /* The toast was the ONLY signal. `setStockPhotos` is never reached on
+           failure, so the modal fell through to its empty-result branch and
+           told the user "No photos found for …" — a failed request and a
+           genuinely empty result rendered identically, minus a toast that
+           auto-dismisses (blocker A-STOCK). */
+        setSearchFailed(true);
         showToast("Discovery search failed", "error");
       } finally {
         if (!controller.signal.aborted) {
@@ -257,6 +268,7 @@ export function useDiscoveryState(
     discFonts: filteredFonts,
     discLoading,
     discoverySearch,
+    searchFailed,
     isDiscoveryEmpty: stockPhotos.length === 0 && stockVideos.length === 0 && filteredIcons.length === 0,
     discOrientation,
     discColor,

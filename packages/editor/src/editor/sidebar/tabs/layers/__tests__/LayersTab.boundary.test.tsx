@@ -26,8 +26,19 @@ vi.mock("@/editor/canvas/hooks/useComposerSelection", () => ({
 import { LayersTab } from "../LayersTab";
 import type { Composer } from "@/engine/Composer";
 
+/* `isProjectLoading` is part of the real Composer contract (Composer.ts:862)
+   and LayersTab now reads it through useProjectLoading — the skeleton has to
+   know the payload is still in flight, because `composer` is non-null from the
+   first render and on its own says nothing. The `as unknown as Composer` cast
+   hid the gap until then; a stub that answers `false` is the "loaded" case
+   these tests are actually about. */
 const stubComposer = () =>
-  ({ on: vi.fn(), off: vi.fn(), emit: vi.fn() } as unknown as Composer);
+  ({
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+    isProjectLoading: vi.fn(() => false),
+  } as unknown as Composer);
 
 beforeAll(() => {
   Object.defineProperty(globalThis.window, "matchMedia", {

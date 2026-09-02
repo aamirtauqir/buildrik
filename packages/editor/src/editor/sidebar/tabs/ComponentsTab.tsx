@@ -115,7 +115,16 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             actions={headerAddBtn}
           />
         )}
-        <PanelErrorState message={state.error} onRetry={() => state.setError(null)} />
+        {/* Board 781:4433 writes its own headline and body; the raw thrown
+            message ("Failed to load components") is not what it draws, and
+            PanelErrorState's `title` default is the generic "Something went
+            wrong" every panel is supposed to override. Brand already does
+            this at DesignSystemTab.tsx:672. */}
+        <PanelErrorState
+          title="Couldn't load your components."
+          message="Your components are safe — only this list failed."
+          onRetry={() => state.setError(null)}
+        />
       </PanelFrame>
     );
   }

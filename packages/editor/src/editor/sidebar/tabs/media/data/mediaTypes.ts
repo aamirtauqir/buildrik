@@ -205,6 +205,9 @@ export interface DiscoveryStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
+  /** The last search THREW. Separate from "no results" — the modal used to
+      render both as "No photos found for …" (blocker A-STOCK). */
+  searchFailed: boolean;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
@@ -288,6 +291,9 @@ export interface MediaStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
+  /** The last search THREW. Separate from "no results" — the modal used to
+      render both as "No photos found for …" (blocker A-STOCK). */
+  searchFailed: boolean;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
@@ -402,6 +408,9 @@ export interface DiscoveryViewProps {
   fonts: DiscFont[];
   loading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   searchQuery: string;
+  /** The last search THREW. Without it this surface renders a failed request
+      as "No photos found for …" — see blocker A-STOCK. */
+  searchFailed?: boolean;
   orientation: DiscOrientation;
   color: DiscColor;
   /** S19: current source provider (Unsplash / Pexels / Pixabay). */

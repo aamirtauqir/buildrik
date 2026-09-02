@@ -9,7 +9,9 @@
  * blast-radius confirm in the delete-token flow, and the "Used by" drill-in
  * row on `TokenDetailView`.
  *
- * Token reference syntax: `{{token.<dotted.id>}}` inside any style value.
+ * Two reference syntaxes count, inside any style value:
+ *   `{{token.<dotted.id>}}`        — template placeholders, pre-import
+ *   `var(--buildrick-design-<id>)` — what the UI actually writes
  * Multiple refs in a single value (e.g. gradients) each generate a separate
  * `UsageRef` entry — count-equivalence with the old scalar map is preserved.
  *
@@ -24,6 +26,27 @@ import type { Element } from "../elements/Element";
 import { EventEmitter } from "../EventEmitter";
 
 const TOKEN_REF_RE = /\{\{token\.([a-zA-Z0-9._-]+)\}\}/g;
+
+/**
+ * The OTHER binding syntax, and the one the product actually writes.
+ *
+ * `{{token.…}}` only ever appears in template HTML strings, and
+ * `resolveTemplateTokens` substitutes those away before import — so a
+ * placeholder survives only on a resolution *miss*. Everything a user binds
+ * through the UI is written as `var(--buildrick-design-<id>)`:
+ * `placeCatalogComponent.ts` writes it when a catalog component lands, and
+ * `tokenBindingDetection.ts` is the Inspector's own contract for reading it
+ * back (spec §6.4).
+ *
+ * Matching only the first form meant `getUsage()` returned 0 for every token
+ * in real use, which in turn made the replace-on-delete modal unreachable in
+ * the PRODUCT (not just the fixture): `TokenDetailView` hard-deletes whenever
+ * `consumerCount === 0`. The "Used by N elements" row and every usage chip
+ * read 0 for the same reason (blocker A14).
+ *
+ * Mirrors `tokenToCssVar(id)` in ./types.ts — keep the prefix in step.
+ */
+const TOKEN_VAR_RE = /var\(\s*--buildrick-design-([A-Za-z0-9_-]+)\s*\)/g;
 
 /**
  * Source record for a single token reference. Emitted by `getBreakdown()` so
@@ -57,9 +80,10 @@ export class TokenUsageTracker extends EventEmitter {
       const styles = el.getStyles();
       for (const [prop, value] of Object.entries(styles)) {
         if (typeof value !== "string") continue;
-        if (value.indexOf("{{token.") === -1) continue;
-        for (const match of value.matchAll(TOKEN_REF_RE)) {
-          const tokenId = match[1];
+        const hasRef = value.indexOf("{{token.") !== -1;
+        const hasVar = value.indexOf("--buildrick-design-") !== -1;
+        if (!hasRef && !hasVar) continue;
+        const record = (tokenId: string) => {
           const bucket = this.refs.get(tokenId);
           const entry: UsageRef = { elementId, styleProp: prop };
           if (bucket) {
@@ -67,7 +91,12 @@ export class TokenUsageTracker extends EventEmitter {
           } else {
             this.refs.set(tokenId, [entry]);
           }
-        }
+        };
+        /* Both syntaxes count. A gradient naming the same token twice still
+           yields two refs, which is the count-equivalence the module header
+           promises. */
+        if (hasRef) for (const m of value.matchAll(TOKEN_REF_RE)) record(m[1]);
+        if (hasVar) for (const m of value.matchAll(TOKEN_VAR_RE)) record(m[1]);
       }
     }
     this.emit("tokenUsage:changed");

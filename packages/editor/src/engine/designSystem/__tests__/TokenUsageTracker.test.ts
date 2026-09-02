@@ -40,6 +40,29 @@ describe("TokenUsageTracker", () => {
     expect(tracker.getUsage("color.brand.primary")).toBe(1);
   });
 
+  /* A14. The tracker used to match ONLY `{{token.…}}`, which appears solely in
+     template HTML that resolveTemplateTokens substitutes away before import.
+     Everything a user binds through the UI is written as
+     `var(--buildrick-design-<id>)` — so every real binding counted as 0, and
+     TokenDetailView hard-deletes on consumerCount === 0. */
+  it("counts a var(--buildrick-design-*) binding — the form the UI actually writes", () => {
+    tracker.recompute([makeStub({ color: "var(--buildrick-design-color-primary)" })]);
+    expect(tracker.getUsage("color-primary")).toBe(1);
+  });
+
+  it("counts both syntaxes together, and each occurrence separately", () => {
+    tracker.recompute([
+      makeStub({ color: "var(--buildrick-design-color-primary)" }),
+      makeStub({ background: "{{token.color.brand.primary}}" }),
+      makeStub({
+        backgroundImage:
+          "linear-gradient(var(--buildrick-design-color-primary), var(--buildrick-design-color-primary))",
+      }),
+    ]);
+    expect(tracker.getUsage("color-primary")).toBe(3);
+    expect(tracker.getUsage("color.brand.primary")).toBe(1);
+  });
+
   it("counts multiple bindings across elements", () => {
     tracker.recompute([
       makeStub({ color: "{{token.color.brand.primary}}" }),

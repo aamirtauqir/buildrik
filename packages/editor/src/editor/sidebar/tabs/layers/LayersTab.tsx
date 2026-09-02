@@ -14,6 +14,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { LayersPanel } from "../../../panels/layers/index";
 import { LayersLoadError, LayersLoadingSkeleton } from "../../../panels/layers/components/LayersStateBlocks";
+import { useProjectLoading } from "../../../shell/hooks/useProjectLoading";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
 
 /*
@@ -88,6 +89,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   onExpandToggle,
 }) => {
   const { selectedElement: selectedEl, selectedId } = useComposerSelection({ composer });
+  const projectLoading = useProjectLoading(composer);
 
   const selectedElement: SelectedElementInfo | null = React.useMemo(() => {
     if (!selectedEl) return null;
@@ -182,7 +184,14 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         </Button>
       </div>
       <div className="bdc-pbody bdc-pbody-scroll">
-        {composer ? (
+        {/* `composer` alone is not "ready": useComposerInit sets it
+            synchronously in the effect body, before the site fetch even
+            starts, so it is non-null on the very first render. Gating the
+            skeleton on it alone showed an empty tree and a footer reading
+            "0 layers" for the whole load. `projectLoading` is the flag Canvas,
+            ProInspector and StudioFooter already agree on — Layers was the one
+            surface not reading it (blocker A2). */}
+        {composer && !projectLoading ? (
           <LayersTreeBoundary onFailedChange={setTreeFailed}>
             <LayersPanel
               composer={composer}

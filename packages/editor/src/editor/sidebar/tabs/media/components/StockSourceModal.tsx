@@ -63,6 +63,7 @@ export function StockSourceModal({
   fonts,
   loading,
   searchQuery,
+  searchFailed,
   orientation,
   color,
   source,
@@ -347,13 +348,29 @@ export function StockSourceModal({
             </div>
           )}
 
+          {/* A failed request is not an empty result. Until `searchFailed`
+              existed both rendered "No photos found for …" and the only
+              difference was a toast that auto-dismissed (blocker A-STOCK). */}
+          {!isLoading && searchFailed && searchQuery.length > 0 && (
+            <div className="stock-empty" role="alert">
+              Couldn&rsquo;t reach the stock library.{" "}
+              <Button
+                color="light"
+                size="xs"
+                className="tw:h-auto tw:min-h-0 tw:p-0 tw:font-normal tw:text-[var(--bk-accent-text)]"
+                onClick={() => onSearch(searchQuery, orientation, color)}
+              >
+                Try again
+              </Button>
+            </div>
+          )}
           {/* Empty state */}
-          {!isLoading &&
+          {!isLoading && !searchFailed &&
             activeTab === "img" && photos.length === 0 &&
             searchQuery.length > 0 && (
               <div className="stock-empty">No photos found for "{searchQuery}"</div>
             )}
-          {!isLoading &&
+          {!isLoading && !searchFailed &&
             activeTab === "vid" && videos.length === 0 &&
             searchQuery.length > 0 && (
               <div className="stock-empty">No videos found for "{searchQuery}"</div>
