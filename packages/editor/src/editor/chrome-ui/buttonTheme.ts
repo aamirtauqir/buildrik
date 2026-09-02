@@ -31,7 +31,7 @@ export const BK_BUTTON_THEME: NonNullable<CustomFlowbiteTheme["button"]> = {
     "tw:disabled:bg-[var(--bk-bg-subtle)] tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:border-transparent tw:disabled:shadow-none",
   color: {
     link:
-      "tw:h-auto tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:font-normal tw:text-[length:var(--bk-text-13)] tw:leading-5 " +
+      "tw:h-auto tw:min-h-6 tw:border-0 tw:bg-transparent tw:p-0 tw:font-normal tw:text-[length:var(--bk-text-13)] tw:leading-5 " +
       "tw:text-[var(--bk-accent-text)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:underline " +
       "tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]",
     ghost:
