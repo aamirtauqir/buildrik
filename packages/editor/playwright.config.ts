@@ -31,7 +31,12 @@ export default defineConfig({
   // Parity baselines are exact computed-value comparisons. A retry cannot fix
   // a wrong colour, and retrying would only hide a flaky mount.
   retries: 0,
-  fullyParallel: true,
+  // One worker, measured 2026-09-02: with parallel workers on the Vite server
+  // Playwright has just started, four media-drawer cases died in the first
+  // page.evaluate ("Execution context was destroyed") in two consecutive runs;
+  // the same twenty cases pass 20/20 at --workers=1. The whole suite is ~40s.
+  fullyParallel: false,
+  workers: 1,
   // CI also emits the HTML report so a failure leaves something browsable in
   // the uploaded artifact. Without it `playwright-report/` is never created and
   // the workflow's upload step silently uploads nothing — the artifact would

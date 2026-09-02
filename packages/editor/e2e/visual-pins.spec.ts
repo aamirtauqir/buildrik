@@ -43,6 +43,13 @@ const CASES = [
 ] as const;
 
 test.describe("visual pin", () => {
+  // Pins are recorded on darwin. CI runs linux, where Playwright looks for a
+  // `-chromium-linux.png` that no one has ever recorded, and a missing platform
+  // snapshot fails every case ("A snapshot doesn't exist ... writing actual").
+  // That was 20 of the 51 red rows in every CI run through 2026-09-02. The
+  // computed-style parity and Figma conformance steps carry the CI verdict;
+  // pins stay a local, by-eye aid.
+  test.skip(!!process.env.CI, "visual pins are recorded on darwin only");
   for (const name of CASES) {
     test(name, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });

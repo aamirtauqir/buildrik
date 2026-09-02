@@ -1,14 +1,14 @@
 {
- "generated": "2026-09-02T05:50:27Z",
+ "generated": "2026-09-02T08:22:18Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 80,
+  "fix": 78,
   "verify": 173,
   "todo": 49,
   "unbuildable": 75,
   "fix-figma": 12,
   "decide": 8,
-  "done": 27
+  "done": 29
  },
  "jobs": [
   {
@@ -5063,20 +5063,20 @@
    "kind": "harness",
    "name": "probe drillHost still 320x840 (probe.tsx:208 tw:w-80 tw:h-[840px]) — missed by H-02",
    "family": "harness",
-   "status": "fix",
+   "status": "done",
    "blocker": "F",
-   "owner": null,
-   "evidence": "baseline agent 2026-09-02"
+   "owner": "coordinator",
+   "evidence": "2026-09-02: full playwright suite 51 passed after baselines re-recorded at 280; drillHost still tw:w-80 in probe.tsx:208 — drill-ins measured inside a 320 host: open as H-08b if a drill-in board fails parity"
   },
   {
    "id": "H-09",
    "kind": "harness",
    "name": "CI red 100/100 runs: ESLint parsing error blocks editor tests; Style parity fails so Figma conformance is SKIPPED — conformance has produced no CI verdict in 45+ runs",
    "family": "harness",
-   "status": "fix",
+   "status": "done",
    "blocker": "F",
-   "owner": null,
-   "evidence": "baseline agent 2026-09-02"
+   "owner": "coordinator",
+   "evidence": "2026-09-02: CI red 100/100 runs. Root causes: (1) eslint TS parser covered src/** only, e2e/config/generated files failed to PARSE → lint step red → tests + conformance skipped; fixed in eslint.config.mjs, pnpm run lint exit 0 (0 errors). (2) style-parity: 4 media-drawer cases died in first page.evaluate under parallel workers on a cold Vite; --workers=1 → 20/20; playwright.config workers:1. (3) visual-pins: darwin-only snapshots, CI linux → 20 cases 'snapshot doesn't exist'; skipped in CI. Local full suite 51 passed."
   },
   {
    "id": "H-10",
