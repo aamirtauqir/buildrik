@@ -40,7 +40,6 @@ interface Props {
   onBulkDelete: () => void;
   onClearSelection: () => void;
   onContextMenu: (id: string, x: number, y: number) => void;
-  onSettingsClick: (id: string) => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string) => void;
   onRenameCancel: () => void;
@@ -73,7 +72,6 @@ export const PageList: React.FC<Props> = ({
   onBulkDelete,
   onClearSelection,
   onContextMenu,
-  onSettingsClick,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
@@ -238,7 +236,6 @@ export const PageList: React.FC<Props> = ({
                   onFolderDelete={() => onFolderDelete(folder.id)}
                   onSelectPage={onSelectPage}
                   onContextMenu={onContextMenu}
-                  onSettingsClick={onSettingsClick}
                   onRenameStart={onRenameStart}
                   onRenameCommit={onRenameCommit}
                   onRenameCancel={onRenameCancel}
@@ -274,7 +271,6 @@ export const PageList: React.FC<Props> = ({
                   onRenameCommit={(name) => onRenameCommit(page.id, name)}
                   onRenameCancel={onRenameCancel}
                   onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
-                  onSettingsClick={() => onSettingsClick(page.id)}
                   searchContext={
                     search
                       ? folders.find((f) => f.id === pageToFolder.get(page.id))?.name

@@ -16,7 +16,6 @@ const baseProps = {
   onRenameCancel: vi.fn(),
   onRenameStart: vi.fn(),
   onContextMenu: vi.fn(),
-  onSettingsClick: vi.fn(),
 };
 
 const home: PageItem = {

@@ -42,7 +42,6 @@ interface Props {
   onRenameCancel: () => void;
   onRenameStart: () => void;
   onContextMenu: (x: number, y: number) => void;
-  onSettingsClick: () => void;
   /** Board 141:40 search results: the owning folder, shown muted right. */
   searchContext?: string;
   /** Board 140:21 / 1171:4729 — 8px warning dot when the page has unsaved edits. */

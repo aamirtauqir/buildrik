@@ -1,20 +1,16 @@
 /**
- * useEditorShortcuts.helpConflict.test.ts — PIN §2-B5: the double
- * help-surface conflict on bare "?".
+ * useEditorShortcuts.helpConflict.test.ts — PIN §2-B5, resolved: bare "?" has
+ * ONE owner.
  *
- * Two independent window keydown listeners both claim the "?" key:
+ * The editor ships two help surfaces on purpose — the shell's
+ * KeyboardShortcutsPanel (app-wide chords) and the canvas cheat sheet
+ * (gestures and selection) — and the shell panel prints the split itself:
+ * "Ctrl+/ · This shortcuts panel", "? · Canvas gestures & selection".
  *
- *   1. useEditorShortcuts (shell)  → modals.setShowShortcuts(true)
- *      (src/editor/shell/hooks/useEditorShortcuts.ts:88)
- *   2. useKeyboardCheatSheet (canvas) → toggles the canvas cheat sheet
- *      (src/editor/canvas/controls/KeyboardCheatSheet.tsx:369)
- *
- * Both call e.preventDefault(), but preventDefault does not stop other
- * keydown listeners — so a single "?" press opens BOTH the shell
- * KeyboardShortcutsPanel and the canvas KeyboardCheatSheet on top of
- * each other. These tests pin the current (conflicting) behavior; when
- * the conflict is resolved (one owner for "?"), the double-open pin
- * below MUST be updated.
+ * Both used to claim "?" from their own window keydown listener, and
+ * preventDefault does not stop a sibling listener, so a single press opened
+ * both overlays on top of each other. useEditorShortcuts no longer binds "?";
+ * useKeyboardCheatSheet is its only owner, and Cmd/Ctrl+/ is the panel's.
  *
  * @license BSD-3-Clause
  */
@@ -27,31 +23,33 @@ import {
 } from "../useEditorShortcuts";
 import { useKeyboardCheatSheet } from "../../../canvas/controls/KeyboardCheatSheet";
 
-function dispatchQuestionMark() {
+function dispatch(key: string, init: KeyboardEventInit = {}) {
   const event = new KeyboardEvent("keydown", {
-    key: "?",
-    shiftKey: true,
+    key,
     cancelable: true,
     bubbles: true,
+    ...init,
   });
   window.dispatchEvent(event);
   return event;
 }
 
-describe("PIN §2-B5 — '?' double help-surface conflict", () => {
+const composer = () =>
+  ({ history: { undo: vi.fn(), redo: vi.fn() } }) as unknown as
+    UseEditorShortcutsOptions["composer"];
+
+describe("PIN §2-B5 — one owner per help chord", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it("one '?' press opens BOTH the shell shortcuts modal AND the canvas cheat sheet", () => {
+  it("'?' opens the canvas cheat sheet and ONLY the canvas cheat sheet", () => {
     const setShowShortcuts = vi.fn();
-    const modals = { setShowShortcuts };
-    const composer = { history: { undo: vi.fn(), redo: vi.fn() } };
 
     const { result } = renderHook(() => {
       useEditorShortcuts({
-        composer: composer as unknown as UseEditorShortcutsOptions["composer"],
-        modals,
+        composer: composer(),
+        modals: { setShowShortcuts },
         saveProject: vi.fn(),
       });
       return useKeyboardCheatSheet();
@@ -59,44 +57,62 @@ describe("PIN §2-B5 — '?' double help-surface conflict", () => {
 
     expect(result.current.isOpen).toBe(false);
     act(() => {
-      dispatchQuestionMark();
+      dispatch("?", { shiftKey: true });
     });
 
-    // PIN §2-B5: both help surfaces respond to the same keypress today.
-    expect(setShowShortcuts).toHaveBeenCalledWith(true); // shell modal opens
-    expect(result.current.isOpen).toBe(true); // canvas cheat sheet ALSO opens
+    expect(result.current.isOpen).toBe(true);
+    expect(setShowShortcuts).not.toHaveBeenCalled();
   });
 
-  it("preventDefault from the shell handler does not shield later listeners", () => {
+  it("Cmd+/ opens the shell panel and leaves the cheat sheet shut", () => {
+    const setShowShortcuts = vi.fn();
+
+    const { result } = renderHook(() => {
+      useEditorShortcuts({
+        composer: composer(),
+        modals: { setShowShortcuts },
+        saveProject: vi.fn(),
+      });
+      return useKeyboardCheatSheet();
+    });
+
+    act(() => {
+      dispatch("/", { metaKey: true });
+    });
+
+    expect(setShowShortcuts).toHaveBeenCalledWith(true);
+    expect(result.current.isOpen).toBe(false);
+  });
+
+  it("preventDefault does not shield later listeners — which is why one hook may claim a chord", () => {
     const setShowShortcuts = vi.fn();
     renderHook(() =>
       useEditorShortcuts({
-        composer: { history: { undo: vi.fn(), redo: vi.fn() } } as unknown as
-          UseEditorShortcutsOptions["composer"],
+        composer: composer(),
         modals: { setShowShortcuts },
         saveProject: vi.fn(),
       }),
     );
 
-    // A stand-in for any second '?' listener registered after the hook —
-    // it still receives the event, and defaultPrevented is already true,
-    // but neither handler checks it.
+    // A stand-in for any second listener registered after the hook — it still
+    // receives the event, and defaultPrevented is already true, but nothing
+    // reads that flag. Propagation is not stopped, so two handlers on one key
+    // means two surfaces.
     const secondListener = vi.fn();
     window.addEventListener("keydown", secondListener);
-    const ev = dispatchQuestionMark();
+    const ev = dispatch("/", { metaKey: true });
     window.removeEventListener("keydown", secondListener);
 
     expect(setShowShortcuts).toHaveBeenCalledWith(true);
     expect(ev.defaultPrevented).toBe(true);
-    expect(secondListener).toHaveBeenCalledTimes(1); // propagation NOT stopped
+    expect(secondListener).toHaveBeenCalledTimes(1);
   });
 
-  it("a second '?' press toggles the cheat sheet closed while the shell modal is told to open AGAIN", () => {
+  it("repeated '?' toggles the cheat sheet without ever reaching the shell panel", () => {
     const setShowShortcuts = vi.fn();
     const { result } = renderHook(() => {
       useEditorShortcuts({
-        composer: { history: { undo: vi.fn(), redo: vi.fn() } } as unknown as
-          UseEditorShortcutsOptions["composer"],
+        composer: composer(),
         modals: { setShowShortcuts },
         saveProject: vi.fn(),
       });
@@ -104,18 +120,13 @@ describe("PIN §2-B5 — '?' double help-surface conflict", () => {
     });
 
     act(() => {
-      dispatchQuestionMark();
+      dispatch("?", { shiftKey: true });
     });
     act(() => {
-      dispatchQuestionMark();
+      dispatch("?", { shiftKey: true });
     });
 
-    // PIN §2-B5 detail: the two surfaces even disagree on semantics —
-    // the cheat sheet TOGGLES (open → closed) while the shell modal is
-    // set to true both times (it never toggles).
     expect(result.current.isOpen).toBe(false);
-    expect(setShowShortcuts).toHaveBeenCalledTimes(2);
-    expect(setShowShortcuts).toHaveBeenNthCalledWith(1, true);
-    expect(setShowShortcuts).toHaveBeenNthCalledWith(2, true);
+    expect(setShowShortcuts).not.toHaveBeenCalled();
   });
 });

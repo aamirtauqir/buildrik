@@ -2,8 +2,17 @@
  * Every printed help chord opens the screen it names.
  *
  * The editor ships two help surfaces on purpose — the canvas cheat sheet
- * (board 815:4518, gestures and selection) and the shell's shortcuts panel
- * (app-wide chords) — but the printed chords crossed over. Measured in the
+ * (gestures and selection) and the shell's shortcuts panel (app-wide chords)
+ * — but the printed chords crossed over.
+ *
+ * Board 815:4518 belongs to the SHELL PANEL, not the cheat sheet. This
+ * docblock attributed it to the cheat sheet while
+ * `KeyboardShortcutsPanel.tsx:126` claimed it for itself — one board cited by
+ * two files for two different screens. The board's own copy settles it: it
+ * draws "Search shortcuts… / General / Save ⌘S / Undo ⌘Z / Redo ⌘⇧Z", which
+ * are app-wide chords. The cheat sheet's groups are Selection · Navigation ·
+ * Positioning · Editing · View · Context Menu and it has no Save. Corrected
+ * 2026-09-02. The canvas cheat sheet has NO board of its own. Measured in the
  * running editor: "?" drew "⌨️ Keyboard Shortcuts · SELECTION · Select
  * element" (the cheat sheet), while ⌘/ and the site-menu row drew "Keyboard
  * Shortcuts · PANELS · Open Insert panel" (the shell panel) — and the menu row

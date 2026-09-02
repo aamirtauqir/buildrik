@@ -284,7 +284,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onClearSelection={bulk.clearSelection}
             onContextMenu={p.openContextMenu}
             dirtyPages={dirtyPages}
-            onSettingsClick={p.openSettings}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}
             onRenameCancel={() => { setNameError(null); p.cancelRename(); }}
@@ -358,7 +357,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onClose={() => setPaletteOpen(false)}
         />
       )}
-      {/* Page settings drawer — opened by gear / context-menu via openSettings */}
+      {/* Page settings drawer — opened via openSettings, from the row's
+          context menu ("Page settings…") or a Listings row. The per-row gear
+          it used to name was deleted with the row action strip. */}
       {settingsPage && (
         <SettingsErrorBoundary onClose={p.closeSettings}>
           <PageSettingsDrawer

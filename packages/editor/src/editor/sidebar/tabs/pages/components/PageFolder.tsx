@@ -34,7 +34,6 @@ interface Props {
   onFolderDelete: () => void;
   onSelectPage: (id: string) => void;
   onContextMenu: (id: string, x: number, y: number) => void;
-  onSettingsClick: (id: string) => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string) => void;
   onRenameCancel: () => void;
@@ -58,7 +57,6 @@ export const PageFolder: React.FC<Props> = ({
   onFolderDelete,
   onSelectPage,
   onContextMenu,
-  onSettingsClick,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
@@ -294,7 +292,6 @@ export const PageFolder: React.FC<Props> = ({
                 onRenameCommit={(name) => onRenameCommit(page.id, name)}
                 onRenameCancel={onRenameCancel}
                 onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
-                onSettingsClick={() => onSettingsClick(page.id)}
                 draggable
                 nested
               />

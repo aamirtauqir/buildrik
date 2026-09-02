@@ -36,7 +36,6 @@ function makeProps(overrides: Partial<React.ComponentProps<typeof PageList>> = {
     onBulkDelete: vi.fn(),
     onClearSelection: vi.fn(),
     onContextMenu: vi.fn(),
-    onSettingsClick: vi.fn(),
     onRenameStart: vi.fn(),
     onRenameCommit: vi.fn(),
     onRenameCancel: vi.fn(),

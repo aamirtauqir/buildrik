@@ -1,5 +1,5 @@
 /**
- * useEditorShortcuts.test.ts — covers all 8 keyboard branches + the
+ * useEditorShortcuts.test.ts — covers every keyboard branch + the
  * editable-surface guard + cleanup-on-unmount.
  *
  * @license BSD-3-Clause
@@ -173,14 +173,9 @@ describe("useEditorShortcuts", () => {
     expect(modals.setShowShortcuts).toHaveBeenCalledWith(true);
   });
 
-  it("'?' (no modifier) opens shortcuts modal", () => {
+  it("'?' does NOT open the shortcuts modal — the canvas cheat sheet owns it", () => {
     mount();
     dispatchKey({ key: "?" });
-    expect(modals.setShowShortcuts).toHaveBeenCalledWith(true);
-  });
-
-  it("'?' WITH ctrl/meta does NOT open shortcuts (avoids browser shortcut conflicts)", () => {
-    mount();
     dispatchKey({ key: "?", metaKey: true });
     dispatchKey({ key: "?", ctrlKey: true });
     expect(modals.setShowShortcuts).not.toHaveBeenCalled();
@@ -212,7 +207,7 @@ describe("useEditorShortcuts", () => {
     document.body.appendChild(input);
     dispatchKey({ key: "s", metaKey: true, target: input });
     dispatchKey({ key: "z", metaKey: true, target: input });
-    dispatchKey({ key: "?", target: input });
+    dispatchKey({ key: "/", metaKey: true, target: input });
     expect(saveProject).not.toHaveBeenCalled();
     expect(composer.history.undo).not.toHaveBeenCalled();
     expect(modals.setShowShortcuts).not.toHaveBeenCalled();

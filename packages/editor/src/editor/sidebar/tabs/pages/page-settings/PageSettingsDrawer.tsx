@@ -5,7 +5,9 @@
  * - Called by PagesTab when settingsPageId is set.
  * - usePageSettings owns ALL form state (same hook, new container).
  * - Tab switching is guarded by unsaved changes (UnsavedWarningModal).
- * - ⌘S saves immediately. ESC / X closes with guard.
+ * - ⌘S saves immediately. ESC and the scrim both close through the guard.
+ *   There is no ✕: the header (board 302:1980) draws the title and the tab
+ *   row and nothing else.
  *
  * @license BSD-3-Clause
  */
@@ -66,6 +68,18 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
     onClose();
   };
 
+  // ESC — the same guarded close as the scrim. Skipped while the discard modal
+  // is open: that dialog owns Escape, and running the guard behind it would
+  // reopen what the dialog had just dismissed.
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || s.showDiscardConfirm) return;
+      e.preventDefault();
+      handleClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [s.showDiscardConfirm, handleClose]);
 
   return (
     <>

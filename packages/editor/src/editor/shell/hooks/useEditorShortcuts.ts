@@ -10,7 +10,6 @@
  *   Cmd/Ctrl+/            → modals.setShowShortcuts(true)
  *   Cmd/Ctrl+J            → open the AI tab (composer ui:switch-tab → AITab)
  *   Escape                → close shortcuts modal
- *   ?                     → modals.setShowShortcuts(true)
  *   F6 / Shift+F6         → cycle focus between shell regions (board 58:2)
  *   C                     → toggle canvas comment mode (board 58:215 legend)
  *   Ctrl/Cmd+,            → openSiteSettings() — the site menu's own row
@@ -30,6 +29,16 @@
  * the shell CommandPalette. (Binding it here too opened a second, canvas-level
  * palette on the same keypress.) The canvas palette is Cmd/Ctrl+Shift+P,
  * registered inside useCanvasCommandPalette.
+ *
+ * Bare "?" is NOT handled here for the same reason. The editor ships two help
+ * surfaces on purpose — this panel for app-wide chords, the canvas cheat sheet
+ * for gestures and selection — and the panel prints the split itself
+ * ("Ctrl+/ · This shortcuts panel", "? · Canvas gestures & selection",
+ * KeyboardShortcutsPanel.tsx:56-57). This hook also bound "?" to the panel,
+ * and preventDefault does not stop the cheat sheet's own window listener
+ * (useKeyboardCheatSheet), so one press opened both overlays on top of each
+ * other. "?" belongs to the cheat sheet; this panel answers to Cmd/Ctrl+/ and
+ * the site-menu row.
  *
  * @license BSD-3-Clause
  */
@@ -163,10 +172,6 @@ export function useEditorShortcuts({
       }
       if (e.key === "Escape") {
         modals.setShowShortcuts(false);
-      }
-      if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        modals.setShowShortcuts(true);
       }
     };
 

@@ -44,7 +44,6 @@ function renderList(pages: ReturnType<typeof page>[]) {
       onToggleSelect={vi.fn()}
       onSelectPage={vi.fn()}
       onContextMenu={vi.fn()}
-      onSettingsClick={vi.fn()}
       onRenameStart={vi.fn()}
       onRenameCommit={vi.fn()}
       onRenameCancel={vi.fn()}

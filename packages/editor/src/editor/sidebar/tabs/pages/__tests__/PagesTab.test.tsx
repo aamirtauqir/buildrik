@@ -152,7 +152,6 @@ describe("PageRow active indicator", () => {
     onRenameCancel: vi.fn(),
     onRenameStart: vi.fn(),
     onContextMenu: vi.fn(),
-    onSettingsClick: vi.fn(),
   };
 
   it("does not have .active class when page is not active", () => {

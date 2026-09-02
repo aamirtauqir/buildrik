@@ -33,7 +33,6 @@ function renderRow(extra: Record<string, unknown> = {}) {
         pages={[page] as never}
         composer={null as never}
         isRenaming={false}
-        onSettingsClick={vi.fn()}
         onSelect={vi.fn()}
         onRenameStart={vi.fn()}
         onRenameCommit={vi.fn()}
