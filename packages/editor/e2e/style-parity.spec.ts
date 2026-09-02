@@ -116,6 +116,27 @@ for (const name of CASES) {
       test.info().annotations.push({ type: "baseline", description: `wrote ${file}` });
       return;
     }
-    expect(actual).toEqual(JSON.parse(readFileSync(file, "utf8")));
+    /* Text metrics differ per platform: the darwin baseline holds fractional
+       widths ("6.60938px"), linux Chromium renders whole pixels ("7px"). Every
+       one of the 20 cases failed in CI on nothing but that (run 33609481172,
+       2026-09-02) while passing locally. Width and height therefore compare
+       within 1px; colours, fonts, radii, paddings and everything else stay
+       exact — those are the values parity exists to pin. */
+    const baseline = JSON.parse(readFileSync(file, "utf8")) as Record<string, Record<string, string>>;
+    const drift: string[] = [];
+    for (const key of new Set([...Object.keys(baseline), ...Object.keys(actual)])) {
+      const a = actual[key], b = baseline[key];
+      if (!a || !b) { drift.push(`${key}: ${a ? "unexpected node" : "missing node"}`); continue; }
+      for (const prop of new Set([...Object.keys(a), ...Object.keys(b)])) {
+        const av = a[prop], bv = b[prop];
+        if (av === bv) continue;
+        if ((prop === "width" || prop === "height") && typeof av === "string" && typeof bv === "string") {
+          const d = Math.abs(parseFloat(av) - parseFloat(bv));
+          if (Number.isFinite(d) && d <= 1) continue;
+        }
+        drift.push(`${key}.${prop}: baseline ${bv} → actual ${av}`);
+      }
+    }
+    expect(drift, `computed-style drift vs ${file}`).toEqual([]);
   });
 }
