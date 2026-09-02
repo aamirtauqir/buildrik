@@ -1,6 +1,7 @@
 /**
- * GroupSection — one board-137:2 group: 32h header (▾/▸ chevron, caps label,
- * live count in Geist Mono right-aligned) + 32h rounded-4 list rows.
+ * GroupSection — one Insert group, boards 1069:4529/4707/4790/4970: a
+ * 28-pixel header (▾/▸ chevron, caps label, live count right-aligned) over
+ * 28-pixel list rows indented to the label.
  *
  * Replaces CatAccordion in the default view. CatAccordion's category IA
  * survives only inside SearchResults grouping.
@@ -32,34 +33,36 @@ interface GroupSectionProps {
   onMineInsert?: (component: ComponentDefinition) => void;
 }
 
-/** Board group header: 32h · ▾/▸ 12px @16 · LABEL 11/500 caps tracking .5 · count mono 11 right. */
+/** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right. */
 const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () => void }> = ({
   group, isOpen, onToggle,
 }) => (
   <Button
     type="button"
     color="light"
-    className="tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row)] tw:px-[16px] tw:gap-0 tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none"
+    className="tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-12)] tw:pr-[var(--bk-space-16)] tw:gap-[6px] tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none"
     aria-expanded={isOpen}
     data-testid={`insert-group-${group.id}`}
     onClick={onToggle}
   >
-    <span className="tw:w-[16px] tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" aria-hidden="true">
+    <span className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)]" aria-hidden="true">
       {isOpen ? "▾" : "▸"}
     </span>
-    <span className="tw:flex-1 tw:text-[11px] tw:leading-[16px] tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+    <span className="tw:flex-1 tw:text-[11px] tw:leading-[16px] tw:font-semibold tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
       {group.label}
     </span>
     {group.count != null && (
-      <span className="tw:font-[family-name:var(--bk-font-mono)] tw:text-[11px] tw:leading-[16px] tw:font-medium tw:text-[var(--bk-ink-muted)] tw:tabular-nums">
+      <span className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-gray-400)] tw:tabular-nums">
         {group.count}
       </span>
     )}
   </Button>
 );
 
-/** Board list row: 32h · rounded-4 · 12px icon · 13/400 label. Exported for
- *  the board's icon-less pinned rows (⌥ Paste HTML…) in BuildTab. */
+/** Board 1069:4999 list row: dense · rounded-4 · 14 icon · 13/400 label,
+ *  indented past the group chevron. `pinned` switches to board 1069:5011's
+ *  ⌥ Paste HTML… band, which is a full-height row at the panel inset with
+ *  12/400 soft-ink text and no icon slot. Exported for BuildTab. */
 export const Row: React.FC<{
   label: string;
   /**
@@ -68,8 +71,10 @@ export const Row: React.FC<{
    * user's own) keep the plain square.
    */
   iconHtml?: string;
-  /** Board 233:1123 draws the Paste-HTML row with no icon slot at all. */
+  /** Board 1069:5011 draws the Paste-HTML row with no icon slot at all. */
   noIcon?: boolean;
+  /** Pinned band (board 1069:5011): standard row height, panel inset, 12/400 soft. */
+  pinned?: boolean;
   /** Board 138:198: disabled row = "Soon" tag + reason tooltip + no insert.
    *  "Disabled without a reason is a bug" — the Button component doc. */
   disabled?: boolean;
@@ -78,14 +83,18 @@ export const Row: React.FC<{
   draggable?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onClick: () => void;
-}> = ({ label, iconHtml, noIcon, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
+}> = ({ label, iconHtml, noIcon, pinned, disabled, disabledReason, testId, draggable, onDragStart, onClick }) => {
   const row = (
     <div
       role="button"
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || undefined}
       draggable={disabled ? false : draggable}
-      className={`tw:flex tw:items-center tw:h-[var(--bk-size-row)] tw:px-[16px] tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
+      className={`tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
+        pinned
+          ? "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-16)]"
+          : "tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)]"
+      } ${
         disabled
           ? "tw:cursor-not-allowed"
           : "tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]"
@@ -98,7 +107,7 @@ export const Row: React.FC<{
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); }
       }}
     >
-      {/* Every element row drew the same 12px solid ink-muted square — a founder
+      {/* Every element row drew the same solid square — a founder
           call from 2026-08-06, taken from the board's List-row icon. It made 53
           element types visually identical in the first panel a user opens, and
           it is the top row of this arc's ledger.
@@ -111,7 +120,7 @@ export const Row: React.FC<{
           whether an element has a face.
 
           Reverting is this block. The square is still what a row with no
-          artwork of its own gets. */}
+          artwork of its own gets — board 1069:4999 draws it at 14 on soft ink. */}
       {noIcon ? null : iconHtml ? (
         <svg
           viewBox="0 0 24 24"
@@ -129,12 +138,18 @@ export const Row: React.FC<{
           dangerouslySetInnerHTML={{ __html: iconHtml }}
         />
       ) : (
-        <span className="tw:size-[12px] tw:rounded-[2px] tw:bg-[var(--bk-ink-muted)] tw:shrink-0" aria-hidden="true" />
+        <span className="tw:size-[14px] tw:rounded-[2px] tw:bg-[var(--bk-ink-soft)] tw:shrink-0" aria-hidden="true" />
       )}
-      <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]">
+      <span
+        className={`tw:flex-1 tw:min-w-0 tw:truncate ${
+          pinned
+            ? "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]"
+            : "tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]"
+        }`}
+      >
         {label}
         {disabled && (
-          <span className="tw:ml-[12px] tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Soon</span>
+          <span className="tw:ml-[var(--bk-space-12)] tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Soon</span>
         )}
       </span>
     </div>
@@ -211,13 +226,13 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         the card width cannot lose that way, and it earns the expanded drawer
         (560/700) more columns instead of two marooned cards. */}
     {isOpen && group.id === "blocks" && (
-      <div className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[16px] tw:px-[16px] tw:py-[8px]">
+      <div className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
         {blocks?.map((b) => (
           <div
             key={b.id}
             role="button"
             tabIndex={0}
-            className="tw:flex tw:flex-col tw:gap-[4px] tw:min-w-0 tw:cursor-pointer tw:select-none"
+            className="tw:flex tw:flex-col tw:gap-[6px] tw:min-w-0 tw:cursor-pointer tw:select-none"
             data-testid={`insert-block-${b.id}`}
             onClick={() => onBlockInsert?.(b)}
             onKeyDown={(e) => {
@@ -228,12 +243,12 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
               <img
                 src={b.preview}
                 alt=""
-                className="tw:h-[76px] tw:w-[136px] tw:rounded-[var(--bk-radius-sm)] tw:object-cover"
+                className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:object-cover"
               />
             ) : (
-              <div className="tw:h-[76px] tw:w-[136px] tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)]" aria-hidden="true" />
+              <div className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)]" aria-hidden="true" />
             )}
-            <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:truncate">
+            <p className="tw:m-0 tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-soft)] tw:truncate">
               {b.label}
             </p>
           </div>

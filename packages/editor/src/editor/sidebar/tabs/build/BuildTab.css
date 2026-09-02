@@ -13,9 +13,9 @@
   min-height: 0;
 }
 
-/* Board 137:7 — 36h search band, box inset 16 each side. */
+/* Board 1069:4533 — search band, box inset 12 each side. */
 .bld-search-wrap {
-  padding: var(--bk-space-4) var(--bk-space-16) var(--bk-space-4);
+  padding: var(--bk-space-4) var(--bk-space-12) var(--bk-space-4);
   flex-shrink: 0;
 }
 

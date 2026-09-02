@@ -36,10 +36,23 @@ type UIExportFormat = ExportFormat | "figma";
 
 const TOKEN_KINDS_COUNT = 14;
 
+/* Board 153:120 draws EXPORT and IMPORT as plain section headers over
+   full-bleed rows. The bordered card that used to wrap them added a THIRD
+   inset on top of SECTION_BODY + this column, and pushed every format row
+   to 60-75 tall against the board's 48. Only the preview pane — which the
+   board does not draw at all — still reads as a card. */
 const CARD = "tw:p-3 tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)]";
+const BLOCK = "tw:flex tw:flex-col";
+/* Board 220:839 · 28-tall caps header. */
+const SECTION_HEAD =
+  "tw:flex tw:h-7 tw:items-center tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] " +
+  "tw:text-[var(--bk-ink-muted)]";
+/* Board 153:132/137/142 · 48 tall, full-bleed, 13/400 title over an 11/400
+   description. `min-h` rather than `h` so the greyed Figma row (board
+   153:147, 60 tall) still fits its longer reason line. */
 const FORMAT_ROW =
-  "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1.5 tw:rounded-md tw:border tw:cursor-pointer " +
-  "tw:text-xs tw:text-[var(--bk-ink)]";
+  "tw:flex tw:items-center tw:gap-2 tw:min-h-12 tw:py-1.5 " +
+  "tw:text-[13px] tw:text-[var(--bk-ink)]";
 const CHIP = "tw:ml-auto tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded-full tw:border tw:text-[length:var(--bk-text-11)] tw:font-medium";
 const PREVIEW =
   "tw:m-0 tw:p-3 tw:max-h-80 tw:overflow-auto tw:whitespace-pre tw:rounded-md tw:border " +
@@ -213,8 +226,10 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
     `${TOKEN_KINDS_COUNT} kinds · ${stats.tokensCount} tokens · ` +
     `${stats.aliasEdges} alias edges · ${stats.darkVariants} dark variants`;
 
+  /* SECTION_BODY already spends 12 of the board's 16 inset; this column adds
+     the last 4 rather than a second full one (the pair measured 24 live). */
   return (
-    <div className="tw:flex tw:flex-col tw:gap-3 tw:p-3">
+    <div className="tw:flex tw:flex-col tw:gap-3 tw:px-1 tw:py-3">
       {/* Board 153:120 leads with the one decision that changes every export —
           how dark values are written — as a single row with its value at the
           right. It used to be three radio rows buried under the CSS format,
@@ -243,11 +258,11 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
         </Select>
       </div>
 
-      <div className={CARD}>
-        <div className="tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]">
+      <div className={BLOCK}>
+        <div className={SECTION_HEAD}>
           EXPORT
         </div>
-        <div className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-1" role="radiogroup" aria-label="Export format">
+        <div className="tw:flex tw:flex-col" role="radiogroup" aria-label="Export format">
           {FORMAT_OPTIONS.map(({ id, label, desc, disabled }) => {
             const droppedCount = id === "tailwind" ? tailwindDropped : 0;
             const chip = chipForFormat(id, droppedCount);
@@ -255,7 +270,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
               <div
                 key={id}
                 data-testid={`format-row-${id}`}
-                className={`${FORMAT_ROW} tw:border-[var(--bk-gray-200)] ${disabled ? "tw:opacity-60" : ""}`}
+                className={`${FORMAT_ROW} ${disabled ? "tw:opacity-60" : ""}`}
               >
                 {/* No radio: board 153:120 gives each format its own Copy
                     and Download, so there is nothing to "select" — and the
@@ -297,7 +312,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
                       onExported?.(label);
                     }}
-                    variant="link" className="tw:font-normal"
+                    variant="link" className="tw:font-normal tw:text-[11px]"
                   >
                     Download
                   </Button>

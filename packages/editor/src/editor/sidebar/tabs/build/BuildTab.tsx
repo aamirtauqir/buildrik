@@ -211,8 +211,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 
         {/* Board 138:53: the pinned bottom stays up DURING search too. */}
         <div className="bld-panel-bottom">
-          {/* Board 233:1123 — pinned above the tips band, no icon slot. */}
-          <Row label={"⌥  Paste HTML…"} noIcon testId="insert-paste-html" onClick={() => void pasteHtml()} />
+          {/* Board 1069:5011 — pinned above the tips band, no icon slot. */}
+          <Row label={"⌥  Paste HTML…"} noIcon pinned testId="insert-paste-html" onClick={() => void pasteHtml()} />
           <TipsFooter
             tipIdx={tab.tipIdx}
             onPrev={tab.tipPrev}

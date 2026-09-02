@@ -1,5 +1,9 @@
 /**
  * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
+ *
+ * The load-error body lives here, not one level up: board 141:165 keeps the
+ * search band (141:170) and the Add-page footer (141:201) either side of it,
+ * and lifting the error out of this shell is what made both vanish.
  * Zero business logic. All state/actions received as props from usePages + useFolders.
  *
  * Class namespace: `.bd-pg-list` is the scroll container (CSS owns `overflow:auto`).
@@ -30,6 +34,9 @@ interface Props {
   selectedIds: Set<string>;
   /** Pages with unsaved edits — board 140:21's dirty ●. */
   dirtyPages?: ReadonlySet<string>;
+  /** Sync failed — board 141:203 replaces the tree, the frame stays. */
+  loadError?: string | null;
+  onRetry?: () => void;
   onAddPage: () => void;
   onAddFolder: () => void;
   onSelectPage: (id: string) => void;
@@ -62,6 +69,8 @@ export const PageList: React.FC<Props> = ({
   pageToFolder,
   selectedIds,
   dirtyPages,
+  loadError,
+  onRetry,
   onAddPage,
   onAddFolder,
   onSelectPage,
@@ -100,7 +109,7 @@ export const PageList: React.FC<Props> = ({
     ? pages.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
     : pages;
 
-  if (pages.length === 0) {
+  if (pages.length === 0 && !loadError) {
     return (
       <div className="bd-pg-list-shell">
         {/* No `role="tree"` on the empty state: its children are the two
@@ -195,7 +204,16 @@ export const PageList: React.FC<Props> = ({
         </div>
       )}
       <div className="bd-pg-list">
-        {visible.length === 0 && search ? (
+        {loadError ? (
+          /* Board 141:203: centered — red fact, muted harm scope, accent retry. */
+          <div className="bd-pg-error" role="alert" aria-live="assertive">
+            <p className="bd-pg-error-title">Couldn{"\u2019"}t load your pages.</p>
+            <p className="bd-pg-error-desc">The site is fine {"\u2014"} this panel isn{"\u2019"}t.</p>
+            <Button color="light" size="xs" className="bd-pg-error-retry" onClick={onRetry}>
+              Try again
+            </Button>
+          </div>
+        ) : visible.length === 0 && search ? (
           <div className="bd-pg-nores" role="status" aria-live="polite" data-testid="pages-no-results">
             <p>Nothing matches {"\u2018"}{search}{"\u2019"}.</p>
             <Button

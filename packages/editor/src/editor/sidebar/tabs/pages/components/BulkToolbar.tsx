@@ -40,7 +40,10 @@ export const BulkToolbar: React.FC<Props> = ({
       <span className="bd-pg-bulk-count tabular">
         <b>{selectedCount}</b> selected
       </span>
-      <span className="bd-pg-bulk-spacer" />
+      {/* Board 141:120-123 order: the count, then Duplicate, Move to…, Delete,
+          left-aligned. The ✕ that follows is not on the board — it is the only
+          way back out of bulk mode with the mouse, so it stays. */}
+      <Button type="button" onClick={onDuplicate}>Duplicate</Button>
       <div className="bd-pg-bulk-folder" ref={pickerRef}>
         <Button
           type="button"
@@ -85,8 +88,8 @@ export const BulkToolbar: React.FC<Props> = ({
           </div>
         )}
       </div>
-      <Button type="button" onClick={onDuplicate}>Duplicate</Button>
       <Button type="button" className="danger" onClick={onDelete}>Delete</Button>
+      <span className="bd-pg-bulk-spacer" />
       <Button
         type="button"
         className="bd-pg-bulk-close"
