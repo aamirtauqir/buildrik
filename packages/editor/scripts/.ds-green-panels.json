@@ -21,9 +21,6 @@
     "packages/editor/src/editor/canvas/overlays/RemoteCursorsOverlay.tsx",
     "packages/editor/src/editor/canvas/overlays/RulersOverlay.tsx",
     "packages/editor/src/editor/canvas/overlays/SpacingLabels.tsx",
-    "packages/editor/src/editor/canvas/spots/CanvasSpot.tsx",
-    "packages/editor/src/editor/canvas/spots/CanvasSpotBadge.tsx",
-    "packages/editor/src/editor/canvas/spots/CanvasSpotSpacing.tsx",
     "packages/editor/src/editor/inspector/components/BatchStylePanel.tsx",
     "packages/editor/src/editor/inspector/components/DeleteConfirmModal.tsx",
     "packages/editor/src/editor/inspector/components/MultiSelectToolbar.tsx",
@@ -137,11 +134,11 @@
   "notes": [
     "Broad chrome audit (93 files added): swept editor/inspector/* + editor/canvas/* + editor/shell/* + editor/panels/* + editor/rail/* + editor/sidebar/shared/* + editor/collaboration/* + remaining shared/ui/* + shared/forms/* and added every zero-violation file.",
     "Previous phases: 76 files across 8 tab shells + 13 shared/ui primitives + Settings sub-screens + Pages sub-components + misc.",
-    "Do NOT remove files from this list once added. If a migration regresses, fix the code — removing from the allowlist hides the regression."
+    "Do NOT remove files from this list once added. If a migration regresses, fix the code \u2014 removing from the allowlist hides the regression."
   ],
   "lastDriftAudit": "2026-05-18",
   "driftedRemoved": {
-    "description": "21 files removed 2026-05-18 — 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) — folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame.",
+    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame.",
     "stale": [
       "packages/editor/src/shared/ui/SemanticBadge.tsx",
       "packages/editor/src/shared/ui/HelpTooltip.tsx",

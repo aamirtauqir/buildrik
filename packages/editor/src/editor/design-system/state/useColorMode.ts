@@ -3,7 +3,7 @@
  *
  * Shared between:
  *   - ColorModeToggle (seg, DS panel header)
- *   - ColorModeIconCycle (icon button, Topbar)
+ *   - (ColorModeIconCycle deleted 2026-09-02 — it was never rendered)
  *
  * @license BSD-3-Clause
  */

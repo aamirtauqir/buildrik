@@ -127,8 +127,8 @@ export function useEditorEventListeners({
   }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
 
   // 3b) UI_PANEL_OPEN → open the requested left-panel tab (and optional sub-screen).
-  // Emitters: command palette navigation, SmartSuggestions, canvas cmd palette.
-  // Allowlist on panel id — SmartSuggestions historically emitted inspector
+  // Emitters: command palette navigation, canvas cmd palette (SmartSuggestions,
+  // deleted 2026-09-02, never rendered). Allowlist on panel id — it historically emitted inspector
   // subpanel ids (layout/style/typography/size) here, which opened a blank
   // drawer because none are real left tabs. Unknown ids no-op.
   /* Was a hand-written list, and it had drifted: `publish`, `review`,
@@ -183,7 +183,7 @@ export function useEditorEventListeners({
      runtime, which the sandboxed-iframe overlay does not replace. */
 
   // 3e) ELEMENT_QUICK_ADD → create + insert an element via the engine API.
-  // Emitters: SmartSuggestions empty-container actions + canvas command palette.
+  // Emitters: canvas command palette (SmartSuggestions' empty-container actions are gone with it).
   React.useEffect(() => {
     if (!composer) return;
     const handle = (event: { parentId?: string; type?: string }) => {

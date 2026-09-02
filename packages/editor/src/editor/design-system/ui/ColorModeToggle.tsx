@@ -12,7 +12,7 @@
  *   - composer.colorMode (B.0) — get/set/resolved
  *   - useColorMode hook — subscribes to "colorMode:changed"
  *
- * Topbar uses ColorModeIconCycle (sibling file) for the icon-cycle path.
+ * (ColorModeIconCycle, the icon-cycle sibling, was never mounted and was deleted 2026-09-02.)
  *
  * @license BSD-3-Clause
  */

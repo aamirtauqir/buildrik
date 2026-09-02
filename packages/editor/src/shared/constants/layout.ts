@@ -45,27 +45,22 @@
  * chrome-ssot Stage 1/3 landed 2026-04-26: LayoutShell.css and
  * design-system/layout.css both ship 56 now. No drift.
  */
-export const TOPBAR_H = 56;
 
 /** Panel header height. Per DESIGN.md §Layout "matches sidebar contract". */
-export const HEADER_H = 44;
 
 /** Panel toolbar height. Per DESIGN.md §Sidebar Panel System. */
 export const TOOLBAR_H = 36;
 
 /** Status-bar footer height. Figma 32-2 footer = 32 (was 40; converged with
  *  LayoutShell.css `--layout-footer-height` = `--buildrick-size-footer`). */
-export const FOOTER_H = 32;
 
 // ============================================================================
 // ROW DENSITY — sidebar + inspector rows
 // ============================================================================
 
 /** Dense list row (layers, typography menus). Per DESIGN.md §Sidebar Panel System. */
-export const ROW_SM = 28;
 
 /** Standard list row (default sidebar rows). */
-export const ROW_MD = 32;
 
 /** Card-style row (template cards, media thumbnails). */
 export const ROW_LG = 48;
