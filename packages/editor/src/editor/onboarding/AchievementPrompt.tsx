@@ -145,7 +145,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: 0.8,
-                  color: "var(--bk-success)",
+                  color: "var(--bk-success-text)",
                 }}
               >
                 {isLastStep ? "All done!" : "Step complete"}
@@ -196,7 +196,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                 aria-hidden="true"
                 style={{
                   fontSize: 16,
-                  color: "var(--bk-ink-muted)",
+                  color: "var(--bk-ink-soft)",
                   flexShrink: 0,
                   marginTop: 2,
                 }}
@@ -208,7 +208,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "0 0 2px",
                     fontSize: 11,
-                    color: "var(--bk-ink-muted)",
+                    color: "var(--bk-ink-soft)",
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: 0.8,
@@ -230,7 +230,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "2px 0 0",
                     fontSize: 12,
-                    color: "var(--bk-ink-muted)",
+                    color: "var(--bk-ink-soft)",
                     lineHeight: 1.4,
                   }}
                 >
