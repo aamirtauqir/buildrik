@@ -87,13 +87,13 @@ type LoadState = "loading" | "ready" | "error";
 
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
-const META = "tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const META = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /** The grey band over each page's comments, and over RESOLVED / DETACHED. */
 const BAND =
-  "tw:flex tw:items-center tw:gap-2 tw:w-full tw:px-3 tw:h-8 tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:flex tw:items-center tw:gap-2 tw:w-full tw:px-4 tw:h-7 tw:bg-[var(--bk-bg-subtle)] " +
   "tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-wide tw:text-[var(--bk-ink-muted)] " +
   "tw:border-0 tw:justify-between";
-const FOOT = "tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-3 tw:flex tw:flex-col tw:gap-2";
+const FOOT = "tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-2";
 const ROUND_STRIP =
   "tw:flex tw:items-center tw:justify-center tw:h-8 tw:bg-[var(--bk-bg-subtle)] " +
   "tw:text-[12px] tw:text-[var(--bk-ink-soft)]";
@@ -430,7 +430,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               grey under it — EmptyState's title is ink-coloured, and the
               distinction is the whole point of the state. */}
           <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2" role="alert">
-            <span className="tw:text-[14px] tw:text-[var(--bk-error)]">
+            <span className="tw:text-[13px] tw:text-[var(--bk-error-text)]">
               Couldn&apos;t load this review round.
             </span>
             <span className={META}>Your work is safe — only the review list failed to load.</span>
@@ -601,7 +601,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   /* Board 157:58 — the round is finished; the next one is the obvious move. */
   const allResolvedBody = (
     <div className="tw:px-6 tw:py-8 tw:text-center tw:flex tw:flex-col tw:gap-2">
-      <span className="tw:text-[14px] tw:text-[var(--bk-success-text)]">Everything is resolved.</span>
+      <span className="tw:text-[13px] tw:text-[var(--bk-success-text)]">Everything is resolved.</span>
       <span className={META}>
         {resolvedComments.length} of {total} — ready to send round {round.roundNumber + 1}.
       </span>
@@ -794,13 +794,17 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               .map((r) => (
                 <span key={r.id} className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]" data-testid={`review-round-${r.roundNumber}`}>
                   Round {r.roundNumber} ·{" "}
-                  {r.revoked
-                    ? "Revoked"
-                    : r.status === "APPROVED"
-                      ? `Approved${r.reviewerName ? ` by ${r.reviewerName}` : ""}`
-                      : r.status === "CHANGES_REQUESTED"
-                        ? "Changes requested"
+                  {/* Outcome first: a revoked link does not undo an approval. Every
+                      previous round printed "Revoked" while the DB said APPROVED
+                      or CHANGES_REQUESTED (measured 2026-09-02). */}
+                  {r.status === "APPROVED"
+                    ? `Approved${r.reviewerName ? ` by ${r.reviewerName}` : ""}`
+                    : r.status === "CHANGES_REQUESTED"
+                      ? "Changes requested"
+                      : r.revoked
+                        ? "Revoked"
                         : "Sent, no reply"}
+                  {r.revoked && (r.status === "APPROVED" || r.status === "CHANGES_REQUESTED") ? " · link revoked" : ""}
                   {r.resolvedAt ? ` · ${new Date(r.resolvedAt).toLocaleDateString()}` : ""}
                 </span>
               ))

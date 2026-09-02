@@ -26,7 +26,7 @@
   flex-shrink: 0;
   padding: 0 8px;  /* board: lock ends 8 from the row's right edge; the LEFT gutter is LayerTreeItem's depth ladder (12 + depth*16) */
   border-radius: 4px;
-  font: 500 11px var(--bk-font-ui);
+  font: 400 13px var(--bk-font-ui);
   color: var(--bk-ink);
   cursor: pointer;
   user-select: none;
@@ -51,11 +51,9 @@
   background: var(--bk-accent);
 }
 
-.bdc-lr.bdc-hidden .bdc-lr-nm { color: var(--bk-ink-muted); }
-.bdc-lr.bdc-hidden .bdc-lr-ic { background: var(--bk-gray-300); }
-.bdc-lr.bdc-hidden .bdc-lr-chev { color: var(--bk-gray-300); }
-.bdc-lr.bdc-hidden .bdc-lr-eye,
-.bdc-lr.bdc-hidden .bdc-lr-lock { color: var(--bk-ink-muted); }
+/* Board 143:179: a hidden layer is the WHOLE row at .45 — not five parts recoloured
+   (the icon used to get a grey square painted behind its glyph). */
+.bdc-lr.bdc-hidden { opacity: 0.45; }
 
 .bdc-lr-chev {
   width: 12px;
@@ -251,6 +249,7 @@
    Promoted to chrome.css in a later cross-tab cleanup. */
 .bdc-icon-btn {
   display: inline-flex;
+  width: var(--bk-size-row-dense); height: var(--bk-size-row-dense); min-height: 0;
   align-items: center;
   justify-content: center;
   background: transparent;

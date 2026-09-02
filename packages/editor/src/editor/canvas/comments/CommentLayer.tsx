@@ -237,6 +237,12 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     const root = canvasRef.current;
     if (!root || !composer || comments.length === 0) return;
     const timer = window.setTimeout(() => {
+      /* Nothing mounted yet = nothing decidable. Measured 2026-09-02: on 3 of 6
+         plain loads the scan ran before the page DOM existed, every pinned
+         comment resolved to "missing", and the orphan modal blocked every
+         click in the editor until Escape — while the element WAS in the DOM
+         a beat later. The next `tick`/`comments` change re-runs the scan. */
+      if (root.childElementCount === 0) return;
       const ids = detectOrphans(comments, root, activePageId);
       lastOrphanIds.current = ids;
       composer.emit("comments:orphans", { ids });
