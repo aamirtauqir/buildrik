@@ -1,3 +1,13 @@
+/*
+ * Board citations here named 152:2 until 2026-09-02. 152:2 is `Brand · root —
+ * SUPERSEDED 2026-08-27 by 1333:7162`, and a verifier reported this panel as
+ * "NEVER BUILT TO — the code cites 152:2/154:132 and 1333:7162 appears nowhere
+ * in src". The second half was true and the first half was not: this file
+ * already renders 1333:7162's shape — `BrandPreview` (:704) above nine NAMED
+ * rows at `tw:h-13` (52px) whose labels are the board's nine, verbatim. Only
+ * the citations were stale, and they are the reason C3 read as a redraw.
+ * 154:132 (Basic mode) keeps its number — it is a state of the root, not the root.
+ */
 /**
  * DesignSystemTab — the Brand panel.
  *
@@ -96,7 +106,7 @@ type DesignSection = "tokens" | "typography" | "styles" | "starters" | "classes"
 /**
  * Brand root — a drill-in list, not a tab bar (M5).
  *
- * Board `Brand · root` (g4Gz… 152:2) draws nine peer destinations with a `›`
+ * Board `Brand · root` (g4Gz… 1333:7162) draws nine peer destinations with a `›`
  * chevron each. The code had four tabs plus a modal (Starters), a toggle
  * (Colour mode) and a banner (Lint) — same capabilities, different mental
  * model. Figma owns navigation (rule 2), and the sidebar is drill-in stack nav.
@@ -117,7 +127,7 @@ type DesignSection = "tokens" | "typography" | "styles" | "starters" | "classes"
  * question is worse than no row stands — it just no longer excuses a row whose
  * number is one property away.
  */
-/* Board 152:2's order, top to bottom. Typography used to sit second here and
+/* Board 1333:7162's order, top to bottom. Typography used to sit second here and
    sits sixth on the board — the list is the whole screen, so its order is the
    layout. */
 const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
@@ -267,7 +277,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     opacity, zindex, breakpoint, grid, sizing, icon, imagery,
   ];
 
-  /* Board 152:2 puts a count on every row that has one — "Tokens 14",
+  /* Board 1333:7162 puts a count on every row that has one — "Tokens 14",
      "Presets 18", "Classes 12". The docblock above this file says a count
      that is not the truth is worse than none, which is why Lint carried the
      only one; these three are counted from the same sources the screens
@@ -299,7 +309,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         if (name) classNames.add(name);
       }
     }
-    /* Board 152:2 draws a count on Starters and Components too, and its
+    /* Board 1333:7162 draws a count on Starters and Components too, and its
        numbers are not sample data: 6 is `STARTER_DS_REGISTRY.length` and 27 is
        `CATALOG.length` to the digit. Both rows shipped countless — the only
        two rows on the board that carry a number and did not here. */
@@ -307,7 +317,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
        on Classes or Components — the two rows whose contents Basic cannot
        edit. Its own footer says why: "Basic mode hides what you cannot edit
        yet." A number for something you cannot touch is the noise that note is
-       about. Board 152:2 (Pro) shows both. */
+       about. Board 1333:7162 (Pro) shows both. */
     if (isBeginner) {
       return { tokens, styles: presets, starters: STARTER_DS_REGISTRY.length };
     }
@@ -617,7 +627,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         </Button>
       </div>
 
-      {/* Board 152:2 draws the root as a list and nothing else. What used to
+      {/* Board 1333:7162 draws the root as a preview band above the list. What used to
           sit above it has a destination of its own on the boards: Light/Dark
           is the Colour mode screen's own control (153:92), Export belongs to
           Import / export (153:120), the starter gallery is the Starters row,
@@ -634,7 +644,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         </>
       )}
 
-      {/* Breadcrumb — only inside a destination. Board 152:2 draws no crumb at
+      {/* Breadcrumb — only inside a destination. Board 1333:7162 draws no crumb at
           the root, and 153:2 draws `‹ <Section>` inside one. */}
       {activeSection && (
         <div className={`${STRIP} tw:px-3 tw:py-2 tw:bg-[var(--bk-bg-subtle)]`}>
@@ -685,7 +695,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {activeSection === "export" && !lastExport && importOutcome && (
             <SectionStatusBadge status={importOutcome} />
           )}
-          {/* Brand root — the drill-in list (M5, board 152:2) */}
+          {/* Brand root — the preview band + drill-in list (M5, board 1333:7162) */}
           {activeSection === null && suppressedCount > 0 ? (
             <div className="tw:px-4 tw:pb-2">
               <span
