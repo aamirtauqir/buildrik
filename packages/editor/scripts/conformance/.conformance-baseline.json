@@ -4,5 +4,37 @@
     "compared": 7,
     "contrastFailures": 3,
     "nonTextFailures": 0
+  },
+  "content-load-error": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 5
+  },
+  "layers-load-error": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 7
+  },
+  "layers-loading": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 8
+  },
+  "layers-no-results": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 8
   }
 }
