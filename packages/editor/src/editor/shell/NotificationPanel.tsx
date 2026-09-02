@@ -278,16 +278,25 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
                   {n.actorName ? `${n.actorName} ` : ""}
                   {n.message}
                 </span>
-                {jumpable ? null : (
-                  <span className="bk-notif-row__gone">
-                    The target is gone — the note is kept, but there&rsquo;s nothing to jump to.
-                  </span>
-                )}
               </span>
               {/* Board 165:2 puts the age at the right of its own row, not on
                   a second line under the text with the type repeated. */}
               <span className={ROW_META_CLASS}>{relTime(n.createdAt)}</span>
             </Row>
+            {/* Board 165:81 — a tinted marker of its own, indented to the row's
+                text column (dot 16 + 8 wide + 8 gap), not a quiet third line
+                inside the row. The row above stays a row you can read; this
+                says why it does not click. */}
+            {jumpable ? null : (
+              <div className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-0.5 tw:bg-[var(--bk-warning-tint)] tw:pl-8" data-jump-gone-note>
+                <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]">
+                  What this points to was deleted
+                </span>
+                <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  The notification is kept, but there&rsquo;s nothing to jump to.
+                </span>
+              </div>
+            )}
             </React.Fragment>
           );
         })}

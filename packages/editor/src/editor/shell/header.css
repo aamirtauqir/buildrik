@@ -80,11 +80,6 @@
   line-height: var(--bk-leading-normal);
 }
 
-.bk-notif-row__gone {
-  color: var(--bk-warning-text);
-  font-size: var(--bk-text-11);
-}
-
 /* ── Send for review ─────────────────────────────────────────────────────── */
 
 .bk-send-review {
