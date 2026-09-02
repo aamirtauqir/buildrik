@@ -133,27 +133,28 @@ Biggest: **F13** flowbite h-10/link leak (39 jobs across 7 families) · **C10** 
 
 ## Flow integrity (prototype wiring) — audited 2026-09-02, first full walk
 
-`boards.json` scopes the census to page **1:3**, so five other pages carrying flows had never been walked. All six now have numbers. Every page is clean on dangling destinations, hover-gated navigation, duplicate triggers and self-loops — the defect is unwired work, not broken wiring.
+`boards.json` scopes the census to page **1:3**, so five other pages carrying flows had never been walked. All six now have numbers.
+
+> **Read this before quoting any earlier figure.** The first pass of this audit used a checker that collected reactions with `frame.findAll(…)` — which searches **descendants only**, so a reaction on the frame node *itself* was never counted. **248 frames on page 1:3 carry frame-level reactions**, and frame-level is precisely how the linear pages express "this state resolves into that one". Every percentage published before the fix was an undercount. Worst of them: 1:4 Site was reported as the file's worst page at 47% with 15 orphans and 28 dead ends — it is **100% reachable with none of either**. The same bug is in the `flow-audit` skill's own reference script.
 
 | page | frames | edges | reachable | orphans | dead ends |
 |---|---|---|---|---|---|
-| 988:2 Dashboard v2 | 79 | 909 | **97%** | 2 | **0** |
-| 1:6 Client review | 21 | 31 | **100%** (was 95) | 0 | 5 (starts + terminals) |
-| 1:3 Editor | 305 live | 1305 | **86%** (was 58) | 17 | 40 |
-| 397:2 Dashboard spine | 34 | 122 | 68% | 11 | 9 |
-| 1:5 Portfolio | 33 | 56 | 58% | 11 | 15 |
-| 1:4 Site | 47 | 37 | **47%** | 15 | 28 |
+| 1:6 Client review | 21 | 41 | **100%** | 0 | 4 (starts + terminals) |
+| 988:2 Dashboard v2 | 79 | 911 | **100%** | 0 | **0** |
+| 1:4 Site | 47 | 114 | **100%** | 0 | 0 |
+| 1:5 Portfolio | 33 | 94 | **100%** | 0 | 0 |
+| 1:3 Editor | 305 live | 1612 | **99%** | 2 | 12 |
+| 397:2 Dashboard spine | 34 | 160 | 91% | 3 | 0 |
 
-**988:2 is the standard.** 11.5 edges per frame against the editor page's 4.3, and not one dead end. It is what a finished prototype looks like in this file.
+**What the work actually was.** Of ~185 hotspots added to page 1:3, 15 duplicated an edge the host already carried and were removed; the other ~170 reached destinations nothing else reached — real gaps, whatever the headline number said. The systemic cause was genuine: family hubs wired fully *outward* while the states they lead to carried no edge of their own, so you could reach a screen and never leave it.
 
-**The systemic cause, on every page:** the family hubs are fully wired *outward* and carry every `hotspot/state ·` link, while the states they lead to have no edge of their own. You can reach a screen and never leave it. The editor page had that 133 times.
+**Sibling asymmetry** was the second pattern — one variant of a pair wired, its twin not. On 1:6 that was three of four defects: `brand-colour` reachable and `brand-colour-fails-contrast` not; `post-approval-edited-since` with a way back and `post-approval-unchanged` without; `expired-token` backing out and `load-error` not.
 
-**The second pattern is sibling asymmetry** — one variant of a pair wired and its twin left out. On 1:6 that was three of its four defects: `brand-colour` reachable and `brand-colour-fails-contrast` not; `post-approval-edited-since` with a way back and `post-approval-unchanged` without; `expired-token` backing out and `load-error` not.
+**What was deliberately NOT wired.** A state produced by a condition (a failed upload, a 90-day expiry, an empty result set) gets a `hotspot/state ·` at most — never a fake button. A board whose control does not exist in code gets neither: Media at 100% quota has no exit because `StorageQuotaBar.tsx:93` gates the optimise link on `isNearLimit`; the AI step-gate renders no Stop (`AgentPlan.tsx:174`); `171:2` step-failed has no dismiss. Wiring those would have hidden three product gaps.
 
-**What was deliberately NOT wired.** A state produced by a condition (a failed upload, a 90-day expiry, an empty result set) gets a `hotspot/state ·` at most — never a fake button. And a board whose control does not exist in code gets neither: Media at 100% quota has no exit because `StorageQuotaBar.tsx:93` gates the optimise link on `isNearLimit`, the AI step-gate renders no Stop (`AgentPlan.tsx:174`), and `171:2` step-failed has no dismiss. Wiring those would have hidden three product gaps.
+**Eight boards were named rather than wired** — no producer at all, so they read as flow gaps when they are missing subjects: `143:355` (the tree always seeds a root row), `1082:5004` (no list view exists), `306:2111`/`306:2136`/`306:2161` (the three preset mutators have zero UI callers, so `isDirty` is permanently false), `1339:7221` (its error code cannot come from its own query — a test hand-built the payload), `165:24` (no such `LoadState`), `1175:4841` (nothing writes the applied-template key).
 
-**Eight boards were named rather than wired** — they have no producer at all, so they were reading as flow gaps when they are missing subjects: `143:355` (the tree always seeds a root row), `1082:5004` (no list view exists), `306:2111`/`306:2136`/`306:2161` (presets have no dirty state — the three mutators have zero UI callers), `1339:7221` (its error code cannot come from its own query), `165:24` (no such LoadState), `1175:4841` (nothing writes the applied-template key).
-
+**Still open on 1:3:** the 2 orphans and 6 of the 12 dead ends are the **NEW 2026-08-28** boards — `1342:7162` setup-chip, `1343:7162` view-mode, `1344:7162` navigation-model drill-in, `1344:7165` Branding pointer, `1347:7162` session-expired — drawn and never wired into the prototype.
 
 ## Queued redraw waves — waves 1 and 3 DONE, wave 2 half done
 
