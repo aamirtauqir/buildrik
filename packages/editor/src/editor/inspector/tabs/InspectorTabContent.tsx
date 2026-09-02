@@ -216,7 +216,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           "4 of 13" on the flex board. It says why most of the column is shut:
           the sections below carry nothing for this element yet. */}
       {renderIds.length > 0 && (
-        <p className="tw:m-0 tw:px-4 tw:py-3 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+        <p className="tw:m-0 tw:px-4 tw:py-3 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]">
           {renderIds.filter((id) => sectionApplies(id, styles)).length} of{" "}
           {renderIds.length} sections apply
         </p>

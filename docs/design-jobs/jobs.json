@@ -1,12 +1,12 @@
 {
- "generated": "2026-09-02T09:28:29Z",
+ "generated": "2026-09-02T09:53:28Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 80,
-  "verify": 173,
-  "todo": 49,
-  "unbuildable": 63,
-  "decide": 6,
+  "fix": 108,
+  "verify": 144,
+  "todo": 47,
+  "unbuildable": 64,
+  "decide": 8,
   "done": 43,
   "fix-figma": 10
  },
@@ -737,9 +737,9 @@
    "name": "Content · collection",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — collection: reached by creating one; drift — back row / +Add 40h (FIXED to 32 via LINK_BTN), inset 12 vs 16",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: crumb 44 13/500 x12 vs 36 13/400 x16; meta row 44 vs 32; footer 1px rule board lacks. ContentViews.tsx:99,220,241",
    "authority": "board"
   },
   {
@@ -749,9 +749,9 @@
    "name": "Content · conditions",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — conditions: empty-state copy matches; populated rows NOT reached (needs a canvas element pick)",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: row 64 vs 56 (size=tall is 56 exact); summary 12 vs 11; link row 48 vs 36. ContentViews.tsx:1056",
    "authority": "board"
   },
   {
@@ -761,9 +761,9 @@
    "name": "Content · data-sources",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — data-sources: row 64=64, green dot and note copy all match — MATCH",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P3 verifier-content: row 64 ok; dot 7 vs 8; status/note 12 vs 11; link row 48 vs 36 x12 vs 16",
    "authority": "board"
   },
   {
@@ -773,9 +773,9 @@
    "name": "Content · empty",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Content empty: MATCH",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P3 verifier-content: desc renders 12px vs 13 (EmptyState.tsx:26 BODY_CLASS beats tw:text-[13px] — plain element, no merge); centring + CTA ok",
    "authority": "board"
   },
   {
@@ -785,9 +785,9 @@
    "name": "Content · fields",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — fields: field row 64 vs board 44 (Row size='comment' is 64 min-height but the boards use three different two-line heights)",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: row 64 (Row size=comment) vs 44; type 12 vs 11; required 12 #6b7280 vs 11 #d1d5db; '+ Add field' 48 vs 36. Row.tsx:56-63 add a 44 stack size",
    "authority": "board"
   },
   {
@@ -797,9 +797,9 @@
    "name": "Content · load-error",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Content load-error: reached via a 500 on the cms.collections.list batch; copy and x/y exact",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P3 verifier-content: copy/x24/y80/#c81e1e/pt36 exact; block 168 vs 150 (Try again 13/500 32h vs 13/400 20h). ContentTab.tsx:205-211",
    "authority": "board"
   },
   {
@@ -809,9 +809,9 @@
    "name": "Content · loading",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Content loading: reached by delaying the batch; within 2-4px throughout",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: skeleton pitch 34 vs 32, icon 14 r4 @x12 vs 12 r3 @x16, bar 12 vs 10; on release DATA rows move −32 (root adds a 48px block the skeleton omits). ContentTab.tsx:59-62",
    "authority": "board"
   },
   {
@@ -821,9 +821,9 @@
    "name": "Content · record",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — record: toggle 44x24 exact; back row 40h; field inputs NOT verified (0-field collection)",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: label x12 vs 16; TextInput 255x42 r8 #d1d5db 14px vs 248x32 r6 #9ca3af 13px; field block 72 vs 64; Published row 48 vs 32. ContentViews.tsx:66-70,333-338",
    "authority": "board"
   },
   {
@@ -833,9 +833,9 @@
    "name": "Content · root",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Content root: section bands lose their tint (the panel's OWN skeleton passes tint and matches the board) and rows carry no leading glyph, so data landing reflows 18px — the exact thing the skeleton exists to prevent",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: section headers 28 untinted vs 32 #f3f4f6; count Inter 11/400 vs mono 11/500; rows lack 16px glyph (label x16 vs x40); '+ New collection' 48px Button block vs 32 row 13/400. SectionHeader.tsx:16, ContentViews.tsx:170,185,181, Row.tsx:27",
    "authority": "board"
   },
   {
@@ -845,9 +845,9 @@
    "name": "Content · unsaved-record",
    "family": "Content",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: bar 53 with border-top vs 44 none; Discard 12/500 #4b5563 vs 12/400 #6b7280; Save 13 vs 12. ContentViews.tsx:73,388,81",
    "authority": "board:149-108"
   },
   {
@@ -857,9 +857,9 @@
    "name": "Content · variables",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — variables: var row 64 vs 44, same Row-size cause as fields",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: row 64 vs 44; value 12 vs 11; link row 48 vs 36",
    "authority": "board"
   },
   {
@@ -1237,9 +1237,9 @@
    "name": "Inspector · profile · BUTTON",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — 13 sections in board order, exact match",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P2 verifier-inspector: 13/13 order ok; BACKGROUND tabs 91x40 + swatch + hex 127x36 vs Fill+Image rows 160x28. BackgroundSection tabs tw:h-7 + cross-cut",
    "authority": "board"
   },
   {
@@ -1262,9 +1262,9 @@
    "name": "Inspector · profile · FLEX",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — 13 sections in board order, exact match",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P2 verifier-inspector: LAYOUT Display 6x28.5x32 + 277x40 disclosure, no Direction row; FLEXBOX body 389 vs 164. FlexboxSection → 4 Select rows at 28; Direction into LAYOUT",
    "authority": "board"
   },
   {
@@ -1274,9 +1274,9 @@
    "name": "Inspector · profile · GRID",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — 13 sections in board order, exact match",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P2 verifier-inspector: GRID body 453 vs 130: 8 presets 67x40, 3 inputs 89.7x42, 40-tall buttons in 22 rows; 35 controls ≥36. Columns/Row gap/Col gap at 28 first; rest behind More settings",
    "authority": "board"
   },
   {
@@ -1286,9 +1286,9 @@
    "name": "Inspector · profile · INPUT",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — 12 sections in board order, exact match",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P2 verifier-inspector: BORDER Width 24 / Style 24 / hex 127x36 + More 40 vs Width/Colour 160x28; 42 controls ≥36",
    "authority": "board"
   },
   {
@@ -1310,9 +1310,9 @@
    "name": "Inspector · profile · TEXT",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — section order matches EXCEPT the board's LINK section, which LinkSection.tsx:78 gates to link/button/a/cta; text links only inline",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P2 verifier-inspector: header 53 vs 48; pill strip 39/26 12px/500 vs 32/22 11px/400, This-pill white lost (inspector.css:128 beats ScopeDropdown.tsx:102); section header 30 vs 28; rows label-right control x+107 w181 h24 pitch 30 vs label-left x16 control x120 w160 h28 pitch 34; 18 controls ≥36 tall in 24 rows (Align overlaps Color by 12px)",
    "authority": "board"
   },
   {
@@ -3720,9 +3720,9 @@
    "name": "Inspector · single-selection",
    "family": "Inspector",
    "width": 300,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "decide",
+   "owner": "verifier-inspector",
+   "evidence": "P2 C verifier-inspector: board draws 6 sections 32-tall rows, no footer; live 12 sections + footer; contradicts 32:2 (founder authority) and the 807 family — retire 159:2 as superseded by 32:2?",
    "authority": "board:159-2"
   },
   {
@@ -3732,9 +3732,9 @@
    "name": "Inspector · no-selection",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — empty state live at 300w: sentence + AI action; board's x16/full-width action vs live x24/centred link is the only delta",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P3 verifier-inspector: sentence ok; action 61.7x32 13/400 vs 268x16 12/500. InspectorEmptyState.tsx:93 tw:h-4 tw:min-h-0 tw:text-[12px] tw:font-medium",
    "authority": "board"
   },
   {
@@ -3756,9 +3756,9 @@
    "name": "Inspector · multi-select",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — align x6 + distribute x2 + Background/Text color/Radius/Padding/Font size + mixed-field explainer; superset of the board",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P2 verifier-inspector: toolbar padded 16 vs flush; ALIGN band 265x70 r8 vs 300x72 square; buttons 36x32 pitch 40 vs 36x28 pitch 42; rows control 141x24 subtle vs 172x24 white bordered pitch 32. MultiSelectToolbar.tsx:42-118",
    "authority": "board"
   },
   {
@@ -3768,9 +3768,9 @@
    "name": "Inspector · instance-selected",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "drift-instance-band-gated-on-variants-FIXED",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P3 verifier-inspector: band 297x100 vs 72; Reset 91.5x32 button vs 16 text; weights 500 vs 400. VariantSection.tsx:140-151",
    "authority": "board"
   },
   {
@@ -3780,9 +3780,9 @@
    "name": "Inspector · bound-to-CMS",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "unbuildable",
+   "owner": "verifier-inspector",
+   "evidence": "F verifier-inspector: fixture has no bindable field (Menu · 0 fields) — seed one field, then re-verify; static: BindingBanner.tsx:66-86 hint 12 vs 11px, Unbind 32 vs 16 text",
    "authority": "board"
   },
   {
@@ -3792,9 +3792,9 @@
    "name": "Inspector · breakpoint-override",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Tablet + a changed value shows the override bar (border-left), the ↺ 'Revert font size to base', and 'Overridden on Tablet — Base is …'; pill gains a dot. Fixture override reverted after.",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P3 verifier-inspector: row 48 vs 32, value chip subtle vs white bordered 148x24, revert 22x32 vs glyph, note 27 12/500 vs 32 11/400. BreakpointOverrides.tsx:87-114",
    "authority": "board"
   },
   {
@@ -3804,9 +3804,9 @@
    "name": "Inspector · pseudo-state",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Base pill → :hover shows the note 'Editing :hover — not Base', the board's exact copy",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P3 verifier-inspector: copy exact; note 27 12/500 vs 32 11/400. ProInspector.tsx:486",
    "authority": "board"
   },
   {
@@ -3816,9 +3816,9 @@
    "name": "Inspector · reach-all-like-this",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — reach pill → All like this shows 'Editing all 4 paragraphs — All like this' (board's count is sample data)",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P3 verifier-inspector: colours+copy ok; 27 vs 36 tall, 500 vs 400, extra 2px left bar. ProInspector.tsx:462",
    "authority": "board"
   },
   {
@@ -3841,9 +3841,9 @@
    "name": "Inspector · reach-whole-site",
    "family": "Inspector",
    "width": 300,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — whole-site takeover: 0 sections, 'Editing the whole site — every page' + Open Brand / Back to this element; back restores all 11 sections",
+   "status": "decide",
+   "owner": "verifier-inspector",
+   "evidence": "P2 B verifier-inspector: live = takeover with 0 sections + Open Brand/Back; board keeps ALL controls under a 36 warning note + 52 accent hint and names the retired 'Styles tab' — code follows board or fix-figma?",
    "authority": "board"
   },
   {
@@ -3977,9 +3977,9 @@
    "name": "Content · data · no-source",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — data · no-source: copy exact; drawn as a full-width empty state rather than the board's pill",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2 verifier-content: plain text vs gray Badge (#e5e7eb/#9ca3af 12/500 #374151) at x16 y64. ContentViews.tsx:815",
    "authority": "board"
   },
   {
@@ -3989,9 +3989,9 @@
    "name": "Content · data · watching",
    "family": "Content",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — data · watching: green pill real (140 vs 146 wide); board pill has a border, live does not",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P3 verifier-content: pill bg ok; no border vs 1px #0e9f6e; 12/400 #0e9f6e vs 12/500 #046c4e; px8 vs 10; y92 vs 64. ContentViews.tsx:760-763",
    "authority": "board"
   },
   {
@@ -4323,9 +4323,9 @@
    "name": "Content · collection-setup (modal)",
    "family": "Content",
    "width": 500,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — collection-setup modal: 560 wide vs 500, inputs 42 vs 29, field rows 42 vs 25; dynamic-pages block expands to ~192px where the board draws 49",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2+B verifier-content: 560 vs 500; r8 vs 12; title 16 vs 13; inputs 42 vs ~29; field row 54 editable vs ~25 static chip; footer draws TWO rules (CMSCollectionSetupModal.tsx:98 inside ModalFooter). Founder: chips vs editable",
    "authority": "board"
   },
   {
@@ -4335,9 +4335,9 @@
    "name": "Content · records (modal)",
    "family": "Content",
    "width": 640,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — records modal: 720 wide vs 640; adds a collection select the board lacks; thead 32 vs 20",
+   "status": "fix",
+   "owner": "verifier-content",
+   "evidence": "P2+B verifier-content: 720 vs 640; extra collection Select; thead 32 vs ~20; rows 40 vs 27 with 3-button actions. Founder: Select/actions",
    "authority": "board"
   },
   {
@@ -4504,9 +4504,9 @@
    "name": "Inspector · empty · template-applied",
    "family": "Inspector",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P3 verifier-inspector: banner 220x117.5 bordered vs 248x87 borderless (board 280 wide, siblings 300); title 14 vs 12px; button 120x32 vs 113x27. InspectorEmptyState.tsx:48,51,131-145; Figma: widen to 300",
    "authority": "board"
   },
   {
@@ -4528,9 +4528,9 @@
    "name": "Inspector · token-picker popover",
    "family": "Inspector",
    "width": 236,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "fix",
+   "owner": "verifier-inspector",
+   "evidence": "P3 verifier-inspector: list variant 240 wide, tabs 119x40 vs 236 with 55x20 chips; search 27.7 vs 24; swatch tw:size-7 vs 46x30. TokenPickerPopover.tsx:82,191-227",
    "authority": "board"
   },
   {

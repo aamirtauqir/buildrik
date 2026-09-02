@@ -104,7 +104,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 5px 10px;
   /* Boards 807:8342 + 160:412: grey strip, reach pill white, the other two bare
      dark text. Was --bk-bg-panel (#FFFFFF) under three accent-tinted 10px pills
      — same white as the pill meant to stand out of it, so nothing did.
@@ -120,17 +120,18 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  height: 26px;
+  height: 22px;
   min-height: 0;
   padding: 0 8px;
   border-radius: 6px;
-  font: 500 12px var(--bk-font-ui);
+  font: 400 11px var(--bk-font-ui);
   background: transparent;
   color: var(--bk-ink);
   border: none;
   cursor: pointer;
   white-space: nowrap;
 }
+.bdi-bpr .bdi-bpr-pill[aria-haspopup="menu"] { background: var(--bk-bg-card); }
 /* ── Body ─────────────────────────────────────────────── */
 .bdi-body {
   padding: 0;
@@ -148,7 +149,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 9px var(--bk-space-12) 7px;
+  padding: 6px 16px;
   cursor: pointer;
   user-select: none;
   position: relative;
@@ -244,21 +245,19 @@
    Label is Inter Regular 12px, ink-soft (#485465), right-aligned to the control. */
 .bdi-row-ctrl {
   display: grid;
-  grid-template-columns: 88px 1fr;
+  grid-template-columns: 96px 1fr;
   align-items: center;
   gap: 8px;
 }
-.bdi-row-ctrl.wide {
-  grid-template-columns: 88px 1fr;
-}
+.bdi-row-ctrl .bdi-row-content button, .bdi-row-ctrl .bdi-row-content input, .bdi-row-ctrl .bdi-row-content select { height: var(--bk-size-row-dense); min-height: 0; }
 .bdi-row-ctrl .bdi-lb {
   font: 400 12px var(--bk-font-ui);
   color: var(--bk-ink-soft);
   letter-spacing: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  text-align: right;
+  justify-content: flex-start;
+  text-align: left;
   gap: var(--bk-space-4);
 }
 .bdi-row-ctrl.disabled {
@@ -276,7 +275,7 @@
 .bdi-fld {
   display: flex;
   align-items: center;
-  height: 24px;
+  height: var(--bk-size-row-dense);
   width: 100%;
   background: var(--bk-bg-subtle);
   border: 1px solid transparent;
