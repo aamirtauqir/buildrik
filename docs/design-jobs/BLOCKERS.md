@@ -142,8 +142,8 @@ Biggest: **F13** flowbite h-10/link leak (39 jobs across 7 families) · **C10** 
 | 1:6 Client review | 21 | 39 | **100%** | 0 | 4 (starts + terminals) |
 | 988:2 Dashboard v2 | 79 | 911 | **100%** | 0 | **0** |
 | 1:4 Site | 47 | 112 | **100%** | 0 | 0 |
-| 1:5 Portfolio | 33 | 91 | **100%** | 0 | 0 |
-| 1:3 Editor | 303 live | 1633 | **99%** | **0** | 4 |
+| 1:5 Portfolio | 33 | 90 | **100%** | 0 | 0 |
+| 1:3 Editor | 303 live | 1666 | **99%** | **0** | 4 |
 | 397:2 Dashboard spine | 34 | 162 | **100%** | 0 | 0 |
 
 **What the work actually was.** Of ~185 hotspots added to page 1:3, 15 duplicated an edge the host already carried and were removed; the other ~170 reached destinations nothing else reached — real gaps, whatever the headline number said. The systemic cause was genuine: family hubs wired fully *outward* while the states they lead to carried no edge of their own, so you could reach a screen and never leave it.
@@ -156,9 +156,9 @@ Biggest: **F13** flowbite h-10/link leak (39 jobs across 7 families) · **C10** 
 
 **Why the 2026-08-28 boards were orphaned:** each **supersedes an older board that still holds the prototype edges**, and the supersession was never carried across — `1342:7162` ⟵ 296:2064/296:2069, `1343:7162` ⟵ 813:4676, `1347:7162` ⟵ 813:4870, `1344:7165` ⟵ 638:2732. All now wired to their real doors. `1344:7162` was **retired**: not a screen at all, a 1440×400 frame with two text nodes describing a model `SettingsTab.tsx:403-421` already implements.
 
-**The last flow defect, and it needs a human.** A frame carrying **two whole-frame `ON_CLICK`s to different destinations** — one forward, one back to the shell — fires an arbitrary one. 1:4 had 19 of these. 8 were fixed where a child control already carried one of the two (the frame-level copy was redundant); the rest could not be, because for 17 frames on 1:4 the frame-level click is the *only* path back. Remaining: **1:4 25, 1:5 10, 397:2 6, 1:6 3, editor 0.** Each needs one decision — does click-anywhere mean *advance* or *go back*? — and the other edge becomes a scoped hotspot.
+**The last flow defect — resolved, not punted.** 32 frames carried two whole-frame `ON_CLICK`s to different destinations, so which fired was arbitrary (1:4 17 · 1:5 8 · 397:2 6 · 1:6 1). Settled by the file's own convention rather than a coin flip: **a forward transition gets a scoped `hotspot/state ·`; the whole frame means "go back"** — exactly how every hub on 1:3 is already built. The hub-bound edge (chosen by measured in-degree) stayed on the frame, 33 others were scoped onto named hotspots. Two corrections inside that pass: a scoped `AFTER_TIMEOUT` still fires by itself, so those became `ON_CLICK`; and a hub frame should carry no whole-frame click at all, so the two shells had theirs scoped. **Zero nondeterministic pairs remain.** The 13 duplicate-trigger nodes left all point at the *same* destination — benign.
 
-**Blocked:** `1344:7165` and eleven other S7 screens have **no Settings-root board** for an inbound edge to come from. Draw one, or they stay sourceless.
+**The missing Settings root — drawn.** `1344:7165` and eleven other S7 screens had no source because the root the family drills in from was never drawn (`1344:7162` described the model in prose and is retired). `1688:7195` is built from `SettingsTab.tsx:75-92` NAV verbatim — thirteen screens in three groups, each row's real title and subtitle — and **cloned from 638:2378** so the topbar, footer and ground are the same objects the family already uses. All 13 rows wired, a door from the Site menu, a back-edge from all 15 S7 screens.
 
 ## Queued redraw waves — waves 1 and 3 DONE, wave 2 half done
 
