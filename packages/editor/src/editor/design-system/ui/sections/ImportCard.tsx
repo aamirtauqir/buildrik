@@ -51,12 +51,19 @@ interface ParsedState {
   errors: string[];
 }
 
-const CARD = "tw:bg-[var(--bk-gray-50)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:p-3";
-const TITLE = "tw:text-[13px] tw:font-medium tw:mb-2 tw:text-[var(--bk-ink)]";
+/* Board 153:120 gives IMPORT the same plain section header + full-bleed
+   treatment as EXPORT — no card, no second inset. */
+const CARD = "tw:flex tw:flex-col";
+/* Board 220:839 · 28-tall caps header, matching EXPORT. */
+const TITLE =
+  "tw:flex tw:h-7 tw:items-center tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] " +
+  "tw:text-[var(--bk-ink-muted)]";
 /* base/active supply their own border-colour and background together — never
    two competing utilities for the same property (Row precedent). */
+/* Board 153:152 · a 56-tall dashed band, not the 128 the 32-pixel padding
+   was producing. */
 const DROP_BASE =
-  "tw:border-[1.5px] tw:border-dashed tw:rounded-lg tw:px-4 tw:py-8 tw:text-center tw:cursor-pointer " +
+  "tw:border-[1.5px] tw:border-dashed tw:rounded-lg tw:px-4 tw:py-2 tw:text-center tw:cursor-pointer " +
   "tw:text-[var(--bk-ink-soft)] tw:text-xs tw:leading-relaxed tw:[transition:var(--bk-transition-fast)]";
 const DROP_IDLE = "tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)]";
 const DROP_ACTIVE = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
@@ -234,7 +241,7 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
 
   return (
     <div className={CARD}>
-      <div className={TITLE}>Import tokens</div>
+      <div className={TITLE}>IMPORT</div>
 
       {!parsed && (
         <>

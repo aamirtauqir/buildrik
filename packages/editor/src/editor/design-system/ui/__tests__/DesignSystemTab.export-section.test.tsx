@@ -78,8 +78,10 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     await waitFor(() => {
       expect(getByTestId("export-preview")).toBeTruthy();
     });
-    // ImportCard heading visible.
-    expect(getAllByText(/Import tokens/i).length).toBeGreaterThan(0);
+    // ImportCard heading visible — board 153:120 heads the block "IMPORT",
+    // a caps section header matching EXPORT, not the sentence-case card title
+    // this asserted while the card itself was drawn as a bordered box.
+    expect(getAllByText("IMPORT").length).toBeGreaterThan(0);
     // Format radios present.
     expect(getByText(/Custom properties/i)).toBeTruthy(); // board 153:120 copy
   });

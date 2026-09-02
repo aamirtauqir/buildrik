@@ -225,22 +225,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           </span>
         </Button>
       </PanelFrame.Header>
-      {/* Error state — takes priority over everything */}
-      {p.loadError ? (
-        <PanelFrame.Body>
-          {/* Board 141:165: centered — red fact, muted harm scope, accent
-              retry. */}
-          <div className="bd-pg-error" role="alert" aria-live="assertive">
-            <p className="bd-pg-error-title">Couldn{"\u2019"}t load your pages.</p>
-            <p className="bd-pg-error-desc">The site is fine {"\u2014"} this panel isn{"\u2019"}t.</p>
-            <Button color="light" size="xs" className="bd-pg-error-retry" onClick={p.retrySync}>
-              Try again
-            </Button>
-          </div>
-        </PanelFrame.Body>
-      ) : (
-        <PanelFrame.Body noScroll>
-          {view === "listings" ? (
+      {/* Board 141:165 keeps the search band and the Add-page footer either
+          side of the error, so the error is a BODY state inside PageList — not
+          a replacement for the whole panel body. */}
+      <PanelFrame.Body noScroll>
+          {view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
                blocks. The table then took h-full (the WHOLE body) while
@@ -267,6 +256,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             pages={p.pages}
             renamingPageId={p.renamingPageId}
             nameError={nameError}
+            loadError={p.loadError}
+            onRetry={p.retrySync}
             onOpenListings={() => setView("listings")}
             openContextMenuPageId={p.contextMenu?.pageId ?? null}
             composer={composer}
@@ -295,8 +286,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onRemovePageFromFolder={f.removePageFromFolder}
           />
           )}
-        </PanelFrame.Body>
-      )}
+      </PanelFrame.Body>
       {/* Context menu (portal) */}
       {p.contextMenu && (
         <PageContextMenu

@@ -411,7 +411,7 @@
 
 /* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
 .bd-pg-bulk-toolbar {
-  /* Board 141:78: a light full-width band pinned at the bottom — it takes
+  /* Board 141:119: a full-width band on ink pinned at the bottom — it takes
      the footer's place while a selection is active. */
   position: absolute;
   bottom: 0;
@@ -421,32 +421,31 @@
   align-items: center;
   gap: var(--bk-space-8);
   padding: 8px var(--bk-space-16);
-  background: var(--bk-gray-50);
-  border-top: 1px solid var(--bk-border);
+  background: var(--bk-ink);
   z-index: 10;
 }
 .bd-pg-bulk-count {
-  color: var(--bk-ink);
-  font: 400 13px/20px var(--bk-font-ui);
+  color: var(--bk-bg-card);
+  font: 400 12px/18px var(--bk-font-ui);
   white-space: nowrap;
 }
-.bd-pg-bulk-count b { color: var(--bk-ink); font-weight: 500; }
+.bd-pg-bulk-count b { color: var(--bk-bg-card); font-weight: 500; }
 .bd-pg-bulk-spacer { flex: 1; }
 .bd-pg-bulk-toolbar button {
-  /* Board 141:78: plain 13px ink text actions on the light band. */
+  /* Board 141:120-123: plain 12px card-white text actions on the ink band. */
   padding: var(--bk-space-4) var(--bk-space-8);
   border-radius: var(--bk-radius-md);
   background: transparent;
-  color: var(--bk-ink);
+  color: var(--bk-bg-card);
   border: 0;
-  font: 400 13px/20px var(--bk-font-ui);
+  font: 400 12px/18px var(--bk-font-ui);
   cursor: pointer;
   white-space: nowrap;
   transition: background 100ms;
 }
-.bd-pg-bulk-toolbar button:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
-.bd-pg-bulk-toolbar button.danger { color: var(--bk-error); }
-.bd-pg-bulk-toolbar button.danger:hover { background: var(--bk-bg-subtle); color: var(--bk-error); }
+.bd-pg-bulk-toolbar button:hover { background: var(--bk-gray-700); color: var(--bk-bg-card); }
+.bd-pg-bulk-toolbar button.danger { color: var(--bk-red-500); }
+.bd-pg-bulk-toolbar button.danger:hover { background: var(--bk-gray-700); color: var(--bk-red-500); }
 .bd-pg-bulk-close {
   width: 22px; height: 22px;
   display: grid;
