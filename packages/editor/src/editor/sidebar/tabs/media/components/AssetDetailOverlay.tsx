@@ -52,7 +52,7 @@ interface AssetDetailOverlayProps {
 }
 
 const ROW =
-  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded tw:border-0 tw:bg-transparent tw:px-4 " +
+  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded tw:border-0 tw:bg-transparent tw:px-4 tw:font-normal " +
   "tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
 const ROW_CHEVRON = "tw:text-[13px] tw:text-[var(--bk-ink-muted)]";
 const ROW_COUNT =
@@ -343,13 +343,13 @@ export function AssetDetailOverlay({
             </div>
 
             {/* Board 146:11 — alt text above the fold, with ✨ Generate. */}
-            <div className="tw:w-full tw:px-4 tw:pt-1.5 tw:pb-2">
+            <div className="tw:w-full tw:px-4 tw:pt-1.5">
               <label className="tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" htmlFor="med-alt-input">
                 Alt text
               </label>
               <TextField
                 id="med-alt-input"
-                className="tw:mt-1 tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]"
+                className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-[var(--bk-space-8)] tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]"
                 value={altDraft}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAltDraft(e.target.value)}
                 onBlur={commitAltText}
@@ -428,7 +428,7 @@ export function AssetDetailOverlay({
       ) : view === "versions" ? (
         <div className="tw:w-full" role="list" aria-label="Version history">
           {/* Current — pinned, accent-tint with the 3px bar (board 241:1436). */}
-          <div className="tw:relative tw:flex tw:h-14 tw:w-full tw:items-start tw:bg-[var(--bk-accent-subtle,#ebf5ff)]" role="listitem">
+          <div className="tw:relative tw:flex tw:h-14 tw:w-full tw:items-start tw:bg-[var(--bk-accent-tint)]" role="listitem">
             <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
             <span className="tw:mt-4 tw:ml-5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-[var(--bk-accent)]" aria-hidden="true" />
             <span className="tw:ml-3 tw:mt-2.5 tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
@@ -519,7 +519,7 @@ export function AssetDetailOverlay({
             usage.map((pg) => (
               <React.Fragment key={pg.pageId}>
                 {/* 28h page-group header. */}
-                <div className="tw:flex tw:h-7 tw:w-full tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                <div className="tw:flex tw:h-7 tw:w-full tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
                   <span className="tw:flex-1">{pg.pageName}</span>
                   <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums">
                     {pg.hits.length}
@@ -531,7 +531,7 @@ export function AssetDetailOverlay({
                       <span className="tw:block tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
                         {hit.label}
                       </span>
-                      <span className="tw:block tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                      <span className="tw:block tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
                         {hit.crumb}
                       </span>
                     </span>
@@ -539,7 +539,7 @@ export function AssetDetailOverlay({
                       type="button"
                       color="light"
                       size="xs"
-                      variant="link" className="tw:min-h-6 tw:shrink-0"
+                      variant="link" className="tw:min-h-6 tw:shrink-0 tw:text-[12px]"
                       data-testid={`media-jump-${hit.elementId}`}
                       onClick={() => handleJump(pg.pageId, hit.elementId)}
                     >

@@ -234,7 +234,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:max-w-full tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
+              className="tw:min-h-6 tw:max-w-full tw:gap-1.5 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
               aria-expanded={folderMenuOpen}
               data-testid="media-folder-scope"
               onClick={() => setFolderMenuOpen((v) => !v)}

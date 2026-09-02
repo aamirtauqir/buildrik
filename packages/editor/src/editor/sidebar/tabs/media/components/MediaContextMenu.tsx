@@ -56,7 +56,7 @@ const MENU_WIDTH = 180;
 const ITEM_BASE =
   "tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row-dense)] " +
   "tw:px-[var(--bk-space-12)] tw:border-0 tw:rounded-none tw:bg-transparent " +
-  "tw:text-left tw:cursor-pointer tw:text-[13px] tw:leading-[18px] " +
+  "tw:text-left tw:cursor-pointer tw:text-[12px] tw:leading-[18px] " +
   "tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]";
 
 /* Button rows: real <button>, so :enabled / :disabled are live. */
@@ -124,7 +124,24 @@ export function MediaContextMenu({
   const [moveOpen, setMoveOpen] = React.useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
-  useClickOutside(menuRef, onClose, { closeOnEscape: true });
+  useClickOutside(menuRef, onClose);
+
+  /* Escape belongs to the menu, not to the surface underneath it. The hook
+     closed on a document-BUBBLE listener that stopped nothing, so the same
+     keystroke also reached LibraryManager's window listener and shut the
+     whole fullpage manager (measured, board 1163:13695). Closing at document
+     CAPTURE and stopping the event there is the pattern the drill-in
+     overlays already use. */
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      e.stopPropagation();
+      onClose();
+    };
+    document.addEventListener("keydown", onKey, true);
+    return () => document.removeEventListener("keydown", onKey, true);
+  }, [onClose]);
 
   const left = Math.min(x, window.innerWidth - MENU_WIDTH - 8);
   const top = Math.min(y, window.innerHeight - MENU_ITEM_HEIGHT * 8 - 8);
@@ -144,7 +161,7 @@ export function MediaContextMenu({
       <div className="tw:fixed tw:inset-0 tw:z-[199]" onClick={onClose} aria-hidden="true" />
       <div
         ref={menuRef}
-        className={`${MENU_SURFACE} tw:text-[13px] tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]`}
+        className={`${MENU_SURFACE} tw:text-[12px] tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]`}
         role="menu"
         aria-label="Asset actions"
         style={{ position: "fixed", left, top, width: MENU_WIDTH, zIndex: 200 }}
