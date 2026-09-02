@@ -654,7 +654,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           role="alertdialog"
           aria-label={hasClientLink ? "Revoke this review link?" : "Withdraw this review request?"}
         >
-          <span className="tw:text-[14px] tw:text-[var(--bk-error)]">
+          <span className="tw:text-[12px] tw:text-[var(--bk-error-text)]">
             {hasClientLink ? "Revoke this review link?" : "Withdraw this review request?"}
           </span>
           <span className={META}>
@@ -663,12 +663,12 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               : "The request stops waiting for a reply. You can send it again any time."}
           </span>
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:pt-1">
-            <Button color="light" size="sm" onClick={() => setConfirmRevoke(false)}>
+            <Button color="light" size="xs" className="tw:h-7" onClick={() => setConfirmRevoke(false)}>
               Cancel
             </Button>
             {/* `red`, not `failure` — ConfirmDialog:49 is the precedent, and
                 flowbite's "failure" rendered a neutral grey button here. */}
-            <Button color="red" size="sm" onClick={() => void onRevoke()}>
+            <Button color="red" size="xs" className="tw:h-7 tw:bg-[var(--bk-error)] tw:hover:bg-[var(--bk-error-text)]" onClick={() => void onRevoke()}>
               Revoke
             </Button>
           </div>
