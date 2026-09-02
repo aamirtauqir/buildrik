@@ -1,13 +1,13 @@
 {
- "generated": "2026-09-02T08:32:59Z",
+ "generated": "2026-09-02T09:13:42Z",
  "protocol": "PROTOCOL.md",
  "counts": {
   "fix": 80,
   "verify": 173,
   "todo": 49,
-  "unbuildable": 72,
-  "decide": 7,
-  "done": 33,
+  "unbuildable": 63,
+  "decide": 6,
+  "done": 43,
   "fix-figma": 10
  },
  "jobs": [
@@ -20,7 +20,7 @@
    "width": 360,
    "status": "fix",
    "owner": null,
-   "evidence": "drift-applied-not-proposed-no-discard",
+   "evidence": "2026-09-02 Figma D8 DONE: per-step copy. drift-applied-not-proposed-no-discard",
    "authority": "board"
   },
   {
@@ -44,7 +44,7 @@
    "width": 360,
    "status": "fix",
    "owner": null,
-   "evidence": "drift-scopechip-always-shown-board-has-none",
+   "evidence": "2026-09-02 Figma C1 DONE: scope chip added to idle (1625:7162). drift-scopechip-always-shown-board-has-none",
    "authority": "board"
   },
   {
@@ -225,7 +225,7 @@
    "width": 280,
    "status": "fix",
    "owner": "verifier-brand",
-   "evidence": "P3 verifier-brand: same deltas (#9b1c1c vs #c81e1e, no #e02424 border); 08-31 match note predates redraw",
+   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: same deltas (#9b1c1c vs #c81e1e, no #e02424 border); 08-31 match note predates redraw",
    "authority": "board"
   },
   {
@@ -237,7 +237,7 @@
    "width": 280,
    "status": "fix",
    "owner": "verifier-brand",
-   "evidence": "P3 verifier-brand: Badge r4 no border 12/600 #03543f x28 vs pill r9999 1px #0e9f6e 12/500 #046c4e x15. SectionStatusBadge.tsx:80 — one pass fixes 2232/2265/2298",
+   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: Badge r4 no border 12/600 #03543f x28 vs pill r9999 1px #0e9f6e 12/500 #046c4e x15. SectionStatusBadge.tsx:80 — one pass fixes 2232/2265/2298",
    "authority": "board"
   },
   {
@@ -249,7 +249,7 @@
    "width": 280,
    "status": "fix",
    "owner": "verifier-brand",
-   "evidence": "P3 verifier-brand: same SectionStatusBadge deltas",
+   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: same SectionStatusBadge deltas",
    "authority": "board"
   },
   {
@@ -261,7 +261,7 @@
    "width": 280,
    "status": "fix",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: bordered cards double inset; format rows 60-75 vs 48; Copy icon + Download 13px vs both 11px accent text; drop zone 128.5 vs 56. ExportSection.tsx:39-42,217-300; ImportCard.tsx:237. Board copy '.css' names a format accept rejects (D → Figma '.json or .ts')",
+   "evidence": "2026-09-02 Figma D11 copy fixed ('.json or .ts'); P2 verifier-brand: bordered cards double inset; format rows 60-75 vs 48; Copy icon + Download 13px vs both 11px accent text; drop zone 128.5 vs 56. ExportSection.tsx:39-42,217-300; ImportCard.tsx:237. Board copy '.css' names a format accept rejects (D → Figma '.json or .ts')",
    "authority": "board"
   },
   {
@@ -272,7 +272,7 @@
    "family": "Brand",
    "width": 280,
    "status": "unbuildable",
-   "blocker": "E",
+   "blocker": "A",
    "owner": null,
    "evidence": "",
    "authority": "blocked:no-autofix-producer"
@@ -321,7 +321,7 @@
    "family": "Brand",
    "width": 280,
    "status": "unbuildable",
-   "blocker": "E",
+   "blocker": "A",
    "owner": null,
    "evidence": "",
    "authority": "blocked:sync-load"
@@ -346,7 +346,7 @@
    "family": "Brand",
    "width": 280,
    "status": "unbuildable",
-   "blocker": "E",
+   "blocker": "A",
    "owner": null,
    "evidence": "",
    "authority": "blocked:no-element-preset-reference"
@@ -371,7 +371,7 @@
    "family": "Brand",
    "width": 280,
    "status": "unbuildable",
-   "blocker": "E",
+   "blocker": "A",
    "owner": null,
    "evidence": "",
    "authority": "blocked:no-element-preset-reference"
@@ -409,7 +409,7 @@
    "width": 280,
    "status": "fix",
    "owner": "verifier-brand",
-   "evidence": "P3 verifier-brand: pill 400/#057a55/x24/h22 vs 500/#046c4e/x16/h20. StartersSection.tsx:50-53",
+   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: pill 400/#057a55/x24/h22 vs 500/#046c4e/x16/h20. StartersSection.tsx:50-53",
    "authority": "board:306-2186"
   },
   {
@@ -445,7 +445,7 @@
    "width": 280,
    "status": "decide",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: board = list + Add-token pill; live = in-panel modal scrim, 280 card in 279 panel. Shape B. If modal: AddTokenModal.tsx:63 width + chrome-ui Modal",
+   "evidence": "2026-09-02 Figma C6 badge y84; P2 verifier-brand: board = list + Add-token pill; live = in-panel modal scrim, 280 card in 279 panel. Shape B. If modal: AddTokenModal.tsx:63 width + chrome-ui Modal",
    "authority": "board:306-2049-modal"
   },
   {
@@ -468,7 +468,7 @@
    "family": "Brand",
    "width": 280,
    "status": "unbuildable",
-   "blocker": "E",
+   "blocker": "A",
    "owner": null,
    "evidence": "",
    "authority": "blocked:no-font-upload"
@@ -637,9 +637,9 @@
    "name": "Compare · restore-confirm",
    "family": "Compare",
    "width": 1080,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unbuilt-no-restore-action-in-compare",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: unbuilt-no-restore-action-in-compare",
    "authority": "board",
    "blocker": "A"
   },
@@ -919,7 +919,7 @@
    "width": 1440,
    "status": "fix",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: 440 ok, copy ok; info box 13px/r6 vs 12px/r8; Cancel ghost 12px vs bordered 14px. PublishHistory.tsx:82-85; ConfirmDialog.tsx:56-77",
+   "evidence": "2026-09-02 Figma C8: 184:35 h32 r8 14/500; 2026-09-02 verifier-history: 440 ok, copy ok; info box 13px/r6 vs 12px/r8; Cancel ghost 12px vs bordered 14px. PublishHistory.tsx:82-85; ConfirmDialog.tsx:56-77",
    "authority": "code:cites-board"
   },
   {
@@ -979,7 +979,7 @@
    "width": 360,
    "status": "decide",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
+   "evidence": "2026-09-02 Figma D12 sub-copy fixed; 2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
    "authority": "board:163-64"
   },
   {
@@ -1138,9 +1138,9 @@
    "name": "Insert · disabled-item",
    "family": "Insert",
    "width": 280,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unreachable-no-disabled-catalog-entry",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: unreachable-no-disabled-catalog-entry",
    "authority": "board",
    "blocker": "A"
   },
@@ -1175,9 +1175,9 @@
    "name": "Insert · load-error",
    "family": "Insert",
    "width": 280,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unreachable-insertloaderror-zero-callers",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: unreachable-insertloaderror-zero-callers",
    "authority": "board",
    "blocker": "A"
   },
@@ -1188,9 +1188,9 @@
    "name": "Insert · loading",
    "family": "Insert",
    "width": 280,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unreachable-catalog-is-static",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: unreachable-catalog-is-static",
    "authority": "board",
    "blocker": "A"
   },
@@ -1300,7 +1300,7 @@
    "width": 300,
    "status": "fix",
    "owner": null,
-   "evidence": "match-partial-link-section-absent-for-icon",
+   "evidence": "2026-09-02 Figma D7 DONE: Link section hidden on MEDIA profile. match-partial-link-section-absent-for-icon",
    "authority": "board"
   },
   {
@@ -1863,9 +1863,9 @@
    "name": "Pages · loading",
    "family": "Pages",
    "width": 280,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unreachable-skeleton-zero-importers",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: unreachable-skeleton-zero-importers",
    "authority": "board",
    "blocker": "A"
   },
@@ -2418,7 +2418,7 @@
    "width": 1440,
    "status": "fix",
    "owner": null,
-   "evidence": "drift-no-modal",
+   "evidence": "2026-09-02 Figma D4 DONE: AI tile hidden, 2-way. drift-no-modal",
    "authority": "board"
   },
   {
@@ -3295,7 +3295,7 @@
    "width": 1440,
    "status": "fix",
    "owner": null,
-   "evidence": "drift-impersonal-3button-vs-attributed-2button-founder-gated",
+   "evidence": "2026-09-02 Figma D5 DONE: Save backup button added (1625:7164). drift-impersonal-3button-vs-attributed-2button-founder-gated",
    "authority": "board"
   },
   {
@@ -3464,10 +3464,10 @@
    "name": "Templates · loading",
    "family": "Templates",
    "width": 280,
-   "status": "unbuildable",
-   "blocker": "E",
+   "status": "done",
+   "blocker": "A",
    "owner": null,
-   "evidence": "",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: ",
    "authority": "blocked:static-catalog"
   },
   {
@@ -3610,7 +3610,7 @@
    "family": "Layers",
    "width": 280,
    "status": "unbuildable",
-   "blocker": "E",
+   "blocker": "A",
    "owner": null,
    "evidence": "",
    "authority": "blocked:no-list-view"
@@ -3670,10 +3670,10 @@
    "name": "Brand · empty",
    "family": "Brand",
    "width": 280,
-   "status": "unbuildable",
-   "blocker": "E",
+   "status": "done",
+   "blocker": "A",
    "owner": null,
-   "evidence": "",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: ",
    "authority": "blocked:defaults-always-staged"
   },
   {
@@ -3939,10 +3939,10 @@
    "name": "Modal · submitting",
    "family": "Modal",
    "width": 0,
-   "status": "unbuildable",
-   "blocker": "E",
+   "status": "done",
+   "blocker": "A",
    "owner": null,
-   "evidence": "",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: ",
    "authority": "blocked:sync-delete"
   },
   {
@@ -3952,10 +3952,10 @@
    "name": "Modal · error",
    "family": "Modal",
    "width": 0,
-   "status": "unbuildable",
-   "blocker": "E",
+   "status": "done",
+   "blocker": "A",
    "owner": null,
-   "evidence": "",
+   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: ",
    "authority": "blocked:sync-delete"
   },
   {
@@ -4638,7 +4638,7 @@
    "width": 280,
    "status": "fix",
    "owner": "verifier-brand",
-   "evidence": "P1 2026-09-02 verifier-brand: 176.6px unboarded chrome (theme strip 125.6 + mode toggle 51) before preview; rows 51.6 inset x12 vs board 52 full-bleed x16; label 500 vs 400; chevron 14px #9ca3af vs 12px #4b5563; Lint + Import/export under the 693 fold. DesignSystemTab.tsx:597-632,719,708,80. Board header text contradicts Panel-header component (live matches component)",
+   "evidence": "2026-09-02 Figma C4 DONE: header is a 16:6 instance (1627:7162). P1 2026-09-02 verifier-brand: 176.6px unboarded chrome (theme strip 125.6 + mode toggle 51) before preview; rows 51.6 inset x12 vs board 52 full-bleed x16; label 500 vs 400; chevron 14px #9ca3af vs 12px #4b5563; Lint + Import/export under the 693 fold. DesignSystemTab.tsx:597-632,719,708,80. Board header text contradicts Panel-header component (live matches component)",
    "authority": "board"
   },
   {
@@ -5043,10 +5043,10 @@
    "kind": "decision",
    "name": "S1 flows ×11 / AI ×4 / Compare ×3 / Components ×4: feature SHAPE — board or code",
    "family": "founder",
-   "status": "decide",
+   "status": "done",
    "blocker": "G",
    "owner": null,
-   "evidence": ""
+   "evidence": "2026-09-02 blockers: no residual one-line question — the S1/AI/Compare/Components shape mismatches are itemised per job (B rows in BLOCKERS.md)"
   },
   {
    "id": "D-06",
