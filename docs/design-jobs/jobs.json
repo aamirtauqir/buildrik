@@ -1,13 +1,13 @@
 {
- "generated": "2026-09-02T10:16:54Z",
+ "generated": "2026-09-02T13:23:18Z",
  "protocol": "PROTOCOL.md",
  "counts": {
   "fix": 143,
-  "verify": 106,
+  "verify": 107,
   "todo": 38,
   "unbuildable": 66,
   "decide": 9,
-  "done": 52,
+  "done": 51,
   "fix-figma": 10
  },
  "jobs": [
@@ -5073,10 +5073,10 @@
    "kind": "harness",
    "name": "CI red 100/100 runs: ESLint parsing error blocks editor tests; Style parity fails so Figma conformance is SKIPPED — conformance has produced no CI verdict in 45+ runs",
    "family": "harness",
-   "status": "done",
+   "status": "verify",
    "blocker": "F",
    "owner": "coordinator",
-   "evidence": "2026-09-02: CI red 100/100 runs. Root causes: (1) eslint TS parser covered src/** only, e2e/config/generated files failed to PARSE → lint step red → tests + conformance skipped; fixed in eslint.config.mjs, pnpm run lint exit 0 (0 errors). (2) style-parity: 4 media-drawer cases died in first page.evaluate under parallel workers on a cold Vite; --workers=1 → 20/20; playwright.config workers:1. (3) visual-pins: darwin-only snapshots, CI linux → 20 cases 'snapshot doesn't exist'; skipped in CI. Local full suite 51 passed. | CI after the push (run 33609481172): lint + tests green, Style parity red on linux — all 20 cases differ only in text-derived width/height (darwin 6.60938px vs linux 7px). Spec now compares width/height within 1px, everything else exact; 20/20 locally. Verify on the next CI run before calling it closed."
+   "evidence": "2026-09-02: lint + editor tests GREEN in CI (were skipped for 100+ runs); parity 18/20, last two are auto-margin sub-pixel — tolerance pushed, awaiting the next run before closing"
   },
   {
    "id": "H-10",
