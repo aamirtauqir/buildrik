@@ -15,6 +15,20 @@
 import type { CustomFlowbiteTheme } from "flowbite-react/types";
 
 export const BK_BUTTON_THEME: NonNullable<CustomFlowbiteTheme["button"]> = {
+  /* DESIGN.md: disabled is `--bk-ink-disabled`, "visibly inert", and tints are
+     "never frame/alpha opacity". Flowbite's own key is `pointer-events-none
+     opacity-50`, which left every disabled primary as the brand blue at half
+     strength — a dead control still dressed as the primary action (boards
+     781:4526 / 784:4287 draw a grey chip). twMerge lets these token utilities
+     beat the colour variant's `bg-primary-700 text-white`; the matching global
+     `button:disabled { opacity: .5 }` in themes/ux-fixes.css is gone with it. */
+  disabled:
+    "tw:pointer-events-none tw:cursor-not-allowed tw:opacity-100 " +
+    /* `disabled:` variants, not bare utilities: flowbite merges the colour
+       variant AFTER this key, so a bare `tw:bg-*` here loses to
+       `bg-primary-700` (measured — the CTA stayed brand blue). The pseudo-class
+       form wins on specificity whatever the merge order. */
+    "tw:disabled:bg-[var(--bk-bg-subtle)] tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:border-transparent tw:disabled:shadow-none",
   color: {
     link:
       "tw:min-h-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 " +

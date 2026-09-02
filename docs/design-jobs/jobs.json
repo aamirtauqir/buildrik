@@ -1,13 +1,13 @@
 {
- "generated": "2026-09-02T05:02:03Z",
+ "generated": "2026-09-02T05:31:01Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 54,
+  "fix": 52,
   "verify": 188,
   "todo": 68,
   "unbuildable": 70,
-  "done": 21,
-  "decide": 7,
+  "done": 24,
+  "decide": 6,
   "fix-figma": 10
  },
  "jobs": [
@@ -2039,10 +2039,11 @@
    "name": "Publish · load-error",
    "family": "Publish",
    "width": 280,
-   "status": "fix",
-   "owner": null,
-   "evidence": "2026-09-02 live-measured (panel reached via ⋯ site menu > 'Publish panel'; publishHistory aborted for the error state, publish mutations blocked, CTA never clicked). Disabled CTA was brand blue #1A56DB white-on-blue at 50%%, h40, full-width; board draws bg-subtle #F3F4F6 / ink-muted #6B7280 / h28 / label-width. NOW: bg rgb(243,244,246), text rgb(107,114,128), h28, w166 (board 157). REMAINS: opacity 0.5, whose source is NOT this button — themes/ux-fixes.css:95 has a global `button:disabled{opacity:.5}` dimming all 207 disabled buttons. The board's disabled component has no dimming. Removing it is systemic and needs its own change.",
-   "authority": "board"
+   "status": "done",
+   "owner": "coordinator",
+   "evidence": "2026-09-02 live: disabled CTA bg rgb(243,244,246)=#F3F4F6, text rgb(107,114,128)=#6B7280, opacity 1, h28, cursor not-allowed; 0 disabled buttons still dimmed on the publish panel. Board 784:4287 chip. Settled by DESIGN.md:192 (--bk-ink-disabled 'visibly inert') + :208-210 ('never frame/alpha opacity') — code fix, not a founder call. buttonTheme.ts disabled key (disabled: variants) + ux-fixes.css opacity removed.",
+   "authority": "board",
+   "doneAt": "2026-09-02T05:31:01Z"
   },
   {
    "id": "J-778:4238",
@@ -2112,10 +2113,11 @@
    "name": "Publish · publishing",
    "family": "Publish",
    "width": 280,
-   "status": "fix",
-   "owner": null,
-   "evidence": "2026-09-02 live-measured (panel reached via ⋯ site menu > 'Publish panel'; publishHistory aborted for the error state, publish mutations blocked, CTA never clicked). Disabled CTA was brand blue #1A56DB white-on-blue at 50%%, h40, full-width; board draws bg-subtle #F3F4F6 / ink-muted #6B7280 / h28 / label-width. NOW: bg rgb(243,244,246), text rgb(107,114,128), h28, w166 (board 157). REMAINS: opacity 0.5, whose source is NOT this button — themes/ux-fixes.css:95 has a global `button:disabled{opacity:.5}` dimming all 207 disabled buttons. The board's disabled component has no dimming. Removing it is systemic and needs its own change.",
-   "authority": "board"
+   "status": "done",
+   "owner": "coordinator",
+   "evidence": "2026-09-02 live: disabled CTA bg rgb(243,244,246)=#F3F4F6, text rgb(107,114,128)=#6B7280, opacity 1, h28, cursor not-allowed; 0 disabled buttons still dimmed on the publish panel. Board 784:4287 chip. Settled by DESIGN.md:192 (--bk-ink-disabled 'visibly inert') + :208-210 ('never frame/alpha opacity') — code fix, not a founder call. buttonTheme.ts disabled key (disabled: variants) + ux-fixes.css opacity removed.",
+   "authority": "board",
+   "doneAt": "2026-09-02T05:31:01Z"
   },
   {
    "id": "J-912:4520",
@@ -5019,10 +5021,10 @@
    "kind": "decision",
    "name": "ux-fixes.css:95 global button:disabled opacity .5 over 207 buttons vs board grey chip",
    "family": "founder",
-   "status": "decide",
-   "blocker": "G",
-   "owner": null,
-   "evidence": ""
+   "status": "done",
+   "owner": "coordinator",
+   "evidence": "2026-09-02 live: disabled CTA bg rgb(243,244,246)=#F3F4F6, text rgb(107,114,128)=#6B7280, opacity 1, h28, cursor not-allowed; 0 disabled buttons still dimmed on the publish panel. Board 784:4287 chip. Settled by DESIGN.md:192 (--bk-ink-disabled 'visibly inert') + :208-210 ('never frame/alpha opacity') — code fix, not a founder call. buttonTheme.ts disabled key (disabled: variants) + ux-fixes.css opacity removed.",
+   "doneAt": "2026-09-02T05:31:01Z"
   },
   {
    "id": "D-04",

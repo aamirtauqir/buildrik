@@ -672,10 +672,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                    board's grey already reads as disabled without the dimming,
                    but dropping it changes 207 buttons and belongs in its own
                    change. */
-                className={
-                  "tw:h-7 tw:w-auto tw:self-start tw:px-3 " +
-                  "tw:disabled:bg-[var(--bk-bg-subtle)] tw:disabled:text-[var(--bk-ink-muted)]"
-                }
+                className="tw:h-7 tw:w-auto tw:self-start tw:px-3"
               >
                 {/* One label, in every state. Board 641:2652 and 784:4326 both name the
                     destination and neither draws an "Update" variant — the

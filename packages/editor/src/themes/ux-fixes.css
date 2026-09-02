@@ -92,11 +92,12 @@
  *   - "No shrink transforms" (killed scale(0.97) active press)
  *   - "Never opacity-only hovers" + ripple was decorative slop
  *   - Disabled diagonal stripes were busy pattern; simple opacity suffices
- * Disabled basic style (opacity 0.5 + not-allowed) retained on minimal rule below. */
+ * Disabled: cursor only. The alpha dimming this rule carried until 2026-09-02
+ * broke DESIGN.md's own tint rule ("never frame/alpha opacity"); disabled
+ * colour now comes from the chrome Button theme (buttonTheme.ts `disabled`). */
 button:disabled,
 .buildrick-btn:disabled,
 .pill:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
 }
 
