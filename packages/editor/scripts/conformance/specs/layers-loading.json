@@ -3,29 +3,34 @@
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "nodeId": "775:4130",
   "boardName": "Layers · loading",
-  "figmaHash": "0aba1a678c79a001ef95bacaedb9b4f6abee2236280868cdc25b5a68dd5da718",
+  "figmaHash": "9f736c9d443afc77943e67276493390a1a969f13378e5565b45d67a7eb1452c0",
   "extractorVersion": 2,
-  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "extractedAt": "2026-09-02T05:00:54.753Z",
   "copy": [
     "Layers",
-    "Search"
+    "Search",
+    "12 layers"
   ],
   "targets": [
     {
       "nodeId": "775:4130",
       "name": "Layers · loading",
-      "className": "bg-[var(--color\\\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
       "props": {
         "background-color": {
-          "token": "--color/bg-card",
+          "token": "--color/bg-panel",
           "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
         }
       }
     },
     {
       "nodeId": "775:4131",
       "name": "Panel header",
-      "className": "bg-[var(--color\\\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
       "props": {
         "background-color": {
           "token": "--color/bg-panel",
@@ -48,7 +53,7 @@
     {
       "nodeId": "I775:4131;16:7",
       "name": null,
-      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\\\/ink-soft,#4b5563)] text-left tracking-[0.88px]",
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
       "props": {
         "line-height": {
           "value": "16px"
@@ -75,11 +80,15 @@
     {
       "nodeId": "776:4090",
       "name": "search box",
-      "className": "absolute bg-[var(--color\\\\/bg-subtle,#f3f4f6)] h-[28px] left-[16px] overflow-clip rounded-[6px] top-[4px] w-[206px]",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[28px] left-[16px] overflow-clip rounded-[6px] top-[4px] w-[166px]",
       "props": {
         "background-color": {
-          "token": "--color/bg-subtle",
-          "value": "#f3f4f6"
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
         },
         "height": {
           "value": "28px"
@@ -88,14 +97,14 @@
           "value": "6px"
         },
         "width": {
-          "value": "206px"
+          "value": "166px"
         }
       }
     },
     {
       "nodeId": "776:4091",
       "name": null,
-      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[10px] not-italic text-[13px] text-[color:var(--color\\\\/ink-muted,#6b7280)] text-left top-[5px] whitespace-nowrap",
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[9px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[4px] whitespace-nowrap",
       "props": {
         "line-height": {
           "value": "20px"
@@ -106,6 +115,23 @@
         "color": {
           "token": "--color/ink-muted",
           "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "776:4092",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[198px] not-italic text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left top-[10px] tracking-[0.5px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
         }
       }
     },
@@ -125,9 +151,10 @@
     {
       "nodeId": "775:4221",
       "name": "sk/icon",
-      "className": "absolute bg-[#f3f4f6] left-[16px] rounded-[3px] size-[12px] top-[10px]",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] left-[16px] rounded-[3px] size-[12px] top-[10px]",
       "props": {
         "background-color": {
+          "token": "--color/bg-subtle",
           "value": "#f3f4f6"
         },
         "border-radius": {
@@ -138,9 +165,10 @@
     {
       "nodeId": "775:4222",
       "name": "sk",
-      "className": "absolute bg-[#f3f4f6] h-[10px] left-[36px] rounded-[4px] top-[11px] w-[132px]",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] left-[36px] rounded-[4px] top-[11px] w-[92px]",
       "props": {
         "background-color": {
+          "token": "--color/bg-subtle",
           "value": "#f3f4f6"
         },
         "height": {
@@ -150,7 +178,7 @@
           "value": "4px"
         },
         "width": {
-          "value": "132px"
+          "value": "92px"
         }
       }
     },
@@ -170,9 +198,10 @@
     {
       "nodeId": "775:4224",
       "name": "sk/icon",
-      "className": "absolute bg-[#f3f4f6] left-[32px] rounded-[3px] size-[12px] top-[10px]",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] left-[32px] rounded-[3px] size-[12px] top-[10px]",
       "props": {
         "background-color": {
+          "token": "--color/bg-subtle",
           "value": "#f3f4f6"
         },
         "border-radius": {
@@ -183,9 +212,10 @@
     {
       "nodeId": "775:4225",
       "name": "sk",
-      "className": "absolute bg-[#f3f4f6] h-[10px] left-[52px] rounded-[4px] top-[11px] w-[96px]",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] left-[52px] rounded-[4px] top-[11px] w-[96px]",
       "props": {
         "background-color": {
+          "token": "--color/bg-subtle",
           "value": "#f3f4f6"
         },
         "height": {
@@ -215,9 +245,10 @@
     {
       "nodeId": "775:4227",
       "name": "sk/icon",
-      "className": "absolute bg-[#f3f4f6] left-[48px] rounded-[3px] size-[12px] top-[10px]",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] left-[48px] rounded-[3px] size-[12px] top-[10px]",
       "props": {
         "background-color": {
+          "token": "--color/bg-subtle",
           "value": "#f3f4f6"
         },
         "border-radius": {
@@ -228,9 +259,10 @@
     {
       "nodeId": "775:4228",
       "name": "sk",
-      "className": "absolute bg-[#f3f4f6] h-[10px] left-[68px] rounded-[4px] top-[11px] w-[150px]",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] left-[68px] rounded-[4px] top-[11px] w-[110px]",
       "props": {
         "background-color": {
+          "token": "--color/bg-subtle",
           "value": "#f3f4f6"
         },
         "height": {
@@ -240,7 +272,235 @@
           "value": "4px"
         },
         "width": {
-          "value": "150px"
+          "value": "110px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4229",
+      "name": "skeleton 3",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4230",
+      "name": "sk/icon",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] left-[48px] rounded-[3px] size-[12px] top-[10px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4231",
+      "name": "sk",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] left-[68px] rounded-[4px] top-[11px] w-[70px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "70px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4232",
+      "name": "skeleton 4",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4233",
+      "name": "sk/icon",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] left-[32px] rounded-[3px] size-[12px] top-[10px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4234",
+      "name": "sk",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] left-[52px] rounded-[4px] top-[11px] w-[86px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "86px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4235",
+      "name": "skeleton 5",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4236",
+      "name": "sk/icon",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] left-[16px] rounded-[3px] size-[12px] top-[10px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4237",
+      "name": "sk",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] left-[36px] rounded-[4px] top-[11px] w-[124px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "124px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4238",
+      "name": "skeleton 6",
+      "className": "h-[32px] relative shrink-0 w-[280px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4239",
+      "name": "sk/icon",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] left-[32px] rounded-[3px] size-[12px] top-[10px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "border-radius": {
+          "value": "3px"
+        }
+      }
+    },
+    {
+      "nodeId": "775:4240",
+      "name": "sk",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[10px] left-[52px] rounded-[4px] top-[11px] w-[104px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "104px"
+        }
+      }
+    },
+    {
+      "nodeId": "776:4093",
+      "name": "Count footer",
+      "className": "h-[28px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "28px"
+        }
+      }
+    },
+    {
+      "nodeId": "776:4094",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "787:4317",
+      "name": "hotspot/back · Layers · tree",
+      "className": "absolute h-[34px] left-[-1px] top-[777px] w-[280px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "280px"
         }
       }
     }

@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <title>style parity probe</title>
   </head>
+  <!-- Measured 2026-09-02: the UA default body margin (8px) inset every
+       probe surface, so a 280 panel read 264 and every x was +8. -->
+  <style>body{margin:0}</style>
   <body>
     <!-- .bd-studio is load-bearing: chrome-reset.css and most chrome selectors
          are scoped to it, so a probe mounted outside it measures the wrong

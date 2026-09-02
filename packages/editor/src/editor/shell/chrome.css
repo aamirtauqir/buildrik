@@ -21,7 +21,7 @@
   grid-area: panel;
   display: flex; flex-direction: column;
   background: var(--bk-bg-card);
-  border-right: 1px solid var(--bk-border);
+  border-right: 1px solid var(--bk-gray-100);
   overflow: hidden;
 }
 

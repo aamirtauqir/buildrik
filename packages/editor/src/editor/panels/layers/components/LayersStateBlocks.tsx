@@ -17,10 +17,13 @@ import { Button, SkeletonBlock } from "@/editor/chrome-ui";
   default rounded 4).
 */
 const SKELETON_ROWS: ReadonlyArray<{ pl: string; bar: string }> = [
-  { pl: "tw:pl-4", bar: "tw:w-[132px]" },
+  /* Bar widths are board 775:4130's seven `sk` frames — 92 / 96 / 110 / 70 /
+     86 / 124 / 104 — re-extracted 2026-09-02 after the drawer redraw. Rows 0,
+     2 and 3 were 132 / 150 / 110, which the stale 320-era spec had hidden. */
+  { pl: "tw:pl-4", bar: "tw:w-[92px]" },
   { pl: "tw:pl-8", bar: "tw:w-[96px]" },
-  { pl: "tw:pl-12", bar: "tw:w-[150px]" },
   { pl: "tw:pl-12", bar: "tw:w-[110px]" },
+  { pl: "tw:pl-12", bar: "tw:w-[70px]" },
   { pl: "tw:pl-8", bar: "tw:w-[86px]" },
   { pl: "tw:pl-4", bar: "tw:w-[124px]" },
   { pl: "tw:pl-8", bar: "tw:w-[104px]" },

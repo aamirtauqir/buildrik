@@ -450,12 +450,12 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   "layers-load-error": () => (
-    <div data-probe="layers-load-error" style={{ width: 320, background: "#fff" }}>
+    <div data-probe="layers-load-error" style={{ width: 280, background: "#fff" }}>
       <LayersLoadError onRetry={() => {}} />
     </div>
   ),
   "layers-no-results": () => (
-    <div data-probe="layers-no-results" style={{ width: 320, background: "#fff" }}>
+    <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
       <LayersNoResults search="hero" onClear={() => {}} />
     </div>
   ),
@@ -463,12 +463,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   // is reachable in the app yet (the navigate groups go async next) — the
   // probe is their only mount until then, same single-home rule as Layers.
   "insert-loading": () => (
-    <div data-probe="insert-loading" style={{ width: 320, background: "#fff" }}>
+    <div data-probe="insert-loading" style={{ width: 280, background: "#fff" }}>
       <InsertLoadingSkeleton />
     </div>
   ),
   "insert-load-error": () => (
-    <div data-probe="insert-load-error" style={{ width: 320, background: "#fff" }}>
+    <div data-probe="insert-load-error" style={{ width: 280, background: "#fff" }}>
       <InsertLoadError onRetry={() => {}} />
     </div>
   ),
@@ -478,12 +478,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   // Pages board 774:4044 — pages hydrate synchronously today; the probe is
   // the loading block's only mount, same rule as the Insert/Layers pairs.
   "pages-loading": () => (
-    <div data-probe="pages-loading" style={{ width: 320, background: "#fff" }}>
+    <div data-probe="pages-loading" style={{ width: 280, background: "#fff" }}>
       <PagesLoadingSkeleton />
     </div>
   ),
   "insert-disabled-row": () => (
-    <div data-probe="insert-disabled-row" style={{ width: 320, background: "#fff" }}>
+    <div data-probe="insert-disabled-row" style={{ width: 280, background: "#fff" }}>
       <InsertRow
         label="Video"
         disabled

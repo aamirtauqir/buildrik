@@ -2,23 +2,24 @@
   "surface": "media-bulk-bar",
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "nodeId": "145:347",
-  "boardName": "Media · bulk-select",
-  "figmaHash": "e8def38c165ba42d82145bc6118aee4846a8db4a3649026c2145318793598f4d",
+  "boardName": "Bulk bar",
+  "figmaHash": "837766b5c9e71f91198a93a5f1ca66b4fdff03de5b8209dc78e1b102dc06b594",
   "extractorVersion": 2,
-  "extractedAt": "2026-08-04T00:00:00.000000Z",
-  "copy": [],
+  "extractedAt": "2026-09-02T05:01:05.935Z",
+  "copy": [
+    "4 selected",
+    "Move to…",
+    "Delete"
+  ],
   "targets": [
     {
       "nodeId": "145:347",
       "name": "Bulk bar",
-      "className": "[word-break:break-word] bg-[var(--color\\/ink,#111827)] font-['Inter:Regular'] font-normal h-[44px] leading-[18px] not-italic overflow-clip relative shrink-0 text-[12px] text-[color:var(--color\\/bg-card,white)] text-left w-full whitespace-nowrap",
+      "className": "[word-break:break-word] bg-[var(--color\\/ink,#111827)] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative size-full text-[12px] text-[color:var(--color\\/bg-card,white)] whitespace-nowrap",
       "props": {
         "background-color": {
           "token": "--color/ink",
           "value": "#111827"
-        },
-        "height": {
-          "value": "44px"
         },
         "line-height": {
           "value": "18px"

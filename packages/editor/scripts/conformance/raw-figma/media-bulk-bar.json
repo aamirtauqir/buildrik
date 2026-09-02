@@ -1,14 +1,12 @@
 {
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "nodeId": "145:347",
-  "boardName": "Media \u00b7 bulk-select",
-  "fetchedAt": "2026-08-04T00:00:00.000000Z",
+  "boardName": "Bulk bar",
+  "fetchedAt": "2026-09-02T05:01:05.935Z",
   "tool": "mcp__plugin_figma_figma__get_design_context",
-  "note": "Verbatim get_design_context output, trimmed to the structural elements this recipe targets (icon <img> wrappers, asset URL constants and repeated instances removed \u2014 the URLs expire in 7 days and the repeats carry no additional spec).",
+  "note": "Verbatim get_design_context output, trimmed to the structural elements this recipe targets (icon <img> wrappers, asset URL constants and repeated instances removed — the URLs expire in 7 days and the repeats carry no additional spec). Refreshed 2026-09-02 after the 320→280 redraw.",
   "designStyles": [
-    "ui/13 \u00b7 row label: Inter Regular 13/20, ls 0",
-    "ui/12 \u00b7 small: Inter Regular 12/18, ls 0",
-    "data/11 \u00b7 mono small: Geist Mono Medium 11/16, ls 0"
+    "ui/12 · small: Font(family: \"Inter\", style: Regular, size: 12, weight: 400, lineHeight: 18, letterSpacing: 0)."
   ],
-  "code": "export default function MediaBulkSelect() {\n  return (\n    <div data-node-id=\"145:300\" data-name=\"Media \u00b7 bulk-select\">\n      <div className=\"[word-break:break-word] bg-[var(--color\\/ink,#111827)] font-['Inter:Regular'] font-normal h-[44px] leading-[18px] not-italic overflow-clip relative shrink-0 text-[12px] text-[color:var(--color\\/bg-card,white)] text-left w-full whitespace-nowrap\" data-node-id=\"145:347\" data-name=\"Bulk bar\"></div>\n    </div>\n  );\n}"
+  "code": "export default function BulkBar() {\n  return (\n    <div className=\"[word-break:break-word] bg-[var(--color\\/ink,#111827)] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative size-full text-[12px] text-[color:var(--color\\/bg-card,white)] whitespace-nowrap\" data-node-id=\"145:347\" data-name=\"Bulk bar\">\n      <p className=\"absolute left-[16px] top-[14px]\" data-node-id=\"145:348\">\n        4 selected\n      </p>\n      <p className=\"absolute left-[96px] top-[14px]\" data-node-id=\"145:349\">\n        Move to…\n      </p>\n      <p className=\"absolute left-[136px] top-[14px]\" data-node-id=\"145:350\">\n        Delete\n      </p>\n    </div>\n  );\n}"
 }

@@ -3,13 +3,413 @@
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "nodeId": "453:3931",
   "boardName": "Media · load-error",
-  "figmaHash": "edaeb99dbc0b2cbce65298e451be669f3b2125331c00900b5d1ea6d0e8b3d11b",
+  "figmaHash": "6e01981f72a57edc87c3a6ed9ef9ae08ee85441ec81eb8fd081d99516a4bc41a",
   "extractorVersion": 2,
-  "extractedAt": "2026-08-04T00:00:00.000000Z",
+  "extractedAt": "2026-09-02T05:01:16.399Z",
   "copy": [
-    "Couldn’t load your media."
+    "Media",
+    "Search",
+    "image",
+    "128",
+    "video",
+    "svg",
+    "24",
+    "icon",
+    "370",
+    "Couldn’t load your media.",
+    "Try again",
+    "Browse stock"
   ],
   "targets": [
+    {
+      "nodeId": "453:3931",
+      "name": "Media · load-error",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3932",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I453:3932;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3933",
+      "name": "Search",
+      "className": "border border-[var(--color\\/border,#e5e7eb)] border-solid h-[36px] overflow-clip relative rounded-[6px] shrink-0 w-full",
+      "props": {
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3934",
+      "name": "search box",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[28px] left-[15px] overflow-clip rounded-[6px] top-[3px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3935",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[9px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[4px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3936",
+      "name": "Folder row",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[32px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-pre",
+      "props": {
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3937",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[7px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3938",
+      "name": null,
+      "className": "absolute leading-[18px] left-[196px] text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] top-[8px] tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3939",
+      "name": "Type pills",
+      "className": "[word-break:break-word] content-start flex flex-wrap gap-[8px] items-start leading-[16px] overflow-clip px-[16px] py-[4px] relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3940",
+      "name": "pill/image",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3941",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3942",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3943",
+      "name": "pill/video",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3944",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3945",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3946",
+      "name": "pill/svg",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3947",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3948",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3949",
+      "name": "pill/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3950",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3951",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
     {
       "nodeId": "453:3952",
       "name": "Empty state",
@@ -29,14 +429,85 @@
     {
       "nodeId": "453:3953",
       "name": null,
-      "className": "-translate-x-1/2 absolute left-[160px] text-[color:var(--color\\/error-text,#c81e1e)] top-[44px] w-[272px]",
+      "className": "-translate-x-1/2 absolute left-[140px] text-[color:var(--color\\/error-text,#c81e1e)] top-[44px] w-[232px]",
       "props": {
         "color": {
           "token": "--color/error-text",
           "value": "#c81e1e"
         },
         "width": {
-          "value": "272px"
+          "value": "232px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3954",
+      "name": null,
+      "className": "-translate-x-1/2 absolute left-[89px] text-[color:var(--color\\/accent-text,#1a56db)] top-[74px] w-[130px]",
+      "props": {
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "130px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3955",
+      "name": null,
+      "className": "-translate-x-1/2 absolute left-[191px] text-[color:var(--color\\/accent-text,#1a56db)] top-[74px] w-[130px]",
+      "props": {
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "130px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3957",
+      "name": "Footer",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left w-full",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3959",
+      "name": null,
+      "className": "absolute left-[110px] top-[14px] w-[16px] whitespace-pre-wrap",
+      "props": {
+        "width": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "453:3972",
+      "name": "hotspot/back · Media · empty",
+      "className": "h-[34px] relative shrink-0 w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
         }
       }
     }

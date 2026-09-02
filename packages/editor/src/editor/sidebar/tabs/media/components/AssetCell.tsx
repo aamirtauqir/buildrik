@@ -166,7 +166,7 @@ export function AssetCell({
             /* 40x14 at (6, 56) per `I218:686;218:6` — fixed, not padded: a
                badge that grows with its word would shift the thumb's focal
                point between STOCK and AI. */
-            className="tw:absolute tw:left-1.5 tw:top-14 tw:flex tw:h-3.5 tw:w-10 tw:items-center tw:justify-center tw:rounded tw:bg-[var(--bk-gray-900)] tw:text-[11px] tw:leading-4 tw:text-white"
+            className="tw:absolute tw:left-1.5 tw:top-14 tw:flex tw:h-3.5 tw:w-10 tw:items-center tw:justify-center tw:rounded-md tw:bg-[var(--bk-gray-900)] tw:text-[11px] tw:leading-4 tw:text-white"
             data-testid="media-card-badge"
           >
             {badge}

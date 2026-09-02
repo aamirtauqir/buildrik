@@ -23,7 +23,7 @@ export function RightPanel({ title, wide, actions, className, children, ...rest 
   return (
     <aside
       className={[
-        "tw:flex tw:flex-col tw:flex-none tw:bg-white tw:border-l tw:border-[var(--bk-gray-200)] tw:overflow-hidden",
+        "tw:flex tw:flex-col tw:flex-none tw:bg-white tw:border-l tw:border-[var(--bk-gray-100)] tw:overflow-hidden",
         WIDTH_CLASS[wide ? "wide" : "narrow"],
         className,
       ]

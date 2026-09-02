@@ -2,11 +2,12 @@
   "surface": "topbar",
   "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
   "nodeId": "681:26",
-  "boardName": "Topbar / Publish=ready, Review=open",
-  "figmaHash": "f369679d5a961d345bb2344e3911e21ce8cc79c24299ee2aa9b2720a37262743",
+  "boardName": "icon/bell",
+  "figmaHash": "bcc623ffcae9e4e660ef0234e3fb43a6a11dfa87a6e84c0d21cb63fd8d377c4a",
   "extractorVersion": 2,
-  "extractedAt": "2026-08-03T04:13:32.680321Z",
+  "extractedAt": "2026-09-02T05:01:22.228Z",
   "copy": [
+    "Saved 2m ago",
     "‹ Exit",
     "Bella Cucina",
     "In review · 3 open",
@@ -14,17 +15,71 @@
   ],
   "targets": [
     {
-      "nodeId": "681:26",
+      "nodeId": "692:421",
       "name": null,
-      "className": "bg-[var(--color\\\\/bg-card,white)] border-[var(--color\\\\/border,#e5e7eb)] border-b border-solid content-stretch flex gap-[12px] h-[56px] items-center overflow-clip px-[16px] relative w-[1440px]",
+      "className": "h-[24px] overflow-clip relative rounded-[9999px] w-px",
+      "props": {
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "697:444",
+      "name": null,
+      "className": "bg-[var(--color\\\\/success-tint,#def7ec)] content-stretch flex gap-[6px] items-center overflow-clip px-[8px] py-[2px] relative rounded-[9999px]",
       "props": {
         "background-color": {
-          "token": "--color/bg-card",
-          "value": "white"
+          "token": "--color/success-tint",
+          "value": "#def7ec"
         },
+        "gap": {
+          "value": "6px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "2px"
+        },
+        "padding-bottom": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "697:443",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/success-text,#057a55)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/success-text",
+          "value": "#057a55"
+        }
+      }
+    },
+    {
+      "nodeId": "681:26",
+      "name": null,
+      "className": "bg-white border-[#f3f4f6] border-b border-solid content-stretch flex gap-[12px] h-[56px] items-center overflow-clip px-[12px] relative shadow-[0px_1px_1px_0px_rgba(0,0,0,0.04)] w-[1440px]",
+      "props": {
         "border-color": {
-          "token": "--color/border",
-          "value": "#e5e7eb"
+          "value": "#f3f4f6"
         },
         "gap": {
           "value": "12px"
@@ -33,10 +88,10 @@
           "value": "56px"
         },
         "padding-left": {
-          "value": "16px"
+          "value": "12px"
         },
         "padding-right": {
-          "value": "16px"
+          "value": "12px"
         },
         "width": {
           "value": "1440px"
@@ -46,19 +101,24 @@
     {
       "nodeId": "698:428",
       "name": "btn/exit",
-      "className": "content-stretch flex h-[28px] items-center justify-center px-[10px] relative rounded-[var(--radius\\/lg,8px)] shrink-0",
+      "className": "content-stretch flex h-[28px] items-center justify-center px-[12px] py-[6px] relative rounded-[8px] shrink-0",
       "props": {
         "height": {
           "value": "28px"
         },
         "padding-left": {
-          "value": "10px"
+          "value": "12px"
         },
         "padding-right": {
-          "value": "10px"
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
         },
         "border-radius": {
-          "token": "--radius/lg",
           "value": "8px"
         }
       }
@@ -66,34 +126,26 @@
     {
       "nodeId": "I698:428;9:55",
       "name": null,
-      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--flowbite\\/gray\\/900,#111827)] whitespace-nowrap",
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[18px] not-italic relative shrink-0 text-[#374151] text-[13px] whitespace-nowrap",
       "props": {
         "line-height": {
           "value": "18px"
         },
         "font-size": {
-          "value": "12px"
-        },
-        "color": {
-          "token": "--flowbite/gray/900",
-          "value": "#111827"
+          "value": "13px"
         }
       }
     },
     {
       "nodeId": "680:11",
       "name": null,
-      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic overflow-hidden relative shrink-0 text-[13px] text-[color:var(--color\\/ink,#111827)] text-ellipsis w-[200px] whitespace-nowrap",
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic overflow-hidden relative shrink-0 text-[#111827] text-[14px] text-ellipsis w-[200px] whitespace-nowrap",
       "props": {
         "line-height": {
           "value": "20px"
         },
         "font-size": {
-          "value": "13px"
-        },
-        "color": {
-          "token": "--color/ink",
-          "value": "#111827"
+          "value": "14px"
         },
         "width": {
           "value": "200px"
@@ -157,22 +209,32 @@
       }
     },
     {
+      "nodeId": "698:431",
+      "name": "Icon button",
+      "className": "absolute content-stretch flex items-center justify-center left-0 overflow-clip rounded-[6px] size-[32px] top-0",
+      "props": {
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
       "nodeId": "680:22",
       "name": "btn/publish",
-      "className": "bg-[var(--flowbite\\/blue\\/700,#1a56db)] content-stretch flex h-[32px] items-center justify-center px-[20px] py-[10px] relative rounded-[var(--radius\\/lg,8px)] shrink-0",
+      "className": "bg-[var(--flowbite\\/blue\\/600,#1c64f2)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
       "props": {
         "background-color": {
-          "token": "--flowbite/blue/700",
-          "value": "#1a56db"
+          "token": "--flowbite/blue/600",
+          "value": "#1c64f2"
         },
         "height": {
           "value": "32px"
         },
         "padding-left": {
-          "value": "20px"
+          "value": "16px"
         },
         "padding-right": {
-          "value": "20px"
+          "value": "16px"
         },
         "padding-top": {
           "value": "10px"
@@ -181,7 +243,6 @@
           "value": "10px"
         },
         "border-radius": {
-          "token": "--radius/lg",
           "value": "8px"
         }
       }
@@ -189,17 +250,13 @@
     {
       "nodeId": "I680:22;9:19",
       "name": null,
-      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[13px] text-[color:var(--color\\/accent-on,white)] whitespace-nowrap",
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap",
       "props": {
         "line-height": {
           "value": "20px"
         },
         "font-size": {
-          "value": "13px"
-        },
-        "color": {
-          "token": "--color/accent-on",
-          "value": "white"
+          "value": "14px"
         }
       }
     },

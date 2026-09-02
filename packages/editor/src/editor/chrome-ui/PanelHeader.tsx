@@ -128,7 +128,7 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
         // screen on page `1:3` overrules it (founder decision D2: the screens
         // win). The tracking survives the case change deliberately: the screen
         // keeps 0.88px on Title Case text.
-        "tw:flex tw:items-center tw:gap-2 tw:py-0 tw:pl-4 tw:pr-3 tw:bg-[var(--bk-bg-panel)] tw:border-b tw:border-[var(--bk-border)] " +
+        "tw:flex tw:items-center tw:gap-2 tw:py-0 tw:pl-4 tw:pr-3 tw:bg-[var(--bk-bg-panel)] tw:border-b tw:border-[var(--bk-gray-100)] " +
           "tw:[font-family:var(--bk-font-ui)] tw:flex-none",
         SIZE_CLASS[size],
         className,
