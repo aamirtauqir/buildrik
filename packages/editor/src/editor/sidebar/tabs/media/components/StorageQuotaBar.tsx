@@ -54,7 +54,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
     ? "tw:text-red-700"
     : isNearLimit
       ? "tw:text-amber-700"
-      : "tw:text-[var(--bk-ink-soft)]";
+      : "tw:text-[var(--bk-ink-muted)]";
   const fill = isExhausted
     ? "tw:bg-red-600"
     : isNearLimit
@@ -73,7 +73,7 @@ export function StorageQuotaBar({ used, total, onOptimize, compact = false }: St
     >
       <div
         data-testid="media-quota-bar"
-        className={`med-quota-text tw:text-[${isExhausted ? "13px" : "11px"}] tw:leading-4 tw:tabular-nums ${tone}`}
+        className={`med-quota-text ${isExhausted ? "tw:text-[13px]" : "tw:text-[11px]"} tw:leading-4 tw:tabular-nums ${tone}`}
       >
         {formatQuotaSize(used)} of {formatQuotaSize(total)} used
         {/* Board 145:250: the reason rides the number — disabled, never hidden. */}

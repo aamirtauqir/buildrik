@@ -179,12 +179,12 @@ export function UploadZone({
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
                   {item.fileName}
                 </span>
-                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]">
+                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]">
                   {Math.round(item.progress)}%
                 </span>
               </span>
               <span
-                className="tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-sm tw:bg-[var(--bk-gray-100)]"
+                className="tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-[2px] tw:bg-[var(--bk-gray-100)]"
                 role="progressbar"
                 aria-label={`Uploading ${item.fileName}`}
                 aria-valuenow={Math.round(item.progress)}
@@ -192,7 +192,7 @@ export function UploadZone({
                 aria-valuemax={100}
               >
                 <span
-                  className="tw:block tw:h-full tw:rounded-sm tw:bg-[var(--bk-accent)]"
+                  className="tw:block tw:h-full tw:rounded-[2px] tw:bg-[var(--bk-accent)]"
                   style={{ width: `${Math.min(100, Math.max(0, item.progress))}%` }}
                 />
               </span>

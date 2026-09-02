@@ -181,7 +181,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
         <TextField
           type="text"
-          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)] tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
+          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
           placeholder="Search"
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
@@ -197,7 +197,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           "Nothing matches" about a file that exists. */}
       {props.serverPage && searchQuery.trim().length >= 2 && props.serverPage.total > props.serverPage.loaded ? (
         <div
-          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:text-[12px] tw:leading-4 ${props.searchState === "failed" ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`}
+          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:leading-4 ${props.searchState === "failed" ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`}
           data-testid="media-search-scope"
           role="status"
         >
@@ -323,7 +323,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 variant="link" className="tw:min-h-6 tw:font-normal"
                 onClick={onOpenStock}
               >
-                Browse stock
+                Stock
               </Button>
             </p>
           </div>
@@ -487,7 +487,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 either: a server-side search imports real assets without moving
                 the cursor, so counting those climbed the footer toward the total
                 while "Load more" still had the same page to fetch. */}
-            <span className="tw:text-[var(--bk-ink-muted)]" data-testid="media-shown-count">
+            <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]" data-testid="media-shown-count">
               Showing {props.serverPage.loaded} of {props.serverPage.total}
             </span>
             <Button
