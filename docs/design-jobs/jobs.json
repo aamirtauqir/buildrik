@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-02T15:26:46.000Z",
+ "generated": "2026-09-02T15:45:10.000Z",
  "protocol": "PROTOCOL.md",
  "counts": {
   "fix": 72,
@@ -882,7 +882,7 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
+   "evidence": "2026-09-02 WAVE 1 drawn: 360->280 on the LIVE-measured chrome (hdr 44 · switcher 40 · filters 32 · search 53; Published gets neither filter nor search). C7 strip closed. | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
    "authority": "founder:history-280-drawer-16-6-header"
   },
   {
@@ -954,7 +954,7 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
+   "evidence": "2026-09-02 WAVE 1 drawn: 360->280 on the LIVE-measured chrome (hdr 44 · switcher 40 · filters 32 · search 53; Published gets neither filter nor search). C7 strip closed. | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
    "authority": "founder:history-280-drawer-16-6-header"
   },
   {
@@ -978,7 +978,7 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 G7 applied in code: project:loaded removed from autoCheckpointEvents; board is now reachable — re-verify live on a fresh profile | G7 (founder verbatim in-session 2026-09-02: 'Gate the first checkpoint behind a real edit') — VersionTimelineManager.ts:140-148; 163:64 becomes buildable | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | 2026-09-02 Figma D12 sub-copy fixed; 2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
+   "evidence": "2026-09-02 WAVE 1 drawn: 360->280 on the LIVE-measured chrome (hdr 44 · switcher 40 · filters 32 · search 53; Published gets neither filter nor search). C7 strip closed. | 2026-09-02 G7 applied in code: project:loaded removed from autoCheckpointEvents; board is now reachable — re-verify live on a fresh profile | G7 (founder verbatim in-session 2026-09-02: 'Gate the first checkpoint behind a real edit') — VersionTimelineManager.ts:140-148; 163:64 becomes buildable | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | 2026-09-02 Figma D12 sub-copy fixed; 2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
    "authority": "founder:gate-first-checkpoint-behind-a-real-edit"
   },
   {
@@ -990,7 +990,7 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
+   "evidence": "2026-09-02 WAVE 1 drawn: 360->280 on the LIVE-measured chrome (hdr 44 · switcher 40 · filters 32 · search 53; Published gets neither filter nor search). C7 strip closed. | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
    "authority": "founder:history-280-drawer-16-6-header"
   },
   {
@@ -1002,7 +1002,7 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
+   "evidence": "2026-09-02 WAVE 1 drawn: 360->280 on the LIVE-measured chrome (hdr 44 · switcher 40 · filters 32 · search 53; Published gets neither filter nor search). C7 strip closed. | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
    "authority": "founder:history-280-drawer-16-6-header"
   },
   {
@@ -1014,7 +1014,7 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
+   "evidence": "2026-09-02 WAVE 1 drawn: 360->280 on the LIVE-measured chrome (hdr 44 · switcher 40 · filters 32 · search 53; Published gets neither filter nor search). C7 strip closed. | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
    "authority": "founder:history-280-drawer-16-6-header"
   },
   {
@@ -1026,7 +1026,7 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
+   "evidence": "2026-09-02 WAVE 1 drawn: 360->280 on the LIVE-measured chrome (hdr 44 · switcher 40 · filters 32 · search 53; Published gets neither filter nor search). C7 strip closed. | G8 (founder verbatim in-session 2026-09-02: 'Redraw the seven at 280'); C7 strip in the same pass | 2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
    "authority": "founder:history-280-drawer-16-6-header"
   },
   {
