@@ -7,6 +7,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 export type EmptyStateSize = "compact" | "sm" | "md";
 
@@ -24,6 +25,9 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const TITLE_CLASS = "tw:font-medium tw:text-[var(--bk-ink)]";
 const BODY_CLASS = "tw:text-[var(--bk-ink-muted)] tw:text-[length:var(--bk-text-12)] tw:max-w-[34ch]";
+/* Merged, not concatenated: two size utilities both compile and source order picks the
+   winner, so `<EmptyStateDesc className="tw:text-[13px]">` rendered 12 (board 149:7). */
+const mergeBody = (className?: string) => twMerge(BODY_CLASS, className);
 
 /** Compound parts — call sites that build their own copy blocks use these. */
 export function EmptyStateTitle({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
@@ -35,7 +39,7 @@ export function EmptyStateTitle({ className, children, ...rest }: React.HTMLAttr
 }
 export function EmptyStateDesc({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
   return (
-    <span className={[BODY_CLASS, className].filter(Boolean).join(" ")} {...rest}>
+    <span className={mergeBody(className)} {...rest}>
       {children}
     </span>
   );

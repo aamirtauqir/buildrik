@@ -42,6 +42,7 @@ export interface UseContentModalsReturn {
   openMediaLibrary: (
     allowedTypes: MediaAssetType[],
     onSelect: (asset: MediaAsset) => void,
+    forLabel?: string,
   ) => void;
   closeMediaLibrary: () => void;
 
@@ -86,8 +87,8 @@ export function useContentModals(): UseContentModalsReturn {
   const closeExporter = React.useCallback(() => setShowExporter(false), []);
 
   const openMediaLibrary = React.useCallback(
-    (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void) => {
-      setMediaLibraryContext({ allowedTypes, onSelect });
+    (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void, forLabel?: string) => {
+      setMediaLibraryContext({ allowedTypes, onSelect, forLabel });
       setShowMediaLibrary(true);
     },
     [],

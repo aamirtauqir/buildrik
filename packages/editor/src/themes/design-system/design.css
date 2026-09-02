@@ -19,6 +19,7 @@
   --buildrick-design-color-border: #27272A;
   --buildrick-design-color-success: #15803D;
   --buildrick-design-color-error: #EF4444;
+  --buildrick-design-color-warning: #8E4B10;
 
   /* COLORS — v4 migration (4 primitives + 4 semantic aliases, added via
    * projectMigrations/0002. Synced to CSS 2026-05-18 to satisfy baseline

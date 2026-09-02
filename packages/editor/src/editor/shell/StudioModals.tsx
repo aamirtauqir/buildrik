@@ -47,6 +47,7 @@ export interface StudioModalsProps {
   mediaLibraryContext: {
     onSelect: (asset: MediaAsset) => void;
     allowedTypes?: MediaAssetType[];
+    forLabel?: string;
   } | null;
   showImageEditor: boolean;
   onCloseImageEditor: () => void;
@@ -173,6 +174,7 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         onClose={onCloseMediaLibrary}
         onSelect={onSelectMedia}
         allowedTypes={mediaLibraryContext?.allowedTypes}
+        forLabel={mediaLibraryContext?.forLabel}
         composer={composer}
       />
 

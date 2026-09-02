@@ -23,12 +23,16 @@ import {
   MODAL_FOOT_CLASS,
 } from "./Modal";
 
-export type ModalSize = "sm" | "md" | "question" | "form" | "lg" | "xl";
+export type ModalSize = "sm" | "md" | "fields" | "table" | "question" | "form" | "lg" | "xl";
 
 const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
   sm: "tw:w-[360px]",
   /* Board 1172:4840 (Brand review) draws its dialog at 520. */
   md: "tw:w-[520px]",
+  /* 1170:4713 collection fields. */
+  fields: "tw:w-[500px]",
+  /* 1170:4749 records table, 1164:4713 media picker. */
+  table: "tw:w-[640px]",
   question: "tw:w-[440px]",
   form: "tw:w-[560px]",
   lg: "tw:w-[720px]",

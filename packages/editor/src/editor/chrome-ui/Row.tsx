@@ -24,7 +24,8 @@ export interface RowProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "on
  *  strings, not exported symbols) by every row variant below and by
  *  NavItem (ported separately, T6 batch 1). */
 export const ROW_LABEL_CLASS = "tw:flex-1 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap";
-export const ROW_META_CLASS = "tw:text-[var(--bk-ink-muted)] tw:text-[11px] tw:flex-none";
+export const ROW_META_CLASS =
+  "tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[11px] tw:font-medium tw:flex-none";
 export const ROW_CHEVRON_CLASS = "tw:text-[var(--bk-ink-muted)] tw:flex-none";
 export const ROW_ICON_CLASS = "tw:flex-none tw:inline-flex tw:text-[var(--bk-ink-muted)]";
 

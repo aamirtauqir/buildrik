@@ -35,6 +35,8 @@ import { useDomainModals } from "./useDomainModals";
 export interface MediaLibraryContext {
   onSelect: (asset: MediaAsset) => void;
   allowedTypes?: MediaAssetType[];
+  /** What the picker is being opened FOR, e.g. "Hero · Image" (board 1164:4713). */
+  forLabel?: string;
 }
 
 /** Image editor context for editing images */
