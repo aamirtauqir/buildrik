@@ -235,9 +235,9 @@
 }
 
 /* Result phases reuse the body copy slot, tinted by outcome. */
-.med-rx-body--success { color: var(--bk-success); }
-.med-rx-body--warn { color: var(--bk-warning); }
-.med-rx-body--error { color: var(--bk-error); }
+.med-rx-body--success { color: var(--bk-success-text); font-size: var(--bk-text-12); font-weight: 600; }
+.med-rx-body--warn { color: var(--bk-warning-text); font-size: var(--bk-text-12); font-weight: 600; }
+.med-rx-body--error { color: var(--bk-error-text); font-size: var(--bk-text-12); font-weight: 600; }
 
 .med-rx-pages {
   list-style: none;

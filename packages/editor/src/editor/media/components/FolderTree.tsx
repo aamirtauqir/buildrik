@@ -361,6 +361,7 @@ export function FolderTree({
           <div className="mgr-tree-newfolder tw:px-2 tw:pb-1.5" data-testid="mgr-new-folder">
             <TextField
               autoFocus
+              className="tw:h-[var(--bk-size-row-dense)] tw:rounded-md tw:px-[var(--bk-space-8)] tw:text-[length:var(--bk-text-12)]"
               value={newFolderName}
               placeholder="Folder name"
               aria-label="New folder name"

@@ -79,6 +79,14 @@ const TYPE_PILLS: ReadonlyArray<{ id: MediaTypeFilter; label: string }> = [
   { id: "fnt", label: "Fonts" },
 ];
 
+/* Board 1163:4641 draws the bulk bar's actions as 11/500 text on the accent
+   tint — accent for Move/Download, error ink for Delete, muted for Clear —
+   not as the outlined 27-tall .mgr-btn the toolbar above it uses. `link`
+   carries the recipe; min-h-6 keeps the 24px target under the smaller text. */
+const BULK_LINK = "tw:min-h-6 tw:text-[11px] tw:font-medium";
+const BULK_LINK_DANGER = `${BULK_LINK} tw:text-[var(--bk-error-text)]`;
+const BULK_LINK_MUTED = "tw:min-h-6 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+
 const SORT_OPTIONS: ReadonlyArray<{ value: MediaSortBy; label: string }> = [
   { value: "date", label: "Recent" },
   { value: "name", label: "Name" },
@@ -182,7 +190,7 @@ export function AssetGrid({
           <div className="mgr-spacer" />
           {/* Bug #4 fix: Move → folder picker popover */}
           <div className="mgr-sort-wrap">
-            <Button className="mgr-btn" onClick={() => setBulkMovePickerOpen((o) => !o)}>
+            <Button variant="link" className={BULK_LINK} onClick={() => setBulkMovePickerOpen((o) => !o)}>
               Move to folder…
             </Button>
             {bulkMovePickerOpen && (
@@ -238,7 +246,8 @@ export function AssetGrid({
             )}
           </div>
           <Button
-            className="mgr-btn"
+            variant="link"
+            className={BULK_LINK}
             onClick={() => {
               // Board 1163:4641 draws Download between Move and Delete. The
               // browser pulls one file at a time, so the selection goes as
@@ -254,7 +263,8 @@ export function AssetGrid({
             Download
           </Button>
           <Button
-            className="mgr-btn danger"
+            variant="link"
+            className={BULK_LINK_DANGER}
             onClick={() => {
               const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
               state.requestBulkDelete(items);
@@ -262,7 +272,7 @@ export function AssetGrid({
           >
             Delete
           </Button>
-          <Button className="mgr-btn" onClick={state.toggleSelMode}>
+          <Button variant="link" className={BULK_LINK_MUTED} onClick={state.toggleSelMode}>
             ✕ Clear
           </Button>
         </div>

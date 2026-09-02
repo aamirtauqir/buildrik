@@ -69,6 +69,7 @@ export function ImportUrlModal({ open, onClose, onImport }: ImportUrlModalProps)
       <TextField
         type="url"
         autoFocus
+        error={Boolean(trimmed) && !valid}
         value={url}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)}
         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -81,7 +82,7 @@ export function ImportUrlModal({ open, onClose, onImport }: ImportUrlModalProps)
       {/* The Button doc's rule: "disabled without a reason is a bug." */}
       {trimmed && !valid ? (
         <p
-          className="tw:mt-1.5 tw:text-[12px] tw:leading-[18px] tw:text-red-700"
+          className="tw:mt-1.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]"
           role="alert"
           data-testid="import-url-error"
         >

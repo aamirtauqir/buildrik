@@ -159,7 +159,7 @@
 }
 
 .mgr-left {
-  background: var(--bk-bg-panel);
+  background: var(--bk-bg-subtle);
   border-right: 1px solid var(--bk-border);
   padding: var(--bk-space-12) 0;
   display: flex;
@@ -170,7 +170,7 @@
 .mgr-left-head {
   margin: 0 var(--bk-space-16) var(--bk-space-8);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -211,7 +211,7 @@
 .mgr-tree-section {
   margin: 0 var(--bk-space-8) var(--bk-space-8);
   font-size: var(--bk-text-11);
-  font-weight: 700;
+  font-weight: 600;
   color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -222,8 +222,8 @@
   align-items: center;
   gap: 6px;
   padding: 6px var(--bk-space-8);
-  border-radius: 4px;
-  font-size: 13px;
+  border-radius: var(--bk-radius-md);
+  font-size: var(--bk-text-12);
   color: var(--bk-ink-soft);
   cursor: pointer;
 }
@@ -565,9 +565,9 @@
 }
 
 .mgr-bulk-count {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--bk-ink);
+  font-size: var(--bk-text-11);
+  font-weight: 500;
+  color: var(--bk-accent-text);
   margin-right: var(--bk-space-8);
 }
 
@@ -580,10 +580,9 @@
 
 .mgr-list-row {
   display: grid;
-  grid-template-columns: 40px 1fr 60px 100px 80px;
   gap: var(--bk-space-12);
   align-items: center;
-  padding: 6px var(--bk-space-20);
+  height: 29px;
   border-bottom: 1px solid var(--bk-border);
   cursor: pointer;
   font-size: 12px;
@@ -617,8 +616,8 @@
 }
 
 .mgr-list-name {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--bk-text-11);
+  font-weight: 400;
   color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1019,11 +1018,11 @@
   grid-template-columns: 24px 1fr 64px 88px 88px;
   align-items: center;
   gap: var(--bk-space-12);
-  padding: 0 var(--bk-space-20);
+  padding: 0 var(--bk-space-12);
 }
 .mgr-list-head {
-  height: 28px;
-  font: 400 11px var(--bk-font-ui);
+  height: 24px;
+  font: 600 11px var(--bk-font-ui);
   color: var(--bk-ink-muted);
   border-bottom: 1px solid var(--bk-border);
 }
@@ -1080,12 +1079,12 @@
   align-items: center;
   justify-content: center;
   gap: var(--bk-space-4);
-  background: var(--bk-alpha-accent-08, rgba(26, 86, 219, 0.04));
+  background: var(--bk-accent-tint);
   pointer-events: none;
   z-index: 3;
 }
-.mgr-dropzone-title { font: 500 14px var(--bk-font-ui); color: var(--bk-accent-text); }
-.mgr-dropzone-sub { font: 400 11px var(--bk-font-ui); color: var(--bk-ink-muted); }
+.mgr-dropzone-title { font: 600 16px var(--bk-font-ui); color: var(--bk-accent-text); }
+.mgr-dropzone-sub { font: 400 11px var(--bk-font-ui); color: var(--bk-ink-soft); }
 
 .mgr-uploads {
   margin: var(--bk-space-8) var(--bk-space-20) 0;
@@ -1110,7 +1109,7 @@
 .mgr-upload-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mgr-upload-track {
   width: 120px;
-  height: 4px;
+  height: 5px;
   border-radius: var(--bk-radius-full);
   background: var(--bk-bg-active, var(--bk-border));
   overflow: hidden;
