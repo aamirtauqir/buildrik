@@ -127,7 +127,9 @@ const GRID_PROFILE: ElementProfile = {
 };
 
 /** Image / video / icon / lottie / svg / audio / embeds — board 807:8521.
- *  Size leads; media carries a link. */
+ *  Size leads. No Link: LinkSection's own gate is link/button/a/cta, so the
+ *  entry never reached the column and only inflated the footer's denominator
+ *  past the board's "of 12". */
 const MEDIA_PROFILE: ElementProfile = {
   order: [
     "size",
@@ -136,7 +138,6 @@ const MEDIA_PROFILE: ElementProfile = {
     "border",
     "corner-radius",
     "effects",
-    "link",
     "interactions",
     "animation",
     "visibility",

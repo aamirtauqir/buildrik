@@ -114,9 +114,11 @@ describe("element profiles — board order", () => {
     expect(order.indexOf("link")).toBeGreaterThan(order.indexOf("animation"));
   });
 
-  /* Board 807:8521 — Size, Spacing. */
-  it("media leads with size then spacing", () => {
+  /* Board 807:8521 — Size, Spacing, and no Link anywhere: LinkSection gates
+     itself to link/button/a/cta, so an entry here could only ever be dead. */
+  it("media leads with size then spacing and carries no link", () => {
     expect(getProfileFor("image").order.slice(0, 2)).toEqual(["size", "spacing"]);
+    expect(getProfileFor("image").order).not.toContain("link");
   });
 
   /* Boards 807:8412 / 807:8475 — Layout, then the box model that element is. */

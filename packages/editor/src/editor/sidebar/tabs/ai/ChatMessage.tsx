@@ -21,7 +21,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         {/* Board 170:29 — before any text arrives the panel says "Thinking…"
             in a band of its own, rather than showing an empty bubble with a
             role label above it. */}
-        {streaming && !text ? <p className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[13px] tw:text-[var(--bk-accent)]">Thinking…</p> : null}
+        {streaming && !text ? <p className="tw:m-0 tw:flex tw:h-14 tw:items-center tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:text-[12px] tw:text-[var(--bk-accent-text)]">Thinking…</p> : null}
         {text ? <p>{text}</p> : null}
         {error ? <p className="bd-ai-msg-error" role="alert">{error}</p> : null}
         {stopped && <span className="bd-ai-msg-stopped">(stopped)</span>}

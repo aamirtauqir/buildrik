@@ -61,13 +61,15 @@ const LOAD_ERROR_FOOT =
 
 /* Board 1138:4573 — the Saves loading state. Staggered indents so it reads as a
    tree settling, not a list of identical bars. */
-const SKELETON = "tw:flex tw:flex-col tw:gap-[var(--bk-space-8)] tw:p-[var(--bk-space-12)]";
-const SKELETON_ROW = "tw:flex tw:items-center tw:gap-[var(--bk-space-8)]";
-const SKELETON_INDENT = ["", "tw:pl-[var(--bk-space-12)]", "tw:pl-[var(--bk-space-24)]"];
+const SKELETON = "tw:flex tw:flex-col";
+const SKELETON_ROW = "tw:flex tw:h-8 tw:items-center tw:gap-[var(--bk-space-8)]";
+/* Board indents: 16, 32, 48, 48, 32 — the icon's own left edge on each row. */
+const SKELETON_INDENT = ["tw:pl-4", "tw:pl-8", "tw:pl-12", "tw:pl-12", "tw:pl-8"];
 const SKELETON_DOT =
-  "tw:flex-none tw:w-[10px] tw:h-[10px] tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)]";
+  "tw:flex-none tw:size-3 tw:rounded-[3px] tw:bg-[var(--bk-bg-subtle)]";
 const SKELETON_BAR =
-  "tw:h-[10px] tw:flex-1 tw:max-w-[180px] tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)]";
+  "tw:flex-none tw:h-[10px] tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)]";
+const SKELETON_BAR_W = ["tw:w-[132px]", "tw:w-[96px]", "tw:w-[150px]", "tw:w-[110px]", "tw:w-[86px]"];
 
 /* Board 163:269 pruned / 163:220 restoring. Amber says nothing failed — the
    oldest auto-saves aged out; accent says something is happening, not wrong. */
@@ -312,9 +314,9 @@ export function VersionHistoryPanel({
       <div className="saves-view">
         <div className={SKELETON} aria-busy="true" aria-label="Loading versions">
           {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className={`${SKELETON_ROW} ${SKELETON_INDENT[i % 3]}`}>
+            <div key={i} className={`${SKELETON_ROW} ${SKELETON_INDENT[i]}`}>
               <span className={SKELETON_DOT} />
-              <span className={SKELETON_BAR} />
+              <span className={`${SKELETON_BAR} ${SKELETON_BAR_W[i]}`} />
             </div>
           ))}
         </div>

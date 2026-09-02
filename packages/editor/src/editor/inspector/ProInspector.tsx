@@ -59,7 +59,9 @@ export interface ProInspectorProps {
   onDelete?: (id: string) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
-    onSelect: (asset: MediaAsset) => void
+    onSelect: (asset: MediaAsset) => void,
+    /** Board 1164:4713 — what the picker is being opened for, e.g. "Hero · Image". */
+    forLabel?: string
   ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,

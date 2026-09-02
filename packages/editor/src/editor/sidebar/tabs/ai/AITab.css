@@ -17,21 +17,21 @@
   font: 500 var(--bk-text-12) var(--bk-font-ui);
 }
 
+/* Boards 170:2/170:29/171:67: the prompt sits on the panel's own 16 gutter with NO rule above it — the tinted scope band already separates it. */
 .bd-ai-composer {
-  border-top: 1px solid var(--bk-border);
-  padding: var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-16) var(--bk-space-12);
   background: var(--bk-bg-card);
 }
 
 .bd-ai-composer-input {
   width: 100%;
-  min-height: 38px;
+  min-height: 52px;
   border: 1px solid var(--bk-border);
   border-radius: var(--bk-radius-lg);
   padding: var(--bk-space-8) var(--bk-space-12);
   background: var(--bk-bg-card);
   color: var(--bk-ink);
-  font: 500 var(--bk-text-12) var(--bk-font-ui);
+  font: 400 var(--bk-text-12)/18px var(--bk-font-ui);
   resize: none;
 }
 
@@ -42,7 +42,7 @@
   display: flex;
   align-items: center;
   gap: var(--bk-space-4);
-  font: 400 var(--bk-text-12) var(--bk-font-ui);
+  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
   color: var(--bk-accent);
 }
 

@@ -212,17 +212,25 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           panel lives in the inspector column, not beside it. The old header
           carried a subtitle ("Chat with AI to edit your page") no board has. */}
       {onBack ? (
-        <div className="tw:flex tw:flex-col">
-          <Button
-            color="light"
-            size="xs"
-            className="tw:self-start tw:border-transparent tw:bg-transparent tw:px-4 tw:py-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]"
-            onClick={onBack}
-            aria-label="Back to Inspector"
-          >
-            ‹ Inspector
-          </Button>
-          <div className="tw:border-b tw:border-[var(--bk-border)] tw:px-4 tw:pb-3 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]">
+        /* shrink-0: these two rows carry fixed heights now, and a flex child
+           in an overflowing column is compressible by default. */
+        <div className="tw:flex tw:shrink-0 tw:flex-col">
+          {/* Boards 170:2/170:29/171:67 put the rule under the BACK ROW (36
+              tall) and leave the title row (44) open below it. It was the
+              other way round, which read as a header with a stray link
+              floating above it. */}
+          <div className="tw:flex tw:h-9 tw:items-center tw:border-b tw:border-[var(--bk-gray-100)]">
+            <Button
+              color="light"
+              size="xs"
+              className="tw:h-full tw:border-transparent tw:bg-transparent tw:px-4 tw:py-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
+              onClick={onBack}
+              aria-label="Back to Inspector"
+            >
+              ‹ Inspector
+            </Button>
+          </div>
+          <div className="tw:flex tw:h-11 tw:items-center tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]">
             AI
           </div>
         </div>

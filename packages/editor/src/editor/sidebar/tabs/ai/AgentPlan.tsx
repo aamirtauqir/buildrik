@@ -6,8 +6,8 @@ import { Button, Checkbox } from "@/editor/chrome-ui";
 /* Utilities, not a stylesheet: this panel's CSS file is on the styling
    ratchet and new chrome belongs inline (DS SSOT §3). */
 const BAND =
-  "tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-2 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-wide tw:text-[var(--bk-ink-muted)]";
-const STEP_ROW = "tw:flex tw:items-baseline tw:gap-2 tw:px-4 tw:py-1 tw:text-[13px] tw:text-[var(--bk-ink)]";
+  "tw:flex tw:h-7 tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]";
+const STEP_ROW = "tw:flex tw:h-10 tw:items-center tw:gap-2 tw:px-4 tw:text-[12px] tw:text-[var(--bk-ink)]";
 const PANEL = "tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-3";
 const PANEL_TITLE = "tw:m-0 tw:text-[13px] tw:font-medium";
 const PANEL_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
@@ -24,13 +24,15 @@ const DISMISS_LINK = "tw:self-start tw:border-transparent tw:bg-transparent tw:p
  * glyph carries their status, Stop under them, and — when the run pauses — an
  * amber panel saying what is about to happen with Skip and Approve.
  *
- * Two places where the boards' words are not used, because they are not true
- * of this code:
- *  - Board 171:67 ends with "Apply lands as ONE undo step — ⌘Z takes back all
- *    three." Each approved step applies in its own transaction
- *    (`applySetStyle` opens one per edit), so a three-step run is three undo
- *    entries. The line here says that instead. The idle state's version of the
- *    promise IS true, because a chat edit is a single apply.
+ * What 171:67 closes on is a `data-name="note"` block — a designer annotation,
+ * not UI (founder ruling 2026-09-03) — so its sentence is neither copy to
+ * render nor a control to grow. The panel's own line is the one that has to be
+ * true, and it is: each approved step applies in its own transaction
+ * (`applySetStyle` opens one per edit), so a three-step run is three undo
+ * entries. `onUndoAll` exists for the two states where a run did NOT finish
+ * cleanly — stopped, and failed mid-run — and stays there.
+ *
+ * One place where a board's words are still not used:
  *  - Board 170:97's footnote ends "…the line between an assistant and
  *    something that edits a client's site unattended", which the auto-apply
  *    checkbox below contradicts. The first half is kept, and the contradiction
@@ -162,7 +164,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
             <span className="tw:w-3 tw:flex-none tw:text-center" style={{ color: STEP_COLOR[s.status] }} aria-hidden="true">
               {STEP_GLYPH[s.status]}
             </span>
-            <span className="tw:min-w-2.5 tw:text-[var(--bk-ink-muted)]">{i + 1}</span>
+            <span className="tw:min-w-2.5 tw:text-[11px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink-muted)]">{i + 1}</span>
             <span className="tw:flex-1">{s.plan.title}</span>
             {STEP_WORD[s.status] ? (
               <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">{STEP_WORD[s.status]}</span>
