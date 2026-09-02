@@ -434,3 +434,29 @@ export function compareContrast(nowSet, baseSet) {
   const fixedPairs = Object.keys(baseSet).filter((k) => !(k in nowSet));
   return { newPairs, worsePairs, fixedPairs };
 }
+
+/**
+ * Which form, if any, renders `id` as a test anchor somewhere in `haystack`.
+ *
+ * Three forms are in normal use and a literal grep only sees the first:
+ *   literal    `data-testid="x"`
+ *   forwarded  a component takes `testId="x"` and renders `data-testid={testId}`
+ *   template   `data-testid={`insert-group-${k}`}` → ids like `insert-group-layout`
+ *
+ * Returns `"literal"`, `"forwarded"`, `` `template:<prefix>${…}` `` or `null`.
+ *
+ * The template verdict is deliberately weaker than the other two: it proves a
+ * template exists whose literal prefix this id starts with, NOT that this exact
+ * id is ever produced. Only a browser settles that, and measure.mjs already
+ * does. This check exists to catch an anchor that has left the codebase.
+ */
+export function anchorForm(id, haystack) {
+  const has = (s) => haystack.includes(s);
+  if (has(`data-testid="${id}"`) || has(`data-testid='${id}'`)
+    || has(`data-testid={"${id}"}`) || has(`data-testid={\`${id}\`}`)) return "literal";
+  if (has(`testId="${id}"`) || has(`testId='${id}'`)
+    || has(`testId={"${id}"}`) || has(`testId={\`${id}\`}`)) return "forwarded";
+  const prefix = [...haystack.matchAll(/(?:data-testid|testId)=\{`([^`$]*)\$\{/g)]
+    .map((m) => m[1]).filter(Boolean).find((p) => id.startsWith(p));
+  return prefix ? `template:${prefix}\${…}` : null;
+}

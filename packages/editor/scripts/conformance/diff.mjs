@@ -273,7 +273,23 @@ if (updateBaseline) {
   // in this same file and assigning a fresh object deleted them.
   patchBaseline(surfaceId, { skipped: skipped.length, compared: rows.length });
   console.log(`\n[diff] baseline updated: ${surfaceId} skipped=${skipped.length} compared=${rows.length}`);
-} else if (baseline[surfaceId]) {
+} else if (!baseline[surfaceId]) {
+  /**
+   * No entry means this ratchet does NOTHING for this surface, and it said so
+   * to nobody. `.conformance-baseline.json` holds one key while surfaces/ holds
+   * nine, so eight of nine surfaces could quietly stop comparing targets and
+   * the run still printed PASS (F5).
+   *
+   * Not a hard failure: a brand-new recipe legitimately has no baseline on its
+   * first run, and failing there would teach people to skip the gate. But the
+   * gap is now stated in the output instead of being invisible.
+   */
+  console.warn(
+    `\n[diff] COVERAGE RATCHET INERT for "${surfaceId}" — no baseline entry.\n` +
+    `       Targets could stop being compared here and this run would still PASS.\n` +
+    `       Seed it once: node scripts/conformance/diff.mjs ${surfaceId} --update-baseline`
+  );
+} else {
   const b = baseline[surfaceId];
   if (skipped.length > b.skipped) {
     die(1, `surface "${surfaceId}": SKIPPED rose ${b.skipped} -> ${skipped.length}. ` +

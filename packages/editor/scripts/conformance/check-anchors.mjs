@@ -96,17 +96,39 @@ const readSource = () => {
   return parts.join("\n");
 };
 
+const { anchorForm } = await import("./lib.mjs");
 const haystack = readSource();
 
+/**
+ * Two anchor forms this check could not see, and both are in normal use here.
+ *
+ * 1. FORWARDED — a component takes `testId="x"` and renders
+ *    `data-testid={testId}`. The literal `data-testid="x"` is never in the
+ *    source, so a real, rendering anchor read as absent.
+ * 2. TEMPLATED — `data-testid={`insert-group-${id}`}` produces ids like
+ *    `insert-group-layout` that no literal can match.
+ *
+ * Both reported MISSING for anchors that render fine, which is the worse
+ * direction for this gate: it was blocking three per-family recipes (Insert
+ * 137:2, Pages 141:124, Notifications 453:4051) that were waiting on exactly
+ * these anchors. A gate that cannot see a construct blocks the work rather
+ * than protecting it.
+ *
+ * The template match is deliberately WEAKER than the others and is reported as
+ * such: it proves a template exists whose literal prefix this id starts with,
+ * not that this specific id is ever produced. Only the browser can settle
+ * that, and measure.mjs already does — this check exists to catch the string
+ * being gone from the codebase entirely.
+ */
 const missing = [];
+const weak = [];
 for (const [id, whereSet] of referenced) {
-  // Matches data-testid="id" and data-testid={"id"} / {`id`} forms.
-  const found = haystack.includes(`data-testid="${id}"`)
-    || haystack.includes(`data-testid='${id}'`)
-    || haystack.includes(`data-testid={"${id}"}`)
-    || haystack.includes(`data-testid={\`${id}\`}`);
-  if (!found) missing.push({ id, where: [...whereSet] });
+  const form = anchorForm(id, haystack);
+  if (!form) missing.push({ id, where: [...whereSet] });
+  else if (form.startsWith("template:")) weak.push({ id, form });
 }
+for (const w of weak)
+  console.log(`[anchors] ${w.id} matched only a TEMPLATE (${w.form}) — the prefix exists, this exact id is unproven here; measure.mjs settles it.`);
 
 if (missing.length) {
   console.error(`[anchors] ${missing.length} anchor(s) named by a recipe do not exist in src/:`);
