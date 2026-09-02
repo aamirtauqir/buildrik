@@ -74,7 +74,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
             border: "none",
             borderRadius: "var(--bk-radius-lg)",
             boxShadow: "var(--bk-shadow-overlay)",
-            background: "#fff",
+            background: "var(--bk-bg-elevated)",
           }}
         />
       </div>

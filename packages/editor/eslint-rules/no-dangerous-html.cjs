@@ -59,11 +59,17 @@ const PROP_NAME = "dangerously" + "SetInnerHTML";
 // or from the monorepo root (CI, IDE workspace mode):
 //   - cwd = packages/editor/: rel = src/editor/canvas/Canvas.tsx
 //   - cwd = monorepo root:    rel = packages/editor/src/editor/canvas/Canvas.tsx
+// Reviewed 2026-09-02: GroupSection mounts `ElEntry.iconHtml`, string literals
+// compiled into the bundle from build/catalog/catalog.ts. No user input, no
+// request, no storage reaches that prop — the same static-markup case as the
+// canvas mount, one level down.
 const ALLOWED_FILES = new Set([
   "src/editor/canvas/Canvas.tsx",
   "src/ai/AICopilot.tsx",
+  "src/editor/sidebar/tabs/build/components/GroupSection.tsx",
   "packages/editor/src/editor/canvas/Canvas.tsx",
   "packages/editor/src/ai/AICopilot.tsx",
+  "packages/editor/src/editor/sidebar/tabs/build/components/GroupSection.tsx",
 ]);
 
 function toRepoRelativePosix(filename, cwd) {

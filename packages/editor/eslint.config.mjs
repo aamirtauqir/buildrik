@@ -81,7 +81,25 @@ const FORM_ATOMS = [
 ];
 
 export default [
+  // Global ignores: generated output, static assets, harness helper scripts and
+  // untracked scratch files at the package root. `eslint .` visits all of these;
+  // none is shipped code.
+  { ignores: [".flowbite-react/**", "assets/**", "e2e/**/*.mjs", "*.mjs", "dist/**"] },
   js.configs.recommended,
+  // Files outside src/ that `eslint .` still visits. Without a TS parser they
+  // fail to PARSE ("Unexpected token <" / "as"), which is an error, which made
+  // `pnpm run lint` — and every editor CI run behind it — red: 0 green runs in
+  // the last 100 as of 2026-09-02, with the editor tests and the Figma
+  // conformance step skipped every time. Parsed here, no DS rules applied.
+  {
+    files: ["e2e/**/*.{ts,tsx}", "*.config.{ts,mts}", "scripts/**/*.{ts,tsx}"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { ecmaVersion: 2022, sourceType: "module", ecmaFeatures: { jsx: true } },
+    },
+    // TypeScript resolves names; `no-undef` on a .ts file only reports DOM/Node globals.
+    rules: { "no-undef": "off" },
+  },
   // Base config — DS V1 rules apply to everything in src/.
   {
     files: ["src/**/*.{ts,tsx}"],

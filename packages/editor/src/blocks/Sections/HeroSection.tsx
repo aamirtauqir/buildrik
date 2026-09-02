@@ -62,7 +62,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           style={{
             fontSize: 48,
             fontWeight: 700,
-            color: "#fff",
+            color: /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#fff",
             marginBottom: 16,
             lineHeight: 1.2,
           }}
@@ -88,7 +88,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               display: "inline-block",
               padding: "14px 32px",
               background: BLOCK_COLORS.accent,
-              color: "#fff",
+              color: /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#fff",
               fontSize: 16,
               fontWeight: 600,
               borderRadius: 8,

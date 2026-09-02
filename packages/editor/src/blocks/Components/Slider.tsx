@@ -120,7 +120,7 @@ export const Slider: React.FC<SliderProps> = ({
               justifyContent: "center",
               background: slide.image
                 ? `url(${slide.image}) center/cover no-repeat`
-                : slide.backgroundColor || "#1a1a2e",
+                : slide.backgroundColor || /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#1a1a2e",
             }}
           >
             {/* Overlay */}
@@ -147,7 +147,7 @@ export const Slider: React.FC<SliderProps> = ({
                   style={{
                     fontSize: 48,
                     fontWeight: 700,
-                    color: "#fff",
+                    color: /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#fff",
                     marginBottom: 16,
                   }}
                 >
@@ -172,7 +172,7 @@ export const Slider: React.FC<SliderProps> = ({
                     display: "inline-block",
                     padding: "14px 32px",
                     background: BLOCK_COLORS.accent,
-                    color: "#fff",
+                    color: /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#fff",
                     fontSize: 16,
                     fontWeight: 600,
                     borderRadius: 8,
@@ -202,7 +202,7 @@ export const Slider: React.FC<SliderProps> = ({
               borderRadius: "50%",
               background: "rgba(255,255,255,0.2)",
               border: "none",
-              color: "#fff",
+              color: /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#fff",
               fontSize: 24,
               cursor: "pointer",
               backdropFilter: "blur(4px)",
@@ -222,7 +222,7 @@ export const Slider: React.FC<SliderProps> = ({
               borderRadius: "50%",
               background: "rgba(255,255,255,0.2)",
               border: "none",
-              color: "#fff",
+              color: /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#fff",
               fontSize: 24,
               cursor: "pointer",
               backdropFilter: "blur(4px)",
