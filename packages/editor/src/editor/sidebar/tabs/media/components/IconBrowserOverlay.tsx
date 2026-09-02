@@ -113,7 +113,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
 
   const grid = (list: IconDefinition[], testid: string) => (
     <div
-      className="tw:grid tw:grid-cols-6 tw:justify-items-center tw:gap-2 tw:px-4 tw:py-3"
+      className="tw:grid tw:grid-cols-5 tw:justify-items-center tw:gap-2 tw:px-4 tw:py-3"
       data-testid={testid}
     >
       {list.map((icon) => {
@@ -145,7 +145,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
       <PanelFrame.Header title="Media" onClose={onClose} />
 
       <Button
-        variant="link" className="tw:flex tw:h-9 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left"
+        variant="link" className="tw:flex tw:h-9 tw:shrink-0 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left"
         onClick={onClose}
         aria-label="Back to media grid"
       >

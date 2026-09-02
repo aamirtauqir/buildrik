@@ -61,7 +61,7 @@
   align-items: center;
   gap: var(--bk-space-8);
   padding: 0 10px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   font-size: 13px;
 }
 
@@ -80,7 +80,7 @@
 
 .mgr-search .mgr-kbd {
   font-size: var(--bk-text-11);
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   border: 1px solid var(--bk-border);
   padding: 1px 5px;
   border-radius: 3px;
@@ -136,7 +136,7 @@
   border-radius: var(--bk-radius-md);
   border: 1px solid var(--bk-border);
   background: var(--bk-bg-card);
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -171,7 +171,7 @@
   margin: 0 var(--bk-space-16) var(--bk-space-8);
   font-size: 11px;
   font-weight: 700;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: flex;
@@ -185,7 +185,7 @@
   border-radius: 3px;
   background: transparent;
   border: none;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -212,7 +212,7 @@
   margin: 0 var(--bk-space-8) var(--bk-space-8);
   font-size: var(--bk-text-11);
   font-weight: 700;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -238,7 +238,7 @@
 
 .mgr-node .mgr-chev {
   width: 12px; height: 12px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   flex-shrink: 0;
 }
 
@@ -272,7 +272,7 @@
 
 .mgr-node .mgr-node-count {
   font-size: 11px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -339,7 +339,7 @@
   cursor: pointer;
 }
 
-.mgr-sort svg { width: 12px; height: 12px; color: var(--bk-ink-disabled); }
+.mgr-sort svg { width: 12px; height: 12px; color: var(--bk-ink-muted); }
 
 .mgr-view-toggle {
   display: inline-flex;
@@ -517,7 +517,7 @@
   border-radius: 3px;
   background: transparent;
   border: none;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -534,7 +534,7 @@
 .mgr-node-del {
   background: none;
   border: none;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   cursor: pointer;
   padding: 2px;
   display: none;
@@ -627,19 +627,19 @@
 
 .mgr-list-type {
   font-size: 11px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   font-weight: 600;
 }
 
 .mgr-list-dims {
   font-size: 11px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .mgr-list-size {
   font-size: 11px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -650,7 +650,7 @@
   display: flex;
   align-items: center;
   font-size: 11px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   flex-shrink: 0;
 }
 
@@ -680,7 +680,7 @@
 
 .mgr-det-sub {
   font-size: 11px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
 }
 
 .mgr-det-preview {
@@ -710,7 +710,7 @@
   padding: 10px var(--bk-space-12);
   font-size: 12px;
   font-weight: 500;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   border: none;
   background: transparent;
   cursor: pointer;
@@ -738,14 +738,14 @@
   margin-bottom: var(--bk-space-16);
 }
 
-.mgr-kv-key { color: var(--bk-ink-disabled); }
+.mgr-kv-key { color: var(--bk-ink-muted); }
 
 .mgr-kv-val { color: var(--bk-ink-soft); font-weight: 500; }
 
 .mgr-used-head {
   font-size: 11px;
   font-weight: 700;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 var(--bk-space-8);
@@ -793,13 +793,13 @@
   align-items: center;
   gap: var(--bk-space-16);
   font-size: 11px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
 }
 
 .mgr-status-dot {
   width: 3px; height: 3px;
   border-radius: var(--bk-radius-full);
-  background: var(--bk-ink-disabled);
+  background: var(--bk-ink-muted);
 }
 
 .mgr-status-right {
@@ -903,7 +903,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   margin-bottom: var(--bk-space-4);
 }
 
@@ -919,7 +919,7 @@
 .mgr-empty-hero p {
   margin: 0;
   font-size: 13px;
-  color: var(--bk-ink-disabled);
+  color: var(--bk-ink-muted);
   line-height: 1.55;
 }
 
@@ -960,7 +960,7 @@
   background: var(--bk-success);
   flex-shrink: 0;
 }
-.mgr-asset-use.unused { color: var(--bk-ink-disabled); }
+.mgr-asset-use.unused { color: var(--bk-ink-muted); }
 .mgr-asset-use.unused .mgr-use-dot { background: var(--bk-border-medium, var(--bk-border)); }
 
 .mgr-count {
@@ -1049,7 +1049,7 @@
   font: 400 11px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
-.mgr-list-use.unused { color: var(--bk-ink-disabled); }
+.mgr-list-use.unused { color: var(--bk-ink-muted); }
 
 /* ─── Board 1163:13695 smart-scope note ──────────────────────────────── */
 .mgr-scope-note {

@@ -117,13 +117,7 @@
   border-radius: var(--bk-radius-sm, 4px);
   border-left: 2px solid transparent;
 }
-.med-upload-queue-item--error {
-  background: var(--bk-error-tint, var(--bk-error-tint));
-  color: var(--bk-error, var(--bk-error));
-  border-left-color: var(--bk-error, var(--bk-error));
-}
 .med-upload-queue-item__name {
-  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -959,10 +953,6 @@
   flex-direction: column;
   gap: 4px;
 }
-.med-quota-text {
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-muted, var(--bk-ink-soft));
-}
 .med-quota-track {
   height: 3px;
   background: var(--bk-bg-subtle, var(--bk-bg-subtle));
@@ -979,10 +969,6 @@
 }
 .med-quota-bar--exhausted .med-quota-fill {
   background: var(--bk-error, var(--bk-error));
-}
-.med-quota-bar--near-limit .med-quota-text,
-.med-quota-bar--exhausted .med-quota-text {
-  color: var(--bk-warning, var(--bk-warning));
 }
 
 /* Asset cell CSS deleted 2026-08-04 (T8). The card is Figma `Card / media`

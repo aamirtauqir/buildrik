@@ -1,13 +1,13 @@
 {
- "generated": "2026-09-02T09:59:45Z",
+ "generated": "2026-09-02T10:16:54Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 117,
-  "verify": 135,
+  "fix": 143,
+  "verify": 106,
   "todo": 38,
   "unbuildable": 66,
-  "decide": 8,
-  "done": 50,
+  "decide": 9,
+  "done": 52,
   "fix-figma": 10
  },
  "jobs": [
@@ -1455,9 +1455,9 @@
    "name": "Media · bulk-select",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: actions 12/500 vs 400; 'Done' not on board; FIGMA 145:349/350 overlap 16px",
    "authority": "board"
   },
   {
@@ -1467,9 +1467,9 @@
    "name": "Media · drill-in · asset-detail",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: alt section 110 vs 80 (input 36 vs 32, Generate 32h Button vs 18h text); dims missing (MediaAsset has no width/height). AssetDetailOverlay.tsx",
    "authority": "board"
   },
   {
@@ -1479,9 +1479,9 @@
    "name": "Media · drill-in · icon-picker",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P1 vm: back row 279x0 (flex-shrink under a 2992px grid) — search covers it, pointer click times out; grid-cols-6 in 247px overflows; no section headers; cells r4 vs r6. IconBrowserOverlay.tsx:148 tw:shrink-0, :116 grid-cols-5; FIGMA 147:19 rows 312 in 280",
    "authority": "board"
   },
   {
@@ -1491,9 +1491,9 @@
    "name": "Media · drill-in · stock-browser",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: filter chips 88x32 11/500 #111827 vs 88x28 11/400 #4b5563; 'Color' vs 'Colour'; stock cards unmeasurable (no provider keys)",
    "authority": "board"
   },
   {
@@ -1503,9 +1503,9 @@
    "name": "Media · drill-in · used-in",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: header/path 12 vs 11; Jump 13/500 vs 12/400",
    "authority": "board"
   },
   {
@@ -1515,9 +1515,9 @@
    "name": "Media · drill-in · versions",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: tint #e1effe vs #ebf5ff; no author line; delta/⋯ offsets 45/12 vs 124/64",
    "authority": "board"
   },
   {
@@ -1527,9 +1527,9 @@
    "name": "Media · empty",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "decide",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: ONE link (Upload dropped by code on purpose) vs board two; board pills show counts on an empty library (FIGMA → 0)",
    "authority": "board"
   },
   {
@@ -1539,9 +1539,9 @@
    "name": "Media · filtered",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: scope row Inter 12/400 #6b7280 vs mono 11/500 accent. SlimLauncher.tsx ~205",
    "authority": "board"
   },
   {
@@ -1551,9 +1551,9 @@
    "name": "Media · folder-scoped",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: scope label 13/500 vs 400; empty-folder state has no board (designer)",
    "authority": "board"
   },
   {
@@ -1563,9 +1563,9 @@
    "name": "Media · grid",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: geometry ok; search bg #fff/#d1d5db vs #f9fafb/#e5e7eb; pills 24 vs 22; footer 'Browse stock' wraps (board 'Stock'); load-more count Inter 12/400 vs mono 11/500",
    "authority": "board"
   },
   {
@@ -1575,9 +1575,9 @@
    "name": "Media · load-error",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "done",
+   "owner": "verifier-media",
+   "evidence": "MATCH-ish vm: block/copy/colours ok; FIGMA: pills draw counts on a failed load; 453:3933 still has the double border",
    "authority": "board"
   },
   {
@@ -1587,9 +1587,9 @@
    "name": "Media · loading",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "done",
+   "owner": "verifier-media",
+   "evidence": "MATCH vm: 6 cells, thumbs 76 r6, bars 96/72/110/84/100/66 exact; FIGMA cells overlap 24px at 280",
    "authority": "board"
   },
   {
@@ -1599,9 +1599,9 @@
    "name": "Media · no-results",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: copy/colour ok; pad 32/16 vs 36/24 → tw:pt-9 tw:px-6",
    "authority": "board"
   },
   {
@@ -1611,9 +1611,9 @@
    "name": "Media · quota-full",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: text amber (css --exhausted rule; JSX template class never compiles); line2 12 #4b5563 vs 11 #6b7280; no 40h tint bar (founder). StorageQuotaBar.tsx ~60",
    "authority": "board"
   },
   {
@@ -1623,9 +1623,9 @@
    "name": "Media · quota-warn",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: band 75 vs 58; text 11/400 #c27803 vs 12 #723b13; track 3; Optimise 32h Button vs 16h text — MediaTab.css:957-986 → delete",
    "authority": "board"
   },
   {
@@ -1635,9 +1635,9 @@
    "name": "Media · upload-failed",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: row #fde8e8 + 2px red border + name 600 vs #fdfdea/none/400 — MediaTab.css:103-145 outranks JSX classes → delete",
    "authority": "board"
   },
   {
@@ -1647,9 +1647,9 @@
    "name": "Media · uploading",
    "family": "Media",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: pct mono 11/400 vs 500; track r4 vs r2 at +32 vs +28. UploadZone.tsx",
    "authority": "board"
   },
   {
@@ -4167,9 +4167,9 @@
    "name": "Media · fullpage · library",
    "family": "Media",
    "width": 1440,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: top 56 vs 52, search 420x34 vs 733x29, buttons 34 vs 27, rows 31.5 vs 27, cards 146x166 vs 144x135, status 36 vs 32; ALL muted text --bk-ink-disabled #D1D5DB vs #6b7280 (1.5:1). LibraryManager.css:83,174,215,275,1052",
    "authority": "board"
   },
   {
@@ -4179,9 +4179,9 @@
    "name": "Media · fullpage · empty",
    "family": "Media",
    "width": 1440,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: 80px ring vs 28 glyph; sub 13/400 #d1d5db vs 11 #6b7280; CTAs 34 vs ~27",
    "authority": "board"
   },
   {
@@ -4191,9 +4191,9 @@
    "name": "Media · fullpage · list-view · bulk-select",
    "family": "Media",
    "width": 1440,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: bulk bar 51h replaces toolbar (board 29h below); outlined 34h Buttons vs 11/500 links; rows 20.5 vs 29; name 13/500 vs 11/400. AssetGrid.tsx",
    "authority": "board"
   },
   {
@@ -4203,9 +4203,9 @@
    "name": "Media · fullpage · unused-scope · context-menu",
    "family": "Media",
    "width": 1440,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: items 28/13 vs 27/12; extra 'Copy alt text'; Escape on the menu closes the whole manager. MediaContextMenu.tsx",
    "authority": "board"
   },
   {
@@ -4215,9 +4215,9 @@
    "name": "Media · fullpage · drag-over · uploading",
    "family": "Media",
    "width": 1440,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: veil accent@4% no dashed border vs #ebf5ff + 2px dashed; title 14/500 vs 15/600. .mgr-dropzone",
    "authority": "board"
   },
   {
@@ -4227,9 +4227,9 @@
    "name": "Media · modal · picker (choose for element)",
    "family": "Media",
    "width": 640,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: 720x532 r8 vs 640 r12 + border; title 16/600 no 'for Hero · Image' subtitle (forLabel exists, not passed); tabs 13 h32 vs 11; extra Grid/List row. MediaLibraryPanel.tsx",
    "authority": "board"
   },
   {
@@ -4239,9 +4239,9 @@
    "name": "Media · modal · replace-across-site",
    "family": "Media",
    "width": 520,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: 520x348 pad 24 r8 vs x300 16/14 r12; thumbs 96x96 r6 + captions vs 96x64 r8 name beside; buttons 32/13 vs 29/11-500. MediaTab.css .med-rx-*",
    "authority": "board"
   },
   {
@@ -4468,9 +4468,9 @@
    "name": "Media · modal · replace-across · result-states",
    "family": "Media",
    "width": 948,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: 'Replaced 3 uses ✓' 13/400 #0e9f6e vs 12/600 #057a55; Done 32h Button vs link",
    "authority": "board"
   },
   {
@@ -4492,9 +4492,9 @@
    "name": "Media · delete-confirm · bulk type-DELETE (>20)",
    "family": "Media",
    "width": 440,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: 440x316 r8 pad 20 vs x199 r12 16/14; title 16 vs 14; input 36 white vs 31 #f3f4f6; buttons 40 vs 29; disabled Delete grey chip (DS) vs board red@50% (FIGMA); hint 11 vs 9. ConfirmDeleteModal.tsx",
    "authority": "board"
   },
   {
@@ -4600,9 +4600,9 @@
    "name": "Media · fullpage · folders · new-folder (inline)",
    "family": "Media",
    "width": 240,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: entry is a 40x18 '+' vs a '＋ New folder' row; input 36 r4 13 vs ~27 r6 12. FolderTree.tsx:364",
    "authority": "board"
   },
   {
@@ -4612,9 +4612,9 @@
    "name": "Media · modal · import-url",
    "family": "Media",
    "width": 520,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P2 vm: 560x223 r8 vs 520x177 r12; title 16 vs 14; label 11 vs 9; input 36 white r4 vs 31 #f9fafb r6; buttons 40h 14/500 r8 vs 29h 11/500 r6. ImportUrlModal.tsx",
    "authority": "board"
   },
   {
@@ -4624,9 +4624,9 @@
    "name": "Media · modal · import-url · invalid",
    "family": "Media",
    "width": 520,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-16",
+   "status": "fix",
+   "owner": "verifier-media",
+   "evidence": "P3 vm: error copy/colour ok (12 vs 11); input border stays accent while focused vs #c81e1e",
    "authority": "board"
   },
   {

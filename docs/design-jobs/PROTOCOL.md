@@ -71,3 +71,7 @@ A job is never moved to `done` on a note. It moves on a ledger line with numbers
 - A parent `resize()` in the Figma sandbox does not relayout child instances —
   bump a padding. `saveVersionHistoryAsync` is unsupported.
 - Bash `while read` drops a last line with no trailing newline. Count in, count out.
+- Live probes abort EVERY mutation at the route, including `siteVersions.create`:
+  the editor's autosave checkpoint minted 40 fixture versions across three verifier
+  sessions on 2026-09-02 (deleted afterwards). Pattern:
+  `saveProject|sites.update|siteVersions|publish|rollback|comments|reviews|assets|content|collections`.
