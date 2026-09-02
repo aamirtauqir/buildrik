@@ -143,8 +143,8 @@ Biggest: **F13** flowbite h-10/link leak (39 jobs across 7 families) · **C10** 
 | 988:2 Dashboard v2 | 79 | 911 | **100%** | 0 | **0** |
 | 1:4 Site | 47 | 114 | **100%** | 0 | 0 |
 | 1:5 Portfolio | 33 | 94 | **100%** | 0 | 0 |
-| 1:3 Editor | 305 live | 1612 | **99%** | 2 | 12 |
-| 397:2 Dashboard spine | 34 | 160 | 91% | 3 | 0 |
+| 1:3 Editor | 305 live | 1611 | **99%** | 2 | 12 |
+| 397:2 Dashboard spine | 34 | 163 | **100%** | 0 | 0 |
 
 **What the work actually was.** Of ~185 hotspots added to page 1:3, 15 duplicated an edge the host already carried and were removed; the other ~170 reached destinations nothing else reached — real gaps, whatever the headline number said. The systemic cause was genuine: family hubs wired fully *outward* while the states they lead to carried no edge of their own, so you could reach a screen and never leave it.
 
