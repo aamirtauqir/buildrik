@@ -1,14 +1,14 @@
 {
- "generated": "2026-09-02T05:31:01Z",
+ "generated": "2026-09-02T05:50:27Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 52,
-  "verify": 188,
-  "todo": 68,
-  "unbuildable": 70,
-  "done": 24,
-  "decide": 6,
-  "fix-figma": 10
+  "fix": 80,
+  "verify": 173,
+  "todo": 49,
+  "unbuildable": 75,
+  "fix-figma": 12,
+  "decide": 8,
+  "done": 27
  },
  "jobs": [
   {
@@ -175,9 +175,9 @@
    "name": "Brand · classes",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: rows 54.5 vs 44; name 13/400 x24 vs Geist Mono 11/500 x16; usage 12 vs 11. ClassesSection.tsx:70-75",
    "authority": "board:153-2-no-menu"
   },
   {
@@ -187,9 +187,9 @@
    "name": "Brand · colour-mode",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — colour-mode: row pitch 48 vs board 32 — half as many rows per screen; token names and Set link match",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: rows 48 vs 32; name 13/400 vs mono 11/500; toggle 32h accent pill vs 28h r6 white 12/400. ColourModeSection.tsx:79/96/123",
    "authority": "board"
   },
   {
@@ -199,9 +199,9 @@
    "name": "Brand · components",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — components: the board PINS 'Generate with AI' to the panel foot; live renders it at y1081 in scroll flow, 674px below the fold and not even last",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P1 verifier-brand: rows 36 vs 44, label 11/600 vs 13/400; Generate-with-AI at y1080 in scroll flow (387 under fold) vs 44px pinned foot strip. ComponentsSection.tsx:45-53,163-206; DesignSystemTab.tsx:795",
    "authority": "board"
   },
   {
@@ -211,9 +211,9 @@
    "name": "Brand · dirty",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: footer h57 grey, 2-line text, 32px buttons (#ef4444 literal :73) vs 44h #fdfdea bar with text actions x16/156/226; DraftChip never renders. DesignTabFooter.tsx:37-83",
    "authority": "board:154-78-save-bar"
   },
   {
@@ -223,9 +223,9 @@
    "name": "Brand · export · error",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P3 verifier-brand: same deltas (#9b1c1c vs #c81e1e, no #e02424 border); 08-31 match note predates redraw",
    "authority": "board"
   },
   {
@@ -235,9 +235,9 @@
    "name": "Brand · export · exported",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — export · exported: board shows a persistent 'Exported CSS' pill; live shows only a transient toast + a Copied! label swap",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P3 verifier-brand: Badge r4 no border 12/600 #03543f x28 vs pill r9999 1px #0e9f6e 12/500 #046c4e x15. SectionStatusBadge.tsx:80 — one pass fixes 2232/2265/2298",
    "authority": "board"
   },
   {
@@ -247,9 +247,9 @@
    "name": "Brand · export · imported",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P3 verifier-brand: same SectionStatusBadge deltas",
    "authority": "board"
   },
   {
@@ -259,9 +259,9 @@
    "name": "Brand · import-export",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — import-export: row pitch 66 vs 48, and TWO nested scrollers (725px hidden inside 470px hidden)",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: bordered cards double inset; format rows 60-75 vs 48; Copy icon + Download 13px vs both 11px accent text; drop zone 128.5 vs 56. ExportSection.tsx:39-42,217-300; ImportCard.tsx:237. Board copy '.css' names a format accept rejects (D → Figma '.json or .ts')",
    "authority": "board"
   },
   {
@@ -284,9 +284,9 @@
    "name": "Brand · lint · suppressed",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: pill #fdfdea/#723b13/400 vs #fdf6b2/#c27803/500; x24 vs 15. DesignSystemTab.tsx:693 → warning Badge",
    "authority": "board:306-2217"
   },
   {
@@ -296,9 +296,9 @@
    "name": "Brand · lint-warnings",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: Lint count 12/500 Inter vs mono 11/500; Lint row y715 under fold. :742. Board on superseded root (C)",
    "authority": "board:154-26"
   },
   {
@@ -308,9 +308,9 @@
    "name": "Brand · load-error",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "unbuildable",
+   "owner": "verifier-brand",
+   "evidence": "A verifier-brand: 3 injections tried; engine throws in siteFontsFromTokens before the panel mounts or ignores payload; getProjectSettings never throws",
    "authority": "board:781-4311"
   },
   {
@@ -333,9 +333,9 @@
    "name": "Brand · presets",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — presets: row pitch 34 vs board 44; variant count right-aligned to x295 vs board x232",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: rows 32/34 vs 44; label x26 500 vs x16 400; count 12px edge 255 vs 11px edge 244. StyleCategoryRow.tsx:58-74, StylesRouter.tsx:143",
    "authority": "board"
   },
   {
@@ -358,9 +358,9 @@
    "name": "Brand · presets · draft",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "unbuildable",
+   "owner": "verifier-brand",
+   "evidence": "A verifier-brand: no UI can dirty a preset (PresetBindingRow click no-op v1)",
    "authority": "code:draft-badge-shipped-needs-token-picker-pass"
   },
   {
@@ -383,9 +383,9 @@
    "name": "Brand · pro-locked",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: note is an li at y808 (116 under fold) vs pinned 40h strip 11/400 #6b7280 bg-subtle. DesignSystemTab.tsx:756-760. Board drawn on superseded root 152:2 (C)",
    "authority": "board:154-132"
   },
   {
@@ -395,9 +395,9 @@
    "name": "Brand · starters",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix-figma",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: grid p24/28 gap12 cards 93.5x139 bordered vs p16/12 gap16 136x104 flat; name 13/600 vs 12/400; warning h34 vs h44. StarterGrid.tsx:39-108. BOARD BUG: gallery rows 288 wide in a 280 frame → cards 116",
    "authority": "board:152-137"
   },
   {
@@ -407,9 +407,9 @@
    "name": "Brand · starters · applied",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P3 verifier-brand: pill 400/#057a55/x24/h22 vs 500/#046c4e/x16/h20. StartersSection.tsx:50-53",
    "authority": "board:306-2186"
   },
   {
@@ -419,9 +419,9 @@
    "name": "Brand · token-detail",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — token-detail: rows 54px vs board 44; adds an All/Issues filter and a section header the board lacks",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: rows 54/56 vs 44; swatch x24 vs 16; name x50 13/500 vs x40 13/400; toolbar h60 unboarded. TokenRow.tsx:106/71/63",
    "authority": "board"
   },
   {
@@ -431,9 +431,9 @@
    "name": "Brand · tokens",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — tokens: an unboarded info banner pushes the first kind +89px; extra 'More token kinds' row and a second helper block",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: first-load banner h90 pushes kind 1 y80→192.5; count 12/500 Inter vs Geist Mono 11/500 x218; label 500 vs 400. TokensSection.tsx:371/383/384",
    "authority": "board"
   },
   {
@@ -443,9 +443,9 @@
    "name": "Brand · tokens · add",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "decide",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: board = list + Add-token pill; live = in-panel modal scrim, 280 card in 279 panel. Shape B. If modal: AddTokenModal.tsx:63 width + chrome-ui Modal",
    "authority": "board:306-2049-modal"
   },
   {
@@ -455,9 +455,9 @@
    "name": "Brand · tokens · replace",
    "family": "Brand",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "unbuildable",
+   "owner": "verifier-brand",
+   "evidence": "A+B verifier-brand: replace modal only from Delete with consumerCount>0; all 17 fixture colours unused; board pill vs code modal",
    "authority": "board:306-2080-modal"
   },
   {
@@ -881,11 +881,10 @@
    "name": "History · Published (tab)",
    "family": "History",
    "width": 360,
-   "status": "unbuildable",
-   "owner": null,
-   "evidence": "unreachable-no-published-versions",
-   "authority": "board",
-   "blocker": "A"
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
+   "authority": "board"
   },
   {
    "id": "J-453:4064",
@@ -894,9 +893,9 @@
    "name": "History · Published · failed",
    "family": "History",
    "width": 1440,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "unbuildable",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: behind the rollback confirm; not run under the rule",
    "authority": "code:cites-board"
   },
   {
@@ -906,9 +905,9 @@
    "name": "History · Published · redeploying",
    "family": "History",
    "width": 1440,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "unbuildable",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: needs a polled rollback job = a confirmed redeploy (forbidden)",
    "authority": "code:cites-board"
   },
   {
@@ -918,9 +917,9 @@
    "name": "History · Published · restore-confirm",
    "family": "History",
    "width": 1440,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: 440 ok, copy ok; info box 13px/r6 vs 12px/r8; Cancel ghost 12px vs bordered 14px. PublishHistory.tsx:82-85; ConfirmDialog.tsx:56-77",
    "authority": "code:cites-board"
   },
   {
@@ -930,9 +929,9 @@
    "name": "History · Published · restored",
    "family": "History",
    "width": 1440,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "unbuildable",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: same producer as 184:37",
    "authority": "code:cites-board"
   },
   {
@@ -942,9 +941,9 @@
    "name": "History · Published · roll-back confirm",
    "family": "History",
    "width": 1440,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: modal 560x405 ok; rows 40 vs 56h, current row dimmed .5 vs full, meta 500/ink-soft vs 400/muted, footer buttons 40 vs 32; no ✕ (founder). PublishHistory.tsx:91-94,326-331",
    "authority": "code:cites-board"
   },
   {
@@ -954,9 +953,9 @@
    "name": "History · Saves",
    "family": "History",
    "width": 360,
-   "status": "verify",
-   "owner": null,
-   "evidence": "drift-prune-note-clipped-FIXED",
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
    "authority": "board"
   },
   {
@@ -978,9 +977,9 @@
    "name": "History · Saves · empty",
    "family": "History",
    "width": 360,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "decide",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
    "authority": "board:163-64"
   },
   {
@@ -990,9 +989,9 @@
    "name": "History · Saves · load-error",
    "family": "History",
    "width": 360,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
    "authority": "board"
   },
   {
@@ -1002,9 +1001,9 @@
    "name": "History · Saves · pruned-notice",
    "family": "History",
    "width": 360,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
    "authority": "board:163-269"
   },
   {
@@ -1014,9 +1013,9 @@
    "name": "History · Saves · restore-confirm",
    "family": "History",
    "width": 360,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match-minor-button-height",
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
    "authority": "board"
   },
   {
@@ -1026,9 +1025,9 @@
    "name": "History · Saves · restoring",
    "family": "History",
    "width": 360,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
    "authority": "code:cites-board"
   },
   {
@@ -1050,9 +1049,9 @@
    "name": "History · milestone suggestion banner (code: MilestoneSuggestionBanner.tsx)",
    "family": "History",
    "width": 680,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix-figma",
+   "owner": "verifier-history",
+   "evidence": "2026-09-02 verifier-history: BOARD DEFECT — banner filled solid #3F83F8 with 11px #6B7280 text (~1.5:1); live accent-tint is right. Code: content column collapses to 30px in the 280 drawer, buttons 40h vs 23. MilestoneSuggestionBanner.tsx:66-76,148-166",
    "authority": "board:433-2348"
   },
   {
@@ -4445,9 +4444,9 @@
    "name": "Brand · review-changes (modal)",
    "family": "Brand",
    "width": 520,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Brand review-changes modal: 360w vs board 520 (ModalContent size='sm'); copy contract exact; buttons 32h vs 27",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P2 verifier-brand: 360x154.8 r8 p20 vs 520x239 r12; title 16/600 vs 13/600; buttons 32h left vs 27h right; no change rows; 'Review 0 staged changes' while footer says unsaved. ReviewModal.tsx:111-179; DesignSystemTab.tsx:806 pass totalDirty",
    "authority": "board"
   },
   {
@@ -4637,9 +4636,9 @@
    "name": "Brand · root — NEW 2026-08-27 (CURRENT)",
    "family": "Brand",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — Brand root (CURRENT): NEVER BUILT TO — the code cites 152:2/154:132 and this board appears nowhere in src. 140px of unboarded chrome (theme strip + mode toggle) hides 2 of 9 rows; scroller sh636/ch504",
+   "status": "fix",
+   "owner": "verifier-brand",
+   "evidence": "P1 2026-09-02 verifier-brand: 176.6px unboarded chrome (theme strip 125.6 + mode toggle 51) before preview; rows 51.6 inset x12 vs board 52 full-bleed x16; label 500 vs 400; chevron 14px #9ca3af vs 12px #4b5563; Lint + Import/export under the 693 fold. DesignSystemTab.tsx:597-632,719,708,80. Board header text contradicts Panel-header component (live matches component)",
    "authority": "board"
   },
   {
@@ -4941,20 +4940,22 @@
    "kind": "harness",
    "name": "raw-figma/ cache refreshed from redrawn boards (8 files dated 2026-08-04)",
    "family": "harness",
-   "status": "fix",
+   "status": "done",
    "blocker": "F",
    "owner": null,
-   "evidence": ""
+   "evidence": "",
+   "doneAt": "2026-09-02T05:42:42Z"
   },
   {
    "id": "H-02",
    "kind": "harness",
    "name": "probe fixtures width 320→280 (e2e/probe/probe.tsx ×6)",
    "family": "harness",
-   "status": "fix",
+   "status": "done",
    "blocker": "F",
    "owner": null,
-   "evidence": ""
+   "evidence": "",
+   "doneAt": "2026-09-02T05:42:42Z"
   },
   {
    "id": "H-03",
@@ -4981,10 +4982,11 @@
    "kind": "harness",
    "name": "layers-loading recipe: skeleton-row 264 vs board 280 — measurement model vs visual",
    "family": "harness",
-   "status": "verify",
+   "status": "done",
    "blocker": "F",
    "owner": null,
-   "evidence": ""
+   "evidence": "",
+   "doneAt": "2026-09-02T05:42:42Z"
   },
   {
    "id": "H-06",
@@ -5055,6 +5057,66 @@
    "blocker": "G",
    "owner": null,
    "evidence": ""
+  },
+  {
+   "id": "H-08",
+   "kind": "harness",
+   "name": "probe drillHost still 320x840 (probe.tsx:208 tw:w-80 tw:h-[840px]) — missed by H-02",
+   "family": "harness",
+   "status": "fix",
+   "blocker": "F",
+   "owner": null,
+   "evidence": "baseline agent 2026-09-02"
+  },
+  {
+   "id": "H-09",
+   "kind": "harness",
+   "name": "CI red 100/100 runs: ESLint parsing error blocks editor tests; Style parity fails so Figma conformance is SKIPPED — conformance has produced no CI verdict in 45+ runs",
+   "family": "harness",
+   "status": "fix",
+   "blocker": "F",
+   "owner": null,
+   "evidence": "baseline agent 2026-09-02"
+  },
+  {
+   "id": "H-10",
+   "kind": "harness",
+   "name": "contrast baseline is a COUNT; cannot tell a new failure from a re-ordered one — baseline the set {selector,text,color,bg}; refuse worse values without --accept-regression",
+   "family": "harness",
+   "status": "fix",
+   "blocker": "F",
+   "owner": null,
+   "evidence": "baseline agent 2026-09-02"
+  },
+  {
+   "id": "H-11",
+   "kind": "harness",
+   "name": "coverage ratchet inert for 8/9 surfaces (.conformance-baseline.json has one key); check-boards counts.verifiedActive stale; recipe null on 439/439 rows",
+   "family": "harness",
+   "status": "fix",
+   "blocker": "F",
+   "owner": null,
+   "evidence": "baseline agent 2026-09-02"
+  },
+  {
+   "id": "H-12",
+   "kind": "harness",
+   "name": "spec freshness never compares raw to the BOARD; raw 'verbatim' is hand-trimmed so live hash compare cannot work — add --live re-fetch compare, MAX_AGE 30→14",
+   "family": "harness",
+   "status": "fix",
+   "blocker": "F",
+   "owner": null,
+   "evidence": "baseline agent 2026-09-02"
+  },
+  {
+   "id": "H-13",
+   "kind": "harness",
+   "name": "3 per-family recipes proposed in ledger (Insert 137:2, Pages 141:124, Notifications 453:4051) — need testIds added first (insert-search, rail-${tab}, pages-footer, notifications-*)",
+   "family": "harness",
+   "status": "todo",
+   "blocker": "F",
+   "owner": null,
+   "evidence": "baseline agent 2026-09-02"
   }
  ]
 }
