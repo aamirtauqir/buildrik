@@ -1,13 +1,13 @@
 {
- "generated": "2026-09-02T09:53:28Z",
+ "generated": "2026-09-02T09:59:45Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 108,
-  "verify": 144,
-  "todo": 47,
-  "unbuildable": 64,
+  "fix": 117,
+  "verify": 135,
+  "todo": 38,
+  "unbuildable": 66,
   "decide": 8,
-  "done": 43,
+  "done": 50,
   "fix-figma": 10
  },
  "jobs": [
@@ -1347,9 +1347,9 @@
    "name": "Layers · filtered",
    "family": "Layers",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "done",
+   "owner": "verifier-layers-review",
+   "evidence": "MATCH vlr: 27 flat rows, pl12, footer total = board",
    "authority": "board:143-2"
   },
   {
@@ -1359,9 +1359,9 @@
    "name": "Layers · hidden",
    "family": "Layers",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — hidden: name/icon dim, aria gains ', hidden', canvas gets data-hidden",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P3 vlr: board row opacity .45; live per-part colours + #d1d5db square behind glyph. layers-v2.css:54-58 → .bdc-lr.bdc-hidden{opacity:.45}",
    "authority": "board"
   },
   {
@@ -1371,9 +1371,9 @@
    "name": "Layers · invalid-drop",
    "family": "Layers",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — invalid-drop: contrast FIXED (was red-on-ink 3.76:1, duplicate color decl); drift remains — alert sits at panel top not the drop point, and copy is raw type names",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P3 vlr: alert at y133 top vs inline at drop row y194; h28/r0/pl16 vs 30/6/12; raw type names index.tsx:130,134,150",
    "authority": "board"
   },
   {
@@ -1383,9 +1383,9 @@
    "name": "Layers · load-error",
    "family": "Layers",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-09-02: count footer no longer survives the tree it counts — board draws no count here. Boundary raises onFailedChange; footer is gated on it and returns on retry. Pinned by LayersTab.boundary.test.tsx, watched to FAIL with the guard removed. Error line moved off tw:text-red-700 to --bk-error-text (#C81E1E), the token the board names.",
+   "status": "done",
+   "owner": "verifier-layers-review",
+   "evidence": "MATCH vlr: pt36 pr24 pb32 gap6, 13/20 #c81e1e, 12 #6b7280, Try again #1a56db, retry restores 40 rows; block 150 vs 127 (32 link button → LayersStateBlocks.tsx:62-66)",
    "authority": "board"
   },
   {
@@ -1395,9 +1395,9 @@
    "name": "Layers · loading",
    "family": "Layers",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — loading: skeleton NEVER renders — composer exists before the payload, so the empty state shows during a 25s stall; LayersTab.tsx:182 false branch is dead",
+   "status": "unbuildable",
+   "owner": "verifier-layers-review",
+   "evidence": "A P2 vlr: skeleton never renders — LayersTab.tsx:185 gates on composer; with sites.get stalled 8s the drawer body is BLANK 8.8s (0 rows, no skeleton). Fix: gate on active page/root",
    "authority": "board"
   },
   {
@@ -1408,8 +1408,8 @@
    "family": "Layers",
    "width": 280,
    "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — locked: lock darkens, aria gains ', locked', draggable flips false",
+   "owner": "verifier-layers-review",
+   "evidence": "F vlr: board payload not retrieved (seat limit); live lock #111827, aria ', locked', draggable=false — re-read board",
    "authority": "board"
   },
   {
@@ -1419,9 +1419,9 @@
    "name": "Layers · multi-select",
    "family": "Layers",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "verify",
+   "owner": "verifier-layers-review",
+   "evidence": "F vlr: board not retrieved; live banner y80 h37 '3 selected' 12/500, four 24x24 buttons, Esc clears",
    "authority": "board:143-295"
   },
   {
@@ -1431,9 +1431,9 @@
    "name": "Layers · no-results",
    "family": "Layers",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "verify",
+   "owner": "verifier-layers-review",
+   "evidence": "F vlr: board not retrieved; live pt36/24/32/24 gap10, y84, 13/20 muted, link 32; footer still '66 layers' under 'Nothing matches' (LayersTab.tsx:207)",
    "authority": "board:782-4260"
   },
   {
@@ -1443,9 +1443,9 @@
    "name": "Layers · tree",
    "family": "Layers",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P2 vlr: row label 11/500 vs 13/400 (every board); pitch 29 vs 28; search input 40 in 28 box; ⊞⊟⚙ 10x40; 53px breadcrumb on selection on no board (decide). layers-v2.css:29,231,236; LayersTab.tsx:163,174-182",
    "authority": "board:142-2"
   },
   {
@@ -2138,9 +2138,9 @@
    "name": "Review panel · all-resolved",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "done",
+   "owner": "verifier-layers-review",
+   "evidence": "MATCH vlr: fill 100%, '2 of 2', copy/colour = board; 14/12 vs 13/11 residual ReviewTab.tsx:602-609",
    "authority": "board"
   },
   {
@@ -2150,9 +2150,9 @@
    "name": "Review panel · detached-present",
    "family": "Review panel",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P1 vlr: false DETACHED on 3/6 plain loads while the element IS in the DOM — commentAnchors.ts:100 pageId===activePageId true for null/null; scan CommentLayer.tsx:229 runs pre-mount → orphan modal blocks every click until Esc",
    "authority": "code:detached-group-wired-fixture-has-no-orphan-now"
   },
   {
@@ -2163,8 +2163,8 @@
    "family": "Review panel",
    "width": 280,
    "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "owner": "verifier-layers-review",
+   "evidence": "F vlr: board not retrieved; live 'has not commented yet.' 14/21 + 'You will be notified.' 12/16",
    "authority": "board"
   },
   {
@@ -2174,9 +2174,9 @@
    "name": "Review panel · load-error",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match-minor-summary-also-hides",
+   "status": "done",
+   "owner": "verifier-layers-review",
+   "evidence": "MATCH vlr: role=alert, copy = board; residual #e02424 vs #c81e1e, 14 vs 13 ReviewTab.tsx:433",
    "authority": "board"
   },
   {
@@ -2186,9 +2186,9 @@
    "name": "Review panel · older-round",
    "family": "Review panel",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P2 B vlr: board read-only round VIEW vs live header list; all 7 previous rounds print 'Revoked' though DB says APPROVED/CHANGES_REQUESTED — ReviewTab.tsx:797 tests revoked before status",
    "authority": "code:rounds-list-ships-comment-linkage-blocked"
   },
   {
@@ -2198,9 +2198,9 @@
    "name": "Review panel · open",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P2 vlr: comment row 105.5 vs 64 (py12, quote 14 vs 13, meta 11 vs 12, 32 Resolve button); bands 32/px12 vs 28/px16; Compare/Re-send full-width 40 vs 28/32 auto; count 12/400 vs mono 11/500. CommentRow.tsx:56,68; ReviewTab.tsx:92-95,385,401,412-421,855",
    "authority": "board"
   },
   {
@@ -2210,9 +2210,9 @@
    "name": "Review panel · re-send-confirm",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "done",
+   "owner": "verifier-layers-review",
+   "evidence": "MATCH vlr: replaces primary, copy shape = board; residual h155 vs 108, title 14 vs 12, buttons 36 vs 28 ReviewTab.tsx:836-848",
    "authority": "board"
   },
   {
@@ -2222,9 +2222,9 @@
    "name": "Review panel · re-sending",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "unbuildable",
+   "owner": "verifier-layers-review",
+   "evidence": "F vlr: only producer is confirming Re-send (forbidden); label shape matches — run with reviews.submit aborted if authorised",
    "authority": "board"
   },
   {
@@ -2246,9 +2246,9 @@
    "name": "Review panel · review-closed",
    "family": "Review panel",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "verify",
+   "owner": "verifier-layers-review",
+   "evidence": "F vlr: board not retrieved; toast needs an approval mutation",
    "authority": "board:158-213-toast"
   },
   {
@@ -2258,9 +2258,9 @@
    "name": "Review panel · revoke-confirm",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "done",
+   "owner": "verifier-layers-review",
+   "evidence": "MATCH vlr: top-of-panel #fdfdea = board; residual title/button reds swapped, h134 vs 116, buttons 36 vs 28 ReviewTab.tsx:657-671",
    "authority": "board"
   },
   {
@@ -2270,9 +2270,9 @@
    "name": "Review panel · revoked",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "done",
+   "owner": "verifier-layers-review",
+   "evidence": "MATCH vlr: copy = board; residual 14/12 vs 13/11 ReviewTab.tsx:590",
    "authority": "board"
   },
   {
@@ -3549,9 +3549,9 @@
    "name": "Layers · context-menu",
    "family": "Layers",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "2026-08-31 — context-menu: 180w, radius 8, 28h items — matches; only .bdc-menu-sep has 4px margins the board lacks",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P3 vlr: w180 vs 140; separators 4px margins vs 0; 'Copy link' wrong group. layers-v2.css:362,390; LayerContextMenu.tsx:80",
    "authority": "board"
   },
   {
@@ -3561,9 +3561,9 @@
    "name": "Layers · renaming",
    "family": "Layers",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P2 vlr: dblclick on unselected row fails (breadcrumb pushes row y113→166); input 36 in 28 row, 11/500, 3 focus affordances vs 2px row border. LayerTreeItem.tsx:235 tw:h-5",
    "authority": "board:1082-4589"
   },
   {
@@ -3646,9 +3646,9 @@
    "name": "Review panel · loading",
    "family": "Review panel",
    "width": 280,
-   "status": "verify",
-   "owner": null,
-   "evidence": "match",
+   "status": "fix",
+   "owner": "verifier-layers-review",
+   "evidence": "P3 vlr: 5 rows pitch 24 vs 32, x −4, bar 12 vs 10, icon r4 vs 3. ReviewTab.tsx:354-367",
    "authority": "board"
   },
   {
@@ -4407,9 +4407,9 @@
    "name": "Layers · display-settings",
    "family": "Layers",
    "width": 280,
-   "status": "todo",
-   "owner": null,
-   "evidence": "",
+   "status": "verify",
+   "owner": "verifier-layers-review",
+   "evidence": "F vlr: board not retrieved; live popover unanchored at x0 y80 (⚙ at x258), mono uppercase header, raw shadow layers-v2.css:404, × 9.5x40, 18x10 switches",
    "authority": "board:1171-4829-entry"
   },
   {

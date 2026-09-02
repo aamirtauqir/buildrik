@@ -60,29 +60,29 @@ const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
    twMerge drops flowbite's. */
 const LINK_BTN =
   "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 tw:h-8 tw:min-h-0 " +
-  "tw:text-[13px] tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] tw:enabled:hover:bg-transparent";
+  "tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] tw:enabled:hover:bg-transparent";
 /** The quiet row-action button, previously copy-pasted at eleven call sites. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
-const FIELD_LABEL = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mx-3 tw:mt-2.5 tw:mb-1";
+const FIELD_LABEL = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mx-4 tw:mt-2.5 tw:mb-1";
 /** Inputs sit in a padded wrapper rather than carrying their own margin, so
  *  the field keeps the TextInput/Select wrapper theme untouched. */
-const FIELD_WRAP = "tw:px-3";
-const TOGGLE_ROW = "tw:flex tw:items-center tw:justify-between tw:p-3";
+const FIELD_WRAP = "tw:px-4";
+const TOGGLE_ROW = "tw:flex tw:h-8 tw:items-center tw:justify-between tw:px-4 tw:py-0";
 /* Board 149:108 tints the save bar with the warning wash, not neutral grey —
    the bar exists to say something is unsaved, and grey says nothing. */
 const SAVEBAR =
-  "tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2.5 tw:border-t tw:border-[var(--bk-gray-200)] " +
+  "tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4 tw:py-0 " +
   "tw:bg-[var(--bk-warning-tint)]";
 /* …and it draws Save as accent TEXT, not a filled button. The Button doc on the
    same Figma page is explicit that the one filled accent button belongs to the
    screen's primary action; a drawer's save bar is not where that is spent. */
 /* The recipe moved into Button's `link` variant (2026-08-29); what stays
    here is the one class this row adds on top. */
-const SAVE_LINK = "tw:min-h-6 tw:font-normal";
+const SAVE_LINK = "tw:min-h-6 tw:text-xs tw:font-normal";
 /** A note that belongs to the row above it, not to the panel's foot. */
-const INLINE_HINT = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:leading-normal tw:px-3 tw:pb-3";
+const INLINE_HINT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-normal tw:px-4 tw:pb-3";
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-[var(--bk-accent-text)]";
-const SUB = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
+const SUB = "tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-[var(--bk-gray-200)]";
 const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
 const SPACER = "tw:flex-1";
@@ -96,7 +96,7 @@ function Crumb({ label, onClick }: { label: string; onClick: () => void }) {
     /* self-start / justify-start: flowbite's Button centres its content and
        stretches to the column's width, so the board's left-aligned back link
        sat in the middle of the panel (149:50, 149:84). */
-    <Button className={`${LINK_BTN} tw:mx-3 tw:mt-2.5 tw:mb-0.5 tw:self-start tw:justify-start`} onClick={onClick} aria-label={`Back to ${label}`}>
+    <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5 tw:self-start tw:justify-start`} onClick={onClick} aria-label={`Back to ${label}`}>
       ‹ {label}
     </Button>
   );
@@ -167,7 +167,7 @@ export function RootView({
   }
   return (
     <div className={SCROLL}>
-      <SectionHeader count={collections.length}>Collections</SectionHeader>
+      <SectionHeader tint className="tw:h-8" count={collections.length}>Collections</SectionHeader>
       {collections.map((c) => (
         <ListRow
           key={c.id}
@@ -178,11 +178,11 @@ export function RootView({
         />
       ))}
       {onCreateCollection && (
-        <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={onCreateCollection}>
+        <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={onCreateCollection}>
           + New collection
         </Button>
       )}
-      <SectionHeader>Data</SectionHeader>
+      <SectionHeader tint className="tw:h-8">Data</SectionHeader>
       <ListRow label="Sources" count={sourcesCount} chevron onClick={onOpenSources} />
       <ListRow label="Variables" count={variablesCount} chevron onClick={onOpenVariables} />
       <ListRow label="Conditions" count={conditionsCount} chevron onClick={onOpenConditions} />
@@ -460,7 +460,7 @@ export function FieldsView({
       <Crumb label={`${collection.name} · fields`} onClick={onBack} />
       <div className={SCROLL}>
         {collection.fields.map((f) => (
-          <Row key={f.id} size="comment" data-field-row>
+          <Row key={f.id} size="stack" data-field-row>
             <span className={ROW_STACK}>
               <span>{f.name}</span>
               <span className={SUB}>{FIELD_TYPE_LABEL[f.type] ?? f.type}</span>
@@ -543,7 +543,7 @@ export function FieldsView({
             </div>
           </div>
         ) : (
-          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
+          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={() => setAdding(true)}>
             + Add field
           </Button>
         )}
@@ -846,7 +846,7 @@ export function SourcesView({
           </div>
         ) : (
           <>
-            <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
+            <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={() => setAdding(true)}>
               + Connect a source
             </Button>
             {/* Board 151:46 prints this under the link, in flow. Pinned to the
@@ -906,7 +906,7 @@ export function VariablesView({
           </div>
         )}
         {variables.map((v) => (
-          <Row key={v.key} size="comment" data-variable-row>
+          <Row key={v.key} size="stack" data-variable-row>
             <span className={ROW_STACK}>
               <span className={MONO}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
@@ -1010,7 +1010,7 @@ export function VariablesView({
             </div>
           </div>
         ) : (
-          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={() => setAdding(true)}>
+          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={() => setAdding(true)}>
             + New variable
           </Button>
         )}
@@ -1053,7 +1053,7 @@ export function ConditionsView({
       <Crumb label="Conditions" onClick={onBack} />
       <div className={SCROLL}>
         {conditions.map((c) => (
-          <Row key={`${c.elementId}`} size="comment" data-condition-row>
+          <Row key={`${c.elementId}`} size="tall" data-condition-row>
             <span className={ROW_STACK}>
               <span className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap">{c.label}</span>
               <span className={SUB}>{conditionSummary(c.binding)}</span>
@@ -1143,7 +1143,7 @@ export function ConditionsView({
             </div>
           </div>
         ) : (
-          <Button className={`${LINK_BTN} tw:mx-3 tw:my-2`} onClick={onStartPick}>
+          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={onStartPick}>
             + New condition
           </Button>
         )}

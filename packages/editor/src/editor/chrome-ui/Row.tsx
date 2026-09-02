@@ -11,7 +11,7 @@
  */
 import React from "react";
 
-export type RowSize = "dense" | "default" | "header" | "tall" | "comment";
+export type RowSize = "dense" | "default" | "header" | "stack" | "tall" | "comment";
 
 export interface RowProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect"> {
   size?: RowSize;
@@ -54,6 +54,9 @@ const SIZE: Record<RowSize, string> = {
   dense: "tw:h-7 tw:text-[11px] tw:items-center",
   default: "tw:h-8 tw:text-[13px] tw:items-center",
   header: "tw:h-11 tw:text-[13px] tw:items-center",
+  /* 44, per the Content boards (151:2 fields, 151:62 variables): a name over
+     a type line, centred — `comment` (64, top-aligned) was carrying these. */
+  stack: "tw:h-11 tw:text-[13px] tw:items-center",
   /* 56, per board 8:29 — NOT 64. At h-16 `tall` was byte-identical in height
      to `comment` (min-h-16), so the set shipped five names for four heights. */
   tall: "tw:h-14 tw:text-[13px] tw:items-center",
