@@ -41,8 +41,16 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SPECS = join(HERE, "specs");
 
-/** Days before a spec is considered worth re-extracting. */
-const MAX_AGE_DAYS = 30;
+/**
+ * Days before a spec is considered worth re-extracting.
+ *
+ * 30 was too slack to ever fire (F6/F7 evidence): the 2026-09-01 redraw moved
+ * 135 boards and landed at day 28.5 of the window, so neither the pre-push FAIL
+ * nor the CI WARN went off for a change that invalidated most of the specs.
+ * A calendar alarm that expires after the redraw it was meant to catch is
+ * decoration. 14 days is inside the cadence this file is actually redrawn on.
+ */
+const MAX_AGE_DAYS = 14;
 
 const args = process.argv.slice(2);
 const modeArg = args.find((a) => a.startsWith("--mode="));

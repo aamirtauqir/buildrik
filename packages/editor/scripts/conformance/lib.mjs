@@ -400,3 +400,37 @@ export function patchBaseline(surfaceId, patch, path = BASELINE_PATH) {
   writeFileSync(path, JSON.stringify(all, null, 2) + "\n");
   return all[surfaceId];
 }
+
+/**
+ * Key a contrast failure the way a human identifies one: which element, which
+ * words, which two colours. Text failures carry `text`, icon failures `label`.
+ */
+export const contrastKey = (p) =>
+  [p.selector, p.text ?? p.label ?? "", p.color, p.bg].join(" | ");
+
+/** `{key: ratio}` for a list of failures. */
+export const contrastSet = (list) =>
+  Object.fromEntries((list ?? []).map((p) => [contrastKey(p), Number(p.ratio)]));
+
+/**
+ * Compare a measured failure set against its baseline set (F6).
+ *
+ * A COUNT cannot do this job: fix one pair, introduce another, and `now >
+ * baseline` is false while a real regression ships. It also cannot see a pair
+ * getting worse — 4.4 -> 2.1 is the same single failure. So three outcomes are
+ * reported separately, and only the set can tell them apart:
+ *
+ *   `newPairs`   a measured pair with no baseline entry   — the swap
+ *   `worsePairs` a known pair whose ratio fell            — silent decay
+ *   `fixedPairs` a baseline pair no longer measured       — an improvement
+ */
+export function compareContrast(nowSet, baseSet) {
+  const newPairs = [];
+  const worsePairs = [];
+  for (const [key, ratio] of Object.entries(nowSet)) {
+    if (!(key in baseSet)) newPairs.push({ key, ratio });
+    else if (ratio < baseSet[key]) worsePairs.push({ key, was: baseSet[key], now: ratio });
+  }
+  const fixedPairs = Object.keys(baseSet).filter((k) => !(k in nowSet));
+  return { newPairs, worsePairs, fixedPairs };
+}

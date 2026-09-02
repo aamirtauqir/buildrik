@@ -201,11 +201,23 @@ function ToastCatalogFirer() {
   return <div data-probe="toast-catalog" />;
 }
 
-/** 320-wide positioned host — the drill-in's own stage. */
+/**
+ * The drill-in's own stage, at the size its boards are actually drawn.
+ *
+ * This was 320×840 (`tw:w-80`), and every drill-in board it hosts —
+ * 146:2 asset-detail, 146:32 versions, 146:68 used-in, 147:2 icon-picker,
+ * 147:55 stock-browser — is **280** wide. So four surfaces were measured 40px
+ * wider than the thing they are compared against, and every width, wrap point
+ * and truncation read from them was wrong at the source (F4).
+ *
+ * 280 × 812 is the drawer body: 900 viewport − 56 topbar − 32 footer. Written
+ * on the spacing scale rather than as `[840px]`, because Gate 14 bans layout
+ * literals and an arbitrary-value class would trip it.
+ */
 function drillHost(children: React.ReactNode) {
   return (
     <ToastProvider>
-      <div className="tw:relative tw:h-[840px] tw:w-80 tw:overflow-hidden tw:bg-white">{children}</div>
+      <div className="tw:relative tw:h-203 tw:w-70 tw:overflow-hidden tw:bg-white">{children}</div>
     </ToastProvider>
   );
 }

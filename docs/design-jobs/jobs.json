@@ -2,11 +2,11 @@
   "generated": "2026-09-03",
   "protocol": "PROTOCOL.md",
   "counts": {
-    "fix": 60,
+    "fix": 55,
     "verify": 268,
-    "done": 83,
-    "todo": 36,
-    "unbuildable": 60,
+    "done": 87,
+    "todo": 34,
+    "unbuildable": 63,
     "fix-figma": 12
   },
   "jobs": [
@@ -575,9 +575,9 @@
       "name": "Compare · list",
       "family": "Compare",
       "width": 1080,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": null,
-      "evidence": "drift-compare-in-320-drawer",
+      "evidence": "drift-compare-in-320-drawer | 2026-09-03 skipped code-ahead: removes the non-colour encoding the code ties to design codex #6 [via editor-ed/impl-panels]",
       "authority": "board"
     },
     {
@@ -599,9 +599,9 @@
       "name": "Compare · no-changes",
       "family": "Compare",
       "width": 1080,
-      "status": "todo",
+      "status": "done",
       "owner": null,
-      "evidence": "",
+      "evidence": " | 2026-09-03 implemented by impl-panels — empty state replaces the body in all three Compare modes [via editor-ed/impl-panels]",
       "authority": "founder:resend-withdraws-approval-so-compare-has-no-reference"
     },
     {
@@ -611,9 +611,9 @@
       "name": "Compare · overlay",
       "family": "Compare",
       "width": 1080,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": null,
-      "evidence": "drift-overlay-is-opacity-blend-not-highlights",
+      "evidence": "drift-overlay-is-opacity-blend-not-highlights | 2026-09-03 skipped code-ahead: CompareChange carries no geometry, so 2 of 5 change kinds cannot produce the tint the board draws [via editor-ed/impl-panels]",
       "authority": "board"
     },
     {
@@ -673,9 +673,9 @@
       "name": "Components · create",
       "family": "Components",
       "width": 1440,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": null,
-      "evidence": "drift-modal-structure-differs-wholesale",
+      "evidence": "drift-modal-structure-differs-wholesale | 2026-09-03 skipped code-ahead: engine has no `scope` field and no bulk replace; board also drops the PRD prefill-DS toggle. Also retired in the Figma arc as superseded by 1170:4777. [via editor-ed/impl-panels]",
       "authority": "board"
     },
     {
@@ -1694,9 +1694,9 @@
       "name": "Notifications · jump-target-deleted",
       "family": "Notifications",
       "width": 360,
-      "status": "todo",
+      "status": "done",
       "owner": null,
-      "evidence": "",
+      "evidence": " | 2026-09-03 implemented by impl-panels — 44-high warning-tint marker block [via editor-ed/impl-panels]",
       "authority": "board:165-71"
     },
     {
@@ -3864,9 +3864,9 @@
       "name": "Issues · filtered",
       "family": "Issues",
       "width": 360,
-      "status": "fix",
+      "status": "done",
       "owner": null,
-      "evidence": "drift-filter-note-position-BOARD-CONFLICT",
+      "evidence": "drift-filter-note-position-BOARD-CONFLICT | 2026-09-03 RULING: its only drift is the position of a `note` block, and note blocks are designer annotations, never UI (all 16 on page 1:3 read — prose rationale, full-board-width strips outside the surface, optional between siblings of one family). Not a drift; nothing to build.",
       "authority": "board"
     },
     {
@@ -4358,9 +4358,9 @@
       "name": "Components · variant-picker · detach-confirm",
       "family": "Components",
       "width": 684,
-      "status": "fix",
+      "status": "done",
       "owner": null,
-      "evidence": "drift-detach-copy-rewritten",
+      "evidence": "drift-detach-copy-rewritten | 2026-09-03 implemented by impl-panels — chrome-ui ConfirmDialog; DetachConfirmModal deleted [via editor-ed/impl-panels]",
       "authority": "board"
     },
     {

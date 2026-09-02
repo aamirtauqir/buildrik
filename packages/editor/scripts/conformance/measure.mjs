@@ -20,7 +20,7 @@ import * as playwright from "playwright-core";
 // mechanics, different question. See e2e/lib/measure-lib.mjs.
 import { launchPinnedBrowser, fontsLoadedStatus } from "../../e2e/lib/measure-lib.mjs";
 // Recipe schema lives in lib.mjs so every consumer reads the same rules.
-import { validateRecipe, runEvery, readBaseline, patchBaseline, parseArgs } from "./lib.mjs";
+import { validateRecipe, runEvery, readBaseline, patchBaseline, parseArgs, contrastSet, compareContrast } from "./lib.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SURFACES = join(HERE, "surfaces");
@@ -545,30 +545,67 @@ for (const p of out.nonTextFailures ?? [])
  * A MISSING target is never baselined. That is an instrument failure, not a
  * product defect, and it exits 3 above.
  */
+/**
+ * F6 — a COUNT is not a ratchet.
+ *
+ * This compared `now > baseline` on a number. Fix one failing pair, introduce
+ * a different one, and the count is unchanged: the gate passes and reports
+ * "0 new failures" while a real regression ships. It also cannot tell you that
+ * a pair got *worse* (4.4 -> 2.1 is the same one failure), and the README's
+ * baseline named "add-page and zoom controls" while no zoom pair was in the
+ * measured five — nobody could tell, because a 3 looks like any other 3.
+ *
+ * So the baseline is the SET of failing pairs, keyed by what identifies a pair
+ * to a human: selector + text + the two colours. Three distinct regressions
+ * now exist and are reported separately:
+ *   NEW    — a measured pair with no baseline entry (the swap the count missed)
+ *   WORSE  — a known pair whose ratio fell
+ *   (fixed pairs are an improvement, and say so)
+ */
 const bl = readBaseline();
 const entry = bl[surfaceId] ?? {};
-const textBaseline = entry.contrastFailures ?? 0;
-const iconBaseline = entry.nonTextFailures ?? 0;
 const textNow = out.contrastFailures.length;
 const iconNow = (out.nonTextFailures ?? []).length;
+const nowPairs = { contrastPairs: contrastSet(out.contrastFailures), nonTextPairs: contrastSet(out.nonTextFailures) };
 
 if (args.includes("--update-baseline")) {
   // Merge, never replace — diff.mjs owns skipped/compared in this same file.
-  patchBaseline(surfaceId, { contrastFailures: textNow, nonTextFailures: iconNow });
+  patchBaseline(surfaceId, { contrastFailures: textNow, nonTextFailures: iconNow, ...nowPairs });
   console.log(`[measure] baseline updated: ${surfaceId} contrast=${textNow} icon=${iconNow}`);
+  for (const [kind, pairs] of [["contrast", nowPairs.contrastPairs], ["icon", nowPairs.nonTextPairs]])
+    for (const [k, r] of Object.entries(pairs)) console.log(`  recorded ${kind} ${r}  ${k}`);
   process.exit(0);
 }
 
+const accept = args.includes("--accept-regression");
 let ratchetBroken = false;
-if (textNow > textBaseline) {
-  console.error(`[measure] TEXT CONTRAST REGRESSION: ${textNow} > baseline ${textBaseline}. A new failure was introduced.`);
-  ratchetBroken = true;
-}
-if (iconNow > iconBaseline) {
-  console.error(`[measure] ICON CONTRAST REGRESSION: ${iconNow} > baseline ${iconBaseline}. A new failure was introduced.`);
-  ratchetBroken = true;
-}
-if (textNow < textBaseline || iconNow < iconBaseline) {
-  console.log(`[measure] contrast improved (text ${textBaseline}->${textNow}, icon ${iconBaseline}->${iconNow}). Lower the baseline: --update-baseline`);
+
+for (const [label, nowSet, baseSet, count, baseCount] of [
+  ["TEXT", nowPairs.contrastPairs, entry.contrastPairs, textNow, entry.contrastFailures ?? 0],
+  ["ICON", nowPairs.nonTextPairs, entry.nonTextPairs, iconNow, entry.nonTextFailures ?? 0],
+]) {
+  if (!baseSet) {
+    /* Legacy numeric-only baseline. Say so loudly rather than pretending the
+       count check is equivalent — it is exactly the check F6 is about. */
+    if (count > baseCount) {
+      console.error(`[measure] ${label} CONTRAST REGRESSION: ${count} > baseline ${baseCount}.`);
+      ratchetBroken = true;
+    }
+    if (count > 0)
+      console.warn(`[measure] ${label}: baseline is a COUNT only — a fixed pair plus a new one would pass unnoticed. Run --update-baseline once to record the pair set.`);
+    continue;
+  }
+  const { newPairs, worsePairs, fixedPairs } = compareContrast(nowSet, baseSet);
+  for (const { key, ratio } of newPairs) {
+    console.error(`[measure] ${label} CONTRAST REGRESSION (NEW pair, ratio ${ratio}): ${key}`);
+    ratchetBroken = true;
+  }
+  for (const { key, was, now } of worsePairs) {
+    console.error(`[measure] ${label} CONTRAST REGRESSION (WORSE ${was} -> ${now}): ${key}`);
+    if (!accept) ratchetBroken = true;
+  }
+  for (const key of fixedPairs) console.log(`[measure] ${label} contrast FIXED: ${key}`);
+  if (fixedPairs.length)
+    console.log(`[measure] ${label}: ${fixedPairs.length} pair(s) fixed — record it: --update-baseline`);
 }
 process.exit(missing.length || ratchetBroken ? 1 : 0);
