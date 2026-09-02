@@ -131,6 +131,30 @@ Biggest: **F13** flowbite h-10/link leak (39 jobs across 7 families) · **C10** 
 - H9 · P3 · written twice: delete-page confirm (PagesTab.tsx:320-333 vs PageTabBar.tsx:419-428, drifted undo copy + casing), 'Nothing matches' ×9 files + 'Clear search' ×8 + 'Try again' ×20, 'Something went wrong' ×3, 'Discard changes?' ×3, unlink-token block (SizeSection.tsx:62-77 = FontControls.tsx:70-85), browse-media ×2, Emotion GuideLine (OverlayStyles.ts:149); tokens re-declared with 0 consumers (layout.ts:48-68, config.ts:136-138, canvas.tokens.ts:187-188), px fallbacks in LayoutShell.css, CHIP_ACTIVE hex twice, #1A56DB ×15 in 8 site-builder files · stops: none · owner: coordinator-code · evidence: dup 05:20:09Z ×7 · fix: one DeletePageConfirm, one NoResults + RetryBlock in chrome-ui (copy final on 57:2), one useDiscardGuard; delete the constants; one canvas-accent source
 - H10 · P3 · CMSRecordsModal.tsx:339 vs the Content tab's records view (ContentViews.tsx:890; board 1170:4749 now measured — 720 vs 640, the modal's only door is ⌘⇧P 'Manage CMS records', useCanvasCommandPalette.ts:170); StockSourceModal + ConfirmDeleteModal mounted on two media hosts (MediaTab.tsx:232/268, LibraryManager.tsx:467/488) · stops: M-03, J-1170:4749 · owner: founder · evidence: dup 05:20:09Z; vc 09:51:12Z J-1170:4749 · fix: decide whether the records modal is still a door; lift the two media modals to one host
 
+## Flow integrity (prototype wiring) — audited 2026-09-02, first full walk
+
+`boards.json` scopes the census to page **1:3**, so five other pages carrying flows had never been walked. All six now have numbers. Every page is clean on dangling destinations, hover-gated navigation, duplicate triggers and self-loops — the defect is unwired work, not broken wiring.
+
+| page | frames | edges | reachable | orphans | dead ends |
+|---|---|---|---|---|---|
+| 988:2 Dashboard v2 | 79 | 909 | **97%** | 2 | **0** |
+| 1:6 Client review | 21 | 31 | **100%** (was 95) | 0 | 5 (starts + terminals) |
+| 1:3 Editor | 305 live | 1305 | **86%** (was 58) | 17 | 40 |
+| 397:2 Dashboard spine | 34 | 122 | 68% | 11 | 9 |
+| 1:5 Portfolio | 33 | 56 | 58% | 11 | 15 |
+| 1:4 Site | 47 | 37 | **47%** | 15 | 28 |
+
+**988:2 is the standard.** 11.5 edges per frame against the editor page's 4.3, and not one dead end. It is what a finished prototype looks like in this file.
+
+**The systemic cause, on every page:** the family hubs are fully wired *outward* and carry every `hotspot/state ·` link, while the states they lead to have no edge of their own. You can reach a screen and never leave it. The editor page had that 133 times.
+
+**The second pattern is sibling asymmetry** — one variant of a pair wired and its twin left out. On 1:6 that was three of its four defects: `brand-colour` reachable and `brand-colour-fails-contrast` not; `post-approval-edited-since` with a way back and `post-approval-unchanged` without; `expired-token` backing out and `load-error` not.
+
+**What was deliberately NOT wired.** A state produced by a condition (a failed upload, a 90-day expiry, an empty result set) gets a `hotspot/state ·` at most — never a fake button. And a board whose control does not exist in code gets neither: Media at 100% quota has no exit because `StorageQuotaBar.tsx:93` gates the optimise link on `isNearLimit`, the AI step-gate renders no Stop (`AgentPlan.tsx:174`), and `171:2` step-failed has no dismiss. Wiring those would have hidden three product gaps.
+
+**Eight boards were named rather than wired** — they have no producer at all, so they were reading as flow gaps when they are missing subjects: `143:355` (the tree always seeds a root row), `1082:5004` (no list view exists), `306:2111`/`306:2136`/`306:2161` (presets have no dirty state — the three mutators have zero UI callers), `1339:7221` (its error code cannot come from its own query), `165:24` (no such LoadState), `1175:4841` (nothing writes the applied-template key).
+
+
 ## Queued redraw waves — waves 1 and 3 DONE, wave 2 half done
 
 Three waves, all Figma-lane, all with a named contract. **Code does not move on any of these families until its wave lands** (founder rule, goal point 2).
