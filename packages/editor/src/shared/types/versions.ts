@@ -80,7 +80,12 @@ export interface VersionHistoryConfig {
 export const DEFAULT_VERSION_HISTORY_CONFIG: VersionHistoryConfig = {
   maxVersions: 50,
   autoCheckpointInterval: 0,
-  autoCheckpointEvents: ["project:loaded", "template:applied"],
+  /* `project:loaded` was in here, so merely OPENING a site minted a version —
+     one nobody made, first in the list, and the reason Saves·empty (163:64)
+     was unreachable on every healthy site. Founder call G7 (2026-09-02): the
+     first checkpoint waits for a real edit. `template:applied` is one; an
+     ordinary edit is covered by the user's own save. */
+  autoCheckpointEvents: ["template:applied"],
   enabled: true,
 };
 

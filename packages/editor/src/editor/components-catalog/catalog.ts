@@ -312,7 +312,7 @@ export const CATALOG: ComponentType[] = [
     defaultBindings: {
       info:    { "background-color": { tokenId: "color-background" }, "border": { tokenId: "border-default" }, "border-radius": { tokenId: "radius-md" }, "color": { tokenId: "color-text" } },
       success: { "background-color": { tokenId: "color-success" },    "color": { tokenId: "color-background" }, "border-radius": { tokenId: "radius-md" } },
-      warning: { "background-color": { tokenId: "color-accent" },     "color": { tokenId: "color-text" },       "border-radius": { tokenId: "radius-md" } },
+      warning: { "background-color": { tokenId: "color-warning" },    "color": { tokenId: "color-background" }, "border-radius": { tokenId: "radius-md" } },
       error:   { "background-color": { tokenId: "color-error" },      "color": { tokenId: "color-background" }, "border-radius": { tokenId: "radius-md" } },
     },
   },

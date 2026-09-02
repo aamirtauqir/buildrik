@@ -137,7 +137,7 @@ pass "Gate 10: hex count at or below baseline"
 # LOCAL_SHADOW exclusions: user-token editor, BackgroundSection (edits user
 # gradients), user-content preview renderers, gradient parsers, tests, stories.
 # features/design-system/ui/** is IN scope (Design tab chrome).
-CHROME_PATHS="packages/editor/src/editor packages/editor/src/shared/ui packages/editor/src/shared/forms"
+CHROME_PATHS="packages/editor/src/editor packages/editor/src/shared/forms"
 CHROME_EXCLUDE='__tests__|\.test\.|\.stories\.|sidebar/tabs/design/|inspector/sections/BackgroundSection\.tsx|shared/utils/parsers/|editor/export/PreviewFrame\.tsx|editor/media/VideoPreview\.tsx|editor/wizard/sectionData\.ts|shared/forms/GradientPicker\.tsx|shared/ui/ds/Box\.tsx|shared/ui/ds/tokens\.ts|sidebar/tabs/media/components/StockSourceModal\.tsx'
 # Box.tsx + tokens.ts are the Token Binding primitives (Survivor #5). They
 # assemble the tokenized output via resolveShadow/resolveRadius resolvers —
@@ -147,7 +147,28 @@ CHROME_EXCLUDE='__tests__|\.test\.|\.stories\.|sidebar/tabs/design/|inspector/se
 
 # Form atoms — exempt from radius-above-4 (Gate 13) only. Gradient + raw shadow
 # (Gates 11, 12) still apply.
-FORM_ATOM_EXCLUDE='shared/ui/Button\.tsx|shared/ui/IconButton\.tsx|shared/ui/Tooltip\.tsx|shared/ui/Modal\.tsx|shared/ui/SemanticBadge\.tsx|shared/ui/PremiumBadge\.tsx|shared/ui/Kbd\.tsx|shared/ui/SharedDialogs\.tsx|shared/forms/'
+#
+# EVERY path in this list used to name `shared/ui/…`, and `src/shared/ui` has not
+# existed since the form atoms moved to `editor/chrome-ui/`. The list therefore
+# excluded NOTHING, and Gate 13 counted every Button, Modal and Tooltip as panel
+# chrome — which is why the r12 review modal (1172:4840) and the r6 starter
+# swatch (152:137) were reverted after they landed, and why every Media/Content
+# modal board reads as a violation. DESIGN.md:507 has said all along that form
+# atoms "may use the full --buildrick-radius-* scale" and "are NOT panel chrome";
+# the rule was right and the gate had lost its grip on it. Founder call G13
+# (2026-09-02): split by SURFACE — panel chrome stays <=4, overlays and form
+# atoms keep 8/12. Names below are the atoms DESIGN.md:507 lists, mapped to the
+# files that actually exist. Keep them in step when a file moves.
+FORM_ATOM_EXCLUDE='chrome-ui/Button\.tsx|chrome-ui/CopyButton\.tsx|chrome-ui/TextInput\.tsx|chrome-ui/TextField\.tsx|chrome-ui/FormField\.tsx|chrome-ui/Select\.tsx|chrome-ui/Tooltip\.tsx|chrome-ui/HelpTooltip\.tsx|chrome-ui/HintTooltip\.tsx|chrome-ui/Toast\.tsx|chrome-ui/Modal\.tsx|chrome-ui/ModalParts\.tsx|chrome-ui/UpgradeModal\.tsx|chrome-ui/ConfirmDialog\.tsx|chrome-ui/Chip\.tsx|chrome-ui/IssueChip\.tsx|shared/forms/'
+
+# Overlays are not panel chrome either. DESIGN.md:507 puts Modal in the form-atom
+# tier with the full radius scale; A1.3 (:515) caps "panel chrome CONTAINERS —
+# panels, headers, toolbars, footers, sidebar rows, inspector sections, rail
+# zones". A modal is none of those, but the gate had no way to tell, so every
+# dialog outside chrome-ui counted against the chrome budget and any modal that
+# adopted the boards' r12 pushed the count over baseline and got reverted.
+# Founder call G13 (2026-09-02): split by SURFACE, not by number.
+OVERLAY_EXCLUDE='Modal\.tsx|Modal\.css|Dialog\.tsx|Dialogs\.tsx|Popover\.tsx|OverlayMount\.tsx|Toast\.tsx'
 
 count_chrome() {
   # $1 = pattern. $2 (optional) = extra exclusion pattern piped in addition to base.
@@ -210,7 +231,7 @@ check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via shadow/glow to
 # Gate 13: Chrome Axiom A1.3 — border-radius ≤ 4px on panel chrome (form atoms exempt).
 # Broadened: CSS (border-radius:) + TSX camelCase (borderRadius:).
 # Matches literal numeric values > 4. Excludes form atoms (Button, Toast, etc.).
-RADIUS_COUNT=$(count_chrome '(border-radius|borderRadius)[[:space:]]*:[[:space:]]*"?([5-9]|1[0-9]|2[0-9]|3[0-9]|50%|999)' "$FORM_ATOM_EXCLUDE")
+RADIUS_COUNT=$(count_chrome '(border-radius|borderRadius)[[:space:]]*:[[:space:]]*"?([5-9]|1[0-9]|2[0-9]|3[0-9]|50%|999)' "$FORM_ATOM_EXCLUDE|$OVERLAY_EXCLUDE")
 check_gate 13 "$RADIUS_COUNT" "$BASE_13" "A1.3 — panel-chrome border-radius ≤ 4 (form atoms exempt)" || exit 1
 
 # Gate 14: Magic layout literals (Survivor #3 target).

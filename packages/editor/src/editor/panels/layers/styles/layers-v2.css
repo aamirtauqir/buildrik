@@ -226,12 +226,16 @@
 .bdc-layers-tree {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  /* Row pitch IS row height. Every Layers board stacks rows at 28/28 — 1082:4527
+     puts them at y80/108/136/164/192 — so a gap here makes each row one pixel
+     further out of step than the last. */
+  gap: 0;
   /* Boards 1082:4739 / 143:60 draw tree rows FULL-BLEED — `x=0 width=320`,
      with the row's own gutters doing the insetting. The 10 here inset every
      row inside the panel, so the trailing eye/lock cluster sat ~10 short of
-     where every Layers board puts it. */
-  padding: var(--bk-space-4) 0 10px;
+     where every Layers board puts it. The top pad went with the gap: the first
+     row starts at 80 = header 44 + toolbar 36, with nothing between. */
+  padding: 0 0 10px;
   overflow-y: auto;
   flex: 1;
   min-height: 0;

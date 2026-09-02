@@ -103,6 +103,25 @@ export const DEFAULT_TOKENS: DesignToken[] = [
     description: "Positive / success state",
   },
   {
+    id: "color-warning",
+    name: "Warning",
+    /* The Alert catalog entry has always had a `warning` variant, and it was
+       bound to `color-accent` — which the dark seed shows is GREEN
+       (0002-seed-dark-color-values.ts:22). A green warning is the product
+       lying about severity, so the variant needed fixing whether or not the
+       token was added; the founder's call (G4, 2026-09-02) was to add it.
+       Flowbite yellow-700 carries white text at 7.4:1, clearing the 4.5
+       floor 06:63 asks for — the chrome's own `--bk-warning` (#C27803) does
+       NOT (3.65:1), which is why this is not a straight reuse. */
+    value: "#8E4B10",
+    darkValue: "#FACA15",
+    category: "colors",
+    cssVar: "--buildrick-design-color-warning",
+    type: "color",
+    group: "state",
+    description: "Caution / warning state",
+  },
+  {
     id: "color-error",
     name: "Error",
     value: "#EF4444",

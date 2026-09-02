@@ -118,6 +118,9 @@ describe("TokensSection — mode-driven token filter (carried over)", () => {
     beginner.unmount();
 
     const pro = render(wrap(<TokensSection />, "pro"));
-    expect(rowFor(pro.container, "color").getAttribute("data-kind-count")).toBe("17");
+    /* 17 → 18 when `color-warning` joined the seed (founder call G4,
+       2026-09-02): the Alert catalog entry's `warning` variant was bound to
+       `color-accent`, which the dark seed shows is green. */
+    expect(rowFor(pro.container, "color").getAttribute("data-kind-count")).toBe("18");
   });
 });
