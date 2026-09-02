@@ -79,10 +79,11 @@ const optionState = (selected: boolean, focused: boolean) =>
       ? "tw:bg-[var(--bk-accent-subtle)] tw:border-[var(--bk-alpha-accent-30)]"
       : "tw:bg-transparent tw:border-transparent tw:hover:bg-[var(--bk-accent-subtle)]";
 
-const SWATCH = "tw:size-7 tw:flex-none tw:rounded-[5px] tw:border tw:border-[var(--bk-border-medium)]";
+const SWATCH =
+  "tw:h-[30px] tw:w-[46px] tw:flex-none tw:rounded-md tw:border tw:border-[var(--bk-border)]";
 const PICKER_INPUT =
-  "tw:[&_input]:px-2 tw:[&_input]:py-[5px] tw:[&_input]:rounded-[5px] " +
-  "tw:[&_input]:border-[var(--bk-border-medium)] tw:[&_input]:bg-white";
+  "tw:[&_input]:h-6 tw:[&_input]:px-2 tw:[&_input]:py-0 tw:[&_input]:rounded-md " +
+  "tw:[&_input]:border-[var(--bk-border)] tw:[&_input]:bg-[var(--bk-bg-subtle)]";
 
 // ============================================================================
 // COMPONENT
@@ -188,21 +189,19 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
 
   return (
     <div
-      className={`tw:overflow-hidden tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-panel)] tw:[box-shadow:var(--bk-shadow-overlay)] ${
-        showSwatch ? "tw:w-57" : "tw:w-60"
-      }`}
+      className="tw:w-59 tw:overflow-hidden tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-panel)] tw:[box-shadow:var(--bk-shadow-overlay)]"
     >
       {/* Tab strip */}
-      <div className="tw:flex tw:border-b tw:border-[var(--bk-gray-200)]">
+      <div className="tw:flex tw:gap-1 tw:px-3 tw:pt-2.5">
         {(allowCustom ? (["tokens", "custom"] as const) : (["tokens"] as const)).map((t) => (
           <Button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`tw:flex-1 tw:px-0 tw:py-[7px] tw:rounded-none tw:border-0 tw:border-b-2 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] ${
+            className={`tw:min-h-6 tw:rounded-md tw:border-0 tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-medium ${
               tab === t
-                ? "tw:border-b-blue-700 tw:bg-[var(--bk-accent-subtle)] tw:text-[var(--bk-accent-text)]"
-                : "tw:border-b-transparent tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]"
+                ? "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
+                : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             }`}
           >
             {t === "tokens" ? "Tokens" : "Custom"}
@@ -212,7 +211,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
       {tab === "tokens" && (
         <div onKeyDown={handleKeyDown}>
           {/* Search */}
-          <div className="tw:px-2 tw:pt-2 tw:pb-1">
+          <div className="tw:px-3 tw:pt-2 tw:pb-1">
             <TextInput
               ref={searchRef}
               type="text"
@@ -251,7 +250,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               ref={listRef}
               role="listbox"
               aria-label={`${tokenLabel} tokens`}
-              className={`tw:px-2 tw:pt-1 tw:max-h-55 tw:overflow-y-auto ${
+              className={`tw:px-3 tw:pt-2 tw:max-h-55 tw:overflow-y-auto ${
                 showSwatch
                   ? "tw:pb-2 tw:grid tw:grid-cols-4 tw:gap-1.5"
                   : "tw:pb-1.5 tw:flex tw:flex-col tw:gap-0.5"
@@ -272,7 +271,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     title={`${token.name}: ${token.value}`}
                     tabIndex={focused ? 0 : -1}
                     onClick={() => onSelect(token.id, cssVarRef)}
-                    className={`tw:px-0.5 tw:py-1 tw:rounded-[5px] tw:border ${optionState(selected, focused)}`}
+                    className={`tw:p-0 tw:rounded-md tw:border ${optionState(selected, focused)}`}
                     onFocus={() => setFocusedIndex(idx)}
                   >
                     <div className="tw:flex tw:flex-col tw:items-center tw:gap-[3px]">

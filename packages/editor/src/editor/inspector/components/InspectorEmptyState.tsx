@@ -45,12 +45,10 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     return (
       <div role="status" aria-live="polite" className={CONTAINER_APPLIED}>
         <div className={APPLIED_BANNER}>
-          <h3 className={`${TITLE} tw:mb-1 tw:text-[var(--bk-success)]`}>Template applied.</h3>
+          <h3 className={APPLIED_TITLE}>Template applied.</h3>
           {/* was color: var(--bk-success-tint) — a BACKGROUND tone used as text,
               i.e. pale green on pale green. The name was barely readable. */}
-          <p className={`${DESCRIPTION} tw:mb-3 tw:text-[var(--bk-ink)]`}>
-            {appliedName}
-          </p>
+          <p className={APPLIED_NAME}>{appliedName}</p>
           {composer && (
             <Button
               size="xs"
@@ -63,7 +61,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           )}
         </div>
         {/* Still show default tips below */}
-        <div className={`${TIP} tw:mt-3`}>
+        <div className={TIP}>
           <span className="tw:opacity-70">Tip:</span> Click an element to edit its properties
         </div>
       </div>
@@ -124,15 +122,21 @@ const CONTAINER_BASE =
    measured, the element carried both classes and computed 64px. */
 const CONTAINER = `${CONTAINER_BASE} tw:pt-16`;          // 159:99, sentence at y64
 const CONTAINER_APPLIED = `${CONTAINER_BASE} tw:pt-4`;   // 1175:4841, banner at y14
-const TITLE = "tw:mb-2 tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)]";
+/* Board 1175:4843/4844 — 12 semibold in the success ink and the template's own
+   name at 11 under it. It was 14 over 13, both a step too loud for a banner
+   the board draws 87 tall. */
+const APPLIED_TITLE = "tw:m-0 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-success-text)]";
+const APPLIED_NAME = "tw:m-0 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-soft)]";
 /* No max-width: the board's sentence sits on one line inside the panel's
    own padding; capping it at 220px broke it across two. */
 const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]";
-const TIP = "tw:mt-5 tw:px-3 tw:py-2 tw:rounded-md tw:bg-blue-50 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+/* Board 1175:4847 sets the tip at 10; the DS type scale floors at 11 and
+   `gate:design-debt-ratchet` locks off-scale sizes at zero, so 11 it is. */
+const TIP = "tw:mt-2.5 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 /** Success banner after a template applies — success tokens, not a hand-mixed green. */
 const APPLIED_BANNER =
-  "tw:w-full tw:max-w-55 tw:px-4 tw:py-3 tw:rounded-lg tw:text-left " +
-  "tw:border tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)]";
+  "tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-1.5 tw:px-3 tw:py-2.5 " +
+  "tw:rounded-lg tw:text-left tw:bg-[var(--bk-success-tint)]";
 /* Board 1175:4841 draws this as the primary action it is — solid accent, not
    a pale tint of it. */
 /* Sized to its label, not to the banner: board 1175:4841 draws it 113px wide
@@ -141,5 +145,5 @@ const APPLIED_BANNER =
    `h-10`, and a competing `h-*` in this string loses on stylesheet order the
    same way the padding did. */
 const APPLIED_ACTION =
-  "tw:inline-block tw:min-h-0 tw:rounded-md tw:text-[12px] tw:font-medium tw:text-center " +
+  "tw:inline-block tw:min-h-6 tw:rounded-md tw:px-3 tw:py-[7px] tw:text-[11px] tw:font-medium tw:text-center " +
   "tw:border-transparent tw:bg-[var(--bk-accent)] tw:text-white";

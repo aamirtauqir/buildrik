@@ -74,9 +74,11 @@ describe("agent run", () => {
     expect(screen.getByText("The run waits rather than guessing.")).toBeInTheDocument();
   });
 
-  /* Board 171:67 ends with "Apply lands as ONE undo step — ⌘Z takes back all
-     three." Each approved step applies in its own transaction, so a run of
-     three is three undo entries: the board's sentence would be a lie here. */
+  /* Board 171:67 closes on a note block, i.e. a designer annotation rather
+     than UI, so the sentence that has to be true is the panel's own: each
+     approved step applies in its own transaction, so a run of three is three
+     undo entries. A finished run offers no Undo all — that button belongs to
+     the two states where the run did not finish cleanly. */
   it("tells the truth about undo at the end of a multi-step run", () => {
     renderPlan({
       phase: "done",
@@ -91,6 +93,24 @@ describe("agent run", () => {
     expect(screen.getByText("2 changes applied, 1 skipped.")).toBeInTheDocument();
     expect(screen.getByText(/Each step is its own undo step/)).toBeInTheDocument();
     expect(screen.queryByText(/ONE undo step/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Undo all" })).toBeNull();
+  });
+
+  /* A clean finish offers no Undo all even when the handler is wired — the
+     note block that reads "Undo all takes back every step" is an annotation,
+     and the two states that DO offer it are stopped and failed. */
+  it("keeps Undo all out of a cleanly finished run", () => {
+    renderPlan({
+      phase: "done",
+      currentIndex: 2,
+      steps: [
+        step("Rewrite the headline", "applied"),
+        step("Warm the tint", "applied"),
+        step("Swap the hero photo", "skipped"),
+      ],
+      onUndoAll: vi.fn(),
+    });
+    expect(screen.queryByRole("button", { name: "Undo all" })).toBeNull();
   });
 
   it("a single applied step says the simple thing instead", () => {

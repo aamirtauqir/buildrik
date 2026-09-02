@@ -40,7 +40,7 @@ export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
         key={p}
         color="light"
         size="xs"
-        className="tw:justify-start tw:border-transparent tw:bg-transparent tw:px-4 tw:py-1 tw:text-[13px] tw:text-[var(--bk-accent)]"
+        className="tw:justify-start tw:border-transparent tw:bg-transparent tw:px-4 tw:py-1 tw:text-[12px] tw:text-[var(--bk-accent)]"
         onClick={() => onTry?.(p)}
         disabled={!onTry}
       >
@@ -55,7 +55,7 @@ export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
     <div className={BAND}>DRAFT</div>
     <Button
       color="light"
-      className="tw:mx-4 tw:flex tw:justify-between tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:py-2 tw:text-[13px] tw:text-[var(--bk-ink)]"
+      className="tw:mx-4 tw:flex tw:h-10 tw:items-center tw:justify-between tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[12px] tw:text-[var(--bk-ink)]"
       onClick={() => onDraft?.()}
       disabled={!onDraft}
     >

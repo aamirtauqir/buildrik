@@ -68,7 +68,9 @@ export interface InspectorTabContentProps {
   advancedState: UseAdvancedSettingsReturn;
   onOpenMediaLibrary?: (
     a: MediaAssetType[],
-    s: (x: MediaAsset) => void
+    s: (x: MediaAsset) => void,
+    /** Board 1164:4713 — what the picker is being opened for, e.g. "Hero · Image". */
+    forLabel?: string
   ) => void;
   onOpenIconPicker?: (
     c: IconConfig | undefined,

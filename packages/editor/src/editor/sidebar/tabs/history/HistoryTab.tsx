@@ -67,10 +67,17 @@ const ClearXSvg = () => (
 */
 /* Board 163:113's preview band — accent tint, actions inline with the title. */
 const PREVIEW_BAND =
-  "tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1 tw:mb-2";
-const PREVIEW_ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3";
-const PREVIEW_TITLE = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent)] tw:truncate";
-const PREVIEW_SUB = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+  "tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-3 tw:bg-[var(--bk-accent-tint)] tw:px-4";
+const PREVIEW_TITLE = "tw:truncate tw:text-[12px] tw:text-[var(--bk-accent-text)]";
+/* The safety sentence, unchanged product copy, on its own row: the bar above
+   it is board 163:159's single 44-tall row and cannot hold a second line.
+   163:165 draws the same sentence but is a `note` block — an annotation, not a
+   spec — so the row here is a code decision, not conformance. */
+const PREVIEW_NOTE =
+  "tw:m-0 tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+/* Board 229:1138/229:1140 — both actions are the dense 28 row, not flowbite's
+   own xs height. A same-property utility is what beats it through twMerge. */
+const PREVIEW_ACTION = "tw:h-7";
 
 const FILTER_ROW = "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
 const FILTER_CHIP =
@@ -277,20 +284,20 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             than inside either list for that reason: 163:64 has no list at all
             and still carries the note. */}
         {showScrubber && preview && (
-          <div className={PREVIEW_BAND} role="status">
-            <div className={PREVIEW_ROW}>
+          <>
+            <div className={PREVIEW_BAND} role="status">
               <span className={PREVIEW_TITLE}>Previewing {preview.label}</span>
               <div className="tw:flex tw:items-center tw:gap-2">
-                <Button color="light" size="xs" onClick={handleScrubberExit}>
+                <Button color="light" size="xs" className={PREVIEW_ACTION} onClick={handleScrubberExit}>
                   Exit
                 </Button>
-                <Button size="xs" onClick={() => handleScrubberRestore(preview.id)}>
+                <Button size="xs" className={PREVIEW_ACTION} onClick={() => handleScrubberRestore(preview.id)}>
                   Restore this version
                 </Button>
               </div>
             </div>
-            <span className={PREVIEW_SUB}>Nothing is written until Restore.</span>
-          </div>
+            <p className={PREVIEW_NOTE}>Nothing is written until Restore.</p>
+          </>
         )}
 
         {activeView === "saves" && savesSettled && <SavesApproval composer={composer} />}
