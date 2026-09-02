@@ -35,8 +35,8 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
 
   return (
     <ModalRoot open onOpenChange={(o) => { if (!o) onCancel(); }}>
-      <ModalContent srTitle="Delete files" className="tw:p-5">
-        <h3 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]" id="med-del-title">
+      <ModalContent srTitle="Delete files" className="tw:p-4">
+        <h3 className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:text-[var(--bk-ink)]" id="med-del-title">
           {/* `isBulk` means "reached from selection mode", not "more than one" —
               selecting a single asset and hitting Delete printed "Delete 1
               files?" directly above a warning line that says "1 file is
@@ -93,13 +93,13 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
         {/* Actions */}
         <div className="tw:mt-4 tw:flex tw:justify-end tw:gap-2">
           <Button
-            className="tw:min-h-8 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
+            className="tw:h-7 tw:min-h-0 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)]"
             onClick={onCancel}
           >
             Cancel
           </Button>
           <Button
-            className="tw:min-h-8 tw:rounded-md tw:border-0 tw:bg-[var(--bk-error)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)] tw:disabled:opacity-50"
+            className="tw:h-7 tw:min-h-0 tw:rounded-md tw:border-0 tw:bg-[var(--bk-error)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)]"
             onClick={onConfirm}
             disabled={!canConfirm}
             aria-disabled={!canConfirm}

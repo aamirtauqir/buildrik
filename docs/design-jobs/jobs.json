@@ -1,9 +1,9 @@
 {
- "generated": "2026-09-02T13:23:18Z",
+ "generated": "2026-09-02T13:49:35Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 143,
-  "verify": 107,
+  "fix": 82,
+  "verify": 168,
   "todo": 38,
   "unbuildable": 66,
   "decide": 9,
@@ -175,9 +175,9 @@
    "name": "Brand · classes",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: rows 54.5 vs 44; name 13/400 x24 vs Geist Mono 11/500 x16; usage 12 vs 11. ClassesSection.tsx:70-75",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 54.5 vs 44; name 13/400 x24 vs Geist Mono 11/500 x16; usage 12 vs 11. ClassesSection.tsx:70-75",
    "authority": "board:153-2-no-menu"
   },
   {
@@ -187,9 +187,9 @@
    "name": "Brand · colour-mode",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: rows 48 vs 32; name 13/400 vs mono 11/500; toggle 32h accent pill vs 28h r6 white 12/400. ColourModeSection.tsx:79/96/123",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 48 vs 32; name 13/400 vs mono 11/500; toggle 32h accent pill vs 28h r6 white 12/400. ColourModeSection.tsx:79/96/123",
    "authority": "board"
   },
   {
@@ -199,9 +199,9 @@
    "name": "Brand · components",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P1 verifier-brand: rows 36 vs 44, label 11/600 vs 13/400; Generate-with-AI at y1080 in scroll flow (387 under fold) vs 44px pinned foot strip. ComponentsSection.tsx:45-53,163-206; DesignSystemTab.tsx:795",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P1 verifier-brand: rows 36 vs 44, label 11/600 vs 13/400; Generate-with-AI at y1080 in scroll flow (387 under fold) vs 44px pinned foot strip. ComponentsSection.tsx:45-53,163-206; DesignSystemTab.tsx:795",
    "authority": "board"
   },
   {
@@ -211,9 +211,9 @@
    "name": "Brand · dirty",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: footer h57 grey, 2-line text, 32px buttons (#ef4444 literal :73) vs 44h #fdfdea bar with text actions x16/156/226; DraftChip never renders. DesignTabFooter.tsx:37-83",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: footer h57 grey, 2-line text, 32px buttons (#ef4444 literal :73) vs 44h #fdfdea bar with text actions x16/156/226; DraftChip never renders. DesignTabFooter.tsx:37-83",
    "authority": "board:154-78-save-bar"
   },
   {
@@ -223,9 +223,9 @@
    "name": "Brand · export · error",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: same deltas (#9b1c1c vs #c81e1e, no #e02424 border); 08-31 match note predates redraw",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 Figma C6 badge y84; P3 verifier-brand: same deltas (#9b1c1c vs #c81e1e, no #e02424 border); 08-31 match note predates redraw",
    "authority": "board"
   },
   {
@@ -235,9 +235,9 @@
    "name": "Brand · export · exported",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: Badge r4 no border 12/600 #03543f x28 vs pill r9999 1px #0e9f6e 12/500 #046c4e x15. SectionStatusBadge.tsx:80 — one pass fixes 2232/2265/2298",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 Figma C6 badge y84; P3 verifier-brand: Badge r4 no border 12/600 #03543f x28 vs pill r9999 1px #0e9f6e 12/500 #046c4e x15. SectionStatusBadge.tsx:80 — one pass fixes 2232/2265/2298",
    "authority": "board"
   },
   {
@@ -247,9 +247,9 @@
    "name": "Brand · export · imported",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: same SectionStatusBadge deltas",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 Figma C6 badge y84; P3 verifier-brand: same SectionStatusBadge deltas",
    "authority": "board"
   },
   {
@@ -284,9 +284,9 @@
    "name": "Brand · lint · suppressed",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: pill #fdfdea/#723b13/400 vs #fdf6b2/#c27803/500; x24 vs 15. DesignSystemTab.tsx:693 → warning Badge",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: pill #fdfdea/#723b13/400 vs #fdf6b2/#c27803/500; x24 vs 15. DesignSystemTab.tsx:693 → warning Badge",
    "authority": "board:306-2217"
   },
   {
@@ -296,9 +296,9 @@
    "name": "Brand · lint-warnings",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: Lint count 12/500 Inter vs mono 11/500; Lint row y715 under fold. :742. Board on superseded root (C)",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: Lint count 12/500 Inter vs mono 11/500; Lint row y715 under fold. :742. Board on superseded root (C)",
    "authority": "board:154-26"
   },
   {
@@ -333,9 +333,9 @@
    "name": "Brand · presets",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: rows 32/34 vs 44; label x26 500 vs x16 400; count 12px edge 255 vs 11px edge 244. StyleCategoryRow.tsx:58-74, StylesRouter.tsx:143",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 32/34 vs 44; label x26 500 vs x16 400; count 12px edge 255 vs 11px edge 244. StyleCategoryRow.tsx:58-74, StylesRouter.tsx:143",
    "authority": "board"
   },
   {
@@ -383,9 +383,9 @@
    "name": "Brand · pro-locked",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: note is an li at y808 (116 under fold) vs pinned 40h strip 11/400 #6b7280 bg-subtle. DesignSystemTab.tsx:756-760. Board drawn on superseded root 152:2 (C)",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: note is an li at y808 (116 under fold) vs pinned 40h strip 11/400 #6b7280 bg-subtle. DesignSystemTab.tsx:756-760. Board drawn on superseded root 152:2 (C)",
    "authority": "board:154-132"
   },
   {
@@ -395,9 +395,9 @@
    "name": "Brand · starters",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "Figma side DONE 2026-09-02 (cards 116, rows 248, thumbs FILL, overflow 0). Code: StarterGrid.tsx:39-108 p16/12 gap16 flat cards 116x104 name 12/400 warning h44 — open",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. Figma side DONE 2026-09-02 (cards 116, rows 248, thumbs FILL, overflow 0). Code: StarterGrid.tsx:39-108 p16/12 gap16 flat cards 116x104 name 12/400 warning h44 — open",
    "authority": "board:152-137"
   },
   {
@@ -407,9 +407,9 @@
    "name": "Brand · starters · applied",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "2026-09-02 Figma C6 badge y84; P3 verifier-brand: pill 400/#057a55/x24/h22 vs 500/#046c4e/x16/h20. StartersSection.tsx:50-53",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 Figma C6 badge y84; P3 verifier-brand: pill 400/#057a55/x24/h22 vs 500/#046c4e/x16/h20. StartersSection.tsx:50-53",
    "authority": "board:306-2186"
   },
   {
@@ -419,9 +419,9 @@
    "name": "Brand · token-detail",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: rows 54/56 vs 44; swatch x24 vs 16; name x50 13/500 vs x40 13/400; toolbar h60 unboarded. TokenRow.tsx:106/71/63",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 54/56 vs 44; swatch x24 vs 16; name x50 13/500 vs x40 13/400; toolbar h60 unboarded. TokenRow.tsx:106/71/63",
    "authority": "board"
   },
   {
@@ -431,9 +431,9 @@
    "name": "Brand · tokens",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: first-load banner h90 pushes kind 1 y80→192.5; count 12/500 Inter vs Geist Mono 11/500 x218; label 500 vs 400. TokensSection.tsx:371/383/384",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: first-load banner h90 pushes kind 1 y80→192.5; count 12/500 Inter vs Geist Mono 11/500 x218; label 500 vs 400. TokensSection.tsx:371/383/384",
    "authority": "board"
   },
   {
@@ -737,9 +737,9 @@
    "name": "Content · collection",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: crumb 44 13/500 x12 vs 36 13/400 x16; meta row 44 vs 32; footer 1px rule board lacks. ContentViews.tsx:99,220,241",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: crumb 44 13/500 x12 vs 36 13/400 x16; meta row 44 vs 32; footer 1px rule board lacks. ContentViews.tsx:99,220,241",
    "authority": "board"
   },
   {
@@ -749,9 +749,9 @@
    "name": "Content · conditions",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: row 64 vs 56 (size=tall is 56 exact); summary 12 vs 11; link row 48 vs 36. ContentViews.tsx:1056",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: row 64 vs 56 (size=tall is 56 exact); summary 12 vs 11; link row 48 vs 36. ContentViews.tsx:1056",
    "authority": "board"
   },
   {
@@ -761,9 +761,9 @@
    "name": "Content · data-sources",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P3 verifier-content: row 64 ok; dot 7 vs 8; status/note 12 vs 11; link row 48 vs 36 x12 vs 16",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-content: row 64 ok; dot 7 vs 8; status/note 12 vs 11; link row 48 vs 36 x12 vs 16",
    "authority": "board"
   },
   {
@@ -773,9 +773,9 @@
    "name": "Content · empty",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P3 verifier-content: desc renders 12px vs 13 (EmptyState.tsx:26 BODY_CLASS beats tw:text-[13px] — plain element, no merge); centring + CTA ok",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-content: desc renders 12px vs 13 (EmptyState.tsx:26 BODY_CLASS beats tw:text-[13px] — plain element, no merge); centring + CTA ok",
    "authority": "board"
   },
   {
@@ -785,9 +785,9 @@
    "name": "Content · fields",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: row 64 (Row size=comment) vs 44; type 12 vs 11; required 12 #6b7280 vs 11 #d1d5db; '+ Add field' 48 vs 36. Row.tsx:56-63 add a 44 stack size",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: row 64 (Row size=comment) vs 44; type 12 vs 11; required 12 #6b7280 vs 11 #d1d5db; '+ Add field' 48 vs 36. Row.tsx:56-63 add a 44 stack size",
    "authority": "board"
   },
   {
@@ -797,9 +797,9 @@
    "name": "Content · load-error",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P3 verifier-content: copy/x24/y80/#c81e1e/pt36 exact; block 168 vs 150 (Try again 13/500 32h vs 13/400 20h). ContentTab.tsx:205-211",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-content: copy/x24/y80/#c81e1e/pt36 exact; block 168 vs 150 (Try again 13/500 32h vs 13/400 20h). ContentTab.tsx:205-211",
    "authority": "board"
   },
   {
@@ -809,9 +809,9 @@
    "name": "Content · loading",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: skeleton pitch 34 vs 32, icon 14 r4 @x12 vs 12 r3 @x16, bar 12 vs 10; on release DATA rows move −32 (root adds a 48px block the skeleton omits). ContentTab.tsx:59-62",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: skeleton pitch 34 vs 32, icon 14 r4 @x12 vs 12 r3 @x16, bar 12 vs 10; on release DATA rows move −32 (root adds a 48px block the skeleton omits). ContentTab.tsx:59-62",
    "authority": "board"
   },
   {
@@ -821,9 +821,9 @@
    "name": "Content · record",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: label x12 vs 16; TextInput 255x42 r8 #d1d5db 14px vs 248x32 r6 #9ca3af 13px; field block 72 vs 64; Published row 48 vs 32. ContentViews.tsx:66-70,333-338",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: label x12 vs 16; TextInput 255x42 r8 #d1d5db 14px vs 248x32 r6 #9ca3af 13px; field block 72 vs 64; Published row 48 vs 32. ContentViews.tsx:66-70,333-338",
    "authority": "board"
   },
   {
@@ -833,9 +833,9 @@
    "name": "Content · root",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: section headers 28 untinted vs 32 #f3f4f6; count Inter 11/400 vs mono 11/500; rows lack 16px glyph (label x16 vs x40); '+ New collection' 48px Button block vs 32 row 13/400. SectionHeader.tsx:16, ContentViews.tsx:170,185,181, Row.tsx:27",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: section headers 28 untinted vs 32 #f3f4f6; count Inter 11/400 vs mono 11/500; rows lack 16px glyph (label x16 vs x40); '+ New collection' 48px Button block vs 32 row 13/400. SectionHeader.tsx:16, ContentViews.tsx:170,185,181, Row.tsx:27",
    "authority": "board"
   },
   {
@@ -845,9 +845,9 @@
    "name": "Content · unsaved-record",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: bar 53 with border-top vs 44 none; Discard 12/500 #4b5563 vs 12/400 #6b7280; Save 13 vs 12. ContentViews.tsx:73,388,81",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: bar 53 with border-top vs 44 none; Discard 12/500 #4b5563 vs 12/400 #6b7280; Save 13 vs 12. ContentViews.tsx:73,388,81",
    "authority": "board:149-108"
   },
   {
@@ -857,9 +857,9 @@
    "name": "Content · variables",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: row 64 vs 44; value 12 vs 11; link row 48 vs 36",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: row 64 vs 44; value 12 vs 11; link row 48 vs 36",
    "authority": "board"
   },
   {
@@ -881,9 +881,9 @@
    "name": "History · Published (tab)",
    "family": "History",
    "width": 360,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
    "authority": "board"
   },
   {
@@ -917,9 +917,9 @@
    "name": "History · Published · restore-confirm",
    "family": "History",
    "width": 1440,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 Figma C8: 184:35 h32 r8 14/500; 2026-09-02 verifier-history: 440 ok, copy ok; info box 13px/r6 vs 12px/r8; Cancel ghost 12px vs bordered 14px. PublishHistory.tsx:82-85; ConfirmDialog.tsx:56-77",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 Figma C8: 184:35 h32 r8 14/500; 2026-09-02 verifier-history: 440 ok, copy ok; info box 13px/r6 vs 12px/r8; Cancel ghost 12px vs bordered 14px. PublishHistory.tsx:82-85; ConfirmDialog.tsx:56-77",
    "authority": "code:cites-board"
   },
   {
@@ -941,9 +941,9 @@
    "name": "History · Published · roll-back confirm",
    "family": "History",
    "width": 1440,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: modal 560x405 ok; rows 40 vs 56h, current row dimmed .5 vs full, meta 500/ink-soft vs 400/muted, footer buttons 40 vs 32; no ✕ (founder). PublishHistory.tsx:91-94,326-331",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: modal 560x405 ok; rows 40 vs 56h, current row dimmed .5 vs full, meta 500/ink-soft vs 400/muted, footer buttons 40 vs 32; no ✕ (founder). PublishHistory.tsx:91-94,326-331",
    "authority": "code:cites-board"
   },
   {
@@ -953,9 +953,9 @@
    "name": "History · Saves",
    "family": "History",
    "width": 360,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
    "authority": "board"
   },
   {
@@ -989,9 +989,9 @@
    "name": "History · Saves · load-error",
    "family": "History",
    "width": 360,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
    "authority": "board"
   },
   {
@@ -1001,9 +1001,9 @@
    "name": "History · Saves · pruned-notice",
    "family": "History",
    "width": 360,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
    "authority": "board:163-269"
   },
   {
@@ -1013,9 +1013,9 @@
    "name": "History · Saves · restore-confirm",
    "family": "History",
    "width": 360,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
    "authority": "board"
   },
   {
@@ -1025,9 +1025,9 @@
    "name": "History · Saves · restoring",
    "family": "History",
    "width": 360,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
    "authority": "code:cites-board"
   },
   {
@@ -1049,9 +1049,9 @@
    "name": "History · milestone suggestion banner (code: MilestoneSuggestionBanner.tsx)",
    "family": "History",
    "width": 680,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-history",
-   "evidence": "Figma side DONE 2026-09-02 (tint fill, 30% accent border, blue-700 buttons; read-back ok). Code: MilestoneSuggestionBanner flex-wrap + 24h buttons in fix batch 2 — re-measure",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. Figma side DONE 2026-09-02 (tint fill, 30% accent border, blue-700 buttons; read-back ok). Code: MilestoneSuggestionBanner flex-wrap + 24h buttons in fix batch 2 — re-measure",
    "authority": "board:433-2348"
   },
   {
@@ -1237,9 +1237,9 @@
    "name": "Inspector · profile · BUTTON",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P2 verifier-inspector: 13/13 order ok; BACKGROUND tabs 91x40 + swatch + hex 127x36 vs Fill+Image rows 160x28. BackgroundSection tabs tw:h-7 + cross-cut",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: 13/13 order ok; BACKGROUND tabs 91x40 + swatch + hex 127x36 vs Fill+Image rows 160x28. BackgroundSection tabs tw:h-7 + cross-cut",
    "authority": "board"
   },
   {
@@ -1262,9 +1262,9 @@
    "name": "Inspector · profile · FLEX",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P2 verifier-inspector: LAYOUT Display 6x28.5x32 + 277x40 disclosure, no Direction row; FLEXBOX body 389 vs 164. FlexboxSection → 4 Select rows at 28; Direction into LAYOUT",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: LAYOUT Display 6x28.5x32 + 277x40 disclosure, no Direction row; FLEXBOX body 389 vs 164. FlexboxSection → 4 Select rows at 28; Direction into LAYOUT",
    "authority": "board"
   },
   {
@@ -1274,9 +1274,9 @@
    "name": "Inspector · profile · GRID",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P2 verifier-inspector: GRID body 453 vs 130: 8 presets 67x40, 3 inputs 89.7x42, 40-tall buttons in 22 rows; 35 controls ≥36. Columns/Row gap/Col gap at 28 first; rest behind More settings",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: GRID body 453 vs 130: 8 presets 67x40, 3 inputs 89.7x42, 40-tall buttons in 22 rows; 35 controls ≥36. Columns/Row gap/Col gap at 28 first; rest behind More settings",
    "authority": "board"
   },
   {
@@ -1286,9 +1286,9 @@
    "name": "Inspector · profile · INPUT",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P2 verifier-inspector: BORDER Width 24 / Style 24 / hex 127x36 + More 40 vs Width/Colour 160x28; 42 controls ≥36",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: BORDER Width 24 / Style 24 / hex 127x36 + More 40 vs Width/Colour 160x28; 42 controls ≥36",
    "authority": "board"
   },
   {
@@ -1310,9 +1310,9 @@
    "name": "Inspector · profile · TEXT",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P2 verifier-inspector: header 53 vs 48; pill strip 39/26 12px/500 vs 32/22 11px/400, This-pill white lost (inspector.css:128 beats ScopeDropdown.tsx:102); section header 30 vs 28; rows label-right control x+107 w181 h24 pitch 30 vs label-left x16 control x120 w160 h28 pitch 34; 18 controls ≥36 tall in 24 rows (Align overlaps Color by 12px)",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: header 53 vs 48; pill strip 39/26 12px/500 vs 32/22 11px/400, This-pill white lost (inspector.css:128 beats ScopeDropdown.tsx:102); section header 30 vs 28; rows label-right control x+107 w181 h24 pitch 30 vs label-left x16 control x120 w160 h28 pitch 34; 18 controls ≥36 tall in 24 rows (Align overlaps Color by 12px)",
    "authority": "board"
   },
   {
@@ -1359,9 +1359,9 @@
    "name": "Layers · hidden",
    "family": "Layers",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-layers-review",
-   "evidence": "P3 vlr: board row opacity .45; live per-part colours + #d1d5db square behind glyph. layers-v2.css:54-58 → .bdc-lr.bdc-hidden{opacity:.45}",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 vlr: board row opacity .45; live per-part colours + #d1d5db square behind glyph. layers-v2.css:54-58 → .bdc-lr.bdc-hidden{opacity:.45}",
    "authority": "board"
   },
   {
@@ -1443,9 +1443,9 @@
    "name": "Layers · tree",
    "family": "Layers",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-layers-review",
-   "evidence": "P2 vlr: row label 11/500 vs 13/400 (every board); pitch 29 vs 28; search input 40 in 28 box; ⊞⊟⚙ 10x40; 53px breadcrumb on selection on no board (decide). layers-v2.css:29,231,236; LayersTab.tsx:163,174-182",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vlr: row label 11/500 vs 13/400 (every board); pitch 29 vs 28; search input 40 in 28 box; ⊞⊟⚙ 10x40; 53px breadcrumb on selection on no board (decide). layers-v2.css:29,231,236; LayersTab.tsx:163,174-182",
    "authority": "board:142-2"
   },
   {
@@ -1479,9 +1479,9 @@
    "name": "Media · drill-in · icon-picker",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P1 vm: back row 279x0 (flex-shrink under a 2992px grid) — search covers it, pointer click times out; grid-cols-6 in 247px overflows; no section headers; cells r4 vs r6. IconBrowserOverlay.tsx:148 tw:shrink-0, :116 grid-cols-5; FIGMA 147:19 rows 312 in 280",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P1 vm: back row 279x0 (flex-shrink under a 2992px grid) — search covers it, pointer click times out; grid-cols-6 in 247px overflows; no section headers; cells r4 vs r6. IconBrowserOverlay.tsx:148 tw:shrink-0, :116 grid-cols-5; FIGMA 147:19 rows 312 in 280",
    "authority": "board"
   },
   {
@@ -1539,9 +1539,9 @@
    "name": "Media · filtered",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P3 vm: scope row Inter 12/400 #6b7280 vs mono 11/500 accent. SlimLauncher.tsx ~205",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 vm: scope row Inter 12/400 #6b7280 vs mono 11/500 accent. SlimLauncher.tsx ~205",
    "authority": "board"
   },
   {
@@ -1563,9 +1563,9 @@
    "name": "Media · grid",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P2 vm: geometry ok; search bg #fff/#d1d5db vs #f9fafb/#e5e7eb; pills 24 vs 22; footer 'Browse stock' wraps (board 'Stock'); load-more count Inter 12/400 vs mono 11/500",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vm: geometry ok; search bg #fff/#d1d5db vs #f9fafb/#e5e7eb; pills 24 vs 22; footer 'Browse stock' wraps (board 'Stock'); load-more count Inter 12/400 vs mono 11/500",
    "authority": "board"
   },
   {
@@ -1611,9 +1611,9 @@
    "name": "Media · quota-full",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P2 vm: text amber (css --exhausted rule; JSX template class never compiles); line2 12 #4b5563 vs 11 #6b7280; no 40h tint bar (founder). StorageQuotaBar.tsx ~60",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vm: text amber (css --exhausted rule; JSX template class never compiles); line2 12 #4b5563 vs 11 #6b7280; no 40h tint bar (founder). StorageQuotaBar.tsx ~60",
    "authority": "board"
   },
   {
@@ -1623,9 +1623,9 @@
    "name": "Media · quota-warn",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P2 vm: band 75 vs 58; text 11/400 #c27803 vs 12 #723b13; track 3; Optimise 32h Button vs 16h text — MediaTab.css:957-986 → delete",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vm: band 75 vs 58; text 11/400 #c27803 vs 12 #723b13; track 3; Optimise 32h Button vs 16h text — MediaTab.css:957-986 → delete",
    "authority": "board"
   },
   {
@@ -1635,9 +1635,9 @@
    "name": "Media · upload-failed",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P2 vm: row #fde8e8 + 2px red border + name 600 vs #fdfdea/none/400 — MediaTab.css:103-145 outranks JSX classes → delete",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vm: row #fde8e8 + 2px red border + name 600 vs #fdfdea/none/400 — MediaTab.css:103-145 outranks JSX classes → delete",
    "authority": "board"
   },
   {
@@ -1647,9 +1647,9 @@
    "name": "Media · uploading",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P3 vm: pct mono 11/400 vs 500; track r4 vs r2 at +32 vs +28. UploadZone.tsx",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 vm: pct mono 11/400 vs 500; track r4 vs r2 at +32 vs +28. UploadZone.tsx",
    "authority": "board"
   },
   {
@@ -2150,9 +2150,9 @@
    "name": "Review panel · detached-present",
    "family": "Review panel",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-layers-review",
-   "evidence": "P1 vlr: false DETACHED on 3/6 plain loads while the element IS in the DOM — commentAnchors.ts:100 pageId===activePageId true for null/null; scan CommentLayer.tsx:229 runs pre-mount → orphan modal blocks every click until Esc",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P1 vlr: false DETACHED on 3/6 plain loads while the element IS in the DOM — commentAnchors.ts:100 pageId===activePageId true for null/null; scan CommentLayer.tsx:229 runs pre-mount → orphan modal blocks every click until Esc",
    "authority": "code:detached-group-wired-fixture-has-no-orphan-now"
   },
   {
@@ -2186,9 +2186,9 @@
    "name": "Review panel · older-round",
    "family": "Review panel",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-layers-review",
-   "evidence": "P2 B vlr: board read-only round VIEW vs live header list; all 7 previous rounds print 'Revoked' though DB says APPROVED/CHANGES_REQUESTED — ReviewTab.tsx:797 tests revoked before status",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 B vlr: board read-only round VIEW vs live header list; all 7 previous rounds print 'Revoked' though DB says APPROVED/CHANGES_REQUESTED — ReviewTab.tsx:797 tests revoked before status",
    "authority": "code:rounds-list-ships-comment-linkage-blocked"
   },
   {
@@ -2198,9 +2198,9 @@
    "name": "Review panel · open",
    "family": "Review panel",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-layers-review",
-   "evidence": "P2 vlr: comment row 105.5 vs 64 (py12, quote 14 vs 13, meta 11 vs 12, 32 Resolve button); bands 32/px12 vs 28/px16; Compare/Re-send full-width 40 vs 28/32 auto; count 12/400 vs mono 11/500. CommentRow.tsx:56,68; ReviewTab.tsx:92-95,385,401,412-421,855",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vlr: comment row 105.5 vs 64 (py12, quote 14 vs 13, meta 11 vs 12, 32 Resolve button); bands 32/px12 vs 28/px16; Compare/Re-send full-width 40 vs 28/32 auto; count 12/400 vs mono 11/500. CommentRow.tsx:56,68; ReviewTab.tsx:92-95,385,401,412-421,855",
    "authority": "board"
   },
   {
@@ -3549,9 +3549,9 @@
    "name": "Layers · context-menu",
    "family": "Layers",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-layers-review",
-   "evidence": "P3 vlr: w180 vs 140; separators 4px margins vs 0; 'Copy link' wrong group. layers-v2.css:362,390; LayerContextMenu.tsx:80",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 vlr: w180 vs 140; separators 4px margins vs 0; 'Copy link' wrong group. layers-v2.css:362,390; LayerContextMenu.tsx:80",
    "authority": "board"
   },
   {
@@ -3646,9 +3646,9 @@
    "name": "Review panel · loading",
    "family": "Review panel",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-layers-review",
-   "evidence": "P3 vlr: 5 rows pitch 24 vs 32, x −4, bar 12 vs 10, icon r4 vs 3. ReviewTab.tsx:354-367",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 vlr: 5 rows pitch 24 vs 32, x −4, bar 12 vs 10, icon r4 vs 3. ReviewTab.tsx:354-367",
    "authority": "board"
   },
   {
@@ -3732,9 +3732,9 @@
    "name": "Inspector · no-selection",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P3 verifier-inspector: sentence ok; action 61.7x32 13/400 vs 268x16 12/500. InspectorEmptyState.tsx:93 tw:h-4 tw:min-h-0 tw:text-[12px] tw:font-medium",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: sentence ok; action 61.7x32 13/400 vs 268x16 12/500. InspectorEmptyState.tsx:93 tw:h-4 tw:min-h-0 tw:text-[12px] tw:font-medium",
    "authority": "board"
   },
   {
@@ -3804,9 +3804,9 @@
    "name": "Inspector · pseudo-state",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P3 verifier-inspector: copy exact; note 27 12/500 vs 32 11/400. ProInspector.tsx:486",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: copy exact; note 27 12/500 vs 32 11/400. ProInspector.tsx:486",
    "authority": "board"
   },
   {
@@ -3816,9 +3816,9 @@
    "name": "Inspector · reach-all-like-this",
    "family": "Inspector",
    "width": 300,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-inspector",
-   "evidence": "P3 verifier-inspector: colours+copy ok; 27 vs 36 tall, 500 vs 400, extra 2px left bar. ProInspector.tsx:462",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: colours+copy ok; 27 vs 36 tall, 500 vs 400, extra 2px left bar. ProInspector.tsx:462",
    "authority": "board"
   },
   {
@@ -4167,9 +4167,9 @@
    "name": "Media · fullpage · library",
    "family": "Media",
    "width": 1440,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P2 vm: top 56 vs 52, search 420x34 vs 733x29, buttons 34 vs 27, rows 31.5 vs 27, cards 146x166 vs 144x135, status 36 vs 32; ALL muted text --bk-ink-disabled #D1D5DB vs #6b7280 (1.5:1). LibraryManager.css:83,174,215,275,1052",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vm: top 56 vs 52, search 420x34 vs 733x29, buttons 34 vs 27, rows 31.5 vs 27, cards 146x166 vs 144x135, status 36 vs 32; ALL muted text --bk-ink-disabled #D1D5DB vs #6b7280 (1.5:1). LibraryManager.css:83,174,215,275,1052",
    "authority": "board"
   },
   {
@@ -4179,9 +4179,9 @@
    "name": "Media · fullpage · empty",
    "family": "Media",
    "width": 1440,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P2 vm: 80px ring vs 28 glyph; sub 13/400 #d1d5db vs 11 #6b7280; CTAs 34 vs ~27",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vm: 80px ring vs 28 glyph; sub 13/400 #d1d5db vs 11 #6b7280; CTAs 34 vs ~27",
    "authority": "board"
   },
   {
@@ -4444,9 +4444,9 @@
    "name": "Brand · review-changes (modal)",
    "family": "Brand",
    "width": 520,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: 360x154.8 r8 p20 vs 520x239 r12; title 16/600 vs 13/600; buttons 32h left vs 27h right; no change rows; 'Review 0 staged changes' while footer says unsaved. ReviewModal.tsx:111-179; DesignSystemTab.tsx:806 pass totalDirty",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: 360x154.8 r8 p20 vs 520x239 r12; title 16/600 vs 13/600; buttons 32h left vs 27h right; no change rows; 'Review 0 staged changes' while footer says unsaved. ReviewModal.tsx:111-179; DesignSystemTab.tsx:806 pass totalDirty",
    "authority": "board"
   },
   {
@@ -4636,9 +4636,9 @@
    "name": "Brand · root — NEW 2026-08-27 (CURRENT)",
    "family": "Brand",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "2026-09-02 Figma C4 DONE: header is a 16:6 instance (1627:7162). P1 2026-09-02 verifier-brand: 176.6px unboarded chrome (theme strip 125.6 + mode toggle 51) before preview; rows 51.6 inset x12 vs board 52 full-bleed x16; label 500 vs 400; chevron 14px #9ca3af vs 12px #4b5563; Lint + Import/export under the 693 fold. DesignSystemTab.tsx:597-632,719,708,80. Board header text contradicts Panel-header component (live matches component)",
+   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 Figma C4 DONE: header is a 16:6 instance (1627:7162). P1 2026-09-02 verifier-brand: 176.6px unboarded chrome (theme strip 125.6 + mode toggle 51) before preview; rows 51.6 inset x12 vs board 52 full-bleed x16; label 500 vs 400; chevron 14px #9ca3af vs 12px #4b5563; Lint + Import/export under the 693 fold. DesignSystemTab.tsx:597-632,719,708,80. Board header text contradicts Panel-header component (live matches component)",
    "authority": "board"
   },
   {
