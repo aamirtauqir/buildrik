@@ -67,12 +67,12 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
       {rows.map(([name, count]) => (
         <li
           key={name}
-          className="tw:flex tw:flex-col tw:gap-0.5 tw:px-3 tw:py-2 tw:border-b tw:border-[var(--bk-gray-100)]"
+          className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-0.5 tw:px-4 tw:border-b tw:border-[var(--bk-gray-100)]"
         >
-          <span className="tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]">
+          <span className="tw:text-[11px] tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]">
             .{name}
           </span>
-          <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">
+          <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
             used {count}&times;
           </span>
         </li>

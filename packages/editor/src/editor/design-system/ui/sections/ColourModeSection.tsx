@@ -63,7 +63,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
         data-no-dark-header
       >
         <span>No dark value</span>
-        <span data-no-dark-count>{missing.length}</span>
+        <span className="tw:font-mono tw:tabular-nums tw:font-medium" data-no-dark-count>{missing.length}</span>
       </div>
 
       {missing.length === 0 ? (
@@ -76,7 +76,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
             <li
               key={t.id}
               data-no-dark-row={t.id}
-              className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2"
+              className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4 tw:py-0"
             >
               {/*
                 The id, not the display name. Board 153:92 draws these rows as
@@ -93,7 +93,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
                 reader still reads something human.
               */}
               <span
-                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
+                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[11px] tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
                 title={t.name}
               >
                 {t.id}

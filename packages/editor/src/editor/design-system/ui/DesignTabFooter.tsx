@@ -34,14 +34,17 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
 }) => (
   <div
     data-screen-savebar="true"
+    /* Board 154:78: a 44-tall warning-tint bar, status and both actions on
+       one line as text — no bordered buttons, no grey plate. */
     style={{
       display: "flex",
       alignItems: "center",
-      gap: 8,
-      padding: "10px 12px",
-      borderTop: "1px solid var(--bk-border)",
-      background: "var(--bk-bg-subtle)",
+      gap: 16,
+      height: 44,
+      padding: "0 16px",
+      background: isDirty ? "var(--bk-warning-tint)" : "var(--bk-bg-subtle)",
       flexShrink: 0,
+      whiteSpace: "nowrap",
     }}
   >
     {/* --bk-ink-soft, not --bk-ink-muted: this footer sits on --bk-bg-subtle,
@@ -51,7 +54,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         controls saying "saved" about two different buffers, six hundred pixels
         apart, is a question the user should not have to answer. This one names
         its own subject; the topbar keeps the document. */}
-    <div style={{ flex: 1, fontSize: 12, color: "var(--bk-ink-soft)" }}>
+    <div style={{ flex: 1, fontSize: 11, color: isDirty ? "var(--bk-warning-text)" : "var(--bk-ink-soft)" }}>
       {/* "Unsaved brand changes" is board 154:78's wording, and it replaces
           "N previewing". The count is not lost: the root list still marks each
           dirty destination with its own dot, which is where a number belongs —
@@ -69,14 +72,17 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         <Button
           color="light"
           size="xs"
+          variant="link"
           onClick={onDiscard}
-          style={{ color: /* @lint-hex-policy: discard-affordance red-500, off chrome palette */ "#ef4444" }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+          className="tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]"
         >
           Discard
         </Button>
         <Button
           size="xs"
+          variant="link"
           onClick={onReview}
+          className="tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)]"
         >
           {APPLY_CHANGES_LABEL}
         </Button>

@@ -55,8 +55,9 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         alignItems: "center",
         justifyContent: "space-between",
         width: "100%",
-        padding: "8px 12px",
-        paddingLeft: isActive ? 10 : 12,
+        minHeight: 44,
+        padding: "0 16px",
+        paddingLeft: isActive ? 14 : 16,
         background: isActive ? "var(--bk-bg-subtle)" : "transparent",
         borderTop: "none",
         borderRight: "none",
@@ -70,7 +71,7 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         textAlign: "left",
         fontSize: 13,
         color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
-        fontWeight: isActive ? 600 : 500,
+        fontWeight: isActive ? 500 : 400,
       }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
     >
       {/* Board 152:112 splits the row: name at the left margin, count muted

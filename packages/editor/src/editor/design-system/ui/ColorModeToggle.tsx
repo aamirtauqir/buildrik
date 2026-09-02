@@ -71,15 +71,20 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
     role="tab"
     aria-selected={active}
     onClick={() => composer.colorMode.set(value)}
+    /* Board 153:92: a 28-tall, radius-6 segment — white with ink when
+       active, plain when not. The accent-filled pill it replaced measured 32
+       tall and 11/600 against the board's 12/400. */
     style={{
-      padding: "3px 12px",
-      fontSize: 11,
-      fontWeight: 600,
+      height: 28,
+      padding: "0 12px",
+      fontSize: 12,
+      fontWeight: 400,
       border: "none",
-      borderRadius: "var(--bk-radius-full)",
+      borderRadius: 6,
       cursor: "pointer",
-      background: active ? "var(--bk-accent)" : "transparent",
-      color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
+      background: active ? "var(--bk-bg-elevated)" : "transparent",
+      color: active ? "var(--bk-ink)" : "var(--bk-ink-muted)",
+      boxShadow: active ? "var(--bk-shadow-raised)" : "none",
       transition: "background 80ms",
     }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
   >

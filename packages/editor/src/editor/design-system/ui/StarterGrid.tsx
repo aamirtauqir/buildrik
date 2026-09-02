@@ -36,11 +36,13 @@ export function StarterGrid({
     <div
       role="radiogroup"
       aria-label="Starter design systems"
+      /* Board 152:137 (redrawn at 280 on 2026-09-02): a 16/12 inset, 16 between
+         cards, two 116-wide cards per row. */
       style={{
-        padding: "24px 28px",
+        padding: "12px 16px",
         display: "grid",
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        gap: 12,
+        gap: 16,
       }}
     >
       {STARTER_DS_REGISTRY.map((s) => (
@@ -82,15 +84,15 @@ function StarterCard({ starter, selected, onSelect, showDescription = true }: St
          card locked to 40px: the 80px gradient squashed to 17px and the
          description clipped mid-line with its ellipsis below the fold. Found
          live 2026-08-13; the CLAUDE.md menu/pill trap, on a card. */
-      className={`tw:h-auto tw:items-stretch tw:justify-start tw:text-left tw:font-normal tw:rounded-lg tw:overflow-hidden tw:flex tw:flex-col tw:bg-white tw:p-0 ${
+      className={`tw:h-auto tw:items-stretch tw:justify-start tw:text-left tw:font-normal tw:rounded-lg tw:overflow-hidden tw:flex tw:flex-col tw:bg-transparent tw:p-0 ${
         selected
           ? "tw:border-2 tw:border-[var(--bk-accent)] tw:[box-shadow:0_0_0_2px_var(--bk-accent-subtle)]"
-          : "tw:border tw:border-[var(--bk-gray-200)] tw:shadow-none"
+          : "tw:border-0 tw:shadow-none"
       }`}
     >
       <div
         style={{
-          height: 80,
+          height: 76,
           background: `linear-gradient(135deg, ${primary}, ${background})`,
           display: "grid",
           placeItems: "center",
@@ -104,8 +106,8 @@ function StarterCard({ starter, selected, onSelect, showDescription = true }: St
             in the swatch AND under it, so every card said it twice — and the
             copy inside a gradient was the least readable of the two. */}
       </div>
-      <div style={{ padding: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" }}>
+      <div style={{ padding: "6px 0 0" }}>
+        <div style={{ fontSize: 12, fontWeight: 400, color: "var(--bk-ink-soft)" }}>
           {starter.name}
         </div>
         {showDescription ? (

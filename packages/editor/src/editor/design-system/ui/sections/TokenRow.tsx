@@ -68,7 +68,7 @@ const valueLineStyle: React.CSSProperties = {
 
 const nameStyle: React.CSSProperties = {
   fontSize: 13,
-  fontWeight: 500,
+  fontWeight: 400,
   color: "var(--bk-ink)",
 };
 
@@ -99,11 +99,13 @@ export const TokenRow: React.FC<TokenRowProps> = ({
 }) => {
   const hasLint = !!lintIssues && lintIssues.length > 0;
 
+  /* Board 152:83 draws every token row 44 tall, swatch on the 16 gutter. */
   const rowStyle: React.CSSProperties = {
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
+    minHeight: 44,
     gap: 10,
-    padding: hasLint ? "8px 12px 8px 9px" : "8px 12px",
+    padding: hasLint ? "0 12px 0 13px" : "0 16px",
     background: hasLint ? "rgba(245, 158, 11, 0.08)" : "transparent",
     borderLeft: hasLint ? "3px solid var(--bk-warning-text)" : "none",
     cursor: "pointer",

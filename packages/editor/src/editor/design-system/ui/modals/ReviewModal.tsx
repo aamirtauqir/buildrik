@@ -108,14 +108,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
 
   return (
     <ModalRoot open onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="sm">
+      <ModalContent size="md">
         <div className="tw:p-5">
           {/* Board 1172:4840 counts in the title and says what applying
               reaches: "Applying updates every element bound to these tokens —
               63 places." A count in the title is the difference between
               "review changes" and knowing whether this is a typo fix or a
               rebrand. */}
-          <ModalTitle inset={false} className="tw:text-sm tw:font-semibold tw:text-[var(--bk-ink)] tw:mb-1">
+          <ModalTitle inset={false} className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)] tw:mb-1">
             Review {totalChanges} staged {totalChanges === 1 ? "change" : "changes"}
           </ModalTitle>
 
@@ -189,7 +189,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                 color="light"
                 size="xs"
                 onClick={onDiscardAll}
-                className="tw:mr-auto tw:border-[var(--bk-error)] tw:bg-transparent tw:text-[var(--bk-error)]"
+                className="tw:h-7 tw:text-[11px] tw:border-[var(--bk-error)] tw:bg-transparent tw:text-[var(--bk-error-text)]"
               >
                 Discard all
               </Button>
@@ -199,11 +199,11 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               color="light"
               size="xs"
               onClick={onClose}
-              className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+              className="tw:h-7 tw:text-[11px] tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
             >
               Keep editing
             </Button>
-            <Button size="xs" onClick={onConfirm}>
+            <Button size="xs" className="tw:h-7 tw:text-[11px]" onClick={onConfirm}>
               Apply {totalChanges} {totalChanges === 1 ? "change" : "changes"}
             </Button>
           </div>
