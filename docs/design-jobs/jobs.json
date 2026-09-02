@@ -1,13 +1,13 @@
 {
- "generated": "2026-09-02T13:49:35Z",
+ "generated": "2026-09-02T14:25:00Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 82,
-  "verify": 168,
+  "fix": 78,
+  "verify": 174,
   "todo": 38,
   "unbuildable": 66,
   "decide": 9,
-  "done": 51,
+  "done": 49,
   "fix-figma": 10
  },
  "jobs": [
@@ -177,7 +177,7 @@
    "width": 280,
    "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 54.5 vs 44; name 13/400 x24 vs Geist Mono 11/500 x16; usage 12 vs 11. ClassesSection.tsx:70-75",
+   "evidence": "2026-09-02 C5 figma: 5 ⋯ glyphs removed; ClassesSection.tsx rows are plain <li> with no actions | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 54.5 vs 44; name 13/400 x24 vs Geist Mono 11/500 x16; usage 12 vs 11. ClassesSection.tsx:70-75",
    "authority": "board:153-2-no-menu"
   },
   {
@@ -421,8 +421,8 @@
    "width": 280,
    "status": "verify",
    "owner": "verifier-brand",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 54/56 vs 44; swatch x24 vs 16; name x50 13/500 vs x40 13/400; toolbar h60 unboarded. TokenRow.tsx:106/71/63",
-   "authority": "board"
+   "evidence": "2026-09-02 C5 OPEN: board draws 3 token rows + 3 global foot rows; TokenDetailView.tsx:440/528/324 scopes them to one selected token — designer body redraw | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-brand: rows 54/56 vs 44; swatch x24 vs 16; name x50 13/500 vs x40 13/400; toolbar h60 unboarded. TokenRow.tsx:106/71/63",
+   "authority": "code:token-actions-live-in-the-detail-view"
   },
   {
    "id": "J-152:52",
@@ -626,8 +626,8 @@
    "width": 1080,
    "status": "unbuildable",
    "owner": null,
-   "evidence": "unbuilt-no-resend-action-in-compare",
-   "authority": "board",
+   "evidence": "2026-09-02 C2 RESOLVED: ApprovedCompareView has no re-send control; ReviewTab.tsx:839 owns the confirm. Board renamed SUPERSEDED, both inbound hotspots cut | unbuilt-no-resend-action-in-compare",
+   "authority": "superseded-by:158:2",
    "blocker": "A"
   },
   {
@@ -883,8 +883,8 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
-   "authority": "board"
+   "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
+   "authority": "code:history-tab-version-history-2-tabs"
   },
   {
    "id": "J-453:4064",
@@ -955,8 +955,8 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
-   "authority": "board"
+   "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
+   "authority": "code:history-tab-version-history-2-tabs"
   },
   {
    "id": "J-163:2",
@@ -979,8 +979,8 @@
    "width": 360,
    "status": "decide",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 Figma D12 sub-copy fixed; 2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
-   "authority": "board:163-64"
+   "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | 2026-09-02 Figma D12 sub-copy fixed; 2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
+   "authority": "code:history-tab-version-history-2-tabs"
   },
   {
    "id": "J-453:4031",
@@ -991,8 +991,8 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
-   "authority": "board"
+   "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
+   "authority": "code:history-tab-version-history-2-tabs"
   },
   {
    "id": "J-163:269",
@@ -1003,8 +1003,8 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
-   "authority": "board:163-269"
+   "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
+   "authority": "code:history-tab-version-history-2-tabs"
   },
   {
    "id": "J-163:167",
@@ -1015,8 +1015,8 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
-   "authority": "board"
+   "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
+   "authority": "code:history-tab-version-history-2-tabs"
   },
   {
    "id": "J-163:220",
@@ -1027,8 +1027,8 @@
    "width": 360,
    "status": "verify",
    "owner": "verifier-history",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
-   "authority": "code:cites-board"
+   "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
+   "authority": "code:history-tab-version-history-2-tabs"
   },
   {
    "id": "J-163:113",
@@ -1455,10 +1455,10 @@
    "name": "Media · bulk-select",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P3 vm: actions 12/500 vs 400; 'Done' not on board; FIGMA 145:349/350 overlap 16px",
-   "authority": "board"
+   "evidence": "2026-09-02 C12 figma: Move to… x96->100, Delete x136->180, Done added @234 | P3 vm: actions 12/500 vs 400; 'Done' not on board; FIGMA 145:349/350 overlap 16px",
+   "authority": "code:bulk-bar-gap-6"
   },
   {
    "id": "J-146:2",
@@ -1481,8 +1481,8 @@
    "width": 280,
    "status": "verify",
    "owner": "verifier-media",
-   "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P1 vm: back row 279x0 (flex-shrink under a 2992px grid) — search covers it, pointer click times out; grid-cols-6 in 247px overflows; no section headers; cells r4 vs r6. IconBrowserOverlay.tsx:148 tw:shrink-0, :116 grid-cols-5; FIGMA 147:19 rows 312 in 280",
-   "authority": "board"
+   "evidence": "2026-09-02 C12 figma: rows 312->248 at x16, 5 tiles/row, pad1.6 gap11.2; sections h104->152 / h152->200 | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P1 vm: back row 279x0 (flex-shrink under a 2992px grid) — search covers it, pointer click times out; grid-cols-6 in 247px overflows; no section headers; cells r4 vs r6. IconBrowserOverlay.tsx:148 tw:shrink-0, :116 grid-cols-5; FIGMA 147:19 rows 312 in 280",
+   "authority": "code:icon-grid-is-5-col"
   },
   {
    "id": "J-147:55",
@@ -1529,7 +1529,7 @@
    "width": 280,
    "status": "decide",
    "owner": "verifier-media",
-   "evidence": "P3 vm: ONE link (Upload dropped by code on purpose) vs board two; board pills show counts on an empty library (FIGMA → 0)",
+   "evidence": "2026-09-02 C12 figma: pill counts 128/6/24/370 -> 0 on the empty library; the Upload-link half is still G12 | P3 vm: ONE link (Upload dropped by code on purpose) vs board two; board pills show counts on an empty library (FIGMA → 0)",
    "authority": "board"
   },
   {
@@ -1575,9 +1575,9 @@
    "name": "Media · load-error",
    "family": "Media",
    "width": 280,
-   "status": "done",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "MATCH-ish vm: block/copy/colours ok; FIGMA: pills draw counts on a failed load; 453:3933 still has the double border",
+   "evidence": "2026-09-02 C12 figma: outer Search band stroke/r6 stripped to match twin 144:7; pill counts hidden | MATCH-ish vm: block/copy/colours ok; FIGMA: pills draw counts on a failed load; 453:3933 still has the double border",
    "authority": "board"
   },
   {
@@ -1587,10 +1587,10 @@
    "name": "Media · loading",
    "family": "Media",
    "width": 280,
-   "status": "done",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "MATCH vm: 6 cells, thumbs 76 r6, bars 96/72/110/84/100/66 exact; FIGMA cells overlap 24px at 280",
-   "authority": "board"
+   "evidence": "2026-09-02 C12 figma: skeleton cells 136@16/128 -> 116@16/148; pill counts hidden (loading cannot know them) | MATCH vm: 6 cells, thumbs 76 r6, bars 96/72/110/84/100/66 exact; FIGMA cells overlap 24px at 280",
+   "authority": "code:med-asset-grid-2col"
   },
   {
    "id": "J-782:4353",
@@ -1599,9 +1599,9 @@
    "name": "Media · no-results",
    "family": "Media",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-media",
-   "evidence": "P3 vm: copy/colour ok; pad 32/16 vs 36/24 → tw:pt-9 tw:px-6",
+   "evidence": "2026-09-02 C12 figma: 1314:21 align CENTER->LEFT; UNFIXED: scope rows are 22h holding 32-40h text | P3 vm: copy/colour ok; pad 32/16 vs 36/24 → tw:pt-9 tw:px-6",
    "authority": "board"
   },
   {
@@ -3977,9 +3977,9 @@
    "name": "Content · data · no-source",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P2 verifier-content: plain text vs gray Badge (#e5e7eb/#9ca3af 12/500 #374151) at x16 y64. ContentViews.tsx:815",
+   "evidence": "2026-09-02 C12 figma: Badge 333:2344 132->172, hugs its label | P2 verifier-content: plain text vs gray Badge (#e5e7eb/#9ca3af 12/500 #374151) at x16 y64. ContentViews.tsx:815",
    "authority": "board"
   },
   {
@@ -3989,9 +3989,9 @@
    "name": "Content · data · watching",
    "family": "Content",
    "width": 280,
-   "status": "fix",
+   "status": "verify",
    "owner": "verifier-content",
-   "evidence": "P3 verifier-content: pill bg ok; no border vs 1px #0e9f6e; 12/400 #0e9f6e vs 12/500 #046c4e; px8 vs 10; y92 vs 64. ContentViews.tsx:760-763",
+   "evidence": "2026-09-02 C12 figma: Badge 333:2346 106->146, hugs its label | P3 verifier-content: pill bg ok; no border vs 1px #0e9f6e; 12/400 #0e9f6e vs 12/500 #046c4e; px8 vs 10; y92 vs 64. ContentViews.tsx:760-763",
    "authority": "board"
   },
   {
