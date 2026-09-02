@@ -89,8 +89,23 @@ describe("NotificationPanel — the way to the rest of them", () => {
     const { container } = render(<NotificationPanel onClose={vi.fn()} onNavigate={onNavigate} />);
 
     await waitFor(() => expect(container.querySelector('[data-jump-gone="true"]')).toBeTruthy());
-    expect(screen.getByText(/The target is gone/)).toBeInTheDocument();
     fireEvent.click(container.querySelector('[data-jump-gone="true"]') as HTMLElement);
     expect(onNavigate).not.toHaveBeenCalled();
+  });
+
+  it("explains the dead jump in its own marker below the row (board 165:81)", async () => {
+    fetchRecentNotifications.mockResolvedValue([row({ actionUrl: null })]);
+    const { container } = render(<NotificationPanel onClose={vi.fn()} />);
+
+    const note = await waitFor(() => {
+      const el = container.querySelector("[data-jump-gone-note]");
+      expect(el).toBeTruthy();
+      return el as HTMLElement;
+    });
+    // Two lines, the loss first: this was one quiet line INSIDE the row until
+    // the board was read, so the marker being a sibling of the row is the fix.
+    expect(note.textContent).toMatch(/What this points to was deleted/);
+    expect(note.textContent).toMatch(/The notification is kept, but there’s nothing to jump to\./);
+    expect(container.querySelector('[data-jump-gone="true"] [data-jump-gone-note]')).toBeNull();
   });
 });

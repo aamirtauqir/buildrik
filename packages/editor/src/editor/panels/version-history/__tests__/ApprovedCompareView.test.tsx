@@ -12,8 +12,18 @@ import { ApprovedCompareView } from "../ApprovedCompareView";
 import type { ComparePage } from "@/shared/utils/html";
 
 const wrap = (html: string): ComparePage[] => [{ path: "home", html }];
-const APPROVED = wrap(`<div class="root"><section class="hero"><h2>One</h2></section></div>`);
-const CURRENT_CHANGED = wrap(`<div class="root"><section class="hero"><h2>Two</h2></section></div>`);
+const page = (h2: string) => `<div class="root"><section class="hero"><h2>${h2}</h2></section></div>`;
+const APPROVED = wrap(page("One"));
+const CURRENT_CHANGED = wrap(page("Two"));
+/** Two pages, and the change is on the one that is NOT active by default. */
+const TWO_PAGES_APPROVED: ComparePage[] = [
+  { path: "home", html: page("One") },
+  { path: "about", html: page("Alpha") },
+];
+const TWO_PAGES_CURRENT: ComparePage[] = [
+  { path: "home", html: page("One") },
+  { path: "about", html: page("Beta") },
+];
 
 function renderView(props: Partial<React.ComponentProps<typeof ApprovedCompareView>> = {}) {
   return render(
@@ -42,13 +52,31 @@ describe("ApprovedCompareView", () => {
     expect(screen.getByText(/text changed/i)).toBeInTheDocument();
   });
 
-  it("shows a clean state in list mode when nothing changed", () => {
+  it("draws no panes at all when nothing changed, in every mode (board 168:82)", () => {
     renderView({ currentPages: APPROVED });
-    fireEvent.click(screen.getByRole("button", { name: /^list$/i }));
-    expect(screen.getByText(/matches the approved version/i)).toBeInTheDocument();
+    for (const mode of [/^side by side$/i, /^overlay$/i, /^list$/i]) {
+      fireEvent.click(screen.getByRole("button", { name: mode }));
+      expect(screen.getByText(/nothing changed since the approved version/i)).toBeInTheDocument();
+      // The board's reason for the state: an empty diff view reads as broken.
+      expect(document.querySelector("iframe")).toBeNull();
+    }
   });
 
-  it("always renders the full legend so kinds read by icon+label, not color", () => {
+  it("still marks a single unchanged page while other pages have changes", () => {
+    renderView({ approvedPages: TWO_PAGES_APPROVED, currentPages: TWO_PAGES_CURRENT });
+    fireEvent.click(screen.getByRole("button", { name: /^list$/i }));
+    expect(screen.getByText(/matches the approved version/i)).toBeInTheDocument();
+    expect(screen.queryByText(/nothing changed since the approved version/i)).toBeNull();
+  });
+
+  it("sets the change count in mono, as all four Compare boards do", () => {
+    renderView();
+    const count = document.querySelector("[data-compare-count]");
+    expect(count?.className).toContain("tw:font-mono");
+    expect(count?.className).toContain("tw:tabular-nums");
+  });
+
+  it("renders the full legend so kinds read by icon+label, not color", () => {
     renderView();
     for (const label of ["Added", "Removed", "Moved", "Content", "Style"]) {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);

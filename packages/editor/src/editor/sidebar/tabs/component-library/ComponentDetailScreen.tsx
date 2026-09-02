@@ -12,7 +12,6 @@ import type { Composer } from "../../../../engine";
 import type { ComponentDefinition, VariantProperty } from "../../../../shared/types/components";
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
 import { DrillInHeader } from "../../shared/DrillInHeader";
-import { DetachConfirmModal } from "./DetachConfirmModal";
 // ============================================
 // Types
 // ============================================
@@ -99,13 +98,9 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // overrides, so it is never one click.
   const [showUpdateConfirm, setShowUpdateConfirm] = React.useState(false);
 
-  // Detach confirmation modal state — populated with derived label/master/count
-  // computed from the currently-selected canvas instance at click time.
-  const [pendingDetach, setPendingDetach] = React.useState<{
-    instanceLabel: string;
-    masterName: string;
-    masterInstanceCount: number;
-  } | null>(null);
+  // Detach confirmation state — the master's name, which is the only thing
+  // board 1170:4792's confirm names. Non-null means the dialog is open.
+  const [pendingDetach, setPendingDetach] = React.useState<string | null>(null);
 
   // State for variant selection (for preview)
   const [selectedVariantValues, setSelectedVariantValues] = React.useState<Record<string, string>>(
@@ -251,28 +246,19 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // Instance count for delete message
   const instanceCount = composer?.components?.getInstancesOfComponent?.(component.id)?.length ?? 0;
 
-  // Handle detach instance — open confirmation modal first with derived
-  // label/master/count. The actual detach is fired in confirmDetach below.
+  // Handle detach instance — confirm first. With no composer or nothing
+  // selected there is no instance to name, so the confirm has nothing to say
+  // and the detach goes straight through, as it always has.
   const handleDetach = () => {
     if (!composer) {
       onDetachInstance?.();
       return;
     }
-    const selectedIds = composer.selection?.getSelectedIds() || [];
-    const currentSelectedId = selectedIds[0];
-    if (!currentSelectedId) {
+    if (!composer.selection?.getSelectedIds()?.[0]) {
       onDetachInstance?.();
       return;
     }
-    const allInstances =
-      composer.components?.getInstancesOfComponent?.(component.id) ?? [];
-    const index = allInstances.findIndex((i) => i.elementId === currentSelectedId);
-    const instanceLabel = index >= 0 ? `#${index + 1}` : "selected";
-    setPendingDetach({
-      instanceLabel,
-      masterName: component.name,
-      masterInstanceCount: allInstances.length || 1,
-    });
+    setPendingDetach(component.name);
   };
 
   const confirmDetach = () => {
@@ -444,16 +430,20 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         confirmLabel="Update component"
         tone="destructive"
       />
-      {/* Detach confirmation modal (Task 13) */}
-      {pendingDetach && (
-        <DetachConfirmModal
-          instanceLabel={pendingDetach.instanceLabel}
-          masterName={pendingDetach.masterName}
-          masterInstanceCount={pendingDetach.masterInstanceCount}
-          onCancel={() => setPendingDetach(null)}
-          onConfirm={confirmDetach}
-        />
-      )}
+      {/* Board 1170:4792 — the confirm says what detaching costs THIS copy and
+          what it leaves alone, in one sentence. It replaces four glyph bullets
+          ("resolved bindings will be snapshotted", "becomes free-form") that
+          spoke about masters and bindings to someone who had clicked Detach.
+          Not destructive: the board draws an accent button, and undo restores
+          the link. */}
+      <ConfirmDialog
+        open={pendingDetach !== null}
+        onClose={() => setPendingDetach(null)}
+        onConfirm={confirmDetach}
+        title="Detach from component?"
+        message={`This copy stops receiving updates from "${pendingDetach ?? ""}". The component itself is untouched.`}
+        confirmLabel="Detach"
+      />
     </div>
   );
 };

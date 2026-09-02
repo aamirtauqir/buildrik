@@ -77,6 +77,8 @@ const LIST_SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:pt-1 tw:px-3 tw:
 const LIST_ROW = "tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:mb-1.5 tw:items-start";
 const LIST_DETAIL = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
 const SUMMARY = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:px-3 tw:py-1.5";
+const COUNT =
+  "tw:font-mono tw:text-[11px] tw:font-medium tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]";
 /** The quiet button look, previously copy-pasted onto four separate Buttons. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 function findPage(pages: ComparePage[] | null, path: string): ComparePage | undefined {
@@ -131,6 +133,12 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
   const approvedPage = findPage(approvedPages, path);
   const currentPage = findPage(currentPages, path);
 
+  /* Board 168:82 — zero changes replaces the whole body, in every mode, and
+     the board says why: an empty diff view reads as broken. Read only once
+     the current side has arrived; before that, zero changes means nothing has
+     been compared yet, not that nothing changed. */
+  const nothingChanged = currentReady && result.changes.length === 0;
+
   const changesForPage = result.changes
     .filter((c) => c.page === path)
     .sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind));
@@ -154,7 +162,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
             change total and how many of them are on the page you are looking
             at. Live printed it only in List, so Side-by-side and Overlay left
             you comparing without knowing how much there was to find. */}
-        <span className={LIST_DETAIL} data-compare-count>
+        <span className={COUNT} data-compare-count>
           {result.changes.length} change{result.changes.length === 1 ? "" : "s"}
           {result.changes.length > 0 ? ` · ${changesForPage.length} of ${result.changes.length}` : ""}
         </span>
@@ -176,14 +184,21 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
         )}
       </Toolbar>
 
-      {mode === "list" ? (
+      {nothingChanged ? (
+        <EmptyState
+          className="tw:flex-1"
+          icon={<CheckCircle2 size={24} aria-hidden="true" />}
+          title="Nothing changed since the approved version."
+          body="Every page matches what the client approved."
+        />
+      ) : mode === "list" ? (
         <>
+          {/* Zero total changes never reaches List now — 168:82 takes the
+              whole body — so the summary only ever has counts to print. */}
           <div className={SUMMARY}>
-            {result.changes.length === 0
-              ? "No changes since approval."
-              : KIND_ORDER.filter((k) => result.counts[k] > 0)
-                  .map((k) => `${result.counts[k]} ${KIND[k].label.toLowerCase()}`)
-                  .join(" · ")}
+            {KIND_ORDER.filter((k) => result.counts[k] > 0)
+              .map((k) => `${result.counts[k]} ${KIND[k].label.toLowerCase()}`)
+              .join(" · ")}
           </div>
           <div className={LIST_SCROLL}>
             {changesForPage.length === 0 ? (
@@ -260,19 +275,23 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
         </div>
       )}
 
-      <div className={LEGEND}>
-        {KIND_ORDER.map((k) => {
-          const KindIcon = KIND[k].icon;
-          return (
-            <span key={k} className="tw:flex tw:items-center tw:gap-1">
-              <span className={`tw:inline-flex ${KIND[k].className}`}>
-                <KindIcon size={14} aria-hidden="true" />
+      {/* The legend decodes change kinds. With nothing to decode 168:82 draws
+          none, and a key to five kinds none of which occurred is noise. */}
+      {nothingChanged ? null : (
+        <div className={LEGEND}>
+          {KIND_ORDER.map((k) => {
+            const KindIcon = KIND[k].icon;
+            return (
+              <span key={k} className="tw:flex tw:items-center tw:gap-1">
+                <span className={`tw:inline-flex ${KIND[k].className}`}>
+                  <KindIcon size={14} aria-hidden="true" />
+                </span>
+                {KIND[k].label}
               </span>
-              {KIND[k].label}
-            </span>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

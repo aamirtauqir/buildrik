@@ -5,8 +5,11 @@
  * pro mode. (The "Swap component" action was removed — it had no engine
  * completion path; the Instance Actions area is now Detach-only / Pro-only.)
  *
- * Closes the T13 gating gap flagged by holistic final review: T13
- * shipped DetachConfirmModal but did not gate the trigger button.
+ * Closes the T13 gating gap flagged by holistic final review: T13 shipped the
+ * detach confirmation but did not gate the trigger button. (That confirmation
+ * is chrome-ui's ConfirmDialog as of board 1170:4792; the DetachConfirmModal
+ * component this line used to name is gone. The gate under test is the
+ * trigger, which is unchanged.)
  *
  * @license BSD-3-Clause
  */
