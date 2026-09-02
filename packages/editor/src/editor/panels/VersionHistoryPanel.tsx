@@ -51,11 +51,12 @@ import { useHistoryState } from "@/shared/hooks/useHistoryState";
 const LOAD_ERROR =
   "tw:flex tw:flex-col tw:items-center tw:gap-[var(--bk-space-4)] " +
   "tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-24)] tw:text-center";
-const LOAD_ERROR_TITLE = "tw:text-[var(--bk-error)] tw:text-[13px] tw:font-normal";
+const LOAD_ERROR_TITLE = "tw:text-[var(--bk-error-text)] tw:text-[13px] tw:font-normal";
 const LOAD_ERROR_SUB = "tw:text-[var(--bk-ink-muted)] tw:text-[12px]";
+/* Board 453:4031 closes on a 40-tall note strip with the retry as a text link. */
 const LOAD_ERROR_FOOT =
-  "tw:flex tw:flex-col tw:gap-[var(--bk-space-8)] tw:mt-auto " +
-  "tw:p-[var(--bk-space-12)] tw:border-t tw:border-[var(--bk-border)] " +
+  "tw:flex tw:h-10 tw:items-center tw:justify-between tw:gap-[var(--bk-space-8)] tw:mt-auto " +
+  "tw:px-[var(--bk-space-12)] tw:bg-[var(--bk-bg-subtle)] " +
   "tw:text-[var(--bk-ink-muted)] tw:text-[12px]";
 
 /* Board 1138:4573 — the Saves loading state. Staggered indents so it reads as a
@@ -72,11 +73,11 @@ const SKELETON_BAR =
    oldest auto-saves aged out; accent says something is happening, not wrong. */
 const NOTICE_BASE =
   "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-12)] " +
-  "tw:py-[var(--bk-space-8)] tw:border-b tw:border-[var(--bk-border)] tw:text-[12px]";
+  "tw:py-[var(--bk-space-8)] tw:rounded-lg tw:text-[11px]";
 /* Board 163:167's confirm band — accent tint, its own actions row. */
 const RESTORE_CONFIRM =
-  "tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1 tw:mb-2";
-const RESTORE_CONFIRM_TITLE = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-accent)]";
+  "tw:rounded-none tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1 tw:mb-2";
+const RESTORE_CONFIRM_TITLE = "tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent)]";
 const RESTORE_CONFIRM_SUB = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 const RESTORE_CONFIRM_ACTIONS = "tw:mt-1 tw:flex tw:items-center tw:justify-between tw:gap-2";
 
@@ -84,7 +85,7 @@ const NOTICE_PRUNED =
   `${NOTICE_BASE} tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]`;
 const NOTICE_RESTORING =
   `${NOTICE_BASE} tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]`;
-const NOTICE_STRONG = "tw:font-semibold";
+const NOTICE_STRONG = "tw:font-normal tw:text-[12px]";
 const NOTICE_SUB = "tw:text-[var(--bk-ink-muted)]";
 
 export function VersionHistoryPanel({
@@ -295,7 +296,7 @@ export function VersionHistoryPanel({
         </div>
         <div className={LOAD_ERROR_FOOT}>
           <span>Retry, or reopen Versions in a moment.</span>
-          <Button color="light" size="xs" onClick={retryLoad}>
+          <Button color="light" size="xs" variant="link" className="tw:h-auto tw:p-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)]" onClick={retryLoad}>
             Try again
           </Button>
         </div>
@@ -363,10 +364,10 @@ export function VersionHistoryPanel({
           <div className={RESTORE_CONFIRM_ACTIONS}>
             {/* Cancel first, per the board: the safe door is the one nearer
                 the reading order's start. */}
-            <Button color="light" size="xs" onClick={handleRestoreCancel}>
+            <Button color="light" size="xs" className="tw:h-7" onClick={handleRestoreCancel}>
               Cancel
             </Button>
-            <Button size="xs" onClick={() => handleRestoreConfirm(restoreConfirmVersion.id)}>
+            <Button size="xs" className="tw:h-7" onClick={() => handleRestoreConfirm(restoreConfirmVersion.id)}>
               Restore
             </Button>
           </div>

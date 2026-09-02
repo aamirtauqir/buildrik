@@ -687,10 +687,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           )}
           {/* Brand root — the drill-in list (M5, board 152:2) */}
           {activeSection === null && suppressedCount > 0 ? (
-            <div className="tw:px-3 tw:pb-2">
+            <div className="tw:px-4 tw:pb-2">
               <span
                 role="status"
-                className="tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-0.5 tw:text-xs tw:text-[var(--bk-warning-text)]"
+                className="tw:inline-flex tw:h-5 tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-yellow-100)] tw:px-2 tw:text-xs tw:font-medium tw:leading-none tw:text-[var(--bk-warning-text)]"
               >
                 Warnings suppressed
               </span>
@@ -705,7 +705,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           )}
 
           {activeSection === null && (
-            <ul className="tw:flex tw:flex-col tw:gap-0.5 tw:list-none tw:m-0 tw:p-0">
+            <ul className="tw:flex tw:flex-col tw:gap-0 tw:list-none tw:m-0 tw:p-0">
               {SECTIONS.map((s) => {
                 const dirtyHere =
                   (s.id === "tokens" && tokensDirty > 0) ||
@@ -716,7 +716,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                       color="light"
                       data-section-id={s.id}
                       onClick={() => handleSectionClick(s.id)}
-                      className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-auto tw:px-2 tw:py-2 tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
+                      className="tw:flex tw:w-full tw:items-center tw:gap-2 tw:justify-between tw:h-13 tw:px-4 tw:py-0 tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
                     >
                       {/* `hint` has been written for all nine rows since the
                           board landed and rendered for none of them — the row
@@ -739,11 +739,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                       </span>
                       <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
                         {(s.id === "lint" ? lintIssues.length : sectionCounts[s.id]) ? (
-                          <span className="tw:text-xs tw:text-[var(--bk-ink-soft)]">
+                          <span className="tw:font-mono tw:tabular-nums tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-soft)]">
                             {s.id === "lint" ? lintIssues.length : sectionCounts[s.id]}
                           </span>
                         ) : null}
-                        <span aria-hidden="true" className="tw:text-[var(--bk-gray-400)]">›</span>
+                        <span aria-hidden="true" className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]">›</span>
                       </span>
                     </Button>
                   </li>
@@ -754,7 +754,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                   shows less with no reason given, which reads as missing
                   features rather than a setting the user can change. */}
               {isBeginner && (
-                <li className="tw:mt-3 tw:px-2 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-soft)]" data-basic-mode-note>
+                <li className="tw:mt-auto tw:flex tw:h-10 tw:items-center tw:px-4 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-muted)] tw:bg-[var(--bk-bg-subtle)]" data-basic-mode-note>
                   Basic mode hides what you cannot edit yet. Switch to Pro to unlock.
                 </li>
               )}

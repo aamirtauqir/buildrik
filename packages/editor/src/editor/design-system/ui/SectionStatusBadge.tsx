@@ -39,7 +39,6 @@
  */
 
 import * as React from "react";
-import { Badge } from "@/editor/chrome-ui";
 
 /** Only the state the data model can actually answer. `bound` / `unbound` are
  *  absent on purpose — see the note above. */
@@ -56,12 +55,17 @@ const LABEL: Record<SectionStatus, string> = {
 
 /** Neither is a failure — a draft is a state the user chose, an export is a
  *  thing that worked — so neither is red. */
+/* Boards 306:2232 / 2265 / 2298 draw a bordered pill — 20 tall, radius full,
+   12/500 — not flowbite's square Badge, which measured radius 4, no border and
+   weight 600 against all three. */
+const PILL =
+  "tw:inline-flex tw:h-5 tw:items-center tw:rounded-full tw:border tw:px-2 tw:text-xs tw:font-medium tw:leading-none";
 const COLOR: Record<SectionStatus, string> = {
-  draft: "info",
-  exported: "success",
-  imported: "success",
+  draft: "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]",
+  exported: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
+  imported: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
   /* The one state here that IS a failure, and the only one that may be red. */
-  "import-failed": "failure",
+  "import-failed": "tw:border-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
 };
 
 export interface SectionStatusBadgeProps {
@@ -77,9 +81,9 @@ export function SectionStatusBadge({ status, detail }: SectionStatusBadgeProps) 
        its container, and it measured 263px wide against the board's
        content-width 73–128. The board draws a chip, not a bar. */
     <div className="tw:flex tw:px-4 tw:pt-2 tw:pb-1" data-testid="brand-section-status">
-      <Badge color={COLOR[status]} data-testid={`brand-section-status-${status}`}>
+      <span className={`${PILL} ${COLOR[status]}`} data-testid={`brand-section-status-${status}`}>
         {detail ? `${LABEL[status]} ${detail}` : LABEL[status]}
-      </Badge>
+      </span>
     </div>
   );
 }

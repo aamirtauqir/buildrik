@@ -38,19 +38,21 @@ export interface ComponentsSectionProps {
    failed to resolve, the fallback would silently ship a different blue; it
    resolves, so the second argument was dead weight carrying a second source of
    truth for the same colour. */
-const CONTAINER = "tw:flex tw:flex-col tw:h-full tw:min-h-0 tw:overflow-y-auto";
+const CONTAINER = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
+/* The list scrolls; the AI call to action stays pinned under it (board 153:29). */
+const LIST = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
 /* Board 153:29 draws Components as a DRILL-IN LIST with a chevron per row, not
    the card grid with sketch previews this replaced. Same move Tokens and the
    Brand root already made — the whole panel is one nav model now. */
 const ROW =
-  "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-auto tw:px-2 tw:py-2 " +
-  "tw:rounded-md tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-[var(--bk-gray-100)]";
+  "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-11 tw:px-4 tw:py-0 " +
+  "tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]";
 const CARD = "tw:flex tw:flex-col tw:p-2 tw:border tw:border-[var(--bk-gray-200)] tw:rounded-lg tw:bg-white tw:min-h-29";
 const PREVIEW_BOX =
   "tw:flex tw:items-center tw:justify-center tw:h-11 tw:mb-1.5 tw:rounded tw:bg-[var(--bk-gray-50)] tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]";
-const CARD_NAME = "tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink)] tw:mb-0.5";
+const CARD_NAME = "tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)]";
 const CARD_META = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]";
-const AI_ROW = "tw:flex tw:items-center tw:justify-between tw:px-3 tw:pt-4 tw:pb-1 tw:gap-2";
+const AI_ROW = "tw:flex tw:flex-none tw:h-11 tw:items-center tw:px-4 tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:bg-white";
 const AI_CTA = "tw:text-xs tw:font-medium tw:text-[var(--bk-accent-text)]";
 const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const SAVED_HEADER =
@@ -131,7 +133,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
           Components — the count now rides the Brand root's row, where every
           other destination's count is. */}
 
-      <div data-catalog-grid>
+      <div className={LIST} data-catalog-grid>
         {CATALOG.map((component) => {
           const variantCount = component.variants.length;
           const instanceCount = getInstanceCount(composer, component.id);

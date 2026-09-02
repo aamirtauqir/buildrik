@@ -68,7 +68,7 @@ function relTime(iso: string | Date | null): string {
 
 /* The version line is chrome-ui's VersionRow — Figma 240:6, whose own header
    names "Publish history" as a surface it was drawn for. */
-const WRAP = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:min-w-80";
+const WRAP = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:min-w-0";
 /* Board 949:4474's live banner — green tint block above the list. */
 const LIVE_BANNER =
   "tw:rounded-md tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-1";
@@ -80,8 +80,8 @@ const LIVE_META = "tw:text-xs tw:text-[var(--bk-ink-soft)]";
    try. It sits under the rows, not in a tooltip on each one. */
 const FOOTER_NOTE = "tw:mt-2 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 /* Board 184:24's info block — the accent-tinted box under the sentence. */
-const INFO_BOX = "tw:mt-3 tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5";
-const INFO_TITLE = "tw:m-0 tw:text-[13px] tw:text-[var(--bk-accent)]";
+const INFO_BOX = "tw:mt-3 tw:rounded-lg tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5";
+const INFO_TITLE = "tw:m-0 tw:text-[12px] tw:text-[var(--bk-accent)]";
 const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 /* Boards 184:45 / 453:4064 both open on a 32px status disc, centred. */
 const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-2";
@@ -89,10 +89,10 @@ const STATUS_DISC =
   "tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-full tw:text-white";
 /* Board 184:2's picker rows — a bordered, selectable band per version. */
 const PICK_ROW =
-  "tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-3 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:px-3 tw:py-2 tw:text-left tw:disabled:opacity-50";
+  "tw:flex tw:w-full tw:h-14 tw:items-center tw:justify-between tw:gap-3 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:px-3 tw:py-0 tw:text-left tw:disabled:opacity-100";
 const PICK_ROW_ON = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
 const PICK_TITLE = "tw:text-[13px] tw:text-[var(--bk-ink)]";
-const PICK_META = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+const PICK_META = "tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]";
 const PICK_LIVE = "tw:text-[11px] tw:font-medium tw:text-[var(--bk-success-text)]";
 const NOTICE = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
@@ -326,10 +326,10 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
         title="Roll back to a published version"
         footer={
           <div className="tw:flex tw:justify-end tw:gap-2">
-            <Button color="light" onClick={closePicker}>
+            <Button color="light" size="xs" onClick={closePicker}>
               Cancel
             </Button>
-            <Button disabled={!picking} onClick={() => { setConfirm(picking); closePicker(); }}>
+            <Button size="xs" disabled={!picking} onClick={() => { setConfirm(picking); closePicker(); }}>
               Continue
             </Button>
           </div>

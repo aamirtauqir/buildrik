@@ -67,6 +67,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
       aria-live="polite"
       style={{
         display: "flex",
+        flexWrap: "wrap",
         alignItems: "center",
         gap: 8,
         padding: "8px 12px",
@@ -142,7 +143,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         )}
       </div>
       {/* Actions */}
-      <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: 6, flexShrink: 0, flexBasis: "100%" }}>
         {isEditing ? (
           <Button
             onClick={handleEditSave}

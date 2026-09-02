@@ -78,10 +78,12 @@ describe("SectionStatusBadge — the import outcome (306:2265 / 306:2298)", () =
        chose. Colouring those red would spend the one signal that means "this
        did not happen" on four states where it did. */
     const { container: failed } = render(<SectionStatusBadge status="import-failed" />);
-    expect(failed.innerHTML).toMatch(/red|failure/i);
+    /* The pill paints its one red state with the error tokens, not a flowbite
+       colour name — `--bk-error` / `--bk-error-text` (board 306:2298). */
+    expect(failed.innerHTML).toMatch(/bk-error/);
     for (const s of ["draft", "exported", "imported"] as const) {
       const { container } = render(<SectionStatusBadge status={s} />);
-      expect(container.innerHTML).not.toMatch(/red|failure/i);
+      expect(container.innerHTML).not.toMatch(/bk-error/);
     }
   });
 });
