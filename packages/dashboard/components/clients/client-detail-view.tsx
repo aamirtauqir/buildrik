@@ -19,6 +19,9 @@ interface Branding {
 // on the update payload reject them.
 const orNull = (v: string) => (v.trim() === "" ? null : v.trim());
 
+const badgeNote =
+  "The Buildrick badge is removed by upgrading the workspace, not per client — it only ships on the Free plan.";
+
 function BrandingDialog({
   initial,
   saving,
@@ -35,7 +38,6 @@ function BrandingDialog({
   // render falls back to var(--color-primary) until set.
   const [brandColor, setBrandColor] = useState(initial.brandColor ?? "");
   const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
-  const [hideBuildrik, setHideBuildrik] = useState(initial.hideBuildrik);
   const label = "text-body-sm font-semibold";
   return (
     <Modal
@@ -46,7 +48,7 @@ function BrandingDialog({
         <>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button
-            onClick={() => onSave({ logoUrl: orNull(logoUrl), brandColor: orNull(brandColor), customDomain: orNull(customDomain), hideBuildrik })}
+            onClick={() => onSave({ logoUrl: orNull(logoUrl), brandColor: orNull(brandColor), customDomain: orNull(customDomain), hideBuildrik: initial.hideBuildrik })}
             disabled={saving}
           >
             {saving ? "Saving…" : "Save branding"}
@@ -70,20 +72,24 @@ function BrandingDialog({
           <label className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
           <InputField type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} wrapperClassName="mt-1 w-full" />
         </div>
-        <label className="flex items-center gap-2 pt-1 text-body" style={{ color: "var(--color-text-primary)" }}>
-          <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
+        {/* The badge is decided by PLAN, not by this box: the publish worker sets
+            `showBadge = plan === "FREE"` and `injectBadge` never reads the client
+            row. Honouring `hideBuildrik` would change nothing on PRO/BUSINESS
+            (already badge-free) and would let a FREE workspace strip the badge —
+            a revenue hole, and a pricing decision rather than a defect fix. So the
+            control stops inviting the action instead: disabled, with the reason on
+            it. The stored value still round-trips on save, so nothing is lost. */}
+        <label
+          className="flex items-center gap-2 pt-1 text-body"
+          style={{ color: "var(--color-text-muted)" }}
+          title={badgeNote}
+        >
+          <input type="checkbox" checked={initial.hideBuildrik} disabled readOnly className="accent-[var(--color-primary)]" />
           Hide Buildrick branding for this client
         </label>
-        {/* The badge is decided by PLAN, not by this box: `publish-html.ts:109`
-            — "Injected only on FREE; paid plans ship clean." Nothing outside the
-            clients CRUD reads `hideBuildrik`, so on a FREE workspace this used
-            to be ticked and the badge shipped anyway. Saying so is the fix;
-            making the box actually override the plan is a pricing decision, not
-            a defect fix. */}
         <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Saved with the client, but not applied yet — the Buildrick badge is
-          removed by upgrading the workspace, not per client. Logo and custom
-          domain are stored for your records and are not published either.
+          {badgeNote} Logo and custom domain are stored for your records and are
+          not published either.
         </p>
       </div>
     </Modal>

@@ -22,6 +22,13 @@ export function LibraryPanel() {
   const { addToast } = useToast();
   const utils = trpc.useUtils();
   const query = trpc.siteComponents.workspaceList.useQuery(undefined, { retry: false });
+  /* Both write paths are ADMIN-gated in `site-component.ts` (workspaceRename /
+     workspaceDelete). Same role source the agency layout uses for "Add client",
+     so a Designer is not offered a rename it will only be refused after the
+     click. The server guard stays the authority; this is about not offering it. */
+  const health = trpc.dashboard.health.useQuery();
+  const canManageLibrary = health.data?.role === "OWNER" || health.data?.role === "ADMIN";
+  const denyReason = "Only workspace admins can change shared library components.";
 
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
@@ -115,10 +122,10 @@ export function LibraryPanel() {
                   <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>Updated {timeAgo(c.updatedAt)}</span>
                   {!renaming && (
                     <div className="flex gap-1">
-                      <button onClick={() => startRename(c)} aria-label={`Rename ${c.name}`} className="flex items-center gap-1 rounded-md px-2 py-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+                      <button onClick={() => startRename(c)} disabled={!canManageLibrary} title={canManageLibrary ? undefined : denyReason} aria-label={`Rename ${c.name}`} className="flex items-center gap-1 rounded-md px-2 py-1 text-body-sm disabled:opacity-50" style={{ color: "var(--color-text-secondary)" }}>
                         <Pencil className="h-3.5 w-3.5" /> Rename
                       </button>
-                      <button onClick={() => setDeleting(c)} aria-label={`Delete ${c.name}`} className="flex items-center gap-1 rounded-md px-2 py-1 text-body-sm" style={{ color: "var(--color-error)" }}>
+                      <button onClick={() => setDeleting(c)} disabled={!canManageLibrary} title={canManageLibrary ? undefined : denyReason} aria-label={`Delete ${c.name}`} className="flex items-center gap-1 rounded-md px-2 py-1 text-body-sm disabled:opacity-50" style={{ color: "var(--color-error)" }}>
                         <Trash2 className="h-3.5 w-3.5" /> Delete
                       </button>
                     </div>

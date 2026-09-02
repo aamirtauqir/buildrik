@@ -65,7 +65,6 @@ const ALLOWED = {
   "siteComponents.usage": "The editor's component library shows usage from its own local registry.",
   "help.categories": "The Help index renders its categories from help.articles.",
   "onboarding.completeStep": "The wizard persists its position through onboarding.saveProgress.",
-  "theme.snapshots": "Theme history is not surfaced; the Brand panel reads the live theme.",
 
   // --- built server-side, UI never built. A product decision, not dead code ---
   "theme.presets.list": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",

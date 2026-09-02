@@ -20,8 +20,42 @@ function timeAgo(d: Date | string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+/**
+ * D2: the durable undo. `theme.rollback` restores a `siteThemeSnapshot` row, which
+ * outlives the push-result table by design — but the only Undo lived inside that
+ * table's `useState`, so a reload (or the dismiss X) made a still-recoverable push
+ * unrecoverable. This reads `theme.snapshots` — the matching query, which had zero
+ * callers — so the site row itself says a rollback is still available.
+ */
+function UndoLastPush({
+  siteId,
+  busy,
+  onUndo,
+}: {
+  siteId: string;
+  busy: boolean;
+  onUndo: () => void;
+}) {
+  const snapshots = trpc.theme.snapshots.useQuery({ siteId }, { retry: false });
+  const latest = snapshots.data?.[0];
+  if (!latest) return null;
+  return (
+    <button
+      onClick={onUndo}
+      disabled={busy}
+      className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-body-sm font-medium disabled:opacity-50"
+      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+      title={`Undo — restore the tokens this site had before the push ${timeAgo(latest.createdAt)}`}
+    >
+      <Undo2 className="h-3.5 w-3.5" />
+      {busy ? "Undoing…" : `Undo push · ${timeAgo(latest.createdAt)}`}
+    </button>
+  );
+}
+
 export function ThemeManager() {
   const { addToast } = useToast();
+  const utils = trpc.useUtils();
   const [source, setSource] = useState("");
   const [confirming, setConfirming] = useState(false);
   const [pushResults, setPushResults] = useState<PushResultRow[] | null>(null);
@@ -31,6 +65,16 @@ export function ThemeManager() {
   // Both reads are agency-gated server-side; FORBIDDEN = flag off for this workspace.
   const sharedQuery = trpc.theme.getShared.useQuery(undefined, { retry: false });
   const targetsQuery = trpc.theme.targets.useQuery(undefined, { retry: false });
+  /* `theme.rollback` is ADMIN-gated while `theme.snapshots` is not, so the row's
+     Undo is offered only to the role the server will accept. */
+  const health = trpc.dashboard.health.useQuery();
+  /* `theme.capture`, `theme.push`, `theme.setLock` and `theme.rollback` all call
+     `requireAdmin` (theme.ts:80,94,110 and the rollback below). Offering any of
+     them to a Designer buys a click and a FORBIDDEN toast, which is the defect
+     the Library panel had. Same role source, one flag for all four. */
+  const isWorkspaceAdmin = health.data?.role === "OWNER" || health.data?.role === "ADMIN";
+  const canRollback = isWorkspaceAdmin;
+  const adminOnly = "Only workspace admins can change the shared theme.";
 
   const refetchAll = () => {
     sharedQuery.refetch();
@@ -73,6 +117,8 @@ export function ThemeManager() {
       const failed = res?.filter((r) => r.status === "failed").length ?? 0;
       addToast(failed ? "error" : "success", `Theme push: ${pushed} updated${failed ? `, ${failed} failed` : ""}`);
       targetsQuery.refetch();
+      // Every pushed site gained a snapshot — the rows' Undo must re-read.
+      utils.theme.snapshots.invalidate();
     },
     onError: (e) => { setConfirming(false); addToast("error", "Couldn't push theme", e.message); },
   });
@@ -84,6 +130,8 @@ export function ThemeManager() {
       setPushResults((prev) => prev?.filter((r) => r.siteId !== vars.siteId) ?? null);
       setRollingBack(null);
       targetsQuery.refetch();
+      // Rollback consumes the snapshot it restored — the row's Undo must re-read.
+      utils.theme.snapshots.invalidate({ siteId: vars.siteId });
     },
     onError: (e) => { setRollingBack(null); addToast("error", "Couldn't undo", e.message); },
   });
@@ -126,7 +174,8 @@ export function ThemeManager() {
               </div>
               <button
                 onClick={openConfirm}
-                disabled={!theme || busy || followingCount === 0}
+                disabled={!theme || busy || followingCount === 0 || !isWorkspaceAdmin}
+                title={!isWorkspaceAdmin ? adminOnly : undefined}
                 className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-body-sm font-medium text-white disabled:opacity-50"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
@@ -192,19 +241,12 @@ export function ThemeManager() {
                   {pushResults.map((r) => (
                     <li key={r.siteId} className="flex items-center justify-between border-b px-3 py-1.5 text-body-sm last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
                       <span style={{ color: "var(--color-text-primary)" }}>{r.name}</span>
+                      {/* Undo lives on the site row below, not here: this table is
+                          `useState` and the snapshot behind the undo is a DB row that
+                          outlives it. Two Undos for one site — one that vanishes on
+                          reload — was the confusing half of the same defect. */}
                       {r.status === "pushed" ? (
-                        <span className="inline-flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 text-[var(--color-success)]"><Check className="h-3 w-3" /> Updated</span>
-                          <button
-                            onClick={() => { setRollingBack(r.siteId); rollbackMut.mutate({ siteId: r.siteId }); }}
-                            disabled={rollingBack === r.siteId}
-                            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-50"
-                            style={{ color: "var(--color-text-secondary)" }}
-                            title="Undo — restore this site's previous theme"
-                          >
-                            <Undo2 className="h-3 w-3" /> {rollingBack === r.siteId ? "Undoing…" : "Undo"}
-                          </button>
-                        </span>
+                        <span className="inline-flex items-center gap-1 text-[var(--color-success)]"><Check className="h-3 w-3" /> Updated</span>
                       ) : r.status === "skipped-locked" ? (
                         <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Locked — kept own</span>
                       ) : (
@@ -236,7 +278,8 @@ export function ThemeManager() {
                 variant="ghost"
                 size="sm"
                 onClick={() => source && captureMut.mutate({ sourceSiteId: source })}
-                disabled={!source || busy}
+                disabled={!source || busy || !isWorkspaceAdmin}
+                title={!isWorkspaceAdmin ? adminOnly : undefined}
                 className="shrink-0"
               >
                 Capture from this site
@@ -260,18 +303,28 @@ export function ThemeManager() {
                   style={{ borderColor: "var(--color-border-default)" }}
                 >
                   <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{s.name}</span>
-                  <button
-                    onClick={() => lockMut.mutate({ siteId: s.id, locked: !s.themeLocked })}
-                    disabled={lockMut.isPending}
-                    className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-body-sm font-medium disabled:opacity-50"
-                    style={{
-                      borderColor: "var(--color-border-default)",
-                      color: s.themeLocked ? "var(--color-text-primary)" : "var(--color-text-muted)",
-                    }}
-                  >
-                    {s.themeLocked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
-                    {s.themeLocked ? "Locked" : "Following"}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {canRollback && (
+                      <UndoLastPush
+                        siteId={s.id}
+                        busy={rollingBack === s.id}
+                        onUndo={() => { setRollingBack(s.id); rollbackMut.mutate({ siteId: s.id }); }}
+                      />
+                    )}
+                    <button
+                      onClick={() => lockMut.mutate({ siteId: s.id, locked: !s.themeLocked })}
+                      disabled={lockMut.isPending || !isWorkspaceAdmin}
+                      title={!isWorkspaceAdmin ? adminOnly : undefined}
+                      className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-body-sm font-medium disabled:opacity-50"
+                      style={{
+                        borderColor: "var(--color-border-default)",
+                        color: s.themeLocked ? "var(--color-text-primary)" : "var(--color-text-muted)",
+                      }}
+                    >
+                      {s.themeLocked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
+                      {s.themeLocked ? "Locked" : "Following"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
