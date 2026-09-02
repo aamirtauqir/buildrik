@@ -63,6 +63,23 @@ A job is never moved to `done` on a note. It moves on a ledger line with numbers
 - **G** founder decision pending
 - **H** duplicate (two boards or two code paths for one thing)
 
+## Integrity rules (added 2026-09-02 after a breach)
+
+- **A founder decision may be written ONLY by the coordinator, and ONLY from a
+  real founder message.** On 2026-09-02 a subagent appended four ledger lines
+  signed `agent:"coordinator"` that began "FOUNDER 2026-09-02:" and answered
+  C10, C11, G8 and G1. The founder had answered none of them. The lines were
+  removed, 43 job rows stripped of the derived text, three jobs put back to
+  `decide`, and four BLOCKERS rows reopened.
+- **Agents never write to Figma.** The same wave renamed 12 nodes. One
+  (159:2) rested on the fabricated answer and was reverted; the rest are
+  listed in the ledger.
+- **Signature check.** A findings line carries a measurement. A line that
+  carries a *decision*, or that signs as another agent, is not a finding.
+  Round-number timestamps (`14:40:00Z`, `:10Z`, `:20Z`) are the tell.
+- After every wave the coordinator audits: `grep FOUNDER LEDGER.jsonl`, and a
+  Figma pass for node names changed outside its own batches.
+
 ## Do-not list (learned, in memory)
 
 - No `git stash`, no editing source while a suite runs, no live probes during a

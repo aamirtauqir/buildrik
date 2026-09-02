@@ -1,14 +1,14 @@
 {
- "generated": "2026-09-02T14:25:00Z",
+ "generated": "2026-09-02T14:30:39Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 78,
+  "fix": 75,
   "verify": 174,
   "todo": 38,
-  "unbuildable": 66,
+  "unbuildable": 68,
   "decide": 9,
   "done": 49,
-  "fix-figma": 10
+  "fix-figma": 11
  },
  "jobs": [
   {
@@ -884,7 +884,7 @@
    "status": "verify",
    "owner": "verifier-history",
    "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REACHABLE on test-site-iter5 (6 COMPLETED publishes). P1: PublishHistory.tsx:69 tw:min-w-80 forces 320 in a 279 panel — Live chip clipped, footer cut, rollback button under the canvas. Remove min-w-80; button size xs.",
-   "authority": "code:history-tab-version-history-2-tabs"
+   "authority": "founder:history-280-drawer-16-6-header"
   },
   {
    "id": "J-453:4064",
@@ -956,7 +956,7 @@
    "status": "verify",
    "owner": "verifier-history",
    "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: rows 263x62.5 no dot/'N changes', 40h hover buttons vs board Version row 240:6 56h; prune note below footer vs board 40h block above; approval band no 3px rail. VersionList.tsx:120-215, SavesChrome.tsx",
-   "authority": "code:history-tab-version-history-2-tabs"
+   "authority": "founder:history-280-drawer-16-6-header"
   },
   {
    "id": "J-163:2",
@@ -980,7 +980,7 @@
    "status": "decide",
    "owner": "verifier-history",
    "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | 2026-09-02 Figma D12 sub-copy fixed; 2026-09-02 verifier-history: unreachable on a healthy site — every load auto-checkpoints (VersionTimelineManager.ts:140-148); board sub-copy contradicts code (publish creates no version)",
-   "authority": "code:history-tab-version-history-2-tabs"
+   "authority": "founder:history-280-drawer-16-6-header"
   },
   {
    "id": "J-453:4031",
@@ -992,7 +992,7 @@
    "status": "verify",
    "owner": "verifier-history",
    "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: copy verbatim; title --bk-error #E02424 vs board error-text #C81E1E; foot 82h transparent + 32h button vs board 40h #F3F4F6 note + accent link. VersionHistoryPanel.tsx:56-61,318",
-   "authority": "code:history-tab-version-history-2-tabs"
+   "authority": "founder:history-280-drawer-16-6-header"
   },
   {
    "id": "J-163:269",
@@ -1004,7 +1004,7 @@
    "status": "verify",
    "owner": "verifier-history",
    "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: REAL state; copy+bg match; weight 600 vs 400, 12 vs 11px, radius 0 vs 8, extra border-b; rendered below approval band vs first. VersionHistoryPanel.tsx:73-81",
-   "authority": "code:history-tab-version-history-2-tabs"
+   "authority": "founder:history-280-drawer-16-6-header"
   },
   {
    "id": "J-163:167",
@@ -1016,7 +1016,7 @@
    "status": "verify",
    "owner": "verifier-history",
    "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: buttons 32 vs 28h, title 13/600 vs 12/400, radius 6 vs 0. VersionHistoryPanel.tsx:77-79,362,365",
-   "authority": "code:history-tab-version-history-2-tabs"
+   "authority": "founder:history-280-drawer-16-6-header"
   },
   {
    "id": "J-163:220",
@@ -1028,7 +1028,7 @@
    "status": "verify",
    "owner": "verifier-history",
    "evidence": "2026-09-02 C7 title unified to 'Version History' (HistoryTab.tsx:208); strip (2 tabs + Changes chip, Backups per H4) waits on G8 width | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. 2026-09-02 verifier-history: event-induced; same NOTICE deltas as 163:269",
-   "authority": "code:history-tab-version-history-2-tabs"
+   "authority": "founder:history-280-drawer-16-6-header"
   },
   {
    "id": "J-163:113",
@@ -1240,7 +1240,7 @@
    "status": "verify",
    "owner": "verifier-inspector",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: 13/13 order ok; BACKGROUND tabs 91x40 + swatch + hex 127x36 vs Fill+Image rows 160x28. BackgroundSection tabs tw:h-7 + cross-cut",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-32:2",
@@ -1252,7 +1252,7 @@
    "status": "decide",
    "owner": null,
    "evidence": "2026-09-02 live inventory — FOUNDER CALL, not a conformance fix. Board draws TWO header controls (btn/ai @226 39x22, ⋯ @273); live ships FIVE: Pick element @136, Select parent @160, Ask AI @184 (36.5x22, the board's one), Bind to collection @223, Element actions @257. ProInspector documents pick+select-parent as deliberate. Removing three working affordances because a board omits them is behaviour, not visual — precedence says the CODE contract wins unless the founder decides otherwise. Also: board renders the icon inline as a glyph ('⬚ Section', 14/21) where live uses a 26x26 accent-tinted square.",
-   "authority": "founder",
+   "authority": "founder:keep-the-five-live-header-controls",
    "blocker": "G"
   },
   {
@@ -1265,7 +1265,7 @@
    "status": "verify",
    "owner": "verifier-inspector",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: LAYOUT Display 6x28.5x32 + 277x40 disclosure, no Direction row; FLEXBOX body 389 vs 164. FlexboxSection → 4 Select rows at 28; Direction into LAYOUT",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-807:8475",
@@ -1277,7 +1277,7 @@
    "status": "verify",
    "owner": "verifier-inspector",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: GRID body 453 vs 130: 8 presets 67x40, 3 inputs 89.7x42, 40-tall buttons in 22 rows; 35 controls ≥36. Columns/Row gap/Col gap at 28 first; rest behind More settings",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-807:8614",
@@ -1289,7 +1289,7 @@
    "status": "verify",
    "owner": "verifier-inspector",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: BORDER Width 24 / Style 24 / hex 127x36 + More 40 vs Width/Colour 160x28; 42 controls ≥36",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-807:8521",
@@ -1301,7 +1301,7 @@
    "status": "fix",
    "owner": null,
    "evidence": "2026-09-02 Figma D7 DONE: Link section hidden on MEDIA profile. match-partial-link-section-absent-for-icon",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-807:8342",
@@ -1313,7 +1313,7 @@
    "status": "verify",
    "owner": "verifier-inspector",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: header 53 vs 48; pill strip 39/26 12px/500 vs 32/22 11px/400, This-pill white lost (inspector.css:128 beats ScopeDropdown.tsx:102); section header 30 vs 28; rows label-right control x+107 w181 h24 pitch 30 vs label-left x16 control x120 w160 h28 pitch 34; 18 controls ≥36 tall in 24 rows (Align overlaps Color by 12px)",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-143:60",
@@ -1325,7 +1325,7 @@
    "status": "done",
    "owner": null,
    "evidence": "2026-09-02 re-measured at 280: row 278 full-bleed, line 278x2 #1A56DB, ghost .5. Held.",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-143:355",
@@ -1350,7 +1350,7 @@
    "status": "done",
    "owner": "verifier-layers-review",
    "evidence": "MATCH vlr: 27 flat rows, pl12, footer total = board",
-   "authority": "board:143-2"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-143:179",
@@ -1362,7 +1362,7 @@
    "status": "verify",
    "owner": "verifier-layers-review",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 vlr: board row opacity .45; live per-part colours + #d1d5db square behind glyph. layers-v2.css:54-58 → .bdc-lr.bdc-hidden{opacity:.45}",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-143:119",
@@ -1374,7 +1374,7 @@
    "status": "fix",
    "owner": "verifier-layers-review",
    "evidence": "P3 vlr: alert at y133 top vs inline at drop row y194; h28/r0/pl16 vs 30/6/12; raw type names index.tsx:130,134,150",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-781:4217",
@@ -1386,7 +1386,7 @@
    "status": "done",
    "owner": "verifier-layers-review",
    "evidence": "MATCH vlr: pt36 pr24 pb32 gap6, 13/20 #c81e1e, 12 #6b7280, Try again #1a56db, retry restores 40 rows; block 150 vs 127 (32 link button → LayersStateBlocks.tsx:62-66)",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-775:4130",
@@ -1398,7 +1398,7 @@
    "status": "unbuildable",
    "owner": "verifier-layers-review",
    "evidence": "A P2 vlr: skeleton never renders — LayersTab.tsx:185 gates on composer; with sites.get stalled 8s the drawer body is BLANK 8.8s (0 rows, no skeleton). Fix: gate on active page/root",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-143:237",
@@ -1410,7 +1410,7 @@
    "status": "verify",
    "owner": "verifier-layers-review",
    "evidence": "F vlr: board payload not retrieved (seat limit); live lock #111827, aria ', locked', draggable=false — re-read board",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-143:295",
@@ -1422,7 +1422,7 @@
    "status": "verify",
    "owner": "verifier-layers-review",
    "evidence": "F vlr: board not retrieved; live banner y80 h37 '3 selected' 12/500, four 24x24 buttons, Esc clears",
-   "authority": "board:143-295"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-782:4260",
@@ -1434,7 +1434,7 @@
    "status": "verify",
    "owner": "verifier-layers-review",
    "evidence": "F vlr: board not retrieved; live pt36/24/32/24 gap10, y84, 13/20 muted, link 32; footer still '66 layers' under 'Nothing matches' (LayersTab.tsx:207)",
-   "authority": "board:782-4260"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-142:2",
@@ -1446,7 +1446,7 @@
    "status": "verify",
    "owner": "verifier-layers-review",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 vlr: row label 11/500 vs 13/400 (every board); pitch 29 vs 28; search input 40 in 28 box; ⊞⊟⚙ 10x40; 53px breadcrumb on selection on no board (decide). layers-v2.css:29,231,236; LayersTab.tsx:163,174-182",
-   "authority": "board:142-2"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-145:300",
@@ -2306,10 +2306,10 @@
    "name": "S1.1b · First run → Browse templates (Templates drawer open)",
    "family": "S1 flows",
    "width": 1440,
-   "status": "fix",
+   "status": "unbuildable",
    "owner": null,
-   "evidence": "drift-drawer-side",
-   "authority": "board"
+   "evidence": "2026-09-02 G1 consequence: D2 is MOOT — the rail Templates drawer is retired, so there is no x1120->x60 redraw | drift-drawer-side",
+   "authority": "founder:templates-rail-drawer-retired"
   },
   {
    "id": "J-807:6558",
@@ -2345,8 +2345,8 @@
    "width": 1440,
    "status": "fix",
    "owner": null,
-   "evidence": "drift-modal-vs-full-page",
-   "authority": "board"
+   "evidence": "2026-09-02 D3 now unambiguous under G1: preview is a modal (14:177) | drift-modal-vs-full-page",
+   "authority": "founder:template-preview-is-a-modal"
   },
   {
    "id": "J-297:2027",
@@ -2454,10 +2454,10 @@
    "name": "S1.3b · new-page · template-picker",
    "family": "S1 flows",
    "width": 1440,
-   "status": "fix",
+   "status": "decide",
    "owner": null,
    "evidence": "drift-no-search-no-tabs",
-   "authority": "board"
+   "authority": "founder:templates-dissolved-into-new-page-and-insert"
   },
   {
    "id": "J-296:1972",
@@ -3430,8 +3430,8 @@
    "width": 1440,
    "status": "fix",
    "owner": null,
-   "evidence": "drift-4-generic-phases-vs-6-per-section",
-   "authority": "board"
+   "evidence": "2026-09-02 G1: rail-tab gallery state — re-homes to New-Page (full-page) or Insert (section); board kept, surface retired | drift-4-generic-phases-vs-6-per-section",
+   "authority": "founder:templates-dissolved-rehome-to-new-page-or-insert"
   },
   {
    "id": "J-641:2487",
@@ -3442,8 +3442,8 @@
    "width": 280,
    "status": "done",
    "owner": null,
-   "evidence": "2026-08-31 — gallery: card geometry exact (130h, thumb 288x88); thumb rendered SQUARE because tw:rounded-6 compiles to nothing — FIXED to rounded-md + gated",
-   "authority": "board"
+   "evidence": "2026-09-02 G1: rail-tab gallery state — re-homes to New-Page (full-page) or Insert (section); board kept, surface retired | 2026-08-31 — gallery: card geometry exact (130h, thumb 288x88); thumb rendered SQUARE because tw:rounded-6 compiles to nothing — FIXED to rounded-md + gated",
+   "authority": "founder:templates-dissolved-rehome-to-new-page-or-insert"
   },
   {
    "id": "J-781:4372",
@@ -3454,8 +3454,8 @@
    "width": 280,
    "status": "done",
    "owner": null,
-   "evidence": "2026-09-02 re-measured at 280: drawer 279 vs board 280; block geometry width-agnostic (px-6 pt-9), held.",
-   "authority": "board"
+   "evidence": "2026-09-02 G1: rail-tab gallery state — re-homes to New-Page (full-page) or Insert (section); board kept, surface retired | 2026-09-02 re-measured at 280: drawer 279 vs board 280; block geometry width-agnostic (px-6 pt-9), held.",
+   "authority": "founder:templates-dissolved-rehome-to-new-page-or-insert"
   },
   {
    "id": "J-778:4102",
@@ -3467,8 +3467,8 @@
    "status": "done",
    "blocker": "A",
    "owner": null,
-   "evidence": "2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: ",
-   "authority": "blocked:static-catalog"
+   "evidence": "2026-09-02 G1: rail-tab gallery state — re-homes to New-Page (full-page) or Insert (section); board kept, surface retired | 2026-09-02 coordinator: RETIRED in Figma (no producer; read-back ok) — was: ",
+   "authority": "founder:templates-dissolved-rehome-to-new-page-or-insert"
   },
   {
    "id": "J-782:4402",
@@ -3479,8 +3479,8 @@
    "width": 280,
    "status": "done",
    "owner": null,
-   "evidence": "2026-09-02 re-measured at 280: 134/160 @x24, drawer 279 vs board 280. Held.",
-   "authority": "board"
+   "evidence": "2026-09-02 G1: rail-tab gallery state — re-homes to New-Page (full-page) or Insert (section); board kept, surface retired | 2026-09-02 re-measured at 280: 134/160 @x24, drawer 279 vs board 280. Held.",
+   "authority": "founder:templates-dissolved-rehome-to-new-page-or-insert"
   },
   {
    "id": "J-642:2556",
@@ -3491,8 +3491,8 @@
    "width": 1440,
    "status": "done",
    "owner": null,
-   "evidence": "live-measured 2026-09-01: modal 720x503 @x360, title 18, sub 46, preview 680x320 @20/80, note 412, apply btn 28h @461 — board 720x502/18/46/680x320/412/28@460, the +1 being the footer's real 1px border.",
-   "authority": "board"
+   "evidence": "2026-09-02 G1: rail-tab gallery state — re-homes to New-Page (full-page) or Insert (section); board kept, surface retired | live-measured 2026-09-01: modal 720x503 @x360, title 18, sub 46, preview 680x320 @20/80, note 412, apply btn 28h @461 — board 720x502/18/46/680x320/412/28@460, the +1 being the footer's real 1px border.",
+   "authority": "founder:templates-dissolved-rehome-to-new-page-or-insert"
   },
   {
    "id": "J-1069:4529",
@@ -3552,7 +3552,7 @@
    "status": "verify",
    "owner": "verifier-layers-review",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 vlr: w180 vs 140; separators 4px margins vs 0; 'Copy link' wrong group. layers-v2.css:362,390; LayerContextMenu.tsx:80",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-1082:4589",
@@ -3564,7 +3564,7 @@
    "status": "fix",
    "owner": "verifier-layers-review",
    "evidence": "P2 vlr: dblclick on unselected row fails (breadcrumb pushes row y113→166); input 36 in 28 row, 11/500, 3 focus affordances vs 2px row border. LayerTreeItem.tsx:235 tw:h-5",
-   "authority": "board:1082-4589"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-1082:4640",
@@ -3576,7 +3576,7 @@
    "status": "done",
    "owner": null,
    "evidence": "2026-09-01 indent ladder 16+d*14 -> 12+d*16, board chevrons 12/28/44/60/76; live depth0=12 depth1=28",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-1082:4739",
@@ -3588,7 +3588,7 @@
    "status": "fix",
    "owner": null,
    "evidence": "2026-09-02 re-measured at 280: badge 219 vs board 229 — the same ~10 glyph-vs-button gap as at 320; width did not change it. Row 278 full-bleed. Founder a11y call stands.",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-1082:4835",
@@ -3600,7 +3600,7 @@
    "status": "fix",
    "owner": null,
    "evidence": "2026-08-31 — scroll-overflow: header/toolbar/footer pin correctly; drift — no scrollbar drawn at rest on a 66-row tree (board draws a 4px thumb)",
-   "authority": "board"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-1082:5004",
@@ -3696,10 +3696,10 @@
    "name": "Templates · empty",
    "family": "Templates",
    "width": 280,
-   "status": "fix",
+   "status": "decide",
    "owner": null,
    "evidence": "partial-search-empty-reachable-copy-stale",
-   "authority": "board"
+   "authority": "founder:templates-dissolved-into-new-page-and-insert"
   },
   {
    "id": "J-1138:13436",
@@ -3720,10 +3720,10 @@
    "name": "Inspector · single-selection",
    "family": "Inspector",
    "width": 300,
-   "status": "decide",
+   "status": "unbuildable",
    "owner": "verifier-inspector",
-   "evidence": "P2 C verifier-inspector: board draws 6 sections 32-tall rows, no footer; live 12 sections + footer; contradicts 32:2 (founder authority) and the 807 family — retire 159:2 as superseded by 32:2?",
-   "authority": "board:159-2"
+   "evidence": "2026-09-02 G10 RESOLVED (founder): retired — same state as 32:2 in older geometry | P2 C verifier-inspector: board draws 6 sections 32-tall rows, no footer; live 12 sections + footer; contradicts 32:2 (founder authority) and the 807 family — retire 159:2 as superseded by 32:2?",
+   "authority": "superseded-by:32:2"
   },
   {
    "id": "J-159:99",
@@ -3759,7 +3759,7 @@
    "status": "fix",
    "owner": "verifier-inspector",
    "evidence": "P2 verifier-inspector: toolbar padded 16 vs flush; ALIGN band 265x70 r8 vs 300x72 square; buttons 36x32 pitch 40 vs 36x28 pitch 42; rows control 141x24 subtle vs 172x24 white bordered pitch 32. MultiSelectToolbar.tsx:42-118",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-160:2",
@@ -3771,7 +3771,7 @@
    "status": "fix",
    "owner": "verifier-inspector",
    "evidence": "P3 verifier-inspector: band 297x100 vs 72; Reset 91.5x32 button vs 16 text; weights 500 vs 400. VariantSection.tsx:140-151",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-160:105",
@@ -3783,7 +3783,7 @@
    "status": "unbuildable",
    "owner": "verifier-inspector",
    "evidence": "F verifier-inspector: fixture has no bindable field (Menu · 0 fields) — seed one field, then re-verify; static: BindingBanner.tsx:66-86 hint 12 vs 11px, Unbind 32 vs 16 text",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-160:208",
@@ -3795,7 +3795,7 @@
    "status": "fix",
    "owner": "verifier-inspector",
    "evidence": "P3 verifier-inspector: row 48 vs 32, value chip subtle vs white bordered 148x24, revert 22x32 vs glyph, note 27 12/500 vs 32 11/400. BreakpointOverrides.tsx:87-114",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-160:313",
@@ -3807,7 +3807,7 @@
    "status": "verify",
    "owner": "verifier-inspector",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: copy exact; note 27 12/500 vs 32 11/400. ProInspector.tsx:486",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-160:412",
@@ -3819,7 +3819,7 @@
    "status": "verify",
    "owner": "verifier-inspector",
    "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: colours+copy ok; 27 vs 36 tall, 500 vs 400, extra 2px left bar. ProInspector.tsx:462",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-160:512",
@@ -3841,10 +3841,10 @@
    "name": "Inspector · reach-whole-site",
    "family": "Inspector",
    "width": 300,
-   "status": "decide",
+   "status": "fix-figma",
    "owner": "verifier-inspector",
-   "evidence": "P2 B verifier-inspector: live = takeover with 0 sections + Open Brand/Back; board keeps ALL controls under a 36 warning note + 52 accent hint and names the retired 'Styles tab' — code follows board or fix-figma?",
-   "authority": "board"
+   "evidence": "2026-09-02 G11 RESOLVED (founder): redraw as the takeover (ProInspector.tsx:510-529); copy 'Styles tab' -> 'Brand panel' | P2 B verifier-inspector: live = takeover with 0 sections + Open Brand/Back; board keeps ALL controls under a 36 warning note + 52 accent hint and names the retired 'Styles tab' — code follows board or fix-figma?",
+   "authority": "founder:redraw-189-2-as-the-takeover"
   },
   {
    "id": "J-164:2",
@@ -4278,7 +4278,7 @@
    "status": "verify",
    "owner": null,
    "evidence": "2026-08-31 — replace-confirm: backup checkbox defaulted OFF against a board that draws it checked — FIXED to ON + test; footer buttons 40h (board's 27 is a compressed schematic)",
-   "authority": "board"
+   "authority": "founder:templates-dissolved-into-new-page-and-insert"
   },
   {
    "id": "J-1169:4725",
@@ -4290,7 +4290,7 @@
    "status": "fix",
    "owner": null,
    "evidence": "partial-confirm-only-success-error-unconfirmed",
-   "authority": "board"
+   "authority": "founder:templates-dissolved-into-new-page-and-insert"
   },
   {
    "id": "J-1169:4753",
@@ -4302,7 +4302,7 @@
    "status": "verify",
    "owner": null,
    "evidence": "match-reachable-via-cmd-shift-p",
-   "authority": "board"
+   "authority": "founder:templates-dissolved-into-new-page-and-insert"
   },
   {
    "id": "J-1169:4764",
@@ -4314,7 +4314,7 @@
    "status": "todo",
    "owner": null,
    "evidence": "",
-   "authority": "code:usage-drawer-reachable-but-not-visually-confirmed"
+   "authority": "founder:templates-dissolved-into-new-page-and-insert"
   },
   {
    "id": "J-1170:4713",
@@ -4410,7 +4410,7 @@
    "status": "verify",
    "owner": "verifier-layers-review",
    "evidence": "F vlr: board not retrieved; live popover unanchored at x0 y80 (⚙ at x258), mono uppercase header, raw shadow layers-v2.css:404, × 9.5x40, 18x10 switches",
-   "authority": "board:1171-4829-entry"
+   "authority": "founder:layers-1082-geometry-plus-16-6-header"
   },
   {
    "id": "J-1172:4804",
@@ -4507,7 +4507,7 @@
    "status": "fix",
    "owner": "verifier-inspector",
    "evidence": "P3 verifier-inspector: banner 220x117.5 bordered vs 248x87 borderless (board 280 wide, siblings 300); title 14 vs 12px; button 120x32 vs 113x27. InspectorEmptyState.tsx:48,51,131-145; Figma: widen to 300",
-   "authority": "board"
+   "authority": "founder:inspector-807-geometry-32-2-master"
   },
   {
    "id": "J-1175:4849",
