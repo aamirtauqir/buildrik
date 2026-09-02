@@ -75,7 +75,7 @@ const PREVIEW_SUB = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 const FILTER_ROW = "tw:flex tw:gap-[var(--bk-space-4)] tw:pt-[var(--bk-space-8)] tw:px-[var(--bk-space-12)]";
 const FILTER_CHIP =
   "tw:px-[var(--bk-space-8)] tw:py-[var(--bk-space-4)] tw:text-[12px] " +
-  "tw:font-normal tw:[font-family:inherit] tw:text-[var(--bk-ink-soft)] " +
+  "tw:h-6 tw:leading-4 tw:font-normal tw:[font-family:inherit] tw:text-[var(--bk-ink-soft)] " +
   "tw:bg-transparent tw:border tw:border-[var(--bk-border)] tw:rounded-full " +
   "tw:cursor-pointer tw:[transition:color_150ms_ease-out,background-color_150ms_ease-out,border-color_150ms_ease-out] " +
   "tw:hover:text-[var(--bk-ink)] tw:focus-visible:outline-none " +

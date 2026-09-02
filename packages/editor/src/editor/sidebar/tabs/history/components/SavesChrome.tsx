@@ -21,27 +21,29 @@ import { fetchReviewStatus, type ReviewStatus } from "@/services/ReviewService";
 import { EVENTS } from "@/shared/constants/events";
 import { Button } from "@/editor/chrome-ui";
 
+/* Board 162:2 draws the approval band as a full-bleed strip with a 3px success
+   rail on its left, weight 400 — not a rounded tinted card with a bold title. */
 const BAND =
-  "tw:rounded-md tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-0.5 tw:mb-2";
+  "tw:rounded-none tw:border-l-[3px] tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-0.5 tw:mb-2";
 const BAND_TITLE =
-  "tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:font-semibold tw:tracking-[0.04em] tw:text-[var(--bk-success-text)]";
+  "tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:font-normal tw:text-[var(--bk-success-text)]";
 const BAND_META = "tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
 const NOW_ROW =
-  "tw:flex tw:items-center tw:gap-2 tw:px-1 tw:text-[13px] tw:text-[var(--bk-ink)]";
+  "tw:flex tw:items-center tw:gap-2 tw:px-1 tw:text-[12px] tw:text-[var(--bk-ink)]";
 const NOW_DOT = "tw:size-2 tw:rounded-full tw:bg-[var(--bk-accent)]";
 const NOW_COL = "tw:flex tw:flex-col";
 /* Aligned under the count, past the dot and its gap (8px + 8px). */
 const NOW_SUMMARY =
   "tw:px-1 tw:pb-2 tw:pl-[calc(0.25rem+16px)] tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:truncate";
-const PRUNE_NOTE = "tw:m-0 tw:mt-2 tw:px-1 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+const PRUNE_NOTE = "tw:m-0 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:py-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 /* Boards 163:2 / 163:113 hang one action off the approval anchor. It sat
    unbuilt: "Compare with current" had ZERO occurrences in src/, while the view
    that renders exactly that comparison — ApprovedCompareView — was already
    built to its own eight boards and reachable only from ReviewTab. A finished
    surface with no door to it from the place the board draws the door. */
 const BAND_ACTION =
-  "tw:mt-1 tw:self-start tw:px-0 tw:text-[11px] tw:font-medium " +
-  "tw:text-[var(--bk-success-text)] tw:underline tw:underline-offset-2";
+  "tw:mt-1 tw:self-start tw:h-7 tw:px-3 tw:text-[13px] tw:font-normal " +
+  "tw:text-[var(--bk-gray-700)] tw:border tw:border-[var(--bk-border)] tw:bg-white tw:no-underline";
 
 /** Board 162:2 stamps the approval "18 Jul, 15:42". */
 function approvalStamp(at: string | Date): string {

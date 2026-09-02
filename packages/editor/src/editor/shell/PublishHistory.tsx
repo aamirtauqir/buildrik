@@ -304,7 +304,8 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           the board spends a whole screen (184:2) on choosing the version. */}
       <Button
         color="light"
-        className="tw:mt-1 tw:w-full tw:justify-start"
+        size="xs"
+        className="tw:mt-1 tw:h-8 tw:w-full tw:justify-start"
         disabled={!canRollback || rows.length < 2}
         title={
           !canRollback

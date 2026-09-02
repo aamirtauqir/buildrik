@@ -5,7 +5,7 @@
   "generatedAt": "2026-08-14",
   "counts": {
     "total": 439,
-    "active": 355,
+    "active": 347,
     "designAhead": 41,
     "outOfScope": 43,
     "activeFamilies": 35,
@@ -16,7 +16,8 @@
       "drift-fixed": 23,
       "no": 67,
       "unreachable": 29
-    }
+    },
+    "retired": 8
   },
   "activeFamilies": [
     "AI",
@@ -718,10 +719,10 @@
       "state": "restore-confirm",
       "width": 1080,
       "height": 776,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unbuilt-no-restore-action-in-compare",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unbuilt-no-restore-action-in-compare",
       "verified": "unreachable"
     },
     {
@@ -1236,10 +1237,10 @@
       "state": "disabled-item",
       "width": 280,
       "height": 812,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unreachable-no-disabled-catalog-entry",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unreachable-no-disabled-catalog-entry",
       "verified": "unreachable"
     },
     {
@@ -1275,10 +1276,10 @@
       "state": "load-error",
       "width": 280,
       "height": 812,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unreachable-insertloaderror-zero-callers",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unreachable-insertloaderror-zero-callers",
       "verified": "unreachable"
     },
     {
@@ -1288,10 +1289,10 @@
       "state": "loading",
       "width": 280,
       "height": 812,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unreachable-catalog-is-static",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unreachable-catalog-is-static",
       "verified": "unreachable"
     },
     {
@@ -2018,10 +2019,10 @@
       "state": "loading",
       "width": 280,
       "height": 812,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unreachable-skeleton-zero-importers",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unreachable-skeleton-zero-importers",
       "verified": "unreachable"
     },
     {
@@ -2638,10 +2639,10 @@
       "state": "new-page · error",
       "width": 1440,
       "height": 900,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unreachable-toast-only",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unreachable-toast-only",
       "verified": "unreachable"
     },
     {
@@ -2651,10 +2652,10 @@
       "state": "new-page · loading",
       "width": 1440,
       "height": 900,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unreachable-create-is-synchronous",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unreachable-create-is-synchronous",
       "verified": "unreachable"
     },
     {
@@ -5586,10 +5587,10 @@
       "state": "ai-chat-model",
       "width": 1440,
       "height": 480,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "unbuilt-model-is-hardcoded-DEFAULT_MODEL-no-picker",
+      "verifiedNote": "RETIRED in Figma 2026-09-02 — board draws a state the product cannot produce. unbuilt-model-is-hardcoded-DEFAULT_MODEL-no-picker",
       "verified": "unreachable"
     },
     {

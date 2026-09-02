@@ -479,7 +479,7 @@ export function VersionHistoryPanel({
             color="light"
             size="xs"
             onClick={() => setShowSaveForm(true)}
-            className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:text-[var(--bk-accent)]"
+            className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)]"
           >
             + Save a version
           </Button>
