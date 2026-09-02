@@ -1,14 +1,14 @@
 {
- "generated": "2026-09-02T08:22:18Z",
+ "generated": "2026-09-02T08:32:59Z",
  "protocol": "PROTOCOL.md",
  "counts": {
-  "fix": 78,
+  "fix": 80,
   "verify": 173,
   "todo": 49,
-  "unbuildable": 75,
-  "fix-figma": 12,
-  "decide": 8,
-  "done": 29
+  "unbuildable": 72,
+  "decide": 7,
+  "done": 33,
+  "fix-figma": 10
  },
  "jobs": [
   {
@@ -395,9 +395,9 @@
    "name": "Brand · starters",
    "family": "Brand",
    "width": 280,
-   "status": "fix-figma",
+   "status": "fix",
    "owner": "verifier-brand",
-   "evidence": "P2 verifier-brand: grid p24/28 gap12 cards 93.5x139 bordered vs p16/12 gap16 136x104 flat; name 13/600 vs 12/400; warning h34 vs h44. StarterGrid.tsx:39-108. BOARD BUG: gallery rows 288 wide in a 280 frame → cards 116",
+   "evidence": "Figma side DONE 2026-09-02 (cards 116, rows 248, thumbs FILL, overflow 0). Code: StarterGrid.tsx:39-108 p16/12 gap16 flat cards 116x104 name 12/400 warning h44 — open",
    "authority": "board:152-137"
   },
   {
@@ -1049,9 +1049,9 @@
    "name": "History · milestone suggestion banner (code: MilestoneSuggestionBanner.tsx)",
    "family": "History",
    "width": 680,
-   "status": "fix-figma",
+   "status": "fix",
    "owner": "verifier-history",
-   "evidence": "2026-09-02 verifier-history: BOARD DEFECT — banner filled solid #3F83F8 with 11px #6B7280 text (~1.5:1); live accent-tint is right. Code: content column collapses to 30px in the 280 drawer, buttons 40h vs 23. MilestoneSuggestionBanner.tsx:66-76,148-166",
+   "evidence": "Figma side DONE 2026-09-02 (tint fill, 30% accent border, blue-700 buttons; read-back ok). Code: MilestoneSuggestionBanner flex-wrap + 24h buttons in fix batch 2 — re-measure",
    "authority": "board:433-2348"
   },
   {
@@ -2428,9 +2428,9 @@
    "name": "S1.3 · new-page · error",
    "family": "S1 flows",
    "width": 1440,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unreachable-toast-only",
+   "evidence": "2026-09-02 coordinator: renamed '— RETIRED 2026-09-02' in Figma (read-back ok); board draws a state the product cannot produce — was: unreachable-toast-only",
    "authority": "board",
    "blocker": "A"
   },
@@ -2441,9 +2441,9 @@
    "name": "S1.3 · new-page · loading",
    "family": "S1 flows",
    "width": 1440,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unreachable-create-is-synchronous",
+   "evidence": "2026-09-02 coordinator: renamed '— RETIRED 2026-09-02' in Figma (read-back ok); board draws a state the product cannot produce — was: unreachable-create-is-synchronous",
    "authority": "board",
    "blocker": "A"
   },
@@ -4817,9 +4817,9 @@
    "name": "S2.0 · ai-chat-model — NEW 2026-08-28",
    "family": "S2 flows",
    "width": 1440,
-   "status": "unbuildable",
+   "status": "done",
    "owner": null,
-   "evidence": "unbuilt-model-is-hardcoded-DEFAULT_MODEL-no-picker",
+   "evidence": "2026-09-02 coordinator: renamed '— RETIRED 2026-09-02' in Figma (read-back ok); board draws a state the product cannot produce — was: unbuilt-model-is-hardcoded-DEFAULT_MODEL-no-picker",
    "authority": "board",
    "blocker": "A"
   },
@@ -5053,10 +5053,10 @@
    "kind": "decision",
    "name": "SmartSuggestions.tsx exported, never rendered — delete or design",
    "family": "founder",
-   "status": "decide",
+   "status": "done",
    "blocker": "G",
    "owner": null,
-   "evidence": ""
+   "evidence": "2026-09-02: SmartSuggestions.tsx deleted with 7 other never-rendered components (commit d36c96f2); no decision left"
   },
   {
    "id": "H-08",
