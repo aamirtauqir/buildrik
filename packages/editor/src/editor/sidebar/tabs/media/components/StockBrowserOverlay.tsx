@@ -205,7 +205,7 @@ export function StockBrowserOverlay({
       <div className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:px-4">
         <TextField
           type="text"
-          className="tw:h-[var(--bk-size-row-dense)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)] tw:px-[var(--bk-space-8)] tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
+          className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)] tw:px-[var(--bk-space-8)] tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
           placeholder="Search free stock"
           value={draft}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}
