@@ -24,6 +24,43 @@ const footer = item("footer-1", "container", "footer");
 const tree: LayerItem[] = [item("root-1", "container", "div", [hero, footer])];
 const noNames = new Map<string, string>();
 
+/* The row label is `customName || preview || typeLabel`, and search read only
+   `customName || typeLabel` — so the panel rendered "Click Me" and answered
+   "Nothing matches" to "Click". Both now go through one getDisplayName. */
+const button = (): LayerItem => ({
+  id: "btn-1",
+  type: "button",
+  tagName: "button",
+  depth: 0,
+  children: [],
+  preview: "Click Me",
+});
+
+describe("useLayerSearch — matches the words the row actually shows", () => {
+  it("finds a layer by its visible text, not only by its type", () => {
+    const withText: LayerItem[] = [button()];
+    const { result } = renderHook(() => useLayerSearch());
+    act(() => result.current.setSearch("click"));
+    expect(result.current.countMatches(withText, noNames)).toBe(1);
+    expect(result.current.filterTree(withText, noNames)).toHaveLength(1);
+  });
+
+  it("still finds it by type, which is what used to be the only way", () => {
+    const withText: LayerItem[] = [button()];
+    const { result } = renderHook(() => useLayerSearch());
+    act(() => result.current.setSearch("button"));
+    expect(result.current.countMatches(withText, noNames)).toBe(1);
+  });
+
+  it("lets a rename outrank the text, the way the row does", () => {
+    const withText: LayerItem[] = [button()];
+    const renamed = new Map([["btn-1", "Hero CTA"]]);
+    const { result } = renderHook(() => useLayerSearch());
+    act(() => result.current.setSearch("hero cta"));
+    expect(result.current.countMatches(withText, renamed)).toBe(1);
+  });
+});
+
 describe("useLayerSearch — idle (no query)", () => {
   it("returns the tree unchanged and reports not searching", () => {
     const { result } = renderHook(() => useLayerSearch());

@@ -60,8 +60,20 @@ export function countDescendants(node: LayerItem): number {
  * Resolve the display name for a layer row.
  * Priority: custom name from Map > semantic type label > raw type string.
  */
-export function getDisplayName(id: string, type: string, customNames: Map<string, string>): string {
+/* One rule for what a layer is CALLED, because there were two. The tree row
+   computed `customName || preview || typeLabel` inline while this function
+   returned `customName || typeLabel`, so search and breadcrumb disagreed with
+   the row in front of them. Searching "Click" returned nothing while eight
+   rows rendered "Click Me" — the panel proved it had the text and still said
+   "Nothing matches", on the only in-panel way to relocate an element. */
+export function getDisplayName(
+  id: string,
+  type: string,
+  customNames: Map<string, string>,
+  preview?: string,
+): string {
   const custom = customNames.get(id);
   if (custom) return custom;
+  if (preview) return preview;
   return ELEMENT_TYPE_LABELS[type] ?? type.charAt(0).toUpperCase() + type.slice(1);
 }

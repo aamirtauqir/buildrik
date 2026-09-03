@@ -14,7 +14,7 @@ import { getAncestors, getDisplayName } from "../data/layerUtils";
 import type { LayerItem } from "../types";
 
 export function itemMatches(item: LayerItem, customNames: Map<string, string>, q: string): boolean {
-  const displayName = getDisplayName(item.id, item.type, customNames).toLowerCase();
+  const displayName = getDisplayName(item.id, item.type, customNames, item.preview).toLowerCase();
   return (
     displayName.includes(q) ||
     item.type.toLowerCase().includes(q) ||

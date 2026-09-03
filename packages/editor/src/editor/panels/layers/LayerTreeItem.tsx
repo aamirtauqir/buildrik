@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
+import { getDisplayName } from "./data/layerUtils";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { Button, TextField } from "@/editor/chrome-ui";
 
@@ -92,10 +92,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   const LayerGlyph = getElementIcon(layer.type);
   /* A rename always wins; otherwise a text layer shows its own copy and
      everything else its type label. Twelve rows reading "Heading" named
-     nothing — the words on the page are what a designer is looking for. */
-  const typeLabel =
-    ELEMENT_TYPE_LABELS[layer.type] ?? layer.type.charAt(0).toUpperCase() + layer.type.slice(1);
-  const displayName = customNames.get(layer.id) || layer.preview || typeLabel;
+     nothing — the words on the page are what a designer is looking for.
+     That rule was spelled out inline here, which is how it drifted from the
+     copy in `getDisplayName` that search and the breadcrumb read. */
+  const displayName = getDisplayName(layer.id, layer.type, customNames, layer.preview);
   const canDrag = !!(composer && layer.depth > 0 && !isLocked);
 
   // Board 1082:4739 (Layers · component-instance): ONE diamond badge sits
