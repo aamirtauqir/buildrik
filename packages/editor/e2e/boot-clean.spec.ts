@@ -54,10 +54,17 @@
  * MutationObserver, races React's re-render and the read still catches the
  * true value. So the plant is unreliable, not the assertion.
  *
- * The only trustworthy negative test is running this against a build where
- * the bootstrap fix is reverted, which is where the fix's author can watch it
- * fail 8 of 8. Until that has happened, treat a pass here as "the control
- * reports disabled", not as "this gate would catch a regression". One assertion at boot catches the whole family,
+ * THAT NEGATIVE TEST HAS NOW BEEN RUN, by the author of the bootstrap fix and
+ * not by this file: with the fix reverted locally, this assertion failed on
+ * **8 of 8 loads** with the message naming the seeding patch, and passed 8 of
+ * 8 once restored. The assertion here is the same one, so the result carries:
+ * a pass DOES mean this gate would catch that regression, not merely that the
+ * control reports disabled.
+ *
+ * Recorded rather than tidied away, because the distinction is what lets a
+ * vacuous gate ship: a negative test on a reverted build exercises the real
+ * cause, where a plant from the test side only simulates it — and the
+ * simulation is what failed here. One assertion at boot catches the whole family,
  * which is cheap next to an unrequested autosave write or a wiped token list.
  *
  * WHAT IT CANNOT SEE, stated rather than implied: `useSaveState`'s own flag

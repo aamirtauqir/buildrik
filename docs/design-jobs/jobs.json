@@ -6638,7 +6638,7 @@
     {
       "id": "F-MEDIA-DELETE-NO-TXN",
       "nodeId": null,
-      "name": "Deleting an asset cannot be undone and leaves the canvas element orphaned",
+      "name": "Assets are outside the undoable model, and the canvas that references them is inside",
       "family": "Media",
       "state": null,
       "width": null,
@@ -6648,7 +6648,7 @@
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. deleteAsset (MediaManager.ts:1059) and the updateAsset/moveAsset path never call composer.beginTransaction/endTransaction, so a library delete never enters the undo stack. Live proof of the trap: Undo was ALREADY enabled from an earlier canvas insert; after confirming the delete it STAYED enabled, so nothing distinguishes 'Undo available because of a prior edit' from 'Undo available because of what I just did'. Clicking it did not restore the asset. And the canvas element that referenced the deleted asset was left on the page with a dead src — not removed, not flagged, not relinked. Two failures compounding: the destructive action is unrecoverable, and the control that would normally recover it is enabled and pointing somewhere else."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. deleteAsset (MediaManager.ts:1059) and the updateAsset/moveAsset path never call composer.beginTransaction/endTransaction, so a library delete never enters the undo stack. Live proof of the trap: Undo was ALREADY enabled from an earlier canvas insert; after confirming the delete it STAYED enabled, so nothing distinguishes 'Undo available because of a prior edit' from 'Undo available because of what I just did'. Clicking it did not restore the asset. And the canvas element that referenced the deleted asset was left on the page with a dead src — not removed, not flagged, not relinked. Two failures compounding: the destructive action is unrecoverable, and the control that would normally recover it is enabled and pointing somewhere else. | DIAGNOSIS CORRECTED 2026-09-03 by editor-ed, verified by me: this is NOT a missing-transaction bug and wrapping deleteAsset in beginTransaction/endTransaction WOULD MAKE IT WORSE. `Composer.exportProject()` returns `assets: []` — hardcoded, confirmed at Composer.ts:608 — and that is the exact shape HistoryManager snapshots, so every undo entry in this product records an empty asset list. A transaction would capture empty before and empty after: canUndo would flip true, the button would look right, and undoing would restore nothing. That converts a control that is PLAUSIBLY wrong into one that is CONFIDENTLY wrong. The real shape: the asset store is outside the undoable model entirely while the canvas referencing it is inside — which also explains the counter-example cleanly, since inserting an asset flips canUndo correctly because what it changes is the ELEMENT, and elements are in the snapshot. Split: the dead-src half is unambiguous and fixable (those elements ARE in the snapshot); the restore half needs B-ASSET-UNDO-MODEL first. Caution recorded by editor-ed: restoring the element without the asset just re-creates the dead src, so element cleanup and asset restore must land as one story."
     },
     {
       "id": "F-MEDIA-DELETE-COUNT-ONLY",
@@ -6694,6 +6694,21 @@
       "owner": "editor-ed",
       "recipe": null,
       "evidence": "VERIFIED LIVE 2026-09-03 (TA). The historical orphan — the dashboard could create, rename and delete folders but never move an asset into one, while the editor had been calling media.moveAsset all along — is closed. Right-click > 'Move to folder' in the full-page Library moved an asset out of root instantly, folder counts recomputing live; client (AssetUploadService.ts:181) and server (routers/media.ts:190, services/media.service.ts:358) both implement it. ALSO GOOD, and worth naming because it is the counter-example to F-MEDIA-DELETE-NO-TXN: inserting an asset onto the canvas DOES open a real transaction — canUndo correctly flips true. NOT MEASURED: server-side persistence of the move over the network. The asset never acquired a serverId in this dev environment (uploads do not reach blob storage without BLOB_READ_WRITE_TOKEN), and MediaManager only mirrors folder moves server-side when serverId exists, so the mirror call never fired. Code wiring confirmed, live network confirmation not."
+    },
+    {
+      "id": "B-ASSET-UNDO-MODEL",
+      "nodeId": null,
+      "name": "FOUNDER DECISION — should assets join the undo snapshot, or get their own restore?",
+      "family": "Media",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "open",
+      "authority": "founder",
+      "kind": "decision",
+      "owner": "founder",
+      "recipe": null,
+      "evidence": "Raised 2026-09-03. Composer.exportProject() hardcodes `assets: []` (Composer.ts:608) and that is what HistoryManager snapshots, so the media library sits outside the undoable model while the canvas that references it sits inside. Deleting an asset is therefore unrecoverable AND leaves canvas elements with a dead src, while global Undo stays enabled pointing at whatever the user did before. Two viable designs, and neither session should pick alone. (A) PUT ASSETS IN THE SNAPSHOT — honest, makes Undo mean one thing, but every history entry and every autosave payload then carries the asset list, and a full-snapshot save is already this codebase's documented data-loss precondition; needs a payload-size answer FIRST. (B) GIVE THE LIBRARY ITS OWN RESTORE — soft delete with a time-limited 'Deleted - Undo' owned by MediaManager, smaller, and it stops the global Undo implying it can help. Unambiguous either way and being done regardless: a delete must not leave a canvas element pointing at a dead src."
     }
   ]
 }
