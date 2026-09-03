@@ -150,9 +150,13 @@ export class ElementManager {
   }
 
   /**
-   * Get every registered element, across all pages.
+   * Get every registered element, across all loaded pages.
    * Used by `useUsageMap` to build a `Map<src, count>` in one pass instead
    * of re-scanning per asset.
+   *
+   * This was the only one of three scope comments on this registry that was
+   * right; `findByMediaSrc` and `useUsageMap` both claimed "the active page"
+   * while iterating the same map. Three claims, one map, two wrong.
    */
   getAllElements(): Element[] {
     return Array.from(this.elements.values());
@@ -509,8 +513,19 @@ export class ElementManager {
   }
 
   /**
-   * Find all elements on the active page that reference a given media src.
-   * Checks both the `src` attribute and `background-image` CSS property.
+   * Find every registered element that references a given media src — across
+   * ALL loaded pages, not just the active one. Checks both the `src`
+   * attribute and the `background-image` CSS property.
+   *
+   * This comment said "on the active page" until 2026-09-03 and was wrong,
+   * which mattered: the media delete warning counts usages through here, so
+   * if the scope really had been the active page a user would have been told
+   * nothing breaks while deleting an asset used on three other pages.
+   *
+   * The scope is a property of `setActivePage`, which sets an id and emits
+   * and never clears or repopulates this registry — the only `clear()` is a
+   * full project reset. So the map accumulates every imported page. Check
+   * THAT if you need to trust this line, rather than trusting this line.
    */
   findByMediaSrc(src: string): Element[] {
     const results: Element[] = [];

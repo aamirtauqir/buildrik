@@ -6338,17 +6338,17 @@
     {
       "id": "F-REVIEW-NO-DOOR",
       "nodeId": null,
-      "name": "Review is undiscoverable until a round exists; its printed chord is wrong",
+      "name": "Review has no rail icon (by design); its keyboard chord WORKS — dead-chord claim retracted",
       "family": "Review",
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "parked",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. On a site with zero rounds the rail has no Review icon (6 icons, identical on fixture and a virgin site) and the topbar pill is null. Only door is the command palette. The palette prints 'R' beside 'Open Review panel'; the only r handler in the codebase is CanvasFooterToolbar.tsx:271 `key === 'r' && !e.shiftKey` -> rulers overlay. The advertised chord does something else."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. On a site with zero rounds the rail has no Review icon (6 icons, identical on fixture and a virgin site) and the topbar pill is null. Only door is the command palette. The palette prints 'R' beside 'Open Review panel'; the only r handler in the codebase is CanvasFooterToolbar.tsx:271 `key === 'r' && !e.shiftKey` -> rulers overlay. The advertised chord does something else. | CORRECTED 2026-09-03 (TA), measured live, and half this row was WRONG — mine to retract. **The R chord works.** Pressing bare `r` with canvas focus opened Review: body text went from no review content to review content present, and the rulers overlay did NOT toggle (aria-pressed stayed false). Why the original walk said it was dead: it checked useEditorShortcuts.ts, which indeed has no `r` case — but the handler that owns rail chords is useSidebarKeyboard.ts, which upper-cases the event key (`e.key.toUpperCase()`) and matches GROUPED_TABS_CONFIG[].shortcut, where Review is `shortcut: \"R\"` at tabsConfig.ts:242. Right symptom hunted in the wrong handler — the same shape as my findByMediaSrc scope check. The CanvasFooterToolbar `r` -> rulers handler exists but did not win. **What remains is true and much smaller than the row claimed:** Review has no rail ICON, and that is deliberate, not an oversight — tabsConfig has no `zone` for it so the zone-driven rail render leaves it out, with the comment 'the below-divider rail button is a follow-up (the panel is routable today via TabRouter)'. So Review has TWO working doors, the command palette and the R chord, and one absent-by-design affordance. PARKED rather than fixed: adding a rail slot is the discoverability decision (does Review earn a permanent slot before a round exists?) with a locked 6-tool rail order behind it — a product call, not a defect."
     },
     {
       "id": "F-PUBLISH-DOORS-DISAGREE",

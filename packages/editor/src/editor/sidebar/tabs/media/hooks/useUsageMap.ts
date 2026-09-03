@@ -1,5 +1,13 @@
 /**
- * useUsageMap — memoized Map<src, count> of media usage across the active page.
+ * useUsageMap — memoized Map<src, count> of media usage across ALL loaded
+ * pages, not the active one.
+ *
+ * This line said "across the active page" until 2026-09-03. It reads
+ * `getAllElements()`, whose own comment says "across all pages", so the two
+ * contradicted each other while sharing a registry. `setActivePage` never
+ * clears or repopulates that registry, so the wider scope is the true one —
+ * and it is the scope this hook needs, because a usage count that stopped at
+ * the active page would under-report every asset shared between pages.
  *
  * Replaces the per-asset-card `composer.mediaCommands.getUsages(src)` call,
  * which was O(N × assets) and re-ran on every panel render. This hook
