@@ -561,6 +561,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       : serverHasUnpublishedChanges);
   const nextMove = deriveLifecycleState({
     reviewState: reviewStatus.state,
+    reviewerName: reviewStatus.reviewerName,
     reviewsEnabled: reviewStatus.reviewsEnabled,
     editsRequireApproval: reviewStatus.editsRequireApproval,
     isPublished: Boolean(publishedUrl),
