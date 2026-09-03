@@ -529,6 +529,19 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       );
   }, [composer, currentUser, addToast]);
 
+  /* Brand stages its token edits in a provider this header sits outside, so it
+     announces them. Without this the chip read "Saved · just now" with a green
+     dot while the Brand footer two panels away said "Unsaved brand changes" —
+     same concept, two surfacings, and the global one is the one a user watches.
+     It is deliberately not the project's dirty flag: see the emit site. */
+  const [brandDirty, setBrandDirty] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onBrandDirty = (p?: { dirty?: boolean }) => setBrandDirty(Boolean(p?.dirty));
+    composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+    return () => composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+  }, [composer]);
+
   /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that
      this derivation could not produce, so board 66:640's condition showed the
      chip as Saved. */
@@ -540,7 +553,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         ? "conflict"
         : saveStatus === "error"
           ? "error"
-          : isDirty
+          : isDirty || brandDirty
             ? "unsaved"
             : "saved";
 

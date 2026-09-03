@@ -328,6 +328,11 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
       metadata: {
         name: site.name,
         domain: (site as { domain?: string }).domain,
+        /* Carried so the slug-change warning can ask whether this site is
+           reachable at all, instead of reading a per-page field that defaults
+           to off. Same loose read as `domain` above — this is the tRPC row,
+           not a typed domain object. */
+        publishedUrl: (site as { publishedUrl?: string | null }).publishedUrl ?? null,
       },
     };
   } catch (cause) {

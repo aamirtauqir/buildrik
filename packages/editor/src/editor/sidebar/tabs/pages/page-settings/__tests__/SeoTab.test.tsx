@@ -29,6 +29,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
   return {
     activeTab: "seo",
     setActiveTab: vi.fn(),
+    publishedUrl: null,
     seoTitle: "",
     setSeoTitle: vi.fn(),
     seoDesc: "",
@@ -211,15 +212,28 @@ describe("SeoTab slug field", () => {
     expect(input.getAttribute("aria-invalid")).toBe("true");
   });
 
-  it("shows the destructive-change warning when slug changes on a live page", () => {
-    const s = makeSettings({ slug: "home-v2", slugError: null });
-    render(<SeoTab s={s} page={makePage({ slug: "home", status: "live" })} />);
+  /* These two asserted the OLD gate — `page.status === "live"` — and so pinned
+     the defect they were written beside: status is `settings.visibility ??
+     "draft"`, a per-page field nobody sets unless they open the Advanced tab,
+     so the warning never fired for a real user while this test proved it did.
+     The contract is now the site being reachable. */
+  it("warns when the slug changes on a site that is published", () => {
+    const s = makeSettings({ slug: "home-v2", slugError: null, publishedUrl: "https://acme.example" });
+    render(<SeoTab s={s} page={makePage({ slug: "home", status: "draft" })} />);
     expect(screen.getByRole("alert")).toHaveTextContent(/Changing this URL will break existing links/);
   });
 
-  it("does not show the destructive warning when the page is not live", () => {
-    const s = makeSettings({ slug: "home-v2", slugError: null });
-    render(<SeoTab s={s} page={makePage({ slug: "home", status: "draft" })} />);
+  it("stays silent on a site that has never been published, whatever the page status says", () => {
+    const s = makeSettings({ slug: "home-v2", slugError: null, publishedUrl: null });
+    render(<SeoTab s={s} page={makePage({ slug: "home", status: "live" })} />);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  /* The negative that keeps the gate honest: publishing a site must not make
+     every slug field shout. No pending change, no warning. */
+  it("stays silent when the slug has not changed, even on a published site", () => {
+    const s = makeSettings({ slug: "home", slugError: null, publishedUrl: "https://acme.example" });
+    render(<SeoTab s={s} page={makePage({ slug: "home", status: "live" })} />);
     expect(screen.queryByRole("alert")).toBeNull();
   });
 });

@@ -278,8 +278,15 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             />
           </div>
         </div>
-        {/* Slug destructive warning — shown when slug changes on a live page */}
-        {s.slug !== page.slug && page.status === "live" && !s.slugError && (
+        {/* Slug destructive warning — shown when the slug changes on a site
+            that is actually reachable. Was gated on `page.status === "live"`,
+            i.e. `settings.visibility ?? "draft"`, a per-page field nobody sets
+            unless they open the Advanced tab — so it never fired on a normal
+            page and the warning was effectively dead code. The rejected
+            alternative was to warn whenever the field is unset, which would
+            fire on brand-new sites where "this will break existing links" is
+            false; a warning that cries wolf is worse than none. */}
+        {s.slug !== page.slug && !!s.publishedUrl && !s.slugError && (
           <div className={`tw:flex tw:gap-2 tw:px-2.5 tw:py-2 tw:text-[length:var(--bk-text-12)] ${UI} ${BANNER}`} role="alert">
             <svg className="tw:flex-none tw:mt-px" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />

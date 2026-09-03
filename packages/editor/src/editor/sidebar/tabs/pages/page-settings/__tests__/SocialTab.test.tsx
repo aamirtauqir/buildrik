@@ -14,6 +14,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
   return {
     activeTab: "social",
     setActiveTab: vi.fn(),
+    publishedUrl: null,
     seoTitle: "",
     setSeoTitle: vi.fn(),
     seoDesc: "",

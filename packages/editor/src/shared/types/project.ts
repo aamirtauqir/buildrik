@@ -62,6 +62,18 @@ export interface ProjectMetadata {
   /** Analytics configuration */
   analytics?: AnalyticsConfig;
   /**
+   * The site's live URL, or null when it has never been published.
+   *
+   * Exists so the editor can answer "is this page's URL reachable by anyone?"
+   * — a fact about the SITE, not about a per-page field. The slug-change
+   * warning was gated on `page.status === "live"`, where status is
+   * `settings.visibility ?? "draft"`, a field nobody sets unless they open the
+   * Advanced tab. So the warning never fired on a normal page, and the type
+   * doc claimed the default was "live" while the code defaulted to "draft",
+   * which is why reading the type made the gate look correct.
+   */
+  publishedUrl?: string | null;
+  /**
    * Custom domain for this project (e.g., "acme.com"). Used to build real
    * page URLs in copy-link, SEO previews, and redirects. When unset the UI
    * falls back to the platform default (e.g., "yoursite.aquibra.io").

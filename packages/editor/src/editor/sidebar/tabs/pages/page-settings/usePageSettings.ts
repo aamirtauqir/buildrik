@@ -55,6 +55,10 @@ export interface UsePageSettingsReturn {
   copyPassword: () => void;
 
   domain: string | null;
+  /** The site's live URL, or null when it has never been published. Gates the
+      slug-change warning: "existing links" can only exist if the site is
+      reachable, which is a fact about the site rather than the page. */
+  publishedUrl: string | null;
 
   saveState: SaveState;
   isDirty: boolean;
@@ -351,6 +355,11 @@ export function usePageSettings(
   // and silently resolved to undefined — the slug preview was always broken).
   const domain = composer?.getProjectMetadata?.()?.domain ?? null;
 
+  /* Whether this site is reachable by anyone. The slug warning is about
+     "existing links", so the honest question is whether links can exist —
+     which is a fact about the site being published, not about the page. */
+  const publishedUrl = composer?.getProjectMetadata?.()?.publishedUrl ?? null;
+
   return {
     activeTab,
     setActiveTab,
@@ -384,6 +393,7 @@ export function usePageSettings(
     headCodeError,
     copyPassword,
     domain,
+    publishedUrl,
     saveState,
     isDirty,
     save,

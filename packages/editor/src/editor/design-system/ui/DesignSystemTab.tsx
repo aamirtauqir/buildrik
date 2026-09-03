@@ -339,6 +339,19 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const isDirtyRef = React.useRef(isDirty);
   React.useEffect(() => { isDirtyRef.current = isDirty; }, [isDirty]);
 
+  /* The topbar read only the PROJECT's dirty flag, so a token mid-edit left it
+     reading "Saved · just now" with a green dot while this panel's own footer
+     said "Unsaved brand changes". Same concept, two surfacings, and the global
+     one — the one a user watches — was the wrong one.
+     Announced rather than shared: brand staging lives in TokenRegistryProvider
+     above the sidebar, and the topbar sits outside it. It deliberately does NOT
+     raise the project's dirty flag: autosave would then write a project that
+     has not changed and clear the flag, putting "Saved" back over brand work
+     that is still only staged. */
+  React.useEffect(() => {
+    composer?.emit(EVENTS.BRAND_DIRTY_CHANGED, { dirty: isDirty });
+  }, [composer, isDirty]);
+
   // ─ Load from Composer ─
   const loadFromComposer = React.useCallback(() => {
     if (!composer) return;
