@@ -453,7 +453,9 @@ const DIRTY_DOT = "tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--bk-blue
 const RENAME_INPUT = "tw:w-25 tw:[&_input]:px-1 tw:[&_input]:py-0.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded";
 const ADD_BTN =
   "tw:flex tw:items-center tw:justify-center tw:size-6 tw:ml-1 tw:p-0 tw:rounded tw:text-sm tw:font-medium " +
-  "tw:border tw:border-dashed tw:border-[var(--bk-gray-400)] tw:bg-transparent tw:text-[var(--bk-ink-muted)] tw:hover:bg-[var(--bk-gray-100)]";
+  /* ink-soft, not ink-muted: this sits on the tab bar's gray-100 where muted
+     measures 4.39:1, under the 4.5 floor. Same pairing as the panel subtitle. */
+  "tw:border tw:border-dashed tw:border-[var(--bk-gray-400)] tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]";
 const RENAME_FEEDBACK =
   "tw:fixed tw:z-[10000] tw:px-2 tw:py-1 tw:whitespace-nowrap " +
   "tw:rounded tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:text-xs tw:leading-snug " +
