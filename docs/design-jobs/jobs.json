@@ -6628,12 +6628,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "SPLIT from F-SAVE-OFFLINE-LIE and VERIFIED LIVE 2026-09-03 (TA) on scratchsmoke00000000000001, after editor-ed fixed the label half and said they could not explain this half from the code and were not claiming it. It reproduces. Method, with both controls satisfied so the run cannot be read the wrong way: navigator.onLine measured TRUE at edit time; the save request aborted through a route scoped to **/api/trpc/** (blocked count reported 1, so the interception demonstrably fired); and an EDIT-APPLIED GUARD — the run aborts and prints 'THIS RUN PROVES NOTHING' unless the computed value actually changed. First attempt hit exactly that guard and was discarded rather than reported. Confirmed sequence on H2 el-mt69adgn-1k5f49stcp5: font-size 24px -> 41px applied; save blocked; topbar reads 'Save failed - retry', which is HONEST and is the fixed label; then reload -> font-size is back to 24px, the edit is GONE, and the topbar reads 'Saved - just now'. So the user IS warned at the time, and the warning does not survive: nothing persists the unsaved work and after a reload the product asserts everything is saved over an edit it discarded. The honest state after a failed save is 'you have work that is not on the server', and a reload must not silently downgrade that to 'Saved'."
+      "evidence": "SPLIT from F-SAVE-OFFLINE-LIE and VERIFIED LIVE 2026-09-03 (TA) on scratchsmoke00000000000001, after editor-ed fixed the label half and said they could not explain this half from the code and were not claiming it. It reproduces. Method, with both controls satisfied so the run cannot be read the wrong way: navigator.onLine measured TRUE at edit time; the save request aborted through a route scoped to **/api/trpc/** (blocked count reported 1, so the interception demonstrably fired); and an EDIT-APPLIED GUARD — the run aborts and prints 'THIS RUN PROVES NOTHING' unless the computed value actually changed. First attempt hit exactly that guard and was discarded rather than reported. Confirmed sequence on H2 el-mt69adgn-1k5f49stcp5: font-size 24px -> 41px applied; save blocked; topbar reads 'Save failed - retry', which is HONEST and is the fixed label; then reload -> font-size is back to 24px, the edit is GONE, and the topbar reads 'Saved - just now'. So the user IS warned at the time, and the warning does not survive: nothing persists the unsaved work and after a reload the product asserts everything is saved over an edit it discarded. The honest state after a failed save is 'you have work that is not on the server', and a reload must not silently downgrade that to 'Saved'. | FIXED by editor-ed and VERIFIED LIVE 2026-09-03 (TA), same harness and same two controls (edit-applied guard + blocked-request count, both satisfied: 24px -> 37px applied, 1 save blocked, navigator.onLine true). After reload the topbar reads 'Save failed - retry', NOT 'Saved - just now' — the lie is gone and the honest state survives the reload. The work is preserved and OFFERED rather than auto-applied (font-size still 24px, autoRestored=false), which is the deviation editor-ed disclosed rather than buried: importing a stored project over a freshly loaded one is this codebase's documented data-loss precondition, so a recovery that could itself destroy work is presented as a choice and marks the project dirty when taken. That lands between 'work survives' and 'do not claim saved', and is the right place."
     },
     {
       "id": "F-MEDIA-DELETE-NO-TXN",
@@ -6709,6 +6709,21 @@
       "owner": "founder",
       "recipe": null,
       "evidence": "Raised 2026-09-03. Composer.exportProject() hardcodes `assets: []` (Composer.ts:608) and that is what HistoryManager snapshots, so the media library sits outside the undoable model while the canvas that references it sits inside. Deleting an asset is therefore unrecoverable AND leaves canvas elements with a dead src, while global Undo stays enabled pointing at whatever the user did before. Two viable designs, and neither session should pick alone. (A) PUT ASSETS IN THE SNAPSHOT — honest, makes Undo mean one thing, but every history entry and every autosave payload then carries the asset list, and a full-snapshot save is already this codebase's documented data-loss precondition; needs a payload-size answer FIRST. (B) GIVE THE LIBRARY ITS OWN RESTORE — soft delete with a time-limited 'Deleted - Undo' owned by MediaManager, smaller, and it stops the global Undo implying it can help. Unambiguous either way and being done regardless: a delete must not leave a canvas element pointing at a dead src."
+    },
+    {
+      "id": "F-RECOVERY-COPY-CAUSE",
+      "nodeId": null,
+      "name": "Recovery banner blames an 'unexpected close' for what was a failed save",
+      "family": "Recovery",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND 2026-09-03 (TA) while verifying F-SAVE-LOSS-ON-RELOAD, and filed because it is this audit's own thesis in miniature. The recovery offer reads: 'Recovered your work after an unexpected close - moments ago - 4 pages.' The user did not close anything. The measured event was a SAVE THAT FAILED while the browser was online, and the user was correctly told so at the time ('Save failed - retry'). So the reload now preserves the work — the important half — but renames the cause on the way, and 'unexpected close' invites the user to blame their browser rather than retry a save that is still failing. P3 severity, but the same class as the offline mislabel: an interface naming an event something it was not. Two causes reach this banner (a real unexpected close and a refused save) and the copy only covers one."
     }
   ]
 }
