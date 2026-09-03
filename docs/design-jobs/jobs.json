@@ -3,10 +3,10 @@
   "protocol": "PROTOCOL.md",
   "counts": {
     "fix": 55,
-    "verify": 269,
+    "verify": 270,
     "done": 87,
     "todo": 34,
-    "unbuildable": 62,
+    "unbuildable": 61,
     "fix-figma": 12
   },
   "jobs": [
@@ -161,9 +161,9 @@
       "name": "B9.5 · Migration progress modal — running · failed",
       "family": "B9.5",
       "width": 1040,
-      "status": "unbuildable",
+      "status": "verify",
       "owner": null,
-      "evidence": "",
+      "evidence": " | 2026-09-03 E5 CORRECTION: 'no UI' is false — MigrationProgressModal.tsx exists, MigrationProgressMount.tsx wraps it, and it is mounted in the shell at StudioPanels.tsx:406. ModalParts.tsx:111 names it as one of three modals with a custom header. Moved off unbuildable.",
       "authority": "open:migration-ui-unbuilt",
       "blocker": "A"
     },
