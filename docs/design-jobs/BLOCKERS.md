@@ -167,6 +167,8 @@ Biggest: **F13** flowbite h-10/link leak (39 jobs across 7 families) · **C10** 
 
   **How it stayed hidden:** two sessions put four recorders inside `Composer.markDirty()` — a function this path never calls. There are three dirty flags (`Composer.state.dirty`, `useStudioState:260`, `useSaveState:40`) and the guard reads the second, raised by a bare `setIsDirty(true)`. Four empty runs were read as evidence four times. What worked was recording at the point of USE (the guard's inputs at fire time) and then where the value changes. Written up as `feedback_instrument_where_the_value_changes`.
 
+  **Gate built 2026-09-03 rather than waiting for a fourth instance** (editor-ed's call, and right): `e2e/boot-clean.spec.ts` boots the editor **8 times** and asserts boot alone raises nothing the exit guard can see — UI `isDirty` false, `stranded` 0, `saveStatus` not `saving`, and `Composer.markDirty` never fired. Eight because the UI flag is visible only for the 1000 ms debounce, so one load misses a boot-dirty ~2 times in 3; (2/3)^8 ~ 4%. **A one-shot version would have passed over all three of today's defects.** It checks its own instrument first: if the guard's DEV recorder did not run it fails as unmeasured rather than passing silently — the exact hole my run 9 fell through. **Watched failing:** a planted `isDirty:true` reading fails it with `run 1: the UI dirty flag was raised by boot alone`, and the product-level control is 2-3 prompts in 9 before the fix versus 0 in 9 after. **What it cannot see, stated not implied:** `useSaveState:40` is unreachable from the page — 2 of 3 flags covered.
+
   ```
   run 2  prompt=beforeunload   isDirty=true   saveStatus=idle   stranded=0
   run 9  prompt=beforeunload   reason=[]   ← my mirror missed it, NOT captured
