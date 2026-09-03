@@ -6574,6 +6574,36 @@
       "owner": "editor-ed",
       "recipe": null,
       "evidence": "VERIFIED LIVE 2026-09-03 (TA). Recorded as a positive because it is the standard the rest should be measured against: the Brand panel's Save opens 'Review 1 staged change - Applying updates every element bound to these tokens - 10 places' with Discard all / Keep editing / Apply. It names the blast radius BEFORE committing. Token propagation to bound elements is also live and instant."
+    },
+    {
+      "id": "F-BLOCKS-NO-RENDER",
+      "nodeId": null,
+      "name": "~30 block React components have no render path; 5 'missing controls' are one dead directory",
+      "family": "Blocks",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND 2026-09-03 by editor-ed, mechanical hunt, verified. blocks/Components/*.tsx export both a React component and a *BlockConfig. The editor imports the CONFIGS from blockRegistry, and the canvas mounts ENGINE HTML rather than React, so the components are re-exported through blocks/Components/index.ts and blocks/index.ts and imported by nobody — roughly thirty of them. This reframes a smaller finding: the five block props with no editor control (showDots, showArrows, showDays, showHours, showMinutes) are not five missing inspector controls, they are ONE dead directory, because the component that reads them never renders. Why the repo's own dead-export scanner misses it: a barrel re-export counts as reachable. And shared/forms/SliderField uses a DIFFERENT Slider from chrome-ui, which is what makes the directory look consumed at a glance."
+    },
+    {
+      "id": "B-DRAWER-OVERLAY-1280",
+      "nodeId": null,
+      "name": "FOUNDER DECISION — does the 1280 drawer-overlay mode come back, or go?",
+      "family": "Shell",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "open",
+      "authority": "founder",
+      "kind": "decision",
+      "owner": "founder",
+      "recipe": null,
+      "evidence": "Raised 2026-09-03. The mode is fully built and UNREACHABLE: drawerPinned defaults to true in LayoutShell, and the single production call site (StudioPanels) passes drawerOpen and drawerWidth and never passes drawerPinned — so `overlay: !drawerPinned` and the layout-shell--drawer-overlay class are dead in the running product. **Its tests hide this**: every test exercising the overlay passes drawerPinned={false} itself, which is the UpgradeModal pattern exactly — a test that supplies the trigger proves the branch works and never that the feature has a door. Neither session touched it: deleting a boarded mode is a product call, and the pin its board depends on was removed deliberately. Decision: restore the pin, or retire the overlay and its board."
     }
   ]
 }
