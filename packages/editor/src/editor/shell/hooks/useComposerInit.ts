@@ -528,10 +528,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                Read live with the browser offline: that toast sat under a chip
                already saying Offline. Same words as the manual path, so the
                two agree about what happened and what to do. */
-            const offline =
-              (typeof navigator !== "undefined" && !navigator.onLine) ||
-              /network|fetch|offline|failed to fetch|connection/i.test(message);
-            if (offline) {
+            /* Two facts, not one — the same split `useSaveCallback` already
+               makes, and the reason its comment gives applies verbatim here.
+               `isOffline` says WHY, and only navigator can answer it;
+               `isNetwork` says the save died in transport. Conflating them
+               made a server that refused while the browser was ONLINE report
+               "Offline — not saved", measured with navigator.onLine true at
+               the moment of failure. The advice that follows is then wrong
+               too: waiting to be "back online" never arrives. One rule lived
+               in two copies and only one was fixed. */
+            const isOffline = typeof navigator !== "undefined" && !navigator.onLine;
+            const isNetwork =
+              isOffline || /network|fetch|offline|failed to fetch|connection/i.test(message);
+            if (isNetwork) {
               /* `status: "error"` matches `useSaveCallback`; the topbar's own
                  offline flag outranks it and draws the Offline pill. There is
                  no "offline" status in this state machine. */
@@ -539,9 +548,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               setIsDirty(true);
               if (siteId) {
                 addToast({
-                  title: "Offline — not saved",
-                  description:
-                    "Your changes are still open in this tab. Keep it open and save again once you're back online.",
+                  /* Same words as the manual path for both branches, so one
+                     event cannot be named two different things depending on
+                     which path reported it. */
+                  title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
+                  description: isOffline
+                    ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
+                    : "Your changes are still open in this tab. Keep it open and try saving again.",
                   tone: "warning",
                 });
               }

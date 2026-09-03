@@ -81,19 +81,51 @@ beforeEach(() => {
 });
 afterEach(() => vi.useRealTimers());
 
+/* Only navigator can answer "am I offline". jsdom reports online by default,
+   so a test that merely rejects with "Failed to fetch" is the ONLINE case —
+   which is how this file came to assert the bug: it expected the offline copy
+   from a browser that was online, and passed because the code ORed the two. */
+const setOnline = (online: boolean) => {
+  Object.defineProperty(window.navigator, "onLine", { value: online, configurable: true });
+};
+afterEach(() => setOnline(true));
+
+const runAutosave = async (p: ReturnType<typeof params>) => {
+  renderHook(() => useComposerInit(p));
+  act(() => { composer.emit("project:changed"); });
+  await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
+  return vi.mocked(p.addToast!).mock.calls.map(([t]) => t as { title?: string; description?: string });
+};
+
 describe("autosave while offline", () => {
   it("says offline, not 'save failed', and keeps the work in the tab", async () => {
+    setOnline(false);
     const p = params();
-    renderHook(() => useComposerInit(p));
+    const toasts = await runAutosave(p);
 
-    act(() => { composer.emit("project:changed"); });
-    await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
-
-    const toasts = vi.mocked(p.addToast!).mock.calls.map(([t]) => t as { title?: string; description?: string });
     expect(toasts.some((t) => t.title === "Offline — not saved")).toBe(true);
     expect(toasts.some((t) => t.title === "Save failed")).toBe(false);
-    expect(toasts.find((t) => t.title === "Offline — not saved")?.description).toMatch(/still open in this tab/);
+    expect(toasts.find((t) => t.title === "Offline — not saved")?.description).toMatch(/back online/);
     // The edit is still dirty — it has not been persisted anywhere.
+    expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
+  });
+
+  it("does not call a server refusal 'offline' when the browser is online", async () => {
+    /* Measured live 2026-09-03 with navigator.onLine true at the moment of
+       failure: the toast read "Offline — not saved" and told the user to wait
+       until they were back online, which never arrives. The manual-save path
+       already split these two facts and its comment describes this exact bug;
+       autosave still ORed the regex with navigator. One rule, two copies, one
+       fixed. Both paths now use the same words for the same event. */
+    setOnline(true);
+    const p = params();
+    const toasts = await runAutosave(p);
+
+    expect(toasts.some((t) => t.title === "Couldn't reach the server — not saved")).toBe(true);
+    expect(toasts.some((t) => t.title === "Offline — not saved")).toBe(false);
+    expect(
+      toasts.find((t) => t.title === "Couldn't reach the server — not saved")?.description,
+    ).toMatch(/try saving again/);
     expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
   });
 });
