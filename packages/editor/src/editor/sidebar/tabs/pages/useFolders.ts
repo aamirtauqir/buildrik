@@ -2,7 +2,12 @@
  * useFolders — Sidebar-only page folder management.
  *
  * Folders are a UI organisational concept, NOT stored in the engine.
- * Persisted to localStorage keyed by composerId (or "default").
+ * Persisted to localStorage keyed by SITE (or "default" when the editor is
+ * running without one). It was keyed by `composer.id` until 2026-09-03 —
+ * a property Composer does not have, so the cast reading it always produced
+ * null, every site in a browser shared the one "default" blob, and folders
+ * created on one site appeared on the next, drawn identically to real page
+ * rows.
  *
  * Responsibilities:
  * - CRUD: create, rename, delete folder
@@ -18,23 +23,37 @@ import type { FolderItem } from "./types";
 
 const STORAGE_KEY_PREFIX = "pg-folders-v1-";
 
-function storageKey(composerId: string | null): string {
-  return STORAGE_KEY_PREFIX + (composerId ?? "default");
+const LEGACY_SHARED_KEY = STORAGE_KEY_PREFIX + "default";
+
+function storageKey(siteId: string | null): string {
+  return STORAGE_KEY_PREFIX + (siteId ?? "default");
 }
 
-function load(composerId: string | null): FolderItem[] {
+function load(siteId: string | null): FolderItem[] {
   try {
-    const raw = localStorage.getItem(storageKey(composerId));
-    if (!raw) return [];
-    return JSON.parse(raw) as FolderItem[];
+    const key = storageKey(siteId);
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw) as FolderItem[];
+    /* Whatever a user arranged before the key was site-scoped sits under the
+       shared blob. It is MOVED to the first site that asks for it, never
+       copied: a copy would hand the same folders to every site opened after,
+       which is the bug this fixes. Sites opened later start empty, which is
+       the truth about folders they never had. */
+    if (key === LEGACY_SHARED_KEY) return [];
+    const legacy = localStorage.getItem(LEGACY_SHARED_KEY);
+    if (!legacy) return [];
+    const adopted = JSON.parse(legacy) as FolderItem[];
+    localStorage.setItem(key, legacy);
+    localStorage.removeItem(LEGACY_SHARED_KEY);
+    return adopted;
   } catch {
     return [];
   }
 }
 
-function persist(composerId: string | null, folders: FolderItem[]): void {
+function persist(siteId: string | null, folders: FolderItem[]): void {
   try {
-    localStorage.setItem(storageKey(composerId), JSON.stringify(folders));
+    localStorage.setItem(storageKey(siteId), JSON.stringify(folders));
   } catch {
     // localStorage quota — silently ignore, in-memory state still works
   }
@@ -62,11 +81,11 @@ export interface UseFoldersReturn {
 }
 
 export function useFolders(
-  composerId: string | null,
+  siteId: string | null,
   livePageIds: Set<string>
 ): UseFoldersReturn {
   const [folders, setFolders] = React.useState<FolderItem[]>(() =>
-    load(composerId)
+    load(siteId)
   );
 
   // Prune stale pageIds on mount and whenever livePageIds shrinks
@@ -82,20 +101,20 @@ export function useFolders(
       // Skip re-render + write if nothing changed
       const changed = cleaned.some((f, i) => f.pageIds.length !== prev[i].pageIds.length);
       if (!changed) return prev;
-      persist(composerId, cleaned);
+      persist(siteId, cleaned);
       return cleaned;
     });
-  }, [composerId, livePageIds.size]);
+  }, [siteId, livePageIds.size]);
 
   const update = React.useCallback(
     (updater: (prev: FolderItem[]) => FolderItem[]) => {
       setFolders((prev) => {
         const next = updater(prev);
-        persist(composerId, next);
+        persist(siteId, next);
         return next;
       });
     },
-    [composerId]
+    [siteId]
   );
 
   const createFolder = React.useCallback(

@@ -125,6 +125,31 @@ describe("useFolders (flat model)", () => {
     expect(result.current.folders[0].pageIds).toEqual(["p1"]);
   });
 
+  it("does not hand one site's folders to the next site opened", () => {
+    /* The key was built from `composer.id`, which does not exist, so it was
+       always "pg-folders-v1-default" and folders made on one site showed up on
+       every other — drawn identically to real page rows. */
+    localStorage.clear();
+    const a = renderHook(() => useFolders("site-a", livePages));
+    act(() => { a.result.current.createFolder("Marketing"); });
+    const b = renderHook(() => useFolders("site-b", livePages));
+    expect(b.result.current.folders).toEqual([]);
+    expect(localStorage.getItem("pg-folders-v1-site-a")).toContain("Marketing");
+  });
+
+  it("moves a pre-scoping folder set to the first site that asks, once", () => {
+    /* Whatever was arranged before scoping sits under the shared blob. Moving
+       it keeps that work for one site; copying it would re-create the very
+       bug, handing the same folders to every site opened afterwards. */
+    localStorage.clear();
+    localStorage.setItem("pg-folders-v1-default", JSON.stringify([{ id: "fld-old", name: "Legacy", pageIds: [], collapsed: false }]));
+    const first = renderHook(() => useFolders("site-a", livePages));
+    expect(first.result.current.folders.map((f) => f.name)).toEqual(["Legacy"]);
+    expect(localStorage.getItem("pg-folders-v1-default")).toBeNull();
+    const second = renderHook(() => useFolders("site-b", livePages));
+    expect(second.result.current.folders).toEqual([]);
+  });
+
   it("flat-only invariant: folders never contain other folders", () => {
     const { result } = renderHook(() => useFolders("project-test", livePages));
     act(() => {

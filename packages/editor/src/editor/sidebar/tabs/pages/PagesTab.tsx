@@ -23,6 +23,7 @@ import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
 import "./PagesTab.css";
@@ -48,12 +49,16 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const p = usePages(composer);
 
   // Folders — sidebar-only, localStorage-persisted
-  const composerId = (composer as { id?: string } | null)?.id ?? null;
+  /* This read was `(composer as { id?: string })?.id`, and Composer has no
+     `id` — the cast made a missing property look like an optional one, so
+     every site shared one folder blob. The site is the thing folders belong
+     to, and the URL is where the editor already gets it. */
+  const folderScopeId = getSiteIdFromUrl();
   const livePageIds = React.useMemo(
     () => new Set(p.pages.map((pg) => pg.id)),
     [p.pages]
   );
-  const f = useFolders(composerId, livePageIds);
+  const f = useFolders(folderScopeId, livePageIds);
   const bulk = useBulkSelect();
 
   // Prune stale folder references when pages are deleted
