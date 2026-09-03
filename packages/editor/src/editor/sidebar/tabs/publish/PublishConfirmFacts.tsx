@@ -59,6 +59,12 @@ function approvalLine(round: CurrentRound | null, loading: boolean): string {
   return `Round ${round.roundNumber} is still open.`;
 }
 
+/* One wording for both publish doors. The wizard band and the topbar confirm
+   used to compose this independently, and only the wizard ever composed it —
+   see `onWarnings`. */
+export const warningsLine = (n: number) =>
+  `⚠ ${n} warning${n === 1 ? "" : "s"} — none block. Client approval is a separate gate.`;
+
 export interface PublishConfirmFactsProps {
   /** Gates the reads: neither entry point should fetch while closed. */
   active: boolean;
@@ -77,6 +83,9 @@ export interface PublishConfirmFactsProps {
   /** The blocking check's detail, or null when nothing blocks — same contract
       as onPageCount: read here, enforced by the button. */
   onBlocked?(reason: string | null): void;
+  /** How many non-blocking checks warned. Same read-here-render-there
+      contract as onBlocked, so both publish doors can say the same thing. */
+  onWarnings?(count: number): void;
 }
 
 export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
@@ -88,6 +97,7 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
   onPageCount,
   siteId,
   onBlocked,
+  onWarnings,
 }) => {
   const [pageCount, setPageCount] = React.useState<number | null>(null);
   const [round, setRound] = React.useState<CurrentRound | null>(null);
@@ -118,6 +128,11 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
       const failed = checks?.checks.find((c) => c.status === "fail") ?? null;
       setBlocker(failed ? { label: failed.label, detail: failed.detail } : null);
       onBlocked?.(failed ? failed.detail : null);
+      /* Warnings do not block, which is exactly why they went missing: the
+         topbar confirm asked only whether it was blocked. A user publishing
+         from the fast path was never told the site had unresolved warnings
+         the wizard would have shown them. */
+      onWarnings?.((checks?.checks ?? []).filter((c) => c.status === "warning").length);
       const count = pages ? pages.length : null;
       setPageCount(count);
       onPageCount?.(count);

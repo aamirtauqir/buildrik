@@ -22,7 +22,7 @@ import * as React from "react";
 import { Button, ModalContent, ModalRoot, Spinner } from "@/editor/chrome-ui";
 import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 import type { Composer } from "@/engine";
-import { PublishConfirmFacts } from "./PublishConfirmFacts";
+import { PublishConfirmFacts, warningsLine } from "./PublishConfirmFacts";
 
 type Step = "review" | "confirm";
 
@@ -209,7 +209,7 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
                 : blocked
                   ? `⚠ ${blocking.length} blocking — ${blocking.map((c) => c.label).join(", ")}. Fix to publish.`
                   : warnings.length > 0
-                    ? `⚠ ${warnings.length} warning${warnings.length === 1 ? "" : "s"} — none block. Client approval is a separate gate.`
+                    ? warningsLine(warnings.length)
                     : "All checks pass."}
             </p>
           )}

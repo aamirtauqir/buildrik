@@ -81,6 +81,39 @@ describe("PublishConfirmModal — it does not promise a target it has not checke
     expect(screen.getByText("Publish now")).not.toBeDisabled();
   });
 
+  it("tells the fast path about warnings the wizard would have shown", async () => {
+    /* Warnings do not block, which is why this door never mentioned them: it
+       asked only whether it was blocked. A user publishing from the topbar
+       was never told the site had unresolved warnings, while the same publish
+       started from the panel said so plainly. Both doors now spend one
+       sentence, exported from the facts component they already share. */
+    fetchPrePublishChecks.mockResolvedValue({
+      ready: true,
+      checks: [
+        { label: "Vercel connected", status: "pass" as const, detail: "This workspace is connected to Vercel." },
+        { label: "SEO configured", status: "warning" as const, detail: "No meta description on 2 pages." },
+        { label: "Domain connected", status: "warning" as const, detail: "Using the default vercel.app domain." },
+      ],
+    });
+    mount();
+    await waitFor(() => expect(screen.getByText(/2 warnings — none block/)).toBeInTheDocument());
+    // Warnings never disable the button — that is what "none block" means.
+    expect(screen.getByText("Publish now")).not.toBeDisabled();
+  });
+
+  it("lets the blocker speak alone when it also has warnings", async () => {
+    fetchPrePublishChecks.mockResolvedValue({
+      ready: false,
+      checks: [
+        { label: "Vercel connected", status: "fail" as const, detail: NOT_CONNECTED },
+        { label: "SEO configured", status: "warning" as const, detail: "No meta description on 2 pages." },
+      ],
+    });
+    mount();
+    await waitFor(() => expect(screen.getByText(NOT_CONNECTED)).toBeInTheDocument());
+    expect(screen.queryByText(/warning.*none block/)).not.toBeInTheDocument();
+  });
+
   it("does not invent a verdict when the checks call fails", async () => {
     fetchPrePublishChecks.mockRejectedValue(new Error("offline"));
     mount();

@@ -17,7 +17,7 @@
 import * as React from "react";
 import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
-import { PublishConfirmFacts } from "@/editor/sidebar/tabs/publish/PublishConfirmFacts";
+import { PublishConfirmFacts, warningsLine } from "@/editor/sidebar/tabs/publish/PublishConfirmFacts";
 
 export interface PublishConfirmModalProps {
   isOpen: boolean;
@@ -52,6 +52,7 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
   /* The exporter's count, reported by the facts component: a publish with
      nothing in it must not be offered. */
   const [pageCount, setPageCount] = React.useState<number | null>(null);
+  const [warnCount, setWarnCount] = React.useState(0);
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(o) => !o && onClose()}>
@@ -73,12 +74,24 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
             onPageCount={setPageCount}
             siteId={siteId}
             onBlocked={setBlocked}
+            onWarnings={setWarnCount}
           />
         </div>
 
         {isPublished && (
           <p className="tw:mt-[10px] tw:mb-0 tw:rounded-[var(--bk-radius-sm)] tw:px-[11px] tw:py-[9px] tw:text-[12px] tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]">
             This replaces the live site immediately for all visitors.
+          </p>
+        )}
+
+        {/* The comment above claims these two doors cannot drift apart. They
+            had: the wizard showed a warnings band and this one showed nothing,
+            so the fast path published a site with unresolved warnings and said
+            so nowhere. Suppressed when blocked, where the blocker is the
+            thing to read. */}
+        {!blocked && warnCount > 0 && (
+          <p className="tw:mt-[10px] tw:mb-0 tw:rounded-[var(--bk-radius-sm)] tw:px-[11px] tw:py-[9px] tw:text-[12px] tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]">
+            {warningsLine(warnCount)}
           </p>
         )}
 
