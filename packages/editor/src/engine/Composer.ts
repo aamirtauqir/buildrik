@@ -889,7 +889,9 @@ ${html}${interactionScript}
    * Mark project as modified
    */
   markDirty(): void {
-    /* Dev-only forensics. A freshly loaded, untouched project was measured
+    /* Dev-only forensics, and LOAD-BEARING: `e2e/boot-clean.spec.ts` asserts
+       against `__bkDirtyTrace` and fails as UNMEASURED if this is removed.
+       A freshly loaded, untouched project was measured
        turning itself dirty and autosave then writing it — with a full-snapshot
        save that drops omitted pages, an unrequested write is the data-loss
        precondition, and the exit prompt is only its visible edge. Static

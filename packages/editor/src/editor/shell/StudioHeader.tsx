@@ -460,7 +460,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     const onBefore = (e: BeforeUnloadEvent) => {
       if (bypassRef.current) return;
       const stranded = totalPendingMirrors();
-      /* Dev-only: this guard has three independent reasons to prompt, and a
+      /* Dev-only, and LOAD-BEARING: `e2e/boot-clean.spec.ts` reads
+         `__bkExitReason` and fails as UNMEASURED if this is removed.
+         This guard has three independent reasons to prompt, and a
          clean untouched load was measured prompting 1 run in 3. Recording the
          values AT FIRE TIME says which reason it was, rather than inferring it
          from the pill afterwards. */
