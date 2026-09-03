@@ -31,6 +31,31 @@ export const completeDashboardTaskSchema = z.object({
   taskId: z.enum(DASHBOARD_TASK_IDS),
 });
 
+/**
+ * The editor checklist's seven steps, mirroring `onboardingSteps.ts`.
+ *
+ * These lived only in `localStorage` until 2026-09-03, which meant the one
+ * artefact built to prove a user had activated did not survive the user
+ * changing device, browser or clearing their cache: completing a step wrote
+ * `completed:true` locally, and the same site as the same logged-in user in a
+ * fresh context read `completed:false`. `OnboardingState.editorTasks` already
+ * existed for this — the router even carried a comment reserving it "for when
+ * an editor tour is actually built".
+ */
+export const EDITOR_TASK_IDS = [
+  "set-brand",
+  "add-page",
+  "insert-section",
+  "connect-client",
+  "send-review",
+  "preview",
+  "publish",
+] as const;
+
+export const completeEditorTaskSchema = z.object({
+  taskId: z.enum(EDITOR_TASK_IDS),
+});
+
 // M2 onboarding wizard state (spec §2). Persisted to OnboardingState.wizardData
 // after every step so a refresh resumes at `route` with inputs intact. Versioned
 // so the shape can evolve; validated on write AND read. Fields fill in as the

@@ -5,12 +5,14 @@ import {
   getOnboardingState,
   completeStep,
   completeDashboardTask,
+  completeEditorTask,
   dismissOnboarding,
   saveWizard,
   completeWizard,
 } from "@/server/services/onboarding.service";
 import {
   completeDashboardTaskSchema,
+  completeEditorTaskSchema,
   wizardDataSchema,
 } from "@buildrik/shared/schemas/onboarding";
 
@@ -40,6 +42,16 @@ export const onboardingRouter = router({
     .mutation(async ({ ctx, input }) => {
       try {
         return await completeDashboardTask(ctx.session.user.id, input.taskId);
+      } catch {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to complete task" });
+      }
+    }),
+
+  completeEditorTask: protectedProcedure
+    .input(completeEditorTaskSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await completeEditorTask(ctx.session.user.id, input.taskId);
       } catch {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to complete task" });
       }

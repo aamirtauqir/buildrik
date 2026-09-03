@@ -8,8 +8,9 @@
  * @license BSD-3-Clause
  */
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { STORAGE_KEYS } from "../../shared/constants/storageKeys";
+import { DASHBOARD_URL } from "../../shared/utils/runtimeEnv";
 import {
   DEFAULT_ONBOARDING_STEPS,
   ONBOARDING_SCHEMA_VERSION,
@@ -104,6 +105,42 @@ function loadInitialPhase(): OnboardingPhase {
   }
 }
 
+/**
+ * Mirror one completed step to `OnboardingState.editorTasks`.
+ *
+ * The column and the intent both pre-date this: the onboarding router carried
+ * a comment reserving it "for when an editor tour is actually built". The
+ * checklist was built and never used it.
+ */
+async function mirrorEditorTask(taskId: string): Promise<void> {
+  try {
+    const { createBuildrikApiClient } = await import("@/services/api-client");
+    const client = createBuildrikApiClient(DASHBOARD_URL);
+    await client.onboarding.completeEditorTask.mutate({ taskId: taskId as never });
+  } catch {
+    /* Offline, signed out, or the dashboard is unreachable. The local write
+       stands and the next completion re-sends the set. */
+  }
+}
+
+/**
+ * Server-recorded steps, or null when they cannot be read.
+ *
+ * Null is deliberately distinct from "none completed": a failed read must not
+ * erase ticks the user can see, so the caller falls back to local state rather
+ * than treating an unreachable server as an empty checklist.
+ */
+async function loadServerEditorTasks(): Promise<string[] | null> {
+  try {
+    const { createBuildrikApiClient } = await import("@/services/api-client");
+    const client = createBuildrikApiClient(DASHBOARD_URL);
+    const state = (await client.onboarding.getState.query()) as { editorTasks?: unknown } | null;
+    return Array.isArray(state?.editorTasks) ? (state.editorTasks as string[]) : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Steps loader ─────────────────────────────────────────────────────────────
 
 function loadInitialSteps(): OnboardingStep[] {
@@ -133,6 +170,7 @@ function loadInitialSteps(): OnboardingStep[] {
 export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
   const [phase, setPhase] = useState<OnboardingPhase>(loadInitialPhase);
   const [steps, setSteps] = useState<OnboardingStep[]>(loadInitialSteps);
+
   const [achievement, setAchievement] = useState<AchievementPromptState | null>(null);
   // Redesign P6 (calm first load): the checklist always starts as a minimized pill,
   // never the full bottom-right panel — one small, expandable nudge that doesn't
@@ -161,6 +199,32 @@ export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
 
      Every writer must keep the ref in step — see `replayAll`. */
   const stepsRef = useRef<OnboardingStep[]>(steps);
+
+  /* Hydrate from the server once, so a user who activated on another device or
+     in another browser is not told they have done nothing. The union is
+     deliberate: server ticks are ADDED to local ones and never subtracted, so
+     a stale or unreachable server cannot un-complete a step the user just did,
+     and a local-only completion still shows while its mirror is in flight. */
+  useEffect(() => {
+    let cancelled = false;
+    void loadServerEditorTasks().then((serverDone) => {
+      if (cancelled || !serverDone || serverDone.length === 0) return;
+      const merged = stepsRef.current.map((s) =>
+        s.completed || serverDone.includes(s.id) ? { ...s, completed: true } : s,
+      );
+      if (merged.every((s, i) => s.completed === stepsRef.current[i].completed)) return;
+      stepsRef.current = merged;
+      setSteps(merged);
+      try {
+        localStorage.setItem(STORAGE_KEYS.ONBOARDING_PROGRESS, JSON.stringify(merged));
+      } catch {
+        /* ignore */
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const achievementRef = useRef<AchievementPromptState | null>(null);
   achievementRef.current = achievement;
 
@@ -193,6 +257,18 @@ export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
       } catch {
         /* ignore */
       }
+
+      /* And to the server, because localStorage does not travel. This state is
+         the one artefact built to prove a user activated, and it did not
+         survive them changing device, browser or clearing a cache: a step
+         completed in one context read back as not-done in another, for the
+         same site and the same logged-in user.
+
+         Fire-and-forget on purpose. The local write above already succeeded, so
+         a failed mirror must not undo a completion the user can see ticked —
+         the next completion re-sends the whole set, and `completeEditorTask`
+         is a set-union, so a dropped call self-heals rather than corrupting. */
+      void mirrorEditorTask(stepId);
 
       // Advance activeStepId to the next incomplete step
       const completedIndex = next.findIndex((s) => s.id === stepId);

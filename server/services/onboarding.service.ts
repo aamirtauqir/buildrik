@@ -125,6 +125,28 @@ export async function completeDashboardTask(userId: string, taskId: string) {
   });
 }
 
+/**
+ * Record an editor-checklist step as done, server-side and per user.
+ *
+ * Mirrors `completeDashboardTask` deliberately rather than inventing a second
+ * shape: same set-union write, same idempotence, different column. It does NOT
+ * flip `completed`/`step` the way the dashboard one does — the editor
+ * checklist is a nudge, not the onboarding funnel, and finishing it should not
+ * silently mark the funnel complete.
+ */
+export async function completeEditorTask(userId: string, taskId: string) {
+  const state = await prisma.onboardingState.findUnique({ where: { userId } });
+  if (!state) throw new Error("ONBOARDING_NOT_FOUND");
+
+  const done = new Set(Array.isArray(state.editorTasks) ? (state.editorTasks as string[]) : []);
+  done.add(taskId);
+
+  return prisma.onboardingState.update({
+    where: { userId },
+    data: { editorTasks: [...done] },
+  });
+}
+
 export async function dismissOnboarding(userId: string) {
   return prisma.onboardingState.update({
     where: { userId },
