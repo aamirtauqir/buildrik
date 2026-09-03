@@ -27,7 +27,13 @@ export interface PageItem {
   isHome?: boolean;
   /** True when this page is the currently active/open page in the composer. */
   isActive?: boolean;
-  /** Page visibility/publication status. Defaults to "live". */
+  /** Page visibility/publication status. Defaults to **"draft"** when
+   *  `settings.visibility` is unset (usePages, CAN-013) — a page cannot be
+   *  live before the project is published. This said "live" and the code
+   *  has always said draft; the doc was the wrong half. It matters beyond
+   *  a badge: SeoTab gates its "changing this URL will break existing
+   *  links" warning on `status === "live"`, so on any page whose
+   *  visibility nobody set, that warning does not appear. */
   status?: PageStatus;
   seo?: PageSEO;
   /** Custom <head> HTML injected for this page (from settings.head) */
