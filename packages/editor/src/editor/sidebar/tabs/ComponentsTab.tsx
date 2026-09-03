@@ -8,7 +8,6 @@
  * @license BSD-3-Clause
  */
 
-import { Plus } from "lucide-react";
 import * as React from "react";
 import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, PanelFrame, SkeletonListItem, TextInput, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
@@ -62,19 +61,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     }
   }, [pendingToast, addToast, setPendingToast]);
 
-  // ── "+" header action button ──────────────────────────────────────────────────
-
-  const headerAddBtn = (
-    <Button
-     
-      onClick={() => onCreateNew?.()}
-      title="Create a new component"
-      aria-label="Create component"
-    >
-      <Plus size={14} />
-    </Button>
-  );
-
   // ── Guard: components not available ──────────────────────────────────────────
 
   if (!composer?.components?.isAvailable()) {
@@ -87,7 +73,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
-            actions={headerAddBtn}
           />
         )}
         <EmptyState icon={<ComponentIcon />}>
@@ -112,7 +97,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
-            actions={headerAddBtn}
           />
         )}
         {/* Board 781:4433 writes its own headline and body; the raw thrown
@@ -182,7 +166,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               onExpandToggle={onExpandToggle}
               onHelpClick={state.handleHelpClick}
               onClose={onClose}
-              actions={headerAddBtn}
             />
           </>
         )}
@@ -242,7 +225,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onExpandToggle={onExpandToggle}
             onHelpClick={state.handleHelpClick}
             onClose={onClose}
-            actions={headerAddBtn}
           />
         </>
       )}
