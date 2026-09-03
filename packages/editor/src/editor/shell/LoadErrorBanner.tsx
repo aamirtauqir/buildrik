@@ -51,6 +51,15 @@ const QUIET =
   "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry, onSignIn, onDismiss }) => {
+  /* Board 294:1992's "Reconnecting…" state, on the control rather than as the
+     board's full-screen takeover. Retry is a whole-page reload and said
+     nothing while it ran, so the banner read as a dead button. The takeover
+     itself is refused on purpose: the shipped load error is a banner over the
+     LIVE shell because the local changes underneath are still editable
+     (11-flows.md:34, walked 2026-08-24), and a full-screen reconnect hides the
+     work it is protecting — then offers a Cancel back to the shell it hid. */
+  const [reconnecting, setReconnecting] = React.useState(false);
+
   if (!kind) return null;
 
   const isAuth = kind === "auth";
@@ -71,7 +80,19 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
         {isMissing ? (
           <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>Go to dashboard</Button>
         ) : (
-          <Button color="light" size="xs" onClick={onRetry} className={ACTION}>Retry</Button>
+          <Button
+            color="light"
+            size="xs"
+            disabled={reconnecting}
+            aria-busy={reconnecting}
+            /* Button 9:102: a disabled control names the reason. Here the
+               reason is the label. */
+            title={reconnecting ? "Reaching the server — this usually takes a moment." : undefined}
+            onClick={() => { setReconnecting(true); onRetry(); }}
+            className={ACTION}
+          >
+            {reconnecting ? "Reconnecting…" : "Retry"}
+          </Button>
         )}
       </div>
     </div>
