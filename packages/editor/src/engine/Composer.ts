@@ -889,6 +889,16 @@ ${html}${interactionScript}
    * Mark project as modified
    */
   markDirty(): void {
+    /* Dev-only forensics. A freshly loaded, untouched project was measured
+       turning itself dirty and autosave then writing it — with a full-snapshot
+       save that drops omitted pages, an unrequested write is the data-loss
+       precondition, and the exit prompt is only its visible edge. Static
+       reading could not say WHICH path fires, so the first transition records
+       where it came from. Stripped from production by the DEV guard. */
+    if (import.meta.env?.DEV && !this.state.dirty && typeof window !== "undefined") {
+      const w = window as unknown as { __bkDirtyTrace?: string[] };
+      (w.__bkDirtyTrace ??= []).push(new Error("markDirty").stack ?? "no stack");
+    }
     // Once a project has unsaved changes we keep dirty=true,
     // but we still emit "project:changed" on every logical
     // modification so that HistoryManager and storage can
