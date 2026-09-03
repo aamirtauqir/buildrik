@@ -68,8 +68,7 @@ test.describe("exit guard — beforeunload", () => {
   });
 
   /**
-   * PRODUCT ASSERTION — currently `fixme`, and the reason matters more than
-   * the skip.
+   * PRODUCT ASSERTION — live since 2026-09-03, and the history is the point.
    *
    * A clean editor SHOULD raise no prompt: `StudioHeader.tsx:460-469` returns
    * early when `!isDirty && saveStatus !== "saving" && stranded === 0`. It
@@ -89,12 +88,22 @@ test.describe("exit guard — beforeunload", () => {
    * over a project that may not be fully loaded is the documented precondition
    * for the full-snapshot save dropping pages.
    *
-   * WHY `fixme` RATHER THAN A FLAKY ASSERTION. A gate that is red a third of
-   * the time gets ignored, then disabled, and takes the honest failures with
-   * it. The defect is recorded as A-EXITRACE with its measurements; this
-   * marker keeps the test written and visible so that whoever fixes the race
-   * has the assertion already waiting. Remove the `.fixme` at that point —
-   * it should then pass every run, and if it does not, the race is not fixed.
+   * THE CAUSE, once it was found: booting the editor CREATED A PAGE.
+   * `useComposerInit.ts:341` seeds a default page when a project has none, via
+   * `PageManager.createPage`, which emits `project:changed` — and the shell's
+   * handler treats any such emit as an edit and raises `isDirty` immediately,
+   * arming the save behind a 1000ms debounce. So a boot was indistinguishable
+   * from an edit, and closing inside that one-second window prompted. The
+   * `loadProject` branch had always cleared the flag after importing; the
+   * bootstrap branch never did, and now does (`:356`).
+   *
+   * It was held as `.fixme` until then rather than left red, because a gate
+   * that fails a third of the time gets disabled and takes the honest failures
+   * with it. It came off on measurement, not on assurance: nine loads, 0
+   * prompts, with the guard's own inputs recorded at fire time as
+   * `isDirty=false, saveStatus=idle, stranded=0` in all nine. Before the fix
+   * the same harness gave 2-3 prompts in 9. If this test ever goes red again,
+   * that number is the thing to reproduce first.
    *
    * A NOTE ON THE INSTRUMENT, because it bit me here: use `innerText`, never
    * `textContent`. textContent concatenates across element boundaries with no
@@ -103,7 +112,7 @@ test.describe("exit guard — beforeunload", () => {
    * PRODUCT failure — I briefly had this test red 3/3 and the cause was my
    * matcher, not the guard.
    */
-  test.fixme("a clean editor does not prompt on exit (A-EXITRACE: intermittent)", async ({ page }) => {
+  test("a clean editor does not prompt on exit", async ({ page }) => {
     const DEMO = "http://localhost:5050/";
     const up = await page.request.get(DEMO).then((r) => r.ok()).catch(() => false);
     test.skip(!up, "demo app not running on :5050 — start `npm run dev`. NOT MEASURED, not passed.");
