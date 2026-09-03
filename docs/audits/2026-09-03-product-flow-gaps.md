@@ -14,6 +14,50 @@ already: **a finished, tested surface with no way in.**
 
 ---
 
+## The answer, ranked
+
+Five journeys were driven end to end in the running product. **Every one of them
+completes.** The screens are not the problem, and neither is the Figma. What is
+missing is a class the per-screen process cannot see: **the product tells the user
+things that are not true, and loses their work while doing it.**
+
+Four of the five worst findings are the same defect wearing different clothes —
+**an interface that reports an outcome the system did not achieve.**
+
+| # | gap | journey | class |
+|---|---|---|---|
+| 1 | Save fails while **online**, toast says "Offline — not saved"; reload discards the edit while the topbar reads "Saved · just now" | Recovery | **DISHONEST → DATA LOSS** |
+| 2 | Client types their reasoning, clicks **Request changes**, round closes, note is **never sent** (zero rows) and there is no way back. Approve has a confirm; this path has none | Review | **SILENT DATA LOSS** |
+| 3 | Site is `status=DRAFT`, `publishedUrl=null`; the same panel shows both "Not published yet" and a green **LIVE · v1** | Publish | **DISHONEST** |
+| 4 | **Undo enables itself** after a bind and does nothing — binding never enters the history stack | CMS | **DEAD DOOR** |
+| 5 | Activation progress lives only in `localStorage`; another device or a cleared cache says the user has done nothing | Activation | **SILENT** |
+
+Then the discoverability tier: **Review has no door at all** until a round exists
+(rail icon absent, topbar pill null — ⌘K only), and the palette advertises **R**
+for it while the only `r` handler in the codebase opens the rulers overlay.
+**Unpublish** exists with real teardown and is reachable only from the dashboard.
+**Compare between versions** has no diff implementation anywhere in the codebase.
+The two publish doors disagree — the prominent one silently drops all three
+warnings the other shows.
+
+**What this says about the process, which is what was asked.** A per-screen
+conformance pass cannot find any of these. Every one of them is a *relationship*:
+between two controls (notes and Request-changes), between a label and the
+database (`isLive`), between an affordance and a capability (Undo), between two
+copies of one rule (offline detection, where the sibling of the fixed line still
+carries the bug the fixed line's own comment describes), or between one device and
+the next. Screens were being verified; the seams between them were not.
+
+**The strongest counter-evidence to the pessimism:** the mechanics underneath are
+sound. The load-failure guard genuinely prevents the documented site-deleting
+incident. Delete-and-undo fully restores. Session expiry is honest and
+distinguishes itself from offline. Review rounds transition correctly in the
+database and revoke old tokens. Binding drives real data live. This is not a
+product that needs rebuilding — it is one whose truth-telling and its seams were
+never on anyone's checklist.
+
+---
+
 ## Part 1 — Doors (structural, mechanically verified)
 
 ### 1a. Surfaces nothing mounts
@@ -264,7 +308,74 @@ headless — a harness coordinate problem, explicitly not a product finding);
 Approve's own terminal path this session (Request-changes was driven instead;
 APPROVED rows exist historically in the same dataset).
 
-### 3d. Publish / go-live — walked, with one severe defect
+### 3d. Failure / recovery — the guard held; the label lies in front of real loss
+
+| # | failure | reachable | honest | escapable | work preserved |
+|---|---|---|---|---|---|
+| 1 | Load fails | ✓ | ✓ | ✓ | ✓ |
+| 2 | **Save fails while online** | ✓ | **✗** | ✓ | **LOST on reload** |
+| 3 | Session expires mid-edit | ✓ | ✓ | ✓ | ✓ |
+| 4 | Network drops and returns | ✓ | ✓ | ✓ | ✓ (no auto-resave) |
+| 5 | Delete + undo | ✓ | ✓ | ✓ | ✓ full restore |
+| 6 | Close tab with unsaved work | ✓ | ✓ | ✓ | ✓ |
+
+**The good news is load-bearing and was verified live, not assumed:** the
+documented "one failed load plus one edit deletes the site's pages" incident is
+**guarded**. An aborted load raises a `role="alert"` banner — *"Couldn't load…
+You're seeing local changes for now"* — plus a second toast, *"Not saved — this
+site never loaded · Autosave is held back"*, and the `_loadedSites` guard in
+`BuildrikSyncProvider` genuinely blocks autosave for the duration. Retry recovers
+all 66 elements. Undo after a delete fully restores, through two independent doors.
+
+**WORST — a false label standing directly in front of reproducible data loss.**
+With the browser demonstrably **online** (`navigator.onLine === true`, measured at
+the moment) and `sites.saveProject` failing, the autosave toast says **"Offline —
+not saved"**. Reload, and the edit is gone while the topbar reads **"Saved · just
+now"** — no second warning.
+
+The cause is a duplicated rule where only one copy was fixed, and the code says so
+itself. `useSaveCallback.ts:150-155` carries a comment describing *this exact bug*
+— *"They were conflated, so a server that refused while the browser was online…
+produced the toast 'Offline — not saved'… Only navigator can answer 'offline'"* —
+and its manual-save path is correct. The **autosave** path,
+`useComposerInit.ts:508-510`, still reads:
+
+```
+const offline = (!navigator.onLine) || /network|fetch|offline|failed to fetch|connection/i.test(message);
+```
+
+Two paths, one rule, one of them patched. The manual retry names the same failure
+correctly — *"Couldn't reach the server — not saved"* — so the product contradicts
+itself about one event depending on which path reported it.
+
+**Why this ranks above the other honesty bugs:** it primes the user to dismiss the
+true warning. Someone told they are offline checks their wifi, sees it is fine,
+and learns the message is noise — immediately before the reload that discards
+their edit under a topbar claiming everything is saved.
+
+**No auto-recovery after reconnect.** Coming back online fires a "Back online"
+banner, but the topbar stays "Save failed — retry" and the unsent edit was still
+unsent six seconds later. The user must click.
+
+**Correction to Part 2, from this walk:** the Settings screens
+(Domains / Redirects / Forms / Headers / Localization / Webhooks) **do** have
+`loading` and `catch → setLoadError` branches in all six. So those states are
+**NOT DESIGNED**, not NOT BUILT — the code renders something and no board says
+what. The distinction is exactly the one this audit set out to make, and it lands
+on the side of "improvised", not "missing".
+
+**UNEQUAL DOOR, source-confirmed:** `DetachInstanceButton`
+(`ProInspector.tsx:440`, `useComponentsState.ts:432`) fires `detachInstance` on a
+single click with no confirm **and swallows failures silently** (`catch {}`, no
+toast), while the component-library delete for the same class of action routes
+through `ConfirmDialog` (`useComponentsState.ts:264-288`).
+
+*Not verified:* the deleted-site and page-level auth variants of `LoadErrorBanner`
+(would need a crafted NOT_FOUND envelope or a real deletion — deliberately
+avoided); whether the false-offline bug also fires on a transient blip rather than
+a permanent abort.
+
+### 3e. Publish / go-live — walked, with one severe defect
 
 Environment established first, because two known traps could have made the whole
 walk meaningless: **both** `VITE_FEATURE_PUBLISH` and `NEXT_PUBLIC_FEATURE_PUBLISH`
