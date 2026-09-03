@@ -33,6 +33,19 @@
  * (`useSaveState.ts:40`, the settings screens) is not reachable from the page
  * and is NOT asserted here. Two of three flags are covered.
  *
+ * A FOURTH INSTANCE, same day, and this one destroyed data. The same bootstrap
+ * seeding put the app's own startup on the UNDO stack: each `createPage` emits
+ * `project:changed` and the recorder turns it into a patch, so a freshly loaded
+ * editor had the footer Undo ENABLED with the user having done nothing. One
+ * Cmd+Z rewound past initialisation, and the Brand panel faithfully reloaded a
+ * state with no design tokens — all 39 colours replaced by "No colors yet."
+ * under a footer reading "Brand is up to date". It was filed as a Brand bug and
+ * was not one.
+ *
+ * So the invariant is wider than the dirty flags: a fresh boot must leave
+ * NOTHING to undo either. An enabled Undo on an untouched editor is the visible
+ * tell for this whole family, and it is asserted below.
+ *
  * @license BSD-3-Clause
  */
 import { test, expect } from "@playwright/test";
@@ -64,6 +77,9 @@ test.describe("boot leaves the project clean", () => {
     const prompted: number[] = [];
     const reasons: (ExitReason | null)[] = [];
     const engineDirty: number[] = [];
+    /* null = no Undo control found, which must fail loudly rather than pass as
+       "not enabled" — an absent instrument is not a clean result. */
+    const undoEnabled: (boolean | null)[] = [];
 
     for (let i = 0; i < LOADS; i++) {
       const ctx = await browser.newContext();
@@ -89,6 +105,26 @@ test.describe("boot leaves the project clean", () => {
          catches a `registerDefaults`-shaped regression. */
       engineDirty.push(
         await page.evaluate(() => (window as unknown as { __bkDirtyTrace?: unknown[] }).__bkDirtyTrace?.length ?? 0),
+      );
+
+      /* The recorder arms a setTimeout(0) that arms a 500ms coalesce timer, so
+         a seeding patch does not reach the stack for at least that long. The
+         first version of this read ran before it and reported "not enabled" on
+         a build that WAS broken — the negative test passed, which is the only
+         reason it was caught. Settle well past the window before reading. */
+      await page.waitForTimeout(2500);
+
+      /* The UNDO stack, read the way a user sees it. Asking the button rather
+         than the manager is deliberate: the defect was that the affordance and
+         the stack agreed, and both were wrong, so a green reading here means
+         nothing is offered to undo, whatever the internals say. */
+      undoEnabled.push(
+        await page.evaluate(() => {
+          const btn = [...document.querySelectorAll("button")].find((b) =>
+            /undo/i.test(b.getAttribute("aria-label") ?? b.title ?? ""),
+          );
+          return btn ? !(btn as HTMLButtonElement).disabled : null;
+        }),
       );
 
       /* The UI flag, read at the only moment it is exposed: the guard records
@@ -153,6 +189,24 @@ test.describe("boot leaves the project clean", () => {
       engineTouched,
       `Composer.markDirty fired during boot on ${engineTouched}/${LOADS} loads — the engine dirty flag ` +
         "is meant to mean a user edit. This is the registerDefaults shape.",
+    ).toBe(0);
+
+    /* The instrument first, again: if no Undo control was found the readings
+       below are vacuous, and "no button" must not read as "not enabled". */
+    const missing = undoEnabled.filter((v) => v === null).length;
+    expect(
+      missing,
+      `No Undo control found on ${missing}/${LOADS} loads — this assertion cannot see anything. ` +
+        "Fix the selector before trusting a pass.",
+    ).toBe(0);
+
+    const undoOffered = undoEnabled.filter((v) => v === true).length;
+    expect(
+      undoOffered,
+      `Undo was ENABLED on an untouched editor on ${undoOffered}/${LOADS} loads. Boot put its own ` +
+        "startup on the history stack, so the first Cmd+Z rewinds past initialisation — that is how " +
+        "all 39 Brand colour tokens were replaced by \"No colors yet.\" under a footer reading " +
+        "\"Brand is up to date\". Seeding must end with flushPending() then clear().",
     ).toBe(0);
   });
 });
