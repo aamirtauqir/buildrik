@@ -26,7 +26,7 @@ import {
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
-import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
@@ -442,7 +442,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
          edit — `project:changed` also fires on `page:activated`, i.e. merely
          looking at another page. Recording which one arrived, and when, is the
          only way to tell a real edit from a boot-sequence emit. */
-      if (import.meta.env?.DEV && typeof window !== "undefined") {
+      if (IS_DEV_BUILD && typeof window !== "undefined") {
         const w = window as unknown as { __bkDirtySource?: unknown[] };
         (w.__bkDirtySource ??= []).push({
           at: Math.round(performance.now()),

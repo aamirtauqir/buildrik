@@ -40,7 +40,7 @@ import { formatRelativeTime } from "../../shared/utils/relativeTime";
 import { EVENTS } from "../../shared/constants";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
-import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { CommandPalette } from "./modals/CommandPalette";
@@ -466,7 +466,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
          clean untouched load was measured prompting 1 run in 3. Recording the
          values AT FIRE TIME says which reason it was, rather than inferring it
          from the pill afterwards. */
-      if (import.meta.env?.DEV && typeof window !== "undefined") {
+      if (IS_DEV_BUILD && typeof window !== "undefined") {
         const w = window as unknown as { __bkExitReason?: unknown[] };
         (w.__bkExitReason ??= []).push({ isDirty, saveStatus, stranded, at: Date.now() });
       }

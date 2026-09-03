@@ -336,6 +336,8 @@ export const EVENTS = {
   UI_ONBOARDING_REPLAY: "ui:onboarding-replay",
 
   UI_BROWSE_TEMPLATES: "ui:browse-templates",
+  /** Rail switches to a named tab. Six emitters, no constant until now. */
+  UI_SWITCH_TAB: "ui:switch-tab",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",

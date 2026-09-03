@@ -7,6 +7,7 @@
  */
 
 import * as React from "react";
+import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import type { DeviceType } from "../../../shared/types";
 import { migrateLegacyPanelState } from "./panelStateMigration";
 
@@ -435,7 +436,7 @@ export function useStudioState(): UseStudioStateReturn {
      guard and topbar pill both read THIS one, so a recorder on the engine flag
      can run forever without seeing what raises the exit prompt. */
   const markDirty = React.useCallback(() => {
-    if (import.meta.env?.DEV && typeof window !== "undefined") {
+    if (IS_DEV_BUILD && typeof window !== "undefined") {
       const w = window as unknown as { __bkUiDirtyTrace?: string[] };
       (w.__bkUiDirtyTrace ??= []).push(new Error("uiMarkDirty").stack ?? "no stack");
     }

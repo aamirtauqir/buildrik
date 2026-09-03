@@ -7,6 +7,7 @@
  */
 
 import { emailService } from "../services/EmailService";
+import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { MEDIA_EVENTS } from "../shared/constants/media";
 import { EVENTS, THRESHOLDS } from "../shared/constants";
 import type {
@@ -897,7 +898,7 @@ ${html}${interactionScript}
        precondition, and the exit prompt is only its visible edge. Static
        reading could not say WHICH path fires, so the first transition records
        where it came from. Stripped from production by the DEV guard. */
-    if (import.meta.env?.DEV && !this.state.dirty && typeof window !== "undefined") {
+    if (IS_DEV_BUILD && !this.state.dirty && typeof window !== "undefined") {
       const w = window as unknown as { __bkDirtyTrace?: string[] };
       (w.__bkDirtyTrace ??= []).push(new Error("markDirty").stack ?? "no stack");
     }

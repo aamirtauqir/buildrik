@@ -62,22 +62,32 @@ export const RailCoach: React.FC<RailCoachProps> = ({ onDismiss }) => {
       <div
         role="note"
         aria-label="Rail introduction"
-        className="tw:fixed tw:z-[var(--bk-z-popover)] tw:w-[264px] tw:rounded-lg tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-elevated)] tw:p-4 tw:shadow-[var(--bk-shadow-overlay)]"
+        /* Board 65:208 is a dark bubble at 240, radius 6, 12px padding — not a
+           light card. It sits over the canvas, and an elevated-surface card on an
+           elevated surface had nothing to separate it from what it points at. */
+        className="tw:fixed tw:z-[var(--bk-z-popover)] tw:flex tw:flex-col tw:gap-1.5 tw:w-60 tw:rounded-md tw:bg-[var(--bk-ink)] tw:p-3 tw:shadow-[var(--bk-shadow-overlay)]"
         style={{ top: pos.top, left: pos.left }}
       >
         {/* Arrow toward the rail */}
         <div
           aria-hidden="true"
-          className="tw:absolute tw:top-4 tw:-left-[5px] tw:h-2.5 tw:w-2.5 tw:rotate-45 tw:border-b tw:border-l tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-elevated)]"
+          className="tw:absolute tw:top-4 tw:-left-[5px] tw:h-2.5 tw:w-2.5 tw:rotate-45 tw:bg-[var(--bk-ink)]"
         />
-        <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+        <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-bg-card)]">
           Everything you build lives behind these six.
         </p>
-        <p className="tw:mt-1 tw:mb-3 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+        {/* The board draws one body line; this second one explains what the six
+            actually are, which is the whole point of a coach mark. Kept. */}
+        <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-bg-card)]">
           Insert sections, manage layers and pages, add media and content, and
           set your brand — all from this rail.
         </p>
-        <Button size="xs" onClick={dismiss}>
+        <Button
+          size="xs"
+          variant="link"
+          className="tw:h-auto tw:min-h-6 tw:self-start tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-bg-card)]"
+          onClick={dismiss}
+        >
           Got it
         </Button>
       </div>
