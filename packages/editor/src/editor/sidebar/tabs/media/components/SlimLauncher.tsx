@@ -181,7 +181,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
         <TextField
           type="text"
-          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
+          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
           placeholder="Search"
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}

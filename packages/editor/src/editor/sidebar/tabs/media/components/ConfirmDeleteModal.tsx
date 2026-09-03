@@ -80,7 +80,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
               Type <strong>DELETE</strong> to confirm:
             </p>
             <TextField
-              className="tw:h-8 tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[13px]"
+              className="tw:h-[var(--bk-size-row)] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px]"
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
               placeholder="DELETE"
