@@ -6298,12 +6298,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P0. Site with status=DRAFT and publishedUrl=null shows both 'Not published yet' and a green LIVE v1 banner in the same panel on the same load. usePublishSnapshot.ts:184 is `latest ? { ..., isLive: true } : null` - existence of any COMPLETED job means live. PublishHistory.tsx:268 is `const isLive = i === 0` - newest row live by position. Neither consults site.status or publishedUrl. Same class: the 'Since last deploy' list reads the in-memory undo stack, not server truth."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P0. Site with status=DRAFT and publishedUrl=null shows both 'Not published yet' and a green LIVE v1 banner in the same panel on the same load. usePublishSnapshot.ts:184 is `latest ? { ..., isLive: true } : null` - existence of any COMPLETED job means live. PublishHistory.tsx:268 is `const isLive = i === 0` - newest row live by position. Neither consults site.status or publishedUrl. Same class: the 'Since last deploy' list reads the in-memory undo stack, not server truth. | RECONCILED 2026-09-03 (TA): publishedUrl now consulted; verified live by me (LIVE absent on a DRAFT site)."
     },
     {
       "id": "F-UNDO-BINDING",
@@ -6358,12 +6358,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. Sidebar CTA opens a 2-step wizard showing all pre-publish warnings; the prominent topbar Publish button opens PublishConfirmModal, which silently drops all three (SEO, domain, favicon). A user who only uses the obvious button never learns they exist."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. Sidebar CTA opens a 2-step wizard showing all pre-publish warnings; the prominent topbar Publish button opens PublishConfirmModal, which silently drops all three (SEO, domain, favicon). A user who only uses the obvious button never learns they exist. | RECONCILED 2026-09-03 (TA): topbar fast path now shows the same warnings as the wizard."
     },
     {
       "id": "F-COMPARE-NO-DIFF",
@@ -6403,12 +6403,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. InsertLoadingSkeleton (board 775:4053) and InsertLoadError (board 781:4154) are built and unit-tested, and BuildTab has NO loading or error branch at all - its only failure response is a toast (BuildTab.tsx:86). PagesLoadingSkeleton is built and never mounted, though PagesTab does wire loadError (:232,:259) - so the gap is per-STATE, not per-panel, which is why a panel-level audit called Pages covered. Found by a scan of 466 components; the count moved 88->42->63->10 across four passes and the first three were wrong."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. InsertLoadingSkeleton (board 775:4053) and InsertLoadError (board 781:4154) are built and unit-tested, and BuildTab has NO loading or error branch at all - its only failure response is a toast (BuildTab.tsx:86). PagesLoadingSkeleton is built and never mounted, though PagesTab does wire loadError (:232,:259) - so the gap is per-STATE, not per-panel, which is why a panel-level audit called Pages covered. Found by a scan of 466 components; the count moved 88->42->63->10 across four passes and the first three were wrong. | RECONCILED 2026-09-03: Pages half FIXED (PagesLoadingSkeleton mounted in PageList.tsx, verified live by me with a delayed load). Insert half closed as a NON-FINDING on a checked premise, not an assumption: the block catalog is static, the only async source is component hydration, GroupSection renders NOTHING for an empty array so there is no invitation to accept and nothing hydration can discard. The Pages block earned its mount because its wrong-empty invited a creation importProject then destroyed; this one does not."
     },
     {
       "id": "F-DETACH-UNEQUAL",
@@ -6448,12 +6448,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. useFolders.ts stores folders at `pg-folders-v1-${composerId ?? 'default'}` and its own docstring says folders are a 'UI organisational concept, NOT stored in the engine'. Live check: Composer has no `.id` property at all, so composerId is ALWAYS null and the key is ALWAYS pg-folders-v1-default — shared across every site opened in that browser, not merely per-device. Folders render identically to real page rows ('Drag pages here'), so they are visually indistinguishable from real structure while being invisible on another device, gone if storage clears, and absent from the published site."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. useFolders.ts stores folders at `pg-folders-v1-${composerId ?? 'default'}` and its own docstring says folders are a 'UI organisational concept, NOT stored in the engine'. Live check: Composer has no `.id` property at all, so composerId is ALWAYS null and the key is ALWAYS pg-folders-v1-default — shared across every site opened in that browser, not merely per-device. Folders render identically to real page rows ('Drag pages here'), so they are visually indistinguishable from real structure while being invisible on another device, gone if storage clears, and absent from the published site. | RECONCILED 2026-09-03 (TA): key is site-scoped; useFolders.test.ts asserts pg-folders-v1-site-a."
     },
     {
       "id": "F-SLUG-NO-REDIRECT",
@@ -6493,12 +6493,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. The Layers 'Search layers' field matches only the element TYPE keyword — 'Container' 26 hits, 'Grid' 4, 'button' 8 — and never the element's visible text. Searching 'Click' returns ZERO while 8 result rows literally render 'Click Me, button element'; searching a component's own name 'Walk Probe Button' returns zero. The UI proves it has the text right there and still says 'Nothing matches'. This is the only in-panel way to relocate a placed element, and it fails on anything a user would naturally type."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. The Layers 'Search layers' field matches only the element TYPE keyword — 'Container' 26 hits, 'Grid' 4, 'button' 8 — and never the element's visible text. Searching 'Click' returns ZERO while 8 result rows literally render 'Click Me, button element'; searching a component's own name 'Walk Probe Button' returns zero. The UI proves it has the text right there and still says 'Nothing matches'. This is the only in-panel way to relocate a placed element, and it fails on anything a user would naturally type. | RECONCILED 2026-09-03 (TA): one getDisplayName rule, inline copy deleted so it cannot drift again."
     },
     {
       "id": "B-SLUG-WARN-CONDITION",
@@ -6508,12 +6508,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "open",
+      "status": "decided",
       "authority": "founder",
       "kind": "decision",
       "owner": "founder",
       "recipe": null,
-      "evidence": "Raised 2026-09-03 by editor-ed, who deliberately did NOT change the condition on their own judgement, and I agree it is a decision rather than a fix. Today the warning fires only when page.status === 'live', where status is `settings.visibility ?? \"draft\"` — a per-page field that defaults to off and that nobody sets unless they open the Advanced tab. So it never fires on a normal page. The honest condition is 'this page's URL is currently reachable', which is a fact about the SITE being published, not about a per-page field. Two costs to weigh: SeoTab has no publish context today, so wiring that is a real change; and the cheap alternative — warn whenever the field is unset — would fire on brand-new sites where 'will break existing links' is simply false, which trains users to ignore it. Related and separate: slugHistory is collected and read by nothing, so a redirect could be built on it later (F-SLUG-NO-REDIRECT)."
+      "evidence": "Raised 2026-09-03 by editor-ed, who deliberately did NOT change the condition on their own judgement, and I agree it is a decision rather than a fix. Today the warning fires only when page.status === 'live', where status is `settings.visibility ?? \"draft\"` — a per-page field that defaults to off and that nobody sets unless they open the Advanced tab. So it never fires on a normal page. The honest condition is 'this page's URL is currently reachable', which is a fact about the SITE being published, not about a per-page field. Two costs to weigh: SeoTab has no publish context today, so wiring that is a real change; and the cheap alternative — warn whenever the field is unset — would fire on brand-new sites where 'will break existing links' is simply false, which trains users to ignore it. Related and separate: slugHistory is collected and read by nothing, so a redirect could be built on it later (F-SLUG-NO-REDIRECT). | Warn when the PAGE'S URL IS ACTUALLY REACHABLE, i.e. derive it from the site being published rather than from the per-page visibility field. DECIDED 2026-09-03. Today it is gated on page.status === 'live' where status is settings.visibility ?? 'draft' — a field nobody sets unless they open the Advanced tab, so the warning never fires on a normal page. The rejected cheap alternative (warn whenever the field is unset) would fire on brand-new sites where 'this will break existing links' is FALSE, which trains users to dismiss it — a warning that cries wolf is worse than none. SeoTab needs publish context wired for this; that is the real work and it is justified because the current gate makes the warning dead code. Pairs with F-SLUG-NO-REDIRECT: slugHistory is collected and read by nothing, so the redirect its comment promises can be built on data already being kept."
     },
     {
       "id": "F-BRAND-UNDO-DELETES",
@@ -6523,12 +6523,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. Reproduced twice, bit-identical. With a colour token mid-edit the canvas-footer Undo stays ENABLED; pressing it does not revert the value — it removes 'Action' from Tokens > Colours entirely, flips the banner to 'Brand is up to date' (a false all-clear over a token that no longer exists), and fires two toasts that contradict each other: 'Canvas undo/redo - your unsaved design edits were kept' beside 'Design tokens changed from another window. Your edits may conflict.' It does NOT survive reload — a fresh session shows #1A56DB — so this is session-local misinformation rather than disk data loss. Same shape as the CMS-binding Undo but worse: that one did nothing, this one does something destructive and then says everything is fine. The panel's own Save path is well built and gated (see F-BRAND-SAVE-GATE); the corruption happens only because Undo bypasses that gate."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. Reproduced twice, bit-identical. With a colour token mid-edit the canvas-footer Undo stays ENABLED; pressing it does not revert the value — it removes 'Action' from Tokens > Colours entirely, flips the banner to 'Brand is up to date' (a false all-clear over a token that no longer exists), and fires two toasts that contradict each other: 'Canvas undo/redo - your unsaved design edits were kept' beside 'Design tokens changed from another window. Your edits may conflict.' It does NOT survive reload — a fresh session shows #1A56DB — so this is session-local misinformation rather than disk data loss. Same shape as the CMS-binding Undo but worse: that one did nothing, this one does something destructive and then says everything is fine. The panel's own Save path is well built and gated (see F-BRAND-SAVE-GATE); the corruption happens only because Undo bypasses that gate. | RECONCILED 2026-09-03 (TA): boot no longer seeds the undo stack (flushPending+clear); verified live by me (Undo disabled at boot, 39 tokens survive Cmd+Z)."
     },
     {
       "id": "F-BRAND-DIRTY-SPLIT",
@@ -6553,12 +6553,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Unlinking a bound Fill swaps the 'color-action' chip for a bare hex with ZERO messaging — no banner, no badge, no 'Revert to token'. The only route back is reopening the swatch popover and re-picking the token by name. Compare the bar set by responsive overrides, which announce themselves with a sticky 'Overridden on Mobile - Base is 24px' banner, a dedicated Revert to base button and a dot on the pill. The mechanism to communicate an override exists in this product; the brand path does not use it."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Unlinking a bound Fill swaps the 'color-action' chip for a bare hex with ZERO messaging — no banner, no badge, no 'Revert to token'. The only route back is reopening the swatch popover and re-picking the token by name. Compare the bar set by responsive overrides, which announce themselves with a sticky 'Overridden on Mobile - Base is 24px' banner, a dedicated Revert to base button and a dot on the pill. The mechanism to communicate an override exists in this product; the brand path does not use it. | RECONCILED 2026-09-03 (TA): revert-to-token offer added, copied from the responsive-override pattern."
     },
     {
       "id": "F-BRAND-SAVE-GATE",
@@ -6598,12 +6598,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "open",
+      "status": "decided",
       "authority": "founder",
       "kind": "decision",
       "owner": "founder",
       "recipe": null,
-      "evidence": "Raised 2026-09-03. The mode is fully built and UNREACHABLE: drawerPinned defaults to true in LayoutShell, and the single production call site (StudioPanels) passes drawerOpen and drawerWidth and never passes drawerPinned — so `overlay: !drawerPinned` and the layout-shell--drawer-overlay class are dead in the running product. **Its tests hide this**: every test exercising the overlay passes drawerPinned={false} itself, which is the UpgradeModal pattern exactly — a test that supplies the trigger proves the branch works and never that the feature has a door. Neither session touched it: deleting a boarded mode is a product call, and the pin its board depends on was removed deliberately. Decision: restore the pin, or retire the overlay and its board."
+      "evidence": "Raised 2026-09-03. The mode is fully built and UNREACHABLE: drawerPinned defaults to true in LayoutShell, and the single production call site (StudioPanels) passes drawerOpen and drawerWidth and never passes drawerPinned — so `overlay: !drawerPinned` and the layout-shell--drawer-overlay class are dead in the running product. **Its tests hide this**: every test exercising the overlay passes drawerPinned={false} itself, which is the UpgradeModal pattern exactly — a test that supplies the trigger proves the branch works and never that the feature has a door. Neither session touched it: deleting a boarded mode is a product call, and the pin its board depends on was removed deliberately. Decision: restore the pin, or retire the overlay and its board. | RETIRE the overlay mode and its board. DECIDED 2026-09-03. The pin it depends on was removed deliberately, drawerPinned defaults true and the single production call site never passes it, so the mode has had no door for its whole life. Its tests each supply drawerPinned={false} themselves, which proves the branch works and never that the feature is reachable — so there is no evidence anyone has used it. Retiring reduces surface; if the pin returns later the mode can return with it. This is the cheaper direction to reverse: deleting dead code is recoverable from git, whereas keeping an unreachable mode keeps paying maintenance and keeps its board claiming a product state that does not exist."
     },
     {
       "id": "B-UNDO-CAPABILITY",
@@ -6613,12 +6613,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "open",
+      "status": "decided",
       "authority": "founder",
       "kind": "decision",
       "owner": "founder",
       "recipe": null,
-      "evidence": "Raised 2026-09-03 after THREE independent Undo defects in three features found by three separate journey walks. (1) CMS binding: Undo enables itself and does nothing — binding never enters the history stack. (2) Brand token: Undo enables itself and DELETES the token, then shows 'Brand is up to date'. (3) Pages during load: the page the panel invited you to create is discarded and Undo says 'Nothing to undo'. Against these, element delete + Undo restores fully through two independent doors, so the ENGINE's history stack is sound. editor-ed confirmed there is no document stating the intended contract; they looked. **And the brand case is not what it looks like from outside**: DesignSystemTab already has THREE hand-written guards — its history:undo handler keeps staged edits and raises the 'your unsaved design token edits were kept' toast, its PROJECT_LOADED handler is gated, and its cross-window SETTINGS_CHANGE handler raises the second toast rather than reloading. All three refuse to reload over unsaved work, and the token is deleted by none of them — the two contradictory toasts are two guards both firing and both declining to act. So this is not 'Brand forgot to join the history stack'; Brand defends itself three ways and something still reaches through. THAT IS THE ARGUMENT FOR THE DECISION: per-feature guards are the pattern that is failing. The question is whether the Undo affordance should be derived from capability — a feature that has not registered with history renders it disabled — rather than each feature hand-rolling its own defence."
+      "evidence": "Raised 2026-09-03 after THREE independent Undo defects in three features found by three separate journey walks. (1) CMS binding: Undo enables itself and does nothing — binding never enters the history stack. (2) Brand token: Undo enables itself and DELETES the token, then shows 'Brand is up to date'. (3) Pages during load: the page the panel invited you to create is discarded and Undo says 'Nothing to undo'. Against these, element delete + Undo restores fully through two independent doors, so the ENGINE's history stack is sound. editor-ed confirmed there is no document stating the intended contract; they looked. **And the brand case is not what it looks like from outside**: DesignSystemTab already has THREE hand-written guards — its history:undo handler keeps staged edits and raises the 'your unsaved design token edits were kept' toast, its PROJECT_LOADED handler is gated, and its cross-window SETTINGS_CHANGE handler raises the second toast rather than reloading. All three refuse to reload over unsaved work, and the token is deleted by none of them — the two contradictory toasts are two guards both firing and both declining to act. So this is not 'Brand forgot to join the history stack'; Brand defends itself three ways and something still reaches through. THAT IS THE ARGUMENT FOR THE DECISION: per-feature guards are the pattern that is failing. The question is whether the Undo affordance should be derived from capability — a feature that has not registered with history renders it disabled — rather than each feature hand-rolling its own defence. | YES — capability-derived. DECIDED 2026-09-03 on the founder's 'fix all of them'. The Undo affordance must reflect what can actually be undone: a feature that has not registered with history renders it DISABLED rather than enabled-and-inert. Rationale from the measurements: three features enabled it wrongly, and in two of those the control was not merely useless but actively misleading. Per-feature guards are the pattern that failed — DesignSystemTab had THREE hand-written guards and the destructive path still got through. Note the limit, recorded so nobody over-claims: this would NOT have caught the brand case, where the affordance reported a wrong stack accurately; that was fixed at the boot seeding instead."
     },
     {
       "id": "F-SAVE-LOSS-ON-RELOAD",
@@ -6658,12 +6658,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P2. ConfirmDeleteModal does warn — '1 file is currently used on the canvas. Deleting will break those elements.' — which is more honest than most of this audit's findings. But it is a COUNT only: it never names the element or the page, and there is no jump-to-usage from the modal. A user with one usage can guess; a user with nine cannot act on the warning they were given."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P2. ConfirmDeleteModal does warn — '1 file is currently used on the canvas. Deleting will break those elements.' — which is more honest than most of this audit's findings. But it is a COUNT only: it never names the element or the page, and there is no jump-to-usage from the modal. A user with one usage can guess; a user with nine cannot act on the warning they were given. | RECONCILED 2026-09-03 (TA): ConfirmDeleteModal now lists each in-use file with the pages it appears on."
     },
     {
       "id": "F-MEDIA-DRAWER-NO-PICKER",
@@ -6703,12 +6703,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "open",
+      "status": "decided",
       "authority": "founder",
       "kind": "decision",
       "owner": "founder",
       "recipe": null,
-      "evidence": "Raised 2026-09-03. Composer.exportProject() hardcodes `assets: []` (Composer.ts:608) and that is what HistoryManager snapshots, so the media library sits outside the undoable model while the canvas that references it sits inside. Deleting an asset is therefore unrecoverable AND leaves canvas elements with a dead src, while global Undo stays enabled pointing at whatever the user did before. Two viable designs, and neither session should pick alone. (A) PUT ASSETS IN THE SNAPSHOT — honest, makes Undo mean one thing, but every history entry and every autosave payload then carries the asset list, and a full-snapshot save is already this codebase's documented data-loss precondition; needs a payload-size answer FIRST. (B) GIVE THE LIBRARY ITS OWN RESTORE — soft delete with a time-limited 'Deleted - Undo' owned by MediaManager, smaller, and it stops the global Undo implying it can help. Unambiguous either way and being done regardless: a delete must not leave a canvas element pointing at a dead src."
+      "evidence": "Raised 2026-09-03. Composer.exportProject() hardcodes `assets: []` (Composer.ts:608) and that is what HistoryManager snapshots, so the media library sits outside the undoable model while the canvas that references it sits inside. Deleting an asset is therefore unrecoverable AND leaves canvas elements with a dead src, while global Undo stays enabled pointing at whatever the user did before. Two viable designs, and neither session should pick alone. (A) PUT ASSETS IN THE SNAPSHOT — honest, makes Undo mean one thing, but every history entry and every autosave payload then carries the asset list, and a full-snapshot save is already this codebase's documented data-loss precondition; needs a payload-size answer FIRST. (B) GIVE THE LIBRARY ITS OWN RESTORE — soft delete with a time-limited 'Deleted - Undo' owned by MediaManager, smaller, and it stops the global Undo implying it can help. Unambiguous either way and being done regardless: a delete must not leave a canvas element pointing at a dead src. | OPTION B — the media library gets its own time-limited restore, owned by MediaManager. DECIDED 2026-09-03. Assets do NOT join the snapshot. Rationale: exportProject already carries pages + styles, and putting the asset list into every history entry AND every autosave payload enlarges the exact full-snapshot save this codebase documents as its data-loss precondition — trading a recoverable delete for a riskier write is the wrong trade. Option B is smaller, keeps the global Undo honest (it stops implying it can help), and pairs with B-UNDO-CAPABILITY so the control is disabled rather than lying. UNCONDITIONAL, independent of this choice: a delete must not leave a canvas element pointing at a dead src, and element cleanup + asset restore must land as ONE story — restoring the element alone re-creates the dead src by another route."
     },
     {
       "id": "F-RECOVERY-COPY-CAUSE",
@@ -6718,12 +6718,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND 2026-09-03 (TA) while verifying F-SAVE-LOSS-ON-RELOAD, and filed because it is this audit's own thesis in miniature. The recovery offer reads: 'Recovered your work after an unexpected close - moments ago - 4 pages.' The user did not close anything. The measured event was a SAVE THAT FAILED while the browser was online, and the user was correctly told so at the time ('Save failed - retry'). So the reload now preserves the work — the important half — but renames the cause on the way, and 'unexpected close' invites the user to blame their browser rather than retry a save that is still failing. P3 severity, but the same class as the offline mislabel: an interface naming an event something it was not. Two causes reach this banner (a real unexpected close and a refused save) and the copy only covers one."
+      "evidence": "FOUND 2026-09-03 (TA) while verifying F-SAVE-LOSS-ON-RELOAD, and filed because it is this audit's own thesis in miniature. The recovery offer reads: 'Recovered your work after an unexpected close - moments ago - 4 pages.' The user did not close anything. The measured event was a SAVE THAT FAILED while the browser was online, and the user was correctly told so at the time ('Save failed - retry'). So the reload now preserves the work — the important half — but renames the cause on the way, and 'unexpected close' invites the user to blame their browser rather than retry a save that is still failing. P3 severity, but the same class as the offline mislabel: an interface naming an event something it was not. Two causes reach this banner (a real unexpected close and a refused save) and the copy only covers one. | RECONCILED 2026-09-03 (TA): RecoveryBanner no longer claims an unexpected close; the old copy survives only in a comment."
     },
     {
       "id": "F-DOC-SCOPE-CLAIMS",
