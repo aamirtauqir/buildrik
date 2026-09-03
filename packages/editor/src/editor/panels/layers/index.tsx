@@ -366,14 +366,16 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           onClose={() => onDisplaySettingsToggle?.()}
         />
       )}
-      {state.selectionHook.selectedIds.size === 1 && (
-        <LayerBreadcrumb
-          selectedId={[...state.selectionHook.selectedIds][0]}
-          layers={state.treeHook.layers}
-          customNames={state.actionsHook.customNames}
-          onSelect={state.selectionHook.selectLayer}
-        />
-      )}
+      {/* Always mounted, empty when nothing is selected. Mounting it ON selection
+          inserted a block above the tree and pushed every row below it down —
+          between the two halves of a double-click, which broke rename on any row
+          that was not already selected. */}
+      <LayerBreadcrumb
+        selectedId={state.selectionHook.selectedIds.size === 1 ? [...state.selectionHook.selectedIds][0] : null}
+        layers={state.treeHook.layers}
+        customNames={state.actionsHook.customNames}
+        onSelect={state.selectionHook.selectLayer}
+      />
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
       <div aria-live="polite" aria-atomic="true" className="bdc-sr-only">
         {state.search && matchCount > 0

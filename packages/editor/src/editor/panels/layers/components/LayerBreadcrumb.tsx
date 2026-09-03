@@ -9,7 +9,9 @@ import type { LayerItem } from "../types";
 import { Button } from "@/editor/chrome-ui";
 
 interface LayerBreadcrumbProps {
-  selectedId: string;
+  /** `null` when the selection is empty or multiple. The slot still renders, so
+   *  the tree below it never moves. */
+  selectedId: string | null;
   layers: LayerItem[];
   customNames: Map<string, string>;
   onSelect: (id: string, modifiers: { shift?: boolean; meta?: boolean }) => void;
@@ -21,9 +23,13 @@ export function LayerBreadcrumb({
   customNames,
   onSelect,
 }: LayerBreadcrumbProps) {
-  const ancestors = getAncestors(layers, selectedId);
-  const selectedNode = findById(layers, selectedId);
-  if (ancestors.length === 0) return null;
+  const ancestors = selectedId === null ? [] : getAncestors(layers, selectedId);
+  const selectedNode = selectedId === null ? undefined : findById(layers, selectedId);
+  /* Empty slot, not `return null`: a top-level row has no ancestors and used to
+     unmount the crumb, which is the same reflow by another route. */
+  if (selectedId === null || ancestors.length === 0) {
+    return <div className="bdc-layers-crumb" aria-hidden="true" />;
+  }
 
   return (
     <div className="bdc-layers-crumb" role="navigation" aria-label="Layer ancestry">
