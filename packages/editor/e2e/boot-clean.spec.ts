@@ -29,6 +29,22 @@
  * Eight loads bring that to (2/3)^8 ≈ 4%. A one-shot version of this test
  * would have passed over every one of the three defects above.
  *
+ * THE UNDO STACK IS PART OF THIS, added after a third instance.
+ * The same bootstrap seeding that raised the dirty flag also left the editor
+ * booting with a NON-EMPTY UNDO STACK: each seeded `createPage` emits
+ * `project:changed`, the recorder turns each into an undo patch, and the first
+ * Cmd+Z therefore rewinds past project initialisation. Measured consequence:
+ * on a freshly loaded editor, with no user action at all, one Cmd+Z on the
+ * Brand colour view wiped all 39 colour tokens and the panel read "No colors
+ * yet". `HistoryManager` already solves this for the server-load path — it
+ * wipes the stack and records one baseline, its comment noting the import
+ * phase's intermediate states are "NOT user-undoable steps" — and the
+ * bootstrap path never got the same treatment.
+ *
+ * So this gate asserts BOTH halves of "boot left nothing behind": no dirty
+ * flag, and nothing to undo. One assertion at boot catches the whole family,
+ * which is cheap next to an unrequested autosave write or a wiped token list.
+ *
  * WHAT IT CANNOT SEE, stated rather than implied: `useSaveState`'s own flag
  * (`useSaveState.ts:40`, the settings screens) is not reachable from the page
  * and is NOT asserted here. Two of three flags are covered.
@@ -62,7 +78,12 @@ test.describe("boot leaves the project clean", () => {
        reported it as `waitForSelector: Test ended`, which reads exactly like a
        product failure. A duration-shaped failure with no assertion text is a
        timeout until proven otherwise. */
-    test.setTimeout(LOADS * 15_000);
+    /* 25s per load, not 15. Eight boots is inherently slow, and at 15s this
+       died with `page.waitForTimeout: Test ended` on a machine running two
+       suites at once — which reads exactly like an assertion failure and is
+       not one. A duration-shaped failure with no assertion text is a starved
+       process until a solo re-run says otherwise. */
+    test.setTimeout(LOADS * 25_000);
 
     const up = await browser
       .newContext()
@@ -77,6 +98,7 @@ test.describe("boot leaves the project clean", () => {
     const prompted: number[] = [];
     const reasons: (ExitReason | null)[] = [];
     const engineDirty: number[] = [];
+    const undoDisabled: (boolean | null)[] = [];
     /* null = no Undo control found, which must fail loudly rather than pass as
        "not enabled" — an absent instrument is not a clean result. */
     const undoEnabled: (boolean | null)[] = [];
@@ -105,6 +127,18 @@ test.describe("boot leaves the project clean", () => {
          catches a `registerDefaults`-shaped regression. */
       engineDirty.push(
         await page.evaluate(() => (window as unknown as { __bkDirtyTrace?: unknown[] }).__bkDirtyTrace?.length ?? 0),
+      );
+
+      /* Read BEFORE any interaction — the whole point is that a bare boot
+         should leave nothing undoable. A missing button reports null and is
+         asserted separately, so a renamed control cannot quietly pass. */
+      undoDisabled.push(
+        await page.evaluate(() => {
+          const b = [...document.querySelectorAll("button")].find((n) =>
+            /undo/i.test(n.getAttribute("aria-label") ?? ""),
+          ) as HTMLButtonElement | undefined;
+          return b ? b.disabled || b.getAttribute("aria-disabled") === "true" : null;
+        }),
       );
 
       /* The recorder arms a setTimeout(0) that arms a 500ms coalesce timer, so
@@ -165,6 +199,14 @@ test.describe("boot leaves the project clean", () => {
        positive control in exit-guard.spec.ts. One run of mine came back
        prompted with an empty record because this listener lost the ordering
        race, and a silent pass there would have hidden a real prompt. */
+    const undoMissing = undoDisabled.filter((d) => d === null).length;
+    expect(
+      undoMissing,
+      `No control with an "Undo" aria-label was found on ${undoMissing}/${LOADS} loads, so the undo ` +
+        "assertion below measured nothing. If the control was renamed, update this selector — do not " +
+        "read a pass here as a clean boot.",
+    ).toBe(0);
+
     const unrecorded = reasons.filter((r) => r === null).length;
     expect(
       unrecorded,
@@ -183,6 +225,19 @@ test.describe("boot leaves the project clean", () => {
       expect(r!.stranded, `run ${i + 1}: boot left mirrors queued`).toBe(0);
       expect(r!.saveStatus, `run ${i + 1}: boot triggered a save`).not.toBe("saving");
     }
+
+    /* Nothing to undo. The footer Undo control is the observable proxy for
+       `canUndo()`, which is `length > 1` — correct logic that was being fed a
+       stack containing the app's own startup. A control that is ENABLED here
+       means boot left undoable work behind, whatever it happens to undo. */
+    const undoArmed = undoDisabled.filter((d) => d === false).length;
+    expect(
+      undoArmed,
+      `The Undo control was ENABLED after a bare boot on ${undoArmed}/${LOADS} loads. Boot seeding is ` +
+        "leaving patches on the undo stack, so the user's first Cmd+Z rewinds past project " +
+        "initialisation. This is the bootstrap half of the fix HistoryManager already applies to the " +
+        "server-load path.",
+    ).toBe(0);
 
     const engineTouched = engineDirty.filter((n) => n > 0).length;
     expect(

@@ -6268,12 +6268,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P0. Measured live 2026-09-03 with navigator.onLine===true at the moment of failure. Autosave toast says 'Offline - not saved'; reload discards the edit while the topbar reads 'Saved - just now', no second warning. One rule, two copies, one fixed: useSaveCallback.ts:150-155 is correct AND its own comment describes this exact bug being fixed; useComposerInit.ts:508-510 still ORs the regex with navigator.onLine. Manual retry names the same failure correctly, so the product contradicts itself about one event depending on which path reported it."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P0. Measured live 2026-09-03 with navigator.onLine===true at the moment of failure. Autosave toast says 'Offline - not saved'; reload discards the edit while the topbar reads 'Saved - just now', no second warning. One rule, two copies, one fixed: useSaveCallback.ts:150-155 is correct AND its own comment describes this exact bug being fixed; useComposerInit.ts:508-510 still ORs the regex with navigator.onLine. Manual retry names the same failure correctly, so the product contradicts itself about one event depending on which path reported it. | LABEL HALF FIXED by editor-ed and VERIFIED LIVE 2026-09-03 (TA): with navigator.onLine true and the save aborted, the topbar now reads 'Save failed - retry', not 'Offline'. Their note that the EXISTING TEST WAS ASSERTING THE DEFECT is the part to keep — it rejected with 'Failed to fetch' and expected the offline copy without ever setting navigator.onLine, and jsdom reports online, so that test WAS the online case. Third test today found pinning the bug it was written beside. The LOSS half is split out to F-SAVE-LOSS-ON-RELOAD, which reproduces."
     },
     {
       "id": "F-REVIEW-NOTE-LOSS",
@@ -6619,6 +6619,21 @@
       "owner": "founder",
       "recipe": null,
       "evidence": "Raised 2026-09-03 after THREE independent Undo defects in three features found by three separate journey walks. (1) CMS binding: Undo enables itself and does nothing — binding never enters the history stack. (2) Brand token: Undo enables itself and DELETES the token, then shows 'Brand is up to date'. (3) Pages during load: the page the panel invited you to create is discarded and Undo says 'Nothing to undo'. Against these, element delete + Undo restores fully through two independent doors, so the ENGINE's history stack is sound. editor-ed confirmed there is no document stating the intended contract; they looked. **And the brand case is not what it looks like from outside**: DesignSystemTab already has THREE hand-written guards — its history:undo handler keeps staged edits and raises the 'your unsaved design token edits were kept' toast, its PROJECT_LOADED handler is gated, and its cross-window SETTINGS_CHANGE handler raises the second toast rather than reloading. All three refuse to reload over unsaved work, and the token is deleted by none of them — the two contradictory toasts are two guards both firing and both declining to act. So this is not 'Brand forgot to join the history stack'; Brand defends itself three ways and something still reaches through. THAT IS THE ARGUMENT FOR THE DECISION: per-feature guards are the pattern that is failing. The question is whether the Undo affordance should be derived from capability — a feature that has not registered with history renders it disabled — rather than each feature hand-rolling its own defence."
+    },
+    {
+      "id": "F-SAVE-LOSS-ON-RELOAD",
+      "nodeId": null,
+      "name": "A failed save loses the edit on reload, and the topbar then says Saved",
+      "family": "Recovery",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "SPLIT from F-SAVE-OFFLINE-LIE and VERIFIED LIVE 2026-09-03 (TA) on scratchsmoke00000000000001, after editor-ed fixed the label half and said they could not explain this half from the code and were not claiming it. It reproduces. Method, with both controls satisfied so the run cannot be read the wrong way: navigator.onLine measured TRUE at edit time; the save request aborted through a route scoped to **/api/trpc/** (blocked count reported 1, so the interception demonstrably fired); and an EDIT-APPLIED GUARD — the run aborts and prints 'THIS RUN PROVES NOTHING' unless the computed value actually changed. First attempt hit exactly that guard and was discarded rather than reported. Confirmed sequence on H2 el-mt69adgn-1k5f49stcp5: font-size 24px -> 41px applied; save blocked; topbar reads 'Save failed - retry', which is HONEST and is the fixed label; then reload -> font-size is back to 24px, the edit is GONE, and the topbar reads 'Saved - just now'. So the user IS warned at the time, and the warning does not survive: nothing persists the unsaved work and after a reload the product asserts everything is saved over an edit it discarded. The honest state after a failed save is 'you have work that is not on the server', and a reload must not silently downgrade that to 'Saved'."
     }
   ]
 }
