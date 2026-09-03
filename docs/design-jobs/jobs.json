@@ -5823,9 +5823,9 @@
       "name": "Modal · Inspector · delete-confirm",
       "family": "Modal",
       "width": 720,
-      "status": "verify",
+      "status": "fix",
       "owner": null,
-      "evidence": "2026-09-03 drawn from the producer during the Figma-only arc and wired into the prototype (0 orphans, 100% reachable). Not yet verified against the running app.",
+      "evidence": "2026-09-03 drawn from the producer during the Figma-only arc and wired into the prototype (0 orphans, 100% reachable). Not yet verified against the running app. | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, 1440x900, element selected -> Element actions -> Delete. Board read from Figma in the same pass (node 1706:8458), so these are board-vs-live, not board-vs-opinion. HOLDS: panel width 720, corner radius 12, Close 32x32, scrim present rgba(17,24,39,0.4). FAILS: panel height 169 vs board 132 (+37), and the cause is the footer buttons — board Cancel 64x28 and Delete 103x28, live Cancel 80x40 and Delete Section 130x40. **Height 40 vs 28 is the known flowbite h-10 leak** (a `tw:h-8`-style same-property utility wins through twMerge; a different property such as min-h does not). Widths are content-driven here (board label 'Delete Button' vs live 'Delete Section') so only the HEIGHT is a contract. LIKELY SHARED across every modal footer, but measured in THIS modal only — the other 12 Modal rows stay at verify until each is driven. MEASUREMENT TRAP for the next reader: [role=dialog] is a 0x0 wrapper; the panel is its largest painting descendant. Measuring the wrapper reports a modal that does not exist.",
       "authority": "code"
     },
     {
