@@ -36,5 +36,37 @@
     "nonTextPairs": {},
     "skipped": 0,
     "compared": 8
+  },
+  "media-drawer": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 25
+  },
+  "media-bulk-bar": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 4
+  },
+  "media-card": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 6
+  },
+  "media-load-error": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 3
   }
 }

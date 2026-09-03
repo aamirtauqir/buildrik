@@ -309,9 +309,34 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
   // (or scoped by the recipe's contrastScope selector).
   const scope = document.querySelector(contrastScope ?? "body") ?? document.body;
   const ignoreSel = (ignore ?? []).join(",");
+
+  /**
+   * WCAG exempts INACTIVE controls from contrast minimums, and the gate did not.
+   *
+   * 1.4.3 excludes "text ... that is part of an inactive user interface
+   * component", and 1.4.11 carries the same exemption for non-text parts. A
+   * disabled control is deliberately drawn low-contrast BECAUSE it is
+   * unavailable; demanding 4.5:1 there asks the design to stop communicating
+   * the one thing that state exists to communicate.
+   *
+   * This was not theoretical. All four Media surfaces reported the same
+   * `4.39 < 4.5` failure — the folder-scope button's label — and it held every
+   * one of their baselines unseeded. The button paints
+   * `disabled:text-[var(--bk-ink-muted)]` on `disabled:bg-[var(--bk-bg-subtle)]`,
+   * and the `:disabled` pseudo-class outranks the plain `text-[var(--bk-ink)]`
+   * beside it, so the enabled colour never applied. The fixture has no folders,
+   * so the control is correctly disabled and correctly dimmed.
+   *
+   * NOT a blanket amnesty: only genuinely inactive controls are skipped, and
+   * `aria-disabled` counts because a control can be semantically disabled
+   * while staying focusable. Everything else is still measured.
+   */
+  const INACTIVE = ':disabled, [aria-disabled="true"], fieldset:disabled';
+  const isInactive = (el) => !!el.closest(INACTIVE);
   const pairs = [];
   for (const el of scope.querySelectorAll("*")) {
     if (ignoreSel && el.closest(ignoreSel)) continue;
+    if (isInactive(el)) continue;              // WCAG 1.4.3 exemption — see INACTIVE
     if (!paintsTextDirectly(el)) continue;
     const r = el.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) continue;
@@ -367,6 +392,7 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
     if (ignoreSel && svg.closest(ignoreSel)) continue;
     const control = svg.closest(INTERACTIVE);
     if (!control) continue;                       // decorative, not a control part
+    if (isInactive(control)) continue;            // WCAG 1.4.11 exemption — see INACTIVE
     if (control.textContent.trim().length > 0) continue;  // has a text label; icon is not the only affordance
     if (seenIcon.has(control)) continue;
     seenIcon.add(control);
