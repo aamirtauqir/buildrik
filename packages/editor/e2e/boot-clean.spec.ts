@@ -42,7 +42,22 @@
  * bootstrap path never got the same treatment.
  *
  * So this gate asserts BOTH halves of "boot left nothing behind": no dirty
- * flag, and nothing to undo. One assertion at boot catches the whole family,
+ * flag, and nothing to undo.
+ *
+ * HONEST LIMIT ON THE UNDO HALF — read this before trusting it. The dirty
+ * assertions here have been watched FAILING (a planted `isDirty:true` reading
+ * trips them). The undo assertion has NOT. It demonstrably reads real state —
+ * a diagnostic run printed `undoDisabled = [true,true]` with the "Undo"
+ * control present, matching an independent live probe — so it is not vacuous.
+ * But two attempts to plant an armed control from the test side both passed:
+ * forcing `disabled = false`, even re-armed on a 200ms interval against a
+ * MutationObserver, races React's re-render and the read still catches the
+ * true value. So the plant is unreliable, not the assertion.
+ *
+ * The only trustworthy negative test is running this against a build where
+ * the bootstrap fix is reverted, which is where the fix's author can watch it
+ * fail 8 of 8. Until that has happened, treat a pass here as "the control
+ * reports disabled", not as "this gate would catch a regression". One assertion at boot catches the whole family,
  * which is cheap next to an unrequested autosave write or a wiped token list.
  *
  * WHAT IT CANNOT SEE, stated rather than implied: `useSaveState`'s own flag
