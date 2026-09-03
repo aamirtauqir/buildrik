@@ -567,7 +567,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           ) : snapshot.lastDeploy ? (
             <div className={ROW}>
               <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
-                v{snapshot.lastDeploy.version} · live
+                v{snapshot.lastDeploy.version} · {snapshot.lastDeploy.isLive ? "live" : "not live"}
               </span>
               <span className={META}>{snapshot.lastDeploy.when}</span>
             </div>

@@ -69,6 +69,10 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
           { id: "e2", label: "Ancient edit", timestamp: before },
         ])}
         projectId="site_1"
+        /* A serving URL is what makes the last deploy live. Without it this
+           test asserted "v4 · live" over a site with nothing published — the
+           defect itself, pinned as the expectation. */
+        publishedUrl="https://bellacucina.com"
         onVercelPublish={vi.fn()}
       />,
     );
@@ -79,6 +83,19 @@ describe("PublishTab — board 641:2652, the idle panel", () => {
     expect(screen.queryByText("Ancient edit")).toBeNull();
     expect(screen.getByText("3 pages")).toBeTruthy();
     expect(screen.getByText("v4 · live")).toBeTruthy();
+  });
+
+  it("a finished deploy on a site that is not serving does not read as live", async () => {
+    /* The panel showed "never published" and a green live claim on the same
+       load, because any COMPLETED job was taken as proof of liveness. A job
+       that ran is not a site that is up — an unpublish leaves the job row in
+       place. With no serving URL the deploy is named, and called not live. */
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 1, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
+    expect(screen.queryByText("v1 · live")).toBeNull();
   });
 
   it("never-published reads as never published, not as an empty deploy", async () => {
@@ -211,7 +228,14 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
             { id: "j1", version: 2, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
           ]),
     );
-    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        publishedUrl="https://bellacucina.com"
+        onVercelPublish={vi.fn()}
+      />,
+    );
 
     await waitFor(() => expect(screen.getByText("Couldn't reach the deploy service.")).toBeTruthy());
     failing = false;

@@ -180,8 +180,19 @@ export function usePublishSnapshot(
     changes,
     changeCount: changes.length,
     pageCount,
+    /* `isLive` was hardcoded true whenever any COMPLETED job existed, which
+       is a different question from whether the site is serving. On a site
+       whose truth is DRAFT with no published URL, the panel said "never
+       published" and "live" on the same load, and the louder green half was
+       the wrong one. The published URL is the only fact about what is
+       serving; a finished job only says a deploy once ran. */
     lastDeploy: latest
-      ? { version: latest.version, when: deployStamp(latest.completedAt), rawAt: latest.completedAt, isLive: true }
+      ? {
+          version: latest.version,
+          when: deployStamp(latest.completedAt),
+          rawAt: latest.completedAt,
+          isLive: Boolean(publishedUrl),
+        }
       : null,
     loading,
     error,

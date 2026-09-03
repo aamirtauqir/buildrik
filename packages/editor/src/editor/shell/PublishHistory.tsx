@@ -134,12 +134,23 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
      costs the banner one clause, and must not turn the whole list into the
      load-error board. */
   const [liveDomain, setLiveDomain] = React.useState<string | null>(null);
+  /* null = the site state has not answered yet. Distinct from false, so
+     nothing renders a liveness claim in either direction while loading. */
+  const [isPublished, setIsPublished] = React.useState<boolean | null>(null);
 
   /* Board 184:24 names three versions: the target, the one live now, and the
      number the re-publish will take. The first comes from the row; these two
-     come from the list, where index 0 is live by construction. */
-  const liveVersion = rows[0]?.version;
-  const nextVersion = liveVersion !== undefined ? liveVersion + 1 : "…";
+     are derived here — and they answer DIFFERENT questions, which is why they
+     no longer share a name. The newest row gives the next version NUMBER,
+     true whether or not anything is serving. Whether a version is LIVE is a
+     fact about the site, and its only source is the published URL: a
+     COMPLETED job at index 0 survives an unpublish, so the old "index 0 is
+     live by construction" made this banner announce a draft site as up while
+     the panel two clicks away said it had never been published. Null until
+     the site state answers, so nothing claims liveness either way midflight. */
+  const latestVersion = rows[0]?.version;
+  const nextVersion = latestVersion !== undefined ? latestVersion + 1 : "…";
+  const liveVersion = isPublished ? latestVersion : undefined;
 
   const load = React.useCallback(async () => {
     setState("loading");
@@ -150,8 +161,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       setState("error");
     }
     try {
-      setLiveDomain(domainOf((await fetchSitePublishState(siteId)).publishedUrl));
+      const { publishedUrl } = await fetchSitePublishState(siteId);
+      setLiveDomain(domainOf(publishedUrl));
+      setIsPublished(Boolean(publishedUrl));
     } catch {
+      /* A failed read leaves liveness UNKNOWN. Setting false here would
+         assert "not published" on a network blip and take the banner off a
+         site that is up — the same lie as the old hardcoded true, pointing
+         the other way. */
       setLiveDomain(null);
     }
   }, [siteId]);
@@ -251,11 +268,15 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
 
           The "Published versions" header this replaced was a third label for
           a destination the tab strip and the sub-tab already name. */}
-      {rows[0] && (
+      {/* Hidden only when the site is KNOWN not to be serving. When the read
+          failed we still show the version and when it went out — both true of
+          the deploy itself — and drop the green LIVE claim, which is the one
+          part an unread site state cannot support. */}
+      {rows[0] && isPublished !== false && (
         <div className={LIVE_BANNER}>
           <div className={LIVE_TITLE}>
-            <span className={LIVE_DOT} aria-hidden="true" />
-            LIVE · v{rows[0].version}
+            {isPublished && <span className={LIVE_DOT} aria-hidden="true" />}
+            {isPublished ? "LIVE · " : ""}v{rows[0].version}
           </div>
           <div className={LIVE_META}>
             {liveDomain ? `${liveDomain} · ` : ""}
@@ -265,7 +286,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       )}
       {notice && <div className={NOTICE}>{notice}</div>}
       {rows.map((r, i) => {
-        const isLive = i === 0;
+        const isLive = i === 0 && Boolean(isPublished);
         // rolledBackFrom is a job id — map it to that version's number for the label.
         const fromVersion = r.rolledBackFrom
           ? rows.find((x) => x.id === r.rolledBackFrom)?.version

@@ -250,13 +250,29 @@ describe("board 949:4474 — the banner and the closing rule", () => {
     expect(await screen.findByText(/bellacucina\.vercel\.app · published/)).toBeInTheDocument();
   });
 
-  it("keeps the banner when the domain cannot be read", async () => {
-    // The domain is a second, best-effort read. Losing it costs one clause,
-    // never the whole list — that is board 781:4489's job, not this one's.
+  it("keeps the banner when the site state cannot be read, minus the live claim", async () => {
+    /* That read is best-effort and losing it costs one clause, never the
+       whole list — board 781:4489's job, not this one's. It now also carries
+       whether the site is serving, and an unread state cannot support a green
+       LIVE. So the version and its timestamp stay, both true of the deploy
+       itself, and only the claim goes. Asserting LIVE here would have made a
+       network blip vouch for a site nobody checked. */
     fetchSitePublishState.mockRejectedValueOnce(new Error("offline"));
     renderIt();
-    expect(await screen.findByText(/LIVE · v3/)).toBeInTheDocument();
+    expect(await screen.findByText(/^v3$/)).toBeInTheDocument();
+    expect(screen.queryByText(/LIVE · v3/)).not.toBeInTheDocument();
     expect(screen.getByText(/Version 3/i)).toBeInTheDocument();
+  });
+
+  it("hides the banner when the site is known not to be serving", async () => {
+    /* The defect this pins: a COMPLETED job at index 0 was read as proof of
+       liveness, so an unpublished site with deploy history announced itself
+       LIVE. Known-not-serving is different from unread, and only this one
+       takes the banner away. */
+    fetchSitePublishState.mockResolvedValueOnce({ publishedUrl: null });
+    renderIt();
+    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    expect(screen.queryByText(/LIVE/)).not.toBeInTheDocument();
   });
 
   it("states the rollback rule under the list", async () => {
