@@ -430,7 +430,17 @@ export function useStudioState(): UseStudioStateReturn {
   }, []);
 
   // Dirty state helpers
-  const markDirty = React.useCallback(() => setIsDirty(true), []);
+  /* Dev-only forensics, on the UI flag rather than the engine's. There are two
+     dirty flags — `Composer.state.dirty` and this one — and StudioHeader's exit
+     guard and topbar pill both read THIS one, so a recorder on the engine flag
+     can run forever without seeing what raises the exit prompt. */
+  const markDirty = React.useCallback(() => {
+    if (import.meta.env?.DEV && typeof window !== "undefined") {
+      const w = window as unknown as { __bkUiDirtyTrace?: string[] };
+      (w.__bkUiDirtyTrace ??= []).push(new Error("uiMarkDirty").stack ?? "no stack");
+    }
+    setIsDirty(true);
+  }, []);
   const markClean = React.useCallback(() => setIsDirty(false), []);
 
   return {

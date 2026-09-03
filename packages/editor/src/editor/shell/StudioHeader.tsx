@@ -460,6 +460,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     const onBefore = (e: BeforeUnloadEvent) => {
       if (bypassRef.current) return;
       const stranded = totalPendingMirrors();
+      /* Dev-only: this guard has three independent reasons to prompt, and a
+         clean untouched load was measured prompting 1 run in 3. Recording the
+         values AT FIRE TIME says which reason it was, rather than inferring it
+         from the pill afterwards. */
+      if (import.meta.env?.DEV && typeof window !== "undefined") {
+        const w = window as unknown as { __bkExitReason?: unknown[] };
+        (w.__bkExitReason ??= []).push({ isDirty, saveStatus, stranded, at: Date.now() });
+      }
       if (!isDirty && saveStatus !== "saving" && stranded === 0) return;
       e.preventDefault();
       e.returnValue = "";
