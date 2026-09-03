@@ -2769,7 +2769,7 @@
       "width": 360,
       "status": "fix",
       "owner": null,
-      "evidence": "2026-09-01 BLOCKED on producers: 8 of 10 row types never recorded (activity_logs 96% site.settings.updated). Fixed the surface that exists: actorName resolved + consecutive de-dup.",
+      "evidence": "2026-09-01 BLOCKED on producers: 8 of 10 row types never recorded (activity_logs 96% site.settings.updated). Fixed the surface that exists: actorName resolved + consecutive de-dup. | 2026-09-03 A8 CORRECTION: 13 distinct actions DO reach a writer (5 MEMBER_*, review.revoked, site.domain.connected/removed, site.rolled_back, site.settings.updated, site.share_link.created/revoked, site.unpublished). The '96% site.settings.updated' skew describes the DATASET, not the producers. Trimming the board to 2 rows would have removed eleven working producers. This is a fixture gap, not a missing feature.",
       "authority": "board"
     },
     {
