@@ -19,7 +19,25 @@ wrong by 3, and only 3 of H9's 13 claims are genuine semantic duplication. The
 biggest of these was **A14, whose framing was wrong in a way that hid a
 production defect**: the token-usage tracker matched only the template
 placeholder syntax, so every token bound through the UI counted as unused, and
-deleting one skipped the replace-modal entirely. Open rows: **55 → 41.**
+deleting one skipped the replace-modal entirely. **Counted honestly, 2026-09-03 (this replaces every "55 → N" figure said earlier
+today, all of which were wrong).** One fixed rule — a row is CLOSED if it opens
+with ✅ or ❌, PARTIAL if ⚠️ or ⏸️, otherwise OPEN:
+
+| | rows |
+|---|---|
+| total | **94** |
+| closed ✅❌ | **48** |
+| partial ⚠️⏸️ | 9 — A2, A9, A13, B14, F4, F5, F7, H8, H9 |
+| open | 37 |
+| **not done** | **46** |
+
+The running "55 → 41 → 36 → 31" I quoted through the day was produced by a
+regex I kept editing between passes, against a starting set that itself grew as
+new rows were found (A-STOCK, A-EC1, A-EC2, A-PANELSUB, A-CONTRAST, A-WARN,
+F-VERSION, D-SG). Every one of those figures flattered the result. **48 of 94
+closed** is the number; the drift is recorded rather than quietly corrected,
+because a count produced by a method that changes is the same failure as F6's
+count-instead-of-a-set.
 
 A second pass took the P1 **harness** rows, which had been left as "tooling, not
 product" — wrongly, because a gate that lies is worse than no gate. **F6** was
