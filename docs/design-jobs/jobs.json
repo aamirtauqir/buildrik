@@ -6424,6 +6424,66 @@
       "owner": "editor-ed",
       "recipe": null,
       "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. DetachInstanceButton (ProInspector.tsx:440, useComponentsState.ts:432) fires detachInstance on a single click with no confirm AND swallows failures silently (catch {}, no toast), while the component-library door for the same class of destructive action routes through ConfirmDialog (useComponentsState.ts:264-288). UNEQUAL DOOR."
+    },
+    {
+      "id": "F-PAGES-LOAD-LIE",
+      "nodeId": null,
+      "name": "Pages panel claims 'No pages yet' during a real load, then loses the page you create",
+      "family": "Pages",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. Confirmed live by delaying sites.get/pages.list via route interception. `composer` becomes non-null and pages sync BEFORE loadProject(siteId) resolves, so the panel renders 'No pages yet - Create blank page' over a real 4-page project still in flight. Clicking that CTA creates a page; when the real project lands, importProject silently replaces the whole page set, the created page vanishes, and Cmd+Z reports 'Nothing to undo'. UNRECOVERABLE. PagesLoadingSkeleton is built but mounted only in e2e/probe/probe.tsx, never in the product. A disconnected safety net exists — the toast 'Not saved - this site never loaded - Autosave is held back' does fire — but the Pages panel has no idea and keeps inviting page creation. Two controls that do not know about each other, the same shape as the offline mislabel."
+    },
+    {
+      "id": "F-FOLDERS-SHARED-KEY",
+      "nodeId": null,
+      "name": "Page folders are localStorage-only under a key shared by every site",
+      "family": "Pages",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. useFolders.ts stores folders at `pg-folders-v1-${composerId ?? 'default'}` and its own docstring says folders are a 'UI organisational concept, NOT stored in the engine'. Live check: Composer has no `.id` property at all, so composerId is ALWAYS null and the key is ALWAYS pg-folders-v1-default — shared across every site opened in that browser, not merely per-device. Folders render identically to real page rows ('Drag pages here'), so they are visually indistinguishable from real structure while being invisible on another device, gone if storage clears, and absent from the published site."
+    },
+    {
+      "id": "F-SLUG-NO-REDIRECT",
+      "nodeId": null,
+      "name": "Changing a slug breaks the old URL with no warning and no redirect",
+      "family": "Pages",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Slug edit autosaves and the SEO preview updates live, with zero warning anywhere in the SEO or Advanced tabs that the old URL now 404s. PageManager.updatePage appends to page.slugHistory with the comment 'append-only log of prior slugs for 90-day redirect export' — and a grep across src/engine/export finds NOTHING that ever reads slugHistory. The redirect the code's own comment promises does not exist."
+    },
+    {
+      "id": "F-NO-STRUCTURE-VIEW",
+      "nodeId": null,
+      "name": "No whole-site structure view exists",
+      "family": "Pages",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P2. The only site-wide view is 'Listings', a flat SEO-score table (Page / Title / Desc / Score). No hierarchy, no navigation graph, no sitemap. A user cannot see how their pages relate."
     }
   ]
 }
