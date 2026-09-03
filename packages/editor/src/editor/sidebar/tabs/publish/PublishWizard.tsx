@@ -146,9 +146,10 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
     /* Board 833:4518 gives the modal a stepper where a title bar would be —
        so the primitives, not <Modal>, whose title is a plain string. */
     <ModalRoot open={open} onOpenChange={(next) => !next && onClose()}>
-      {/* Boards 833:4518 / 914:4507 are 520 wide; "form" (560) is the closest
-            size in the shared scale and the one other wizards use. */}
-      <ModalContent size="form" srTitle="Publish" className="tw:px-0 tw:py-0">
+      {/* Boards 833:4518 / 914:4507 are both 520 wide, which `md` now is. This
+          read "form (560) is the closest size in the shared scale" until the
+          520 was added to ModalParts for board 1172:4840. */}
+      <ModalContent size="md" srTitle="Publish" className="tw:px-0 tw:py-0">
         <div className="tw:border-b tw:border-[var(--bk-border)] tw:px-6 tw:py-4">{stepper}</div>
       {step === "review" ? (
         <>
