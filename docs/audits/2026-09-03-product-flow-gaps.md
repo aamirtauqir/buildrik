@@ -131,7 +131,66 @@ between a finding and a guess.
 
 ## Part 3 — Journeys (five walks in the running app)
 
-*In progress. Activation, Content/CMS, Publish/go-live, Review sign-off, and
-Failure/Recovery are being driven end-to-end against the server-backed fixture.
-Results append here; each step is recorded as WORKS / BROKEN / NOT MEASURED, and
-"not measured" is never counted as a pass.*
+*Activation, Content/CMS, Publish/go-live, Review sign-off and Failure/Recovery
+are driven end-to-end against the server-backed fixture. Each step is WORKS /
+BROKEN / NOT MEASURED, and "not measured" is never counted as a pass.*
+
+### 3a. Publish / go-live — walked, with one severe defect
+
+Environment established first, because two known traps could have made the whole
+walk meaningless: **both** `VITE_FEATURE_PUBLISH` and `NEXT_PUBLIC_FEATURE_PUBLISH`
+are set, so Publish reaches real users here and not only the `:5050` demo; and
+`PUBLISH_ALLOW_SIMULATION` is unset, so nothing in this walk is the fake-deploy
+path. The workspace has a live Vercel integration, so no final "Publish now" or
+"Roll back" confirm was ever clicked — a real deploy was out of bounds.
+
+| # | step | verdict |
+|---|---|---|
+| 1 | Pre-publish checks | **WORKS** — 6 checks, working "Fix ›" links, correctly non-blocking |
+| 2 | Publish entry | **WORKS, inconsistent** — see SILENT below |
+| 3 | Progress / feedback | **NOT MEASURED** — needs a real deploy; source shows determinate bar, named step, elapsed timer, per-step failure log |
+| 4 | Live URL | **WORKS** — links out when published, honest "Not published yet" when not |
+| 5 | History door | **WORKS** — and three prior no-door bugs are confirmed **fixed** |
+| 6 | Compare two publishes | **CLOSED DOOR** |
+| 7 | Rollback | **WORKS** as a flow; correctly disabled at one version |
+| 8 | Unpublish | **MISSING DOOR from the editor** |
+
+**WORST — DISHONEST: the product tells the user their site is live when it is
+not.** On a site whose DB truth is `status=DRAFT`, `publishedUrl=null`, the *same
+panel on the same load* says all of:
+
+- `ENVIRONMENT → Production: "Not published yet"` — correct
+- `LAST DEPLOY: "v1 · live"` — false
+- Publish History: green **`LIVE · v1 · published 1w ago`** banner, `Version 1 [Live]` — false
+- Topbar Publish tooltip: `"Not live yet."` — correct
+
+Root cause, verified in source rather than taken on report:
+`usePublishSnapshot.ts:184` reads `latest ? { …, isLive: true } : null` — the mere
+existence of a COMPLETED job means "live", with no reference to `site.status` or
+`publishedUrl`. `PublishHistory.tsx:268` is `const isLive = i === 0`: the newest
+row is live purely by position. **The louder signal — green dot, the word LIVE —
+is the wrong one.** A user cannot tell whether their site is up.
+
+Same root class: the "Since last deploy" change list reads the **in-memory**
+`composer.history` undo stack, not server truth, so a fresh load of a dirty site
+reports "0 changes / Nothing has changed" while `hasUnpublishedChanges`
+(server-computed, and used correctly by the topbar) says the opposite.
+
+**SILENT** — there are two publish doors and they disagree. The sidebar CTA opens
+a 2-step wizard showing all warnings; the prominent topbar button opens
+`PublishConfirmModal`, which silently drops all three (SEO, domain, favicon). A
+user who only ever uses the obvious button never learns they exist.
+
+**CLOSED DOOR** — "Compare v{n-1}→v{n}" only fires `ui:switch-tab: history`.
+No version-content diff exists anywhere in the codebase. A user can see *when*
+two versions shipped and never *what changed*.
+
+**MISSING DOOR** — `unpublishSite()` is fully implemented, with real Vercel
+teardown, and is exposed only in the dashboard site header. To take a site down
+you must leave the editor.
+
+*Harness honesty:* both sites named as having completed publishes are
+**soft-deleted** (`deletedAt` 2026-07-18) and throw `NOT_FOUND` on load — DB drift
+since the brief, not a product bug. A substitute with one real COMPLETED publish
+was used instead, and the substitution is recorded rather than the result being
+quietly reported as if the original had been walked.
