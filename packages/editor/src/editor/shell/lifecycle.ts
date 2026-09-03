@@ -33,6 +33,15 @@ export interface LifecycleInput {
   /** The review round's position, from `reviews.status`. */
   reviewState: ReviewPillState;
   /**
+   * Who is reviewing, from `reviews.status`. Boards 307:2193 and 307:2203 name
+   * the reviewer in every sentence they write about the round — "Sara asked for
+   * changes", not "your client asked for changes" — and the shell had the name
+   * (it is already on the approved pill and in the resend toast) while these
+   * lines said "your client". Optional, and `null` when the server did not send
+   * one: `whoever()` falls back rather than writing a sentence with a hole.
+   */
+  reviewerName?: string | null;
+  /**
    * Is the agency review layer on for this workspace? **`null` = we have not
    * been told yet**, which is not the same as "off": guessing "off" offers
    * Publish on a workspace that requires approval, and guessing "on" offers a
@@ -77,6 +86,16 @@ export interface NextMove {
    * five places that show counts.
    */
   hint: string;
+}
+
+/** The reviewer by name where we have one. Two forms because English needs
+ *  both: `Sara` / `your client` as a subject, `Sara's` / `your client's` as a
+ *  possessive. */
+function whoever(i: LifecycleInput): { subject: string; object: string; possessive: string } {
+  const n = i.reviewerName?.trim();
+  return n
+    ? { subject: n, object: n, possessive: `${n}'s` }
+    : { subject: "Your client", object: "your client", possessive: "your client's" };
 }
 
 /** Why publish is refused here, or null. Ordered: a workspace that cannot
@@ -186,14 +205,22 @@ export function deriveLifecycleState(i: LifecycleInput): NextMove | null {
               : null,
           hint: "This workspace publishes after a client approves.",
         };
-      case "pending":
-        return publishMove(i, "Sent — waiting on your client.", "Waiting on your client's approval");
-      case "opened-not-acted":
+      case "pending": {
+        const who = whoever(i);
         return publishMove(
           i,
-          "Your client has opened the review.",
-          "Waiting on your client's approval",
+          `Sent to ${who.object} — waiting on approval.`,
+          `Waiting on ${who.possessive} approval`,
         );
+      }
+      case "opened-not-acted": {
+        const who = whoever(i);
+        return publishMove(
+          i,
+          `${who.subject} has opened the review.`,
+          `Waiting on ${who.possessive} approval`,
+        );
+      }
       case "changes-requested":
         return {
           kind: "open-feedback",
@@ -202,7 +229,7 @@ export function deriveLifecycleState(i: LifecycleInput): NextMove | null {
              viewer may do it. Offline is the one thing that stops it — the
              thread is a fetch. */
           blockedReason: i.offline ? "Can't load feedback while offline" : null,
-          hint: "Your client asked for changes.",
+          hint: `${whoever(i).subject} asked for changes.`,
         };
       case "approved":
         return publishMove(i, "Approved — ready to go live.");

@@ -8,6 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { Element } from "../../../engine/elements/Element";
+import { SNAP_THRESHOLD } from "../../../engine/canvas/constants";
 
 interface SiblingRect {
   id: string;
@@ -27,10 +28,13 @@ export interface SnapResult {
   snapLines: SnapLine[];
 }
 
+/* Board 815:4608 names the snap threshold, and the editor held two of them:
+   this hook declared its own `= 5` under a comment that said 4, while the
+   sibling drag hook imported the engine's. One threshold, one home — the
+   engine's, because that is the one a drag already obeys. The VALUE stays 5:
+   the board's 4 is a drawing, the threshold is behaviour and behaviour follows
+   the code contract. */
 export function useCanvasSnapping(composer: Composer | null) {
-  // Configurable threshold (4px at 100% zoom)
-  const SNAP_THRESHOLD = 5;
-
   const calculateSnapping = React.useCallback(
     (
       id: string,

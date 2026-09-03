@@ -37,4 +37,32 @@ describe("PreviewOverlay", () => {
     fireEvent.keyDown(window, { key: "Escape" });
     expect(onDone).toHaveBeenCalledTimes(1);
   });
+
+  /* Board 807:8663. The row was recorded unbuildable on "PreviewOverlay has no
+     device frame"; DeviceFramePreview has existed all along and the overlay
+     simply did not use it. Asserted through the frame's own geometry — the
+     screen div carries the device width — rather than through a class name,
+     because a class can be present while the frame renders nothing. */
+  const frame = () => screen.getByTitle("Site preview") as HTMLIFrameElement;
+
+  it("a narrow device puts the page inside the device frame, and desktop does not", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} />);
+    expect(frame().parentElement?.style.width).toBe("");
+
+    fireEvent.click(screen.getByRole("button", { name: /^Mobile/ }));
+    expect(frame().parentElement?.style.width).toBe("375px");
+
+    fireEvent.click(screen.getByRole("button", { name: /^Tablet/ }));
+    expect(frame().parentElement?.style.width).toBe("768px");
+
+    fireEvent.click(screen.getByRole("button", { name: /^Desktop/ }));
+    expect(frame().parentElement?.style.width).toBe("");
+  });
+
+  it("the device row is reachable while the overlay covers the canvas", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} />);
+    // The editor's own device control is under the overlay, so the preview has
+    // to carry one or the responsive check cannot be done here at all.
+    expect(screen.getByRole("group", { name: "Breakpoint" })).toBeInTheDocument();
+  });
 });

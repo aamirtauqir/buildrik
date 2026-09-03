@@ -81,13 +81,19 @@ function PinDot({
         top: top - PIN_SIZE / 2,
         width: PIN_SIZE,
         height: PIN_SIZE,
-        borderRadius: "var(--bk-radius-full) var(--bk-radius-full) var(--bk-radius-full) var(--bk-radius-sm)",
+        /* Board 200:201-206 draws the pin as a plain circle with an 11
+           REGULAR numeral. It shipped as a map-pin teardrop (one squared
+           corner) with a 700 numeral, which reads as a badge rather than as a
+           place on the page. The 2 white ring is NOT on the board and stays:
+           the board's pins sit on a white mock, these sit on the customer's
+           page, and a blue disc on a blue hero is invisible. */
+        borderRadius: "var(--bk-radius-full)",
         background: ghost ? "var(--bk-accent-tint)" : "var(--bk-accent)",
         color: ghost ? "var(--bk-accent)" : "var(--bk-bg-card)",
         border: "2px solid var(--bk-bg-card)",
         boxShadow: "var(--bk-shadow-drag)",
         fontSize: 11,
-        fontWeight: 700,
+        fontWeight: 400,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

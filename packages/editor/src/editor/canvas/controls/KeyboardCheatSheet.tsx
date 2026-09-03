@@ -163,9 +163,15 @@ const ShortcutRow: React.FC<{ keys: string[]; description: string }> = ({ keys, 
  * Main Keyboard Cheat Sheet component
  */
 export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose }) => {
-  /* Board 815:4518 opens with a search field. Six groups of chords is more
-     than anyone scans for one of them. Matches the description OR the keys,
-     so "cmd" and "duplicate" both find ⌘D. */
+  /* A search field, because six groups of chords is more than anyone scans
+     for one of them. Matches the description OR the keys, so "cmd" and
+     "duplicate" both find ⌘D.
+
+     This cited board 815:4518, which belongs to the SHELL panel
+     (`panels/KeyboardShortcutsPanel.tsx`) — the board draws "Save ⌘S",
+     app-wide chords this surface does not own. `helpChords.test.ts` settled
+     that on 2026-09-02 and this citation was the copy it missed. The canvas
+     cheat sheet has no board of its own. */
   const [query, setQuery] = React.useState("");
   const groups = React.useMemo(() => {
     const q = query.trim().toLowerCase();

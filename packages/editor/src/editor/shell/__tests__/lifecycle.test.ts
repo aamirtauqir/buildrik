@@ -206,3 +206,34 @@ describe("deriveLifecycleState — off the happy path", () => {
     expect(move?.blockedReason).toBe("Waiting on your client's approval");
   });
 });
+
+/* Boards 307:2193 and 307:2203 write every sentence about the round with the
+   reviewer's name in it. The shell already had the name — the approved pill and
+   the resend toast both print it — while these lines said "your client". */
+describe("deriveLifecycleState — the reviewer has a name", () => {
+  const named = (over: Partial<LifecycleInput>) =>
+    deriveLifecycleState(at({ reviewerName: "Sara", ...over }));
+
+  it("names the reviewer in the hint and in the refusal", () => {
+    expect(named({ reviewState: "pending" })?.hint).toBe("Sent to Sara — waiting on approval.");
+    expect(named({ reviewState: "pending" })?.blockedReason).toBe("Waiting on Sara's approval");
+    expect(named({ reviewState: "opened-not-acted" })?.hint).toBe("Sara has opened the review.");
+    expect(named({ reviewState: "changes-requested" })?.hint).toBe("Sara asked for changes.");
+  });
+
+  /* `null` is the server saying it has no name, and a sentence with a hole in
+     it ("Sent to  — waiting") is worse than the generic one. Whitespace counts
+     as no name for the same reason. */
+  it.each([[null], [undefined], ["   "]])("falls back to the generic line for %p", (reviewerName) => {
+    const move = deriveLifecycleState(at({ reviewState: "pending", reviewerName }));
+    expect(move?.hint).toBe("Sent to your client — waiting on approval.");
+    expect(move?.blockedReason).toBe("Waiting on your client's approval");
+  });
+
+  it("capitalises the subject when it stands first, and does not when it does not", () => {
+    expect(deriveLifecycleState(at({ reviewState: "changes-requested" }))?.hint).toBe(
+      "Your client asked for changes.",
+    );
+    expect(deriveLifecycleState(at({ reviewState: "pending" }))?.hint).toMatch(/to your client/);
+  });
+});
