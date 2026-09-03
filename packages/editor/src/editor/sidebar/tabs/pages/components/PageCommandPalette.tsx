@@ -1,10 +1,13 @@
 /**
  * PageCommandPalette — ⌘K jump-to-page, board 1171:4807.
  *
- * The board draws it as a 296w dropdown ANCHORED IN THE PANEL under the
- * header, not the screen-centred 560w modal on a scrim this used to be: the
- * palette navigates the list it is sitting on, so it stays on that surface.
- * Rows are name + the home ⌂ glyph, active row on accent-subtle. No status
+ * The board draws it as a 256-wide dropdown ANCHORED IN THE PANEL under the
+ * header, not the screen-centred 560-wide modal on a scrim this used to be:
+ * the palette navigates the list it is sitting on, so it stays on that
+ * surface. 256 is the drawer's 280 less a 12 gutter each side — the 296 this
+ * carried was the same arithmetic against the old 320 drawer, and only the
+ * `max-width` clamp in PagesTab.css kept it on screen after the drawer moved.
+ * Rows are name + the home ⌂ glyph, active row on --bk-accent-tint. No status
  * chips, no file icons, no shortcut footer — the board draws none of them,
  * and the list they duplicated is two rows away.
  *

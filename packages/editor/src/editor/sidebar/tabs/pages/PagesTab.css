@@ -509,7 +509,7 @@
   position: absolute;
   top: 59px;
   left: 12px;
-  width: 296px;
+  width: 256px;
   max-width: calc(100% - 24px);
   background: var(--bk-bg-card);
   border: 1px solid var(--bk-border);
@@ -542,7 +542,7 @@
 }
 .bd-pg-palette-item.active,
 .bd-pg-palette-item:hover {
-  background: var(--bk-accent-subtle);
+  background: var(--bk-accent-tint);
   color: var(--bk-accent-text);
 }
 .bd-pg-palette-item-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
