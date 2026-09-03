@@ -6724,6 +6724,36 @@
       "owner": "editor-ed",
       "recipe": null,
       "evidence": "FOUND 2026-09-03 (TA) while verifying F-SAVE-LOSS-ON-RELOAD, and filed because it is this audit's own thesis in miniature. The recovery offer reads: 'Recovered your work after an unexpected close - moments ago - 4 pages.' The user did not close anything. The measured event was a SAVE THAT FAILED while the browser was online, and the user was correctly told so at the time ('Save failed - retry'). So the reload now preserves the work — the important half — but renames the cause on the way, and 'unexpected close' invites the user to blame their browser rather than retry a save that is still failing. P3 severity, but the same class as the offline mislabel: an interface naming an event something it was not. Two causes reach this banner (a real unexpected close and a refused save) and the copy only covers one."
+    },
+    {
+      "id": "F-DOC-SCOPE-CLAIMS",
+      "nodeId": null,
+      "name": "Doc comments asserting scope are unchecked claims — three on one registry disagree",
+      "family": "Engine",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND 2026-09-03 by editor-ed while checking a suspected P0, and disproving it is the finding. Three doc comments on the SAME element registry assert different scopes: findByMediaSrc says it searches 'the active page', getAllElements says 'across all pages', useUsageMap says 'active page'. All three iterate the same map, so at least two are wrong. If findByMediaSrc's were right, the media in-use count would miss usages on every other page and a user would delete an asset believing nothing breaks — a real P0. It was settled by reading setActivePage: it sets an id and emits, and never clears or repopulates the registry (the only elements.clear() is a full project reset), so the registry accumulates every imported page and THE COUNT IS CORRECT. findByMediaSrc's comment is the wrong one. This is the same class as the PagesStateBlocks premise that let a data-loss defect ship: a comment asserting scope is a claim, it is load-bearing when someone reasons from it, and it rots silently. Fourth doc premise checked today rather than trusted; second found false."
+    },
+    {
+      "id": "F-FIXTURE-CASTS",
+      "nodeId": null,
+      "name": "A cast on a test fixture converts a type error into a runtime crash",
+      "family": "Engine",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND 2026-09-03 by editor-ed, two instances the same day. A board fixture closed with `as ConfirmDeletePayload`, so adding a required field COMPILED CLEAN and then threw at runtime in five tests. The other was `composer as { id?: string }`, which is what hid the shared-folder-key bug — the cast asserted a property the class does not have, so `composerId` was always null and every site shared one localStorage key. Both were in code that looked careful. The pattern: a cast on a fixture or a handle removes exactly the check that would have caught the change, and moves the failure from compile time to run time — or, in the folders case, to no failure at all and a silent wrong value. Worth a lint rule or a sweep; `as` on test fixtures is where it is cheapest to remove."
     }
   ]
 }
