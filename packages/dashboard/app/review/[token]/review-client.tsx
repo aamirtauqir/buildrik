@@ -138,7 +138,10 @@ export function ReviewClient({ token }: { token: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [draft, setDraft] = useState("");
-  const [asking, setAsking] = useState(false);
+  /* One confirm, two intents. Approve had a confirm and Request changes went
+     straight to the mutation — and Request changes is the terminal, no-way-back
+     one that carries the client's reasoning. */
+  const [asking, setAsking] = useState<"approve" | "changes" | null>(null);
 
   if (review.isLoading) {
     return (
@@ -285,19 +288,14 @@ export function ReviewClient({ token }: { token: string }) {
             change it.
           </p>
           <button
-            onClick={() =>
-              resolve.mutate(
-                { token, status: "CHANGES_REQUESTED" },
-                { onSuccess: () => utils.clientReview.get.invalidate() },
-              )
-            }
+            onClick={() => setAsking("changes")}
             disabled={resolve.isPending}
             className="h-9 rounded border border-[#D1D5DB] px-4 text-[13px] font-semibold text-[#111827] disabled:opacity-40"
           >
             Request changes
           </button>
           <button
-            onClick={() => setAsking(true)}
+            onClick={() => setAsking("approve")}
             disabled={resolve.isPending}
             className="h-9 rounded bg-[#1A56DB] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
           >
@@ -378,35 +376,86 @@ export function ReviewClient({ token }: { token: string }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,23,42,0.4)] p-6">
           <div className="w-full max-w-[440px] rounded-lg bg-white p-6">
             <h2 className="text-[16px] font-semibold text-[#111827]">
-              Approve {data.siteName}?
+              {asking === "approve"
+                ? `Approve ${data.siteName}?`
+                : `Request changes to ${data.siteName}?`}
             </h2>
             <p className="mt-2 text-[13px] leading-relaxed text-[#4B5563]">
-              This tells your designer the design is settled and they can put it
-              live. You are approving the version you have been looking at.
+              {asking === "approve"
+                ? "This tells your designer the design is settled and they can put it live. You are approving the version you have been looking at."
+                : draft.trim()
+                  ? "Your note below is sent with this, so your designer knows what to change. This closes the round and you cannot reopen it."
+                  : "Your designer will not be told what to change, because you have not written a note. This closes the round and you cannot reopen it."}
             </p>
+            {comment.error && asking === "changes" ? (
+              /* The note failed, so the round was NOT closed — saying nothing
+                 here would look like the button was simply dead. */
+              <p className="mt-3 text-[12px] text-[#E02424]">
+                Your note could not be sent, so nothing was submitted: {comment.error.message}
+              </p>
+            ) : null}
             <div className="mt-6 flex justify-end gap-3">
               <button
-                onClick={() => setAsking(false)}
+                onClick={() => setAsking(null)}
                 className="h-9 rounded border border-[#D1D5DB] px-4 text-[13px] font-semibold text-[#111827]"
               >
-                Not yet
+                {asking === "approve" ? "Not yet" : "Go back"}
               </button>
               <button
-                onClick={() =>
-                  resolve.mutate(
-                    { token, status: "APPROVED" },
+                onClick={() => {
+                  if (asking === "approve") {
+                    resolve.mutate(
+                      { token, status: "APPROVED" },
+                      {
+                        onSuccess: () => {
+                          setAsking(null);
+                          utils.clientReview.get.invalidate();
+                        },
+                      },
+                    );
+                    return;
+                  }
+                  /* The reason and the verdict were independent controls:
+                     typing did nothing until "Add note" was clicked, so typing
+                     and then clicking Request changes closed the round with the
+                     text discarded and no way back. On a sign-off product the
+                     reason IS the deliverable, so it is sent first and the
+                     round only closes if it lands. */
+                  const closeRound = () =>
+                    resolve.mutate(
+                      { token, status: "CHANGES_REQUESTED" },
+                      {
+                        onSuccess: () => {
+                          setAsking(null);
+                          utils.clientReview.get.invalidate();
+                        },
+                      },
+                    );
+                  const note = draft.trim();
+                  if (!note) return closeRound();
+                  comment.mutate(
+                    { token, body: note },
                     {
                       onSuccess: () => {
-                        setAsking(false);
-                        utils.clientReview.get.invalidate();
+                        setDraft("");
+                        void utils.clientReview.comments.invalidate({ token });
+                        closeRound();
                       },
                     },
-                  )
-                }
-                disabled={resolve.isPending}
+                  );
+                }}
+                disabled={resolve.isPending || comment.isPending}
                 className="h-9 rounded bg-[#1A56DB] px-4 text-[13px] font-semibold text-white disabled:opacity-40"
               >
-                {resolve.isPending ? "Approving…" : "Yes, approve"}
+                {asking === "approve"
+                  ? resolve.isPending
+                    ? "Approving…"
+                    : "Yes, approve"
+                  : comment.isPending
+                    ? "Sending your note…"
+                    : resolve.isPending
+                      ? "Submitting…"
+                      : "Send and request changes"}
               </button>
             </div>
           </div>
