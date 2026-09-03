@@ -1,10 +1,13 @@
 /**
- * useHistoryFeedback
- * Listens to history events (undo/redo) and triggers descriptive toasts
+ * useHistoryFeedback — the undo/redo toasts of board 814:7027.
  *
- * P1-8 Enhancement: Improved toast messages with clearer action descriptions
- * - Shows action verb + target (e.g., "Deleted Heading" instead of just "Delete")
- * - Uses consistent past tense for clarity
+ * Six variants: undo and redo of a delete, a text edit, a move and a style
+ * change, each carrying the reverse-action link; and the empty-stack toast,
+ * which carries none because there is nothing to reverse.
+ *
+ * The docblock here used to promise "action verb + target (e.g. 'Deleted
+ * Heading')". There is no target: the undo event carries a fixed label and
+ * nothing else. Past tense is real; the element's name is not.
  *
  * @license BSD-3-Clause
  */
@@ -14,38 +17,102 @@ import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
 
-/** Map of action labels to user-friendly descriptions */
+/**
+ * Board 814:7027 leads with the reason these toasts exist: "shows what was
+ * undone/redone so the user has confidence". Every variant it draws is a
+ * past-tense sentence about the thing that moved — "Deleted 'Button'",
+ * "Moved 'Section' to Column 2", "Fill changed on 'Hero'".
+ *
+ * This table is keyed on the labels `beginTransaction` actually passes. It
+ * used to be keyed on labels the engine has never recorded: 11 of its 17 keys
+ * (`context-delete`, `batch-style`, `text-edit`, `drag-drop`, `resize` …) match
+ * nothing, while 50 real ones matched nothing here and fell through to the
+ * kebab-to-Title-Case fallback. The most common undo in the editor — ⌘Z after
+ * the Delete command, whose label is `delete`, not `delete-element` — therefore
+ * read "Delete", the internal label with a capital letter, rather than the
+ * board's "Deleted …". Same for "Nudge", "Insert Block Drop", "Style Batch".
+ *
+ * The element's own name is NOT available here: HISTORY_UNDO carries only the
+ * label, and the labels are fixed strings, so `'Button'` in the board's copy
+ * has no producer. The verb and the object are what the code can honestly say.
+ */
 const ACTION_DESCRIPTIONS: Record<string, string> = {
-  // Element operations
-  "create-element": "Created element",
+  // Add / insert
+  "add element": "Added element",
+  "added block": "Added block",
+  "insert-block-drop": "Added block",
+  "insert-block-sidebar": "Added block",
+  "insert-component": "Added component",
+  "instantiate-component-drop": "Added component",
+  "insert-template-drop": "Added template",
+  "import-html-to-active-page": "Imported HTML",
+  "insert-html-to-element": "Inserted HTML",
+  "apply-interpreted-tree": "Applied generated layout",
+  "ai-edit": "Applied an AI edit",
+  // Remove / duplicate
+  delete: "Deleted element",
   "delete-element": "Deleted element",
+  "delete-layer": "Deleted layer",
+  "delete-layers": "Deleted layers",
+  cut: "Cut element",
+  duplicate: "Duplicated element",
   "duplicate-element": "Duplicated element",
-  "cut-element": "Cut element",
-  "move-element": "Moved element",
-  "move-layer": "Reordered layer",
-  "wrap-element": "Wrapped element",
-  // Style operations
-  "style-change": "Changed style",
-  "batch-style": "Changed styles",
-  "element-style-changed": "Changed element style",
-  // Content operations
-  "content-change": "Edited content",
-  "text-edit": "Edited text",
-  // Quick actions
-  "quick-add-block": "Added block",
-  "context-delete": "Deleted element",
-  // History labels from transactions
-  resize: "Resized element",
-  "drag-drop": "Moved element",
+  "duplicate-layer": "Duplicated layer",
+  "clone-element": "Duplicated element",
   paste: "Pasted element",
+  "paste-styles": "Pasted styles",
+  // Move / order
+  "move-element": "Moved element",
+  "multi-element-move": "Moved elements",
+  "keyboard-move": "Moved element",
+  "touch-move-element": "Moved element",
+  nudge: "Moved element",
+  "move-layer": "Reordered layer",
+  "keyboard-reorder": "Reordered layer",
+  reorder: "Reordered layer",
+  "reorder-section": "Reordered section",
+  "move-layer-top": "Brought layer to front",
+  "move-layer-bottom": "Sent layer to back",
+  // Group / arrange
+  "group-elements": "Grouped elements",
+  "group-layers": "Grouped layers",
+  "ungroup-elements": "Ungrouped elements",
+  "align-horizontal": "Aligned horizontally",
+  "align-vertical": "Aligned vertically",
+  distribute: "Distributed elements",
+  "resize-element": "Resized element",
+  // Style / content
+  "style-change": "Changed style",
+  "style-batch": "Changed styles",
+  "batch-multi-style": "Changed styles",
+  "auto-fix contrast": "Fixed contrast",
+  "set design token": "Changed a design token",
+  "inline edit": "Edited text",
+  "inline-edit": "Edited text",
+  "link-change": "Changed link",
+  "link-target-change": "Changed link target",
+  "animation-change": "Changed animation",
+  "interactions-change": "Changed interactions",
+  // Media / components
+  "replace media": "Replaced media",
+  "replace across canvas": "Replaced media across the page",
+  "replace across selected pages": "Replaced media across pages",
+  "instance-sync": "Synced component instances",
+  "variant-change": "Changed variant",
 };
 
-/** Labels that represent destructive operations where undo is especially useful */
+/**
+ * Destructive undos linger twice as long. This set had the same problem as the
+ * table above — `context-delete`, `cut-element` and `batch-style` are not
+ * labels this engine records, so the longer linger never once fired for the
+ * Delete key, which is the whole reason it exists.
+ */
 const DESTRUCTIVE_LABELS = new Set([
+  "delete",
   "delete-element",
-  "context-delete",
-  "cut-element",
-  "batch-style",
+  "delete-layer",
+  "delete-layers",
+  "cut",
 ]);
 
 export function useHistoryFeedback(
@@ -55,36 +122,23 @@ export function useHistoryFeedback(
   React.useEffect(() => {
     if (!composer) return;
 
-    /**
-     * Format a history label into a user-friendly message
-     * P1-8: Enhanced to provide clearer context about what was undone/redone
-     */
+    /** A history label, said the way board 814:7027 says it. */
     const formatLabel = (label?: string): string => {
       if (!label) return "last action";
 
-      // Check for known action descriptions first
-      const knownAction = ACTION_DESCRIPTIONS[label.toLowerCase()];
-      if (knownAction) return knownAction;
+      const known = ACTION_DESCRIPTIONS[label.toLowerCase()];
+      if (known) return known;
 
-      // Convert kebab-case to Title Case (e.g. "quick-add-block" -> "Quick Add Block")
-      const formatted = label
+      /* Already a sentence — a hand-written transaction label, or
+         HistoryManager's own "Restored to: <label>". Kebab-splitting those
+         gave "Restored To: Nudge". Leave them alone. */
+      if (label.includes(" ")) return label;
+
+      // Unmapped kebab-case, e.g. "some-new-op" -> "Some New Op".
+      return label
         .split("-")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
-
-      // Add context if it looks like an element type was included
-      // e.g., "Delete Heading" -> "Deleted heading"
-      if (formatted.startsWith("Delete ")) {
-        return `Deleted ${formatted.slice(7).toLowerCase()}`;
-      }
-      if (formatted.startsWith("Create ")) {
-        return `Created ${formatted.slice(7).toLowerCase()}`;
-      }
-      if (formatted.startsWith("Style ")) {
-        return `Styled ${formatted.slice(6).toLowerCase()}`;
-      }
-
-      return formatted;
     };
 
     /* Board 814:7027 puts the reverse-action link on EVERY undo/redo toast,
