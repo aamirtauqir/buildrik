@@ -6433,12 +6433,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. Confirmed live by delaying sites.get/pages.list via route interception. `composer` becomes non-null and pages sync BEFORE loadProject(siteId) resolves, so the panel renders 'No pages yet - Create blank page' over a real 4-page project still in flight. Clicking that CTA creates a page; when the real project lands, importProject silently replaces the whole page set, the created page vanishes, and Cmd+Z reports 'Nothing to undo'. UNRECOVERABLE. PagesLoadingSkeleton is built but mounted only in e2e/probe/probe.tsx, never in the product. A disconnected safety net exists — the toast 'Not saved - this site never loaded - Autosave is held back' does fire — but the Pages panel has no idea and keeps inviting page creation. Two controls that do not know about each other, the same shape as the offline mislabel."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. Confirmed live by delaying sites.get/pages.list via route interception. `composer` becomes non-null and pages sync BEFORE loadProject(siteId) resolves, so the panel renders 'No pages yet - Create blank page' over a real 4-page project still in flight. Clicking that CTA creates a page; when the real project lands, importProject silently replaces the whole page set, the created page vanishes, and Cmd+Z reports 'Nothing to undo'. UNRECOVERABLE. PagesLoadingSkeleton is built but mounted only in e2e/probe/probe.tsx, never in the product. A disconnected safety net exists — the toast 'Not saved - this site never loaded - Autosave is held back' does fire — but the Pages panel has no idea and keeps inviting page creation. Two controls that do not know about each other, the same shape as the offline mislabel. | FIXED by editor-ed and VERIFIED LIVE 2026-09-03 (TA) with the delayed-load repro they could not run. Delayed sites.get/pages.list by 7s through a route scoped to **/api/trpc/** (a pattern containing 'content' or 'assets' also matches Vite module URLs and stops the editor booting). Result at 0.7s / 2.2s / 4.0s into the delay: noPagesYet=false, createBlankCTA=false, 25 skeleton nodes rendered; after load the skeleton is gone and the real pages are there. POSITIVE CONTROL: the run reports delayed=2, so the interception demonstrably fired — a run reporting 0 would have proved nothing. The skeleton is mounted in PageList.tsx:23,124 and fed by PagesTab.tsx:265 `loading={p.loading}`; the flag is seeded from _loadedSites, the same registry the write boundary consults, so the panel that invites an edit cannot disagree with the save that refuses it."
     },
     {
       "id": "F-FOLDERS-SHARED-KEY",
@@ -6604,6 +6604,21 @@
       "owner": "founder",
       "recipe": null,
       "evidence": "Raised 2026-09-03. The mode is fully built and UNREACHABLE: drawerPinned defaults to true in LayoutShell, and the single production call site (StudioPanels) passes drawerOpen and drawerWidth and never passes drawerPinned — so `overlay: !drawerPinned` and the layout-shell--drawer-overlay class are dead in the running product. **Its tests hide this**: every test exercising the overlay passes drawerPinned={false} itself, which is the UpgradeModal pattern exactly — a test that supplies the trigger proves the branch works and never that the feature has a door. Neither session touched it: deleting a boarded mode is a product call, and the pin its board depends on was removed deliberately. Decision: restore the pin, or retire the overlay and its board."
+    },
+    {
+      "id": "B-UNDO-CAPABILITY",
+      "nodeId": null,
+      "name": "FOUNDER DECISION — should the Undo affordance be capability-derived?",
+      "family": "Shell",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "open",
+      "authority": "founder",
+      "kind": "decision",
+      "owner": "founder",
+      "recipe": null,
+      "evidence": "Raised 2026-09-03 after THREE independent Undo defects in three features found by three separate journey walks. (1) CMS binding: Undo enables itself and does nothing — binding never enters the history stack. (2) Brand token: Undo enables itself and DELETES the token, then shows 'Brand is up to date'. (3) Pages during load: the page the panel invited you to create is discarded and Undo says 'Nothing to undo'. Against these, element delete + Undo restores fully through two independent doors, so the ENGINE's history stack is sound. editor-ed confirmed there is no document stating the intended contract; they looked. **And the brand case is not what it looks like from outside**: DesignSystemTab already has THREE hand-written guards — its history:undo handler keeps staged edits and raises the 'your unsaved design token edits were kept' toast, its PROJECT_LOADED handler is gated, and its cross-window SETTINGS_CHANGE handler raises the second toast rather than reloading. All three refuse to reload over unsaved work, and the token is deleted by none of them — the two contradictory toasts are two guards both firing and both declining to act. So this is not 'Brand forgot to join the history stack'; Brand defends itself three ways and something still reaches through. THAT IS THE ARGUMENT FOR THE DECISION: per-feature guards are the pattern that is failing. The question is whether the Undo affordance should be derived from capability — a feature that has not registered with history renders it disabled — rather than each feature hand-rolling its own defence."
     }
   ]
 }
