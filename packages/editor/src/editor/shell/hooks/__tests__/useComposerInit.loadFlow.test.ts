@@ -46,6 +46,11 @@ const mockComposer = {
   history: {
     canUndo: vi.fn(() => false),
     canRedo: vi.fn(() => false),
+    /* The bootstrap path resets the undo baseline so seeding is not undoable.
+       Absent here, the call threw as an unhandled rejection and the suite
+       still reported 495 passed — a false green. */
+    flushPending: vi.fn(),
+    clear: vi.fn(),
   },
   versions: { setProjectId: vi.fn(() => Promise.resolve()) },
   components: { setProjectId: vi.fn(() => Promise.resolve()) },
@@ -289,6 +294,34 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     });
 
     expect(mockComposer.setProjectLoading).not.toHaveBeenCalled();
+  });
+
+  it("leaves nothing on the undo stack after seeding a bootstrap project", async () => {
+    /* Seeding emits project:changed per created page, and the recorder turns
+       each into an undo patch — so a freshly opened editor had canUndo() true
+       with the user having done nothing, and the footer Undo enabled. Pressing
+       it rewound past the seeding: the Brand panel reloaded a state with no
+       design tokens and showed "No colors yet." over all 39 colour tokens,
+       under a footer reading "Brand is up to date". Measured live 2026-09-03,
+       before and after.
+
+       flushPending must come first. clear() does not cancel the recorder's
+       armed timer chain, so the seeding patch lands after the clear and puts
+       the stack straight back to undoable — measured, the first attempt at
+       this fix changed nothing. */
+    vi.mocked(getSiteIdFromUrl).mockReturnValue(null);
+
+    renderHook(() => useComposerInit(makeParams()));
+    await act(async () => {
+      mockComposer.emit("composer:ready");
+      await flushMicrotasks();
+    });
+
+    expect(mockComposer.history.flushPending).toHaveBeenCalled();
+    expect(mockComposer.history.clear).toHaveBeenCalled();
+    const flushOrder = mockComposer.history.flushPending.mock.invocationCallOrder[0];
+    const clearOrder = mockComposer.history.clear.mock.invocationCallOrder[0];
+    expect(flushOrder).toBeLessThan(clearOrder);
   });
 });
 

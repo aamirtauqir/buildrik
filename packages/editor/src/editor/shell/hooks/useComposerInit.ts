@@ -354,6 +354,29 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
              `loadProject` branch already clears the flag after importing for
              exactly this reason; this branch never did. */
           setIsDirty(false);
+          /* The same seeding also lands on the UNDO stack, and that one is
+             destructive. `PROJECT_CHANGED` from each createPage is recorded as
+             a patch, so a freshly opened editor has `canUndo()` true with the
+             user having done nothing — measured 2026-09-03, the footer Undo is
+             enabled on load. Pressing it rewinds past the seeding to a state
+             with no design tokens: the Brand panel faithfully reloads that and
+             shows "No colors yet." over all 39 colour tokens, with the footer
+             reading "Brand is up to date".
+
+             HistoryManager already resets the stack to one baseline after a
+             server project loads, and its comment gives this exact reason —
+             intermediate import states are "NOT user-undoable steps". The
+             bootstrap path creates the same kind of transitional states and
+             never got the same treatment. `clear()` re-seeds a single baseline,
+             which is what makes `canUndo()` (length > 1) false.
+
+             `clear()` alone did not fix it, measured: the recorder arms a
+             setTimeout(0) that arms the coalesce timer, so the seeding patch
+             lands AFTER the clear and puts the stack straight back to two.
+             `flushPending()` cancels that whole chain and commits what is
+             owed, and the clear then wipes it — order matters. */
+          inst.history?.flushPending?.();
+          inst.history?.clear?.();
         });
     }
 
