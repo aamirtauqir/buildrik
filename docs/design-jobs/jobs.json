@@ -6458,7 +6458,7 @@
     {
       "id": "F-SLUG-NO-REDIRECT",
       "nodeId": null,
-      "name": "Changing a slug breaks the old URL with no warning and no redirect",
+      "name": "Slug-change warning exists but is gated on a field that defaults to off",
       "family": "Pages",
       "state": null,
       "width": null,
@@ -6468,7 +6468,7 @@
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Slug edit autosaves and the SEO preview updates live, with zero warning anywhere in the SEO or Advanced tabs that the old URL now 404s. PageManager.updatePage appends to page.slugHistory with the comment 'append-only log of prior slugs for 90-day redirect export' — and a grep across src/engine/export finds NOTHING that ever reads slugHistory. The redirect the code's own comment promises does not exist."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Slug edit autosaves and the SEO preview updates live, with zero warning anywhere in the SEO or Advanced tabs that the old URL now 404s. PageManager.updatePage appends to page.slugHistory with the comment 'append-only log of prior slugs for 90-day redirect export' — and a grep across src/engine/export finds NOTHING that ever reads slugHistory. The redirect the code's own comment promises does not exist. | CORRECTED 2026-09-03 — my row was WRONG as written and the real defect is worse. There IS a warning, and an honest one: 'Changing this URL will break existing links, bookmarks, and search engine results for this page. Consider setting up a redirect in your hosting settings after saving.' Nothing is silent by design. But it is gated on page.status === 'live', and status is `settings.visibility ?? \"draft\"`, which nobody sets unless they open the Advanced tab — so on a NORMAL page the warning NEVER FIRES. I observed the right symptom and named the wrong mechanism. What hid it: the type doc claimed the status defaults to 'live' while the code has always defaulted to 'draft', so anyone reading the type would conclude the warning fires by default; that comment is now corrected. The slugHistory half of this row STANDS unchanged — written by PageManager, carried to the server by the sync provider, read by nothing, under a comment promising a '90-day redirect export' that does not exist. Same shape as the UpgradeModal's '403 interceptor'. The data is being collected so building it later is possible, but nobody should read that line and believe redirects happen."
     },
     {
       "id": "F-NO-STRUCTURE-VIEW",
@@ -6499,6 +6499,21 @@
       "owner": "editor-ed",
       "recipe": null,
       "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. The Layers 'Search layers' field matches only the element TYPE keyword — 'Container' 26 hits, 'Grid' 4, 'button' 8 — and never the element's visible text. Searching 'Click' returns ZERO while 8 result rows literally render 'Click Me, button element'; searching a component's own name 'Walk Probe Button' returns zero. The UI proves it has the text right there and still says 'Nothing matches'. This is the only in-panel way to relocate a placed element, and it fails on anything a user would naturally type."
+    },
+    {
+      "id": "B-SLUG-WARN-CONDITION",
+      "nodeId": null,
+      "name": "FOUNDER DECISION — what should gate the slug-change warning?",
+      "family": "Pages",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "open",
+      "authority": "founder",
+      "kind": "decision",
+      "owner": "founder",
+      "recipe": null,
+      "evidence": "Raised 2026-09-03 by editor-ed, who deliberately did NOT change the condition on their own judgement, and I agree it is a decision rather than a fix. Today the warning fires only when page.status === 'live', where status is `settings.visibility ?? \"draft\"` — a per-page field that defaults to off and that nobody sets unless they open the Advanced tab. So it never fires on a normal page. The honest condition is 'this page's URL is currently reachable', which is a fact about the SITE being published, not about a per-page field. Two costs to weigh: SeoTab has no publish context today, so wiring that is a real change; and the cheap alternative — warn whenever the field is unset — would fire on brand-new sites where 'will break existing links' is simply false, which trains users to ignore it. Related and separate: slugHistory is collected and read by nothing, so a redirect could be built on it later (F-SLUG-NO-REDIRECT)."
     }
   ]
 }
