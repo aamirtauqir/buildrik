@@ -6283,12 +6283,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P0. 'Your notes' and 'Request changes' are independent controls; typing does nothing until 'Add note' is clicked. Typing then clicking Request changes closes the round to a terminal screen and a DB query immediately after returns ZERO rows containing the text. No way back. Approve has an explicit confirm modal; the path carrying the client's reasoning has none. This is the core promise of a sign-off product."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P0. 'Your notes' and 'Request changes' are independent controls; typing does nothing until 'Add note' is clicked. Typing then clicking Request changes closes the round to a terminal screen and a DB query immediately after returns ZERO rows containing the text. No way back. Approve has an explicit confirm modal; the path carrying the client's reasoning has none. This is the core promise of a sign-off product. | FIXED by editor-ed and VERIFIED LIVE 2026-09-03 (TA) by driving the real client page unauthenticated and spending the fixture's PENDING round. Same drive as the one that found the defect: typed a marked note into 'Your notes', NEVER clicked 'Add note', clicked Request changes. RESULT: the round is CHANGES_REQUESTED with resolvedAt set, AND the note is persisted as a comment — 'AUDITNOTE1788454312133 tighten the hero spacing' at 16:52:02. Before the fix the identical drive left ZERO rows containing the text while the round closed anyway. The confirm also exists now and its label names the send: 'Send and request changes', with 'Go back' beside it. NOTE FOR THE NEXT MEASURER: that confirm is INLINE, not a [role=dialog] — my first attempt scoped the confirm click to a dialog, found none, and submitted nothing, which looked exactly like a fix that had kept the round open. Same wrong-box family as the 0x0 dialog wrapper."
     },
     {
       "id": "F-PUBLISH-ISLIVE",
