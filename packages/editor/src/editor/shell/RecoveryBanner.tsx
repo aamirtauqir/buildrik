@@ -1,9 +1,17 @@
 /**
  * RecoveryBanner (C6) — surfaces the crash sentinel RecoveryManager writes but
- * nothing previously read. On reopen after an unexpected close, the editor has
- * already reloaded the local autosave; this banner tells the user that happened
- * (with a timestamp + how much was recovered) and lets them either keep the
- * recovered work or discard it and reload the server version.
+ * nothing previously read. The editor has already reloaded the local autosave;
+ * this banner tells the user that happened (with a timestamp + how much was
+ * recovered) and lets them either keep the recovered work or discard it and
+ * reload the server version.
+ *
+ * It used to say the work was recovered "after an unexpected close". The
+ * sentinel records a TIMESTAMP and nothing else, so that was an inference the
+ * record cannot support — and at least two things reach this banner: a genuine
+ * crash, and an ordinary reload taken while a save was failing. Naming the
+ * wrong one is not a cosmetic slip: it invites the user to blame their browser
+ * instead of retrying a save that is still broken. The copy now states what is
+ * known — that the work was kept on this device, and may not be on the server.
  *
  * Non-binary per the design review: shows WHEN and HOW MUCH, not a bare
  * "Restore?" (the "newer server copy" comparison is a follow-up — it needs a
@@ -63,7 +71,8 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
   return (
     <div style={S.bar} role="status" aria-label="Recovered work">
       <div style={S.text}>
-        <span style={S.strong}>Recovered your work</span> after an unexpected close · {relTime(record.at)}{scope}.
+        <span style={S.strong}>Recovered your work</span> · {relTime(record.at)}{scope}. It was
+        kept on this device, so it may not be on the server yet.
       </div>
       <div style={S.actions}>
         <Button color="light" size="xs" onClick={discard} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">Discard &amp; reload</Button>

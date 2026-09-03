@@ -10,6 +10,24 @@
  * groups go async next. The probe host renders them for the eye and the
  * harness until then.
  *
+ * PREMISE RE-CHECKED 2026-09-03, because the sibling note on PagesStateBlocks
+ * said the same kind of thing and was wrong, which is how a data-loss defect
+ * shipped. Here it holds, with one exception the note did not mention: MINE
+ * hydrates ASYNCHRONOUSLY (`ComponentManager.setProjectId` awaits storage), so
+ * there IS a window where the group reads empty. It stays unmounted anyway,
+ * and the reason is the difference from the Pages case rather than the flash:
+ *
+ *   - hydration emits COMPONENT_LIST_UPDATED and BuildTab re-reads on it, so
+ *     the wrong-empty corrects itself;
+ *   - an empty MINE renders NOTHING — GroupSection maps the array and has no
+ *     empty state and no call to action — so there is nothing to accept and
+ *     nothing hydration can discard.
+ *
+ * The Pages block earned its mount because the wrong-empty INVITED a page
+ * creation that `importProject` then threw away. Absent an invitation, a
+ * transient empty costs nothing, and building a surface for it is the churn
+ * this rebuild is supposed to be moving away from.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
