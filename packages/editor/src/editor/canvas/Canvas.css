@@ -404,13 +404,19 @@
 /* Board 65:2: one sentence, then the two routes side by side. The button
    rules that used to live here re-implemented the DS button on top of the DS
    button — the chrome-ui pair carries its own appearance. */
+/* 65:201 stacks the sentence and the actions at a 12 gap, and 65:202 sets the
+   headline on -0.16px of tracking, which at 16px is exactly the tight step. */
 .bd-canvas-empty-cta__title {
   font-size: 16px;
   font-weight: 600;
+  line-height: 24px;
+  letter-spacing: var(--bk-tracking-tight);
   color: var(--bk-ink);
-  margin: 0 0 var(--bk-space-16);
+  margin: 0 0 var(--bk-space-12);
 }
 
+/* 65:203 draws a 10 gap between the two buttons. There is no 10 on the 4-base
+   scale and no token for it; 12 is the step the board's own grid rounds to. */
 .bd-canvas-empty-cta__actions {
   display: flex;
   align-items: center;
