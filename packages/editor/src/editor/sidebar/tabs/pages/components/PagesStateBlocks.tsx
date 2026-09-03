@@ -1,8 +1,16 @@
 /**
  * Pages panel state blocks — board 774:4044 (Pages · loading), fetched
- * 2026-08-07. Pages hydrate synchronously from the composer today, so the
- * probe is this block's only mount until the source goes async — the same
- * single-home rule as Insert/Layers state blocks.
+ * 2026-08-07.
+ *
+ * This said "pages hydrate synchronously from the composer today, so the probe
+ * is this block's only mount until the source goes async". That premise was
+ * false for every server-backed site and it is what made the skeleton look
+ * optional: the composer becomes non-null and the page list syncs EMPTY while
+ * `loadProject` is still in flight, so the panel showed "No pages yet · Create
+ * blank page" over a real project. Accepting cost the user the page —
+ * `importProject` replaces the whole set and ⌘Z reports nothing to undo.
+ * Mounted by PageList since 2026-09-03; the standalone demo, which really is
+ * synchronous, was the case the note generalised from.
  * @license BSD-3-Clause
  */
 import * as React from "react";

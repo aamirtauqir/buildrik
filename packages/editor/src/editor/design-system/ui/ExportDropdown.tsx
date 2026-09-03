@@ -6,9 +6,12 @@
  * Brand import/export flow is boarded at 153:120 (import-export), 306:2232
  * (exported), 306:2265 (imported) and 306:2298 (error), and none of the other
  * four pieces exist yet. Deleting the one built part would mean rebuilding it
- * when the flow lands. Same call as PagesStateBlocks, which carries the same
- * kind of note — the difference between "built ahead" and "left behind" is
- * whether anyone wrote down which it was.
+ * when the flow lands. The difference between "built ahead" and "left behind"
+ * is whether anyone wrote down which it was — and writing it down is not
+ * enough on its own. This cited PagesStateBlocks as the same call; that one
+ * turned out to be neither, a block the product needed immediately while its
+ * note explained why it could wait. A note that reasons from a premise
+ * ("pages hydrate synchronously") ages exactly as well as the premise.
  *
  * @license BSD-3-Clause
  */
