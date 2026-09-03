@@ -25,6 +25,7 @@ import {
   SaveConflictError,
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
+import { clearUnsaved, keepUnsaved, readUnsaved } from "@/services/unsavedRecovery";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
@@ -220,7 +221,39 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // instead of "Not saved" on fresh load. The just-loaded state IS
             // the persisted state; without this seed lastSavedAt stays null
             // and the indicator falsely warns of unsaved work.
-            setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
+            /* — unless a save failed before this reload. Then the just-loaded
+               state is the persisted state and NOT all the user's work, and
+               seeding "Saved · just now" over the gap is the lie that turned a
+               warned failure into a silent loss. Measured: edit, save blocked,
+               reload, edit gone, topbar green. */
+            const unsaved = readUnsaved(siteId);
+            if (unsaved) {
+              setSaveState({
+                status: "error",
+                error: "This site has edits that never reached the server.",
+              });
+              addToastRef.current?.({
+                title: "Some work never reached the server",
+                description:
+                  "A save failed before this page was reloaded. The version on screen is the server's. Restoring puts your unsaved edits back so you can save them again.",
+                tone: "warning",
+                /* Never applied automatically. Importing a stored project over
+                   a freshly loaded one is this codebase's documented data-loss
+                   precondition, so the choice is the user's. */
+                action: {
+                  label: "Restore my edits",
+                  onClick: () => {
+                    instance.importProject(unsaved.project);
+                    setIsDirty(true);
+                    setSaveState({ status: "idle", error: undefined });
+                    clearUnsaved(siteId);
+                  },
+                },
+                duration: Infinity,
+              });
+            } else {
+              setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
+            }
             setIsDirty(false);
             // Phase B3: hydrate media library from server. Additive — never
             // throws. Returns null on offline/auth/unconfigured; we just
@@ -504,6 +537,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                branch, and the manual ⌘S path) has always announced itself;
                only the branch every real user takes did not. */
             if (snapshot) composer.markSaved(snapshot);
+            /* The server has it now, so the recovery copy is no longer work
+               that is missing — leaving it would offer a stale restore on the
+               next load. */
+            if (siteId) clearUnsaved(siteId);
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
@@ -541,6 +578,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             const isNetwork =
               isOffline || /network|fetch|offline|failed to fetch|connection/i.test(message);
             if (isNetwork) {
+              /* Nothing local is written for a dashboard-backed site, so this
+                 edit exists only in this tab. Keep it, or a reload discards it
+                 while the load path seeds "Saved · just now" over the gap. */
+              if (siteId) keepUnsaved(siteId, composer.exportProject());
               /* `status: "error"` matches `useSaveCallback`; the topbar's own
                  offline flag outranks it and draws the Offline pill. There is
                  no "offline" status in this state machine. */

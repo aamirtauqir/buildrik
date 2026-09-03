@@ -28,6 +28,7 @@ import {
   SETTINGS_MIRROR_ERROR_EVENT,
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { clearUnsaved, keepUnsaved } from "@/services/unsavedRecovery";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -118,6 +119,9 @@ export function useSaveCallback({
       : composer.saveProject();
     return savePromise
       .then((): SaveOutcome => {
+        /* On the server now, so the recovery copy is no longer missing work.
+           Left behind it would offer a stale restore on the next load. */
+        if (siteId) clearUnsaved(siteId);
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
         addToast({
@@ -167,6 +171,11 @@ export function useSaveCallback({
              components, templates and versions, never the project. Only the
              siteId-less branch runs `composer.saveProject()`, which is the one
              that reaches localStorage — so only it may make the promise. */
+          /* With a siteId nothing local is written, so this edit lives only
+             in this tab and a reload discards it. Keep it, so the reload can
+             offer it back instead of seeding "Saved · just now" over the gap.
+             The siteId-less branch already reaches localStorage. */
+          if (siteId) keepUnsaved(siteId, composer.exportProject());
           setSaveState((prev) =>
             siteId ? { ...prev, status: "error", error: errorMessage } : { ...prev, status: "idle" },
           );

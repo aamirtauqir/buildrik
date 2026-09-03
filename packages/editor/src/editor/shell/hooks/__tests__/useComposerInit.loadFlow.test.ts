@@ -191,6 +191,70 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     resetMockComposer();
   });
 
+  it("does not claim Saved on a reload that has work the server never got", async () => {
+    /* Measured 2026-09-03: an H2 sized 24 -> 41px, the save blocked with
+       navigator.onLine true, reload — font-size back to 24 and the topbar
+       reading "Saved · just now" over the edit the product discarded. The user
+       IS warned at the time; the warning simply did not survive the reload,
+       and the load path seeds lastSavedAt because "the just-loaded state IS
+       the persisted state" — true, and not all of the user's work. */
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: { pages: [{ id: "p" }], styles: [] }, at: "2026-09-03T00:00:00.000Z" }),
+    );
+
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+    await act(async () => {
+      mockComposer.emit("composer:ready");
+      await flushMicrotasks();
+    });
+
+    const seeded = vi.mocked(params.setSaveState!).mock.calls.map(([v]) => v);
+    expect(seeded.some((v) => typeof v === "object" && v !== null && "lastSavedAt" in v)).toBe(false);
+
+    const toast = vi
+      .mocked(params.addToast!)
+      .mock.calls.map(([t]) => t)
+      .find((t) => /never reached the server/i.test(t.title ?? ""));
+    expect(toast).toBeTruthy();
+    expect(toast!.action?.label).toBe("Restore my edits");
+    /* Never applied on its own: importing a stored project over a freshly
+       loaded one is this codebase's documented data-loss precondition, so the
+       only import so far is the server's own. */
+    expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
+  });
+
+  it("restores only when the user asks, and clears the record once it has", async () => {
+    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
+    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "server" }], styles: [] } as never);
+    const mine = { pages: [{ id: "mine" }], styles: [] };
+    localStorage.setItem(
+      "bk-unsaved-v1-site-9",
+      JSON.stringify({ project: mine, at: "2026-09-03T00:00:00.000Z" }),
+    );
+
+    const params = makeParams();
+    renderHook(() => useComposerInit(params));
+    await act(async () => {
+      mockComposer.emit("composer:ready");
+      await flushMicrotasks();
+    });
+
+    const toast = vi
+      .mocked(params.addToast!)
+      .mock.calls.map(([t]) => t)
+      .find((t) => /never reached the server/i.test(t.title ?? ""));
+    act(() => toast!.action!.onClick());
+
+    expect(mockComposer.importProject).toHaveBeenLastCalledWith(mine);
+    // Restored work is unsaved work — the dirty flag has to say so.
+    expect(vi.mocked(params.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
+    expect(localStorage.getItem("bk-unsaved-v1-site-9")).toBeNull();
+  });
+
   it("scopes IndexedDB buckets, imports, seeds saveState, hydrates media, toasts", async () => {
     const projectData = { pages: [{ id: "p" }], dsSchemaVersion: 0, styles: [] };
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
