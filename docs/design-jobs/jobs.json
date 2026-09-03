@@ -1408,7 +1408,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-layers-review",
-      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board payload not retrieved (seat limit); live lock #111827, aria ', locked', draggable=false — re-read board",
+      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board payload not retrieved (seat limit); live lock #111827, aria ', locked', draggable=false — re-read board | 2026-09-03 F9 re-read: lock rest colour is #6B7280 @10px (8 instances) vs live #111827 — drift confirmed [read via the OAuth client, which is not seat-capped]",
       "authority": "founder:layers-1082-geometry-plus-16-6-header"
     },
     {
@@ -1420,7 +1420,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-layers-review",
-      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board not retrieved; live banner y80 h37 '3 selected' 12/500, four 24x24 buttons, Esc clears",
+      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board not retrieved; live banner y80 h37 '3 selected' 12/500, four 24x24 buttons, Esc clears | 2026-09-03 F9 re-read: NO 37h banner on the board; only Toolbar 280x36 [read via the OAuth client, which is not seat-capped]",
       "authority": "founder:layers-1082-geometry-plus-16-6-header"
     },
     {
@@ -1432,7 +1432,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-layers-review",
-      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board not retrieved; live pt36/24/32/24 gap10, y84, 13/20 muted, link 32; footer still '66 layers' under 'Nothing matches' (LayersTab.tsx:207)",
+      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board not retrieved; live pt36/24/32/24 gap10, y84, 13/20 muted, link 32; footer still '66 layers' under 'Nothing matches' (LayersTab.tsx:207) | 2026-09-03 F9 re-read: board has no footer count — only 'Layers' 11px and 'Nothing matches' 13px; the live '66 layers' footer is code-only, so the board gains it [read via the OAuth client, which is not seat-capped]",
       "authority": "founder:layers-1082-geometry-plus-16-6-header"
     },
     {
@@ -2163,7 +2163,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-layers-review",
-      "evidence": "F vlr: board not retrieved; live 'has not commented yet.' 14/21 + 'You will be notified.' 12/16",
+      "evidence": "F vlr: board not retrieved; live 'has not commented yet.' 14/21 + 'You will be notified.' 12/16 | 2026-09-03 F9 re-read: board carries 13 and 11 against live 14/12 — drift confirmed [read via the OAuth client, which is not seat-capped]",
       "authority": "board"
     },
     {
@@ -2247,7 +2247,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-layers-review",
-      "evidence": "F vlr: board not retrieved; toast needs an approval mutation",
+      "evidence": "F vlr: board not retrieved; toast needs an approval mutation | 2026-09-03 F9 re-read: BOTH — a full 280x812 panel state (Gone 280x160) with a Toast 280x56 inside it, not one or the other [read via the OAuth client, which is not seat-capped]",
       "authority": "board:158-213-toast"
     },
     {
@@ -4408,7 +4408,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-layers-review",
-      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board not retrieved; live popover unanchored at x0 y80 (⚙ at x258), mono uppercase header, raw shadow layers-v2.css:404, × 9.5x40, 18x10 switches",
+      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board not retrieved; live popover unanchored at x0 y80 (⚙ at x258), mono uppercase header, raw shadow layers-v2.css:404, × 9.5x40, 18x10 switches | 2026-09-03 F9 re-read: header is 'Layers' Inter 11, NOT mono; gear at x228 — the mono-header premise does not hold [read via the OAuth client, which is not seat-capped]",
       "authority": "founder:layers-1082-geometry-plus-16-6-header"
     },
     {
