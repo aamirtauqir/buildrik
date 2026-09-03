@@ -347,6 +347,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               root?.setContent(page.component);
             }
           });
+          /* Seeding is not an edit. Creating the default page emits
+             `project:changed`, and the shell's handler raises the dirty flag on
+             any emit — so a freshly opened project was dirty on 9 of 9 loads
+             before the user touched anything, and autosave then wrote it. The
+             `loadProject` branch already clears the flag after importing for
+             exactly this reason; this branch never did. */
+          setIsDirty(false);
         });
     }
 
@@ -431,6 +438,17 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     let changeSeq = 0;
 
     const handler = () => {
+      /* Dev-only: four events share this handler and none of them proves a user
+         edit — `project:changed` also fires on `page:activated`, i.e. merely
+         looking at another page. Recording which one arrived, and when, is the
+         only way to tell a real edit from a boot-sequence emit. */
+      if (import.meta.env?.DEV && typeof window !== "undefined") {
+        const w = window as unknown as { __bkDirtySource?: unknown[] };
+        (w.__bkDirtySource ??= []).push({
+          at: Math.round(performance.now()),
+          stack: (new Error().stack ?? "").split("\n").slice(1, 16).join(" | "),
+        });
+      }
       setIsDirty(true);
       changeSeq += 1;
       if (timeoutId) clearTimeout(timeoutId);
