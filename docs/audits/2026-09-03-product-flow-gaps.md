@@ -186,7 +186,85 @@ recorded as unresolved rather than assumed either way. Also not measured: a true
 blank-account onboarding, since the fixture is pre-populated, so "Insert a
 section" reads incomplete despite content existing.
 
-### 3b. Publish / go-live — walked, with one severe defect
+### 3b. Content / CMS — the journey works; undo lies about it
+
+collection → fields → records → bind → real data on canvas → unbind.
+
+Steps 1–8 **WORK**, and better than expected: collections *and* their fields can be
+created from inside the editor (a 2-step wizard, not dashboard-only), the field
+type picker is complete, published/draft state is a real `aria-label` rather than
+a colour alone, the unsaved-edit guard raises a genuine Discard confirm, binding
+updates the canvas to real data live, and unbind is discoverable in the banner.
+
+**WORST — DEAD DOOR: the Undo control claims a capability it does not have.**
+Binding an element does not enter the history stack — `BaseBindingManager` emits
+`BINDING_CREATED` and never touches history or `markDirty` (verified in the
+engine, not inferred from the UI). But the topbar Undo **enables itself** right
+after a bind, and pressing it — keyboard and mouse, verified twice — leaves the
+canvas text and the "Bound" chip completely unchanged, with **zero console
+errors**. A user who mis-binds and reflexively hits ⌘Z gets no error and no
+revert. The only escape is the manual Unbind, if they find it.
+
+**SILENT — a draft record renders as though it were published.** Bind to a DRAFT
+record and the canvas shows its data with no signal anywhere — chip, banner and
+tooltip all say only "Bound to Dishes.name". The user cannot tell that what they
+are looking at is unpublished.
+
+Minor: for an existing but empty collection the binding popover offers
+"No fields defined — **+ Create Collection**", which is the wrong label for a
+collection that already exists. A CLOSED DOOR with misleading copy, not a dead end.
+
+*Not measured:* image-field binding (no `<img>` on the loaded route), publish-time
+validation of draft-bound content (would need a real deploy), collection-level
+delete.
+
+### 3c. Review / client sign-off — the client's verdict can be silently destroyed
+
+comment → resolve → round → send to client → client approves or requests changes
+→ round closes → next round.
+
+Steps 1–6 **WORK**, verified against the database rather than the screen: replies
+create real `Comment` rows, Resolve moves OPEN→RESOLVED, "Re-send for review"
+fired `reviews.submit` (confirmed by the literal outgoing request URL, not a
+route-pattern guess — a batched tRPC pattern that matches nothing looks identical
+to a product that does nothing), created round 9 and **revoked round 8's token**
+server-side. The old token then correctly shows "There's a newer version". Round
+history lists rounds 1–8 with per-round outcome and date, so a user can always
+tell which round they are looking at. The agency reviews queue correctly blocks
+self-approval while showing live Approve / Request-changes on someone else's
+submission — confirmed as both states side by side.
+
+**WORST — SILENT DATA LOSS on the client's most likely click.** On the client
+review page the "Your notes" textarea and the "Request changes" button are two
+independent controls: typing a note does nothing until "Add note" is clicked
+separately. Typing a note and then clicking **Request changes** — exactly what a
+client does after saying their piece — closes the round instantly to a terminal
+"You asked for changes" screen. A database query immediately after found **zero
+rows containing that text**. It was never sent anywhere, and the terminal state
+offers no way back.
+
+**And the asymmetry is the tell:** *Approve* has an explicit "Approve `{site}`?"
+confirm modal. *Request changes* — the path that carries the client's reasoning —
+has no guard at all. This is the one thing a client-sign-off product should
+protect hardest.
+
+**NO DOOR for a never-reviewed site.** On a site with zero rounds the rail has no
+Review icon (6 icons, confirmed identical on the fixture and on a virgin site) and
+the topbar pill is null. The **only** door is ⌘K → "Open Review panel". Once a
+round exists the topbar pill becomes a real door — so the feature is undiscoverable
+precisely when a user would be starting their first review.
+
+**A printed chord that is wrong, not merely dead.** The palette prints **R** beside
+"Open Review panel"; pressing `r` does not open Review. There *is* an `r` handler
+— `CanvasFooterToolbar.tsx:271`, `key === "r" && !e.shiftKey` → the **rulers**
+overlay. So the advertised chord does something else entirely.
+
+*Not measured:* canvas click-to-pin (the target resolved off-viewport at y=-411 in
+headless — a harness coordinate problem, explicitly not a product finding);
+Approve's own terminal path this session (Request-changes was driven instead;
+APPROVED rows exist historically in the same dataset).
+
+### 3d. Publish / go-live — walked, with one severe defect
 
 Environment established first, because two known traps could have made the whole
 walk meaningless: **both** `VITE_FEATURE_PUBLISH` and `NEXT_PUBLIC_FEATURE_PUBLISH`
