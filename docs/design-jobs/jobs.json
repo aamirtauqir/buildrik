@@ -1480,7 +1480,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-media",
-      "evidence": "2026-09-02 C12 figma: rows 312->248 at x16, 5 tiles/row, pad1.6 gap11.2; sections h104->152 / h152->200 | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P1 vm: back row 279x0 (flex-shrink under a 2992px grid) — search covers it, pointer click times out; grid-cols-6 in 247px overflows; no section headers; cells r4 vs r6. IconBrowserOverlay.tsx:148 tw:shrink-0, :116 grid-cols-5; FIGMA 147:19 rows 312 in 280",
+      "evidence": "2026-09-02 C12 figma: rows 312->248 at x16, 5 tiles/row, pad1.6 gap11.2; sections h104->152 / h152->200 | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P1 vm: back row 279x0 (flex-shrink under a 2992px grid) — search covers it, pointer click times out; grid-cols-6 in 247px overflows; no section headers; cells r4 vs r6. IconBrowserOverlay.tsx:148 tw:shrink-0, :116 grid-cols-5; FIGMA 147:19 rows 312 in 280 | NOT VERIFIABLE ON THE DEMO 2026-09-03 (TA), stays at verify. The drill-in cannot be opened with an empty library: the entry is `media-type-chip-ico`, which renders DISABLED with title='No svg files in this library yet', so IconBrowserOverlay never mounts and the back row this row is about does not exist to measure. Needs the fixture (cmrsur1fp000unh3rvmmiq25t) which has media assets. Queued for the server-backed batch. NOTE: this also means the P1 'back row 279x0' was measured in a state I could not reach, so I can neither confirm nor clear it here.",
       "authority": "code:icon-grid-is-5-col"
     },
     {
