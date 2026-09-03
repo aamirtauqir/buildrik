@@ -6484,6 +6484,21 @@
       "owner": "editor-ed",
       "recipe": null,
       "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P2. The only site-wide view is 'Listings', a flat SEO-score table (Page / Title / Desc / Score). No hierarchy, no navigation graph, no sitemap. A user cannot see how their pages relate."
+    },
+    {
+      "id": "F-LAYERS-SEARCH-TYPE",
+      "nodeId": null,
+      "name": "Layers search matches element TYPE, never the text the rows display",
+      "family": "Layers",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. The Layers 'Search layers' field matches only the element TYPE keyword — 'Container' 26 hits, 'Grid' 4, 'button' 8 — and never the element's visible text. Searching 'Click' returns ZERO while 8 result rows literally render 'Click Me, button element'; searching a component's own name 'Walk Probe Button' returns zero. The UI proves it has the text right there and still says 'Nothing matches'. This is the only in-panel way to relocate a placed element, and it fails on anything a user would naturally type."
     }
   ]
 }
