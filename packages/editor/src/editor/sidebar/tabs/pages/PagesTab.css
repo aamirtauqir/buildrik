@@ -411,8 +411,8 @@
 
 /* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
 .bd-pg-bulk-toolbar {
-  /* Board 141:119: a full-width band on ink pinned at the bottom — it takes
-     the footer's place while a selection is active. */
+  /* Board 141:119: a full-width 44-tall band on ink pinned at the bottom — it
+     takes the footer's place while a selection is active. */
   position: absolute;
   bottom: 0;
   left: 0;
@@ -420,7 +420,7 @@
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
-  padding: 8px var(--bk-space-16);
+  height: 44px; padding: 0 var(--bk-space-16);
   background: var(--bk-ink);
   z-index: 10;
 }
