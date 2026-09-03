@@ -1014,6 +1014,60 @@ describe("T8 status grammar", () => {
   });
 });
 
+// ── brand's unsaved work reaches the chip ───────────────────────────────────
+describe("the save chip counts brand's staged edits, not only the project's", () => {
+  /* A token mid-edit left this reading "Saved · just now" with a green dot
+     while the Brand panel's own footer said "Unsaved brand changes". Same
+     concept, two surfacings, and the global one is the one a user watches.
+     Brand stages in a provider this header sits outside, so it announces. */
+  function brandComposer() {
+    const handlers = new Map<string, Set<(p?: unknown) => void>>();
+    return {
+      on: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      }),
+      off: vi.fn((ev: string, fn: (p?: unknown) => void) => {
+        handlers.get(ev)?.delete(fn);
+      }),
+      emit: (ev: string, payload?: unknown) => {
+        handlers.get(ev)?.forEach((fn) => fn(payload));
+      },
+      getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
+    };
+  }
+
+  it("reads unsaved once brand announces staged edits, with the project clean", () => {
+    const composer = brandComposer();
+    render(
+      <StudioHeader
+        {...makeProps({
+          composer: composer as unknown as StudioHeaderProps["composer"],
+          isDirty: false,
+        })}
+      />,
+    );
+    expect(screen.queryByText("Unsaved changes")).toBeNull();
+    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
+    expect(screen.getByText("Unsaved changes")).toBeTruthy();
+  });
+
+  it("goes back to saved when brand's edits are applied or discarded", () => {
+    const composer = brandComposer();
+    render(
+      <StudioHeader
+        {...makeProps({
+          composer: composer as unknown as StudioHeaderProps["composer"],
+          isDirty: false,
+        })}
+      />,
+    );
+    act(() => composer.emit("brand:dirty-changed", { dirty: true }));
+    act(() => composer.emit("brand:dirty-changed", { dirty: false }));
+    expect(screen.queryByText("Unsaved changes")).toBeNull();
+  });
+});
+
 // ── F7 · perf pair ──────────────────────────────────────────────────────────
 describe("F7 perf pair", () => {
   function makeComposer(meta: { name: string }) {

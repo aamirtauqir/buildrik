@@ -539,7 +539,11 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     if (!composer) return;
     const onBrandDirty = (p?: { dirty?: boolean }) => setBrandDirty(Boolean(p?.dirty));
     composer.on(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
-    return () => composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+    /* Block body, not a shorthand: `off` is chainable and returns the composer,
+       so an arrow shorthand hands React an instance where a destructor belongs. */
+    return () => {
+      composer.off(EVENTS.BRAND_DIRTY_CHANGED, onBrandDirty);
+    };
   }, [composer]);
 
   /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that

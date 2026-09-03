@@ -349,7 +349,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
      has not changed and clear the flag, putting "Saved" back over brand work
      that is still only staged. */
   React.useEffect(() => {
-    composer?.emit(EVENTS.BRAND_DIRTY_CHANGED, { dirty: isDirty });
+    /* Optional CALL, not just optional access: this panel is mounted in tests
+       with partial composer mocks that carry no emitter, and a hard call turns
+       a missing test double into a crash in the component under test. */
+    composer?.emit?.(EVENTS.BRAND_DIRTY_CHANGED, { dirty: isDirty });
   }, [composer, isDirty]);
 
   // ─ Load from Composer ─
