@@ -772,9 +772,9 @@
       "name": "Content · empty",
       "family": "Content",
       "width": 280,
-      "status": "verify",
+      "status": "done",
       "owner": "verifier-content",
-      "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-content: desc renders 12px vs 13 (EmptyState.tsx:26 BODY_CLASS beats tw:text-[13px] — plain element, no merge); centring + CTA ok",
+      "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-content: desc renders 12px vs 13 (EmptyState.tsx:26 BODY_CLASS beats tw:text-[13px] — plain element, no merge); centring + CTA ok | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, Content rail tab. **PASSES — the P3 is fixed.** The description renders 13px/400 (the claim was 12px, EmptyState.tsx BODY_CLASS beating tw:text-[13px] on a plain element where nothing merges). Measured by reading the text node's own parent, not a wrapper. CTA 'Create a collection' 13px/400 at rgb(26,86,219) = #1A56DB, the canonical accent. Body colour rgb(107,114,128) on white = 4.83:1, clears AA. Drawer measures 279 wide (the 340 I first read included the 60px rail). verify -> done.",
       "authority": "board"
     },
     {
@@ -834,7 +834,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-content",
-      "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: section headers 28 untinted vs 32 #f3f4f6; count Inter 11/400 vs mono 11/500; rows lack 16px glyph (label x16 vs x40); '+ New collection' 48px Button block vs 32 row 13/400. SectionHeader.tsx:16, ContentViews.tsx:170,185,181, Row.tsx:27",
+      "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: section headers 28 untinted vs 32 #f3f4f6; count Inter 11/400 vs mono 11/500; rows lack 16px glyph (label x16 vs x40); '+ New collection' 48px Button block vs 32 row 13/400. SectionHeader.tsx:16, ContentViews.tsx:170,185,181, Row.tsx:27 | NOT VERIFIABLE HERE 2026-09-03 (TA), stays at verify. The standalone demo on :5050 has no collections, so the Content tab renders its EMPTY state (J-149:7) and the ROOT state never appears — section headers, the count pill and the collection rows this row is about are not on screen to measure. Not a failure and not a pass: it needs a server-backed project with at least one collection (see the recorded procedure for reaching server-backed editor state). Re-queue behind that.",
       "authority": "board"
     },
     {
