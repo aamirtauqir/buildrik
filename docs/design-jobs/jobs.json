@@ -3731,9 +3731,9 @@
       "name": "Inspector · no-selection",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: sentence ok; action 61.7x32 13/400 vs 268x16 12/500. InspectorEmptyState.tsx:93 tw:h-4 tw:min-h-0 tw:text-[12px] tw:font-medium",
+      "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: sentence ok; action 61.7x32 13/400 vs 268x16 12/500. InspectorEmptyState.tsx:93 tw:h-4 tw:min-h-0 tw:text-[12px] tw:font-medium | RE-MEASURED LIVE 2026-09-03 @1d3cbf37 (TA): the empty-state action is now 62x24 (was recorded 61.7x32) against the board's 268x16 12/500. The height moved 32->24 but the width is still a quarter of the board's. Still a miss, back to fix.",
       "authority": "board"
     },
     {
@@ -3755,9 +3755,9 @@
       "name": "Inspector · multi-select",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | P2 verifier-inspector: toolbar padded 16 vs flush; ALIGN band 265x70 r8 vs 300x72 square; buttons 36x32 pitch 40 vs 36x28 pitch 42; rows control 141x24 subtle vs 172x24 white bordered pitch 32. MultiSelectToolbar.tsx:42-118",
+      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | P2 verifier-inspector: toolbar padded 16 vs flush; ALIGN band 265x70 r8 vs 300x72 square; buttons 36x32 pitch 40 vs 36x28 pitch 42; rows control 141x24 subtle vs 172x24 white bordered pitch 32. MultiSelectToolbar.tsx:42-118 | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, 1440x900, Section inserted then selected — FAILS on control geometry, back to fix. Panel measured 300 wide, the same width the board assumes (120+160+20 gutter), so this is not a width artifact. HOLDS: row pitch 34 (312->346->380), row height 28, section headers 28. FAILS: control group 173x28 not 160x28 (+13 wide), x116 from the panel edge not x120, and the control has NO fill (rgba(0,0,0,0)) where the board says #f9fafb. Right gutter is 11 live vs 20 on the board. SCOPE — measured on the CONTAINER/Section profile only: the shared mechanical claim is common to all six rows, but each row's own state composition (multi-select, instance, bound, breakpoint, pseudo, reach-all) is NOT verified.",
       "authority": "founder:inspector-807-geometry-32-2-master"
     },
     {
@@ -3767,9 +3767,9 @@
       "name": "Inspector · instance-selected",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | P3 verifier-inspector: band 297x100 vs 72; Reset 91.5x32 button vs 16 text; weights 500 vs 400. VariantSection.tsx:140-151",
+      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | P3 verifier-inspector: band 297x100 vs 72; Reset 91.5x32 button vs 16 text; weights 500 vs 400. VariantSection.tsx:140-151 | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, 1440x900, Section inserted then selected — FAILS on control geometry, back to fix. Panel measured 300 wide, the same width the board assumes (120+160+20 gutter), so this is not a width artifact. HOLDS: row pitch 34 (312->346->380), row height 28, section headers 28. FAILS: control group 173x28 not 160x28 (+13 wide), x116 from the panel edge not x120, and the control has NO fill (rgba(0,0,0,0)) where the board says #f9fafb. Right gutter is 11 live vs 20 on the board. SCOPE — measured on the CONTAINER/Section profile only: the shared mechanical claim is common to all six rows, but each row's own state composition (multi-select, instance, bound, breakpoint, pseudo, reach-all) is NOT verified.",
       "authority": "founder:inspector-807-geometry-32-2-master"
     },
     {
@@ -3779,9 +3779,9 @@
       "name": "Inspector · bound-to-CMS",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | F verifier-inspector: fixture has no bindable field (Menu · 0 fields) — seed one field, then re-verify; static: BindingBanner.tsx:66-86 hint 12 vs 11px, Unbind 32 vs 16 text",
+      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | F verifier-inspector: fixture has no bindable field (Menu · 0 fields) — seed one field, then re-verify; static: BindingBanner.tsx:66-86 hint 12 vs 11px, Unbind 32 vs 16 text | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, 1440x900, Section inserted then selected — FAILS on control geometry, back to fix. Panel measured 300 wide, the same width the board assumes (120+160+20 gutter), so this is not a width artifact. HOLDS: row pitch 34 (312->346->380), row height 28, section headers 28. FAILS: control group 173x28 not 160x28 (+13 wide), x116 from the panel edge not x120, and the control has NO fill (rgba(0,0,0,0)) where the board says #f9fafb. Right gutter is 11 live vs 20 on the board. SCOPE — measured on the CONTAINER/Section profile only: the shared mechanical claim is common to all six rows, but each row's own state composition (multi-select, instance, bound, breakpoint, pseudo, reach-all) is NOT verified.",
       "authority": "founder:inspector-807-geometry-32-2-master"
     },
     {
@@ -3791,9 +3791,9 @@
       "name": "Inspector · breakpoint-override",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | P3 verifier-inspector: row 48 vs 32, value chip subtle vs white bordered 148x24, revert 22x32 vs glyph, note 27 12/500 vs 32 11/400. BreakpointOverrides.tsx:87-114",
+      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | P3 verifier-inspector: row 48 vs 32, value chip subtle vs white bordered 148x24, revert 22x32 vs glyph, note 27 12/500 vs 32 11/400. BreakpointOverrides.tsx:87-114 | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, 1440x900, Section inserted then selected — FAILS on control geometry, back to fix. Panel measured 300 wide, the same width the board assumes (120+160+20 gutter), so this is not a width artifact. HOLDS: row pitch 34 (312->346->380), row height 28, section headers 28. FAILS: control group 173x28 not 160x28 (+13 wide), x116 from the panel edge not x120, and the control has NO fill (rgba(0,0,0,0)) where the board says #f9fafb. Right gutter is 11 live vs 20 on the board. SCOPE — measured on the CONTAINER/Section profile only: the shared mechanical claim is common to all six rows, but each row's own state composition (multi-select, instance, bound, breakpoint, pseudo, reach-all) is NOT verified.",
       "authority": "founder:inspector-807-geometry-32-2-master"
     },
     {
@@ -3803,9 +3803,9 @@
       "name": "Inspector · pseudo-state",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: copy exact; note 27 12/500 vs 32 11/400. ProInspector.tsx:486",
+      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: copy exact; note 27 12/500 vs 32 11/400. ProInspector.tsx:486 | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, 1440x900, Section inserted then selected — FAILS on control geometry, back to fix. Panel measured 300 wide, the same width the board assumes (120+160+20 gutter), so this is not a width artifact. HOLDS: row pitch 34 (312->346->380), row height 28, section headers 28. FAILS: control group 173x28 not 160x28 (+13 wide), x116 from the panel edge not x120, and the control has NO fill (rgba(0,0,0,0)) where the board says #f9fafb. Right gutter is 11 live vs 20 on the board. SCOPE — measured on the CONTAINER/Section profile only: the shared mechanical claim is common to all six rows, but each row's own state composition (multi-select, instance, bound, breakpoint, pseudo, reach-all) is NOT verified.",
       "authority": "founder:inspector-807-geometry-32-2-master"
     },
     {
@@ -3815,9 +3815,9 @@
       "name": "Inspector · reach-all-like-this",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: colours+copy ok; 27 vs 36 tall, 500 vs 400, extra 2px left bar. ProInspector.tsx:462",
+      "evidence": "2026-09-02 WAVE 2 (mechanical half) drawn: control 160x28 @x120 #f9fafb, row pitch 32->34, section headers 32->28; header/tail/footer composition still designer | C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P3 verifier-inspector: colours+copy ok; 27 vs 36 tall, 500 vs 400, extra 2px left bar. ProInspector.tsx:462 | VERIFIED LIVE 2026-09-03 @1d3cbf37 (TA), :5050, 1440x900, Section inserted then selected — FAILS on control geometry, back to fix. Panel measured 300 wide, the same width the board assumes (120+160+20 gutter), so this is not a width artifact. HOLDS: row pitch 34 (312->346->380), row height 28, section headers 28. FAILS: control group 173x28 not 160x28 (+13 wide), x116 from the panel edge not x120, and the control has NO fill (rgba(0,0,0,0)) where the board says #f9fafb. Right gutter is 11 live vs 20 on the board. SCOPE — measured on the CONTAINER/Section profile only: the shared mechanical claim is common to all six rows, but each row's own state composition (multi-select, instance, bound, breakpoint, pseudo, reach-all) is NOT verified.",
       "authority": "founder:inspector-807-geometry-32-2-master"
     },
     {
