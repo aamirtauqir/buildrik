@@ -6634,6 +6634,66 @@
       "owner": "editor-ed",
       "recipe": null,
       "evidence": "SPLIT from F-SAVE-OFFLINE-LIE and VERIFIED LIVE 2026-09-03 (TA) on scratchsmoke00000000000001, after editor-ed fixed the label half and said they could not explain this half from the code and were not claiming it. It reproduces. Method, with both controls satisfied so the run cannot be read the wrong way: navigator.onLine measured TRUE at edit time; the save request aborted through a route scoped to **/api/trpc/** (blocked count reported 1, so the interception demonstrably fired); and an EDIT-APPLIED GUARD — the run aborts and prints 'THIS RUN PROVES NOTHING' unless the computed value actually changed. First attempt hit exactly that guard and was discarded rather than reported. Confirmed sequence on H2 el-mt69adgn-1k5f49stcp5: font-size 24px -> 41px applied; save blocked; topbar reads 'Save failed - retry', which is HONEST and is the fixed label; then reload -> font-size is back to 24px, the edit is GONE, and the topbar reads 'Saved - just now'. So the user IS warned at the time, and the warning does not survive: nothing persists the unsaved work and after a reload the product asserts everything is saved over an edit it discarded. The honest state after a failed save is 'you have work that is not on the server', and a reload must not silently downgrade that to 'Saved'."
+    },
+    {
+      "id": "F-MEDIA-DELETE-NO-TXN",
+      "nodeId": null,
+      "name": "Deleting an asset cannot be undone and leaves the canvas element orphaned",
+      "family": "Media",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. deleteAsset (MediaManager.ts:1059) and the updateAsset/moveAsset path never call composer.beginTransaction/endTransaction, so a library delete never enters the undo stack. Live proof of the trap: Undo was ALREADY enabled from an earlier canvas insert; after confirming the delete it STAYED enabled, so nothing distinguishes 'Undo available because of a prior edit' from 'Undo available because of what I just did'. Clicking it did not restore the asset. And the canvas element that referenced the deleted asset was left on the page with a dead src — not removed, not flagged, not relinked. Two failures compounding: the destructive action is unrecoverable, and the control that would normally recover it is enabled and pointing somewhere else."
+    },
+    {
+      "id": "F-MEDIA-DELETE-COUNT-ONLY",
+      "nodeId": null,
+      "name": "Delete warns how many elements break, never which",
+      "family": "Media",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P2. ConfirmDeleteModal does warn — '1 file is currently used on the canvas. Deleting will break those elements.' — which is more honest than most of this audit's findings. But it is a COUNT only: it never names the element or the page, and there is no jump-to-usage from the modal. A user with one usage can guess; a user with nine cannot act on the warning they were given."
+    },
+    {
+      "id": "F-MEDIA-DRAWER-NO-PICKER",
+      "nodeId": null,
+      "name": "The docked media panel has no folder picker; bulk Move redirects out",
+      "family": "Media",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P3. By design and documented in code (MediaTab.tsx:358-360, 'the drawer has no folder picker of its own yet'): right-click enters bulk-selection mode and the bulk bar's 'Move to...' opens the full Library rather than moving. Confirmed live. Recorded as a gap in the docked flow rather than a defect, since the full-page path works."
+    },
+    {
+      "id": "F-MEDIA-MOVE-DOOR",
+      "nodeId": null,
+      "name": "GOOD — the media.moveAsset orphan procedure now has a door",
+      "family": "Media",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "done",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "VERIFIED LIVE 2026-09-03 (TA). The historical orphan — the dashboard could create, rename and delete folders but never move an asset into one, while the editor had been calling media.moveAsset all along — is closed. Right-click > 'Move to folder' in the full-page Library moved an asset out of root instantly, folder counts recomputing live; client (AssetUploadService.ts:181) and server (routers/media.ts:190, services/media.service.ts:358) both implement it. ALSO GOOD, and worth naming because it is the counter-example to F-MEDIA-DELETE-NO-TXN: inserting an asset onto the canvas DOES open a real transaction — canUndo correctly flips true. NOT MEASURED: server-side persistence of the move over the network. The asset never acquired a serverId in this dev environment (uploads do not reach blob storage without BLOB_READ_WRITE_TOKEN), and MediaManager only mirrors folder moves server-side when serverId exists, so the mirror call never fired. Code wiring confirmed, live network confirmation not."
     }
   ]
 }
