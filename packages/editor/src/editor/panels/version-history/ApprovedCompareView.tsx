@@ -51,7 +51,7 @@ const KIND: Record<CompareChangeKind, { icon: LucideIcon; className: string; lab
   style: { icon: Palette, className: "tw:text-[var(--bk-warning-text)]", label: "Style" },
   added: { icon: Plus, className: "tw:text-[var(--bk-success)]", label: "Added" },
   removed: { icon: Minus, className: "tw:text-[var(--bk-error)]", label: "Removed" },
-  moved: { icon: GripVertical, className: "tw:text-[var(--bk-gray-400)]", label: "Moved" },
+  moved: { icon: GripVertical, className: "tw:text-[var(--bk-ink-muted)]", label: "Moved" },
 };
 
 const KIND_ORDER: CompareChangeKind[] = ["added", "removed", "moved", "content", "style"];

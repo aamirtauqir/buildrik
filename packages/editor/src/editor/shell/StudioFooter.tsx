@@ -94,7 +94,7 @@ const ZOOM_ROW =
   "tw:flex tw:w-full tw:h-7 tw:min-h-0 tw:items-center tw:justify-between tw:gap-6 tw:rounded tw:border-0 " +
   "tw:px-3 tw:py-0 tw:text-xs tw:font-medium tw:leading-5 tw:whitespace-nowrap tw:bg-transparent " +
   "tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]";
-const ZOOM_KEY = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-gray-400)]";
+const ZOOM_KEY = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]";
 
 export const StudioFooter: React.FC<StudioFooterProps> = ({
   composer,

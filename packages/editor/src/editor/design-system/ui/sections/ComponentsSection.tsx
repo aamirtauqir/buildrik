@@ -152,7 +152,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
                   {variantCount} variant{variantCount === 1 ? "" : "s"}
                   {instanceCount > 0 ? ` · ${instanceCount} in use` : ""}
                 </span>
-                <span aria-hidden="true" className="tw:text-[var(--bk-gray-400)]">›</span>
+                <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">›</span>
               </span>
             </Button>
           );
@@ -205,7 +205,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
                     1 master · {instanceCount} instance{instanceCount === 1 ? "" : "s"}
                   </span>
                 </span>
-                <span aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-gray-400)]">›</span>
+                <span aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]">›</span>
               </Button>
             );
           })}

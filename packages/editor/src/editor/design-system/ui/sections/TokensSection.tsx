@@ -399,7 +399,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               </span>
               <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
                 <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">{ordered.muted.length}</span>
-                <span aria-hidden="true" className="tw:text-[var(--bk-gray-400)]">{showAllKinds ? "⌃" : "›"}</span>
+                <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">{showAllKinds ? "⌃" : "›"}</span>
               </span>
             </Button>
           )}

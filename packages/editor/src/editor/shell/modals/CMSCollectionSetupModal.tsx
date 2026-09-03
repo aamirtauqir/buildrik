@@ -83,7 +83,7 @@ const BOARD_ROW =
    so this uses the utility that IS that colour rather than inventing a token.
    Caught by gate:token-resolution, which fails an undefined ref with no
    fallback: it would have rendered no colour at all. */
-const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-gray-400)]";
+const BOARD_HANDLE = "tw:flex-none tw:cursor-grab tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]";
 /* Button's `link` variant supplies the recipe; 11px medium is this modal's
    own board size. */
 const BOARD_LINK = "tw:min-h-6 tw:text-[length:var(--bk-text-11)] tw:font-medium";
