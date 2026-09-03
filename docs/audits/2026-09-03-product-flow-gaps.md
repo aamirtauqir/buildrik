@@ -56,11 +56,28 @@ panel-level audit would have called Pages covered.
 
 Found today, third-party confirmed, reproduced on three separate loads:
 
-- **Site menu → "Site settings" and "Getting started" do nothing.** Click reports
-  success. No panel, no route, no tab, **zero console errors**. `SiteMenu.tsx:188`
-  wires `onOpenSiteSettings` and `SettingsTab` renders a full-page `PanelFrame`,
-  so the handler or its prop is the suspect. This is a **DEAD DOOR on a top-level
-  menu item** and is ranked first.
+- ~~**Site menu → "Site settings" and "Getting started" do nothing.**~~
+  **RETRACTED the same day. Both work.** This was ranked first in the first draft
+  of this document and it was wrong.
+
+  Three independent checks agree: **Site settings** opens the Project settings
+  modal (`[role=dialog]` present; General / Canvas / SEO / PROJECT NAME / AUTHOR),
+  and **Getting started** mounts a 320×443 `role="region"` checklist plus an
+  onboarding-steps list and a rail note — body text grows by 341 characters on
+  click, with **zero console errors**. The code chains are complete in both
+  directions.
+
+  **Why the original walk said "dead", and this is the most transferable lesson
+  in this document:** the check scraped the *studio subtree* and looked for a
+  dialog. A modal is `position: fixed` in a **portal**, so it is not in that
+  subtree at all — it can be fully open and score as nothing-happened. And the
+  onboarding checklist is a `role="region"`, not a dialog, so a dialog-only check
+  misses it even when it looks in the right place.
+
+  **Rule for any DEAD DOOR or MISSING DOOR claim: diff the whole document, not a
+  subtree, and count by geometry rather than by role.** List every visible node
+  over ~150×40 with a role or label, take a set difference across the click. A
+  role-based check was wrong twice before this rule was written down.
 - **The 1280 drawer-overlay mode is fully built with no trigger.**
   `LayoutShell.tsx:248,287` plus its CSS; `drawerPinned` has exactly one caller
   (`StudioPanels.tsx:411`) which never passes it, and the pin its board's title
@@ -135,7 +152,41 @@ between a finding and a guess.
 are driven end-to-end against the server-backed fixture. Each step is WORKS /
 BROKEN / NOT MEASURED, and "not measured" is never counted as a pass.*
 
-### 3a. Publish / go-live — walked, with one severe defect
+### 3a. Activation — the journey works; the proof of it does not persist
+
+dashboard → site → editor → first edit → autosave → preview → leave and return.
+
+| # | step | verdict |
+|---|---|---|
+| 1 | Discover "create a site" | **WORKS** — CLOSED DOOR on this account: "Site limit reached (3/3)", correctly messaged |
+| 2 | Pick an existing site | **WORKS** — site cards, real "Edit" link to `/edit/<id>` |
+| 3 | Open editor | **WORKS** — full chrome, canvas renders real content |
+| 4 | First meaningful edit | **WORKS** — click selects, double-click edits inline, commits on blur |
+| 5 | Autosave | **WORKS**, but **SILENT** — the header flips to "Saved · just now" ambiently; no confirmation of the save itself, though toasts do fire for other events |
+| 6 | Preview | **WORKS** — in-app Desktop/Tablet/Mobile overlay with a clear "Done" way back |
+| 7 | Leave and come back | **WORKS** — verified by closing the browser entirely and reopening a fresh session |
+| 8 | "Get started" checklist | **WORKS** — two doors, 7 steps whose CTAs fire the real action and tick live |
+
+**WORST — the activation signal itself does not survive step 7.** The checklist's
+completion state lives **only in `localStorage` under
+`buildrick-onboarding-progress`, and is never synced server-side.** Proven, not
+inferred: completing "Preview your site" in one browser context wrote
+`"completed":true` and moved the pill 3/7 → 4/7; reopening **the same site as the
+same logged-in user in a fresh browser context** read `"completed":false` and the
+pill was back at 3/7.
+
+That is the founder's own step 7 — leave and come back — applied to the one
+artifact built to prove activation happened. A user who activates on a laptop and
+returns on another device, in another browser, or after clearing their cache is
+told by the product that they have done nothing.
+
+*Not disambiguated:* whether the "Connect first client" / "Send for review" steps
+are server-derived or also client-local — the evidence was mixed and it is
+recorded as unresolved rather than assumed either way. Also not measured: a true
+blank-account onboarding, since the fixture is pre-populated, so "Insert a
+section" reads incomplete despite content existing.
+
+### 3b. Publish / go-live — walked, with one severe defect
 
 Environment established first, because two known traps could have made the whole
 walk meaningless: **both** `VITE_FEATURE_PUBLISH` and `NEXT_PUBLIC_FEATURE_PUBLISH`
