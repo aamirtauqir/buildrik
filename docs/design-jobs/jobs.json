@@ -6514,6 +6514,66 @@
       "owner": "founder",
       "recipe": null,
       "evidence": "Raised 2026-09-03 by editor-ed, who deliberately did NOT change the condition on their own judgement, and I agree it is a decision rather than a fix. Today the warning fires only when page.status === 'live', where status is `settings.visibility ?? \"draft\"` — a per-page field that defaults to off and that nobody sets unless they open the Advanced tab. So it never fires on a normal page. The honest condition is 'this page's URL is currently reachable', which is a fact about the SITE being published, not about a per-page field. Two costs to weigh: SeoTab has no publish context today, so wiring that is a real change; and the cheap alternative — warn whenever the field is unset — would fire on brand-new sites where 'will break existing links' is simply false, which trains users to ignore it. Related and separate: slugHistory is collected and read by nothing, so a redirect could be built on it later (F-SLUG-NO-REDIRECT)."
+    },
+    {
+      "id": "F-BRAND-UNDO-DELETES",
+      "nodeId": null,
+      "name": "Undo on a pending token edit DELETES the token and declares all-clear",
+      "family": "Brand",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. Reproduced twice, bit-identical. With a colour token mid-edit the canvas-footer Undo stays ENABLED; pressing it does not revert the value — it removes 'Action' from Tokens > Colours entirely, flips the banner to 'Brand is up to date' (a false all-clear over a token that no longer exists), and fires two toasts that contradict each other: 'Canvas undo/redo - your unsaved design edits were kept' beside 'Design tokens changed from another window. Your edits may conflict.' It does NOT survive reload — a fresh session shows #1A56DB — so this is session-local misinformation rather than disk data loss. Same shape as the CMS-binding Undo but worse: that one did nothing, this one does something destructive and then says everything is fine. The panel's own Save path is well built and gated (see F-BRAND-SAVE-GATE); the corruption happens only because Undo bypasses that gate."
+    },
+    {
+      "id": "F-BRAND-DIRTY-SPLIT",
+      "nodeId": null,
+      "name": "A brand-only edit leaves the topbar saying Saved",
+      "family": "Brand",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. With a token mid-edit the topbar reads 'Saved - just now' with a green dot; only the Brand panel's own footer shows 'Unsaved brand changes / Discard / Save'. An ELEMENT-level edit does flip the topbar to 'Unsaved changes'. Same concept, two surfacings, and the global one is the one that is wrong — a user watching the topbar believes their brand work is saved."
+    },
+    {
+      "id": "F-BRAND-UNLINK-SILENT",
+      "nodeId": null,
+      "name": "Unlinking a value from a token says nothing and offers no way back",
+      "family": "Brand",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "fix",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Unlinking a bound Fill swaps the 'color-action' chip for a bare hex with ZERO messaging — no banner, no badge, no 'Revert to token'. The only route back is reopening the swatch popover and re-picking the token by name. Compare the bar set by responsive overrides, which announce themselves with a sticky 'Overridden on Mobile - Base is 24px' banner, a dedicated Revert to base button and a dot on the pill. The mechanism to communicate an override exists in this product; the brand path does not use it."
+    },
+    {
+      "id": "F-BRAND-SAVE-GATE",
+      "nodeId": null,
+      "name": "GOOD — brand Save discloses blast radius before applying",
+      "family": "Brand",
+      "state": null,
+      "width": null,
+      "height": null,
+      "status": "done",
+      "authority": "product",
+      "kind": "flow",
+      "owner": "editor-ed",
+      "recipe": null,
+      "evidence": "VERIFIED LIVE 2026-09-03 (TA). Recorded as a positive because it is the standard the rest should be measured against: the Brand panel's Save opens 'Review 1 staged change - Applying updates every element bound to these tokens - 10 places' with Discard all / Keep editing / Apply. It names the blast radius BEFORE committing. Token propagation to bound elements is also live and instant."
     }
   ]
 }
