@@ -16,7 +16,7 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
-import { Button } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
 
 interface DetachInstanceButtonProps {
   composer: Composer | null;
@@ -51,6 +51,8 @@ export const DetachInstanceButton: React.FC<DetachInstanceButtonProps> = ({
   selectedElementId,
   onDetached,
 }) => {
+  const [confirming, setConfirming] = React.useState(false);
+  const { addToast } = useToast();
   const mode = useDSModeOptional()?.mode ?? "beginner";
   const isPro = mode === "pro";
 
@@ -65,32 +67,71 @@ export const DetachInstanceButton: React.FC<DetachInstanceButtonProps> = ({
     }
   }, [composer, selectedElementId]);
 
+  /* Named, not generic: the sibling door names the component and a detach that
+     says "its component" leaves the user checking which one they just cut. */
+  const componentName = React.useMemo(() => {
+    if (!composer?.components || !selectedElementId) return null;
+    try {
+      const inst = composer.components.getInstanceByElementId?.(selectedElementId);
+      const id = (inst as { componentId?: string } | undefined)?.componentId;
+      if (!id) return null;
+      return composer.components.getComponent?.(id)?.name ?? null;
+    } catch {
+      return null;
+    }
+  }, [composer, selectedElementId]);
+
   if (!isPro || !isInstance || !selectedElementId || !composer?.components) {
     return null;
   }
 
   const handleDetach = async () => {
+    setConfirming(false);
     try {
       const ok = await composer.components.detachInstance(selectedElementId);
-      if (ok) onDetached?.(selectedElementId);
+      if (ok) {
+        onDetached?.(selectedElementId);
+        return;
+      }
+      /* A refusal used to be indistinguishable from a success: `if (ok)` with
+         nothing on the else, beside a catch that swallowed. The button was
+         pressed, the link stayed, and nothing on screen said so. */
+      addToast({ description: "Couldn't detach this instance. It may already be detached.", tone: "error" });
     } catch {
-      // Engine throws on edge cases (already-detached, etc.); silently
-      // ignore — the inspector will re-render with updated state if successful.
+      addToast({ description: "Couldn't detach this instance. Try again.", tone: "error" });
     }
   };
 
   return (
-    <Button
-      type="button"
-      color="light"
-      size="xs"
-      onClick={handleDetach}
-      style={buttonStyle}
-      data-detach-instance-button
-      aria-label={`Detach instance ${selectedElementId}`}
-    >
-      <span style={dotStyle} aria-hidden />
-      Detach instance
-    </Button>
+    <>
+      <Button
+        type="button"
+        color="light"
+        size="xs"
+        onClick={() => setConfirming(true)}
+        style={buttonStyle}
+        data-detach-instance-button
+        aria-label={`Detach instance ${selectedElementId}`}
+      >
+        <span style={dotStyle} aria-hidden />
+        Detach instance
+      </Button>
+      {/* The component-library door has confirmed this since it shipped; this
+          one detached on a single click. Same action, same consequence, two
+          answers depending on which door you came through — so it uses that
+          door's dialog and its wording rather than a second mechanism. */}
+      <ConfirmDialog
+        open={confirming}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => void handleDetach()}
+        title="Detach from component?"
+        message={
+          componentName
+            ? `This copy stops receiving updates from "${componentName}". The component itself is untouched.`
+            : "This copy stops receiving updates from its component. The component itself is untouched."
+        }
+        confirmLabel="Detach"
+      />
+    </>
   );
 };

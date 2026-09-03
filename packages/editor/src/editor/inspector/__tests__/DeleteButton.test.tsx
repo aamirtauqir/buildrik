@@ -1,6 +1,14 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ProInspector } from "../ProInspector";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* ProInspector mounts DetachInstanceButton, which reports a refused detach
+   rather than swallowing it — so it needs the toast context. AquibraStudio
+   wraps the whole studio in one, so every real mount has it and only these
+   tests rendered the subtree bare. */
+const renderWithToast = (ui: React.ReactNode) => render(<ToastProvider>{ui}</ToastProvider>);
+
 
 const makeComposer = () => ({
   elements: { getElement: vi.fn(() => null) },
@@ -22,7 +30,7 @@ const el = { id: "abc12345678", type: "container" };
 
 describe("Element actions overflow menu — delete entry", () => {
   it("exposes a Delete menu item with an SVG icon (not emoji)", () => {
-    render(
+    renderWithToast(
       <ProInspector selectedElement={el} composer={makeComposer() as never} onDelete={vi.fn()} />
     );
 

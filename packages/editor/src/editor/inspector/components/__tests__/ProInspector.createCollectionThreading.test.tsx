@@ -54,6 +54,14 @@ vi.mock("../DeleteConfirmModal", () => ({
 }));
 
 import { ProInspector } from "../../ProInspector";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* ProInspector mounts DetachInstanceButton, which reports a refused detach
+   rather than swallowing it — so it needs the toast context. AquibraStudio
+   wraps the whole studio in one, so every real mount has it and only these
+   tests rendered the subtree bare. */
+const renderWithToast = (ui: React.ReactNode) => render(<ToastProvider>{ui}</ToastProvider>);
+
 
 function makeMinimalComposer() {
   return {
@@ -92,7 +100,7 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
     bindingPopoverProps.length = 0;
     const spy = vi.fn();
 
-    render(
+    renderWithToast(
       <ProInspector
         selectedElement={{ id: "el-1", type: "box", tagName: "div" }}
         composer={makeMinimalComposer()}
@@ -115,7 +123,7 @@ describe("ProInspector threads onOpenCreateCollection to BindingPopover", () => 
 
   it("renders cleanly when onOpenCreateCollection is omitted", () => {
     bindingPopoverProps.length = 0;
-    render(
+    renderWithToast(
       <ProInspector
         selectedElement={{ id: "el-1", type: "box", tagName: "div" }}
         composer={makeMinimalComposer()}

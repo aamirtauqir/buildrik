@@ -33,6 +33,14 @@ vi.mock("../components/DeleteConfirmModal", () => ({ DeleteConfirmModal: () => n
 vi.mock("../components/BindingPopover", () => ({ BindingPopover: () => null }));
 
 import { ProInspector } from "../ProInspector";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* ProInspector mounts DetachInstanceButton, which reports a refused detach
+   rather than swallowing it — so it needs the toast context. AquibraStudio
+   wraps the whole studio in one, so every real mount has it and only these
+   tests rendered the subtree bare. */
+const renderWithToast = (ui: React.ReactNode) => render(<ToastProvider>{ui}</ToastProvider>);
+
 
 function makeElement(id: string) {
   return {
@@ -73,7 +81,7 @@ function makeComposer(
 
 describe("ProInspector — branch selection", () => {
   it("renders the empty state when no element is selected", () => {
-    render(<ProInspector selectedElement={null} composer={makeComposer([])} />);
+    renderWithToast(<ProInspector selectedElement={null} composer={makeComposer([])} />);
     expect(screen.getByTestId("empty-state")).toBeInTheDocument();
     expect(screen.queryByTestId("multi-toolbar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("tab-content")).not.toBeInTheDocument();
@@ -82,14 +90,14 @@ describe("ProInspector — branch selection", () => {
   /* Board 159:102 — "Select something on the canvas to edit it." is a lie
      while the canvas is still filling itself in. */
   it("renders the loading skeleton, not the empty state, while the project loads", () => {
-    render(<ProInspector selectedElement={null} composer={makeComposer([], true)} />);
+    renderWithToast(<ProInspector selectedElement={null} composer={makeComposer([], true)} />);
     expect(screen.getByTestId("inspector-loading")).toBeInTheDocument();
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
   });
 
   it("renders the multi-select toolbar when 2+ elements are selected", () => {
     const composer = makeComposer([makeElement("a"), makeElement("b")]);
-    render(
+    renderWithToast(
       <ProInspector
         selectedElement={{ id: "a", type: "box", tagName: "div" }}
         composer={composer}
@@ -103,7 +111,7 @@ describe("ProInspector — branch selection", () => {
 
   it("renders the single-element inspector body when exactly one is selected", () => {
     const composer = makeComposer([makeElement("a")]);
-    render(
+    renderWithToast(
       <ProInspector
         selectedElement={{ id: "a", type: "box", tagName: "div" }}
         composer={composer}

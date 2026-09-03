@@ -1,6 +1,14 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ProInspector } from "../ProInspector";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* ProInspector mounts DetachInstanceButton, which reports a refused detach
+   rather than swallowing it — so it needs the toast context. AquibraStudio
+   wraps the whole studio in one, so every real mount has it and only these
+   tests rendered the subtree bare. */
+const renderWithToast = (ui: React.ReactNode) => render(<ToastProvider>{ui}</ToastProvider>);
+
 
 // A minimal composer mock that satisfies all hooks used by ProInspector.
 // - useComposerSelection needs selection.getSelected / getAllSelected
@@ -34,7 +42,7 @@ const openDeleteConfirmation = () => {
 
 describe("Delete confirmation modal — copy", () => {
   it("does NOT say 'cannot be undone'", () => {
-    render(
+    renderWithToast(
       <ProInspector
         selectedElement={selectedElement as never}
         composer={makeComposer() as never}
@@ -46,7 +54,7 @@ describe("Delete confirmation modal — copy", () => {
   });
 
   it("mentions Ctrl+Z undo hint", () => {
-    render(
+    renderWithToast(
       <ProInspector
         selectedElement={selectedElement as never}
         composer={makeComposer() as never}
