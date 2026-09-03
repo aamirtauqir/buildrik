@@ -273,9 +273,13 @@ function ResultView({
           Replaced {replaced.length} use{replaced.length === 1 ? "" : "s"} ✓
         </p>
         <footer className="med-rx-footer">
+          {/* Board 1174:4849's clean result closes on an 11/500 text link, not
+              on the filled 32-tall button the confirm and partial phases use:
+              there is nothing left to decide, so nothing to weight. */}
           <Button
             type="button"
-            className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
+            variant="link"
+            className="tw:text-[length:var(--bk-text-11)] tw:font-medium"
             onClick={onClose}
           >
             Done
