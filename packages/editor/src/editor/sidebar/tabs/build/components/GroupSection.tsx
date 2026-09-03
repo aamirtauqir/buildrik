@@ -212,7 +212,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
       />
     ))}
     {/* Board 1069:4970 (mine-expanded): the user's own components as plain
-        32h rows — same Row treatment as ELEMENTS. Empty registry = no rows;
+        dense rows — same Row treatment as ELEMENTS. Empty registry = no rows;
         the group header's live count already says 0. */}
     {isOpen && group.id === "mine" && mine?.map((c) => (
       <Row
