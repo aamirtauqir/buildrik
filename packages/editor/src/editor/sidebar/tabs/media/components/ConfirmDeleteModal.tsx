@@ -26,7 +26,7 @@ const LARGE_BULK_THRESHOLD = 20;
 
 export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDeleteModalProps) {
   const [confirmInput, setConfirmInput] = useState("");
-  const { keys, names, inUseCount, isBulk } = payload;
+  const { keys, names, inUseCount, inUse, isBulk } = payload;
   const isLargeBulk = isBulk && keys.length > LARGE_BULK_THRESHOLD;
   const canConfirm = !isLargeBulk || confirmInput === "DELETE";
 
@@ -70,6 +70,20 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
           >
             ⚠ {inUseCount} {inUseCount === 1 ? "file is" : "files are"} currently used on the
             canvas. Deleting will break those elements.
+            {/* The count alone is not a warning anyone can act on: with one
+                usage you can guess, with nine you cannot. Naming the file and
+                the pages it is on costs two lines and makes the sentence
+                above checkable. */}
+            {inUse.length > 0 && (
+              <ul className="tw:m-0 tw:mt-1.5 tw:list-none tw:p-0">
+                {inUse.map((u) => (
+                  <li key={u.name} className="tw:min-w-0 tw:truncate">
+                    {u.name}
+                    {u.pages.length > 0 ? ` — ${u.pages.join(", ")}` : ""}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
 

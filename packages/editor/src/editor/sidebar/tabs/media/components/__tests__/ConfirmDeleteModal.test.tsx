@@ -21,6 +21,7 @@ const payload = (over: Partial<ConfirmDeletePayload> = {}): ConfirmDeletePayload
   keys: ["a"],
   names: ["one.png"],
   inUseCount: 0,
+  inUse: [],
   isBulk: false,
   ...over,
 });
@@ -92,6 +93,38 @@ describe("ConfirmDeleteModal", () => {
 
     fireEvent.click(confirm);
     expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("names which files break and the pages they are on", () => {
+    /* The warning was a COUNT. With one usage you can guess which file; with
+       nine you cannot act on the warning you were given, so it stops being a
+       warning. The elements were already being found and thrown away. */
+    render(
+      <ConfirmDeleteModal
+        payload={payload({
+          inUseCount: 2,
+          inUse: [
+            { name: "hero.jpg", pages: ["Home", "Pricing"] },
+            { name: "logo.svg", pages: ["Home"] },
+          ],
+        })}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/hero\.jpg — Home, Pricing/)).toBeTruthy();
+    expect(screen.getByText(/logo\.svg — Home/)).toBeTruthy();
+  });
+
+  it("names a file whose page cannot be traced, rather than dropping it", () => {
+    render(
+      <ConfirmDeleteModal
+        payload={payload({ inUseCount: 1, inUse: [{ name: "orphan.png", pages: [] }] })}
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("orphan.png")).toBeTruthy();
   });
 
   it("cancels without deleting", () => {

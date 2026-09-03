@@ -6,7 +6,7 @@
 
 import { useCallback, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
-import type { ConfirmDeletePayload, LibraryItem, SelectionStateResult } from "../data/mediaTypes";
+import type { AssetUsage, ConfirmDeletePayload, LibraryItem, SelectionStateResult } from "../data/mediaTypes";
 
 type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning") => void;
 
@@ -21,15 +21,41 @@ export function useSelectionState(
   // §14 — last single-click anchor for shift-range select.
   const [anchorKey, setAnchorKey] = useState<string | null>(null);
 
+  /* Returns WHICH assets break and where, not just how many. The elements were
+     already being found and thrown away for a count — the modal could not name
+     a single one, so a user with nine usages had a warning they could not act
+     on. */
   const checkInUse = useCallback(
-    (keys: string[]): number => {
+    (keys: string[]): AssetUsage[] => {
+      type ElNode = { getParent?: () => ElNode | null; id?: string };
       const elements = composer.elements as unknown as {
-        findByMediaSrc?: (src: string) => unknown[];
+        findByMediaSrc?: (src: string) => ElNode[];
       };
-      if (typeof elements?.findByMediaSrc !== "function") return 0;
-      return keys.filter((key) => {
+      if (typeof elements?.findByMediaSrc !== "function") return [];
+
+      /* Page names by their root element id, so a found element can be traced
+         home by walking parents. The registry is flat and holds every imported
+         page, so "which page" is not otherwise recoverable from an element. */
+      const pageOfRoot = new Map<string, string>();
+      for (const p of composer.elements.getAllPages?.() ?? []) {
+        const rootId = (p as { root?: { id?: string } }).root?.id;
+        if (rootId) pageOfRoot.set(rootId, p.name ?? "Untitled page");
+      }
+      const pageFor = (el: ElNode): string | null => {
+        let node: ElNode | null = el;
+        /* Bounded: a cycle in the parent chain would hang the confirm dialog,
+           and no tree in this product is anywhere near this deep. */
+        for (let hops = 0; node && hops < 200; hops++) {
+          if (node.id && pageOfRoot.has(node.id)) return pageOfRoot.get(node.id)!;
+          node = node.getParent?.() ?? null;
+        }
+        return null;
+      };
+
+      const usages: AssetUsage[] = [];
+      for (const key of keys) {
         const asset = composer.media.getAsset(key);
-        if (!asset) return false;
+        if (!asset) continue;
         /*
           Called ON the manager, not through a detached reference. The old code
           lifted the method out (`const findFn = composer.elements.findByMediaSrc`)
@@ -39,8 +65,12 @@ export function useSelectionState(
           Delete opened no confirm modal at all, and the in-use count that warns
           before deleting a referenced asset never ran.
         */
-        return elements.findByMediaSrc!(asset.src).length > 0;
-      }).length;
+        const found = elements.findByMediaSrc!(asset.src);
+        if (found.length === 0) continue;
+        const pages = [...new Set(found.map(pageFor).filter((n): n is string => Boolean(n)))];
+        usages.push({ name: asset.name ?? key, pages });
+      }
+      return usages;
     },
     [composer]
   );
@@ -116,8 +146,8 @@ export function useSelectionState(
     (key: string) => {
       const item = libraryItems.find((i) => i.key === key);
       if (!item) return;
-      const inUseCount = checkInUse([key]);
-      setConfirmDelete({ keys: [key], names: [item.name], inUseCount, isBulk: false });
+      const inUse = checkInUse([key]);
+      setConfirmDelete({ keys: [key], names: [item.name], inUseCount: inUse.length, inUse, isBulk: false });
     },
     [libraryItems, checkInUse]
   );
@@ -126,8 +156,8 @@ export function useSelectionState(
     (items: LibraryItem[]) => {
       const keys = items.map((i) => i.key);
       const names = items.map((i) => i.name);
-      const inUseCount = checkInUse(keys);
-      setConfirmDelete({ keys, names, inUseCount, isBulk: true });
+      const inUse = checkInUse(keys);
+      setConfirmDelete({ keys, names, inUseCount: inUse.length, inUse, isBulk: true });
     },
     [checkInUse]
   );

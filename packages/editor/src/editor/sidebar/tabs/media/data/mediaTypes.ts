@@ -84,10 +84,22 @@ export interface LibraryItem {
 
 // --- Delete confirmation ---
 
+/** One asset the delete would break, and where it is used. */
+export interface AssetUsage {
+  name: string;
+  /** Page names holding an element that references it. Empty when the element
+   *  cannot be traced to a page — named as unknown rather than dropped. */
+  pages: string[];
+}
+
 export interface ConfirmDeletePayload {
   keys: string[];
   names: string[];
   inUseCount: number;
+  /* The count alone told a user that something would break and not what. With
+     one usage you can guess; with nine you cannot act on the warning you were
+     given, so the warning stops being a warning. */
+  inUse: AssetUsage[];
   isBulk: boolean;
 }
 

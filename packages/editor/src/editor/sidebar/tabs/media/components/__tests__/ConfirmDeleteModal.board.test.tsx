@@ -19,9 +19,13 @@ function payload(over: Partial<ConfirmDeletePayload> = {}): ConfirmDeletePayload
     keys: Array.from({ length: 34 }, (_, i) => `k${i}`),
     names: Array.from({ length: 34 }, (_, i) => `file-${i}.jpg`),
     inUseCount: 5,
+    inUse: Array.from({ length: 5 }, (_, i) => ({ name: `file-${i}.jpg`, pages: ["Home"] })),
     isBulk: true,
     ...over,
-  } as ConfirmDeletePayload;
+    /* The `as ConfirmDeletePayload` that used to close this object is why
+       adding a required field compiled clean here and then threw at runtime in
+       five tests. A cast on a fixture turns a type error into a crash. */
+  };
 }
 
 describe("ConfirmDeleteModal (board 1175:4827)", () => {
