@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { runProjectMigrations } from "../runner";
+/* The target is read, never retyped: these assertions are about "the chain
+   ran to completion", not about the number 2. Hardcoding it meant every new
+   migration broke six unrelated tests (0003 did). */
+import { TARGET_PROJECT_VERSION } from "../index";
 import type { ProjectPayload } from "../types";
 
 const SITE_ID = "site-alpha";
@@ -16,22 +20,22 @@ describe("runProjectMigrations", () => {
   it("returns same payload + same version when fromVersion >= TARGET_PROJECT_VERSION", () => {
     const result = runProjectMigrations({
       project: v0Payload,
-      currentVersion: 2,
+      currentVersion: TARGET_PROJECT_VERSION,
       siteId: SITE_ID,
     });
     expect(result.project).toBe(v0Payload);
-    expect(result.newVersion).toBe(2);
+    expect(result.newVersion).toBe(TARGET_PROJECT_VERSION);
     expect(localStorage.getItem(SNAPSHOT_KEY)).toBeNull();
     expect(localStorage.getItem(MARKER_KEY)).toBeNull();
   });
 
-  it("applies 0001+0002 and returns v=2 when fromVersion=0", () => {
+  it("applies every migration and returns the target version when fromVersion=0", () => {
     const result = runProjectMigrations({
       project: v0Payload,
       currentVersion: 0,
       siteId: SITE_ID,
     });
-    expect(result.newVersion).toBe(2);
+    expect(result.newVersion).toBe(TARGET_PROJECT_VERSION);
     expect(result.project.tokens.length).toBeGreaterThanOrEqual(18);
   });
 
@@ -89,7 +93,7 @@ describe("runProjectMigrations", () => {
       currentVersion: 0,
       siteId: SITE_ID,
     });
-    expect(result.newVersion).toBe(2);
+    expect(result.newVersion).toBe(TARGET_PROJECT_VERSION);
     expect(localStorage.getItem(MARKER_KEY)).toBeNull();
     expect(localStorage.getItem(SNAPSHOT_KEY)).toBeNull();
   });

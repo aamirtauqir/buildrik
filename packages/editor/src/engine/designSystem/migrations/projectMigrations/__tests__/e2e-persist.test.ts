@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { runProjectMigrations } from "../runner";
+import { TARGET_PROJECT_VERSION } from "../index";
 import type { ProjectPayload } from "../types";
 
 /**
@@ -7,10 +8,10 @@ import type { ProjectPayload } from "../types";
  * without spinning up the browser. The mocked tRPC client captures what
  * loadProject would receive and what saveProject would push.
  */
-describe("v0 → v2 round trip", () => {
+describe("v0 → latest round trip", () => {
   beforeEach(() => localStorage.clear());
 
-  it("v=0 site loads, runs 0001+0002, saves with dsSchemaVersion=2 and 18 new kind tokens", () => {
+  it("v=0 site loads, runs the whole chain, saves at the target version with 18 new kind tokens", () => {
     const initial: ProjectPayload = { tokens: [] };
 
     const loadedVersion = 0;
@@ -21,7 +22,7 @@ describe("v0 → v2 round trip", () => {
       siteId: "site-roundtrip",
     });
 
-    expect(newVersion).toBe(2);
+    expect(newVersion).toBe(TARGET_PROJECT_VERSION);
     expect(project.tokens.filter((t) => t.kind === "radius")).toHaveLength(2);
     expect(project.tokens.filter((t) => t.kind === "shadow")).toHaveLength(2);
     expect(project.tokens.filter((t) => t.kind === "imagery")).toHaveLength(1);
@@ -33,12 +34,12 @@ describe("v0 → v2 round trip", () => {
     saveSpy({ siteId: "site-roundtrip", projectData: { ...project, dsSchemaVersion: newVersion } });
     expect(saveSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        projectData: expect.objectContaining({ dsSchemaVersion: 2 }),
+        projectData: expect.objectContaining({ dsSchemaVersion: TARGET_PROJECT_VERSION }),
       })
     );
   });
 
-  it("v=2 site is a no-op on second load (idempotent across full chain)", () => {
+  it("a site already at the target version is a no-op on second load (idempotent across full chain)", () => {
     const v2Payload: ProjectPayload = {
       tokens: [
         {
@@ -56,15 +57,15 @@ describe("v0 → v2 round trip", () => {
 
     const result = runProjectMigrations({
       project: v2Payload,
-      currentVersion: 2,
+      currentVersion: TARGET_PROJECT_VERSION,
       siteId: "site-roundtrip",
     });
 
-    expect(result.newVersion).toBe(2);
+    expect(result.newVersion).toBe(TARGET_PROJECT_VERSION);
     expect(result.project).toBe(v2Payload);
   });
 
-  it("v=1 site runs only 0002 and bumps to v=2 (skips already-applied 0001)", () => {
+  it("v=1 site runs the remaining migrations and reaches the target (skips already-applied 0001)", () => {
     const v1Payload: ProjectPayload = {
       tokens: [
         {
@@ -85,7 +86,7 @@ describe("v0 → v2 round trip", () => {
       siteId: "site-roundtrip-v1",
     });
 
-    expect(newVersion).toBe(2);
+    expect(newVersion).toBe(TARGET_PROJECT_VERSION);
     expect(project.tokens.find((t) => t.id === "color-primary")?.darkValue).toBe("#60A5FA");
   });
 });

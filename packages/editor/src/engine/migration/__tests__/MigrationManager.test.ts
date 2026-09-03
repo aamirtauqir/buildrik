@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { MigrationManager } from "../MigrationManager";
 import { EventEmitter } from "../../EventEmitter";
 import type { ProjectPayload } from "../../designSystem/migrations/projectMigrations";
+/* Read the target, never retype it — these assertions are about "the chain ran
+   to completion" and "already at target", not about the number 2. Adding
+   migration 0003 broke both by moving a literal out from under them. */
+import { TARGET_PROJECT_VERSION } from "../../designSystem/migrations/projectMigrations";
 
 describe("MigrationManager", () => {
   beforeEach(() => localStorage.clear());
@@ -18,11 +22,11 @@ describe("MigrationManager", () => {
       siteId: "site-1",
     });
 
-    expect(result.newVersion).toBe(2);
+    expect(result.newVersion).toBe(TARGET_PROJECT_VERSION);
     expect(onComplete).toHaveBeenCalledWith({
       siteId: "site-1",
       fromVersion: 0,
-      toVersion: 2,
+      toVersion: TARGET_PROJECT_VERSION,
     });
   });
 
@@ -32,9 +36,9 @@ describe("MigrationManager", () => {
     emitter.on("migration:skipped", onSkipped);
     const mgr = new MigrationManager(emitter);
 
-    mgr.run({ project: { tokens: [] }, currentVersion: 2, siteId: "site-1" });
+    mgr.run({ project: { tokens: [] }, currentVersion: TARGET_PROJECT_VERSION, siteId: "site-1" });
 
-    expect(onSkipped).toHaveBeenCalledWith({ siteId: "site-1", currentVersion: 2 });
+    expect(onSkipped).toHaveBeenCalledWith({ siteId: "site-1", currentVersion: TARGET_PROJECT_VERSION });
   });
 
   it("emits migration:started before migration:complete", () => {
