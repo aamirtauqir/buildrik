@@ -237,7 +237,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="lg">
+      <ModalContent size="table">
         {/* Board 1170:4749 puts the collection and its record count IN the
             title — "Menu items — 12 records" — so the modal says what it is
             holding before you read a single row. */}

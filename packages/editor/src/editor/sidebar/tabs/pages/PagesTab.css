@@ -699,18 +699,13 @@
   padding: var(--bk-space-32) var(--bk-space-24) 0;
   text-align: center;
 }
-/* Board 141:204 names --color/error-text (#C81E1E), not the brighter --bk-error
-   (#E02424) — the same substitution commit 530588b4 made in Content, Insert and
-   Media. It missed this one because it grepped for Tailwind's red-700. */
+/* Board 141:204 names error-text; 530588b4 missed it, grepping for red-700. */
 .bd-pg-error-title { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-error-text); }
 .bd-pg-error-desc { margin: 0; font: 400 12px/18px var(--bk-font-ui); color: var(--bk-ink-muted); }
 .bd-pg-error-retry,
 .bd-pg-nores-clear,
 .bd-pg-onepage-add {
-  /* Not `min-height: 0`: these are text links whose 20px line box was the only
-     thing holding them at the editor's 20px hit-target floor (DESIGN.md:518).
-     Stating it means a type change cannot quietly shrink the target. */
-  min-height: 20px;
+  min-height: 20px; /* stated: the line box was all that held the hit floor */
   border: none;
   background: transparent;
   padding: 0;

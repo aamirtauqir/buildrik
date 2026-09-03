@@ -94,7 +94,7 @@ describe("PageList", () => {
     expect(screen.getByText(/Couldn\u2019t load your pages\./)).toBeInTheDocument();
     expect(screen.getByText("Try again")).toBeInTheDocument();
     expect(container.querySelector(".bd-pg-search")).not.toBeNull();
-    expect(screen.getByRole("button", { name: /add page/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add new page/i })).toBeInTheDocument();
   });
 
   it("does not render legacy pg-list class names", () => {

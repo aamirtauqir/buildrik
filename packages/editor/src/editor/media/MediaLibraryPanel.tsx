@@ -161,7 +161,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="lg">
+      <ModalContent size="table">
         <ModalTitle>
           {title}
           {forLabel ? (

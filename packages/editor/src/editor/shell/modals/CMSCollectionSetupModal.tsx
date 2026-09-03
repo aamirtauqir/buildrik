@@ -265,7 +265,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         fields.some((f) => f.name !== "title")
       }
     >
-      <ModalContent size="form">
+      <ModalContent size="fields">
         {/* Board 1170:4713's own title is the step, not the wizard. */}
         <ModalTitle>{step === 2 && name.trim() ? `Fields for ${name.trim()}` : "Create Collection"}</ModalTitle>
         <ModalClose aria-label="Close modal">
