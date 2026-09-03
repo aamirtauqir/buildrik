@@ -264,8 +264,8 @@
 }
 
 .entry-label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--bk-text-12); /* board 163:49 draws the change label 12/400 */
+  font-weight: 400;
   color: var(--bk-ink);
   line-height: 1.3;
 }
