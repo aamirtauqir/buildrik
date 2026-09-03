@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, Kbd, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { Button, Kbd, ModalBody, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -40,54 +40,28 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         </svg>
       </ModalClose>
       <ModalBody>
-        <div style={{ padding: "var(--bk-space-16)" }}>
-    <p
-      role="alert"
-      style={{
-        margin: "0 0 var(--bk-space-16)",
-        color: "var(--bk-ink-soft)",
-        fontSize: "var(--bk-text-13)",
-        lineHeight: 1.5,
-      }}
-    >
-      {/* The board's sample says "This cannot be undone", which is not true
-          of this editor — a delete is one undo step. The code contract wins on
-          behaviour, so the sentence says what actually happens. */}
-      <strong>{elementLabel}</strong> is removed from the page. You can undo it with{" "}
-      <Kbd style={{ fontFamily: "var(--bk-font-mono)", fontSize: "0.9em" }}>Ctrl+Z</Kbd>.
-    </p>
-    <div style={{ display: "flex", gap: "var(--bk-space-12)", justifyContent: "flex-end" }}>
-      <Button
-        onClick={onClose}
-        style={{
-          padding: "8px 16px",
-          background: "var(--bk-gray-200)",
-          border: "1px solid var(--bk-border)",
-          borderRadius: "var(--bk-radius-lg)",
-          color: "var(--bk-ink)",
-          cursor: "pointer",
-          fontWeight: 500,
-        }}
-      >
-        Cancel
-      </Button>
-      <Button
-        onClick={onConfirm}
-        style={{
-          padding: "8px 16px",
-          background: "var(--bk-error)",
-          border: "none",
-          borderRadius: "var(--bk-radius-lg)",
-          color: "white",
-          cursor: "pointer",
-          fontWeight: 600,
-        }}
-      >
-        Delete {elementLabel}
-      </Button>
-    </div>
-  </div>
+        <p role="alert" className="tw:m-0">
+          {/* The board's sample says "This cannot be undone", which is not true
+              of this editor — a delete is one undo step. The code contract wins on
+              behaviour, so the sentence says what actually happens. */}
+          <strong>{elementLabel}</strong> is removed from the page. You can undo it with{" "}
+          <Kbd>Ctrl+Z</Kbd>.
+        </p>
       </ModalBody>
+      {/* Board 1706:8462 — the actions belong to a real ModalFooter, which is
+          what caps them at 28. They shipped in a hand-rolled flex row inside
+          ModalBody, so MODAL_FOOT_CLASS never reached them and flowbite's own
+          40 stood: the panel measured 169 against the board's 132, and the
+          whole +37 was here. Capping the two buttons with `tw:h-7` instead
+          would leave the next modal to rediscover the same thing. */}
+      <ModalFooter>
+        <Button variant="secondary" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button variant="danger" onClick={onConfirm}>
+          Delete {elementLabel}
+        </Button>
+      </ModalFooter>
     </ModalContent>
   </ModalRoot>
 );

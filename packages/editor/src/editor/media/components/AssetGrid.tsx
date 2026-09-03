@@ -183,101 +183,6 @@ export function AssetGrid({
           </span>
         </div>
       )}
-      {/* Bulk action toolbar (multi-select mode) */}
-      {state.selMode && state.selectedKeys.size > 0 && (
-        <div className="mgr-bulk-bar">
-          <span className="mgr-bulk-count">{state.selectedKeys.size} selected</span>
-          <div className="mgr-spacer" />
-          {/* Bug #4 fix: Move → folder picker popover */}
-          <div className="mgr-sort-wrap">
-            <Button variant="link" className={BULK_LINK} onClick={() => setBulkMovePickerOpen((o) => !o)}>
-              Move to folder…
-            </Button>
-            {bulkMovePickerOpen && (
-              <>
-                <div
-                  className="mgr-sort-scrim"
-                  onClick={() => setBulkMovePickerOpen(false)}
-                />
-                <div
-                  className="mgr-sort-menu"
-                  style={{ minWidth: 200, maxHeight: 280, overflowY: "auto" }}
-                >
-                  <Button
-                    className="mgr-sort-item"
-                    onClick={() => {
-                      const keys = Array.from(state.selectedKeys);
-                      state.bulkMoveAssets(keys, null);
-                      addToast({
-                        description: `Moved ${keys.length} to root`,
-                        tone: "success",
-                      });
-                      setBulkMovePickerOpen(false);
-                      state.toggleSelMode();
-                    }}
-                  >
-                    <FolderOpen size={12} /> Root
-                  </Button>
-                  {state.folders.length > 0 && <div className="mgr-sort-sep" />}
-                  {state.folders.map((folder) => (
-                    <Button
-                      key={folder.id}
-                      className="mgr-sort-item"
-                      onClick={() => {
-                        const keys = Array.from(state.selectedKeys);
-                        state.bulkMoveAssets(keys, folder.id);
-                        addToast({
-                          description: `Moved ${keys.length} to ${folder.name}`,
-                          tone: "success",
-                        });
-                        setBulkMovePickerOpen(false);
-                        state.toggleSelMode();
-                      }}
-                    >
-                      <div
-                        className="mgr-folder-dot"
-                        style={{ background: "var(--bk-warning)" }}
-                      />
-                      {folder.name}
-                    </Button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-          <Button
-            variant="link"
-            className={BULK_LINK}
-            onClick={() => {
-              // Board 1163:4641 draws Download between Move and Delete. The
-              // browser pulls one file at a time, so the selection goes as
-              // individual downloads — the engine owns the disk write.
-              const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
-              const n = onDownload(items.map((i) => ({ src: i.src, name: i.displayName ?? i.name })));
-              addToast({
-                description: `Downloading ${n} ${n === 1 ? "file" : "files"}`,
-                tone: "info",
-              });
-            }}
-          >
-            Download
-          </Button>
-          <Button
-            variant="link"
-            className={BULK_LINK_DANGER}
-            onClick={() => {
-              const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
-              state.requestBulkDelete(items);
-            }}
-          >
-            Delete
-          </Button>
-          <Button variant="link" className={BULK_LINK_MUTED} onClick={state.toggleSelMode}>
-            ✕ Clear
-          </Button>
-        </div>
-      )}
-
       {/*
         Board 1161:35 — the grid toolbar reads left to right: what you are
         looking at, what formats are in it, then how it is arranged. The
@@ -406,6 +311,103 @@ export function AssetGrid({
           <CheckSquare size={13} />
         </Button>
       </div>
+
+      {/* Board 1163:4641 draws the bulk bar BELOW the toolbar, not in
+          place of it: what you are filtering by stays on screen while a
+          selection is live. */}
+      {state.selMode && state.selectedKeys.size > 0 && (
+        <div className="mgr-bulk-bar">
+          <span className="mgr-bulk-count">{state.selectedKeys.size} selected</span>
+          <div className="mgr-spacer" />
+          {/* Bug #4 fix: Move → folder picker popover */}
+          <div className="mgr-sort-wrap">
+            <Button variant="link" className={BULK_LINK} onClick={() => setBulkMovePickerOpen((o) => !o)}>
+              Move to folder…
+            </Button>
+            {bulkMovePickerOpen && (
+              <>
+                <div
+                  className="mgr-sort-scrim"
+                  onClick={() => setBulkMovePickerOpen(false)}
+                />
+                <div
+                  className="mgr-sort-menu"
+                  style={{ minWidth: 200, maxHeight: 280, overflowY: "auto" }}
+                >
+                  <Button
+                    className="mgr-sort-item"
+                    onClick={() => {
+                      const keys = Array.from(state.selectedKeys);
+                      state.bulkMoveAssets(keys, null);
+                      addToast({
+                        description: `Moved ${keys.length} to root`,
+                        tone: "success",
+                      });
+                      setBulkMovePickerOpen(false);
+                      state.toggleSelMode();
+                    }}
+                  >
+                    <FolderOpen size={12} /> Root
+                  </Button>
+                  {state.folders.length > 0 && <div className="mgr-sort-sep" />}
+                  {state.folders.map((folder) => (
+                    <Button
+                      key={folder.id}
+                      className="mgr-sort-item"
+                      onClick={() => {
+                        const keys = Array.from(state.selectedKeys);
+                        state.bulkMoveAssets(keys, folder.id);
+                        addToast({
+                          description: `Moved ${keys.length} to ${folder.name}`,
+                          tone: "success",
+                        });
+                        setBulkMovePickerOpen(false);
+                        state.toggleSelMode();
+                      }}
+                    >
+                      <div
+                        className="mgr-folder-dot"
+                        style={{ background: "var(--bk-warning)" }}
+                      />
+                      {folder.name}
+                    </Button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+          <Button
+            variant="link"
+            className={BULK_LINK}
+            onClick={() => {
+              // Board 1163:4641 draws Download between Move and Delete. The
+              // browser pulls one file at a time, so the selection goes as
+              // individual downloads — the engine owns the disk write.
+              const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
+              const n = onDownload(items.map((i) => ({ src: i.src, name: i.displayName ?? i.name })));
+              addToast({
+                description: `Downloading ${n} ${n === 1 ? "file" : "files"}`,
+                tone: "info",
+              });
+            }}
+          >
+            Download
+          </Button>
+          <Button
+            variant="link"
+            className={BULK_LINK_DANGER}
+            onClick={() => {
+              const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
+              state.requestBulkDelete(items);
+            }}
+          >
+            Delete
+          </Button>
+          <Button variant="link" className={BULK_LINK_MUTED} onClick={state.toggleSelMode}>
+            ✕ Clear
+          </Button>
+        </div>
+      )}
 
       {/*
         Board 1163:13695 — a smart scope says what it is showing AND what that
