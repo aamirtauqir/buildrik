@@ -257,6 +257,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             renamingPageId={p.renamingPageId}
             nameError={nameError}
             loadError={p.loadError}
+            loading={p.loading}
             onRetry={p.retrySync}
             onOpenListings={() => setView("listings")}
             openContextMenuPageId={p.contextMenu?.pageId ?? null}

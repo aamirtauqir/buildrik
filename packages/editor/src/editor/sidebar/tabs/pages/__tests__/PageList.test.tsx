@@ -49,6 +49,30 @@ function makeProps(overrides: Partial<React.ComponentProps<typeof PageList>> = {
 }
 
 describe("PageList", () => {
+  it("does not invite a page creation while the project is still loading", () => {
+    /* The list syncs EMPTY before `loadProject` resolves, and this panel read
+       that as "no pages yet" and offered Create blank page. Accepting cost the
+       user the page: the real project lands, `importProject` replaces the
+       whole set, and ⌘Z reports nothing to undo. An empty list under a pending
+       load means "nothing has answered yet", which is what the skeleton says. */
+    render(<PageList {...makeProps({ pages: [], loading: true })} />);
+    expect(screen.queryByText("No pages yet")).not.toBeInTheDocument();
+    expect(screen.queryByText("Create blank page")).not.toBeInTheDocument();
+  });
+
+  it("shows the empty state once the load has answered", () => {
+    render(<PageList {...makeProps({ pages: [], loading: false })} />);
+    expect(screen.getByText("No pages yet")).toBeInTheDocument();
+    expect(screen.getByText("Create blank page")).toBeInTheDocument();
+  });
+
+  it("lets a load error win over the skeleton, so Retry stays reachable", () => {
+    render(<PageList {...makeProps({ pages: [], loading: true, loadError: "Couldn't load your pages" })} />);
+    expect(screen.queryByText("No pages yet")).not.toBeInTheDocument();
+    expect(screen.getByText(/Couldn.t load your pages\./)).toBeInTheDocument();
+    expect(screen.getByText("Try again")).toBeInTheDocument();
+  });
+
   it("renders empty state when pages array is empty", () => {
     render(<PageList {...makeProps({ pages: [] })} />);
     expect(screen.getByText("No pages yet")).toBeInTheDocument();

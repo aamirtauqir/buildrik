@@ -20,6 +20,7 @@ import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
+import { PagesLoadingSkeleton } from "./PagesStateBlocks";
 
 interface Props {
   pages: PageItem[];
@@ -36,6 +37,8 @@ interface Props {
   dirtyPages?: ReadonlySet<string>;
   /** Sync failed — board 141:203 replaces the tree, the frame stays. */
   loadError?: string | null;
+  /** The project has not answered yet — an empty list is not an empty site. */
+  loading?: boolean;
   onRetry?: () => void;
   onAddPage: () => void;
   onAddFolder: () => void;
@@ -70,6 +73,7 @@ export const PageList: React.FC<Props> = ({
   selectedIds,
   dirtyPages,
   loadError,
+  loading,
   onRetry,
   onAddPage,
   onAddFolder,
@@ -108,6 +112,20 @@ export const PageList: React.FC<Props> = ({
   const visible = search
     ? pages.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
     : pages;
+
+  /* PagesLoadingSkeleton existed for months with no importer outside the e2e
+     probe, while this empty state shipped over every still-loading project and
+     invited a page creation that `importProject` would silently discard. The
+     skeleton was built for exactly this moment; it just had no door. */
+  if (pages.length === 0 && loading && !loadError) {
+    return (
+      <div className="bd-pg-list-shell">
+        <div className="bd-pg-list">
+          <PagesLoadingSkeleton />
+        </div>
+      </div>
+    );
+  }
 
   if (pages.length === 0 && !loadError) {
     return (

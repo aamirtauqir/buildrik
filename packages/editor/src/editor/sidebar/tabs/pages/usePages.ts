@@ -25,6 +25,7 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { getDefaultPageName } from "../../../../shared/utils/pageUtils";
 import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem } from "./types";
+import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
 
 interface ContextMenuState {
   pageId: string;
@@ -67,6 +68,9 @@ export interface UsePagesReturn {
   // Error state
   loadError: string | null;
   retrySync: () => void;
+  /** The site's project is still on its way. An empty list means "not known
+      yet", not "no pages" — see the state below. */
+  loading: boolean;
 }
 
 export function usePages(composer: Composer | null): UsePagesReturn {
@@ -77,6 +81,18 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   const [contextMenu, setContextMenu] = React.useState<ContextMenuState | null>(null);
   const [settingsPageId, setSettingsPageId] = React.useState<string | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
+  /* A server-backed project syncs an EMPTY page list before `loadProject`
+     resolves, and the panel read that as "no pages yet" and offered to create
+     one. Accepting cost the user their work: the real project lands,
+     `importProject` replaces the whole page set, the created page is gone and
+     ⌘Z says "Nothing to undo" — unrecoverable. The list is only empty in the
+     sense that nothing has answered yet.
+
+     Seeded from the same registry the save boundary consults rather than from
+     `false`, so a panel remounted after the load completes does not sit on a
+     skeleton waiting for a PROJECT_LOADED that already fired. */
+  const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
+  const [loaded, setLoaded] = React.useState(() => !siteId || hasProjectLoaded(siteId));
   const [retryKey, setRetryKey] = React.useState(0);
 
   // ── Sync from composer ────────────────────────────────────────────────────
@@ -132,7 +148,10 @@ export function usePages(composer: Composer | null): UsePagesReturn {
        PageTabBar and useLayerTree already listen to both for the same reason.
        `syncOnLoad` ignores the payload: an import has no page:* type to
        filter on, and every import can change the whole list. */
-    const syncOnLoad = () => sync();
+    const syncOnLoad = () => {
+      setLoaded(true);
+      sync();
+    };
     composer.on(EVENTS.PROJECT_CHANGED, handler);
     composer.on(EVENTS.PROJECT_LOADED, syncOnLoad);
     return () => {
@@ -414,5 +433,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     isOnlyPage: pages.length === 1,
     loadError,
     retrySync,
+    /* A failed load is not a pending one: `loadError` owns that state and
+       offers Retry, so the skeleton must stand down or the error never shows. */
+    loading: !loaded && !loadError,
   };
 }

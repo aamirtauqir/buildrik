@@ -523,6 +523,15 @@ export async function loadServerMedia(
   }
 }
 
+/** Whether this site's project has finished loading this session. The same
+ *  `_loadedSites` the write boundary consults, so a panel asking "may I invite
+ *  an edit yet?" and the save refusing to overwrite cannot disagree. Reading
+ *  it is also what lets a panel remount mid-session without waiting forever
+ *  for a PROJECT_LOADED that already fired. */
+export function hasProjectLoaded(siteId: string): boolean {
+  return _loadedSites.has(siteId);
+}
+
 export function getSiteIdFromUrl(): string | null {
   if (typeof window === "undefined") return null;
   const pathMatch = window.location.pathname.match(/^\/edit\/([^/?#]+)/);
