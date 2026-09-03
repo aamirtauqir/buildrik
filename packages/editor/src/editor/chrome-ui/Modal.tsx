@@ -30,7 +30,12 @@ export const MODAL_BODY_CLASS = "tw:px-4 tw:pt-0 tw:pb-4 tw:overflow-auto tw:tex
    button cannot lose to it on source order (CLAUDE.md §Chrome). */
 export const MODAL_FOOT_CLASS =
   "tw:flex tw:items-center tw:justify-end tw:gap-2 tw:py-3 tw:px-4 tw:border-t tw:border-[var(--bk-border)] " +
-  "tw:[&>button]:h-7 tw:[&>button]:min-h-0 tw:[&>div>button]:h-7 tw:[&>div>button]:min-h-0";
+  /* Descendant, not child: the child selectors caught a footer whose buttons
+     sit directly in it or one div down, and missed every modal that wraps them
+     in its own flex row — the delete confirm shipped 40-tall buttons against a
+     board drawing 28 because of exactly that. There is no case where a button
+     inside a modal footer should keep flowbite's 40. */
+  "tw:[&_button]:h-7 tw:[&_button]:min-h-0";
 
 const KIND_WIDTH_CLASS: Record<ModalKind, string> = {
   question: "tw:w-[440px]",
