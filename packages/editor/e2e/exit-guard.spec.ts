@@ -73,10 +73,21 @@ test.describe("exit guard — beforeunload", () => {
    *
    * A clean editor SHOULD raise no prompt: `StudioHeader.tsx:460-469` returns
    * early when `!isDirty && saveStatus !== "saving" && stranded === 0`. It
-   * intermittently does prompt — measured at roughly 1 run in 3, and NOT
-   * fixed by waiting for the topbar to report "Saved", which I tried and
-   * which changed nothing. So there is a window after hydration where one of
-   * those three conditions is transiently true, and I do not yet know which.
+   * intermittently does prompt — measured at roughly 1 run in 3.
+   *
+   * WHICH OF THE THREE, MEASURED 2026-09-03. `isDirty`, and the guard is
+   * RIGHT to fire. Nine fresh loads against `:5050`, each waiting for the
+   * topbar to report "Saved" before closing: 3 prompted, 6 did not, and the
+   * split is perfect — every prompting run's topbar read "Unsaved changes",
+   * every silent run's read "Saved". `sawSaved` was true in all nine, so the
+   * editor reports Saved and then turns itself dirty with no user input.
+   *
+   * That reclassifies the defect. This is not an exit-guard bug and not a
+   * flaky test: the guard is correctly reporting real unsaved state, and the
+   * product is manufacturing that state out of nothing. It also matters well
+   * beyond a close prompt — autosave writes on dirty, and a spontaneous dirty
+   * over a project that may not be fully loaded is the documented precondition
+   * for the full-snapshot save dropping pages.
    *
    * WHY `fixme` RATHER THAN A FLAKY ASSERTION. A gate that is red a third of
    * the time gets ignored, then disabled, and takes the honest failures with
