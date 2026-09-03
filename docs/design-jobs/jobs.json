@@ -3,10 +3,10 @@
   "protocol": "PROTOCOL.md",
   "counts": {
     "fix": 55,
-    "verify": 268,
+    "verify": 269,
     "done": 87,
     "todo": 34,
-    "unbuildable": 63,
+    "unbuildable": 62,
     "fix-figma": 12
   },
   "jobs": [
@@ -2694,9 +2694,9 @@
       "name": "S3.8 · preview-responsive · mobile-device-frame",
       "family": "S3 flows",
       "width": 1440,
-      "status": "unbuildable",
+      "status": "verify",
       "owner": null,
-      "evidence": "unbuilt-previewoverlay-has-no-device-frame",
+      "evidence": "unbuilt-previewoverlay-has-no-device-frame | 2026-09-03 CORRECTION [found by editor-ed]: the slug 'unbuilt-previewoverlay-has-no-device-frame' is FALSE — canvas/DeviceFramePreview.tsx exists and takes device/active/children, so this was never a capability gap. Moved off `unbuildable`. The open question is narrower: does board 807:8663 draw the MOBILE bezel that component renders, or a desktop browser chrome? If desktop, the old verdict was right for the wrong reason and the row becomes `blocked` rather than unbuildable. editor-ed's flows implementer is answering that from the board before touching code.",
       "authority": "board",
       "blocker": "A"
     },
