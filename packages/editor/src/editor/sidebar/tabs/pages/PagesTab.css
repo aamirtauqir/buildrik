@@ -411,8 +411,8 @@
 
 /* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
 .bd-pg-bulk-toolbar {
-  /* Board 141:119: a full-width band on ink pinned at the bottom — it takes
-     the footer's place while a selection is active. */
+  /* Board 141:119: a full-width 44-tall band on ink pinned at the bottom — it
+     takes the footer's place while a selection is active. */
   position: absolute;
   bottom: 0;
   left: 0;
@@ -420,7 +420,7 @@
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
-  padding: 8px var(--bk-space-16);
+  height: 44px; padding: 0 var(--bk-space-16);
   background: var(--bk-ink);
   z-index: 10;
 }
@@ -509,7 +509,7 @@
   position: absolute;
   top: 59px;
   left: 12px;
-  width: 296px;
+  width: 256px;
   max-width: calc(100% - 24px);
   background: var(--bk-bg-card);
   border: 1px solid var(--bk-border);
@@ -542,7 +542,7 @@
 }
 .bd-pg-palette-item.active,
 .bd-pg-palette-item:hover {
-  background: var(--bk-accent-subtle);
+  background: var(--bk-accent-tint);
   color: var(--bk-accent-text);
 }
 .bd-pg-palette-item-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -699,12 +699,18 @@
   padding: var(--bk-space-32) var(--bk-space-24) 0;
   text-align: center;
 }
-.bd-pg-error-title { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-error); }
+/* Board 141:204 names --color/error-text (#C81E1E), not the brighter --bk-error
+   (#E02424) — the same substitution commit 530588b4 made in Content, Insert and
+   Media. It missed this one because it grepped for Tailwind's red-700. */
+.bd-pg-error-title { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-error-text); }
 .bd-pg-error-desc { margin: 0; font: 400 12px/18px var(--bk-font-ui); color: var(--bk-ink-muted); }
 .bd-pg-error-retry,
 .bd-pg-nores-clear,
 .bd-pg-onepage-add {
-  min-height: 0;
+  /* Not `min-height: 0`: these are text links whose 20px line box was the only
+     thing holding them at the editor's 20px hit-target floor (DESIGN.md:518).
+     Stating it means a type change cannot quietly shrink the target. */
+  min-height: 20px;
   border: none;
   background: transparent;
   padding: 0;

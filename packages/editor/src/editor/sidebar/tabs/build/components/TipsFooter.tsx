@@ -1,9 +1,13 @@
 /**
- * TipsFooter — board 137:43 "TipsFooter": a single 40-tall strip on the accent
- * tint, not a card. "💡 Tip n/N" + one-line tip body + ‹ › ✕. The ✕ hides
- * tips (scope lives in useBuildTab); no collapse state — board 138:244 shows
- * dismiss removes the band entirely, nothing collapsed remains. The strip
- * stays mounted during search (board 138:53 draws it under the results).
+ * TipsFooter — the Insert panel's bottom band: one dense strip on the accent
+ * tint, not a card. "💡 Tip n/N" + ‹ › ✕. The ✕ hides tips (scope lives in
+ * useBuildTab); no collapse state — board 138:244 shows dismiss removes the
+ * band entirely, nothing collapsed remains. The strip stays mounted during
+ * search (board 138:53 draws it under the results).
+ *
+ * Geometry from the four Insert state boards, which agree exactly
+ * (1069:4704 · 4784 · 4867 · 5015): 28 tall, 12 inset each side, 11px type.
+ * The 40-tall 12/16-inset strip this carried came from the older 137:43.
  *
  * @license BSD-3-Clause
  */
@@ -28,16 +32,19 @@ const strip: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 8,
-  height: "var(--bk-space-40)",
-  padding: "0 12px 0 16px",
+  height: "var(--bk-size-row-dense)",
+  padding: "0 var(--bk-space-12)",
   background: "var(--bk-accent-tint)",
   color: "var(--bk-accent-text)",
   fontFamily: "var(--bk-font-ui)",
-  fontSize: "var(--bk-text-12)",
-  lineHeight: "18px",
+  fontSize: "var(--bk-text-11)",
+  lineHeight: "16px",
 };
 
-// Board text style ui/12 — Inter Regular, no bold in the strip.
+// Board text style ui/11 — Inter Regular, no bold in the strip. The ‹ › ✕ keep
+// --bk-accent-text rather than the boards' ink-muted: measured on the tint,
+// accent-text is 5.60:1 and ink-muted 4.38:1, and the boards' own left-hand
+// #4270d9 measures 4.18 — an opacity artefact, not a fourth blue.
 const counter: React.CSSProperties = {
   fontWeight: 400,
   flexShrink: 0,

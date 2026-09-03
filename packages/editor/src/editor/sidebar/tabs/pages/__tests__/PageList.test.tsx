@@ -80,6 +80,23 @@ describe("PageList", () => {
     expect(container.querySelector(".bd-pg-drop-indicator")).not.toBeNull();
   });
 
+  /* Board 141:165 stacks the load error BETWEEN the search band (141:170) and
+     the Add-page footer (141:201). Lifting the error a level up — which is
+     where it used to live, in PagesTab — replaced the whole panel body and
+     took both of them off screen, leaving a dead end with no retry and no way
+     to add a page. This is the assertion that catches that lift happening
+     again; the copy check is deliberately alongside it, so a test that only
+     matched the headline cannot pass while the frame is gone. */
+  it("keeps the search band and the Add-page footer around the load error", () => {
+    const { container } = render(
+      <PageList {...makeProps({ loadError: "Couldn't load your pages", onRetry: vi.fn() })} />,
+    );
+    expect(screen.getByText(/Couldn\u2019t load your pages\./)).toBeInTheDocument();
+    expect(screen.getByText("Try again")).toBeInTheDocument();
+    expect(container.querySelector(".bd-pg-search")).not.toBeNull();
+    expect(screen.getByRole("button", { name: /add page/i })).toBeInTheDocument();
+  });
+
   it("does not render legacy pg-list class names", () => {
     const { container } = render(<PageList {...makeProps()} />);
     expect(container.querySelector(".pg-list")).toBeNull();

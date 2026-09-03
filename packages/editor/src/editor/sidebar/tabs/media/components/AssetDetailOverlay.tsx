@@ -103,6 +103,12 @@ export function AssetDetailOverlay({
   const [altDraft, setAltDraft] = useState(item.altText ?? "");
   const [altBusy, setAltBusy] = useState(false);
   const [metaError, setMetaError] = useState(false);
+  // Board 146:9 draws "1440×960 · 245 KB" under the preview, and MediaAsset
+  // only carries width/height when the upload went through the WebP optimiser
+  // (MediaManager.ts:950) — an SVG, a server-loaded row and a stock save all
+  // have neither, so the board's first fact shipped blank for most assets.
+  // Measured below instead, from the file itself.
+  const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
 
@@ -231,7 +237,26 @@ export function AssetDetailOverlay({
     setView("hub");
     setMetaError(false);
     setPendingRestore(null);
+    setNatural(null);
   }, [item.key, item.altText]);
+
+  // Images decode off-screen, from `item.src` and never from `item.thumb`:
+  // the thumbnail is a resize of the same picture, so its bitmap would print a
+  // confidently wrong number. Videos report theirs from the element itself.
+  useEffect(() => {
+    if (item.width != null && item.height != null) return;
+    if (item.type !== "img" || !item.src) return;
+    const probe = new Image();
+    probe.onload = () => {
+      if (mountedRef.current && probe.naturalWidth && probe.naturalHeight) {
+        setNatural({ w: probe.naturalWidth, h: probe.naturalHeight });
+      }
+    };
+    probe.src = item.src;
+    return () => {
+      probe.onload = null;
+    };
+  }, [item.type, item.src, item.width, item.height]);
 
   const commitAltText = useCallback(() => {
     if (!onUpdate) return;
@@ -262,6 +287,11 @@ export function AssetDetailOverlay({
       if (mountedRef.current) setAltBusy(false);
     }
   }, [altBusy, item.key, display, onUpdate]);
+
+  // The asset's own metadata wins; the measured bitmap is the fallback.
+  const dims = item.width != null && item.height != null
+    ? { w: item.width, h: item.height }
+    : natural;
 
   const showEdit = item.type === "img" && !!onEditImage;
   const showOptimize = item.type === "img" && !!onOptimized;
@@ -326,6 +356,10 @@ export function AssetDetailOverlay({
                 <video
                   src={item.src}
                   className="tw:size-full tw:object-contain"
+                  onLoadedMetadata={(e: React.SyntheticEvent<HTMLVideoElement>) => {
+                    const v = e.currentTarget;
+                    if (v.videoWidth && v.videoHeight) setNatural({ w: v.videoWidth, h: v.videoHeight });
+                  }}
                   onError={() => setMetaError(true)}
                 />
               ) : (
@@ -337,7 +371,7 @@ export function AssetDetailOverlay({
                 />
               )}
               <span className="tw:absolute tw:bottom-2 tw:left-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
-                {item.width != null && item.height != null ? `${item.width}×${item.height} · ` : ""}
+                {dims ? `${dims.w}\u00d7${dims.h} \u00b7 ` : ""}
                 {fmtSize(item.size)}
               </span>
             </div>
