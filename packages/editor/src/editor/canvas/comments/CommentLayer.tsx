@@ -237,15 +237,35 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     const root = canvasRef.current;
     if (!root || !composer || comments.length === 0) return;
     const timer = window.setTimeout(() => {
-      /* Nothing mounted yet = nothing decidable. Measured 2026-09-02: on 3 of 6
-         plain loads the scan ran before the page DOM existed, every pinned
-         comment resolved to "missing", and the orphan modal blocked every
-         click in the editor until Escape — while the element WAS in the DOM
-         a beat later. The next `tick`/`comments` change re-runs the scan. */
-      if (root.childElementCount === 0) return;
+      /* Nothing RENDERED yet = nothing decidable. A first version of this guard
+         tested `root.childElementCount`, which was worse than no guard at all:
+         the wrapper receives one empty container about 1.8s before the page
+         renders, so the count was 1 and the scan ran on an empty page every
+         time — 6 of 6 loads opened the modal, against 3 of 6 unguarded. A
+         mounted page carries elements with `data-buildrick-id`; the bare
+         container alone does not. The next `tick`/`comments` change re-runs. */
       const ids = detectOrphans(comments, root, activePageId);
+      /* EVERY pinned comment missing at once, on a DOM that holds nothing but
+         its own container, is the signature of a page that has not rendered —
+         not of a user deleting every anchored element in one go. Suppressing
+         only that case keeps a genuine single deletion announceable, which a
+         plain "is anything mounted" guard did not: the wrapper receives an
+         empty container about 1.8s before the page, so counting children let
+         the scan through on an empty page every time. */
+      const pinnedHere = comments.filter(
+        (c) => c.status === "OPEN" && c.targetSelector != null && c.pageId === activePageId,
+      ).length;
+      const rendered = root.querySelectorAll("[data-buildrick-id]").length;
+      if (ids.length > 0 && ids.length === pinnedHere && rendered <= 1) return;
       lastOrphanIds.current = ids;
       composer.emit("comments:orphans", { ids });
+      /* An id that is no longer orphaned must leave the announced set, or a
+         wrong announcement can never be taken back: the element arrives, the
+         scan agrees it is fine, and `fresh` stays empty because the id is
+         still marked as told. */
+      for (const id of [...announcedOrphans.current]) {
+        if (!ids.includes(id)) announcedOrphans.current.delete(id);
+      }
       const fresh = ids.filter((id) => !announcedOrphans.current.has(id));
       if (fresh.length > 0) {
         fresh.forEach((id) => announcedOrphans.current.add(id));

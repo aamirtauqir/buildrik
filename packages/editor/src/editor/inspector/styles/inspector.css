@@ -173,7 +173,7 @@
 /* Figma 32-2: uppercase, letter-spaced, muted section label (LAYOUT / SPACING …). */
 .bdi-sec-h .bdi-sec-name {
   flex: 1;
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
+  font: 600 var(--bk-text-11)/16px var(--bk-font-ui);
   color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -249,7 +249,7 @@
   align-items: center;
   gap: 8px;
 }
-.bdi-row-ctrl .bdi-row-content button, .bdi-row-ctrl .bdi-row-content input, .bdi-row-ctrl .bdi-row-content select { height: var(--bk-size-row-dense); min-height: 0; }
+.bdi-row-ctrl button, .bdi-row-ctrl input, .bdi-row-ctrl select { height: var(--bk-size-row-dense); min-height: 0; }
 .bdi-row-ctrl .bdi-lb {
   font: 400 12px var(--bk-font-ui);
   color: var(--bk-ink-soft);
