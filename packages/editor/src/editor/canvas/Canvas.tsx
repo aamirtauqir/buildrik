@@ -502,8 +502,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // from composer element tree HTML — already the sanitized editor source.
     const canvasInnerHtml = React.useMemo(() => ({ __html: displayContent }), [displayContent]);
 
-    // Empty canvas CTA overlay state
-    const [emptyDismissed, setEmptyDismissed] = React.useState(false);
+    /* Empty-canvas CTA overlay state. This was `emptyDismissed`, and Start
+       blank was the only thing that set it — so the button's whole effect was
+       to hide the guidance. Board 807:6558 keeps the CTA on an empty page and
+       changes what it says, so the flag now records that the user chose the
+       blank route, and the page's own emptiness still decides whether the
+       overlay shows at all. */
+    const [startedBlank, setStartedBlank] = React.useState(false);
     /* A site the server says is gone gets no invitation to start work. The
        banner above the canvas explains it; this half was still offering
        "Browse templates" and "Start blank" over a project whose every save is
@@ -517,8 +522,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         composer.off(EVENTS.PROJECT_UNAVAILABLE, onGone);
       };
     }, [composer]);
+    /* A page that received content is no longer mid-first-run, so emptying it
+       again offers the two routes rather than the follow-up sentence. */
     React.useEffect(() => {
-      if (content) setEmptyDismissed(false);
+      if (content) setStartedBlank(false);
     }, [content]);
 
     /* An empty canvas means one of two things and they are opposites: this
@@ -542,8 +549,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       const rootEl = rootId ? composer?.elements?.getElement?.(rootId) : null;
       return !!rootEl && rootEl.getChildren().length === 0;
     }, [composer, content]);
-    const isCanvasEmpty =
-      pageIsEmpty && !emptyDismissed && !projectLoading && !projectUnavailable;
+    const isCanvasEmpty = pageIsEmpty && !projectLoading && !projectUnavailable;
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
@@ -674,10 +680,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             handleMarqueeEnd();
           }}
           ref={frameRef}
-          style={{
-            ...getCanvasStyles(size, device, scale, isDragOver),
-            ...(pickMode ? { cursor: "crosshair" } : {}),
-          }}
+          /* Pick mode's crosshair cannot be an inline style on this frame.
+             `cursor` inherits, and an inherited value loses to any declaration
+             that matches the element itself — and Canvas.css matches every one
+             of them: `[data-buildrick-id]:hover { cursor: move }`. So the
+             crosshair showed over the empty gutter and nowhere else, which is
+             the one part of the canvas with nothing to pick. The attribute
+             hands it to a rule that reaches the subtree instead. */
+          data-bk-pick={pickMode ? "true" : undefined}
+          style={getCanvasStyles(size, device, scale, isDragOver)}
         >
           {/* Element animations resolve against these. The canvas had none
               after animation-utils.css was deleted with the vibcoder bundle,
@@ -715,11 +726,22 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
              templates / Start blank — build CTAs, and Browse templates emits an
              event whose drawer is not mounted in view mode, so it is a dead
              door as well as a wrong one. The container placeholder next to it
-             was already suppressed; this larger one was missed. */}
+             was already suppressed; this larger one was missed.
+
+             Start blank goes to board 807:6558: the Insert drawer opens, and
+             the sentence becomes the next instruction. It used to only set a
+             flag that hid the whole CTA, so the one button a first-time user
+             pressed left them on an empty canvas with no drawer and nothing to
+             do. `ui:switch-tab` is the seam StudioPanels already listens on,
+             and it opens the panel when it is closed. */}
           {isCanvasEmpty && !readOnly && (
             <CanvasEmptyCTA
+              started={startedBlank}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
-              onStartBlank={() => setEmptyDismissed(true)}
+              onStartBlank={() => {
+                setStartedBlank(true);
+                composer?.emit("ui:switch-tab", { tab: "add" });
+              }}
             />
           )}
 

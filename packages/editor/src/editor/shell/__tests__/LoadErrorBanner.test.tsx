@@ -68,4 +68,39 @@ describe("LoadErrorBanner", () => {
     fireEvent.click(screen.getByRole("button", { name: /retry/i }));
     expect(onRetry).toHaveBeenCalled();
   });
+
+  /* Board 294:1992 draws "Reconnecting…" as a full-screen takeover. The state
+     is real; the takeover is not built, because the shipped load error is a
+     banner over the LIVE shell — the local changes underneath stay editable —
+     and hiding the whole editor to say "reconnecting" hides the work it exists
+     to protect. Retry is a whole-page reload, and until now it said nothing
+     while it ran, which reads as a dead button. */
+  it("says it is reconnecting while the retry runs", () => {
+    const onRetry = vi.fn();
+    renderBanner({ kind: "network", onRetry });
+    fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+
+    const busy = screen.getByRole("button", { name: /reconnecting/i });
+    expect(busy).toHaveAttribute("aria-busy", "true");
+    expect(busy).toBeDisabled();
+    /* 9:102: disabled without a stated reason is a bug. */
+    expect(busy).toHaveAttribute("title", expect.stringMatching(/reaching the server/i));
+  });
+
+  it("a second click cannot stack another reload", () => {
+    const onRetry = vi.fn();
+    renderBanner({ kind: "network", onRetry });
+    fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /reconnecting/i }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it("the auth banner's retry gets the same state", () => {
+    renderBanner({ kind: "auth" });
+    fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
+    expect(screen.getByRole("button", { name: /reconnecting/i })).toBeDisabled();
+    /* Sign in opens a new tab and is not the thing being waited on. */
+    expect(screen.getByRole("button", { name: /sign in/i })).not.toBeDisabled();
+  });
 });

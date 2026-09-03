@@ -85,6 +85,19 @@ describe("StaleApprovalModal", () => {
     expect(screen.getByText("Changed since approval")).toBeInTheDocument();
   });
 
+  /* Board 131:201 closes with the reassurance (131:410), and it is true of the
+     code: `publish-approval.ts:97` blocks only while `acknowledgeStale` is
+     false, so acknowledging ships on top of the sign-off rather than voiding
+     it. Without the line the user has to guess whether the amber button also
+     throws away the approval they already have. */
+  it("says the approval survives the acknowledged publish, and whose it is", async () => {
+    mount();
+    expect(
+      await screen.findByText(/approval still stands — publishing now just ships these changes on top of it/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/^Sara’s approval still stands/)).toBeInTheDocument();
+  });
+
   it("re-sends a fresh round to the same client and closes", async () => {
     const onClose = vi.fn();
     mount({ onClose });

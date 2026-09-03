@@ -132,7 +132,10 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(o) => !o && onClose()}>
-      <ModalContent size="lg" srTitle="Publish un-approved changes?">
+      {/* 560, which board 131:201 draws (131:401 is 560x352) and which the
+          size map already carries — `form` is the only 560 in it. It shipped
+          `lg` (720), a third wider than the only board that states a width. */}
+      <ModalContent size="form" srTitle="Publish un-approved changes?">
         {/* Board 1168:4713. The title states the FACT (the approval is stale),
             not a question about the client — the question is the buttons. */}
         <ModalTitle>The approval is older than your latest edits</ModalTitle>
@@ -180,6 +183,16 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
                 </div>
               )}
             </div>
+            {/* Board 131:201's closing line (131:410), and it is true of this
+                code: acknowledging lets the publish through WITHOUT revoking
+                the sign-off — `publish-approval.ts:97` only blocks while
+                `acknowledgeStale` is false. Without it the modal states the
+                risk and leaves the user to guess whether pressing the amber
+                button also throws away the approval they already have. */}
+            <p className="tw:m-0 tw:mb-3 tw:text-[12px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
+              {round?.reviewerName ? `${round.reviewerName}’s` : "The"} approval still stands — publishing
+              now just ships {changed.length === 1 ? "this change" : "these changes"} on top of it.
+            </p>
           </>
         )}
         </ModalBody>
