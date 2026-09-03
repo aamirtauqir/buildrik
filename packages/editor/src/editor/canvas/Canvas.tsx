@@ -674,10 +674,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             handleMarqueeEnd();
           }}
           ref={frameRef}
-          style={{
-            ...getCanvasStyles(size, device, scale, isDragOver),
-            ...(pickMode ? { cursor: "crosshair" } : {}),
-          }}
+          /* Pick mode's crosshair cannot be an inline style on this frame.
+             `cursor` inherits, and an inherited value loses to any declaration
+             that matches the element itself — and Canvas.css matches every one
+             of them: `[data-buildrick-id]:hover { cursor: move }`. So the
+             crosshair showed over the empty gutter and nowhere else, which is
+             the one part of the canvas with nothing to pick. The attribute
+             hands it to a rule that reaches the subtree instead. */
+          data-bk-pick={pickMode ? "true" : undefined}
+          style={getCanvasStyles(size, device, scale, isDragOver)}
         >
           {/* Element animations resolve against these. The canvas had none
               after animation-utils.css was deleted with the vibcoder bundle,
