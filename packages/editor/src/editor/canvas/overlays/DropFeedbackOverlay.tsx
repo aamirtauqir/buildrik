@@ -232,6 +232,10 @@ const DropPositionLine: React.FC<DropPositionLineProps> = ({ position, targetRec
   const color = isValid ? COLORS.valid.border : COLORS.invalid.border;
   const top = position === "before" ? targetRect.top - 1 : targetRect.top + targetRect.height;
 
+  /* Board 807:7514-7516: a 3-tall accent bar with an 8 endcap dot at each end.
+     The dots are what make a 3-pixel line read as an insertion point rather
+     than as a border on the element above it. They take their colour from the
+     line (`bg-current`) so the invalid state stays one colour, not two. */
   return (
     <div
       className="bd-drop-position-line"
@@ -240,15 +244,23 @@ const DropPositionLine: React.FC<DropPositionLineProps> = ({ position, targetRec
         left: targetRect.left - 4,
         top,
         width: targetRect.width + 8,
-        height: 2,
+        height: 3,
         backgroundColor: color,
-        borderRadius: 1,
+        color,
+        borderRadius: 2,
         animation: "dropLineFadeIn 150ms ease-out forwards",
         zIndex: Z_LAYERS.dropPositionLine,
       }}
-    />
+    >
+      <span className={DOT_CLASS + " tw:left-0 tw:-translate-x-1/2"} />
+      <span className={DOT_CLASS + " tw:right-0 tw:translate-x-1/2"} />
+    </div>
   );
 };
+
+/** The endcap dots of the insertion line (board 807:7515 / 807:7516). */
+const DOT_CLASS =
+  "tw:absolute tw:top-1/2 tw:size-2 tw:-translate-y-1/2 tw:rounded-full tw:bg-current";
 
 /** Animated drop slot preview - Simple dashed outline */
 interface DropSlotPreviewProps {
@@ -362,21 +374,30 @@ interface DropBreadcrumbProps {
 const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => {
   if (path.length === 0) return null;
 
+  /* Board 807:7517 draws this as a DARK pill — ink ground, white 11 medium,
+     radius 4 — and prefixes the chain with "Drop inside:". It shipped as a
+     white card in the canvas's own colours, which is the one palette the
+     canvas cannot own: the customer's page is behind it, and a light chip on a
+     light hero disappears. The prefix is the half that says what the chain is
+     FOR; the chain alone reads as a breadcrumb of where you are. */
   return (
     <div
       className="bd-drop-breadcrumb"
       style={{
         position: "absolute",
         left: targetRect.left,
-        top: targetRect.top - 28,
+        top: targetRect.top - 34,
         display: "flex",
         alignItems: "center",
         gap: 2,
-        backgroundColor: "var(--bk-bg-panel)",
-        padding: "4px 8px",
+        backgroundColor: "var(--bk-ink)",
+        padding: "6px 8px",
         borderRadius: 4,
-        fontSize: 12,
-        color: "var(--bk-ink-soft)",
+        fontSize: 11,
+        fontWeight: 500,
+        /* No `--bk-ink-inverse` token exists; `--bk-bg-card` is the repo's
+           white, and COLORS.invalid.text already uses it for the same job. */
+        color: "var(--bk-bg-card)",
         boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
         animation: "breadcrumbFadeIn 150ms ease-out forwards",
         zIndex: Z_LAYERS.dropBreadcrumb,
@@ -385,21 +406,13 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
         overflow: "hidden",
       }}
     >
+      <span className="tw:opacity-70">Drop inside:</span>
       {path.map((item, idx) => (
         <React.Fragment key={item.id}>
-          <span
-            style={{
-              color: item.isCurrent
-                ? "var(--bk-ink, var(--bk-bg-panel))"
-                : "var(--bk-ink-soft)",
-              fontWeight: item.isCurrent ? 600 : 400,
-            }}
-          >
+          <span className={item.isCurrent ? "tw:font-semibold" : "tw:opacity-70"}>
             {item.label}
           </span>
-          {idx < path.length - 1 && (
-            <span style={{ color: "var(--bk-ink-muted)", margin: "0 2px" }}>›</span>
-          )}
+          {idx < path.length - 1 && <span className="tw:mx-0.5 tw:opacity-50">›</span>}
         </React.Fragment>
       ))}
     </div>
