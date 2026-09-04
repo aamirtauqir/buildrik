@@ -15,7 +15,7 @@ the file, not estimated. Ground truth captured 2026-09-04.
 | **total top-level frames** | **820** |
 
 Prototype graph: **2,489 edges** — 350 at frame level, **2,139 on hotspot
-children**. Orphan screens **21 (5%)**. Dead ends **12 (3%)**.
+children**. Orphan screens **21 (5%)** — of which **3 are real defects**; 13 are self-annotated retirements and 5 are page markers. Dead ends **12 (3%)** — **3 real**, nine annotated by design.
 
 > **A first pass read reactions only at frame level and reported 77% orphans and
 > 58% dead ends.** Both were wrong by an order of magnitude: 86% of this file's
@@ -35,8 +35,9 @@ Severity: **Critical** blocks a job · **Major** IA/hierarchy/missing states ·
 | IA-3 | **The S-flow numbering implies seven flows and delivers four.** S1 22 screens, S3 18, S5 23, S7 42 — but **S2 = 1, S6 = 1, S4 = 0**. A reader counting S1–S7 expects seven journeys; three of those slots are empty or a stub. | per-flow counts | **Major** | Either build S2/S4/S6 or retire the numbering and name journeys for the job they do ("First run", "Publish", "Client sign-off"). |
 | IA-4 | **Screens and annotation share one flat page.** 418 of 820 frames are captions, strips, markers or stray shapes, interleaved with the 397 screens in one list. | kind census | **Major** | Group with Figma Sections: screens by feature, annotation into a parallel `Notes` section per feature. Sections preserve node ids, history and every prototype link. |
 | IA-5 | **12 stray shapes sit at page top level** (`Rectangle` ×12). | name census | **Minor** | Delete or move into the frame they annotate. |
-| IA-6 | 21 orphan screens — nothing navigates to them. Concentrated in Insert (3), Compare (2), S1.3 (2), REVIEW (2). | flow graph | **Major** | Give each an entry point or retire it. Full list in `ia-graph.json`. |
-| IA-7 | 12 dead ends — no forward path and no way back. Layers (3), Client sign-off (2). | flow graph | **Major** | Every terminal screen needs an onward step. |
+| IA-6 | **3 real orphan screens.** The graph reports 21, but 13 already carry `RETIRED`/`SUPERSEDED`/`UNBUILDABLE` in their own names and 5 are page markers (📄 🗃️ 🔍), not screens. The three with no entry point and no explanation: `65:2` Shell state 1 · First run, `130:2` S5.2 · none, `807:8723` S5.5 · reviewer-view · external-reviewer. | flow graph, cross-checked against frame names | **Major** | Give these three an entry point or annotate them like the other 13. |
+| IA-7 | **3 real dead ends.** Of 12, nine are annotated `CONDITION-ONLY`, `NOT A STATE`, `TERMINAL by design` or `RETIRED`. The three unexplained: `295:1972` S1.3 · new-page · 3-way, `1707:8456` Inspector · error-boundary, `1719:8421` Ecommerce · bound · inspector. | flow graph, cross-checked | **Major** | Each needs an onward step — an error boundary with no way back is the worst of the three. |
+| IA-8 | **The file already annotates its own retirements, and the convention works.** 13 orphans and 9 dead ends carry the reason in the frame name, which is why the true defect count is 6 and not 33. | name census | — | Keep the convention; apply it to the six above so the next audit reads clean. |
 
 ### What is already working — protect it
 
@@ -64,8 +65,8 @@ Severity: **Critical** blocks a job · **Major** IA/hierarchy/missing states ·
 - [ ] C3 · Annotation frames are out of the screen list
 - [ ] C4 · No family has exactly one screen unless it is genuinely standalone
 - [ ] C5 · S-flow numbering is either complete or retired — no phantom slots
-- [ ] C6 · Every orphan has an entry point or a recorded retirement
-- [ ] C7 · Every dead end has an onward step
+- [ ] C6 · The 3 real orphans (65:2, 130:2, 807:8723) have an entry point or a recorded retirement
+- [ ] C7 · The 3 real dead ends (295:1972, 1707:8456, 1719:8421) have an onward step
 - [ ] C8 · Stray top-level shapes are gone
 - [ ] C9 · Prototype edge count did not drop (2,489 baseline) — sectioning must not break wiring
 - [ ] C10 · A codex review has read the diff and signed off
