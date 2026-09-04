@@ -701,6 +701,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       "history:redo",
       "history:recorded",
       "history:cleared",
+      /* A feature mutating outside history disables Undo until the next
+         recorded action; the button has to hear it or it keeps offering. */
+      EVENTS.HISTORY_UNRECORDED,
       EVENTS.PROJECT_LOADED,
       EVENTS.VERSION_RESTORED,
     ] as const;

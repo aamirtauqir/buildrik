@@ -367,3 +367,24 @@ describe("CMSBindingManager — collection (repeater) bindings", () => {
     expect(dataOff).toHaveBeenCalledWith("source:updated", expect.any(Function));
   });
 });
+
+describe("CMSBindingManager — a binding tells history it happened outside it", () => {
+  /* Bindings live in this manager's map and ProjectData has no field for
+     them, so they cannot join the snapshot. Undo enabled itself after a
+     binding and undid an unrelated earlier edit (walked 2026-09-03). The
+     binding announces itself so Undo stops offering until the next recorded
+     action, and a refusal can name it. */
+  it("announces bind and unbind as unrecorded actions", async () => {
+    const { cms, collection, item } = await setupWithContent();
+    const { composer } = makeComposer({ "el-1": makeElementStub() });
+    const noteUnrecordedAction = vi.fn();
+    Object.assign(composer, { history: { noteUnrecordedAction } });
+    const manager = new CMSBindingManager(composer, cms);
+
+    manager.bindToField("el-1", collection.id, item.id, "title", "content");
+    expect(noteUnrecordedAction).toHaveBeenCalledWith("binding a field to content");
+
+    manager.unbindAll("el-1");
+    expect(noteUnrecordedAction).toHaveBeenCalledWith("unbinding a field");
+  });
+});

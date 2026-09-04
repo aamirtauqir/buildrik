@@ -123,6 +123,9 @@ export const EVENTS = {
      ⌘Z on an empty stack returned false and said nothing, so an undo that
      had nothing left looked exactly like an undo that was broken. */
   HISTORY_NOOP: "history:noop",
+  /** A feature changed the project OUTSIDE history — the change is real and
+   *  cannot be undone. The Undo affordance reads this so it stops offering. */
+  HISTORY_UNRECORDED: "history:unrecorded",
   HISTORY_CHANGED: "history:changed",
   HISTORY_CLEARED: "history:cleared",
   HISTORY_RECORDED: "history:recorded",
@@ -825,7 +828,8 @@ export interface EventPayloads {
   [EVENTS.HISTORY_REDO]: {
     entry: { timestamp: number; snapshot: import("../types").ProjectData; label?: string };
   };
-  [EVENTS.HISTORY_NOOP]: { direction: "undo" | "redo" };
+  [EVENTS.HISTORY_NOOP]: { direction: "undo" | "redo"; reason?: string };
+  [EVENTS.HISTORY_UNRECORDED]: { label: string };
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;
 

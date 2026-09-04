@@ -98,6 +98,12 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
        need telling; before this, `BINDING_CREATED` and `BINDING_REMOVED` were
        constants nothing ever emitted. */
     this.composer.emit(EVENTS.BINDING_CREATED, { elementId, binding });
+    /* Bindings live in this map, not on the element, and ProjectData has no
+       field for them — so they cannot join the snapshot history records, and
+       wrapping this in a transaction would flip canUndo true over an entry
+       that restores nothing. Say so instead: Undo enabled itself after a
+       binding and undid an unrelated earlier edit, measured 2026-09-03. */
+    this.composer.history?.noteUnrecordedAction?.("binding a field to content");
     void this.applyBinding(elementId, binding);
   }
 
@@ -116,6 +122,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
       this.bindings.set(elementId, filtered);
     }
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId, key });
+    this.composer.history?.noteUnrecordedAction?.("unbinding a field");
   }
 
   /**
@@ -124,6 +131,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
   unbindAll(elementId: string): void {
     this.bindings.delete(elementId);
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });
+    this.composer.history?.noteUnrecordedAction?.("unbinding a field");
   }
 
   /**

@@ -32,6 +32,17 @@ export type { HistoryChange, HistoryDisplayEntry } from "./historyTypes";
 export class HistoryManager {
   private composer: Composer;
   private undoStack: HistoryEntry[] = [];
+  /* Whether the most recent USER action is on the stack. Three features in
+     three walks (CMS binding, brand tokens, a page created mid-load) mutated
+     outside history while Undo stayed enabled and pointed at an unrelated
+     earlier edit — "plausibly wrong": nothing distinguished "enabled because
+     of what I just did" from "enabled because of something ten minutes ago".
+     Undoing the PREVIOUS edit when the user meant the binding is an action
+     they did not ask for, which is worse than refusing. So a feature that
+     changes the project outside history says so, and Undo disables until the
+     next recorded action. A refusal names the reason (HISTORY_NOOP.reason). */
+  private lastActionRecorded = true;
+  private lastUnrecordedLabel: string | undefined;
   private redoStack: HistoryEntry[] = [];
   private config: HistoryConfig;
   private isRecording: boolean = true;
@@ -217,6 +228,8 @@ export class HistoryManager {
     this.currentStateCache = newState;
     this.redoStack = [];
     this.trimHistory();
+    this.lastActionRecorded = true;
+    this.lastUnrecordedLabel = undefined;
     this.composer.emit(EVENTS.HISTORY_RECORDED, { label: finalLabel });
   }
 
@@ -450,7 +463,10 @@ export class HistoryManager {
     // entirely (it never reaches the redo stack). SSOT for all undo callers.
     this.flushPending();
     if (!this.canUndo()) {
-      this.composer.emit(EVENTS.HISTORY_NOOP, { direction: "undo" });
+      /* "Nothing to undo" would be false here when the stack has entries and
+         the LAST action is what cannot be undone — say which. */
+      const reason = this.undoStack.length > 1 && !this.lastActionRecorded ? this.lastUnrecordedLabel : undefined;
+      this.composer.emit(EVENTS.HISTORY_NOOP, { direction: "undo", reason });
       return false;
     }
 
@@ -487,6 +503,9 @@ export class HistoryManager {
     this.updatePatchCounter();
     this.validateSelectionAfterRestore();
 
+    /* After an undo the stack top is a recorded action again. */
+    this.lastActionRecorded = true;
+    this.lastUnrecordedLabel = undefined;
     this.composer.emit(EVENTS.HISTORY_UNDO, {
       entry: { timestamp: Date.now(), snapshot: previousState, label: current.label },
     });
@@ -573,6 +592,8 @@ export class HistoryManager {
     this.updatePatchCounter();
     this.validateSelectionAfterRestore();
 
+    this.lastActionRecorded = true;
+    this.lastUnrecordedLabel = undefined;
     this.composer.emit(EVENTS.HISTORY_REDO, {
       entry: { timestamp: Date.now(), snapshot: newState, label: entry.label },
     });
@@ -611,7 +632,17 @@ export class HistoryManager {
   // ─── Public query API ───────────────────────────────────────────────────────
 
   canUndo(): boolean {
-    return this.undoStack.length > 1;
+    return this.undoStack.length > 1 && this.lastActionRecorded;
+  }
+
+  /** A feature changed the project outside history. Undo stops offering
+   *  until the next recorded action, and a refusal names `label`. The label
+   *  is user-facing copy, said the way the toast will say it. */
+  noteUnrecordedAction(label: string): void {
+    if (this.isDestroyed) return;
+    this.lastActionRecorded = false;
+    this.lastUnrecordedLabel = label;
+    this.composer.emit(EVENTS.HISTORY_UNRECORDED, { label });
   }
   canRedo(): boolean {
     return this.redoStack.length > 0;
@@ -721,6 +752,8 @@ export class HistoryManager {
     // PROJECT_CHANGED handler only schedules a record when undoStack is
     // non-empty, and getCurrentState() throws on a fully empty stack — without
     // a baseline, clear() permanently disables undo. Skip during destroy().
+    this.lastActionRecorded = true;
+    this.lastUnrecordedLabel = undefined;
     if (!this.isDestroyed) {
       this.recordCheckpoint("cleared");
     }

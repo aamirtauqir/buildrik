@@ -172,11 +172,19 @@ export function useHistoryFeedback(
     /* Board 814:7027's sixth variant. ⌘Z with an empty stack did nothing and
        said nothing — indistinguishable from an undo that failed. Grey, no
        reverse action: there is nothing to reverse. */
-    const handleNoop = (data: { direction: "undo" | "redo" }) => {
+    const handleNoop = (data: { direction: "undo" | "redo"; reason?: string }) => {
+      /* "Nothing to undo" is false when the stack has entries and the LAST
+         action is what cannot be undone — a binding, say. Undoing the earlier
+         edit instead would be an action the user did not ask for, so the
+         engine refuses and names why. */
       addToast({
-        description: data.direction === "undo" ? "Nothing to undo" : "Nothing to redo",
+        description: data.reason
+          ? `Can't undo ${data.reason} — it isn't recorded in history. Your earlier edits are still there.`
+          : data.direction === "undo"
+            ? "Nothing to undo"
+            : "Nothing to redo",
         tone: "neutral",
-        duration: 2000,
+        duration: data.reason ? 4000 : 2000,
       });
     };
 
