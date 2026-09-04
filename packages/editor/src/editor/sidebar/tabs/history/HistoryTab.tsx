@@ -19,6 +19,7 @@ import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
+import { TimeTravelIcon } from "./icons";
 import type { HistoryView, SavesFilter, HistoryTabProps } from "./types";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { SavesApproval, SavesPruneNote } from "./components/SavesChrome";
@@ -250,6 +251,23 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 {FILTER_LABEL[f]}
               </Button>
             ))}
+            {/* Board 163:113 is the Milestones list WITH time-travel active —
+                but the only door into it lived inside ActivityView's header,
+                reachable only from the "All changes" filter (plus the
+                Ctrl+Shift+T chord nobody is told about). Milestones had no
+                way in at all. */}
+            {savesFilter === "milestones" && (
+              <Button
+                type="button"
+                className="tt-btn tw:ml-auto"
+                onClick={() => setShowScrubber(true)}
+                aria-label="Open Time-Travel scrubber (Ctrl+Shift+T)"
+                title="Time-Travel (Ctrl+Shift+T)"
+              >
+                <TimeTravelIcon />
+                Time-Travel
+              </Button>
+            )}
           </div>
           <div className="search-bar">
             <span className="search-icon" aria-hidden="true">

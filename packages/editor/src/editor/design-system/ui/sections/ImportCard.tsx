@@ -60,11 +60,15 @@ const TITLE =
   "tw:text-[var(--bk-ink-muted)]";
 /* base/active supply their own border-colour and background together — never
    two competing utilities for the same property (Row precedent). */
-/* Board 153:152 · a 56-tall dashed band, not the 128 the 32-pixel padding
-   was producing. */
+/* Board 153:152 · a 56-tall dashed band with ONE centred line, not the 128
+   the 32-pixel padding was producing (and not the two-line "or click to
+   browse" hint the row used to carry — the whole zone is still clickable,
+   the board just doesn't spell that out). `h-14` fixes the 56px directly
+   instead of reaching it through padding + line count. */
 const DROP_BASE =
-  "tw:border-[1.5px] tw:border-dashed tw:rounded-lg tw:px-4 tw:py-2 tw:text-center tw:cursor-pointer " +
-  "tw:text-[var(--bk-ink-soft)] tw:text-xs tw:leading-relaxed tw:[transition:var(--bk-transition-fast)]";
+  "tw:flex tw:h-14 tw:items-center tw:justify-center tw:border-[1.5px] tw:border-dashed tw:rounded-lg " +
+  "tw:px-4 tw:text-center tw:cursor-pointer tw:text-[var(--bk-ink-soft)] tw:text-xs " +
+  "tw:[transition:var(--bk-transition-fast)]";
 const DROP_IDLE = "tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-gray-50)]";
 const DROP_ACTIVE = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
 const DETAIL_BLOCK =
@@ -262,12 +266,10 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
           >
-            <div className="tw:font-medium tw:text-[var(--bk-ink)] tw:mb-1">
-              Drop tokens.json or tailwind.config.ts
-            </div>
-            <div className="tw:text-[var(--bk-ink-muted)]">
-              or click to browse
-            </div>
+            {/* Board 153:120/153:152 draw one centred line: "Drop .json or
+                .ts". The zone stays clickable (aria-label below keeps the
+                fuller, accurate hint for assistive tech). */}
+            Drop .json or .ts
             <TextInput
               ref={fileInputRef}
               type="file"

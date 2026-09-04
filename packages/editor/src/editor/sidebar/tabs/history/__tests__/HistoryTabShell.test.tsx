@@ -211,6 +211,18 @@ describe("HistoryTab shell", () => {
     fireEvent.keyDown(document, { key: "T", ctrlKey: true, shiftKey: true });
     expect(screen.queryByTestId("tt-scrubber")).toBeNull();
   });
+
+  /* Board 163:113 is the Milestones list with time-travel active, but the
+     only door in used to live inside ActivityView's header — reachable only
+     after switching to "All changes". Milestones (the default view) had no
+     button at all, just the undiscoverable Ctrl+Shift+T chord. */
+  it("opens the Time-Travel scrubber from the Milestones filter, not just Changes", () => {
+    renderTab();
+    expect(screen.getByTestId("saves-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("tt-scrubber")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Open Time-Travel scrubber/ }));
+    expect(screen.getByTestId("tt-scrubber")).toBeInTheDocument();
+  });
 });
 
 /*

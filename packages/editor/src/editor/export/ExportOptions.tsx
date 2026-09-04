@@ -2,10 +2,14 @@
  * Export Options Panel
  * Configuration UI for export settings
  *
- * The format picker is a real radiogroup built from chrome-ui's FormatRow
- * (Figma 249:6) — the atom written for exactly this surface. Picking one of
- * several exclusive options is a radio group, not a row of buttons that happen
- * to look selected.
+ * The format picker is a real radiogroup — picking one of several exclusive
+ * options is a radio group, not a row of buttons that happen to look
+ * selected — but the VISUAL is board 1172:4825's compact pill row, not
+ * chrome-ui's FormatRow. FormatRow is the title+description CARD (min-h-16,
+ * Figma 249:6): right for a surface with room for a description, and this
+ * modal's 1172:4825 draws none — a single line of 11px pills, all five
+ * formats in one row. FormatRow here cost 40+ extra pixels of row height per
+ * format for a description line the board never draws.
  *
  * @license BSD-3-Clause
  */
@@ -13,7 +17,7 @@
 import * as React from "react";
 import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
-import { Badge, Button, Checkbox, FormatRow, Label, TextInput } from "@/editor/chrome-ui";
+import { Button, Checkbox, Label, Radio, TextInput } from "@/editor/chrome-ui";
 // ============================================================================
 // FORMAT CONFIG
 // ============================================================================
@@ -33,15 +37,6 @@ const FORMAT_LABELS: Record<ExportFormat, string> = {
   nextjs: "Next.js",
 };
 
-const FORMAT_DESCRIPTIONS: Record<ExportFormat, string> = {
-  html: "Static HTML file with embedded or linked CSS",
-  zip: "All files bundled in a ZIP archive",
-  json: "Raw JSON data export",
-  react: "React component output",
-  vue: "Vue single-file component",
-  nextjs: "Next.js page component",
-};
-
 /** One field label style, not five copies of the same inline object. */
 const FIELD_LABEL = "tw:block tw:mb-1.5";
 /** The segmented single-choice strip (CSS style, CMS mode, template syntax). */
@@ -52,7 +47,7 @@ const SEGMENTED = "tw:flex tw:gap-2";
 const segmentColor = (selected: boolean) => (selected ? undefined : ("light" as const));
 
 // ============================================================================
-// FORMAT GRID — 2-column selector used in ExportModal header
+// FORMAT GRID — board 1172:4825's single-row pill selector
 // ============================================================================
 
 export interface FormatGridProps {
@@ -60,31 +55,46 @@ export interface FormatGridProps {
   onFormatChange: (format: ExportFormat) => void;
 }
 
-export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormatChange }) => (
-  <div role="radiogroup" aria-label="Export format" className="tw:grid tw:grid-cols-2 tw:gap-2.5">
-    {AVAILABLE_FORMATS.map((fmt) => (
-      <FormatRow
-        key={fmt}
-        name="export-format"
-        value={fmt}
-        title={FORMAT_LABELS[fmt]}
-        description={FORMAT_DESCRIPTIONS[fmt]}
-        checked={selectedFormat === fmt}
-        onChange={(value) => onFormatChange(value as ExportFormat)}
-      />
-    ))}
+/* fmt/HTML (selected), fmt/ZIP, fmt/React, fmt/Vue (dimmed + Soon),
+   fmt/Next.js (dimmed + Soon) — one row, gap 8, px-10/py-7, rounded-6,
+   11px medium. The Radio stays real (arrow keys, `role="radio"`, checked
+   state) but is visually hidden — the board's pill carries no dot, the
+   tinted fill + accent border/text ARE the checked state. */
+const PILL_BASE =
+  "tw:flex tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:px-2.5 tw:py-[7px] " +
+  "tw:text-[11px] tw:font-medium tw:cursor-pointer tw:[transition:var(--bk-transition-fast)] " +
+  "tw:aria-disabled:opacity-55 tw:aria-disabled:pointer-events-none tw:aria-disabled:select-none";
+const PILL_SELECTED = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]";
+const PILL_IDLE = "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)]";
+const SOON_TAG = "tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1 tw:py-px tw:text-[8px] tw:font-medium tw:text-[var(--bk-ink-muted)]";
 
-    {/* Unimplemented stubs: same row, no radio, not reachable. */}
+export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormatChange }) => (
+  <div role="radiogroup" aria-label="Export format" className="tw:flex tw:flex-wrap tw:gap-2">
+    {AVAILABLE_FORMATS.map((fmt) => {
+      const checked = selectedFormat === fmt;
+      return (
+        <label key={fmt} className={[PILL_BASE, checked ? PILL_SELECTED : PILL_IDLE].join(" ")}>
+          <Radio
+            className="tw:sr-only"
+            color="blue"
+            name="export-format"
+            value={fmt}
+            checked={checked}
+            onChange={() => onFormatChange(fmt)}
+          />
+          {FORMAT_LABELS[fmt]}
+        </label>
+      );
+    })}
+
+    {/* Unimplemented stubs: same row, no radio, not reachable — a disabled
+        radio would still answer to getByRole("radio") and still take an
+        arrow-key stop in the group (FormatRow precedent). */}
     {COMING_SOON_FORMATS.map((fmt) => (
-      <FormatRow
-        key={fmt}
-        disabled
-        name="export-format"
-        value={fmt}
-        title={FORMAT_LABELS[fmt]}
-        description={FORMAT_DESCRIPTIONS[fmt]}
-        trailing={<Badge color="gray">Soon</Badge>}
-      />
+      <label key={fmt} className={[PILL_BASE, PILL_IDLE].join(" ")} aria-disabled="true">
+        {FORMAT_LABELS[fmt]}
+        <span className={SOON_TAG}>Soon</span>
+      </label>
     ))}
   </div>
 );
