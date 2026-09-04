@@ -1273,9 +1273,9 @@
       "name": "Inspector · profile · GRID",
       "family": "Inspector",
       "width": 300,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-inspector",
-      "evidence": "C11 (founder verbatim in-session 2026-09-02: '807 geometry, 32:2 master, retire 159:2, redraw 189:2') | CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-inspector: GRID body 453 vs 130: 8 presets 67x40, 3 inputs 89.7x42, 40-tall buttons in 22 rows; 35 controls ≥36. Columns/Row gap/Col gap at 28 first; rest behind More settings",
+      "evidence": "AUDIT DRIFT 2026-09-04 (auditor, live at 1440x900): GRID section body measured 490px against the board's 130px — WORSE than the 453px reading that preceded the fix. Its own evidence said 'CODE APPLIED — re-measure to close', which is exactly the claim that did not survive re-measurement. NOT re-confirmed by the coordinator: layout/index.tsx does gate Position/Overflow/Visibility behind 'More settings', so the auditor's 'nothing was moved' is at least partly wrong — the GRID-specific controls are a different block. Re-measure before trusting either reading.",
       "authority": "founder:inspector-807-geometry-32-2-master"
     },
     {
@@ -1576,7 +1576,7 @@
       "width": 280,
       "status": "verify",
       "owner": "verifier-media",
-      "evidence": "2026-09-02 C12 figma: outer Search band stroke/r6 stripped to match twin 144:7; pill counts hidden | MATCH-ish vm: block/copy/colours ok; FIGMA: pills draw counts on a failed load; 453:3933 still has the double border",
+      "evidence": "2026-09-02 C12 figma: outer Search band stroke/r6 stripped to match twin 144:7; pill counts hidden | MATCH-ish vm: block/copy/colours ok; FIGMA: pills draw counts on a failed load; 453:3933 still has the double border | AUDIT CLAIM CHECKED AND REJECTED 2026-09-04 (coordinator). The auditor reported the second link reading 'Stock' live against the board's 'Browse stock'. Both labels in SlimLauncher.tsx (:392 and :639) read 'Browse stock', and :636 carries the comment recording that exact rename — 'one door wore two names in the same panel'. The claim does not hold against current main; the row stays as it was.",
       "authority": "board"
     },
     {
@@ -4406,9 +4406,9 @@
       "name": "Layers · display-settings",
       "family": "Layers",
       "width": 280,
-      "status": "verify",
+      "status": "fix",
       "owner": "verifier-layers-review",
-      "evidence": "2026-09-02 WAVE 3 drawn: Tree row component 243:6 320->280 at 1082 geometry; toolbar + footer conformed; 16:6 headers on the 1082 pair | C10 (founder verbatim in-session 2026-09-02: '1082 geometry + 16:6 header') | F vlr: board not retrieved; live popover unanchored at x0 y80 (⚙ at x258), mono uppercase header, raw shadow layers-v2.css:404, × 9.5x40, 18x10 switches | 2026-09-03 F9 re-read: header is 'Layers' Inter 11, NOT mono; gear at x228 — the mono-header premise does not hold [read via the OAuth client, which is not seat-capped]",
+      "evidence": "AUDIT DRIFT CONFIRMED 2026-09-04 (auditor measured live; coordinator confirmed in source). LayerDisplaySettings.tsx renders 'Show HTML tags', 'Show element IDs', 'Compact rows'; the board draws 'Show hidden layers', 'Show lock badges', 'Highlight CMS-bound' — only 'Compact rows' is shared. Popover also left-anchored flush to the panel edge at 234px against the board's 133px right-aligned to the gear. Back to fix; it was counted as complete.",
       "authority": "founder:layers-1082-geometry-plus-16-6-header"
     },
     {
@@ -4515,9 +4515,9 @@
       "name": "Canvas · breadcrumb bar",
       "family": "Canvas",
       "width": 720,
-      "status": "verify",
+      "status": "unbuildable",
       "owner": null,
-      "evidence": "2026-08-31 — breadcrumb bar: live prints ← Parent / → Child and BOTH WORK; the board's Alt+↑/Alt+↓ are dead — the board is stale here, not the code",
+      "evidence": "CODE AHEAD 2026-09-04 (auditor). Board says 'Alt+↑ Parent / Alt+↓ Child'; the breadcrumb renders '← Parent / → Child' in both source and DOM, and the arrow glyphs match the hint text. The row's own evidence already flagged the board as stale, which this corroborates. Founder rule: where the code is ahead, do not implement — record and move on.",
       "authority": "board"
     },
     {
