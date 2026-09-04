@@ -273,12 +273,12 @@ the total is exact.
 - [x] C1 · Sections exist for every feature family with ≥5 screens — 28 sections, counts read back live
 - [x] C2 · Every screen sits in exactly one section — loose frames at page top level: **0**
 - [x] C3 · Annotation frames are out of the screen list — 418 in `Notes`, verified as its child count
-- [ ] C4 · No family has exactly one screen unless it is genuinely standalone
-- [ ] C5 · S-flow numbering is either complete or retired — no phantom slots
-- [ ] C6 · The 3 real orphans (65:2, 130:2, 807:8723) have an entry point or a recorded retirement
-- [ ] C7 · The 3 real dead ends (295:1972, 1707:8456, 1719:8421) have an onward step
-- [ ] C8 · Stray top-level shapes are gone
-- [x] C9 · Prototype edge count **2,489 → 2,489**, walked across 36,280 descendants twice
+- [x] C4 · No family has exactly one screen unless it is genuinely standalone — one section holds a single frame, `📄 Reference — UX analysis docs`, which is a reference doc, not a feature family. Smallest real families: Ecommerce 2, Canvas 3.
+- [x] C5 · S-flow numbering is either complete or retired — **retired as an index.** 62 of 74 Journeys boards carry an S-number, and the gaps (S3.5, S4.2/4.4/4.5, S5.7–5.9, S6.1) are not missing screens: each subject was found as boards in a feature section (S3.5 → Inspector, S4.4/4.5 → Preview, S5.7 → Review, S6.1 → Publish). The section name now says the numbers are a journey narrative, not a screen index. **One genuine phantom: S4.1 share-preview, 0 frames anywhere** — its caption is renamed `NO BOARD ANYWHERE`.
+- [x] C6 · The 3 real orphans have a recorded entry — all three measured `in=0`, and all three are flow *starts*, so in=0 is correct: `65:2` first run (arrive by opening the editor), `130:2` the initial `none` state of S5.2 (leads to `130:201 · pending`), `807:8723` the external reviewer (arrives by share link `/share/<token>`, per root CLAUDE.md). Each name now carries `— ENTRY POINT: <how a user arrives>`; read back MARKED.
+- [x] C7 · **REFUTED — they were never dead ends.** Measured `out=1, dangling=0` each, to live, differently-named screens: `295:1972 → 807:7252` (S1.3b template-picker), `1707:8456 → 159:102` (Inspector · loading), `1719:8421 → 1719:8450` (bind popover · fields). The row was a claim carried forward from the frame-level pass, not a finding. No change made; the audit is corrected instead.
+- [x] C8 · Stray top-level shapes are gone — loose top-level nodes: **0** (27 sections hold everything). Of 379 non-frame children, 378 are `caption/…` TEXT correctly parked in `Notes`; the single one outside it (`NEW ONES` in the Insert review section) is now labelled as a section label. Also corrected a label that lied: `Notes` announced *418 screens* while holding 40 boards + 378 captions.
+- [x] C9 · Prototype edge count **2,489 → 2,489**, walked across 36,280 descendants twice — re-verified after this round of renames: still 2,489 across 898 section children, 0 loose.
 - [ ] C10 · A codex review has read the diff and signed off — *running*
 
 **Rule for every tick:** cite the fetched value. A tick without evidence is a
