@@ -39,6 +39,23 @@ Severity: **Critical** blocks a job · **Major** IA/hierarchy/missing states ·
 | IA-7 | **3 real dead ends.** Of 12, nine are annotated `CONDITION-ONLY`, `NOT A STATE`, `TERMINAL by design` or `RETIRED`. The three unexplained: `295:1972` S1.3 · new-page · 3-way, `1707:8456` Inspector · error-boundary, `1719:8421` Ecommerce · bound · inspector. | flow graph, cross-checked | **Major** | Each needs an onward step — an error boundary with no way back is the worst of the three. |
 | IA-8 | **The file already annotates its own retirements, and the convention works.** 13 orphans and 9 dead ends carry the reason in the frame name, which is why the true defect count is 6 and not 33. | name census | — | Keep the convention; apply it to the six above so the next audit reads clean. |
 
+
+**Where IA-1 … IA-8 were closed** — each was measured shut, not assumed:
+
+| # | Closed by | Measured |
+|---|---|---|
+| IA-1 two taxonomies | Sections (features are the spine) + C5 | 27 sections; S-numbers recorded as a journey narrative, not an index |
+| IA-2 40 singleton families | Section reorg + C4 | exactly one single-frame section left, and it is a reference doc |
+| IA-3 numbering implies 7, delivers 4 | C5 | numbering retired as an index; every gapped slot's screens found in a feature section — except S4.1, marked `NO BOARD ANYWHERE` |
+| IA-4 screens + annotation interleaved | Section reorg + C3 | 378 captions parked in `Notes`; the one TEXT outside it is now labelled |
+| IA-5 12 stray top-level shapes | C8 | loose top-level nodes: **0** |
+| IA-6 3 orphans | C6 | all three `in=0` and all three are flow starts; each renamed `— ENTRY POINT: …`, read back MARKED |
+| IA-7 3 dead ends | C7 | **retracted** — all three measure `out=1, dangling=0` to live screens |
+| IA-8 the convention works | kept and applied | the six above now carry their reason in the frame name, as IA-8 recommended |
+
+Every one of these was a rename. No Figma node was deleted, and the prototype
+edge count is unchanged at **2,489** across 898 section children.
+
 ### What is already working — protect it
 
 - **Flow wiring is in good shape**: 5% orphans and 3% dead ends across 397
