@@ -1766,9 +1766,9 @@
       "name": "Orphan comments · detected",
       "family": "Orphan comments",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "partial-copy+action-confirmed-geometry-not-measured",
+      "status": "done",
+      "owner": "wave-A",
+      "evidence": "LANDED 9e2e1c5c0 (wave A, merged to main 2026-09-04): modal is 560 wide per board 184:56, warning band at --bk-radius-lg, and each lost comment names the element it was on (captured off ELEMENT_DELETED — nothing persists it server-side; Comment stores only targetSelector). elementIdFromSelector added as the inverse of anchorSelector. Verified on main after merge: tsc clean, 26/26 comment tests.",
       "authority": "board"
     },
     {
@@ -1778,9 +1778,9 @@
       "name": "Orphan comments · dismissed",
       "family": "Orphan comments",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). The confirm would sit on the Detached row's Resolve action, which is already a one-click instantly-reversible Resolve/Reopen toggle. boards.json already records authority code:dismiss-offered-needs-live-orphan-to-confirm (verified by coordinator).",
       "authority": "code:dismiss-offered-needs-live-orphan-to-confirm"
     },
     {
@@ -1790,9 +1790,9 @@
       "name": "Orphan comments · reattach",
       "family": "Orphan comments",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). The shipped reattach — click the canvas element, with a banner and hitTest, wired through comments:reattach-start/reattached and ReviewService.reattachReviewComment — is strictly more precise than the board's pick-from-a-list. boards.json authority code:reattach-service+event-exist (verified).",
       "authority": "code:reattach-service+event-exist-needs-live-orphan"
     },
     {
@@ -2767,9 +2767,9 @@
       "name": "S5.10 · activity-log",
       "family": "S5 flows",
       "width": 360,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-01 BLOCKED on producers: 8 of 10 row types never recorded (activity_logs 96% site.settings.updated). Fixed the surface that exists: actorName resolved + consecutive de-dup. | 2026-09-03 A8 CORRECTION: 13 distinct actions DO reach a writer (5 MEMBER_*, review.revoked, site.domain.connected/removed, site.rolled_back, site.settings.updated, site.share_link.created/revoked, site.unpublished). The '96% site.settings.updated' skew describes the DATASET, not the producers. Trimming the board to 2 rows would have removed eleven working producers. This is a fixture gap, not a missing feature.",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). Fixture-data gap, not a missing feature (BLOCKERS.md A8): 13 actions already reach a writer, and the surface lives in packages/dashboard, outside this lane.",
       "authority": "board"
     },
     {
@@ -2851,9 +2851,9 @@
       "name": "S5.3 · no-comments",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). 1440-wide legacy whole-shell mockup; census authority superseded:by-review-panel-156-158 (verified by coordinator). The superseding Review panel family is built and largely verified; rebuilding this would mean re-implementing the studio chrome, including AquibraStudio.tsx, which is off-limits.",
       "authority": "superseded:by-review-panel-156-158"
     },
     {
@@ -2863,9 +2863,9 @@
       "name": "S5.3 · open-thread",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). Same superseded:by-review-panel-156-158 (verified).",
       "authority": "superseded:by-review-panel-156-158"
     },
     {
@@ -2875,9 +2875,9 @@
       "name": "S5.3 · replied",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). Same superseded:by-review-panel-156-158 (verified).",
       "authority": "superseded:by-review-panel-156-158"
     },
     {
@@ -2887,9 +2887,9 @@
       "name": "S5.3 · resolved",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). Same superseded:by-review-panel-156-158 (verified).",
       "authority": "superseded:by-review-panel-156-158"
     },
     {
@@ -2899,9 +2899,9 @@
       "name": "S5.3 · show-resolved",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-A",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave A). Same superseded:by-review-panel-156-158 (verified).",
       "authority": "superseded:by-review-panel-156-158"
     },
     {
@@ -2911,9 +2911,9 @@
       "name": "S5.4 · gate · changes-requested",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "done",
+      "owner": "wave-A",
+      "evidence": "ALREADY BUILT — bookkeeping corrected 2026-09-04 (wave A, spot-checked by coordinator). deriveLifecycleState resolves this at the Publish control itself (button relabels / disables with a reason), so the board's reactive block-modal could only open after a button the user cannot press.",
       "authority": "board:307:2203"
     },
     {
@@ -2923,9 +2923,9 @@
       "name": "S5.4 · gate · no-review-sent",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "done",
+      "owner": "wave-A",
+      "evidence": "ALREADY BUILT — bookkeeping corrected 2026-09-04 (wave A, spot-checked by coordinator). Same as J-307:2203 — resolved at the control, not in a modal.",
       "authority": "board:307:2213"
     },
     {
@@ -2935,9 +2935,9 @@
       "name": "S5.4 · gate · pending",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "done",
+      "owner": "wave-A",
+      "evidence": "ALREADY BUILT — bookkeeping corrected 2026-09-04 (wave A, spot-checked by coordinator). Same as J-307:2203 — resolved at the control, not in a modal.",
       "authority": "board:307:2193"
     },
     {
@@ -2971,9 +2971,9 @@
       "name": "S5.6 · approved-edited-since",
       "family": "S5 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "done",
+      "owner": "wave-A",
+      "evidence": "ALREADY BUILT — bookkeeping corrected 2026-09-04 (wave A, spot-checked by coordinator). StaleApprovalModal.tsx exists and AquibraStudio imports it; usePublishJob carries a 'stale-approval' block reason, so the chain publish-approval → APPROVAL_STALE → classifyPublishBlock is real. The row's own 'source-only-NOT-LIVE' note was wrong.",
       "authority": "code:stale-approval-modal-source-only-NOT-LIVE"
     },
     {
