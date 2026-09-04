@@ -135,7 +135,13 @@ const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
   { id: "starters",   label: "Starters",        hint: "Whole-brand starting points" },
   { id: "classes",    label: "Classes",         hint: "Names shared across elements" },
-  { id: "components", label: "Components",      hint: "What the brand ships" },
+  /* "Component styles", not "Components". Four doors in this product were
+     labelled Components and led three different places: Insert's inline
+     catalog of placeable components, the site menu's Components panel for
+     managing saved ones, and this — the STYLES the brand defines for them.
+     A user who wants "components" had to guess which door. This one is the
+     odd noun out, and its own hint already said so. */
+  { id: "components", label: "Component styles", hint: "What the brand ships" },
   { id: "typography", label: "Typography",      hint: "The fonts this site uses" },
   { id: "colour-mode", label: "Colour mode",    hint: "Light and dark values" },
   { id: "lint",       label: "Lint",            hint: "What breaks the brand" },

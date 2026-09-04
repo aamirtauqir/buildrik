@@ -85,7 +85,7 @@ describe("DesignSystemTab — Brand root drill-in a11y", () => {
   it("labels every row from the board", () => {
     const { container } = renderRoot();
     const labels = rows(container).map((r) => r.textContent);
-    for (const label of ["Tokens", "Presets", "Starters", "Classes", "Components", "Colour mode", "Lint", "Import / export"]) {
+    for (const label of ["Tokens", "Presets", "Starters", "Classes", "Component styles", "Colour mode", "Lint", "Import / export"]) {
       expect(labels.some((l) => l?.includes(label))).toBe(true);
     }
   });

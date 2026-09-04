@@ -95,6 +95,47 @@ A user cannot tell which one they get. Both now sit in `Command palette · 7
 screens` so the duplication is visible instead of scattered. **Resolution
 needed: one palette, one shortcut, one size.**
 
+## Product navigation audit — measured in the running editor
+
+Driven live at 1440×900 on :5050; 19 screenshots and a DOM probe. The findings
+that survived checking:
+
+### IA-10 · Four doors labelled "Components", three destinations — **Major**
+
+| door | leads to | what it means there |
+|---|---|---|
+| Site menu → `Components ⇧A` | `openLeftPanelToTab("components")` | manage your saved components |
+| Insert drawer → `▸ COMPONENTS 14` | inline catalog group | components you can place |
+| Brand root → `Components · "What the brand ships"` | Brand sub-screen | the *styles* the brand defines |
+| `rail/tabsConfig.ts` → `Components` tab | "Create and use reusable components" | a fourth definition, not in the visible rail |
+
+A user who wants "components" has to guess. **Fixed for the odd noun out:** the
+Brand row now reads **"Component styles"** — its own hint already said that is
+what it is. The other three are genuinely different jobs and keep their names;
+Insert's is scoped inside Insert, so context disambiguates it.
+
+### IA-11 · The panel header never changes on drill-in — **Minor**
+
+`DesignSystemTab.tsx:596` is `const headerTitle = "Brand"`, hardcoded, so at
+Brand › Tokens › color the header still reads `Brand ✕`. Mitigated, and that is
+why this is Minor not Major: the body renders a `‹ Tokens · color` back row, so
+"where am I" is answered — just not by the header.
+
+### Two findings I dropped after checking
+
+- **"Four of six panels never say what they are for."** The probe recorded no
+  purpose copy for Insert, Layers, Pages and Media. Reading the code: Layers
+  says *"This page is empty. Drop something on the canvas to see it here."* with
+  an `Open Insert` action. The probe had measured a POPULATED panel, where a
+  purpose line is legitimately absent. The finding was an artefact of the state
+  I measured in, not a defect.
+- **"Panel purpose belongs in the header subtitle."** `PanelFrame` supports one,
+  and the rail already carries the copy as `ariaLabel`. But the subtitle renders
+  *beside* the title capped at `max-w-40`, and the component's own note says a
+  sentence like this "will not fit beside a label". Using it would have shipped
+  `Upload and manage…`. The body, where Content and Brand already put theirs, is
+  the right home.
+
 ## Checklist — agents tick these, each with evidence
 
 - [x] C1 · Sections exist for every feature family with ≥5 screens — 28 sections, counts read back live

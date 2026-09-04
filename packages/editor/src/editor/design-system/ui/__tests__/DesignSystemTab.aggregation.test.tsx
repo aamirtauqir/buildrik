@@ -61,7 +61,7 @@ describe("DesignSystemTab — 14-kind aggregation", () => {
       container.querySelectorAll<HTMLButtonElement>("[data-section-id]"),
     ).map((r) => r.textContent ?? "");
     expect(rows).toHaveLength(9);
-    for (const label of ["Tokens", "Typography", "Presets", "Starters", "Classes", "Components", "Colour mode", "Lint", "Import / export"]) {
+    for (const label of ["Tokens", "Typography", "Presets", "Starters", "Classes", "Component styles", "Colour mode", "Lint", "Import / export"]) {
       expect(rows.some((r) => r.includes(label))).toBe(true);
     }
   });
