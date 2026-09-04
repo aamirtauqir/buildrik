@@ -1,103 +1,74 @@
-# Autoplan — implement every editor board in the codebase
+# Autoplan — editor Figma board arc
 
-Founder goal, 2026-09-03: *"do not stop unless every board of the editor is
-implemented in the code base … agar koi aisa scenario aa jaye ke codebase aur
-design mein conflict ho, jaise codebase bohat zyada forward ho, tab aap ne ruk
-jana hai, wahan par implement nahi karna, koi aur board dekh lena … main yeh
-chahta hoon ke 80-90% implement ho jaye saare boards."*
+**Restated goal (founder, 2026-09-04).** Implement every editor Figma board in
+the codebase, using multiple agents: some implementing, some testing and
+following up on what is done and what remains. Target **80–90%**. Do not stop
+until every board is implemented — **except where the codebase is ahead of the
+design. There, do not implement: record why and take another board.**
 
-## The two rules that decide everything
+## The two rules, in the order they bind
 
-1. **Implement the board** where the code is behind or merely different.
-2. **SKIP the board** where the code is AHEAD — more states, more affordances,
-   a safer flow, a real capability the board omits. Do not remove working
-   behaviour to match a drawing. Mark the job `skipped-code-ahead`, write one
-   line of evidence saying what the code has that the board lacks, and take
-   the next board. This is a founder ruling, not a judgment call per board.
+1. **Build to the board.** Behaviour follows the CODE contract (Zod schemas,
+   service returns). Everything visual — layout, colour, type, on-screen copy —
+   follows the BOARD. Sample data ("Bella Cucina", "3 open") is never copied
+   literally; the SHAPE is the contract.
+2. **Skip when the code is ahead.** A board drawing a state the product cannot
+   produce, or a worse version of something already built, is not implemented.
+   It is marked with one sentence of evidence and the agent moves on. This is a
+   good outcome and the founder said so explicitly.
 
-## Done condition (observable, not claimed)
+## The arithmetic
 
-`done + verify` ÷ `implement scope` ≥ 85 %, where implement scope excludes
-`unbuildable` (the product cannot produce the state) and `fix-figma` (the board
-is wrong, not the code). At the start of this plan:
+Percentage = `(done + verify) ÷ rows that are not unbuildable/fix-figma`.
 
-| | count |
+| | rows |
 |---|---|
-| implement scope | 447 |
-| done + verify (code applied or matching) | 351 (78.5 %) |
-| work left (`fix` + `todo`) | 96 |
-| skip (unbuildable + fix-figma) | 72 |
+| J- board jobs | 491 |
+| excluded: unbuildable + fix-figma | 54 |
+| **implement scope** | **437** |
+| done + verify | 337 |
+| **complete** | **77.1%** |
 
-To 85 % → 28 more jobs. To 90 % → 51 more.
+To reach 80% close **12** rows; 85% needs **34**; 90% needs **56**. There are
+**96 open buildable rows**, so the target is reachable without touching a
+single exclusion.
 
-A job reaches `verify` when its code is applied, tests and gates are green, and
-the change is pushed. It reaches `done` only on a live measurement.
+**The quoted figure was 78.7% and it was wrong.** Nine rows sat outside the
+denominator with no reason recorded in any field. An exclusion nobody has to
+justify flatters every percentage above it, so they went back in; four were
+then measured live and reach populated surfaces. A further 27 carried their
+reason in the NAME (`[design-ahead]`, `[not-implemented]`) where an evidence
+sweep could not see it — those keep the exclusion and now say why in the field
+that gets read.
 
-## Roles
+## Wave plan
 
-| role | writes | isolation |
+Six implementer lanes, split by family so no two agents touch one file, each in
+its own git worktree; plus an auditor measuring whether the number itself is
+true.
+
+| lane | families | rows |
 |---|---|---|
-| **Coordinator** (this session) | merges worktree branches, runs the suite, commits, pushes | main tree |
-| **Implementer** ×N | code for its OWN families only | its own git worktree |
-| **Verifier** ×2 | nothing — measures live, reports | read-only |
-| **peer session** `packages-1d` | `docs/design-jobs/*` (single writer) | main tree |
+| A | S5 flows, Orphan comments | 13 |
+| B | Inspector, Compare, Modal | 14 |
+| C | Media, Content | 13 |
+| D | S3 flows, Insert, Layers | 14 |
+| E | S1 flows, Pages, Templates | 21 |
+| F | Brand, Shell states, Shell, History, AI, S7, B9.1 | 21 |
+| audit | a spread sample of rows already counted as `verify` | 12–16 |
 
-Two Claude sessions share this repo. `jobs.json`, `LEDGER.jsonl` and
-`BLOCKERS.md` have ONE writer between them; this session sends findings rather
-than writing those files. That is the defect that cost a whole retraction cycle
-on 2026-09-02.
+The auditor exists because `verify` and `done` count the same in the figure
+above. If `verify` does not hold up under measurement, 77.1% is inflated and
+the founder is being told something false. That answer is worth more than any
+single row.
 
-## File ownership per implementer — disjoint by construction
+## What makes a row closeable
 
-| agent | families | owns |
-|---|---|---|
-| impl-media | Media, Media drill-ins | `sidebar/tabs/media/**`, `media/**` |
-| impl-panels | Compare, Components, Modal, Issues | `sidebar/tabs/compare/**`, `components-catalog/**`, `shell/modals/**` |
-| impl-editor | AI, History, Inspector, Layers | `sidebar/tabs/{ai,history}/**`, `inspector/**`, `panels/layers/**` |
-| impl-flows | S1/S3/S5 flows, Shell states | `shell/**`, `canvas/**` |
-| impl-nav | Insert, Pages, Templates, Brand | `sidebar/tabs/{insert,pages,templates}/**`, `design-system/**` |
+`done` means observed in the running app at 1440×900 — not a probe render, not
+the JSX, not a green unit suite. All three have passed over a broken feature in
+this repo. Measure with `getComputedStyle`/`getBoundingClientRect`: at 2× a
+screenshot hides an 8px error.
 
-`chrome-ui/**`, `themes/**`, `shared/**` and anything under `scripts/` are
-**coordinator-only**. An implementer that needs a chrome-ui change writes the
-request into its report; it does not edit the file. That keeps the shared
-component library single-writer while five agents run.
-
-## Per-job loop for an implementer
-
-1. Read the job's evidence in `jobs.json` (numbers + file:line are already there
-   for most; a `todo` job needs the board read first).
-2. Read the board once via `scripts/baseline/figma-mcp.mjs`
-   (`get_design_context`). The Figma seat is capped near 28 calls/hour — budget
-   it, and if the cap trips, work the jobs whose evidence already carries the
-   numbers.
-3. Decide: behind → implement. Ahead → **skip**, one line of why.
-4. Apply the change. Anchor every edit on an exact string; assert it matched.
-5. `npx tsc --noEmit` + `npx vitest run <your dirs>` + `pnpm run verify:ds`.
-   All three green or the change does not leave the worktree.
-6. Report: job, verdict (`implemented` / `skipped-code-ahead` / `blocked`),
-   file:line, and what a verifier should measure to confirm it.
-
-## Gates that will bite (learned today)
-
-- Gate 14 greps raw text for `28px`/`32px`/`320px` — use the token
-  (`var(--bk-size-row)`, `var(--bk-size-row-dense)`) or a scale class.
-- `gate:styling-ratchet` counts CSS lines per file: a fix must not grow the
-  file. Fold declarations onto one line.
-- Gate 13 caps panel-chrome radius at 4; the founder has since split the rule
-  by surface, so read the current baseline before touching a radius.
-- flowbite leaks `h-10` and, on `variant="link"`, used to leak weight 500. A
-  same-property utility wins through twMerge; a different property loses.
-- WCAG target-size floors every control at 24×24, so a text link is
-  `tw:h-auto tw:min-h-6`, never `min-h-0`.
-
-## Waves
-
-**Wave 1 (now).** 5 implementers in worktrees + 2 verifiers on the live app.
-Verifiers do not wait for the implementers: they measure the 351 jobs already
-in `verify` and convert the ones that hold to `done`, which is where most of
-the percentage actually comes from.
-
-**Wave 2.** Coordinator merges each worktree branch in turn, runs the whole
-suite, pushes. Re-launch implementers on what came back `blocked`.
-
-**Wave 3.** Re-measure everything touched; report the honest percentage.
+Every agent commits per row, path-scoped, behind `tsc && vitest && verify:ds`.
+A chain that prints failures and commits anyway has put red code on main twice
+in one day; the check must be something the commit is *behind*.
