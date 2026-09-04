@@ -239,3 +239,18 @@ export async function fetchPrePublishChecks(siteId: string): Promise<PrePublishC
 export async function unpublishSite(siteId: string): Promise<void> {
   await getClient().sites.unpublish.mutate({ siteId });
 }
+
+export type PublishPageChange = "added" | "removed" | "changed" | "same";
+export interface PublishDiff {
+  retained: boolean;
+  pages: Array<{ path: string; change: PublishPageChange; fromBytes: number | null; toBytes: number | null }>;
+  added: number;
+  removed: number;
+  changed: number;
+}
+
+/** What changed between two published versions, page by page. THROWS on a
+ *  fetch error — same rule as fetchPublishHistory. */
+export async function fetchPublishDiff(siteId: string, fromJobId: string, toJobId: string): Promise<PublishDiff> {
+  return getClient().sites.publishDiff.query({ siteId, fromJobId, toJobId });
+}

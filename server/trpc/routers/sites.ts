@@ -31,6 +31,7 @@ import {
   getPublishStatus,
   cancelPublish,
   unpublishSite,
+  getPublishDiff,
   getPublishHistory,
   rollbackPublish,
 } from "@/server/services/publish.service";
@@ -44,7 +45,7 @@ import {
   getProjectDataSchema,
   editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
-import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
+import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
@@ -457,6 +458,21 @@ export const sitesRouter = router({
         throw e;
       }
       return getPublishHistory(input.siteId);
+    }),
+
+  // What changed between two published versions, page by page. EDITOR, like
+  // history: reading your own site's shipped content. HTML never leaves the
+  // service — only paths, change kinds and sizes.
+  publishDiff: protectedProcedure
+    .input(publishDiffInput)
+    .query(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getPublishDiff(input.siteId, input.fromJobId, input.toJobId);
     }),
 
   // P1: roll back = re-publish a prior version as a NEW job (contract §5).

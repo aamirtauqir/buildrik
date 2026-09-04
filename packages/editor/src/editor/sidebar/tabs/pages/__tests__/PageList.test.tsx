@@ -128,3 +128,13 @@ describe("PageList", () => {
     expect(container.querySelector(".pg-list__search-wrap")).toBeNull();
   });
 });
+
+describe("PageList — the Structure door", () => {
+  it("opens the site-structure view when a handler is given", () => {
+    const onOpenStructure = vi.fn();
+    /* The empty state renders no footer links; a page makes the list body mount. */
+    render(<PageList {...makeProps({ pages: [{ id: "p1", name: "Home", slug: "home" } as never], onOpenStructure })} />);
+    fireEvent.click(screen.getByTestId("pages-open-structure"));
+    expect(onOpenStructure).toHaveBeenCalledTimes(1);
+  });
+});

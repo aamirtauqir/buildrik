@@ -14,10 +14,12 @@ const rollbackToVersion = vi.fn();
    not carry — the panel reads it separately. */
 const fetchSitePublishState = vi.fn();
 
+const fetchPublishDiff = vi.fn();
 vi.mock("../../../services/PublishService", () => ({
   fetchPublishHistory: (...a: unknown[]) => fetchPublishHistory(...a),
   fetchSitePublishState: (...a: unknown[]) => fetchSitePublishState(...a),
   rollbackToVersion: (...a: unknown[]) => rollbackToVersion(...a),
+  fetchPublishDiff: (...a: unknown[]) => fetchPublishDiff(...a),
 }));
 
 // P6 role gating — controllable; null = unknown (rollback stays enabled).
@@ -422,5 +424,58 @@ describe("board 184:2 — the version picker", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(screen.queryByText(/^Roll back to v/)).toBeNull();
     expect(rollbackToVersion).not.toHaveBeenCalled();
+  });
+});
+
+describe("Compare — what changed between two published versions", () => {
+  /* "Compare v3 → v4" only switched tabs; no diff existed. Now every row but
+     the oldest can compare itself with the version before it, page by page. */
+  beforeEach(() => {
+    fetchPublishDiff.mockReset().mockResolvedValue({
+      retained: true,
+      pages: [
+        { path: "about.html", change: "changed", fromBytes: 1024, toBytes: 2048 },
+        { path: "index.html", change: "same", fromBytes: 512, toBytes: 512 },
+        { path: "new.html", change: "added", fromBytes: null, toBytes: 300 },
+      ],
+      added: 1, removed: 0, changed: 1,
+    });
+  });
+
+  it("offers Compare on every row except the oldest, which has nothing before it", async () => {
+    renderIt();
+    await screen.findByText(/Version 3/i);
+    expect(screen.getByRole("button", { name: "Compare v2 to v3" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Compare v1 to v2" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Compare v0/ })).toBeNull();
+  });
+
+  it("asks the server for exactly those two jobs and names what changed", async () => {
+    renderIt();
+    await screen.findByText(/Version 3/i);
+    fireEvent.click(screen.getByRole("button", { name: "Compare v2 to v3" }));
+    await waitFor(() => expect(fetchPublishDiff).toHaveBeenCalledWith("s1", "j2", "j3"));
+    expect(await screen.findByTestId("publish-diff-summary")).toHaveTextContent("1 changed · 1 added · 0 removed · 1 unchanged");
+    expect(screen.getByText("about.html").closest("li")).toHaveAttribute("data-change", "changed");
+    expect(screen.getByText("new.html").closest("li")).toHaveAttribute("data-change", "added");
+    expect(screen.getByText("1.0 KB → 2.0 KB")).toBeInTheDocument();
+  });
+
+  it("says a pruned version cannot be compared, rather than showing an empty diff", async () => {
+    fetchPublishDiff.mockResolvedValue({ retained: false, pages: [], added: 0, removed: 0, changed: 0 });
+    renderIt();
+    await screen.findByText(/Version 3/i);
+    fireEvent.click(screen.getByRole("button", { name: "Compare v1 to v2" }));
+    expect(await screen.findByText(/no longer stored/)).toBeInTheDocument();
+    expect(screen.queryByTestId("publish-diff-summary")).toBeNull();
+  });
+
+  it("goes back to the list", async () => {
+    renderIt();
+    await screen.findByText(/Version 3/i);
+    fireEvent.click(screen.getByRole("button", { name: "Compare v2 to v3" }));
+    await screen.findByTestId("publish-diff");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Versions" }));
+    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
   });
 });

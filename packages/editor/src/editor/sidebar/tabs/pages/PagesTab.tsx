@@ -18,6 +18,7 @@ import type { Composer } from "../../../../engine";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
+import { SiteStructureTree } from "./components/SiteStructureTree";
 import { SearchListingsTable } from "./components/SearchListingsTable";
 import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
@@ -83,7 +84,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
   // tree; the table is the SEO-at-a-glance view that scales past a few pages.
-  const [view, setView] = React.useState<"pages" | "listings">("pages");
+  const [view, setView] = React.useState<"pages" | "listings" | "structure">("pages");
 
   // Settings drawer — resolve the active page from the id stored in usePages
   const dirtyPages = useDirtyPages(composer);
@@ -234,7 +235,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           side of the error, so the error is a BODY state inside PageList — not
           a replacement for the whole panel body. */}
       <PanelFrame.Body noScroll>
-          {view === "listings" && !p.loadError ? (
+          {view === "structure" && !p.loadError ? (
+            <SiteStructureTree pages={p.pages} onSelectPage={(id) => { p.selectPage(id); }} onBack={() => setView("pages")} />
+          ) : view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
                blocks. The table then took h-full (the WHOLE body) while
@@ -265,6 +268,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             loading={p.loading}
             onRetry={p.retrySync}
             onOpenListings={() => setView("listings")}
+            onOpenStructure={() => setView("structure")}
             openContextMenuPageId={p.contextMenu?.pageId ?? null}
             composer={composer}
             folders={f.folders}

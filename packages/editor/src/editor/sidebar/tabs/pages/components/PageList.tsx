@@ -28,6 +28,8 @@ interface Props {
   nameError: string | null;
   /** Opens the whole-site listings view — board 140:10's toolbar link. */
   onOpenListings?: () => void;
+  /** The site as a tree of routes — the only site-wide view was a flat SEO table. */
+  onOpenStructure?: () => void;
   openContextMenuPageId?: string | null;
   composer: Composer | null;
   folders: FolderItem[];
@@ -66,6 +68,7 @@ export const PageList: React.FC<Props> = ({
   renamingPageId,
   nameError,
   onOpenListings,
+  onOpenStructure,
   openContextMenuPageId = null,
   composer,
   folders,
@@ -186,6 +189,17 @@ export const PageList: React.FC<Props> = ({
             onClick={onOpenListings}
           >
             {"\u229E"} Listings
+          </Button>
+        )}
+        {onOpenStructure && (
+          <Button
+            color="light"
+            size="xs"
+            className="bd-pg-listings-link"
+            data-testid="pages-open-structure"
+            onClick={onOpenStructure}
+          >
+            {"\u2442"} Structure
           </Button>
         )}
       </div>

@@ -486,6 +486,70 @@ export interface PublishHistoryRow {
   rolledBackFrom: string | null;
 }
 
+export type PublishPageChange = "added" | "removed" | "changed" | "same";
+export interface PublishDiffPage {
+  path: string;
+  change: PublishPageChange;
+  fromBytes: number | null;
+  toBytes: number | null;
+}
+export interface PublishDiff {
+  /** False when either job's payload has been pruned (older than the retained
+   *  window) — then there is nothing to compare and `pages` is empty. */
+  retained: boolean;
+  pages: PublishDiffPage[];
+  added: number;
+  removed: number;
+  changed: number;
+}
+
+type RetainedPayload = { pages?: Array<{ path?: string; html?: string }> } | null;
+
+/**
+ * What changed between two published versions, page by page.
+ *
+ * "Compare v3 → v4" only ever switched to the History tab; no version-content
+ * diff existed anywhere, so a user saw WHEN two versions shipped and never
+ * WHAT changed. The deploy payload is retained on COMPLETED jobs for the
+ * rollback window, which is exactly the content that shipped — so the diff is
+ * of what went live, not of the editor's working copy.
+ *
+ * Page-level on purpose. A client does not read a line diff of generated HTML;
+ * "pricing changed, about was added, faq was removed" is the answer to the
+ * question they asked. The HTML itself never leaves the service — same
+ * discipline as getPublishStatus and getPublishHistory.
+ */
+export async function getPublishDiff(siteId: string, fromJobId: string, toJobId: string): Promise<PublishDiff> {
+  const jobs = await prisma.publishBuildJob.findMany({
+    where: { siteId, status: "COMPLETED", id: { in: [fromJobId, toJobId] } },
+    select: { id: true, log: true },
+  });
+  const from = jobs.find((j) => j.id === fromJobId);
+  const to = jobs.find((j) => j.id === toJobId);
+  if (!from || !to) throw new Error("PUBLISH_DIFF_NOT_FOUND: both versions must be completed publishes of this site");
+  const pagesOf = (log: unknown): Map<string, number> | null => {
+    const p = (log as RetainedPayload)?.pages;
+    if (!Array.isArray(p)) return null;
+    const m = new Map<string, number>();
+    for (const pg of p) if (pg?.path) m.set(pg.path, Buffer.byteLength(pg.html ?? "", "utf8"));
+    return m;
+  };
+  const a = pagesOf(from.log);
+  const b = pagesOf(to.log);
+  if (!a || !b) return { retained: false, pages: [], added: 0, removed: 0, changed: 0 };
+
+  const fromHtml = new Map(((from.log as RetainedPayload)?.pages ?? []).map((p) => [p.path ?? "", p.html ?? ""]));
+  const toHtml = new Map(((to.log as RetainedPayload)?.pages ?? []).map((p) => [p.path ?? "", p.html ?? ""]));
+  const paths = [...new Set([...a.keys(), ...b.keys()])].sort();
+  const pages: PublishDiffPage[] = paths.map((path) => {
+    const inA = a.has(path), inB = b.has(path);
+    const change: PublishPageChange = !inA ? "added" : !inB ? "removed" : fromHtml.get(path) === toHtml.get(path) ? "same" : "changed";
+    return { path, change, fromBytes: inA ? a.get(path)! : null, toBytes: inB ? b.get(path)! : null };
+  });
+  const count = (c: PublishPageChange) => pages.filter((p) => p.change === c).length;
+  return { retained: true, pages, added: count("added"), removed: count("removed"), changed: count("changed") };
+}
+
 /**
  * A site's published-version history (contract §5), newest first, capped at the
  * retained window. Reads `log` ONLY to derive `rollbackable`; the raw HTML

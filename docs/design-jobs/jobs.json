@@ -6373,12 +6373,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
-      "owner": "editor-ed",
+      "owner": "editor-aa",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. 'Compare v{n-1}->v{n}' only fires ui:switch-tab: history. No version-content diff exists anywhere in the codebase. A user sees WHEN two versions shipped, never WHAT changed."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. 'Compare v{n-1}->v{n}' only fires ui:switch-tab: history. No version-content diff exists anywhere in the codebase. A user sees WHEN two versions shipped, never WHAT changed. | LANDED 2026-09-04 (editor-aa): Built: sites.publishDiff diffs the retained deploy payloads of two COMPLETED jobs page by page (added/removed/changed/same + sizes; HTML never leaves the service). Editor: every Published row but the oldest has Compare; PublishDiffView shows summary + per-page badges; pruned versions say so instead of an empty diff."
     },
     {
       "id": "F-UNPUBLISH-NO-DOOR",
@@ -6478,12 +6478,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
-      "owner": "editor-ed",
+      "owner": "editor-aa",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P2. The only site-wide view is 'Listings', a flat SEO-score table (Page / Title / Desc / Score). No hierarchy, no navigation graph, no sitemap. A user cannot see how their pages relate."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P2. The only site-wide view is 'Listings', a flat SEO-score table (Page / Title / Desc / Score). No hierarchy, no navigation graph, no sitemap. A user cannot see how their pages relate. | LANDED 2026-09-04 (editor-aa): Built: SiteStructureTree — the site as a tree of routes, read off the pages the panel already holds (/pricing/teams under /pricing; a segment with no page shows as a gap). Door: 'Structure' beside 'Listings' in the Pages footer; click selects the page."
     },
     {
       "id": "F-LAYERS-SEARCH-TYPE",

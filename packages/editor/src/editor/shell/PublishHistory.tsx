@@ -25,6 +25,7 @@ import {
   rollbackToVersion,
   type PublishHistoryRow,
 } from "../../services/PublishService";
+import { PublishDiffView } from "./PublishDiffView";
 
 export interface PublishHistoryProps {
   siteId: string;
@@ -134,6 +135,8 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
      costs the banner one clause, and must not turn the whole list into the
      load-error board. */
   const [liveDomain, setLiveDomain] = React.useState<string | null>(null);
+  /* Two versions to compare, page by page. Null = show the list. */
+  const [compare, setCompare] = React.useState<{ from: { id: string; version: number }; to: { id: string; version: number } } | null>(null);
   /* null = the site state has not answered yet. Distinct from false, so
      nothing renders a liveness claim in either direction while loading. */
   const [isPublished, setIsPublished] = React.useState<boolean | null>(null);
@@ -285,7 +288,9 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
         </div>
       )}
       {notice && <div className={NOTICE}>{notice}</div>}
-      {rows.map((r, i) => {
+      {compare ? (
+        <PublishDiffView siteId={siteId} from={compare.from} to={compare.to} onBack={() => setCompare(null)} />
+      ) : rows.map((r, i) => {
         const isLive = i === 0 && Boolean(isPublished);
         // rolledBackFrom is a job id — map it to that version's number for the label.
         const fromVersion = r.rolledBackFrom
@@ -304,6 +309,19 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             current={isLive}
             currentLabel="Live"
             meta={fromVersion !== undefined ? `↩ from v${fromVersion} · ${relTime(r.completedAt)}` : relTime(r.completedAt)}
+            actions={
+              i < rows.length - 1 ? (
+                <Button
+                  color="light"
+                  size="xs"
+                  onClick={() => setCompare({ from: { id: rows[i + 1].id, version: rows[i + 1].version }, to: { id: r.id, version: r.version } })}
+                  className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:text-[var(--bk-accent)]"
+                  aria-label={`Compare v${rows[i + 1].version} to v${r.version}`}
+                >
+                  Compare
+                </Button>
+              ) : undefined
+            }
             /* Board 949:4474's rows carry no Roll back button — rollback
                starts from the button under the list, which opens the picker
                (board 184:2). A per-row button plus that one would be two

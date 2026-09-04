@@ -117,4 +117,12 @@ export const publishHistoryInput = z.object({ siteId: z.string().min(1) });
 export type PublishHistoryInput = z.infer<typeof publishHistoryInput>;
 
 export const rollbackInput = z.object({ siteId: z.string().min(1), jobId: z.string().min(1) });
+
+/** Two COMPLETED publish jobs of one site to compare, page by page. */
+export const publishDiffInput = z.object({
+  siteId: z.string().min(1),
+  fromJobId: z.string().min(1),
+  toJobId: z.string().min(1),
+});
+export type PublishDiffInput = z.infer<typeof publishDiffInput>;
 export type RollbackInput = z.infer<typeof rollbackInput>;
