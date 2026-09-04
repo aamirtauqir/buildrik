@@ -62,6 +62,19 @@ function makeComposer(siblingIds: string[]): Composer {
   } as unknown as Composer;
 }
 
+/** Composer whose parent has an id — needed for the parent-padding indicator,
+ *  which resolves the parent's own DOM node. */
+function makeComposerWithParent(parentId: string, siblingIds: string[]): Composer {
+  const children = [DRAG_ID, ...siblingIds].map((id) => ({ getId: () => id }));
+  const parent = { getId: () => parentId, getChildren: () => children };
+  const element = { getId: () => DRAG_ID, getParent: () => parent };
+  return {
+    elements: {
+      getElement: vi.fn((id: string) => (id === DRAG_ID ? element : null)),
+    },
+  } as unknown as Composer;
+}
+
 function renderSnapping(composer: Composer | null) {
   return renderHook(() => useCanvasSnapping(composer)).result.current;
 }
@@ -224,5 +237,97 @@ describe("useCanvasSnapping — threshold math (SNAP_THRESHOLD=5, strict <)", ()
 
     const result = calculateSnapping(DRAG_ID, { left: 103, top: 300, width: 50, height: 50 });
     expect(result.x).toBe(100);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Board 815:4608 — spacing indicators (scenarios 3 & 4)
+// ---------------------------------------------------------------------------
+
+describe("useCanvasSnapping — equal spacing indicator (board 815:4608, scenario 3)", () => {
+  it("draws a red equal-gap line on each side once dragging equalises them", () => {
+    // Sibling A occupies 0-50; sibling B occupies 220-270. Dragging the
+    // element to left=110 (occupying 110-160) puts 60px on both sides.
+    addSiblingDom("sib-a", { left: 0, top: 100, width: 50, height: 50 });
+    addSiblingDom("sib-b", { left: 220, top: 100, width: 50, height: 50 });
+    const composer = makeComposer(["sib-a", "sib-b"]);
+    const { calculateSnapping } = renderSnapping(composer);
+
+    const result = calculateSnapping(DRAG_ID, { left: 110, top: 100, width: 50, height: 50 });
+    const gaps = result.snapLines.filter((l) => l.kind === "equal-gap");
+    expect(gaps).toHaveLength(2);
+    for (const gap of gaps) {
+      expect(gap.orientation).toBe("horizontal");
+      expect(gap.value).toBe(60);
+    }
+  });
+
+  it("stays silent when the gaps do not agree", () => {
+    addSiblingDom("sib-a", { left: 0, top: 100, width: 50, height: 50 });
+    // Far enough that the second gap (300-160=140) does not match the first (60).
+    addSiblingDom("sib-b", { left: 300, top: 100, width: 50, height: 50 });
+    const composer = makeComposer(["sib-a", "sib-b"]);
+    const { calculateSnapping } = renderSnapping(composer);
+
+    const result = calculateSnapping(DRAG_ID, { left: 110, top: 100, width: 50, height: 50 });
+    expect(result.snapLines.filter((l) => l.kind === "equal-gap")).toEqual([]);
+  });
+
+  it("needs at least 3 elements on the axis — one sibling alone never qualifies", () => {
+    addSiblingDom("sib-a", { left: 0, top: 100, width: 50, height: 50 });
+    const composer = makeComposer(["sib-a"]);
+    const { calculateSnapping } = renderSnapping(composer);
+
+    const result = calculateSnapping(DRAG_ID, { left: 110, top: 300, width: 50, height: 50 });
+    expect(result.snapLines.filter((l) => l.kind === "equal-gap")).toEqual([]);
+  });
+});
+
+describe("useCanvasSnapping — parent padding indicator (board 815:4608, scenario 4)", () => {
+  function addParentDom(id: string, r: { left: number; top: number; width: number; height: number }) {
+    const el = document.createElement("div");
+    el.setAttribute("data-buildrick-id", id);
+    stubRect(el, r);
+    canvasEl.appendChild(el);
+    return el;
+  }
+
+  it("draws a red padding line when the drop distance matches a sibling's existing padding", () => {
+    addParentDom("parent-1", { left: 50, top: 0, width: 400, height: 300 });
+    // sib-1 already sits 150px off the parent's left edge (200 - 50).
+    addSiblingDom("sib-1", { left: 200, top: 100, width: 50, height: 50 });
+    const composer = makeComposerWithParent("parent-1", ["sib-1"]);
+    const { calculateSnapping } = renderSnapping(composer);
+
+    // Same 150px left offset as sib-1, but wider (80 vs 50) and lower so its
+    // right/top/bottom distances land nowhere near sib-1's — only the left
+    // edge this test is about should match.
+    const result = calculateSnapping(DRAG_ID, { left: 200, top: 250, width: 80, height: 50 });
+    const padding = result.snapLines.filter((l) => l.kind === "parent-padding");
+    expect(padding).toHaveLength(1);
+    expect(padding[0]).toMatchObject({ orientation: "horizontal", kind: "parent-padding", value: 150 });
+  });
+
+  it("stays silent when no sibling shares that distance from the parent edge", () => {
+    addParentDom("parent-1", { left: 50, top: 0, width: 400, height: 300 });
+    addSiblingDom("sib-1", { left: 200, top: 100, width: 50, height: 50 }); // 150px padding
+    const composer = makeComposerWithParent("parent-1", ["sib-1"]);
+    const { calculateSnapping } = renderSnapping(composer);
+
+    // 90px off the left edge — nowhere near sib-1's 150px.
+    const result = calculateSnapping(DRAG_ID, { left: 140, top: 250, width: 50, height: 50 });
+    expect(result.snapLines.filter((l) => l.kind === "parent-padding")).toEqual([]);
+  });
+
+  it("does nothing when the element's parent has no DOM node of its own", () => {
+    // makeComposer's parent carries no getId() — the existing 15-test suite
+    // above already exercises this path; asserted explicitly here because
+    // it is the guard the padding indicator depends on.
+    addSiblingDom("sib-1", { left: 200, top: 100, width: 50, height: 50 });
+    const composer = makeComposer(["sib-1"]);
+    const { calculateSnapping } = renderSnapping(composer);
+
+    const result = calculateSnapping(DRAG_ID, { left: 200, top: 250, width: 50, height: 50 });
+    expect(result.snapLines.filter((l) => l.kind === "parent-padding")).toEqual([]);
   });
 });
