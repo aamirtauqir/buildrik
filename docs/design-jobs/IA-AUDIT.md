@@ -129,7 +129,7 @@ panel"* and referred to *"the **Design tab**"*. There is no Components button
 in the shipping 6-item rail, and the panel is headed Brand. Both corrected.
 Same defect class as a two-named door: the interface describing itself wrongly.
 
-### IA-14 · Three rail hierarchies live in the code; a flag picks one — **Major, open**
+### IA-14 · Three rail hierarchies live in the code; a flag picks one — **Major, fixed**
 
 `rail/tabsConfig.ts` carries a legacy 11-button zone rail, a 4-tool E3 rail
 (`?rail=e3`), and the shipping 6-item Figma rail — its own comment calls this
@@ -138,7 +138,15 @@ nothing prevents drift back. **Recommendation:** delete the two dead renderers
 or gate them behind a loud dev-only flag, so there is one navigation model in
 the code and not just in what happens to ship.
 
-### IA-15 · Insert and Layers open with no purpose copy — **Minor, open**
+**Fixed** (`2e201ebfe`) — gated, not deleted. `resolveRailMode`
+(`shared/utils/editorViewMode.ts:62`) honours `e3`/`legacy` only when
+`IS_DEV_BUILD`; a production bundle resolves every `?rail=` value to `figma`.
+Both renderers still compile and stay reachable in dev, so the alternatives
+remain available for comparison without being one URL away for a customer.
+Five tests pinned the old behaviour and were rewritten in the same commit —
+they now assert BOTH halves (hatches live in dev, ignored in production).
+
+### IA-15 · Insert and Layers open with no purpose copy — **Minor, fixed**
 
 Measured live with storage cleared: `Insert` and `Layers` render a title and
 raw content and nothing else, while Content, Media and Pages each give a
@@ -149,6 +157,41 @@ truncated row and "1 layer".
 > which does explain itself. Both are true: the EMPTY state speaks, the
 > POPULATED state — the one a returning user sees — does not. Reading the code
 > answered a different question than the one the probe asked.
+
+**Fixed.** One line per panel, measured live at 1440×900:
+
+| Panel | Line | Measured |
+|---|---|---|
+| Insert | "Click to add at the end of the page, or drag onto the canvas." — with a selection, "Click to add into or beside **Container**, or drag onto the canvas." | 279px wide, 11px, `rgb(75,85,99)` |
+| Layers | "Every element on this page. Drag a row to reorder or nest it." | 278px wide, same type |
+
+Neither line is invented copy. Insert's states the real smart-placement rule in
+`shell/hooks/useBlockInsertion.ts:67-80` — into the selected element when it can
+hold the block, beside it when it cannot, page-end when nothing is selected.
+Layers' names only drop positions that exist (`panels/layers/types.ts:56` —
+`"before" | "after" | "inside"`). Layers' line is hidden while the tree is empty
+so it does not stutter against the empty state, and both hide during search.
+
+Two defects surfaced while fixing it, both caught by measuring rather than
+reading:
+
+1. **I nearly "fixed" a panel that wasn't broken.** Source said Insert shows a
+   "Drag onto canvas" tip pill. Live, it shows no such thing — the shipping
+   Insert is `sidebar/tabs/build/BuildTab.tsx`, not the `ElementsTab.tsx` I had
+   read. Same trap as `feedback_matched_boards_to_the_wrong_component`.
+2. **`insertionContext` was dead AND stale.** It was computed and returned by
+   `useBuildTab` with no reader anywhere, and its deps were `[composer]` while
+   its body read `composer.selection` — so once rendered it would have named
+   whatever was selected at mount. Now subscribed to the same five selection
+   events `useLayerSelection` uses. Verified live: the line moved from "end of
+   the page" to "into or beside Container" on selecting a row.
+3. **The line collapsed to 24px** when its styles moved from a CSS class to
+   `tw:` utilities — its parent is a flex row, so it shrank to fit. `tw:w-full`
+   restored 279px. A screenshot would have shown text and looked fine.
+
+Styles are `tw:` utilities, not new CSS: `check-styling-ratchet.mjs` locks both
+files' line counts and correctly rejected the CSS version (+12 / +9). The DS
+contract wanted them inline anyway.
 
 ### IA-16 · Brand root has 9 destinations, not 8 — factual correction
 
@@ -236,7 +279,7 @@ the total is exact.
 - [ ] C7 · The 3 real dead ends (295:1972, 1707:8456, 1719:8421) have an onward step
 - [ ] C8 · Stray top-level shapes are gone
 - [x] C9 · Prototype edge count **2,489 → 2,489**, walked across 36,280 descendants twice
-- [ ] C10 · A codex review has read the diff and signed off
+- [ ] C10 · A codex review has read the diff and signed off — *running*
 
 **Rule for every tick:** cite the fetched value. A tick without evidence is a
 guess, and guesses are what this audit exists to remove.

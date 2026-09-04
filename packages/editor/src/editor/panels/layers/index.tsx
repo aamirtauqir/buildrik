@@ -377,6 +377,17 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         customNames={state.actionsHook.customNames}
         onSelect={state.selectionHook.selectLayer}
       />
+      {/* What this panel is for. The empty state explains itself ("This page is
+          empty…"), but the moment one element existed the panel became a bare
+          tree — the reason to be here, and the fact that a row can be dragged
+          to reorder or nest, were nowhere on screen. Hidden while searching so
+          it does not sit above a result count. Drop positions verified against
+          types.ts:56 — "before" | "after" | "inside". */}
+      {state.layers.length > 0 && !state.searchHook.isSearching && (
+        <p data-testid="layers-purpose" className="tw:m-0 tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
+          Every element on this page. Drag a row to reorder or nest it.
+        </p>
+      )}
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
       <div aria-live="polite" aria-atomic="true" className="bdc-sr-only">
         {state.search && matchCount > 0

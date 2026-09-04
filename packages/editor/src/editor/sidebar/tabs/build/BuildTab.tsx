@@ -171,6 +171,21 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           />
         </div>
 
+        {/* What this panel is for. Insert opened straight onto a wall of 53
+            element tiles with nothing saying what a click does — the two
+            affordances (click to add, drag to place) were discoverable only by
+            trying one. The destination is the real smart-placement rule in
+            useBlockInsertion: into the selected element when it can hold the
+            block, beside it when it cannot, and at the end of the page when
+            nothing is selected. Stated, not guessed. */}
+        {!isSearching && (
+          <p data-testid="insert-purpose" className="tw:m-0 tw:w-full tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
+            {tab.insertionContext
+              ? `Click to add into or beside ${tab.insertionContext.label}, or drag onto the canvas.`
+              : "Click to add at the end of the page, or drag onto the canvas."}
+          </p>
+        )}
+
         {isSearching ? (
           <div className="bld-scroll">
             <SearchResults
