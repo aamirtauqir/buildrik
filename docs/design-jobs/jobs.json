@@ -6313,12 +6313,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P1. BaseBindingManager emits BINDING_CREATED and touches neither history nor markDirty (verified in engine). The topbar Undo enables immediately after a bind; pressing it - keyboard and mouse, twice - changes neither canvas text nor the Bound chip, with zero console errors. The control claims a capability it does not have. Related: a binding to a DRAFT record renders identically to a published one, with no signal in chip, banner or tooltip."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P1. BaseBindingManager emits BINDING_CREATED and touches neither history nor markDirty (verified in engine). The topbar Undo enables immediately after a bind; pressing it - keyboard and mouse, twice - changes neither canvas text nor the Bound chip, with zero console errors. The control claims a capability it does not have. Related: a binding to a DRAFT record renders identically to a published one, with no signal in chip, banner or tooltip. | LANDED de36af334 — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-ACTIVATION-LOCAL",
@@ -6328,12 +6328,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P1. buildrick-onboarding-progress is never synced server-side. Proven: completing a step in one browser context wrote completed:true and moved the pill 3/7 -> 4/7; the same site as the same logged-in user in a fresh context read completed:false and 3/7. This is the journey's own final step - leave and come back - applied to the one artefact built to prove activation happened."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P1. buildrick-onboarding-progress is never synced server-side. Proven: completing a step in one browser context wrote completed:true and moved the pill 3/7 -> 4/7; the same site as the same logged-in user in a fresh context read completed:false and 3/7. This is the journey's own final step - leave and come back - applied to the one artefact built to prove activation happened. | LANDED 0f15878b1 — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-REVIEW-NO-DOOR",
@@ -6418,12 +6418,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. DetachInstanceButton (ProInspector.tsx:440, useComponentsState.ts:432) fires detachInstance on a single click with no confirm AND swallows failures silently (catch {}, no toast), while the component-library door for the same class of destructive action routes through ConfirmDialog (useComponentsState.ts:264-288). UNEQUAL DOOR."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. DetachInstanceButton (ProInspector.tsx:440, useComponentsState.ts:432) fires detachInstance on a single click with no confirm AND swallows failures silently (catch {}, no toast), while the component-library door for the same class of destructive action routes through ConfirmDialog (useComponentsState.ts:264-288). UNEQUAL DOOR. | LANDED (inspector detach confirm commit, 2026-09-03) — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-PAGES-LOAD-LIE",
@@ -6463,12 +6463,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Slug edit autosaves and the SEO preview updates live, with zero warning anywhere in the SEO or Advanced tabs that the old URL now 404s. PageManager.updatePage appends to page.slugHistory with the comment 'append-only log of prior slugs for 90-day redirect export' — and a grep across src/engine/export finds NOTHING that ever reads slugHistory. The redirect the code's own comment promises does not exist. | CORRECTED 2026-09-03 — my row was WRONG as written and the real defect is worse. There IS a warning, and an honest one: 'Changing this URL will break existing links, bookmarks, and search engine results for this page. Consider setting up a redirect in your hosting settings after saving.' Nothing is silent by design. But it is gated on page.status === 'live', and status is `settings.visibility ?? \"draft\"`, which nobody sets unless they open the Advanced tab — so on a NORMAL page the warning NEVER FIRES. I observed the right symptom and named the wrong mechanism. What hid it: the type doc claimed the status defaults to 'live' while the code has always defaulted to 'draft', so anyone reading the type would conclude the warning fires by default; that comment is now corrected. The slugHistory half of this row STANDS unchanged — written by PageManager, carried to the server by the sync provider, read by nothing, under a comment promising a '90-day redirect export' that does not exist. Same shape as the UpgradeModal's '403 interceptor'. The data is being collected so building it later is possible, but nobody should read that line and believe redirects happen."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. Slug edit autosaves and the SEO preview updates live, with zero warning anywhere in the SEO or Advanced tabs that the old URL now 404s. PageManager.updatePage appends to page.slugHistory with the comment 'append-only log of prior slugs for 90-day redirect export' — and a grep across src/engine/export finds NOTHING that ever reads slugHistory. The redirect the code's own comment promises does not exist. | CORRECTED 2026-09-03 — my row was WRONG as written and the real defect is worse. There IS a warning, and an honest one: 'Changing this URL will break existing links, bookmarks, and search engine results for this page. Consider setting up a redirect in your hosting settings after saving.' Nothing is silent by design. But it is gated on page.status === 'live', and status is `settings.visibility ?? \"draft\"`, which nobody sets unless they open the Advanced tab — so on a NORMAL page the warning NEVER FIRES. I observed the right symptom and named the wrong mechanism. What hid it: the type doc claimed the status defaults to 'live' while the code has always defaulted to 'draft', so anyone reading the type would conclude the warning fires by default; that comment is now corrected. The slugHistory half of this row STANDS unchanged — written by PageManager, carried to the server by the sync provider, read by nothing, under a comment promising a '90-day redirect export' that does not exist. Same shape as the UpgradeModal's '403 interceptor'. The data is being collected so building it later is possible, but nobody should read that line and believe redirects happen. | LANDED cbf6dd934 — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-NO-STRUCTURE-VIEW",
@@ -6538,12 +6538,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. With a token mid-edit the topbar reads 'Saved - just now' with a green dot; only the Brand panel's own footer shows 'Unsaved brand changes / Discard / Save'. An ELEMENT-level edit does flip the topbar to 'Unsaved changes'. Same concept, two surfacings, and the global one is the one that is wrong — a user watching the topbar believes their brand work is saved."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P1. With a token mid-edit the topbar reads 'Saved - just now' with a green dot; only the Brand panel's own footer shows 'Unsaved brand changes / Discard / Save'. An ELEMENT-level edit does flip the topbar to 'Unsaved changes'. Same concept, two surfacings, and the global one is the one that is wrong — a user watching the topbar believes their brand work is saved. | LANDED 872fe3b54 — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-BRAND-UNLINK-SILENT",
@@ -6583,12 +6583,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND 2026-09-03 by editor-ed, mechanical hunt, verified. blocks/Components/*.tsx export both a React component and a *BlockConfig. The editor imports the CONFIGS from blockRegistry, and the canvas mounts ENGINE HTML rather than React, so the components are re-exported through blocks/Components/index.ts and blocks/index.ts and imported by nobody — roughly thirty of them. This reframes a smaller finding: the five block props with no editor control (showDots, showArrows, showDays, showHours, showMinutes) are not five missing inspector controls, they are ONE dead directory, because the component that reads them never renders. Why the repo's own dead-export scanner misses it: a barrel re-export counts as reachable. And shared/forms/SliderField uses a DIFFERENT Slider from chrome-ui, which is what makes the directory look consumed at a glance."
+      "evidence": "FOUND 2026-09-03 by editor-ed, mechanical hunt, verified. blocks/Components/*.tsx export both a React component and a *BlockConfig. The editor imports the CONFIGS from blockRegistry, and the canvas mounts ENGINE HTML rather than React, so the components are re-exported through blocks/Components/index.ts and blocks/index.ts and imported by nobody — roughly thirty of them. This reframes a smaller finding: the five block props with no editor control (showDots, showArrows, showDays, showHours, showMinutes) are not five missing inspector controls, they are ONE dead directory, because the component that reads them never renders. Why the repo's own dead-export scanner misses it: a barrel re-export counts as reachable. And shared/forms/SliderField uses a DIFFERENT Slider from chrome-ui, which is what makes the directory look consumed at a glance. | LANDED 5b5fd55ae — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "B-DRAWER-OVERLAY-1280",
@@ -6643,12 +6643,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. deleteAsset (MediaManager.ts:1059) and the updateAsset/moveAsset path never call composer.beginTransaction/endTransaction, so a library delete never enters the undo stack. Live proof of the trap: Undo was ALREADY enabled from an earlier canvas insert; after confirming the delete it STAYED enabled, so nothing distinguishes 'Undo available because of a prior edit' from 'Undo available because of what I just did'. Clicking it did not restore the asset. And the canvas element that referenced the deleted asset was left on the page with a dead src — not removed, not flagged, not relinked. Two failures compounding: the destructive action is unrecoverable, and the control that would normally recover it is enabled and pointing somewhere else. | DIAGNOSIS CORRECTED 2026-09-03 by editor-ed, verified by me: this is NOT a missing-transaction bug and wrapping deleteAsset in beginTransaction/endTransaction WOULD MAKE IT WORSE. `Composer.exportProject()` returns `assets: []` — hardcoded, confirmed at Composer.ts:608 — and that is the exact shape HistoryManager snapshots, so every undo entry in this product records an empty asset list. A transaction would capture empty before and empty after: canUndo would flip true, the button would look right, and undoing would restore nothing. That converts a control that is PLAUSIBLY wrong into one that is CONFIDENTLY wrong. The real shape: the asset store is outside the undoable model entirely while the canvas referencing it is inside — which also explains the counter-example cleanly, since inserting an asset flips canUndo correctly because what it changes is the ELEMENT, and elements are in the snapshot. Split: the dead-src half is unambiguous and fixable (those elements ARE in the snapshot); the restore half needs B-ASSET-UNDO-MODEL first. Caution recorded by editor-ed: restoring the element without the asset just re-creates the dead src, so element cleanup and asset restore must land as one story."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P0. deleteAsset (MediaManager.ts:1059) and the updateAsset/moveAsset path never call composer.beginTransaction/endTransaction, so a library delete never enters the undo stack. Live proof of the trap: Undo was ALREADY enabled from an earlier canvas insert; after confirming the delete it STAYED enabled, so nothing distinguishes 'Undo available because of a prior edit' from 'Undo available because of what I just did'. Clicking it did not restore the asset. And the canvas element that referenced the deleted asset was left on the page with a dead src — not removed, not flagged, not relinked. Two failures compounding: the destructive action is unrecoverable, and the control that would normally recover it is enabled and pointing somewhere else. | DIAGNOSIS CORRECTED 2026-09-03 by editor-ed, verified by me: this is NOT a missing-transaction bug and wrapping deleteAsset in beginTransaction/endTransaction WOULD MAKE IT WORSE. `Composer.exportProject()` returns `assets: []` — hardcoded, confirmed at Composer.ts:608 — and that is the exact shape HistoryManager snapshots, so every undo entry in this product records an empty asset list. A transaction would capture empty before and empty after: canUndo would flip true, the button would look right, and undoing would restore nothing. That converts a control that is PLAUSIBLY wrong into one that is CONFIDENTLY wrong. The real shape: the asset store is outside the undoable model entirely while the canvas referencing it is inside — which also explains the counter-example cleanly, since inserting an asset flips canUndo correctly because what it changes is the ELEMENT, and elements are in the snapshot. Split: the dead-src half is unambiguous and fixable (those elements ARE in the snapshot); the restore half needs B-ASSET-UNDO-MODEL first. Caution recorded by editor-ed: restoring the element without the asset just re-creates the dead src, so element cleanup and asset restore must land as one story. | LANDED faa20f11b — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-MEDIA-DELETE-COUNT-ONLY",
@@ -6673,12 +6673,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P3. By design and documented in code (MediaTab.tsx:358-360, 'the drawer has no folder picker of its own yet'): right-click enters bulk-selection mode and the bulk bar's 'Move to...' opens the full Library rather than moving. Confirmed live. Recorded as a gap in the docked flow rather than a defect, since the full-page path works."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live. P3. By design and documented in code (MediaTab.tsx:358-360, 'the drawer has no folder picker of its own yet'): right-click enters bulk-selection mode and the bulk bar's 'Move to...' opens the full Library rather than moving. Confirmed live. Recorded as a gap in the docked flow rather than a defect, since the full-page path works. | LANDED c2fddc7fc — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-MEDIA-MOVE-DOOR",
@@ -6733,12 +6733,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
       "owner": "editor-ed",
       "recipe": null,
-      "evidence": "FOUND 2026-09-03 by editor-ed while checking a suspected P0, and disproving it is the finding. Three doc comments on the SAME element registry assert different scopes: findByMediaSrc says it searches 'the active page', getAllElements says 'across all pages', useUsageMap says 'active page'. All three iterate the same map, so at least two are wrong. If findByMediaSrc's were right, the media in-use count would miss usages on every other page and a user would delete an asset believing nothing breaks — a real P0. It was settled by reading setActivePage: it sets an id and emits, and never clears or repopulates the registry (the only elements.clear() is a full project reset), so the registry accumulates every imported page and THE COUNT IS CORRECT. findByMediaSrc's comment is the wrong one. This is the same class as the PagesStateBlocks premise that let a data-loss defect ship: a comment asserting scope is a claim, it is load-bearing when someone reasons from it, and it rots silently. Fourth doc premise checked today rather than trusted; second found false."
+      "evidence": "FOUND 2026-09-03 by editor-ed while checking a suspected P0, and disproving it is the finding. Three doc comments on the SAME element registry assert different scopes: findByMediaSrc says it searches 'the active page', getAllElements says 'across all pages', useUsageMap says 'active page'. All three iterate the same map, so at least two are wrong. If findByMediaSrc's were right, the media in-use count would miss usages on every other page and a user would delete an asset believing nothing breaks — a real P0. It was settled by reading setActivePage: it sets an id and emits, and never clears or repopulates the registry (the only elements.clear() is a full project reset), so the registry accumulates every imported page and THE COUNT IS CORRECT. findByMediaSrc's comment is the wrong one. This is the same class as the PagesStateBlocks premise that let a data-loss defect ship: a comment asserting scope is a claim, it is load-bearing when someone reasons from it, and it rots silently. Fourth doc premise checked today rather than trusted; second found false. | LANDED (peer scope-comment commit; useUsageMap header now names setActivePage) — marked done 2026-09-04 by editor-aa (sole session after packages-1d exited; board was stale by nine rows)"
     },
     {
       "id": "F-FIXTURE-CASTS",

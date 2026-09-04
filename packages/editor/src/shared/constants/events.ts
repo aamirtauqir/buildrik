@@ -341,6 +341,10 @@ export const EVENTS = {
   UI_BROWSE_TEMPLATES: "ui:browse-templates",
   /** Rail switches to a named tab. Six emitters, no constant until now. */
   UI_SWITCH_TAB: "ui:switch-tab",
+  /** The site menu asked to take the site down. The Publish panel owns the
+   *  one confirm, so the menu opens the panel and asks it rather than
+   *  hosting a second dialog. */
+  UI_UNPUBLISH_REQUEST: "ui:unpublish-request",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
@@ -889,6 +893,7 @@ export interface EventPayloads {
   // Template apply / remove (S9 — emitted by PageManager.recordAppliedTemplate / removeAppliedTemplate)
   [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
   [EVENTS.BRAND_APPLIED]: void;
+  [EVENTS.UI_UNPUBLISH_REQUEST]: void;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };

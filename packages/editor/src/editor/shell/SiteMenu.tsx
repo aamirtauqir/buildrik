@@ -73,6 +73,11 @@ export interface SiteMenuProps {
    */
   onOpenPublish?: () => void;
   onOpenPublishHistory?: () => void;
+  /** Take the site down. Only offered while a published URL exists; the
+   *  Publish panel hosts the confirm. unpublishSite was fully built with
+   *  Vercel teardown and exposed only in the dashboard, so taking a site down
+   *  meant leaving the editor. */
+  onUnpublish?: () => void;
   onExportCode?: () => void;
   // ── Build ─────────────────────────────────────────────────────────────────
   onOpenTemplates?: () => void;
@@ -141,6 +146,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenReview,
   onOpenPublish,
   onOpenPublishHistory,
+  onUnpublish,
   onExportCode,
   onOpenTemplates,
   onOpenComponents,
@@ -198,6 +204,9 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             {onOpenPublish ? <MenuItem onClick={run(onOpenPublish)}>Publish panel</MenuItem> : null}
             {onOpenPublishHistory ? (
               <MenuItem onClick={run(onOpenPublishHistory)}>Publish history</MenuItem>
+            ) : null}
+            {onUnpublish && publishedUrl ? (
+              <MenuItem onClick={run(onUnpublish)}>Unpublish site…</MenuItem>
             ) : null}
             {onExportCode ? <MenuItem onClick={run(onExportCode)}>Export code</MenuItem> : null}
           </MenuGroup>

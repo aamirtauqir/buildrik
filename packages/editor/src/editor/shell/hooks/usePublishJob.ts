@@ -120,6 +120,10 @@ export interface UsePublishJobResult {
   hasUnpublishedChanges: boolean | null;
   /** Dismiss an approval block without publishing (Cancel / after a toast). */
   dismissBlock: () => void;
+  /** The server just took the site down (sites.unpublish succeeded). Drop the
+   *  last job's URL and the hydrated live state so the topbar and panel stop
+   *  saying live — the shell's `publishedUrl` is derived from both. */
+  unpublished: () => void;
 }
 
 export function usePublishJob(): UsePublishJobResult {
@@ -306,7 +310,16 @@ export function usePublishJob(): UsePublishJobResult {
         ? "published"
         : "idle";
 
+  const unpublished = React.useCallback(() => {
+    stopPolling();
+    setStatus(null);
+    setJobId(null);
+    setError(null);
+    setHydrated((h) => (h ? { ...h, isPublished: false, publishedUrl: null, hasUnpublishedChanges: null } : h));
+  }, [stopPolling]);
+
   return {
+    unpublished,
     uiState,
     jobId,
     progress: status?.progress ?? 0,

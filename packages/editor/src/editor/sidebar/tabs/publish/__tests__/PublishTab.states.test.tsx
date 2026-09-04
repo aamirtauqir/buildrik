@@ -15,10 +15,12 @@ import * as React from "react";
 import type { PublishTabProps } from "../PublishTab";
 
 const fetchPublishHistory = vi.fn();
+const unpublishSite = vi.fn((_siteId: string) => Promise.resolve());
 vi.mock("@/services/PublishService", () => ({
   fetchPrePublishChecks: () => Promise.resolve({ ready: true, checks: [] }),
   fetchPublishHistory: (siteId: string) => fetchPublishHistory(siteId),
   rollbackToVersion: () => Promise.resolve(),
+  unpublishSite: (siteId: string) => unpublishSite(siteId),
 }));
 
 vi.mock("@/editor/chrome-ui", async () => {
@@ -313,5 +315,39 @@ describe("PublishTab — the zero-changes sentence tells the truth", () => {
       expect(screen.getByText("Nothing has changed since the last deploy.")).toBeInTheDocument(),
     );
     expect(screen.queryByText("Publishing will put the whole site live for the first time.")).toBeNull();
+  });
+});
+
+describe("PublishTab — Unpublish has a door, one confirm, and tells the shell", () => {
+  it("offers Unpublish only on a live deploy, confirms in the dashboard's words, then unpublishes", async () => {
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 3, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    const unpublished = vi.fn();
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        publishedUrl="https://bellacucina.com"
+        publishJob={{ ...job({ uiState: "published", publishedUrl: "https://bellacucina.com" }), unpublished }}
+        onVercelPublish={vi.fn()}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("Unpublish site…")).toBeTruthy());
+    fireEvent.click(screen.getByText("Unpublish site…"));
+    expect(screen.getByText("Unpublish site?")).toBeTruthy();
+    expect(unpublishSite).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Unpublish" }));
+    await waitFor(() => expect(unpublishSite).toHaveBeenCalledWith("site_1"));
+    await waitFor(() => expect(unpublished).toHaveBeenCalledTimes(1));
+  });
+
+  it("does not offer Unpublish on a deploy that is not serving", async () => {
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 1, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    renderTab(<PublishTab composer={composerWith()} projectId="site_1" onVercelPublish={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText("v1 · not live")).toBeTruthy());
+    expect(screen.queryByText("Unpublish site…")).toBeNull();
   });
 });

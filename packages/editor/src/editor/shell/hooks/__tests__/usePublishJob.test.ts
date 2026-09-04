@@ -590,3 +590,28 @@ describe("approval-gate messages are one contract, not two copies", () => {
     expect(result.current.blockedReason).toBeNull();
   });
 });
+
+describe("unpublished() — the server took the site down, the hook stops saying live", () => {
+  /* The shell derives publishedUrl from the last job's status OR the hydrated
+     state, so a successful sites.unpublish has to clear both, or the topbar
+     keeps a green Published over a site that is a draft again. The hook has
+     no composer, but the panel receives this whole result as a prop, so it
+     reports the new truth through a method rather than an event. */
+  it("drops the hydrated live URL and reads idle", async () => {
+    mockGetSiteId.mockReturnValue("site-9");
+    mockFetchSiteState.mockResolvedValue({
+      isPublished: true,
+      publishedUrl: "https://live.example.com",
+      hasUnpublishedChanges: null,
+      lastPublishedAt: null,
+    });
+    const { result } = renderHook(() => usePublishJob());
+    await flushMicrotasks();
+    expect(result.current.publishedUrl).toBe("https://live.example.com");
+
+    act(() => result.current.unpublished());
+    expect(result.current.publishedUrl).toBeNull();
+    expect(result.current.uiState).toBe("idle");
+    expect(mockFetchSiteState).toHaveBeenCalledTimes(1); // no re-fetch: the caller just wrote the truth
+  });
+});

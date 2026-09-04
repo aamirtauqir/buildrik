@@ -9,11 +9,12 @@
  */
 
 import * as React from "react";
-import { PanelFrame, Button, Progress, SkeletonBlock, Spinner } from "@/editor/chrome-ui";
+import { PanelFrame, Button, ConfirmDialog, Progress, SkeletonBlock, Spinner, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { fetchPrePublishChecks } from "../../../../services/PublishService";
+import { fetchPrePublishChecks, unpublishSite } from "../../../../services/PublishService";
+import { EVENTS } from "@/shared/constants";
 import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { PublishWizard } from "./PublishWizard";
 import { getSiteIdFromUrl } from "../../../../services/BuildrikSyncProvider";
@@ -174,6 +175,45 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   // Board 641:2652's three sections, every field read from what the editor
   // already owns (deploy history, undo stack, page list).
   const snapshot = usePublishSnapshot(composer, siteId, publishedUrl, publishJob?.uiState);
+
+  /* Unpublish. unpublishSite was fully built — Vercel teardown included — and
+     exposed only in the dashboard's site header, so taking a site down meant
+     leaving the editor. This panel hosts the ONE confirm; the site menu opens
+     the panel and asks it (UI_UNPUBLISH_REQUEST) rather than hosting a second
+     dialog with drifting words. The copy is the dashboard's, verbatim. */
+  const { addToast } = useToast();
+  const [confirmUnpublish, setConfirmUnpublish] = React.useState(false);
+  const [unpublishing, setUnpublishing] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const ask = () => setConfirmUnpublish(true);
+    composer.on(EVENTS.UI_UNPUBLISH_REQUEST, ask);
+    return () => {
+      composer.off(EVENTS.UI_UNPUBLISH_REQUEST, ask);
+    };
+  }, [composer]);
+  const runUnpublish = async () => {
+    if (!siteId) return;
+    setConfirmUnpublish(false);
+    setUnpublishing(true);
+    try {
+      await unpublishSite(siteId);
+      /* The server's truth changed; the shell derives `publishedUrl` from the
+         last job and the hydrated state, so both are told. */
+      publishJob?.unpublished();
+      addToast({ title: "Site unpublished", description: "Its public URL stops working until you publish again.", tone: "info" });
+      snapshot.reload();
+    } catch (e) {
+      addToast({
+        title: "Couldn't unpublish",
+        description: e instanceof Error ? e.message : "The site is still live. Try again.",
+        tone: "error",
+      });
+    } finally {
+      setUnpublishing(false);
+    }
+  };
+  const siteName = composer?.getProjectMetadata?.()?.name ?? "This site";
   /* Board 833:4518 / 914:4507: publishing runs through a stepped modal, so the
      panel's CTA opens the gate rather than firing the deploy. */
   const [wizardOpen, setWizardOpen] = React.useState(false);
@@ -565,12 +605,25 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           {snapshot.loading ? (
             <SkeletonRows widths={["tw:w-24"]} />
           ) : snapshot.lastDeploy ? (
-            <div className={ROW}>
-              <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
-                v{snapshot.lastDeploy.version} · {snapshot.lastDeploy.isLive ? "live" : "not live"}
-              </span>
-              <span className={META}>{snapshot.lastDeploy.when}</span>
-            </div>
+            <>
+              <div className={ROW}>
+                <span className="tw:text-[13px] tw:text-[var(--bk-ink)]">
+                  v{snapshot.lastDeploy.version} · {snapshot.lastDeploy.isLive ? "live" : "not live"}
+                </span>
+                <span className={META}>{snapshot.lastDeploy.when}</span>
+              </div>
+              {snapshot.lastDeploy.isLive && siteId && (
+                <Button
+                  color="light"
+                  size="xs"
+                  onClick={() => setConfirmUnpublish(true)}
+                  disabled={unpublishing}
+                  className="tw:mt-1 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-error)]"
+                >
+                  {unpublishing ? "Unpublishing…" : "Unpublish site…"}
+                </Button>
+              )}
+            </>
           ) : (
             <p className={META}>This site has never been published.</p>
           )}
@@ -757,6 +810,15 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         publishedUrl={publishedUrl}
         isPublished={isPublished}
         rollbackTo={snapshot.lastDeploy?.version ?? null}
+      />
+      <ConfirmDialog
+        open={confirmUnpublish}
+        onClose={() => setConfirmUnpublish(false)}
+        onConfirm={() => void runUnpublish()}
+        title="Unpublish site?"
+        message={<><strong>{siteName}</strong> will be taken offline and its public URL will stop working until you publish again.</>}
+        confirmLabel="Unpublish"
+        tone="destructive"
       />
     </PanelFrame>
   );

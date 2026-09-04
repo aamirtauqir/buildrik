@@ -51,6 +51,7 @@ const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => 
   blockedReason: null,
   lastPublishedAt: null,
   hasUnpublishedChanges: null,
+  unpublished: vi.fn(),
   publish: vi.fn(),
   cancel: vi.fn(),
   track: vi.fn(),

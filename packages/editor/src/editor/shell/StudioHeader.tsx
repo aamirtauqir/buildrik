@@ -795,6 +795,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenReview={viewMode.readOnlyView ? undefined : onOpenReview}
             onOpenPublish={viewMode.readOnlyView ? undefined : onOpenPublish}
             onOpenPublishHistory={viewMode.readOnlyView ? undefined : onOpenPublishHistory}
+            onUnpublish={
+              viewMode.readOnlyView || !publishedUrl
+                ? undefined
+                : () => {
+                    onOpenPublish?.();
+                    composer?.emit(EVENTS.UI_UNPUBLISH_REQUEST, undefined);
+                  }
+            }
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code
                view, options — and it had no door. `handleExport` opens it, but
                `handleExport` is third in `onVercelPublish ?? onOpenPublish ??

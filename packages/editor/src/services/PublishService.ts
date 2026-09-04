@@ -228,3 +228,14 @@ export async function rollbackToVersion(siteId: string, jobId: string): Promise<
 export async function fetchPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
   return getClient().sites.prePublishChecks.query({ siteId });
 }
+
+/**
+ * Take the site down. Server-side this deletes the production deployment and
+ * flips the site to DRAFT (publish.service.ts unpublishSite); ADMIN only.
+ * It was fully built and exposed only in the dashboard's site header, so
+ * taking a site down meant leaving the editor. THROWS on failure — a refused
+ * unpublish must read as refused, not as done.
+ */
+export async function unpublishSite(siteId: string): Promise<void> {
+  await getClient().sites.unpublish.mutate({ siteId });
+}
