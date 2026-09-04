@@ -375,7 +375,7 @@ resolved their names and parents; I did not fetch their contents.
 Agent F. Section `1776:8376`, **18 frames in module, 18 fetched** (name, type,
 size, x/y, full text content with per-node y/x/size/weight, non-text node
 inventory on the archetype, and reactions on the frame *and every descendant*).
-**5 screenshotted:** 148:2, 149:7, 149:50, 775:4241, 1170:4749.
+**5 screenshotted and viewed:** 148:2, 149:7, 149:50, 775:4241, 1170:4749.
 
 Fetched: 148:2, 149:7, 149:50, 149:84, 149:108, 151:2, 151:46, 151:62, 151:87,
 453:4010, 775:4241, 1170:4713, 1170:4749, 1705:8286, 1705:8339, 1705:8378,
@@ -395,7 +395,7 @@ Q1 verdicts: 17 KEEP · 1 MERGE-INTO(1776:8381 Inspector — `151:87` conditions
 ## Pages — coverage
 
 Agent F. Section `1776:8377`, **13 frames in module, 13 fetched** (same depth).
-**4 screenshotted:** 140:2, 141:78, 141:207, 1717:17217.
+**5 screenshotted and viewed:** 140:2, 141:78, 141:165, 141:207, 1717:17217.
 
 Fetched: 140:2, 141:2, 141:40, 141:78, 141:124, 141:165, 141:207, 435:2348,
 774:4044, 782:4212, 1171:4713, 1171:4767, 1717:17217.
@@ -414,7 +414,8 @@ Q1 verdicts: 11 KEEP · 1 KEEP-and-re-file (`435:2348` is Shell chrome) ·
 ## Layers — coverage
 
 Agent F. Section `1776:8375`, **18 frames in module, 18 fetched** (same depth).
-**5 screenshotted:** 142:2, 143:60, 143:119, 143:355, 775:4130, 1171:4829 (6).
+**8 screenshotted and viewed:** 142:2, 143:60, 143:119, 143:355, 775:4130, 1082:4527,
+1082:4640, 1171:4829.
 
 Fetched: 142:2, 143:2, 143:60, 143:119, 143:179, 143:237, 143:295, 143:355,
 775:4130, 781:4217, 782:4260, 1082:4527, 1082:4589, 1082:4640, 1082:4739,
@@ -438,7 +439,7 @@ Q1 verdicts: 13 KEEP · 1 MERGE-INTO(142:2) (`143:237` locked) · 4 self-labelle
 ## AI — coverage
 
 Agent F. Section `1776:8380`, **11 frames in module, 11 fetched** (same depth).
-**3 screenshotted:** 170:2, 170:29, 171:67, 171:36 (4).
+**5 screenshotted and viewed:** 170:2, 170:29, 171:2, 171:36, 171:67.
 
 Fetched: 170:2, 170:17, 170:29, 170:41, 170:70, 170:97, 171:2, 171:36, 171:67,
 171:105, 171:136.
@@ -464,11 +465,141 @@ EmptyThread,AgentPlan,ScopeChip}.tsx`, `AITab.css`,
 
 Q1 verdicts: 10 KEEP · 1 MERGE-INTO(170:2) (`170:17` scoped) · 0 CUT.
 
-**Wave F total: 60 of 60 frames fetched, 19 screenshotted, 38 findings
+**Wave F total: 60 of 60 frames fetched, 23 screenshotted AND viewed, 38 findings
 (2 Critical · 25 Major · 10 Minor · 1 Polish).** Screenshots were taken two
 ways and both produced complete PNGs: `node.screenshot()` via the committed
 JSON-RPC client returns an inline *image* content block (13 boards, all
 IEND-verified), and `scripts/baseline/figma-shot.mjs` downloads the hosted URL
-(6 boards, `complete=true`). The failure mode that cost wave E its screenshots —
+(10 boards, `complete=true`). The failure mode that cost wave E its screenshots —
 `exportAsync` + `base64Encode`, which returns *text* and is truncated at ~20KB —
 was hit once here and abandoned; it is the encoding, not the export, that fails.
+
+---
+
+## Brand — coverage
+
+**Screens in module: 34** (section `1776:8373`).
+**Fetched: 34 of 34** — reactions on the frame *and every descendant*, plus a
+full text dump, for all 34.
+**Screenshotted: 34 of 34**, downloaded as verified-complete PNGs via
+`scripts/baseline/figma-shot.mjs` (PNG header + IEND checked on each).
+**Rendered and looked at: 12 of 34** — `152:52`, `152:112`, `153:120`,
+`154:26`, `154:78`, `154:132`, `306:2217`, `775:4305`, `1333:7162`,
+`1704:8575`, `1704:8607`, `1706:8483`. Looking, not measuring, is what caught
+D-B-37 (a toast parked over the type specimen) and D-B-35 (a board named for a
+state it does not draw).
+**Captured but not rendered: 22** — findings on those rest on text + node
+structure + reactions only, and say so in their `evidence`.
+
+Q1 verdicts, all 34:
+
+| Verdict | Count | Screens |
+|---|---|---|
+| KEEP | 28 | 152:52, 152:83, 152:112, 152:137, 153:2, 153:29, 153:57, 153:92, 153:120, 154:2, 154:78, 154:132, 306:2049, 306:2080, 306:2186, 306:2217, 306:2232, 306:2265, 306:2298, 775:4305, 781:4311, 1172:4840, 1333:7162, 1704:8575, 1704:8607, 1706:8467, 1706:8476, 1706:8483 |
+| MERGE-INTO | 1 | 154:26 → 1333:7162 (D-B-35 — draws no state) |
+| CUT | 0 | — |
+| UNSURE | 1 | 433:2391 — a project **schema** migration modal (v0→v3, "Split styles per breakpoint", "Normalise element ids") filed under Brand and reachable only from Import / export. The subject is the project, not the brand; `design-system/migrations/` holds only `index.ts` + tests, so I could not confirm a DS-token migration is what this draws. Flagged, not filed. |
+| Pre-labelled, not re-filed | 4 | 306:2111, 306:2136, 306:2161 (UNBUILDABLE), 1138:13376 (RETIRED) |
+
+*(28 + 1 + 1 + 4 = 34.) The modal family's fourth state, `1706:8492`
+"AI prompt · error", is **not** in this count — it is a child of the Notes
+section, which is the finding (D-B-07).*
+
+**Not checked:** contrast ratios, type scale and token conformance on any Brand
+board; the live app (this was a Figma-only pass per the brief).
+
+## Inspector — coverage
+
+**Screens in module: 10** (section `1776:8381`).
+**Fetched: 10 of 10** — reactions (frame + descendants) and text for all 10.
+**Screenshotted: 10 of 10** (verified-complete PNGs).
+**Rendered and looked at: 5 of 10** — `32:2`, `807:8342`, `807:8614`,
+`824:5095`, `1707:8456`.
+**Captured but not rendered: 5** — `807:8412`, `807:8475`, `807:8521`,
+`807:8567`, `429:2350`.
+
+Q1 verdicts, all 10:
+
+| Verdict | Count | Screens |
+|---|---|---|
+| KEEP | 4 | 32:2, 807:8342, 1707:8456, 429:2350 |
+| CUT (→ Archive, rename SUPERSEDED) | 1 | 824:5095 (D-B-15) |
+| UNSURE | 5 | 807:8412, 807:8475, 807:8521, 807:8567, 807:8614 — five 812px boards whose whole delta is which 2–4 of 12–13 sections are open (D-B-17) |
+
+**The module's real size is ~25 screens, not 10** (D-B-14). Ten full 300×812
+Inspector screens sit in `📄 Reference`: `159:99` no-selection, `159:102`
+loading, `159:123` multi-select, `160:2` instance-selected, `160:105`
+bound-to-CMS, `160:208` breakpoint-override, `160:313` pseudo-state, `160:412`
+reach-all-like-this, `160:512` ai-agent-run, `189:2` reach-whole-site. Five
+popovers/modals sit in `Notes`: `1176:4804`, `1706:8458`, `1707:8406`,
+`1707:8417`, `1707:8427`.
+
+**Not checked:** I read the *names, sizes and text* of those 15 out-of-section
+boards and screenshotted two of them (`159:99`, `160:105`) — I did **not** read
+their reactions, so I cannot say what they are wired to or whether moving them
+would break a prototype path.
+
+## Canvas — coverage
+
+**Screens in module: 3** (section `1779:5`).
+**Fetched: 3 of 3** — reactions and text for all 3.
+**Screenshotted: 3 of 3.** **Rendered and looked at: 3 of 3** — `817:4649`,
+`817:4723`, `1176:4866`. Full coverage.
+
+Q1 verdicts, all 3:
+
+| Verdict | Screens |
+|---|---|
+| MERGE-INTO(862:6859 · 📄 Reference) | 817:4649, 817:4723 — both are spec sheets, not screens (D-B-19) |
+| MERGE-INTO(1776:8388 · Journeys, beside 807:7775) | 1176:4866 — a submenu detail of the S3.3 context-menu board |
+| KEEP | 0 |
+
+**The decision, with evidence, not hedged: the Canvas section contains zero
+canvas screens, and this is a filing failure, not an absence.** The canvas is
+boarded — ten S3.x screens in Journeys (`301:1979`, `301:2186`, `301:2393`,
+`807:7301`, `807:7775`, `807:8069`, `807:8663`, `814:7027`, `815:4518`,
+`815:4608`), seven fragments in Notes (`1175:4849`, `1176:4824`, `1176:4925`,
+`1707:8433/8436/8452/8455`) and `1177:4804` in Command palette.
+
+**Not checked:** I did not fetch or screenshot any of those 18 out-of-section
+canvas boards — I have their names and sizes from a sweep of all 898 frame
+names on page `1:3`, nothing more. Whether they are individually good is
+unaudited.
+
+## Ecommerce — coverage
+
+**Screens in module: 2** (section `1779:6`).
+**Fetched: 2 of 2.** **Screenshotted: 2 of 2.** **Rendered and looked at: 2 of
+2** — `1719:8391`, `1719:8421`. Full coverage.
+
+Q1 verdicts, both:
+
+| Verdict | Screen |
+|---|---|
+| MERGE-INTO(1776:8376 · Content) | 1719:8391 collection-setup — the object is a CMS collection |
+| MERGE-INTO(160:105 · Inspector · bound-to-CMS) | 1719:8421 bound · inspector — a duplicate of an existing board (D-B-24) |
+
+**The Q1 answer, applied hard:** a Buildrik user's mental model has no
+ecommerce object, and neither does the code — `editor/ecommerce/` contains
+exactly one file, `CollectionSetupModal.tsx`; the rest of the family is CMS
+binding in `inspector/components/BindingBanner.tsx` + `BindingPopover.tsx`. The
+boards agree with the code: `1719:8391` says "…a Products collection in **your
+CMS**", `1719:8421` says "Edit the record in **Content**", and the file's own
+caption `304:2107` says "**generic CMS binding**, inspector 300". The module is
+an orphan named after its trigger. It is also a 5-screen family filed as 2 —
+`1719:8414`, `1719:8443` and `1719:8450` are children of **Notes** (D-B-25).
+
+`1719:8421` is marked ENTRY in neither its name nor its reactions; I read the
+name first, per the brief, and it carries no `ENTRY POINT` / `RETIRED` /
+`UNBUILDABLE` marker — its in-edge comes from `1719:8450` in Notes.
+
+**Not checked:** the Content module (`1776:8376`, 18 screens) is wave F's — I
+did not verify that it has a home for `1719:8391`, only that the noun belongs
+there.
+
+**Wave B total: 49 of 49 frames fetched (reactions on frame + every
+descendant, plus full text), 49 of 49 screenshotted as verified-complete PNGs
+via `scripts/baseline/figma-shot.mjs`, 22 of 49 rendered and looked at,
+37 findings (2 Critical · 25 Major · 10 Minor · 0 Polish). Q1, all 49:
+32 KEEP · 6 MERGE-INTO · 1 CUT · 6 UNSURE · 4 pre-labelled and not re-filed.
+No Figma node was created, renamed, moved or deleted.**
