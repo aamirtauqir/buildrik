@@ -20,6 +20,11 @@ function renderToolbar(
   );
 }
 
+const sectionOf = (label: string) => {
+  const heading = screen.getByText(label);
+  return heading.parentElement as HTMLElement;
+};
+
 afterEach(() => vi.restoreAllMocks());
 
 describe("MultiSelectToolbar — gating", () => {
@@ -117,11 +122,6 @@ describe("MultiSelectToolbar — board 159:123 bands ALIGN, and only ALIGN", () 
      a grey pill the board does not draw. Measured off the frame — the band is
      #F3F4F6 (`--bk-bg-subtle`) from the ALIGN label down through its buttons,
      and white from DISTRIBUTE onward. */
-  const sectionOf = (label: string) => {
-    const heading = screen.getByText(label);
-    return heading.parentElement as HTMLElement;
-  };
-
   it("tints the ALIGN section", () => {
     renderToolbar(["a", "b", "c"]);
     expect(sectionOf("Align").style.background).toContain("--bk-bg-subtle");
@@ -137,5 +137,25 @@ describe("MultiSelectToolbar — board 159:123 bands ALIGN, and only ALIGN", () 
     const align = screen.getByRole("button", { name: "Align elements to left" });
     expect(align.className).toContain("tw:bg-white");
     expect(align.className).not.toContain("tw:bg-transparent");
+  });
+
+  /* Board 159:126 is `w-full` at x0, no rounded-* class — the tint bleeds to
+     both panel edges with square corners. A prior pass nested it inside an
+     outer 16px-padded wrapper with `--bk-radius-lg` (8px), which both inset
+     the band off the edges and rounded a corner the board doesn't draw. */
+  it("bleeds the ALIGN band to the panel edges with square corners", () => {
+    renderToolbar(["a", "b", "c"]);
+    const align = sectionOf("Align");
+    expect(align.style.borderRadius).toBe("");
+    expect(align.style.padding).not.toContain("--bk-space-12");
+  });
+});
+
+describe("MultiSelectToolbar — board 159:134 Distribute is one row, not stacked", () => {
+  it("puts the label and the button pair side by side", () => {
+    renderToolbar(["a", "b", "c"]);
+    const distribute = sectionOf("Distribute");
+    expect(distribute.style.display).toBe("flex");
+    expect(distribute.style.flexDirection).not.toBe("column");
   });
 });
