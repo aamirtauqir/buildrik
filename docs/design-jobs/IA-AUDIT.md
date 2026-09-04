@@ -112,27 +112,44 @@ A user cannot tell which one they get. Both now sit in `Command palette · 7
 screens` so the duplication is visible instead of scattered. **Resolution
 needed: one palette, one shortcut, one size.**
 
-**Confirmed as a real duplication, and the chord half is now settled.** Both
-boards read *"Type a command or search…"* and list commands — same job, not two
-jobs:
+**RETRACTED — I had the chords backwards, and the retraction is the finding.**
 
-- `CmdK` (640×420, 6 states) — ACTIONS / GO TO grouping, an AI offer on
-  no-results, and disabled commands shown with a reason.
-- `Canvas · command palette (⌘⇧P)` (520×426) — EDIT / VIEW commands.
+I read `useEditorShortcuts.ts:30` ("The canvas palette is Cmd/Ctrl+Shift+P") as
+"the shipping palette is ⌘⇧P" and built everything on it. Agent E checked the
+call sites instead of the comment. The truth:
 
-In code there is **one** command palette and it is ⌘⇧P
-(`shell/modals/CommandPalette.tsx`, opened via `useEditorShortcuts.ts:30`).
-**⌘K is not free**: `PagesTab.tsx:127` binds it on `window` to Pages' *"go to
-page…"* finder (`PageCommandPalette.tsx:106`) — a different job that happens to
-share the palette shape. So the CmdK board's chord is already taken, and by the
-precedence rule (behaviour → the CODE contract) the chord is decided: ⌘⇧P.
+| Palette | Chord | Component | Boards |
+|---|---|---|---|
+| **Shell** | **⌘K** (`StudioHeader.tsx:250`, listener on `document`) | `shell/modals/CommandPalette.tsx` | the six CmdK boards — **source cites them by id**: `SUGGESTED_COUNT = 5` ← `166:2`, `disabled`/`disabledReason` ← `166:58` |
+| **Canvas** | **⌘⇧P** (`useCanvasCommandPalette.ts:50`) | `canvas/controls/CommandPalette` | `1177:4804`, whose own footer says "distinct from shell ⌘K" |
 
-What is **not** decided, and is not mine to decide: the two boards are 640×420
-and 520×426, and the CmdK content is the better design (disabled-with-reason,
-AI fallback). Merging them is a design call. Recorded in Figma rather than
-silently resolved — the section now carries `CHORD CONFLICT, needs one
-decision`, `1177:4804` is marked `SHIPPED design`, and the six CmdK boards
-carry `chord unavailable (⌘K = go-to-page); content is the richer design`.
+So the CmdK boards were never a rejected alternative — they are the shipping
+shell palette's own documentation, and I annotated them "chord unavailable".
+Both palettes ship. Both are correct as drawn. What is wrong is that there are
+two of them at all.
+
+**And the mistake was hiding a real bug — now the highest-severity finding in
+this file:**
+
+> **⌘K is bound twice, unguarded.** `StudioHeader.tsx:264` listens on
+> `document`; `PagesTab.tsx:135` listens on `window`. Neither calls
+> `stopPropagation`, and both toggle. With the Pages panel mounted, one ⌘K
+> opens the **shell command palette and the go-to-page finder at the same
+> time**. Verified by reading both call sites, 2026-09-04.
+
+This is the third time this project has been bitten by two listeners on one
+chord (memory: `feedback_two_window_listeners_one_chord`).
+
+**Still one founder decision, now better informed.** Agent E's recommendation,
+which I endorse: one palette on **⌘K at 520px** — take `1177:4804`'s category
+grouping and keyboard footer as the frame, fold in the three states only the
+CmdK set has (RECENT/SUGGESTED on open, no-results → AI offer,
+disabled-with-reason), and add **GO TO** as a category, which absorbs the Pages
+finder and removes the collision as a side effect. Retire the 640 width;
+nothing else in the editor is that wide.
+
+The Figma annotations were corrected to match this table and read back clean;
+the eight nodes no longer carry the wrong chord.
 
 ## Product navigation audit — measured in the running editor
 
