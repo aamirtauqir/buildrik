@@ -115,10 +115,11 @@ describe("ExportModal — rendering + export generation", () => {
   it("renders the format grid with HTML/ZIP/React selectable and Vue/Next.js stubbed", async () => {
     renderModal();
     await screen.findByText(/5 elements/);
-    // Card accessible names = label + description text.
-    expect(screen.getByRole("radio", { name: /^HTML Static/ })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /^ZIP All files/ })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /^React React component/ })).toBeInTheDocument();
+    // Board 1172:4825's pills carry no description — the accessible name is
+    // just the format label.
+    expect(screen.getByRole("radio", { name: "HTML" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "ZIP" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "React" })).toBeInTheDocument();
     // KNOWN pin: Vue/Next.js are coming-soon stubs, not buttons.
     expect(screen.getAllByText("Soon")).toHaveLength(2);
     expect(screen.queryByRole("button", { name: /Vue/ })).toBeNull();
@@ -210,7 +211,7 @@ describe("ExportModal — download flows", () => {
     renderModal();
     await screen.findByText(/5 elements/);
 
-    fireEvent.click(screen.getByRole("radio", { name: /^ZIP All files/ }));
+    fireEvent.click(screen.getByRole("radio", { name: "ZIP" }));
     // Format change regenerates the export, then the label flips.
     const zipBtn = await screen.findByRole("button", { name: "Export as ZIP" });
     await waitFor(() => expect(zipBtn).toBeEnabled());
@@ -242,7 +243,7 @@ describe("ExportModal — download flows", () => {
     renderModal();
     await screen.findByText(/5 elements/);
 
-    fireEvent.click(screen.getByRole("radio", { name: /^React React component/ }));
+    fireEvent.click(screen.getByRole("radio", { name: "React" }));
     // Pin the current label casing for the react format.
     const reactBtn = await screen.findByRole("button", { name: "Export as REACT" });
     await waitFor(() => expect(reactBtn).toBeEnabled());
@@ -268,7 +269,7 @@ describe("ExportModal — download flows", () => {
     });
     renderModal();
     await screen.findByText(/5 elements/);
-    fireEvent.click(screen.getByRole("radio", { name: /^React React component/ }));
+    fireEvent.click(screen.getByRole("radio", { name: "React" }));
 
     expect(
       await screen.findByText("React components cannot be previewed directly.")
