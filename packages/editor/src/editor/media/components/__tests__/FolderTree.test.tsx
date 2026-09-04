@@ -122,6 +122,20 @@ describe("FolderTree — user folders", () => {
     expect(promptSpy).not.toHaveBeenCalled();
   });
 
+  it("boards 1163:13695/1205:4829 — the trigger is a labelled row in the list, not a header icon, and the input replaces it while editing", () => {
+    mount();
+    // The label reads, unlike the old icon-only 18x18 button — and it sits
+    // in the tree body, not in the "Folders" header row.
+    const trigger = screen.getByTitle("New folder");
+    expect(trigger.textContent).toContain("New folder");
+    expect(screen.getByText("Folders").closest(".mgr-left-head")?.contains(trigger)).toBe(false);
+
+    fireEvent.click(trigger);
+    // Mutually exclusive with the input, same as the board's two states.
+    expect(screen.queryByTitle("New folder")).toBeNull();
+    expect(screen.getByTestId("mgr-new-folder-input")).toBeInTheDocument();
+  });
+
   it("Enter creates the folder with the trimmed name", () => {
     const { props } = mount();
     fireEvent.click(screen.getByTitle("New folder"));
