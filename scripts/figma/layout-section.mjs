@@ -46,18 +46,29 @@ const GUTTER = 120, PAD_X = 100, PAD_TOP = 220, PAD_BOTTOM = 140, MAX_ROW = ${MA
 
    3. NUMBERS SORTED AS TEXT — "Shell state 10" preceded "state 5". Compare with
       a numeric-aware collator. */
+/* Segment-aware. Boards are named "Module · subject · state", so a state word
+   must be tested against the right SEGMENT, not the whole string. Two
+   regressions came from testing the whole string:
+     - "Inspector · profile · GRID" and "Media · fullpage · library" were
+       hoisted to slot 1 as if they were their module's landing state, tearing
+       each away from its own subject family. tree/grid/library/overview only
+       mean "the default" when the name is "Module · state" — two segments.
+     - "Shell state 5 · Drawer closed" was ranked as an overlay because the
+       string contains "drawer". An overlay is a board whose FIRST segment is
+       the overlay ("Modal · open"), not one that mentions a drawer. */
+const segs = (n) => String(n || "").split(" — ")[0].split("·").map((t) => t.trim().toLowerCase());
 const rank = (n) => {
-  const x = (n || "").toLowerCase();
-  if (/retired|superseded|unbuildable|not-implemented|design-ahead/.test(x)) return 9;
-  if (/error|failed|load-error|conflict|offline|quota/.test(x)) return 7;
-  if (/loading|skeleton|pending/.test(x)) return 6;
-  if (/empty|no-results|none|zero/.test(x)) return 5;
-  if (/confirm|modal|popover|menu|drawer/.test(x)) return 4;
-  /* NOTE the doubled backslashes: this whole block is inside a JS template
-     literal, so a single \b is consumed as a backspace escape and the word
-     boundary silently disappears. That is exactly how the v2 rank shipped
-     matching nothing and reported "moved 0". */
-  if (/default|root|idle|\\bbase\\b|state 1\\b|· 1\\b|\\btree\\b|\\bgrid\\b|\\blibrary\\b|\\boverview\\b|landing/.test(x)) return 0;
+  const full = String(n || "").toLowerCase();
+  if (/retired|superseded|unbuildable|not-implemented|design-ahead/.test(full)) return 9;
+  const p = segs(n);
+  const first = p[0] || "", last = p[p.length - 1] || "";
+  if (/error|failed|load-error|conflict|offline|quota/.test(last)) return 7;
+  if (/loading|skeleton|pending/.test(last)) return 6;
+  if (/empty|no-results|none|zero/.test(last)) return 5;
+  if (/^(modal|popover|menu|drawer|dialog|sheet|confirm)\b/.test(first)) return 4;
+  if (/^(default|root|idle|base|landing|panel)$/.test(last)) return 0;
+  if (p.length <= 2 && /^(tree|grid|library|overview|list)$/.test(last)) return 0;
+  if (/^state 1$|^1$/.test(last)) return 0;
   return 2;
 };
 /* Hand-rolled natural compare: Intl does not exist in the Figma plugin
@@ -81,7 +92,10 @@ const band = (w) => -Math.round(w / 200);   // negative => widest band first
    bare 4000x2 divider rules — gridded together it renders as a wall of grey
    hairlines with the boards lost inside it. A board is anything with real
    height that is not a text node. */
-const isBoard = (c) => c.type !== "TEXT" && c.height > 100 ? 0 : 1;
+/* >40, not >100: eight real boards — toasts, popovers and inline toolbars —
+   are shorter than 100 and were sorted in with the captions, buried in the
+   annotation band. The divider rules this must still exclude are 4000x2. */
+const isBoard = (c) => c.type !== "TEXT" && c.height > 40 ? 0 : 1;
 
 /* SUBJECT GROUPING. Boards are named "Module · subject · state", and sorting by
    state across the whole section scatters each subject's story: Settings'
@@ -91,14 +105,34 @@ const isBoard = (c) => c.type !== "TEXT" && c.height > 100 ? 0 : 1;
    Grouping by subject first turns 45 scattered boards into a dozen readable
    stories. The module's own landing state (rank 0) still leads the section,
    ahead of every subject. */
+const STATE_WORD = /^(default|root|idle|base|landing|panel|empty|loading|error|load-error|save-error|failed|pending|confirm|open|closed|active|hover|focus|disabled|validation|locked|no-results|none)$/;
 const subject = (n) => {
-  const parts = String(n || "").split("·").map((t) => t.trim().toLowerCase());
-  return parts.length > 2 ? parts[1] : "";
+  /* The subject is every segment between the module prefix and the trailing
+     state word. Taking parts[1] made "S7 · Settings · Domains" and
+     "S7 · Settings · Analytics" BOTH read as subject "settings", so the whole
+     of Settings fell through to state-kind grouping and Domains' five states
+     stayed scattered across three rows — the fix reported success and changed
+     nothing. */
+  const p = String(n || "").split(" — ")[0].split("·").map((t) => t.trim().toLowerCase()).filter(Boolean);
+  /* Three segments minimum. With two, the second segment IS the state, not a
+     subject — treating it as one sorted Journeys by state text and produced
+     "S1.4 · 0 of 7", "S1.4 · 4 of 7", "S1-stress · 40 pages", "S1.4 · 7 of 7",
+     because the subjects compared were "0 of 7" < "4 of 7" < "40 pages" <
+     "7 of 7". Two-segment names fall through to the natural name sort, which is
+     what a numbered sequence needs. */
+  if (p.length < 3) return "";
+  const mid = p.slice(1);
+  if (mid.length > 1 && STATE_WORD.test(mid[mid.length - 1])) mid.pop();
+  return mid.join(" ");
 };
 const isRoot = (c) => (rank(c.name) === 0 ? 0 : 1);
 /* Height band as a tiebreak keeps rows level: six frames of 632/470/259/560/812
    top-aligned in one row read as a staircase with up to 553px of hole. */
-const hBand = (h) => -Math.round(h / 100);
+/* Coarse on purpose. At /100 the height band outranked the name and inverted
+   sequences that carry meaning — Journeys ran S3.11 before S3.10, and that
+   section's whole premise is order. At /400 only genuinely different sizes
+   separate, and boards of similar height keep their named sequence. */
+const hBand = (h) => -Math.round(h / 400);
 
 const kids = s.children.filter(c => typeof c.width === "number" && c.width > 0)
   .sort((a, b) =>
@@ -106,9 +140,14 @@ const kids = s.children.filter(c => typeof c.width === "number" && c.width > 0)
     (isRoot(a) - isRoot(b)) ||
     (subject(a.name) < subject(b.name) ? -1 : subject(a.name) > subject(b.name) ? 1 : 0) ||
     (rank(a.name) - rank(b.name)) ||
-    (band(a.width) - band(b.width)) ||
+    /* Name BEFORE the size bands. Sizing is a layout concern and meaning is a
+       reading concern, and when a size band outranked the name it reordered
+       sequences that carry meaning — Journeys ran S3.11 before S3.10, and put
+       an S1-stress board between S1.4 · 4 of 7 and S1.4 · 7 of 7. Row levelling
+       is the row-packer's job (the ragged wrap below), not the comparator's. */
+    natural(a.name, b.name) ||
     (hBand(a.height) - hBand(b.height)) ||
-    natural(a.name, b.name));
+    (band(a.width) - band(b.width)));
 
 /* CAPTION PAIRING. Once a caption has been moved into its board's section
    (pair-captions.mjs), it should sit UNDER that board as one unit — that is the
@@ -143,7 +182,16 @@ for (const k of layoutKids) {
   }
   const unitW = Math.max(k.width, cap ? cap.width : 0);
   const unitH = k.height + (cap ? CAP_GAP + cap.height : 0);
-  if (x > PAD_X && x + unitW > MAX_ROW) { x = PAD_X; y += rowH + GUTTER; rowH = 0; }
+  /* Close the row early when the next unit is a very different height. Sorting
+     alone could not fix this: a short frame in a different rank or width band
+     still landed mid-row, leaving holes of 553-790px under it in 10 of 14
+     sections. Reading order is preserved — only the wrap point moves. */
+  /* 2.4, not 1.6: at 1.6 every ordinary height change closed the row and
+     Publish went from nine frames wide to four — trading holes for endless
+     vertical scroll. Only a genuine mismatch (a 259-tall frame beside an
+     812-tall one) should wrap. */
+  const ragged = rowH > 0 && (unitH > rowH * 2.4 || unitH * 2.4 < rowH);
+  if (x > PAD_X && (x + unitW > MAX_ROW || ragged)) { x = PAD_X; y += rowH + GUTTER; rowH = 0; }
   if (Math.round(k.x) !== Math.round(x) || Math.round(k.y) !== Math.round(y)) moved++;
   k.x = x; k.y = y;
   if (cap) { cap.x = x; cap.y = y + k.height + CAP_GAP; }

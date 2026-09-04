@@ -21,16 +21,25 @@ const ORDER = [
   ["1776:8382", "Compare"], ["1776:8383", "Review"], ["1776:8384", "Client sign-off"],
   ["1779:2", "Notifications"], ["1776:8387", "Settings/S7"], ["1779:6", "Ecommerce"],
   ["1776:8388", "Journeys · S-flows"], ["1776:8389", "Notes · captions & annotations"],
-  ["862:6859", "Reference — specs & completeness"], ["862:6860", "Reference — UX analysis docs"],
+  ["862:6859", "Reference · specs & completeness"], ["862:6860", "Reference · UX analysis docs"],
   ["1084:4527", "REVIEW · Templates + Components"], ["1090:4527", "REVIEW · Insert"],
-  ["957:4474", "Archive — superseded"],
+  ["957:4474", "Archive · superseded"],
 ];
+
+const NOTES = {
+  "1779:3": "two palettes ship: shell ⌘K and canvas ⌘⇧P — one decision open",
+  "1938:8372": "the editor's saved-components panel; page 1:2 is the LIBRARY",
+  "1776:8388": "S-numbers are a journey narrative, not a screen index",
+  "1776:8389": "unmatched captions, orphan headers and divider rules",
+  "1084:4527": "holds 10 Templates boards and 0 component boards",
+};
 
 await connect();
 const code = `
 const page = figma.root.children.find(p => p.id === "1:3");
 await figma.setCurrentPageAsync(page);
 const ORDER = ${JSON.stringify(ORDER)};
+const NOTES = ${JSON.stringify(NOTES)};
 const GUTTER = 900;
 let y = 0, i = 0;
 const out = [];
@@ -47,9 +56,15 @@ for (const [id, label] of ORDER) {
      paragraphs — the command-palette one ran ~470 characters — which defeats
      the "NN · Name · count" scan the numbering exists for. The full text lives
      in the audit findings; the name only needs to flag that a note exists. */
-  let tail = (s.name.split(" — ").slice(1).join(" — ") || "").trim();
-  if (tail.length > 72) tail = tail.slice(0, 69).replace(/[\s,;·]+$/, "") + "…";
-  s.name = num + " · " + label + " · " + n + (tail ? " — " + tail : "");
+  /* NOT derived from the previous name. Three section names had grown into
+     garbage by repeated append — "24 · Reference — specs & completeness · 45 —
+     specs & completeness · 45 — specs & compl…" — because the label itself
+     contained " — ", so every run split inside the label and re-appended it,
+     carrying a stale count along. Labels no longer contain an em dash, and the
+     annotation comes from this table rather than from the string being
+     rewritten, which makes the rename idempotent by construction. */
+  const note = NOTES[id];
+  s.name = num + " · " + label + " · " + n + (note ? " — " + note : "");
   s.x = 0; s.y = y;
   y += s.height + GUTTER;
   placed.add(id);

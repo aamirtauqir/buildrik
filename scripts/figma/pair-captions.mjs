@@ -35,9 +35,15 @@ const norm = (s) => String(s || "").toLowerCase()
 /* Index every board OUTSIDE Notes. A name that two boards share is dropped
    from the index entirely — an ambiguous target is not a match. */
 const index = new Map(), dupes = new Set();
+/* Skip archived and retired boards when indexing. "Brand · root" lost its
+   caption because "Brand · root — SUPERSEDED 2026-08-27" sits in the Archive
+   section and normalises identically, so the key was dropped as ambiguous —
+   a live board was denied its note by a dead copy of itself. */
+const DEAD = /retired|superseded|unbuildable|not-implemented|design-ahead/i;
 for (const s of secs) {
-  if (s.id === notes.id) continue;
+  if (s.id === notes.id || /Archive/i.test(s.name)) continue;
   for (const b of s.children) {
+    if (DEAD.test(b.name || "")) continue;
     if (b.type === "TEXT" || !(b.height > 100)) continue;
     const k = norm(b.name);
     if (!k) continue;
