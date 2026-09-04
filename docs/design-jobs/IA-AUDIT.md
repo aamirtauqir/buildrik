@@ -346,7 +346,16 @@ the total is exact.
 - [x] C7 · **REFUTED — they were never dead ends.** Measured `out=1, dangling=0` each, to live, differently-named screens: `295:1972 → 807:7252` (S1.3b template-picker), `1707:8456 → 159:102` (Inspector · loading), `1719:8421 → 1719:8450` (bind popover · fields). The row was a claim carried forward from the frame-level pass, not a finding. No change made; the audit is corrected instead.
 - [x] C8 · Stray top-level shapes are gone — loose top-level nodes: **0** (27 sections hold everything). Of 379 non-frame children, 378 are `caption/…` TEXT correctly parked in `Notes`; the single one outside it (`NEW ONES` in the Insert review section) is now labelled as a section label. Also corrected a label that lied: `Notes` announced *418 screens* while holding 40 boards + 378 captions.
 - [x] C9 · Prototype edge count **2,489 → 2,489**, walked across 36,280 descendants twice — re-verified after this round of renames: still 2,489 across 898 section children, 0 loose.
-- [ ] C10 · A codex review has read the diff and signed off — *running*
+- [x] C10 · A codex review has read the diff and signed off — **it did not sign off, and that is the useful outcome.** `codex-cli 0.121.0` returned four findings and an independent verifier confirmed all four, plus a fifth it found itself: two tests shipped red (`DesignRailButton.test.tsx:31`, `StudioFooter.test.tsx:241`), the Insert copy overstated two claims, `editorViewMode.ts`'s header documented a five-tool rail that ships six, and this file said "Two defects" above three items. All five fixed in `8a34b061a`. The verifier ran a negative control — deleting the IA-14 gate makes `editorViewMode.test.ts:74` fail — so the gate is watched to fail, not merely watched.
+
+**Where the checks stand after that round**
+
+| Check | Result |
+|---|---|
+| Full editor suite | **976 files, 9568 passed**, 1 skipped, 23 todo, 0 failed, 0 unhandled |
+| `tsc --noEmit` | 0 errors from this work; 3 pre-existing (`services/`, `server/auth.config.ts`), reproduced at `2e201ebfe~1` in a detached worktree |
+| styling-ratchet / design-debt / buildrick-baseline / copy / anchors / ds-grep | PASS |
+| `gate:ds-ssot` | **RED, and not from this work** — 11 "new" antiPatterns in files none of these commits touch. `scripts/baselines/ssot.json` was already modified in this session's opening `git status`: 79 lines removed, deleting exactly those 11 grandfathered entries. A peer session owns that edit in a shared working tree, so it is reported, not reverted. |
 
 **Rule for every tick:** cite the fetched value. A tick without evidence is a
 guess, and guesses are what this audit exists to remove.
