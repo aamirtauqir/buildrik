@@ -66,7 +66,12 @@ const PILL_BASE =
   "tw:aria-disabled:opacity-55 tw:aria-disabled:pointer-events-none tw:aria-disabled:select-none";
 const PILL_SELECTED = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]";
 const PILL_IDLE = "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)]";
-const SOON_TAG = "tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1 tw:py-px tw:text-[8px] tw:font-medium tw:text-[var(--bk-ink-muted)]";
+/* The scale has no 8px step and the ratchet locks that population at zero,
+   so the "soon" tag sits on the floor the scale does define. Micro chrome
+   furniture snapped onto --bk-text-11 in the same 2026-08-29 pass. */
+const SOON_TAG =
+  "tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1 tw:py-px tw:text-[length:var(--bk-text-11)] " +
+  "tw:font-medium tw:text-[var(--bk-ink-muted)]";
 
 export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormatChange }) => (
   <div role="radiogroup" aria-label="Export format" className="tw:flex tw:flex-wrap tw:gap-2">
