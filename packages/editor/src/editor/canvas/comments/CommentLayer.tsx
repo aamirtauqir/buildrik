@@ -23,7 +23,7 @@
  */
 import * as React from "react";
 import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, isModalOpen, useToast, Button, Textarea } from "@/editor/chrome-ui";
-import type { Composer } from "@/engine";
+import type { Composer, Element } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import {
@@ -36,9 +36,26 @@ import {
 import {
   anchorSelector,
   detectOrphans,
+  elementIdFromSelector,
   pinPosition,
   pointToFractions,
 } from "./commentAnchors";
+
+/** Board 184:56 names the deleted element ("was on: "Book a table""), not just
+ *  that one was deleted. Nothing persists that name server-side (`Comment`
+ *  stores only `targetSelector`), so it is captured client-side the moment the
+ *  element dies — `ELEMENT_DELETED` still carries the live instance — and kept
+ *  only for this session. An id missing from the map (the deletion happened in
+ *  an earlier session, or before comments loaded) falls back to the generic
+ *  line below rather than inventing a name. */
+function deletedElementLabel(element: Element): string {
+  const content = element
+    .getContent()
+    .replace(/<[^>]*>/g, "")
+    .trim()
+    .slice(0, 40);
+  return content || element.getType();
+}
 
 interface CommentLayerProps {
   composer: Composer | null;
@@ -122,6 +139,8 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
   const announcedOrphans = React.useRef<Set<string>>(new Set());
   const lastOrphanIds = React.useRef<string[]>([]);
   const layerRef = React.useRef<HTMLDivElement | null>(null);
+  // Session-only cache: engine element id → its label at the moment it died.
+  const deletedLabels = React.useRef<Map<string, string>>(new Map());
 
   const activePageId = composer?.elements.getActivePage()?.id ?? null;
   const hasSite = currentSiteId() != null;
@@ -157,6 +176,10 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
       }
     };
     const bump = () => setTick((t) => t + 1);
+    const onElementDeleted = (element: Element) => {
+      deletedLabels.current.set(element.getId(), deletedElementLabel(element));
+      bump();
+    };
     composer.on("ui:comment-mode", onMode);
     composer.on("comments:refresh", onRefresh);
     composer.on("comments:orphans-request", onOrphansRequest);
@@ -168,7 +191,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
        so without this the pins kept pointing at where the elements used to
        be. Same gap the Pages panel had. */
     composer.on(EVENTS.PROJECT_LOADED, bump);
-    composer.on(EVENTS.ELEMENT_DELETED, bump);
+    composer.on(EVENTS.ELEMENT_DELETED, onElementDeleted);
     return () => {
       composer.off("ui:comment-mode", onMode);
       composer.off("comments:refresh", onRefresh);
@@ -176,7 +199,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
     composer.off("comments:reattach-start", onReattachStart);
       composer.off(EVENTS.PROJECT_CHANGED, bump);
       composer.off(EVENTS.PROJECT_LOADED, bump);
-      composer.off(EVENTS.ELEMENT_DELETED, bump);
+      composer.off(EVENTS.ELEMENT_DELETED, onElementDeleted);
     };
   }, [composer, refresh]);
 
@@ -485,9 +508,11 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
         </>
       )}
 
-      {/* Orphan-comment modal (board 184:56) */}
+      {/* Orphan-comment modal — board 184:56, measured: 560-wide (`form`, not
+          `lg`/720) with an 8px-radius note band, not the 4px this shipped
+          with. */}
       <ModalRoot open={orphanModal != null} onOpenChange={(o) => !o && setOrphanModal(null)}>
-        <ModalContent size="lg" srTitle="Comments lost their element">
+        <ModalContent size="form" srTitle="Comments lost their element">
           <ModalTitle>
             {orphanModal?.length === 1
               ? "A comment lost its element"
@@ -501,21 +526,25 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             auto-deleted — and moved to the Detached group at the top of the Review panel.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {(orphanModal ?? []).map((c) => (
-              <div
-                key={c.id}
-                style={{
-                  background: "var(--bk-warning-tint)",
-                  border: "1px solid var(--bk-warning-text)",
-                  borderRadius: "var(--bk-radius-sm)",
-                  padding: "8px 10px",
-                  fontSize: 12,
-                }}
-              >
-                <div style={{ color: "var(--bk-ink)" }}>&ldquo;{c.body.slice(0, 120)}&rdquo;</div>
-                <div style={{ color: "var(--bk-warning-text)", marginTop: 2 }}>was pinned to a deleted element</div>
-              </div>
-            ))}
+            {(orphanModal ?? []).map((c) => {
+              const label = deletedLabels.current.get(elementIdFromSelector(c.targetSelector) ?? "");
+              return (
+                <div
+                  key={c.id}
+                  style={{
+                    background: "var(--bk-warning-tint)",
+                    borderRadius: "var(--bk-radius-lg)",
+                    padding: "10px 12px",
+                    fontSize: 12,
+                  }}
+                >
+                  <div style={{ color: "var(--bk-ink)" }}>&ldquo;{c.body.slice(0, 120)}&rdquo;</div>
+                  <div style={{ color: "var(--bk-warning-text)", marginTop: 2 }}>
+                    {label ? `was on: "${label}"` : "was pinned to a deleted element"}
+                  </div>
+                </div>
+              );
+            })}
           </div>
           </ModalBody>
           <ModalFooter>

@@ -7,6 +7,7 @@
 import { describe, it, expect } from "vitest";
 import {
   anchorSelector,
+  elementIdFromSelector,
   resolveAnchor,
   pinPosition,
   pointToFractions,
@@ -40,6 +41,22 @@ describe("anchorSelector", () => {
 
   it("escapes quotes and backslashes so ids cannot break the selector", () => {
     expect(anchorSelector('a"b\\c')).toBe('[data-buildrick-id="a\\"b\\\\c"]');
+  });
+});
+
+describe("elementIdFromSelector", () => {
+  it("is the inverse of anchorSelector", () => {
+    expect(elementIdFromSelector(anchorSelector("el-42"))).toBe("el-42");
+  });
+
+  it("round-trips an id with quotes and backslashes", () => {
+    const id = 'a"b\\c';
+    expect(elementIdFromSelector(anchorSelector(id))).toBe(id);
+  });
+
+  it("returns null for an unpinned note and a malformed selector", () => {
+    expect(elementIdFromSelector(null)).toBeNull();
+    expect(elementIdFromSelector(":::not-a-selector")).toBeNull();
   });
 });
 

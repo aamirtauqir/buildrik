@@ -26,6 +26,16 @@ export function anchorSelector(elementId: string): string {
   return `[data-buildrick-id="${elementId.replace(/["\\]/g, "\\$&")}"]`;
 }
 
+/** Inverse of `anchorSelector` — the engine element id a stored selector
+ *  points at, or null for anything else (unpinned notes, a hand-edited or
+ *  otherwise malformed selector). Used to look up a deleted element's label
+ *  for the orphan-comment modal (board 184:56). */
+export function elementIdFromSelector(selector: string | null): string | null {
+  if (!selector) return null;
+  const m = /^\[data-buildrick-id="((?:[^"\\]|\\.)*)"\]$/.exec(selector);
+  return m ? m[1].replace(/\\(.)/g, "$1") : null;
+}
+
 /** Resolve a stored selector inside the canvas content root. Invalid selectors
  *  (crafted or from an older format) resolve to null, never throw. */
 export function resolveAnchor(root: ParentNode, selector: string): HTMLElement | null {
