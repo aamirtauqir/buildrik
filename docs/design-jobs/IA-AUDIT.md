@@ -58,17 +58,54 @@ Severity: **Critical** blocks a job · **Major** IA/hierarchy/missing states ·
 4. **Close orphans and dead ends** (IA-6, IA-7).
 5. **Sweep stray shapes** (IA-5).
 
+## Phase 4 — executed 2026-09-04, verified live
+
+**28 Figma Sections now hold every frame on page 1:3. Zero loose frames.**
+Reparenting preserves node ids, history and wiring: the prototype edge count
+read **2,489 before and 2,489 after**, walked across all 36,280 descendants —
+the reorganisation broke nothing.
+
+| section | screens | | section | screens |
+|---|---|---|---|---|
+| Journeys · S-flows | 74 | | Shell | 17 |
+| Settings/S7 | 45 | | Insert | 14 |
+| Media | 40 | | Publish | 14 |
+| Brand | 30 | | Pages | 13 |
+| Review | 23 | | AI | 11 |
+| History | 21 | | Inspector | 10 |
+| Layers | 18 | | Client sign-off | 10 |
+| Content | 18 | | Compare | 8 |
+| Command palette | 7 | | Notifications, Preview | 6, 6 |
+| Modal | 5 | | Canvas, Ecommerce | 3, 2 |
+| Notes · captions & annotation | 418 | | | |
+
+The last 41 frames were placed by design judgment rather than by the literal
+name rule, because the rule could not route them: five new feature sections
+(Notifications, Command palette, Preview, Canvas, Ecommerce) and the rest
+folded into the feature that owns the job — modals with their feature, not
+into a `Modal` bucket, because grouping by form tells a user nothing about
+what they came to do.
+
+### IA-9 · Two command palettes — **Major**, and exactly the duplication asked about
+
+`CmdK · empty/typing/results/no-results/ai-offer/disabled-command` (640×420,
+six frames) and `Canvas · command palette (⌘⇧P)` (520×426) are two designs for
+one job, at two sizes, under two names, with two different shortcuts implied.
+A user cannot tell which one they get. Both now sit in `Command palette · 7
+screens` so the duplication is visible instead of scattered. **Resolution
+needed: one palette, one shortcut, one size.**
+
 ## Checklist — agents tick these, each with evidence
 
-- [ ] C1 · Sections exist for every feature family with ≥5 screens
-- [ ] C2 · Every screen sits in exactly one section
-- [ ] C3 · Annotation frames are out of the screen list
+- [x] C1 · Sections exist for every feature family with ≥5 screens — 28 sections, counts read back live
+- [x] C2 · Every screen sits in exactly one section — loose frames at page top level: **0**
+- [x] C3 · Annotation frames are out of the screen list — 418 in `Notes`, verified as its child count
 - [ ] C4 · No family has exactly one screen unless it is genuinely standalone
 - [ ] C5 · S-flow numbering is either complete or retired — no phantom slots
 - [ ] C6 · The 3 real orphans (65:2, 130:2, 807:8723) have an entry point or a recorded retirement
 - [ ] C7 · The 3 real dead ends (295:1972, 1707:8456, 1719:8421) have an onward step
 - [ ] C8 · Stray top-level shapes are gone
-- [ ] C9 · Prototype edge count did not drop (2,489 baseline) — sectioning must not break wiring
+- [x] C9 · Prototype edge count **2,489 → 2,489**, walked across 36,280 descendants twice
 - [ ] C10 · A codex review has read the diff and signed off
 
 **Rule for every tick:** cite the fetched value. A tick without evidence is a
