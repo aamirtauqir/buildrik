@@ -4,13 +4,13 @@
  */
 
 export { cardBlockConfig } from "./Card";
-export { Slider, sliderBlockConfig } from "./Slider";
-export { Testimonials, testimonialsBlockConfig } from "./Testimonials";
-export { PricingTable, pricingBlockConfig } from "./PricingTable";
-export { ProgressBar, SkillsProgress, progressBlockConfig } from "./ProgressBar";
-export { CountdownTimer, countdownBlockConfig } from "./CountdownTimer";
-export { SocialIcons, socialIconsBlockConfig } from "./SocialIcons";
-export { ContactForm, contactFormBlockConfig } from "./ContactForm";
+export { sliderBlockConfig } from "./Slider";
+export { testimonialsBlockConfig } from "./Testimonials";
+export { pricingBlockConfig } from "./PricingTable";
+export { progressBlockConfig } from "./ProgressBar";
+export { countdownBlockConfig } from "./CountdownTimer";
+export { socialIconsBlockConfig } from "./SocialIcons";
+export { contactFormBlockConfig } from "./ContactForm";
 export { accordionBlockConfig } from "./Accordion";
 
 // GAP-FIX: Additional components from spec

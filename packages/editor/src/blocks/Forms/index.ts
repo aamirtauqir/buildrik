@@ -19,4 +19,4 @@ export { rangeInputBlockConfig } from "./RangeInput";
 export { colorInputBlockConfig } from "./ColorInput";
 export { labelBlockConfig } from "./Label";
 export { submitButtonBlockConfig } from "./SubmitButton";
-export { ContactForm, contactFormBlockConfig } from "../Components/ContactForm";
+export { contactFormBlockConfig } from "../Components/ContactForm";

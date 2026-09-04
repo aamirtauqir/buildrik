@@ -3,82 +3,6 @@
  * @license BSD-3-Clause
  */
 
-import * as React from "react";
-import { BLOCK_COLORS } from "../blockPalette";
-
-export interface SocialLink {
-  platform: string;
-  url: string;
-  icon?: string;
-}
-
-export interface SocialIconsProps {
-  links: SocialLink[];
-  size?: "sm" | "md" | "lg";
-  variant?: "filled" | "outline" | "minimal";
-  color?: string;
-}
-
-const platformIcons: Record<string, string> = {
-  facebook: "📘",
-  twitter: "🐦",
-  instagram: "📷",
-  linkedin: "💼",
-  youtube: "▶️",
-  tiktok: "🎵",
-  pinterest: "📌",
-  github: "🐙",
-  dribbble: "🏀",
-  behance: "🅱️",
-};
-
-const defaultLinks: SocialLink[] = [
-  { platform: "facebook", url: "#" },
-  { platform: "twitter", url: "#" },
-  { platform: "instagram", url: "#" },
-  { platform: "linkedin", url: "#" },
-];
-
-export const SocialIcons: React.FC<SocialIconsProps> = ({
-  links = defaultLinks,
-  size = "md",
-  variant = "filled",
-  color = BLOCK_COLORS.accent,
-}) => {
-  const sizeMap = { sm: 32, md: 40, lg: 48 };
-  const iconSize = sizeMap[size];
-
-  return (
-    <div style={{ display: "flex", gap: 12 }}>
-      {links.map((link, index) => (
-        <a
-          key={index}
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={link.platform}
-          style={{
-            width: iconSize,
-            height: iconSize,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "50%",
-            background: variant === "filled" ? color : "transparent",
-            border: variant === "outline" ? `2px solid ${color}` : "none",
-            color: variant === "filled" ? /* @lint-hex-policy: block default colour — exported user-site content, not editor chrome */ "#fff" : color,
-            fontSize: iconSize * 0.5,
-            textDecoration: "none",
-            transition: "transform 0.2s ease",
-          }}
-        >
-          {link.icon || platformIcons[link.platform.toLowerCase()] || "🔗"}
-        </a>
-      ))}
-    </div>
-  );
-};
-
 export const socialIconsBlockConfig = {
   id: "social-icons",
   label: "Social Icons",
@@ -94,4 +18,3 @@ export const socialIconsBlockConfig = {
     "</div>",
 };
 
-export default SocialIcons;

@@ -57,17 +57,12 @@ export {
   svgBlockConfig,
   lottieBlockConfig,
   iconBlockConfig,
-  VideoEmbed,
-  ImageGallery,
   galleryBlockConfig,
-  MapEmbed,
 } from "./Media";
 
 // Section Blocks
 export {
-  HeroSection,
   heroBlockConfig,
-  Features,
   featuresBlockConfig,
   footerBlockConfig,
   navbarBlockConfig,
@@ -77,19 +72,11 @@ export {
 // Component Blocks
 export {
   cardBlockConfig,
-  Slider,
   sliderBlockConfig,
-  Testimonials,
   testimonialsBlockConfig,
-  PricingTable,
   pricingBlockConfig,
-  ProgressBar,
-  SkillsProgress,
   progressBlockConfig,
-  CountdownTimer,
   countdownBlockConfig,
-  SocialIcons,
-  ContactForm,
   contactFormBlockConfig,
 } from "./Components";
 
