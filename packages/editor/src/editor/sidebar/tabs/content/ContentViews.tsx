@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Braces, Database, GitBranch, Table2 } from "lucide-react";
 import {
   ConfirmDialog,
   Button,
@@ -27,6 +28,8 @@ import {
   RecordRow,
   Row,
   SectionHeader,
+  ROW_ICON_CLASS,
+  ROW_LABEL_CLASS,
   Select,
   Textarea,
   TextInput,
@@ -167,25 +170,40 @@ export function RootView({
   }
   return (
     <div className={SCROLL}>
-      <SectionHeader tint className="tw:h-8" count={collections.length}>Collections</SectionHeader>
+      {/* Board 148:2 — the group header is 32-tall with a tint wash, not the
+          shared List section's plain 28. The arbitrary bracket sorts after
+          the named `h-7` scale utility in the compiled sheet and so wins
+          regardless of class order (same trick as AssetDetailOverlay's alt
+          input) rather than trusting an equal-specificity `h-8` to win. */}
+      <SectionHeader tint className="tw:h-[var(--bk-size-row)]" count={collections.length}>Collections</SectionHeader>
       {collections.map((c) => (
         <ListRow
           key={c.id}
+          icon={<Table2 size={16} />}
           label={c.name}
           count={recordCounts[c.id] ?? "—"}
           chevron
           onClick={() => onOpenCollection(c.id)}
         />
       ))}
+      {/* Board 148:20 — a bare row, not a button: "+" sits in the icon column
+          (12/400 ink-muted) and "New collection" is the 13/400 accent-text
+          label, flush with every List row above it. The old small inset
+          Button (mx-4, its own 48h before this fix) never matched that. */}
       {onCreateCollection && (
-        <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={onCreateCollection}>
-          + New collection
-        </Button>
+        <Row interactive onClick={onCreateCollection} data-testid="content-new-collection" aria-label="New collection">
+          <span className={`${ROW_ICON_CLASS} tw:text-[length:var(--bk-text-12)] tw:leading-[18px]`} aria-hidden="true">
+            +
+          </span>
+          <span className={`${ROW_LABEL_CLASS} tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-accent-text)]`}>
+            New collection
+          </span>
+        </Row>
       )}
-      <SectionHeader tint className="tw:h-8">Data</SectionHeader>
-      <ListRow label="Sources" count={sourcesCount} chevron onClick={onOpenSources} />
-      <ListRow label="Variables" count={variablesCount} chevron onClick={onOpenVariables} />
-      <ListRow label="Conditions" count={conditionsCount} chevron onClick={onOpenConditions} />
+      <SectionHeader tint className="tw:h-[var(--bk-size-row)]">Data</SectionHeader>
+      <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron onClick={onOpenSources} />
+      <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron onClick={onOpenVariables} />
+      <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron onClick={onOpenConditions} />
     </div>
   );
 }
