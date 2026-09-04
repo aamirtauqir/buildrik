@@ -98,3 +98,30 @@ bindable.
 Listed here because it is the one place the unification made a deliberate visual
 change. If 21 was right, **DESIGN.md:148 is the thing to edit** and the style
 should follow it — not the other way round.
+
+
+---
+
+## 8. The 360-wide drawers — TESTED, and it is a redraw
+
+**22 boards: AI 11, Notifications 6, History 5, against 154 at 280×812.**
+
+The final QA recommended settling every drawer at 280×812. I stopped calling
+this "risky" and measured it, then tested it on `165:2 Notifications · unread`.
+
+**Result: narrowing to 280 deletes controls.** Seven nodes ended up outside the
+new edge — the close button pinned at x=345, every timestamp at x=326, and the
+notification titles at x=300. The rendered panel came back with **no close
+button and no timestamps at all**. Reverted; the board is back at 360×776 with
+0 overflow and the controls restored.
+
+The cause is structural, not incidental: these boards are VERTICAL auto-layout
+whose *rows* are not, so setting each child to FILL reflows the column and
+leaves everything pinned inside a row exactly where it was.
+
+**So this is a redraw of three modules, not a resize**, and the cost is now
+known rather than guessed. Whoever takes it needs to re-pin each row's
+right-aligned content — roughly 7 nodes per board across 22 boards.
+
+The height half of the same recommendation was safe and **is done**: the seven
+280×776 boards are now 280×812, so the 280-wide drawer has one size.
