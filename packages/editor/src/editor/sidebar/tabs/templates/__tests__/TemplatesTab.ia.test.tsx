@@ -105,4 +105,18 @@ describe("TemplatesTab — new-page mode", () => {
     render(<TemplatesTab composer={bareComposer()} isExpanded />);
     expect(screen.queryByText("Choose a template for your new page")).toBeNull();
   });
+
+  /* Board 807:7252 draws the search bar open with no toggle icon anywhere on
+     the header — a picker whose only door out is "know to click the
+     magnifying glass first" fails the board silently. The plain Templates
+     tab keeps its icon-toggle (no board evidence it should change). */
+  it("search input is visible without a toggle click (board 807:7252)", () => {
+    render(<TemplatesTab composer={bareComposer()} isExpanded newPageMode />);
+    expect(screen.getByRole("textbox", { name: "Search templates" })).toBeInTheDocument();
+  });
+
+  it("plain expanded view keeps search behind its header toggle", () => {
+    render(<TemplatesTab composer={bareComposer()} isExpanded />);
+    expect(screen.queryByRole("textbox", { name: "Search templates" })).toBeNull();
+  });
 });
