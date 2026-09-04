@@ -43,7 +43,12 @@ for (const [id, label] of ORDER) {
   const n = s.children.filter(c => typeof c.width === "number").length;
   /* Keep any audit annotation that follows the em dash; replace only the
      leading identity so re-running is idempotent. */
-  const tail = (s.name.split(" — ").slice(1).join(" — ") || "").trim();
+  /* Keep the annotation, but cap it. Two section names had grown into
+     paragraphs — the command-palette one ran ~470 characters — which defeats
+     the "NN · Name · count" scan the numbering exists for. The full text lives
+     in the audit findings; the name only needs to flag that a note exists. */
+  let tail = (s.name.split(" — ").slice(1).join(" — ") || "").trim();
+  if (tail.length > 72) tail = tail.slice(0, 69).replace(/[\s,;·]+$/, "") + "…";
   s.name = num + " · " + label + " · " + n + (tail ? " — " + tail : "");
   s.x = 0; s.y = y;
   y += s.height + GUTTER;

@@ -29,8 +29,23 @@ const GUTTER = 120, PAD_X = 100, PAD_TOP = 220, PAD_BOTTOM = 140, MAX_ROW = ${MA
 
 /* Reading order a designer expects: the default/root state first, then the
    populated variants, then the states that only appear when something is
-   absent or wrong, and finally anything the file has already retired. Within a
-   rank, alphabetical, so the order is stable across runs. */
+   absent or wrong, and finally anything the file has already retired.
+
+   v2, after a layout review found two systematic faults:
+
+   1. DEFAULT-FIRST MISSED FOUR SECTIONS. The rank-0 test looked for the words
+      "default"/"root"/"idle", so "Layers · tree", "Pages · tree", "Media · grid"
+      and "Components · library" — each its module's landing state — sorted as
+      ordinary variants and landed 3rd, 7th and 12th. A module whose first frame
+      is not its default reads wrong however tidy the grid is.
+
+   2. ROW-PACKING BY HEIGHT LEFT HOLES. Sections mix 1440x900 boards with
+      280x812 panels and ~230-tall modals; packed in name order, a 230-tall
+      modal mid-row forces a 680px hole under it. Frames are now grouped into
+      width bands within each rank, widest first, so a row holds one size.
+
+   3. NUMBERS SORTED AS TEXT — "Shell state 10" preceded "state 5". Compare with
+      a numeric-aware collator. */
 const rank = (n) => {
   const x = (n || "").toLowerCase();
   if (/retired|superseded|unbuildable|not-implemented|design-ahead/.test(x)) return 9;
@@ -38,11 +53,62 @@ const rank = (n) => {
   if (/loading|skeleton|pending/.test(x)) return 6;
   if (/empty|no-results|none|zero/.test(x)) return 5;
   if (/confirm|modal|popover|menu|drawer/.test(x)) return 4;
-  if (/default|root|idle|\\bbase\\b|state 1|· 1\\b/.test(x)) return 0;
+  /* NOTE the doubled backslashes: this whole block is inside a JS template
+     literal, so a single \b is consumed as a backspace escape and the word
+     boundary silently disappears. That is exactly how the v2 rank shipped
+     matching nothing and reported "moved 0". */
+  if (/default|root|idle|\\bbase\\b|state 1\\b|· 1\\b|\\btree\\b|\\bgrid\\b|\\blibrary\\b|\\boverview\\b|landing/.test(x)) return 0;
   return 2;
 };
+/* Hand-rolled natural compare: Intl does not exist in the Figma plugin
+   sandbox, and a plain localeCompare puts "state 10" before "state 5". */
+const natural = (a, b) => {
+  const ax = String(a || "").toLowerCase().match(/\\d+|\\D+/g) || [];
+  const bx = String(b || "").toLowerCase().match(/\\d+|\\D+/g) || [];
+  for (let i = 0; i < Math.max(ax.length, bx.length); i++) {
+    const x = ax[i], y = bx[i];
+    if (x === undefined) return -1;
+    if (y === undefined) return 1;
+    const nx = /^\\d/.test(x), ny = /^\\d/.test(y);
+    if (nx && ny) { const d = parseInt(x, 10) - parseInt(y, 10); if (d) return d; }
+    else if (x !== y) return x < y ? -1 : 1;
+  }
+  return 0;
+};
+const band = (w) => -Math.round(w / 200);   // negative => widest band first
+/* Boards before annotation. Section 23 holds 39 real boards mixed into 244
+   caption one-liners (1440x18), 110 orphaned headers and legend cells, and 12
+   bare 4000x2 divider rules — gridded together it renders as a wall of grey
+   hairlines with the boards lost inside it. A board is anything with real
+   height that is not a text node. */
+const isBoard = (c) => c.type !== "TEXT" && c.height > 100 ? 0 : 1;
+
+/* SUBJECT GROUPING. Boards are named "Module · subject · state", and sorting by
+   state across the whole section scatters each subject's story: Settings'
+   five Domains states landed in three different rows and five different
+   columns, and History interleaved Published / Saves / Backups so a dark
+   1440x900 board alternated with a 280x776 drawer down the whole section.
+   Grouping by subject first turns 45 scattered boards into a dozen readable
+   stories. The module's own landing state (rank 0) still leads the section,
+   ahead of every subject. */
+const subject = (n) => {
+  const parts = String(n || "").split("·").map((t) => t.trim().toLowerCase());
+  return parts.length > 2 ? parts[1] : "";
+};
+const isRoot = (c) => (rank(c.name) === 0 ? 0 : 1);
+/* Height band as a tiebreak keeps rows level: six frames of 632/470/259/560/812
+   top-aligned in one row read as a staircase with up to 553px of hole. */
+const hBand = (h) => -Math.round(h / 100);
+
 const kids = s.children.filter(c => typeof c.width === "number" && c.width > 0)
-  .sort((a, b) => (rank(a.name) - rank(b.name)) || (a.name || "").localeCompare(b.name || ""));
+  .sort((a, b) =>
+    (isBoard(a) - isBoard(b)) ||
+    (isRoot(a) - isRoot(b)) ||
+    (subject(a.name) < subject(b.name) ? -1 : subject(a.name) > subject(b.name) ? 1 : 0) ||
+    (rank(a.name) - rank(b.name)) ||
+    (band(a.width) - band(b.width)) ||
+    (hBand(a.height) - hBand(b.height)) ||
+    natural(a.name, b.name));
 
 let x = PAD_X, y = PAD_TOP, rowH = 0, maxX = 0, moved = 0;
 for (const k of kids) {
