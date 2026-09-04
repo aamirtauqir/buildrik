@@ -38,7 +38,12 @@ const PREFIX = {
 };
 
 const rows = [], moved = [];
-for (const b of notes.children.filter(c => c.type !== "TEXT" && c.height > 40)) {
+/* >12, not >40. A breadcrumb bar and an inline-edit toolbar are real boards and
+   are shorter than 40px, so they stayed in Notes while the rest of their family
+   moved — and two Canvas AI popovers were stranded apart from the prompt and
+   diff boards they belong with. The divider rules this must still exclude are
+   4000x2. */
+for (const b of notes.children.filter(c => c.type !== "TEXT" && c.height > 12)) {
   /* Strip a leading status tag before matching: "[design-ahead] History ·
      Backups · restoring" is a History board, and leaving the tag on the first
      segment kept five Backups screens stranded in Notes while the History

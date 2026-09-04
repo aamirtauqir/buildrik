@@ -13,7 +13,8 @@
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
 
 const FILE_KEY = "g4GzQFqzNYz5sosz1QtZXC";
-const [sectionId, maxRowArg] = process.argv.slice(2);
+const [sectionId, maxRowArg, modeArg] = process.argv.slice(2);
+const SEQ = modeArg === "seq";   // sequence sections: no ragged wrap, J-headers as row labels
 if (!sectionId) { console.error("usage: layout-section.mjs <sectionId> [maxRowWidth]"); process.exit(2); }
 const MAX_ROW = Number(maxRowArg) || 9000;
 
@@ -26,6 +27,25 @@ const s = await figma.getNodeByIdAsync(${JSON.stringify(sectionId)});
 if (!s || s.type !== "SECTION") return "NOT A SECTION";
 
 const GUTTER = 120, PAD_X = 100, PAD_TOP = 220, PAD_BOTTOM = 140, MAX_ROW = ${MAX_ROW};
+const SEQ = ${SEQ};
+
+/* SEQUENCE MODE (Journeys). Seven "J<n> — TITLE" headers were stranded in the
+   Notes section — the labels the journey layer is missing, sitting in the one
+   section that cannot use them. They map 1:1 onto the S-flows, and the mapping
+   is corroborated by a gap found earlier in this audit: J3 PREVIEW & TEST maps
+   to S4, which has zero boards in the section. Each header now opens a row and
+   its flow's boards follow, so an empty flow is VISIBLE rather than merely
+   absent from a list. Ragged wrapping is off here — sequence beats level rows
+   when the section's whole premise is order. */
+const J_TO_FLOW = { j1: 1, j2a: 2, j2b: 3, j3: 4, j4: 5, j5: 6, j6: 7 };
+const headerFlow = (n) => {
+  const m = String(n || "").match(/^(J\\d[A-Za-z]?) —/);
+  return m ? (J_TO_FLOW[m[1].toLowerCase()] ?? 99) : null;
+};
+const boardFlow = (n) => {
+  const m = String(n || "").replace(/^\\s*\\[[^\\]]*\\]\\s*/, "").match(/^S(\\d)/i);
+  return m ? Number(m[1]) : 99;
+};
 
 /* Reading order a designer expects: the default/root state first, then the
    populated variants, then the states that only appear when something is
@@ -134,20 +154,32 @@ const isRoot = (c) => (rank(c.name) === 0 ? 0 : 1);
    separate, and boards of similar height keep their named sequence. */
 const hBand = (h) => -Math.round(h / 400);
 
+const flowOf = (c) => (headerFlow(c.name) ?? boardFlow(c.name));
+const isHeader = (c) => (headerFlow(c.name) === null ? 1 : 0);
+
+/* Sequence sections read in flow order: each J-header, then that flow's boards.
+   Everything else reads in module order. */
+const bySequence = (a, b) =>
+  (flowOf(a) - flowOf(b)) ||
+  (isHeader(a) - isHeader(b)) ||
+  natural(a.name, b.name);
+
+const byModule = (a, b) =>
+  (isBoard(a) - isBoard(b)) ||
+  (isRoot(a) - isRoot(b)) ||
+  (subject(a.name) < subject(b.name) ? -1 : subject(a.name) > subject(b.name) ? 1 : 0) ||
+  (rank(a.name) - rank(b.name)) ||
+  /* Name BEFORE the size bands. Sizing is a layout concern and meaning is a
+     reading concern, and when a size band outranked the name it reordered
+     sequences that carry meaning — Journeys ran S3.11 before S3.10, and put an
+     S1-stress board between S1.4 · 4 of 7 and S1.4 · 7 of 7. Row levelling is
+     the row-packer's job, not the comparator's. */
+  natural(a.name, b.name) ||
+  (hBand(a.height) - hBand(b.height)) ||
+  (band(a.width) - band(b.width));
+
 const kids = s.children.filter(c => typeof c.width === "number" && c.width > 0)
-  .sort((a, b) =>
-    (isBoard(a) - isBoard(b)) ||
-    (isRoot(a) - isRoot(b)) ||
-    (subject(a.name) < subject(b.name) ? -1 : subject(a.name) > subject(b.name) ? 1 : 0) ||
-    (rank(a.name) - rank(b.name)) ||
-    /* Name BEFORE the size bands. Sizing is a layout concern and meaning is a
-       reading concern, and when a size band outranked the name it reordered
-       sequences that carry meaning — Journeys ran S3.11 before S3.10, and put
-       an S1-stress board between S1.4 · 4 of 7 and S1.4 · 7 of 7. Row levelling
-       is the row-packer's job (the ragged wrap below), not the comparator's. */
-    natural(a.name, b.name) ||
-    (hBand(a.height) - hBand(b.height)) ||
-    (band(a.width) - band(b.width)));
+  .sort(SEQ ? bySequence : byModule);
 
 /* CAPTION PAIRING. Once a caption has been moved into its board's section
    (pair-captions.mjs), it should sit UNDER that board as one unit — that is the
@@ -199,7 +231,11 @@ for (const k of layoutKids) {
      Publish went from nine frames wide to four — trading holes for endless
      vertical scroll. Only a genuine mismatch (a 259-tall frame beside an
      812-tall one) should wrap. */
-  const ragged = rowH > 0 && (unitH > rowH * 2.4 || unitH * 2.4 < rowH);
+  const isJHeader = SEQ && headerFlow(k.name) !== null;
+  /* A flow header opens a row of its own and its boards start the next, so an
+     empty flow shows as a labelled gap rather than being merely absent. Ragged
+     wrapping is off in sequence mode: order is the point of that section. */
+  const ragged = isJHeader || (!SEQ && rowH > 0 && (unitH > rowH * 2.4 || unitH * 2.4 < rowH));
   if (x > PAD_X && (x + unitW > MAX_ROW || ragged)) { x = PAD_X; y += rowH + GUTTER; rowH = 0; }
   if (Math.round(k.x) !== Math.round(x) || Math.round(k.y) !== Math.round(y)) moved++;
   k.x = x; k.y = y;
@@ -207,6 +243,7 @@ for (const k of layoutKids) {
   rowH = Math.max(rowH, unitH);
   x += unitW + GUTTER;
   maxX = Math.max(maxX, x);
+  if (isJHeader) { x = PAD_X; y += rowH + GUTTER; rowH = 0; }
 }
 const w = Math.max(maxX - GUTTER + PAD_X, 1200);
 const h = y + rowH + PAD_BOTTOM;
