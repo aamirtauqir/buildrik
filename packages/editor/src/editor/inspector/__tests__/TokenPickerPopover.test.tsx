@@ -116,4 +116,23 @@ describe("TokenPickerPopover", () => {
     await userEvent.type(searchInput, "zzznomatch");
     expect(screen.getByText("No tokens found")).toBeInTheDocument();
   });
+
+  /* Board 1176:4804 draws the tab chips 20 tall. flowbite's default Button
+     (no `size` prop here) ships a fixed height that measured 40 live before
+     this fix; `min-h-6` is a different twMerge group from `height` and never
+     contested it. `h-auto` is the same group and wins, letting the 4px/4px
+     padding plus the 11px label size it near the board's 20. */
+  it("does not carry flowbite's fixed tab height", () => {
+    render(
+      <TokenPickerPopover
+        tokens={TOKENS}
+        currentValue=""
+        onSelect={vi.fn()}
+        onCustomValue={vi.fn()}
+      />
+    );
+    const tab = screen.getByRole("button", { name: "Tokens" });
+    expect(tab.className).toContain("tw:h-auto");
+    expect(tab.className).not.toMatch(/tw:h-(8|10)\b/);
+  });
 });
