@@ -120,6 +120,18 @@ describe("PageTabBar", () => {
     expect(screen.getByRole("tab", { name: "About" })).toBeInTheDocument();
   });
 
+  /* Board 435:2348: the active tab's white surface reaches the bar's own
+     bottom edge — the row wraps its bottom padding into a per-tab margin
+     instead, so only the (invisible) resting tabs carry the 4px gap. */
+  it("keeps the active tab flush with the bar bottom (board 435:2348)", () => {
+    const { composer } = makeComposer(TWO_PAGES);
+    renderBar(composer);
+    const row = screen.getByRole("tablist").parentElement;
+    expect(row?.className).not.toMatch(/tw:pb-1\b/);
+    expect(screen.getByRole("tab", { name: "Home, Homepage" }).className).not.toMatch(/tw:mb-1\b/);
+    expect(screen.getByRole("tab", { name: "About" }).className).toMatch(/tw:mb-1\b/);
+  });
+
   it("renders nothing without a composer", () => {
     const { container } = render(
       <ToastProvider>

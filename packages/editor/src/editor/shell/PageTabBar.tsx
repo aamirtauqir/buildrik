@@ -437,13 +437,21 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
  *  proud of it. Both were bg-card before, which left the active page marked
  *  only by a 500 weight and a 5%-alpha shadow — invisible in practice.
  *  Figma board B9.7 is the record. */
+/* Board 435:2348: the active tab's white surface runs the full height of the
+   strip, flush with the bar's own bottom edge — a browser-tab affordance,
+   read as fused with the canvas below. ROW used to give every tab an even
+   `py-1`, which centered the active tab's box with a 4px gap of app-background
+   showing beneath it instead of touching the border. Dropping ROW's bottom
+   padding and aligning to the row's end lets the active tab reach it; the
+   resting tabs (which carry no visible surface either way) get that 4px back
+   as their own margin so the row's overall height is unchanged. */
 const BAR = "tw:relative tw:border-y tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-app)]";
-const ROW = "tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1";
-const TABS = "tw:flex tw:min-w-0 tw:items-center tw:gap-0.5 tw:overflow-x-auto";
+const ROW = "tw:flex tw:items-end tw:gap-2 tw:px-2 tw:pt-1";
+const TABS = "tw:flex tw:min-w-0 tw:items-end tw:gap-0.5 tw:overflow-x-auto";
 const TAB =
   "tw:flex tw:items-center tw:gap-1 tw:px-3 tw:py-1.5 tw:whitespace-nowrap tw:cursor-pointer " +
   "tw:rounded-t-md tw:rounded-b-none tw:text-[13px]";
-const TAB_RESTING = "tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-soft)]";
+const TAB_RESTING = "tw:mb-1 tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink-soft)]";
 const TAB_ACTIVE =
   "tw:border tw:border-b-0 tw:border-[var(--bk-gray-200)] tw:bg-white tw:font-medium tw:text-[var(--bk-ink)] " +
   "tw:[box-shadow:var(--bk-shadow-raised)]";
@@ -452,7 +460,10 @@ const TAB_NAME = "tw:inline-block tw:max-w-30 tw:overflow-hidden tw:text-ellipsi
 const DIRTY_DOT = "tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--bk-blue-500)]";
 const RENAME_INPUT = "tw:w-25 tw:[&_input]:px-1 tw:[&_input]:py-0.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded";
 const ADD_BTN =
-  "tw:flex tw:items-center tw:justify-center tw:size-6 tw:ml-1 tw:p-0 tw:rounded tw:text-sm tw:font-medium " +
+  /* mb-1 mirrors TAB_RESTING — ROW aligns to its own bottom edge now (see
+     ROW/TAB_ACTIVE above), so this needs the same offset the resting tabs
+     carry to stay at its old, vertically-centered-looking position. */
+  "tw:flex tw:items-center tw:justify-center tw:size-6 tw:ml-1 tw:mb-1 tw:p-0 tw:rounded tw:text-sm tw:font-medium " +
   /* ink-soft, not ink-muted: this sits on the tab bar's gray-100 where muted
      measures 4.39:1, under the 4.5 floor. Same pairing as the panel subtitle. */
   "tw:border tw:border-dashed tw:border-[var(--bk-gray-400)] tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]";
