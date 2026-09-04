@@ -213,10 +213,13 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
       )}
 
       <div className={FOOTER_CALLOUT} data-readonly-footer>
-        <strong>Read-only by design:</strong> Components live as their own rail
-        panel. The Design tab summary lets users see what's installed without
-        leaving Design context — but every CTA on this page jumps to the
-        Components panel for actual authoring.
+        <strong>Read-only by design:</strong> Components live in their own
+        panel. This summary lets you see what's installed without leaving
+        Brand — but every action here jumps to the Components panel to author.
+        {/* Was "their own RAIL panel" and "the Design tab": Components has no
+            rail button in the shipping 6-item rail, and this panel is headed
+            Brand, not Design. Copy naming a control that is not there is the
+            same defect class as a door with two names. */}
       </div>
     </div>
   );

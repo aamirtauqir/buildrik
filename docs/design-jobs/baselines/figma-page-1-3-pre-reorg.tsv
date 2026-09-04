@@ -1,0 +1,820 @@
+52:2	1440x900	815:4518	S1 · Editor — ASSEMBLED (1440, drawer pinned)
+55:2	1440x900	876:4532	S1-stress · 40 pages · depth-5 tree · 62-char site name
+58:2	1440x900	876:4532	S1-keyboard · F6 region cycle + focus outline
+65:2	1440x900	199:205	Shell state 1 · First run
+65:211	1440x900	807:8069	Shell state 7 · Preview
+65:412	1440x900	199:2,52:2	Shell state 12 · Loading
+66:4	1440x900	199:205	Shell state 4 · Multi-select
+66:225	1440x900	199:2	Shell state 9 · AI agent run
+66:441	1440x900	199:2,807:7000	Shell state 10 · Offline
+66:640	1440x900	52:2,199:2	Shell state 11 · Saving → conflict
+75:2	1436x992	876:4532	Media drill-ins — the five destinations
+128:2	1440x900	129:2	S5.1 · compose
+129:2	1440x900	129:223,129:223	S5.1 · sending
+129:223	1440x900	130:201	S5.1 · sent
+129:451	1440x900	128:2	S5.1 · error
+130:2	1440x900	130:201	S5.2 · none
+130:201	1440x900	130:400	S5.2 · pending
+130:400	1440x900	130:798	S5.2 · opened-not-acted
+130:599	1440x900	130:201	S5.2 · changes-requested
+130:798	1440x900	130:997	S5.2 · approved
+130:997	1440x900	130:201	S5.2 · approved-but-edited-since
+131:2	1440x900	131:201	S5.6 · approved-clean (topbar identical to S5.2 · approved by design — the scenarios differ downstream, not here)
+131:201	1440x900	131:415	S5.6 · approved-edited-since
+131:415	1440x900	131:2	S5.6 · re-sent
+132:2	1440x900	133:212	S5.3 · open-thread — SUPERSEDED 2026-09-02 by 156:2 (page-grouped open thread, ReviewTab.tsx:728-738)
+133:2	1440x900	132:2	S5.3 · no-comments — SUPERSEDED 2026-09-02 by 157:221 (emptyBody, ReviewTab.tsx:629-636)
+133:212	1440x900	133:422	S5.3 · replied — SUPERSEDED 2026-09-02 by the reply composer + reload, ReviewTab.tsx:815-831 — no separate screen
+133:422	1440x900	133:630	S5.3 · resolved — SUPERSEDED 2026-09-02 by the resolved group + row style, ReviewTab.tsx:740-760
+133:630	1440x900	133:2	S5.3 · show-resolved — SUPERSEDED 2026-09-02 by 157:109 (resolvedOpen, ReviewTab.tsx:742-758)
+134:3	1440x18		caption/S5.1 · compose
+134:4	1440x18		caption/S5.1 · sending
+134:5	1440x18		caption/S5.1 · sent
+134:6	1440x18		caption/S5.1 · error
+134:7	1440x18		caption/S5.2 · none
+134:8	1440x18		caption/S5.2 · pending
+134:9	1440x18		caption/S5.2 · opened-not-acted
+134:10	1440x18		caption/S5.2 · changes-requested
+134:11	1440x18		caption/S5.2 · approved
+134:12	1440x18		caption/S5.2 · approved-but-edited-since
+134:13	1440x18		caption/S5.3 · no-comments
+134:14	1440x18		caption/S5.3 · open-thread
+134:15	1440x18		caption/S5.3 · replied
+134:16	1440x18		caption/S5.3 · resolved
+134:17	1440x18		caption/S5.3 · show-resolved
+134:18	1440x18		caption/S5.6 · approved-clean
+134:19	1440x18		caption/S5.6 · approved-edited-since
+134:20	1440x18		caption/S5.6 · re-sent
+137:2	280x812	138:2	Insert · default
+138:2	280x812	138:53	Insert · group-expanded
+138:53	280x812	138:106	Insert · searching
+138:106	280x812	138:153	Insert · no-results
+138:153	280x812		Insert · dragging — CONDITION-ONLY — leaves on drop/dragend, no control (GroupSection.tsx:167-169)
+138:198	280x812	138:244	Insert · disabled-item — RETIRED 2026-09-02 (no producer)
+138:244	280x812	137:2	Insert · tip-dismissed
+140:2	280x812	141:2	Pages · tree
+141:2	280x812	141:40	Pages · folders-collapsed
+141:40	280x812	141:78	Pages · searching
+141:78	280x812	141:124	Pages · bulk-select
+141:124	280x812	141:165	Pages · empty
+141:165	280x812	141:207	Pages · load-error
+141:207	280x812	140:2	Pages · listings
+142:2	280x812	143:2	Layers · tree
+143:2	280x812	143:60	Layers · filtered
+143:60	280x812	143:119	Layers · dragging
+143:119	280x812	143:179	Layers · invalid-drop
+143:179	280x812	143:237	Layers · hidden
+143:237	280x812	143:295	Layers · locked
+143:295	280x812	143:355	Layers · multi-select
+143:355	280x812	142:2	Layers · empty — UNBUILDABLE — buildLayersFromEngine always emits a root row, so layers.length===0 means no page/composer, never an empty page (useLayerTree.ts:97,63-72)
+144:2	280x812	146:2	Media · grid
+145:2	280x812	145:49	Media · filtered
+145:49	280x812	145:96	Media · folder-scoped
+145:96	280x812	145:148	Media · uploading
+145:148	280x812	145:199	Media · upload-failed
+145:199	280x812	145:250	Media · quota-warn
+145:250	280x812	145:300	Media · quota-full
+145:300	280x812	145:359	Media · bulk-select
+145:359	280x812	144:2	Media · empty
+146:2	280x812	144:2	Media · drill-in · asset-detail
+146:32	280x812	146:2	Media · drill-in · versions
+146:68	280x812	146:2	Media · drill-in · used-in
+147:2	280x812	144:2	Media · drill-in · icon-picker
+147:55	280x812	144:2	Media · drill-in · stock-browser
+148:2	280x812	149:7	Content · root
+149:7	280x812	149:50	Content · empty
+149:50	280x812	149:84	Content · collection
+149:84	280x812	149:108	Content · record
+149:108	280x812	151:2	Content · unsaved-record
+151:2	280x812	151:46	Content · fields
+151:46	280x812	151:62	Content · data-sources
+151:62	280x812	151:87	Content · variables
+151:87	280x812	148:2	Content · conditions
+152:52	280x812	152:83	Brand · tokens
+152:83	280x812	152:112	Brand · token-detail
+152:112	280x812	152:137	Brand · presets
+152:137	280x812	153:2	Brand · starters
+153:2	280x812	153:29	Brand · classes
+153:29	280x812	153:57	Brand · components
+153:57	280x812	153:92	Brand · typography
+153:92	280x812	153:120	Brand · colour-mode
+153:120	280x812	154:2	Brand · import-export
+154:2	280x812	154:26	Brand · lint
+154:26	280x812	817:4899	Brand · lint-warnings
+154:78	280x812	154:132	Brand · dirty
+154:132	280x812	1333:7162	Brand · pro-locked
+155:11	320x36		caption/Insert · default
+155:12	320x54		caption/Insert · group-expanded
+155:13	320x36		caption/Insert · searching
+155:14	320x18		caption/Insert · no-results
+155:15	320x54		caption/Insert · dragging
+155:16	320x72		caption/Insert · disabled-item
+155:17	320x36		caption/Insert · tip-dismissed
+155:18	320x36		caption/Pages · tree
+155:19	320x18		caption/Pages · folders-collapsed
+155:20	320x18		caption/Pages · searching
+155:21	320x36		caption/Pages · bulk-select
+155:22	320x18		caption/Pages · empty
+155:23	320x36		caption/Pages · load-error
+155:24	320x90		caption/Pages · listings
+155:25	320x54		caption/Layers · tree
+155:26	320x36		caption/Layers · filtered
+155:27	320x18		caption/Layers · dragging
+155:28	320x36		caption/Layers · invalid-drop
+155:29	320x36		caption/Layers · hidden
+155:30	320x54		caption/Layers · locked
+155:31	320x36		caption/Layers · multi-select
+155:32	320x18		caption/Layers · empty
+155:33	320x54		caption/Media · grid
+155:34	320x36		caption/Media · filtered
+155:35	320x72		caption/Media · folder-scoped
+155:36	320x36		caption/Media · uploading
+155:37	320x36		caption/Media · upload-failed
+155:38	320x36		caption/Media · quota-warn
+155:39	320x54		caption/Media · quota-full
+155:40	320x18		caption/Media · bulk-select
+155:41	320x18		caption/Media · empty
+155:42	320x54		caption/Media · drill-in · asset-detail
+155:43	320x72		caption/Media · drill-in · versions
+155:44	320x72		caption/Media · drill-in · used-in
+155:45	320x36		caption/Media · drill-in · icon-picker
+155:46	320x144		caption/Media · drill-in · stock-browser
+155:47	320x54		caption/Content · root
+155:48	320x72		caption/Content · empty
+155:49	320x36		caption/Content · collection
+155:50	320x36		caption/Content · record
+155:51	320x54		caption/Content · unsaved-record
+155:52	320x36		caption/Content · fields
+155:53	320x36		caption/Content · data-sources
+155:54	320x36		caption/Content · variables
+155:55	320x36		caption/Content · conditions
+155:56	320x54		caption/Brand · root
+155:57	320x36		caption/Brand · tokens
+155:58	320x54		caption/Brand · token-detail
+155:59	320x18		caption/Brand · presets
+155:60	320x36		caption/Brand · starters
+155:61	320x18		caption/Brand · classes
+155:62	320x36		caption/Brand · components
+155:63	320x72		caption/Brand · typography
+155:64	320x36		caption/Brand · colour-mode
+155:65	320x126		caption/Brand · import-export
+155:66	320x36		caption/Brand · lint
+155:67	320x36		caption/Brand · lint-warnings
+155:68	320x54		caption/Brand · dirty
+155:69	320x54		caption/Brand · pro-locked
+156:2	280x812	157:58	Review panel · open
+157:2	280x812	157:109	Review panel · detached-present
+157:58	280x812	158:2	Review panel · all-resolved
+157:109	280x812	157:169	Review panel · resolved-expanded
+157:169	280x812	157:221	Review panel · older-round
+157:221	280x812	158:2	Review panel · empty
+158:2	280x812	158:57	Review panel · re-send-confirm
+158:57	280x812	156:2	Review panel · re-sending
+158:105	280x812	158:162	Review panel · revoke-confirm
+158:162	280x812	158:213	Review panel · revoked
+158:213	280x812	156:2	Review panel · review-closed
+161:2	320x108		caption/Review panel · open
+161:3	320x54		caption/Review panel · all-resolved
+161:4	320x90		caption/Review panel · detached-present
+161:5	320x36		caption/Review panel · resolved-expanded
+161:6	320x54		caption/Review panel · older-round
+161:7	320x72		caption/Review panel · re-send-confirm
+161:8	320x36		caption/Review panel · re-sending
+161:9	320x54		caption/Review panel · revoke-confirm
+161:10	320x36		caption/Review panel · revoked
+161:11	320x72		caption/Review panel · review-closed
+161:12	320x36		caption/Review panel · empty
+161:13	300x54		caption/Inspector · no-selection
+161:14	300x72		caption/Inspector · single-selection
+161:15	300x72		caption/Inspector · multi-select
+161:16	300x54		caption/Inspector · instance-selected
+161:17	300x72		caption/Inspector · bound-to-CMS
+161:18	300x72		caption/Inspector · breakpoint-override
+161:19	300x36		caption/Inspector · pseudo-state
+161:20	300x126		caption/Inspector · reach-all-like-this
+161:21	300x72		caption/Inspector · ai-agent-run
+161:22	300x36		caption/Inspector · loading
+162:2	280x776	163:2	History · Saves
+163:2	360x776	163:113	History · Saves · changes
+163:64	280x776	162:2	History · Saves · empty
+163:113	360x776	163:167	History · Saves · time-travel
+163:167	280x776	163:220	History · Saves · restore-confirm
+163:220	280x776	162:2	History · Saves · restoring
+163:269	280x776	162:2	History · Saves · pruned-notice
+165:2	360x776	165:24	Notifications · unread
+165:24	360x776	165:44	Notifications · all-read — NO CODE SUBJECT — LoadState is loading|ready|error; 'all caught up' is the EMPTY branch, and a fully-read list renders the ordinary list (NotificationPanel.tsx:98,248-250,267)
+165:44	360x776		Notifications · empty
+165:51	360x776	165:2	Notifications · loading
+165:71	360x776	165:2	Notifications · jump-target-deleted
+166:2	640x420	166:18	CmdK · empty
+166:18	640x420	166:27	CmdK · typing
+166:27	640x420	52:2	CmdK · results
+166:45	640x420	166:51	CmdK · no-results
+166:51	640x420	170:29	CmdK · ai-offer
+166:58	640x420	166:2	CmdK · disabled-command
+168:2	1080x776	168:26	Compare · side-by-side
+168:26	1080x776	168:48	Compare · overlay
+168:48	1080x776	168:2	Compare · list
+168:82	1080x776	168:2	Compare · no-changes
+169:2	1080x776		Compare · single-page
+169:28	1080x776	169:2	Compare · loading-render
+169:60	1080x776	163:220	Compare · restore-confirm — RETIRED 2026-09-02 (no producer)
+169:92	1080x776	158:57	Compare · resend-confirm — SUPERSEDED 2026-09-02 by 158:2 (no re-send in ApprovedCompareView; ReviewTab.tsx:839 owns the confirm)
+170:2	360x776	170:17,171:67	AI · idle
+170:17	360x776	170:29	AI · scoped
+170:29	360x776	170:41	AI · thinking
+170:41	360x776	170:70	AI · planning
+170:70	360x776	170:97	AI · running
+170:97	360x776	171:2	AI · step-gate
+171:2	360x776	171:36	AI · step-failed
+171:36	360x776	171:67	AI · stopped
+171:67	360x776	170:2	AI · done
+171:105	360x776	170:2	AI · error-quota
+171:136	360x776	170:2	AI · not-configured
+172:2	360x54		caption/Versions · saves
+172:3	360x36		caption/Versions · changes
+172:4	360x18		caption/Versions · empty
+172:5	360x54		caption/Versions · time-travel
+172:6	360x54		caption/Versions · restore-confirm
+172:7	360x36		caption/Versions · restoring
+172:8	360x36		caption/Versions · pruned-notice
+172:9	420x36		caption/Compare · side-by-side
+172:10	420x36		caption/Compare · overlay
+172:11	420x36		caption/Compare · list
+172:12	420x36		caption/Compare · no-changes
+172:13	420x54		caption/Compare · single-page
+172:14	420x36		caption/Compare · loading-render
+172:15	420x36		caption/Compare · restore-confirm
+172:16	420x36		caption/Compare · resend-confirm
+172:17	420x36		caption/CmdK · empty
+172:18	420x18		caption/CmdK · typing
+172:19	420x36		caption/CmdK · results
+172:20	420x18		caption/CmdK · no-results
+172:21	420x36		caption/CmdK · ai-offer
+172:22	420x54		caption/CmdK · disabled-command
+172:23	360x36		caption/Issues · all
+172:24	360x18		caption/Issues · filtered
+172:25	360x36		caption/Issues · empty
+172:26	360x36		caption/Issues · fixing
+172:27	360x72		caption/Issues · fix-failed
+172:28	360x18		caption/Notifications · unread
+172:29	360x36		caption/Notifications · all-read
+172:30	360x18		caption/Notifications · empty
+172:31	360x36		caption/Notifications · loading
+172:32	360x36		caption/Notifications · jump-target-deleted
+172:33	360x54		caption/AI · idle
+172:34	360x54		caption/AI · scoped
+172:35	360x18		caption/AI · thinking
+172:36	360x36		caption/AI · planning
+172:37	360x36		caption/AI · running
+172:38	360x54		caption/AI · step-gate
+172:39	360x36		caption/AI · step-failed
+172:40	360x36		caption/AI · stopped
+172:41	360x36		caption/AI · done
+172:42	360x36		caption/AI · error-quota
+172:43	360x54		caption/AI · not-configured
+184:2	1440x900	184:24	History · Published · roll-back confirm
+184:24	1440x900	184:37	History · Published · restore-confirm
+184:37	1440x900	184:45,184:45	History · Published · redeploying
+184:45	1440x900	184:2	History · Published · restored
+184:56	1440x900	184:70	Orphan comments · detected
+184:70	1440x900	184:87	Orphan comments · reattach
+184:87	1440x900	184:56	Orphan comments · dismissed
+186:2	560x36		caption/Modal · open
+186:3	560x36		caption/Modal · dirty
+186:4	560x36		caption/Modal · submitting
+186:5	560x36		caption/Modal · error
+186:6	560x36		caption/Modal · success-then-close
+186:7	560x36		caption/Rollback · pick-version
+186:8	560x36		caption/Rollback · confirm
+186:9	560x36		caption/Rollback · publishing
+186:10	560x36		caption/Rollback · done
+186:11	560x36		caption/Orphan comments · detected
+186:12	560x36		caption/Orphan comments · reattach
+186:13	560x36		caption/Orphan comments · dismissed
+189:104	300x144		caption/Inspector · reach-whole-site
+199:2	1440x900	199:205	Shell state 2 · Returning (default)
+199:205	1440x900	66:4	Shell state 3 · Element selected
+199:409	1440x900	199:2	Shell state 5 · Drawer closed
+200:2	1440x900	200:213	Shell state 6 · Comment mode
+200:213	1440x900	199:2	Shell state 8 · Review active
+201:2	1200x18		caption/Shell state 2 · Returning (default)
+201:3	1200x18		caption/Shell state 3 · Element selected
+201:4	1200x18		caption/Shell state 5 · Drawer closed
+201:5	1200x36		caption/Shell state 6 · Comment mode
+201:6	1200x18		caption/Shell state 8 · Review active
+202:2	1280x720		Shell · 1280 · pin auto-released (overlay) — RETIRED 2026-09-04
+202:204	1200x36		caption/Shell · 1280 · pin auto-released (overlay)
+204:2	1200x18		caption/Shell state 1 · First run
+204:3	1200x18		caption/Shell state 4 · Multi-select
+204:4	1200x18		caption/Shell state 7 · Preview
+204:5	1200x18		caption/Shell state 9 · AI agent run
+204:6	1200x18		caption/Shell state 10 · Offline
+204:7	1200x18		caption/Shell state 11 · Saving → conflict
+204:8	1200x18		caption/Shell state 12 · Loading
+294:1975	485x24		——— PRD gap-fill · J1 Discover & onboard ———
+294:1976	1440x900	1347:7162	S1.5 · session-expired
+294:1983	271x19		S1.5 · Load-error — session expired
+294:1984	1440x900	294:1992	S1.5 · network-error
+294:1991	256x19		S1.5 · Load-error — network error
+294:1992	1440x900	52:2	S1.5 · retrying
+294:1999	212x19		S1.5 · Load-error — retrying
+295:1972	1440x900		S1.3 · new-page · 3-way
+295:1988	355x19		S1.3 · New-page choice — blank · template · AI
+295:1989	1440x900	52:2	S1.3 · new-page · loading — RETIRED 2026-09-02
+295:1993	206x19		S1.3 · New-page — loading
+295:1994	1440x900	295:1972	S1.3 · new-page · error — RETIRED 2026-09-02
+295:2001	243x19		S1.3 · New-page — error + retry
+296:1972	1440x900	296:1999	S1.4 · 0 of 7
+296:1973	204x19		S1.4 · Onboarding — 0 of 7
+296:1999	1440x900	296:2030	S1.4 · 4 of 7
+296:2000	204x19		S1.4 · Onboarding — 4 of 7
+296:2030	1440x900	1342:7162	S1.4 · 7 of 7
+296:2031	203x19		S1.4 · Onboarding — 7 of 7
+296:2065	267x19		S1.4 · Onboarding — minimized-pill
+296:2070	237x19		S1.4 · Onboarding — dismissed
+297:1972	1440x900	52:2	S1.1 · coach-dismissed
+297:2026	471x19		S1.1 · First-open — coach dismissed (1 coach nodes removed)
+297:2027	1440x900	52:2	S1.2 · crash-recovery
+297:2138	319x19		S1.2 · Returning — crash-recovery banner
+297:2139	1440x900	52:2	S1.2 · load-error
+297:2248	221x19		S1.2 · Returning — load-error
+299:1972	1730x24		——— PRD gap-fill · J2 AI-draft — DECIDED 2026-07-22: editor keeps edit-AI (S2.5) only; S2.1–S2.3 = reference for the ONBOARDING AI path (real), not an editor build target ———
+299:1977	172x19		S2.1 · AI brief — empty
+299:2001	161x19		S2.1 · AI brief — filled
+299:2025	206x19		S2.1 · AI brief — submitting
+299:2033	281x19		S2.3 · Result — accept or regenerate
+299:2046	192x19		S2.3 · Result — accepted
+299:2056	218x19		S2.3 · Result — regenerating
+300:2000	192x19		S2.2 · Generating — slow
+300:2017	278x19		S2.4 · AI unavailable — generic error
+300:2057	275x19		S2.5 · AITab — reject (edit reverted)
+301:1978	438x24		——— PRD gap-fill · J3 Build the page ———
+301:1979	1440x900	807:7301	S3.1 · dragging
+301:2185	194x19		S3.1 · Canvas — dragging
+301:2186	1440x900	301:2393	S3.1 · pick-mode
+301:2392	207x19		S3.1 · Canvas — pick-mode
+301:2393	1440x900	301:1979	S3.1 · inline-edit
+301:2599	203x19		S3.1 · Canvas — inline-edit
+302:1978	1440x900	302:2004	S3.7 · page-settings · SEO
+302:2003	238x19		S3.7 · Page settings — SEO tab
+302:2004	1440x900	302:2026	S3.7 · page-settings · Social
+302:2025	252x19		S3.7 · Page settings — Social tab
+302:2026	1440x900	302:1978	S3.7 · page-settings · Advanced
+302:2047	283x19		S3.7 · Page settings — Advanced tab
+303:1996	265x19		S3.14 · Command palette — recent
+303:1997	280x812	303:2032	S3.6 · media · editing
+303:2031	284x19		S3.6 · Media — editing (image editor)
+303:2032	280x812	303:1997	S3.6 · media · optimizing
+303:2066	199x19		S3.6 · Media — optimizing
+303:2082	264x19		S3.12b · Data binding — no-source
+303:2098	256x19		S3.12b · Data binding — watching
+304:2052	436x19		S3.13 · Ecommerce — setup (CollectionSetupModal, 720)
+304:2085	536x19		S3.13 · Ecommerce — sample-added → the toast (no separate screen)
+304:2107	510x19		S3.13 · Ecommerce — bound (generic CMS binding, inspector 300)
+306:2048	393x24		——— PRD gap-fill · J4 On-brand ———
+306:2049	280x812	306:2080	Brand · tokens · add
+306:2079	143x18		S4.1 · Tokens — add
+306:2080	280x812	306:2049	Brand · tokens · replace
+306:2110	169x18		S4.1 · Tokens — replace
+306:2111	280x812	306:2136	Brand · presets · bound — UNBUILDABLE — elements carry no preset reference; TokenUsageTracker counts tokens (SectionStatusBadge.tsx:17-29)
+306:2135	168x18		S4.2 · Presets — bound
+306:2136	280x812	306:2161	Brand · presets · unbound — UNBUILDABLE — same cause as 306:2111
+306:2160	186x18		S4.2 · Presets — unbound
+306:2161	280x812	306:2111	Brand · presets · draft — UNBUILDABLE today — updatePreset/addPreset/deletePreset have zero UI callers, so isDirty is permanently false (usePresetsForCategory.ts:67-88)
+306:2185	157x18		S4.2 · Presets — draft
+306:2186	280x812		Brand · starters · applied
+306:2216	179x18		S4.3 · Starters — applied
+306:2217	280x812		Brand · lint · suppressed
+306:2231	199x18		S4.4 · DS lint — suppressed
+306:2232	280x812	306:2265	Brand · export · exported
+306:2264	233x18		S4.5 · Import/export — exported
+306:2265	280x812	306:2298	Brand · export · imported
+306:2297	233x18		S4.5 · Import/export — imported
+306:2298	280x812	306:2232	Brand · export · error
+306:2330	203x18		S4.5 · Import/export — error
+307:2192	534x24		——— PRD gap-fill · J5 Approval gate + Chrome ———
+307:2193	1440x900	130:201	S5.4 · gate · pending
+307:2202	242x19		S5.4 · Approval gate — pending
+307:2203	1440x900	132:2	S5.4 · gate · changes-requested
+307:2212	327x19		S5.4 · Approval gate — changes requested
+307:2213	1440x900	128:2	S5.4 · gate · no-review-sent
+307:2222	291x19		S5.4 · Approval gate — no review sent
+307:2231	648x19		C6 · Recovery banner — restore unsaved work on reopen (engine RecoveryManager)
+309:2192	417x24		——— PRD gap-fill · J6 Publish flow ———
+309:2202	168x19		S6.1 · Publish — ready
+309:2212	239x19		S6.1 · Publish — connect Vercel
+309:2220	204x19		S6.1 · Publish — publishing
+309:2233	151x19		S6.1 · Publish — live
+309:2245	167x19		S6.1 · Publish — failed
+396:2407	416x38		S2.2 · Generating — streaming (decision-gated: J2 build-or-cut banner)
+396:2408	360x38		S2.2 · Generating — cancel-confirm (steps applied stay)
+429:2348	904x34		B9 · Code-ahead surfaces — as-built design records (2026-07-25)
+429:2349	707x34		These six surfaces shipped in code before a board existed. Each board documents the surface as built and fixes it to the canonical light theme + Figma 32-2 tokens — the board is now the visual source of truth.
+429:2350	1120x701	807:8342	B9.1 · Animation editor — Entrance · Attention · Exit
+429:2524	1120x15		caption/B9.1 Animation editor
+430:2348	1440x852		Onboarding · achievement prompt · step complete (code: AchievementPrompt.tsx)
+430:2374	1200x57		caption/B9.2
+430:2375	1440x852		Onboarding · achievement prompt · final step (code: AchievementPrompt.tsx)
+430:2396	1200x38		caption/B9.3
+433:2348	680x402		History · milestone suggestion banner (code: MilestoneSuggestionBanner.tsx)
+433:2390	680x114		caption/B9.4 Milestone banner
+433:2391	1040x470		B9.5 · Migration progress modal — running · failed
+433:2443	1040x76		caption/B9.5 Migration modal
+434:2426	1200x57		caption/B9.6 Project settings modal
+435:2348	1080x920		Pages · page tab bar (code: PageTabBar.tsx)
+435:2437	1080x95		caption/B9.7 Page tab bar
+453:3931	280x812	144:2	Media · load-error
+453:3969	320x90		caption/Media · load-error
+453:3974	280x812	158:2	Review panel · load-error
+453:4005	320x75		caption/Review panel · load-error
+453:4010	280x812	149:50	Content · load-error
+453:4026	320x75		caption/Content · load-error
+453:4031	280x776	162:2	History · Saves · load-error
+453:4046	360x60		caption/Versions · load-error
+453:4051	360x776	165:2	Notifications · load-error
+453:4059	360x45		caption/Notifications · load-error
+453:4064	1440x900	184:2	History · Published · failed
+453:4075	1200x30		caption/Rollback · failed
+463:2378	1200x76		caption/S1 · Editor — ASSEMBLED
+638:2378	1440x900	52:2	S7 · Settings · General
+638:3070	1440x900		S7 · Settings · SEO
+639:2754	1440x900		S7 · Settings · Export
+639:3092	1440x900	807:8756	S7 · Settings · Domains
+639:3443	1440x900		S7 · Settings · Analytics
+639:3795	1440x900		S7 · Settings · Localization
+639:4144	1440x900		S7 · Settings · Custom code
+640:2440	1440x900		S7 · Settings · Redirects
+640:2789	1440x900		S7 · Settings · Headers
+640:3135	1440x900		S7 · Settings · Forms
+640:3488	1440x900		S7 · Settings · Integrations
+640:3849	1440x900		S7 · Settings · Webhooks
+641:2652	280x812	833:4518	Publish · panel
+642:3696	1440x900	52:2	[design-ahead] Shell state 13 · Presence (multiplayer)
+774:4044	280x812	141:2	Pages · loading — RETIRED 2026-09-02 (no producer)
+775:4053	280x812	138:2	Insert · loading — RETIRED 2026-09-02 (no producer)
+775:4130	280x812	143:2	Layers · loading
+775:4241	280x812	149:7	Content · loading
+775:4305	280x812	152:52	Brand · loading
+777:4093	280x812	146:2	Media · loading
+778:4238	280x812		Publish · loading
+781:4154	280x812	138:2	Insert · load-error — RETIRED 2026-09-02 (no producer)
+781:4217	280x812	143:2	Layers · load-error
+781:4311	280x812	152:52	Brand · load-error
+781:4489	280x812		Publish · load-error
+782:4212	280x812	141:2	Pages · no-results
+782:4260	280x812	143:2	Layers · no-results
+782:4353	280x812	146:2	Media · no-results
+784:4250	280x812	817:5220	Publish · publishing
+784:4326	280x812	807:8787	Publish · live
+784:4403	280x812		Publish · failed
+784:4480	280x812		Publish · not-connected
+788:4299	320x54		caption/Insert · loading
+788:4300	320x54		caption/Insert · load-error
+788:4301	320x54		caption/Pages · loading
+788:4302	320x36		caption/Pages · no-results
+788:4303	320x54		caption/Layers · loading
+788:4304	320x36		caption/Layers · load-error
+788:4305	320x36		caption/Layers · no-results
+788:4306	320x54		caption/Media · loading
+788:4307	320x54		caption/Media · no-results
+788:4308	320x36		caption/Content · loading
+788:4309	320x36		caption/Brand · loading
+788:4310	320x36		caption/Brand · load-error
+788:4311	320x36		caption/Templates · loading
+788:4312	320x36		caption/Templates · load-error
+788:4313	320x36		caption/Templates · no-results
+788:4314	320x54		caption/Components · loading
+788:4315	320x54		caption/Components · load-error
+788:4316	320x54		caption/Publish · loading
+788:4317	320x36		caption/Publish · load-error
+788:4318	320x54		caption/Publish · publishing
+788:4319	320x54		caption/Publish · live
+788:4320	320x54		caption/Publish · failed
+788:4321	320x54		caption/Publish · not-connected
+807:6557	1440x36		caption/S1.1b - First run - Browse templates
+807:6558	1440x900	199:205	S1.1c - First run - Start blank (Insert drawer opens)
+807:6693	1440x36		caption/S1.1c - First run - Start blank
+807:6964	1440x54		caption/S1.1d - Template applied
+807:6999	1080x54		caption/S1.2d - Conflict - Review both
+807:7000	1440x900	199:2,52:2	S1.2e - Offline - Connection restored (syncing banner)
+807:7251	1440x36		caption/S1.2e - Offline - Connection restored
+807:7297	1440x54		caption/S1.3b - New page - Template picker
+807:7301	1440x900	815:4608	S3.2 · drop-target · insertion-indicators
+807:7521	1440x54		caption/S3.2 - drop-target - insertion-indicators
+807:7775	1440x900	814:7027	S3.3 · context-menu · right-click
+807:8068	1440x54		caption/S3.3 - context-menu - right-click
+807:8069	1440x900	807:8663	S3.4 · responsive-viewport · breakpoint-bar
+807:8341	1440x54		caption/S3.4 - responsive-viewport - breakpoint-bar
+807:8342	300x812	807:8412	Inspector · profile · TEXT
+807:8412	300x812	807:8475	Inspector · profile · FLEX
+807:8475	300x812	807:8521	Inspector · profile · GRID
+807:8521	300x812	807:8567	Inspector · profile · MEDIA
+807:8567	300x812	807:8614	Inspector · profile · BUTTON
+807:8614	300x812	159:123	Inspector · profile · INPUT
+807:8659	1896x54		caption/S3.5 - inspector-element-profiles
+807:8663	1440x900	817:4856	S3.8 · preview-responsive · mobile-device-frame
+807:8722	1440x54		caption/S3.8 - preview-responsive - mobile-device-frame
+807:8723	1440x900	132:2	S5.5 · reviewer-view · external-reviewer
+807:8755	1440x54		caption/S5.5 - reviewer-view - external
+807:8756	1440x900	639:3092	S6.2 · custom-domain · DNS-verification
+807:8786	1440x54		caption/S6.2 - custom-domain - DNS-verification
+807:8787	1440x900	641:2652	[not-implemented] S6.3 · publish-changelog · diff-summary
+807:8837	1440x54		caption/S6.3 - publish-changelog - diff-summary
+813:4520	1440x54		caption/S1.1e - template-preview - full-page
+813:4835	1440x36		caption/S1.6 - viewer-editor-state - read-only
+813:4836	1440x360	52:2	S1.2f · save-indicator · 5-states
+813:4869	1440x54		caption/S1.2f - save-indicator - 5-states
+813:4887	1440x54		caption/S1.5b - session-expired - unsaved-changes
+813:4888	1440x900	52:2	S1.2g · force-refresh · new-version-available
+813:4898	1440x54		caption/S1.2g - force-refresh - new-version
+814:7027	1440x320	817:4649	S3.9 · undo-redo-toast · 6-variants
+814:7065	1440x36		caption/S3.9 - undo-redo-toast
+815:4518	640x934	807:7775	S3.10 · keyboard-shortcuts-overlay
+815:4607	640x90		caption/S3.10 - keyboard-shortcuts-overlay
+815:4608	1080x680	301:2186	S3.11 · smart-guides-snap-indicators
+815:4648	1080x72		caption/S3.11 - smart-guides-snap
+817:4649	1440x500	817:4723	Canvas · toolbar states
+817:4722	1440x54		caption/S3.12 - canvas-toolbar-states
+817:4723	900x480	813:4836	Canvas · zoom levels
+817:4772	900x72		caption/S3.13 - zoom-level-states
+817:4773	800x918		caption/J2-deep-pass-addendum
+817:4774	480x560	52:2	[not-implemented · superseded by 988:2 · Site · Access] Preview · share link — same hand-off; share links are owned by access-tab.tsx + share-link.service.ts
+817:4855	480x144		caption/S4.1 - share-preview-link
+817:4856	1080x540	52:2	[not-implemented] Preview · interaction test
+817:4898	1080x72		caption/S4.2 - preview-interaction-test
+817:4899	280x812	154:2	[not-implemented] Preview · accessibility checker
+817:4949	320x216		caption/S4.4 - accessibility-checker
+817:4950	480x632	817:5289	[design-ahead] Preview · performance audit
+817:5004	480x162		caption/S4.5 - performance-lighthouse
+817:5005	800x846		caption/J3-deep-pass-addendum
+817:5006	1200x520	132:2	[design-ahead] S5.7 · comment-thread-micro-states
+817:5068	1200x72		caption/S5.7 - comment-thread-micro
+817:5113	520x144		caption/S5.9 - share-permissions
+817:5114	360x812	52:2	S5.10 · activity-log
+817:5194	360x234		caption/S5.10 - activity-log
+817:5195	800x360	52:2	[design-ahead] S5.8 · multiplayer-cursor-following
+817:5218	800x108		caption/S5.8 - multiplayer-following
+817:5219	800x846		caption/J4-deep-pass-addendum
+817:5220	520x548	641:2652	[not-implemented] S6.4 · deploy-progress-pipeline
+817:5261	520x144		caption/S6.4 - deploy-progress
+817:5262	440x548	641:2652	[design-ahead] S6.5 · scheduled-publish
+817:5287	440x180		caption/S6.5 - scheduled-publish
+817:5288	800x558		caption/J5-deep-pass-addendum
+817:5289	800x480	52:2	[design-ahead] S7.1 · site-health-monitor · with-incidents (filled half of a pair — 1157:4649 is the empty half, NOT a duplicate)
+817:5362	800x108		caption/S7.1 - site-health-monitor
+817:5432	520x162		caption/S7.2 - backup-restore
+817:5433	800x1044		caption/J6-deep-pass-addendum-FINAL
+817:5434	671x39		SHELL STATES — Editor Chrome Reference
+817:5435	4000x2		Rectangle
+817:5436	445x39		J1 — DISCOVER & ONBOARD
+817:5437	4000x2		Rectangle
+817:5438	350x39		J2A — AI DRAFT PATH
+817:5439	4000x2		Rectangle
+817:5440	606x39		J2B — BUILD A PAGE (Canvas & Editor)
+817:5441	4000x2		Rectangle
+817:5442	353x39		J3 — PREVIEW & TEST
+817:5443	4000x2		Rectangle
+817:5444	489x39		J4 — COLLABORATE & REVIEW
+817:5445	4000x2		Rectangle
+817:5446	334x39		J5 — PUBLISH & SHIP
+817:5447	4000x2		Rectangle
+817:5448	783x39		J6 — MAINTAIN & SCALE (Settings, Brand, Health)
+817:5449	4000x2		Rectangle
+817:5450	755x39		PANELS — Left Rail Drawers & Secondary Panels
+817:5451	4000x2		Rectangle
+817:5452	1009x39		SECONDARY — Inspector, AI, Compare, Modal, Data, Ecommerce
+817:5453	4000x2		Rectangle
+817:5454	845x39		REFERENCE — Proofs, Permissions, Architecture Docs
+817:5455	4000x2		Rectangle
+817:5456	603x39		LABELS — Original screen annotations
+817:5457	4000x2		Rectangle
+824:5095	300x552	876:4532	Inspector · flat scroll body (profile-ordered; tabs exist in data, not UI)
+833:4518	520x439		Publish · pre-checks
+839:6646	309x29		📋 12-POINT UX ANALYSIS
+839:6647	342x29		PHASE 1 — SHELL (SH1–SH6)
+839:6648	511x29		PHASE 1 — BUILD WORKSPACE (BW1–BW8)
+839:6649	464x29		PHASE 2 — DESIGN TOKENS (DS1–DS8)
+839:6650	365x29		PHASE 2 — ASSETS (AS1–AS8)
+839:6651	332x29		PHASE 2 — DATA (DT1–DT8)
+839:6652	454x29		PHASE 2 — ELEMENT CONFIG WIZARD
+839:6653	725x29		PHASE 3 — REVIEW, HISTORY, ACTIVITY, SHARE, COMMENTS
+839:6654	487x29		PHASE 4 — PUBLISH, SETTINGS, DOMAIN
+839:6655	536x29		PHASE 5 — AI, COMMAND K, QUICK ACTIONS
+839:6656	1064x29		PHASE 6 — ERROR RECOVERY, FIND/REPLACE, BULK TOKENS, WHAT'S NEW, ONBOARDING
+839:6657	265x29		INSPECTOR REDESIGN
+862:6859	5080x28298		📄 Reference — specs, stress boards & completeness proofs
+862:6860	1360x19723		📄 Reference — UX analysis docs
+876:4532	1440x1163		Reference · index
+878:4518	440x548	641:2652	[design-ahead] S6.5b · scheduled-publish · scheduled
+878:4543	440x169		[design-ahead] S6.5c · scheduled-publish · cancel-confirm
+879:4518	520x185		[design-ahead] History · Backups · restore-confirm
+879:4526	440x141	879:4531	[design-ahead] History · Backups · restoring
+879:4531	440x169	950:4474	[design-ahead] History · Backups · restored
+879:4536	440x121	950:4474	[design-ahead] History · Backups · creating
+879:6896	480x141	817:4950	[design-ahead] Preview · performance audit · running
+879:6901	520x259		[design-ahead] Preview · performance audit · issue detail
+893:4518	520x439		Publish · pre-checks · blocked
+32:2	300x776	876:4532	Inspector · profile · CONTAINER (fallback)
+912:4520	520x617		[design-ahead] Publish · Options
+914:4507	520x361		Publish · Confirm
+927:4474	520x216		Exit · Workspace (leaves the editor)
+949:4474	280x776		History · Published (tab)
+950:4474	360x776		[design-ahead] History · Backups (tab)
+957:4474	5520x3956		🗃️ Archive — superseded
+963:4474	1440x900	876:4532	Shell · 360 overlay panel (slot proof)
+1054:4527	187x39		Shell States
+1054:4528	82x19		41 screens
+1054:4529	174x39		Left Panels
+1054:4530	84x19		85 screens
+1054:4531	372x39		Inspector / Right Panels
+1054:4532	74x19		8 screens
+1054:4533	864x39		Right Drawers (Review, History, AI, Comments, Publish)
+1054:4534	84x19		48 screens
+1054:4535	279x39		Command Palette
+1054:4536	74x19		6 screens
+1054:4537	144x39		Compare
+1054:4538	74x19		8 screens
+1054:4539	255x39		Feature Screens
+1054:4540	84x19		55 screens
+1054:4541	185x39		Onboarding
+1054:4542	74x19		2 screens
+1054:4543	374x39		Design-ahead / Preview
+1054:4544	82x19		19 screens
+1054:4545	328x39		Notifications & Other
+1054:4546	79x19		11 screens
+1054:4547	227x39		Miscellaneous
+1054:4548	84x19		26 screens
+1061:4527	187x39		Insert Panel
+1061:4528	82x19		14 screens
+1069:4529	280x812		Insert · elements-expanded
+1069:4707	280x812		Insert · blocks-expanded
+1073:4527	415x39		Layers Panel
+1082:4527	280x812		Layers · context-menu
+1082:4589	280x812		Layers · renaming
+1082:4640	280x812		Layers · expanded
+1082:4739	280x812		Layers · component-instance — NOT A STATE — a per-row badge gated on composer.components.isInstance (LayerTreeItem.tsx:115,256-264)
+1082:4835	280x812		Layers · scroll-overflow — NOT A STATE — a scroll condition of .bdc-pbody-scroll (LayersTab.tsx:184)
+1082:5004	280x812		Layers · list-view — UNBUILDABLE — no list-view exists; zero hits for list-view/listView/viewMode under panels/layers/
+1084:4527	3120x6676		🔍 REVIEW · Templates + Components — 2026-08-06
+1090:4527	880x1032		🔍 REVIEW · Insert — inline expanded (3 boards)
+1114:13298	384x39		label/Insert
+1114:13299	394x39		label/Pages
+1114:13300	400x39		label/Layers
+1114:13301	391x39		label/Media
+1114:13302	419x39		label/Content
+1114:13303	394x39		label/Brand
+1124:4527	1000x700		S3.6 · media · image-editor (modal)
+1124:4562	280x812		S3.6 · media · optimise (drill-in)
+1138:4527	280x812	158:2	Review panel · loading
+1138:4573	360x776	162:2	History · Saves · loading
+1138:13376	280x812	152:52	Brand · empty — RETIRED 2026-09-02 (no producer)
+1138:13394	280x812	137:2	Components · empty
+1138:13413	280x812	137:2	Templates · empty
+1138:13436	1440x900		S7 · Settings · Custom code · locked (Pro)
+1156:4593	440x548	641:2652	[design-ahead] S6.5d · scheduled-publish · invalid-date
+1156:4620	360x776		[design-ahead] History · Backups · empty
+1156:4665	440x169	950:4474	[design-ahead] History · Backups · restore-failed
+1157:4593	480x470	817:5289	[design-ahead] Preview · performance audit · all-clear
+1157:4649	800x480	52:2	[design-ahead] S7.1 · site-health-monitor · healthy (empty half of a pair — 817:5289 is the filled half, NOT a duplicate)
+1159:4593	1440x900		Media · fullpage · library
+1162:4617	1440x900		Media · fullpage · empty
+1163:4641	1440x900		Media · fullpage · list-view · bulk-select
+1163:13695	1440x900		Media · fullpage · unused-scope · context-menu
+1163:13948	1440x900		Media · fullpage · drag-over · uploading
+1164:4713	640x520		Media · modal · picker (choose for element)
+1164:4738	520x300		Media · modal · replace-across-site
+1168:4713	520x262		Publish · stale-approval (modal)
+1168:4732	500x247		Publish · issues-confirm (publish anyway)
+1169:4713	480x140	137:2	Templates · replace-confirm (modal)
+1169:4725	1068x102	137:2	Templates · create-page — confirm · success · error
+1169:4753	460x142	137:2	Templates · save-as-template (modal)
+1169:4764	380x139	137:2	Templates · usage-drawer
+1170:4713	500x474		Content · collection-setup (modal)
+1170:4749	640x350		Content · records (modal)
+1170:4777	720x740	1082:4527	Components · create (modal)
+1170:4792	684x154	1138:13394	Components · variant-picker · detach-confirm
+1171:4713	280x812	141:2	Pages · context-menu
+1171:4767	280x812	141:2	Pages · command-palette (⌘K)
+1171:4820	440x117		Pages · settings · unsaved-warning (modal)
+1171:4829	280x812	143:2	Layers · display-settings
+1172:4804	1308x117		Exit · guard — dirty · risky-offline · stranded
+1172:4825	560x293	1171:4767	Export · HTML (modal)
+1172:4840	520x239		Brand · review-changes (modal)
+1172:4867	560x244	1171:4767	Project settings (modal — ⌃,)
+1174:4849	948x80		Media · modal · replace-across · result-states
+1175:4804	420x225		Upgrade modal (403 gate)
+1175:4827	440x202		Media · delete-confirm · bulk type-DELETE (>20)
+1175:4841	300x169		Inspector · empty · template-applied — UNBUILDABLE as shipped — the appliedName branch exists but nothing writes buildrick-last-applied-template (InspectorEmptyState.tsx:44,27)
+1175:4849	720x36		Canvas · breadcrumb bar
+1176:4804	236x184		Inspector · token-picker popover
+1176:4824	605x33		Canvas · inline-edit toolbar (18 controls)
+1176:4866	402x238		Canvas · context-menu · submenu anatomy
+1176:4925	980x145		Canvas · hover levels — minimal · Alt · Alt+Shift · clone
+1177:4804	520x426		Canvas · command palette (⌘⇧P)
+1177:4859	460x445		Reference · toast catalog — 5 tones · sticky class
+1205:4804	520x179		Media · modal · import-url
+1205:4816	520x202		Media · modal · import-url · invalid
+1205:4829	240x330		Media · fullpage · folders · new-folder (inline)
+1306:2	580x520		S3.7 · page-settings · SEO — from code 2026-08-24 — RETIRED 2026-09-02, duplicate capture of 302:1978 (boards.json: out-of-scope, authority code:capture)
+1333:7162	280x812		Brand · root — NEW 2026-08-27 (CURRENT)
+1339:7162	1280x720		Client sign-off · A0 · identify · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1339:7171	1280x720		Client sign-off · A · viewing · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1339:7186	1280x720		Client sign-off · D · approved · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1339:7193	1280x720		Client sign-off · C · changes-requested · 1280 — TERMINAL by design — the branch renders text + 'Signed as', zero controls (review-client.tsx:287-298,247-272) — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1339:7200	1280x720		Client sign-off · F · dead-link · expired · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1339:7207	1280x720		Client sign-off · F · dead-link · revoked · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1339:7214	1280x720		Client sign-off · F · dead-link · not-found · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1339:7221	1280x720		Client sign-off · F · dead-link · conflict · 1280 — UNBUILDABLE — clientReview.get throws only INVALID_TOKEN/REVOKED/EXPIRED; CONFLICT comes from resolveReview, whose error is never rendered (client-review.service.ts:119-125, 278-280) — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1340:7162	1280x720		Client sign-off · B · commenting · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1340:7174	1280x720		Client sign-off · E · post-approval-edited · 1280 — echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state
+1342:7162	1440x360		S1.4 · setup-chip · footer-band — NEW 2026-08-28
+1343:7162	1440x900	1175:4849	S1.6 · view-mode · stripped-chrome — NEW 2026-08-28
+1344:7162	1440x400		S7.0 · navigation-model · drill-in — NEW 2026-08-28 — RETIRED 2026-09-02, not a screen (1440x400, two text nodes documenting the drill-in model SettingsTab.tsx:403-421 already implements)
+1344:7165	720x560		S7.2 · Branding · pointer — NEW 2026-08-28
+1345:7162	1440x480		S2.0 · ai-chat-model — NEW 2026-08-28 — RETIRED 2026-09-02
+1347:7162	720x520		S1.5b · session-expired · unsaved-warning — NEW 2026-08-28
+1688:7195	1440x900	52:2	S7 · Settings · root — NEW 2026-09-02 (from SettingsTab.tsx:75-92 NAV)
+1702:6931	1440x900	807:8756	S7 · Settings · Domains · loading
+1702:7095	1440x900	807:8756	S7 · Settings · Domains · empty
+1702:7261	1440x900	807:8756	S7 · Settings · Domains · load-error
+1702:7425	1440x900	807:8756	S7 · Settings · Domains · save-error
+1703:7127	1440x900	639:3795	S7 · Settings · Localization · loading
+1703:7286	1440x900	639:3795	S7 · Settings · Localization · load-error
+1703:7445	1440x900	639:3795	S7 · Settings · Localization · save-error
+1703:7606	1440x900	640:2789	S7 · Settings · Headers · loading
+1703:7760	1440x900	640:2789	S7 · Settings · Headers · load-error
+1703:7914	1440x900	640:2789	S7 · Settings · Headers · save-error
+1703:8070	1440x900	640:2440	S7 · Settings · Redirects · loading
+1703:8232	1440x900	640:2440	S7 · Settings · Redirects · empty
+1703:8394	1440x900	640:2440	S7 · Settings · Redirects · load-error
+1703:8556	1440x900	640:2440	S7 · Settings · Redirects · save-error
+1703:8720	1440x900	640:3135	S7 · Settings · Forms · loading
+1703:8882	1440x900	640:3135	S7 · Settings · Forms · empty
+1703:9046	1440x900	640:3135	S7 · Settings · Forms · error
+1703:9208	1440x900	640:3135	S7 · Settings · Forms · action-error
+1703:9370	1440x900	640:3135	S7 · Settings · Forms · inbox-loading
+1703:9532	1440x900	640:3135	S7 · Settings · Forms · inbox-empty
+1703:9694	1440x900	640:3849	S7 · Settings · Webhooks · loading
+1703:9857	1440x900	640:3849	S7 · Settings · Webhooks · empty
+1703:10022	1440x900	640:3849	S7 · Settings · Webhooks · load-error
+1703:10185	1440x900	640:3849	S7 · Settings · Webhooks · save-error
+1703:10352	1440x900	640:3849	S7 · Settings · Webhooks · forbidden
+1703:10515	1440x900	639:3443	S7 · Settings · Analytics · validation
+1704:8205	280x812	949:4474	History · Published · loading
+1704:8256	280x812	949:4474	History · Published · load-error
+1704:8309	280x812	949:4474	History · Published · empty
+1704:8361	280x812	146:2	Media · drill-in · used-in · empty
+1704:8396	280x812	146:2	Media · drill-in · versions · empty
+1704:8448	280x812	144:2	Media · drill-in · icon-picker · no-results
+1704:8514	280x812	146:2	Media · filter-empty
+1704:8575	280x812	153:29	Brand · classes · empty
+1704:8607	280x812	153:57	Brand · components · saved-empty
+1705:8286	280x812	149:84	Content · collection · empty
+1705:8339	280x812	151:87	Content · variables · empty
+1705:8378	280x812	148:2	Content · conditions · empty
+1705:8408	280x812	151:2	Content · record · save-error
+1705:8454	280x812	151:87	Content · variables · key-error
+1705:8494	280x812	157:58	Review · comment-update-failed
+1705:8566	280x812	157:58	Review · reply-failed
+1705:8636	280x812	157:58	Review · round-history · load-error
+1705:8704	280x812	157:58	Review · reply-composer band
+1705:8773	280x812	157:58	Review · foot · revoke + invite
+1705:8842	280x812	145:49	Media · search-scope · truncated
+1705:8889	280x812	145:49	Media · search-scope · failed
+1706:8433	720x80	1170:4749	Modal · CMS records · no-collections
+1706:8437	720x162	1170:4749	Modal · CMS records · none-published
+1706:8444	720x188	1170:4749	Modal · CMS records · empty
+1706:8451	720x180	1170:4749	Modal · CMS records · publish-error
+1706:8458	720x132	807:8342	Modal · Inspector · delete-confirm
+1706:8467	720x228	1333:7162	Modal · Brand · AI prompt · idle
+1706:8476	720x227	1706:8467	Modal · Brand · AI prompt · generating
+1706:8483	720x236	1706:8476	Modal · Brand · AI prompt · success
+1706:8492	720x147	1706:8476	Modal · Brand · AI prompt · error
+1706:8501	380x225	1082:4527	Modal · Add Child Element
+1706:8505	580x121	140:2	Modal · page-settings · save-failed
+1706:8509	580x116	140:2	Modal · page-settings · crash
+1707:8406	228x162	1176:4804	Popover · Inspector · token-picker · empty
+1707:8417	240x113	1176:4804	Popover · Inspector · token-picker · no-results
+1707:8427	240x158	807:8342	Popover · Inspector · binding · no-records
+1707:8433	248x84	1176:4824	Popover · Canvas · AI · prompt
+1707:8436	248x34	1707:8433	Popover · Canvas · AI · streaming
+1707:8452	248x112	1707:8436	Popover · Canvas · AI · diff
+1707:8455	248x40	1707:8436	Popover · Canvas · AI · error
+1707:8456	300x812	159:102	Inspector · error-boundary
+1716:8391	720x600	147:55	Media · stock · photos · results
+1716:8453	720x400	1716:8391	Media · stock · searching
+1716:8497	720x400	1716:8453	Media · stock · no-results
+1716:8541	720x340	1716:8391	Media · stock · icons · empty
+1716:8557	720x460	1716:8391	Media · stock · quota-strip
+1717:17203	420x260	144:2	Media · context-menu · move-to-folder · no-folders
+1717:17217	280x320	140:2	Pages · rename · name-conflict
+1717:17235	280x300	1717:17246	Review · compare · load-error
+1717:17246	280x260	156:2	Review · compare · loading
+1719:8391	720x400	137:2	Ecommerce · collection-setup (modal)
+1719:8414	360x72	1719:8391	Ecommerce · collection-created · toast
+1719:8420	360x52		Toast.tsx bottom-right, 360w, tone success. The no-sample branch reads 'Products collection created'. There is NO 'sample-added' screen — the checkbox is inside the setup modal and is checked by default, so it would be the same drawing.
+1719:8421	300x230	1719:8450	Ecommerce · bound · inspector
+1719:8443	240x132	807:8342	Ecommerce · bind · popover · collections
+1719:8450	240x300	1719:8443	Ecommerce · bind · popover · fields
+1738:8394	720x440	1716:8453	Media · stock · search-failed

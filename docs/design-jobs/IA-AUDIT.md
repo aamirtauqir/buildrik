@@ -114,6 +114,47 @@ Brand row now reads **"Component styles"** — its own hint already said that is
 what it is. The other three are genuinely different jobs and keep their names;
 Insert's is scoped inside Insert, so context disambiguates it.
 
+### IA-12 · "Brand" and "Design system" are one destination with two names — **Major, fixed**
+
+`SiteMenu.tsx:244` rendered `Design system`; it calls `onOpenDesignSystem`,
+which is `openLeftPanelToTab("design")` — the exact tab the rail's **Brand**
+button opens, and the panel that appears is headed `Brand`. Two names for one
+screen is a door the user has to learn twice. **The menu row now reads
+"Brand."**
+
+### IA-13 · Copy naming a control that does not exist — **Minor, fixed**
+
+Brand › Components told the user *"Components live as their own **rail**
+panel"* and referred to *"the **Design tab**"*. There is no Components button
+in the shipping 6-item rail, and the panel is headed Brand. Both corrected.
+Same defect class as a two-named door: the interface describing itself wrongly.
+
+### IA-14 · Three rail hierarchies live in the code; a flag picks one — **Major, open**
+
+`rail/tabsConfig.ts` carries a legacy 11-button zone rail, a 4-tool E3 rail
+(`?rail=e3`), and the shipping 6-item Figma rail — its own comment calls this
+"a THIRD render source". The live rail matches the Figma one exactly today, and
+nothing prevents drift back. **Recommendation:** delete the two dead renderers
+or gate them behind a loud dev-only flag, so there is one navigation model in
+the code and not just in what happens to ship.
+
+### IA-15 · Insert and Layers open with no purpose copy — **Minor, open**
+
+Measured live with storage cleared: `Insert` and `Layers` render a title and
+raw content and nothing else, while Content, Media and Pages each give a
+sentence or a CTA in the same state. Layers is weakest — a search box, one
+truncated row and "1 layer".
+
+> I had dropped this finding earlier after reading `LayersEmptyState.tsx`,
+> which does explain itself. Both are true: the EMPTY state speaks, the
+> POPULATED state — the one a returning user sees — does not. Reading the code
+> answered a different question than the one the probe asked.
+
+### IA-16 · Brand root has 9 destinations, not 8 — factual correction
+
+`Import / export` was missing from the list I had been working from. Not a
+defect; recorded so downstream counts are right.
+
 ### IA-11 · The panel header never changes on drill-in — **Minor**
 
 `DesignSystemTab.tsx:596` is `const headerTitle = "Brand"`, hardcoded, so at
@@ -135,6 +176,54 @@ why this is Minor not Major: the body renders a `‹ Tokens · color` back row, 
   sentence like this "will not fit beside a label". Using it would have shipped
   `Upload and manage…`. The body, where Content and Brand already put theirs, is
   the right home.
+
+## Adversarial review — what it broke, and what it fixed
+
+An independent reviewer re-derived every number live and ran codex over the
+document. Three claims held; three did not, and the two real ones are fixed.
+
+**Held.** 28 sections / 0 loose frames (re-fetched). Edge total 2,489 before and
+after, summed over 36,285 descendants — the cleanest confirmation in the audit.
+IA-9's two command palettes, measured: six `CmdK` frames at 640×420 and
+`Canvas · command palette` at 520×426.
+
+**Broke — and it was right.** The audit contradicted itself: its own prose says
+*"modals with their feature, not into a `Modal` bucket, because grouping by
+form tells a user nothing about what they came to do"* — while a `Modal · 5
+screens` section sat in the summary table two paragraphs above. **Fixed:** the
+three `Modal · Brand · AI prompt` states and the B9.5 migration modal moved to
+Brand, `Modal · Add Child Element` to Insert, and the empty container removed.
+27 sections now; edge total re-verified at 2,489.
+
+**Broke — and the answer is that nothing was lost.** The review computed 395
+screens against the audit's 397 and, with codex converging on the same figure by
+pure arithmetic, called it an unreconciled 2-screen gap. It is a classification
+difference, not a loss, and the manifest settles it exactly:
+
+| | |
+|---|---|
+| top-level frames in the Phase-1 census | 820 |
+| of those, nodes that were themselves legacy Sections (📄 ×2, 🗃️, 🔍 ×2) | −5 |
+| their children, which were never top-level | +83 |
+| **= items inside sections now** | **898** ✓ |
+
+Every id in the pre-reorg census is still present. The five legacy sections are
+each ≥280×200, so a size-based "is this a screen" test counts them as screens —
+which is where the difference comes from.
+
+**The process gap was real and is closed.** The review noted no pre-reorg node-id
+manifest was committed anywhere, making the question unanswerable after the
+fact. It existed only in a scratch directory. It is now committed at
+`docs/design-jobs/baselines/figma-page-1-3-pre-reorg.tsv` — 820 rows of
+`id · size · prototype targets · name` — so any future reorganisation of this
+page can be reconciled against it exactly, the way this one just was.
+
+**Also fair, and recorded rather than argued:** the C1–C3 ticks cite counts that
+do not by themselves establish the broader property claimed ("28 sections" is
+not "every family has a section"), and the 350/2,139 frame-vs-hotspot split does
+not reproduce post-reorg — it measures 416/2,073, because the 66 edges under the
+five legacy sections changed depth. The total is what the claim rests on, and
+the total is exact.
 
 ## Checklist — agents tick these, each with evidence
 

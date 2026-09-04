@@ -241,7 +241,12 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
                 Components
               </MenuItem>
             ) : null}
-            {onOpenDesignSystem ? <MenuItem onClick={run(onOpenDesignSystem)}>Design system</MenuItem> : null}
+            {/* "Brand", not "Design system". This row and the rail's Brand
+                button are the SAME destination — both land on tab "design"
+                (AquibraStudio.tsx:509) and the panel that opens is headed
+                "Brand". Two names for one screen is a door the user has to
+                learn twice. Measured live 2026-09-04. */}
+            {onOpenDesignSystem ? <MenuItem onClick={run(onOpenDesignSystem)}>Brand</MenuItem> : null}
             {onOpenPlugins ? <MenuItem onClick={run(onOpenPlugins)}>Plugins</MenuItem> : null}
           </MenuGroup>
         )}
