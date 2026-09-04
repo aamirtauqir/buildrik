@@ -24,9 +24,11 @@ const ORDER = [
   ["862:6859", "Reference · specs & completeness"], ["862:6860", "Reference · UX analysis docs"],
   ["1090:4527", "REVIEW · Insert"],
   ["957:4474", "Archive · superseded"],
+  ["2040:8372", "Library · shared chrome"],
 ];
 
 const NOTES = {
+  "2040:8372": "the Rail component set — every editor board instances it",
   "1779:3": "two palettes ship: shell ⌘K and canvas ⌘⇧P — one decision open",
   "1938:8372": "the editor's saved-components panel; page 1:2 is the LIBRARY",
   "1776:8388": "S-numbers are a journey narrative, not a screen index",
