@@ -68,6 +68,20 @@ describe("ImportUrlModal", () => {
     expect(onImport).toHaveBeenCalledWith("https://example.test/b.mp4");
   });
 
+  // Board 1205:4816 draws the invalid URL AND focus at once — the field
+  // still has focus (autoFocus + the user mid-typo) while the error shows.
+  // TextField's `aria-invalid:focus:` compound variant is what keeps the
+  // border on --bk-error there instead of losing to the plain `:focus`
+  // rule's accent border on equal specificity.
+  it("stays marked invalid while still focused, so the error border wins over the focus ring", () => {
+    render(<ImportUrlModal open onClose={vi.fn()} onImport={vi.fn()} />);
+    const input = screen.getByTestId("import-url-input");
+    input.focus();
+    fireEvent.change(input, { target: { value: "not-a-url" } });
+    expect(input).toHaveFocus();
+    expect(input).toHaveAttribute("aria-invalid", "true");
+  });
+
   it("never opens a native prompt", () => {
     render(<ImportUrlModal open onClose={vi.fn()} onImport={vi.fn()} />);
     fireEvent.change(screen.getByTestId("import-url-input"), {

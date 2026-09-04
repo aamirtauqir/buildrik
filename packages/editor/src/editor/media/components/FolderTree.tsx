@@ -20,7 +20,6 @@ import {
   MinusCircle,
   FolderOpen,
   Trash2,
-  Plus,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
@@ -283,18 +282,7 @@ export function FolderTree({
 
   return (
     <div className="mgr-left">
-      <div className="mgr-left-head">
-        Folders
-        <Button
-          className="mgr-tree-add"
-          title="New folder"
-          aria-label="New folder"
-          onClick={() => setNewFolderName((v) => (v === null ? "" : null))}
-          aria-expanded={newFolderName !== null}
-        >
-          <Plus size={12} />
-        </Button>
-      </div>
+      <div className="mgr-left-head">Folders</div>
 
       <div className="mgr-tree">
         {/* Smart folders (Bugs #6, #7 fix: actually filter) */}
@@ -356,7 +344,24 @@ export function FolderTree({
           Board 1205:4829 — the name is typed at the bottom of My folders,
           where the folder will land, with the two keys spelled out. It
           replaced a native prompt(), which could not say any of this.
+
+          Board 1163:13695's row/＋ New folder (12/400 ink-soft, 8/6 padding,
+          r6) is a row IN the list, right after the last folder — not the
+          18x18 icon-only button that used to sit in the "Folders" header.
+          `.mgr-node`'s own padding/radius/font are that exact spec, so the
+          trigger reuses it rather than carrying a second copy.
         */}
+        {newFolderName === null ? (
+          <Button
+            className="mgr-node"
+            title="New folder"
+            aria-label="New folder"
+            onClick={() => setNewFolderName("")}
+          >
+            {"＋  New folder"}
+          </Button>
+        ) : null}
+
         {newFolderName !== null ? (
           <div className="mgr-tree-newfolder tw:px-2 tw:pb-1.5" data-testid="mgr-new-folder">
             <TextField

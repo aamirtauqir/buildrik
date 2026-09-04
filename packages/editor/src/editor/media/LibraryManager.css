@@ -174,27 +174,7 @@
   color: var(--bk-ink-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
-
-.mgr-tree-add {
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
-  background: transparent;
-  border: none;
-  color: var(--bk-ink-muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.mgr-tree-add:hover { background: var(--bk-bg-subtle); color: var(--bk-accent); }
-
-.mgr-tree-add svg { width: 12px; height: 12px; }
 
 .mgr-tree {
   flex: 1;

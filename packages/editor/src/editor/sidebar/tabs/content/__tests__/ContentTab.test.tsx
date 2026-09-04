@@ -151,6 +151,28 @@ describe("ContentTab", () => {
     }
   });
 
+  it("root rows carry the board 148:2 leading glyph, and 'New collection' is a row, not a button", async () => {
+    const onCreateCollection = vi.fn();
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} onCreateCollection={onCreateCollection} />);
+    await screen.findByText("Menu items");
+
+    // Every List row (collections + the three Data rows) now fills the icon
+    // slot board 232:6 calls out — this used to render blank, which read as
+    // the label starting 24px further left than its board.
+    for (const label of ["Menu items", "Sources", "Variables", "Conditions"]) {
+      const row = screen.getByText(label).closest('[role="button"]');
+      expect(row?.querySelector("svg")).toBeTruthy();
+    }
+
+    // Board 148:20 is a bare row (a "+" glyph + accent-text label), not the
+    // small inset Button this used to render as.
+    const newCollectionRow = screen.getByRole("button", { name: "New collection" });
+    expect(newCollectionRow.tagName).toBe("DIV");
+    fireEvent.click(newCollectionRow);
+    expect(onCreateCollection).toHaveBeenCalledTimes(1);
+  });
+
   it("drills into a collection, opens a record, saves edits back through the engine", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     render(<ContentTab composer={composer as never} />);
