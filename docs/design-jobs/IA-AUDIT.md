@@ -86,7 +86,7 @@ folded into the feature that owns the job — modals with their feature, not
 into a `Modal` bucket, because grouping by form tells a user nothing about
 what they came to do.
 
-### IA-9 · Two command palettes — **Major**, and exactly the duplication asked about
+### IA-9 · Two command palettes — **Major, open — one founder decision left**
 
 `CmdK · empty/typing/results/no-results/ai-offer/disabled-command` (640×420,
 six frames) and `Canvas · command palette (⌘⇧P)` (520×426) are two designs for
@@ -95,12 +95,34 @@ A user cannot tell which one they get. Both now sit in `Command palette · 7
 screens` so the duplication is visible instead of scattered. **Resolution
 needed: one palette, one shortcut, one size.**
 
+**Confirmed as a real duplication, and the chord half is now settled.** Both
+boards read *"Type a command or search…"* and list commands — same job, not two
+jobs:
+
+- `CmdK` (640×420, 6 states) — ACTIONS / GO TO grouping, an AI offer on
+  no-results, and disabled commands shown with a reason.
+- `Canvas · command palette (⌘⇧P)` (520×426) — EDIT / VIEW commands.
+
+In code there is **one** command palette and it is ⌘⇧P
+(`shell/modals/CommandPalette.tsx`, opened via `useEditorShortcuts.ts:30`).
+**⌘K is not free**: `PagesTab.tsx:127` binds it on `window` to Pages' *"go to
+page…"* finder (`PageCommandPalette.tsx:106`) — a different job that happens to
+share the palette shape. So the CmdK board's chord is already taken, and by the
+precedence rule (behaviour → the CODE contract) the chord is decided: ⌘⇧P.
+
+What is **not** decided, and is not mine to decide: the two boards are 640×420
+and 520×426, and the CmdK content is the better design (disabled-with-reason,
+AI fallback). Merging them is a design call. Recorded in Figma rather than
+silently resolved — the section now carries `CHORD CONFLICT, needs one
+decision`, `1177:4804` is marked `SHIPPED design`, and the six CmdK boards
+carry `chord unavailable (⌘K = go-to-page); content is the richer design`.
+
 ## Product navigation audit — measured in the running editor
 
 Driven live at 1440×900 on :5050; 19 screenshots and a DOM probe. The findings
 that survived checking:
 
-### IA-10 · Four doors labelled "Components", three destinations — **Major**
+### IA-10 · Four doors labelled "Components", three destinations — **Major, fixed**
 
 | door | leads to | what it means there |
 |---|---|---|
@@ -113,6 +135,12 @@ A user who wants "components" has to guess. **Fixed for the odd noun out:** the
 Brand row now reads **"Component styles"** — its own hint already said that is
 what it is. The other three are genuinely different jobs and keep their names;
 Insert's is scoped inside Insert, so context disambiguates it.
+
+**And the fourth door is gone from production.** The `rail/tabsConfig.ts`
+`Components` tab was reachable only through the legacy rails, which IA-14 has
+since gated to dev builds — so a customer now sees three doors, two of which
+are scoped by the surface they sit in. Four labels, three destinations, one
+guess required → three labels, three destinations, no guess.
 
 ### IA-12 · "Brand" and "Design system" are one destination with two names — **Major, fixed**
 
@@ -198,12 +226,20 @@ contract wanted them inline anyway.
 `Import / export` was missing from the list I had been working from. Not a
 defect; recorded so downstream counts are right.
 
-### IA-11 · The panel header never changes on drill-in — **Minor**
+### IA-11 · The panel header never changes on drill-in — **Minor, fixed**
 
 `DesignSystemTab.tsx:596` is `const headerTitle = "Brand"`, hardcoded, so at
 Brand › Tokens › color the header still reads `Brand ✕`. Mitigated, and that is
 why this is Minor not Major: the body renders a `‹ Tokens · color` back row, so
 "where am I" is answered — just not by the header.
+
+**Fixed** (`2e201ebfe`). The header now tracks `activeSection` and reads
+`Brand › Tokens`. The comment defending the constant cited "the section tablist
+below the toolbar row" as the location cue — and line 473 of the same file
+records that tab bar being removed and its handler going with it, so the cue it
+pointed at had not existed for some time. The token kind stays out of the title:
+it is an 11px caps label in a fixed 44px bar and the body crumb already carries
+`· color`. Verified live across all nine destinations.
 
 ### Two findings I dropped after checking
 
