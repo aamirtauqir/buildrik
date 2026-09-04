@@ -352,12 +352,18 @@ function MediaTabWithComposer({
         }}
         onToggleSelect={state.toggleSelect}
         onExitSelection={state.toggleSelMode}
-        // Move needs a destination, and the drawer has no folder picker of its
-        // own yet — the fullpage manager owns that popover. Until it does, the
-        // control opens the library where the picker lives rather than
-        // pretending to work. (Board 145:349 draws "Move to…" with an ellipsis,
-        // which is the same promise: a second step follows.)
+        // The drawer has its own picker now — the same folder list the context
+        // menu shows. The library fallback stays only for a caller that cannot
+        // move (no composer). (Board 145:349 draws "Move to…" with an ellipsis:
+        // a second step follows, and the step is the picker, not a detour.)
         onBulkMove={onOpenLibrary ? () => onOpenLibrary() : undefined}
+        onBulkMoveTo={(folderId) => {
+          const keys = [...state.selectedKeys];
+          void Promise.all(keys.map((k) => state.moveAsset(k, folderId))).then(() => {
+            showToast(`Moved ${keys.length} file${keys.length === 1 ? "" : "s"}`, "success");
+            state.toggleSelMode();
+          });
+        }}
         onBulkDelete={() =>
           state.requestBulkDelete(
             state.libraryItems.filter((i) => state.selectedKeys.has(i.key)),

@@ -14,6 +14,7 @@
 import * as React from "react";
 import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem, MediaFolder } from "../data/mediaTypes";
+import { flattenFolderTree } from "../utils/folderTree";
 import { Button } from "@/editor/chrome-ui";
 
 interface MediaContextMenuProps {
@@ -79,31 +80,6 @@ const MENU_SURFACE =
   "tw:bg-[var(--bk-bg-card)] tw:rounded-[var(--bk-radius-lg)] " +
   "tw:shadow-[var(--bk-shadow-overlay)] tw:py-[var(--bk-space-4)]";
 const MENU_ITEM_HEIGHT = 28;
-
-/**
- * Sort folders depth-first so nested children render directly under
- * their parent. Returns array of { folder, depth } pairs.
- */
-function flattenFolderTree(
-  folders: ReadonlyArray<MediaFolder>,
-): Array<{ folder: MediaFolder; depth: number }> {
-  const byParent = new Map<string | null, MediaFolder[]>();
-  for (const f of folders) {
-    const list = byParent.get(f.parentId) ?? [];
-    list.push(f);
-    byParent.set(f.parentId, list);
-  }
-  const out: Array<{ folder: MediaFolder; depth: number }> = [];
-  const walk = (parentId: string | null, depth: number) => {
-    const children = byParent.get(parentId) ?? [];
-    for (const f of children) {
-      out.push({ folder: f, depth });
-      walk(f.id, depth + 1);
-    }
-  };
-  walk(null, 0);
-  return out;
-}
 
 export function MediaContextMenu({
   x,

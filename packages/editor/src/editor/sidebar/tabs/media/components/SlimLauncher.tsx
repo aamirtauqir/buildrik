@@ -26,6 +26,7 @@ import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock,
 import { Upload, Cloud, Shapes, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
+import { flattenFolderTree } from "../utils/folderTree";
 import { TypePills } from "./TypePills";
 import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
@@ -90,7 +91,11 @@ interface SlimLauncherProps {
   onEnterSelection?(key: string): void;
   onToggleSelect?(key: string): void;
   onExitSelection?(): void;
+  /** Legacy: open the full library, where the picker used to live. */
   onBulkMove?(): void;
+  /** Move every selected asset to a folder (null = root). When provided, the
+   *  bulk bar shows its own picker instead of bouncing to the library. */
+  onBulkMoveTo?(folderId: string | null): void;
   onBulkDelete?(): void;
   /**
    * Retry a failed upload. The drawer had no way to reach it: `MediaTab` wired
@@ -114,6 +119,7 @@ interface SlimLauncherProps {
 }
 
 export function SlimLauncher(props: SlimLauncherProps) {
+  const [bulkMoveOpen, setBulkMoveOpen] = React.useState(false);
   const {
     activeTypes,
     counts,
@@ -515,16 +521,55 @@ export function SlimLauncher(props: SlimLauncherProps) {
           data-testid="media-bulk-bar"
         >
           <span data-testid="media-bulk-count">{props.selectedKeys?.size ?? 0} selected</span>
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
-            onClick={props.onBulkMove}
-            disabled={!props.selectedKeys?.size}
-          >
-            Move to…
-          </Button>
+          {/* Board 145:349 draws "Move to…" — the ellipsis promises a second
+              step. That step used to be "open the whole library and find the
+              picker there". Now it is the picker: the same folder list the
+              context menu shows, from the same helper, so the two cannot drift. */}
+          {props.onBulkMoveTo ? (
+            <Popover
+              open={bulkMoveOpen}
+              onClose={() => setBulkMoveOpen(false)}
+              label="Move selected files to folder"
+              placement="top"
+              trigger={
+                <Button
+                  type="button"
+                  color="light"
+                  size="xs"
+                  variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
+                  onClick={() => setBulkMoveOpen((v) => !v)}
+                  disabled={!props.selectedKeys?.size}
+                  aria-haspopup="menu"
+                  aria-expanded={bulkMoveOpen}
+                >
+                  Move to…
+                </Button>
+              }
+            >
+              <Menu label="Folders">
+                <MenuItem onClick={() => { setBulkMoveOpen(false); props.onBulkMoveTo?.(null); }}>(Root)</MenuItem>
+                {flattenFolderTree(props.allFolders ?? []).map(({ folder, depth }) => (
+                  <MenuItem
+                    key={folder.id}
+                    onClick={() => { setBulkMoveOpen(false); props.onBulkMoveTo?.(folder.id); }}
+                  >
+                    {"\u00a0".repeat(depth * 2)}{folder.name}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Popover>
+          ) : (
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              variant="link" className="tw:min-h-6 tw:text-[length:var(--bk-text-12)] tw:text-white"
+              onClick={props.onBulkMove}
+              disabled={!props.selectedKeys?.size}
+            >
+              Move to…
+            </Button>
+          )}
           <Button
             type="button"
             color="light"
