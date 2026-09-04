@@ -4120,8 +4120,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — scroll-overflow: header/toolbar/footer pin correctly; drift — no scrollbar drawn at rest on a 66-row tree (board draws a 4px thumb)",
-      "verified": "drift-open"
+      "verifiedNote": "2026-09-04 (J-1082:4835) — the 08-31 drift fixed: LayersScrollThumb renders the 4px thumb itself from scrollTop/scrollHeight/clientHeight (computeThumbGeometry), independent of the OS's overlay-scrollbar show-on-scroll timing that a styled ::-webkit-scrollbar-thumb alone still rode. header/toolbar/footer still pin correctly.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "1082:5004",
