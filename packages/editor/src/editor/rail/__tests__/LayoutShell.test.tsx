@@ -4,8 +4,9 @@
  *
  * The shell routes children by displayName into named grid regions (topbar,
  * rail, drawer, sidebar, canvas, inspector, fullpage, footer) and injects
- * open/overlay state into Drawer and Inspector via cloneElement inside a
- * useMemo, whose deps include `drawerPinned` — see the pin/unpin tests.
+ * open state into Drawer and Inspector via cloneElement inside a useMemo.
+ * (The drawer-overlay mode and its `drawerPinned` prop were retired
+ * 2026-09-04 — no production caller ever passed it.)
  */
 
 import { describe, it, expect, afterEach } from "vitest";
@@ -217,24 +218,6 @@ describe("LayoutShell — drawer/inspector prop injection", () => {
     expect(closedDrawer.getAttribute("tabindex")).toBe("-1");
   });
 
-  it("injects overlay = !drawerPinned into the Drawer slot on initial render", () => {
-    const { container } = renderFullShell({ drawerPinned: false });
-    const drawer = container.querySelector(".layout-shell__drawer")!;
-    expect(drawer.classList.contains("layout-shell__drawer--overlay")).toBe(
-      true
-    );
-    expect(
-      container.querySelector(".layout-shell--drawer-overlay")
-    ).not.toBeNull();
-
-    const { container: pinned } = renderFullShell({ drawerPinned: true });
-    expect(
-      pinned
-        .querySelector(".layout-shell__drawer")!
-        .classList.contains("layout-shell__drawer--overlay")
-    ).toBe(false);
-    expect(pinned.querySelector(".layout-shell--drawer-overlay")).toBeNull();
-  });
 
   it("injects inspectorOpen into the Inspector slot", () => {
     const { container } = renderFullShell({ inspectorOpen: false });
@@ -243,98 +226,5 @@ describe("LayoutShell — drawer/inspector prop injection", () => {
       inspector.classList.contains("layout-shell__inspector--open")
     ).toBe(false);
     expect(inspector.getAttribute("aria-hidden")).toBe("true");
-  });
-});
-
-describe("LayoutShell — pin/unpin reaches the drawer slot", () => {
-  /* Was pinned as §3: the slots useMemo listed [children, drawerOpen,
-     inspectorOpen] and omitted `drawerPinned`, which the Drawer clone reads
-     (`overlay: !drawerPinned`). With referentially stable children a pin/unpin
-     never recomputed the memo, so the drawer kept its stale overlay prop while
-     the wrapper class — computed outside the memo — flipped, and the two
-     disagreed about overlay mode. It did not bite in the app only because
-     AquibraStudio re-creates its children every render; any memoised caller
-     would have hit it. */
-
-  const stableChildren = [
-    <LayoutShell.Drawer key="drawer">drawer-content</LayoutShell.Drawer>,
-    <LayoutShell.Canvas key="canvas">canvas-content</LayoutShell.Canvas>,
-  ];
-
-  it("with stable children, unpinning updates the wrapper AND the drawer slot", () => {
-    const { container, rerender } = render(
-      <LayoutShell drawerOpen drawerPinned>
-        {stableChildren}
-      </LayoutShell>
-    );
-    const drawer = () => container.querySelector(".layout-shell__drawer")!;
-    expect(drawer().classList.contains("layout-shell__drawer--overlay")).toBe(
-      false
-    );
-    expect(container.querySelector(".layout-shell--drawer-overlay")).toBeNull();
-
-    rerender(
-      <LayoutShell drawerOpen drawerPinned={false}>
-        {stableChildren}
-      </LayoutShell>
-    );
-
-    expect(
-      container.querySelector(".layout-shell--drawer-overlay")
-    ).not.toBeNull();
-    expect(drawer().classList.contains("layout-shell__drawer--overlay")).toBe(
-      true
-    );
-  });
-
-  it("re-pinning goes back", () => {
-    const { container, rerender } = render(
-      <LayoutShell drawerOpen drawerPinned={false}>
-        {stableChildren}
-      </LayoutShell>
-    );
-    rerender(
-      <LayoutShell drawerOpen drawerPinned>
-        {stableChildren}
-      </LayoutShell>
-    );
-    const drawer = container.querySelector(".layout-shell__drawer")!;
-    expect(drawer.classList.contains("layout-shell__drawer--overlay")).toBe(false);
-    expect(container.querySelector(".layout-shell--drawer-overlay")).toBeNull();
-  });
-
-  it("with stable children, drawerOpen still propagates (it IS a memo dep)", () => {
-    const { container, rerender } = render(
-      <LayoutShell drawerOpen drawerPinned>
-        {stableChildren}
-      </LayoutShell>
-    );
-    rerender(
-      <LayoutShell drawerOpen={false} drawerPinned>
-        {stableChildren}
-      </LayoutShell>
-    );
-    const drawer = container.querySelector(".layout-shell__drawer")!;
-    expect(drawer.classList.contains("layout-shell__drawer--open")).toBe(false);
-    expect(drawer.getAttribute("aria-hidden")).toBe("true");
-  });
-
-  it("with fresh children each render, unpinning propagates to the drawer slot", () => {
-    // Fresh JSX = new children reference = memo recomputes = no staleness.
-    // In the real app (AquibraStudio) children are re-created every render,
-    // which is why this bug does not bite in production today.
-    const make = (pinned: boolean) => (
-      <LayoutShell drawerOpen drawerPinned={pinned}>
-        <LayoutShell.Drawer>drawer-content</LayoutShell.Drawer>
-        <LayoutShell.Canvas>canvas-content</LayoutShell.Canvas>
-      </LayoutShell>
-    );
-    const { container, rerender } = render(make(true));
-    rerender(make(false));
-    expect(
-      container
-        .querySelector(".layout-shell__drawer")!
-        .classList.contains("layout-shell__drawer--overlay")
-    ).toBe(true);
   });
 });

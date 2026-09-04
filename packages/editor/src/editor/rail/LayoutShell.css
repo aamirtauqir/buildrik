@@ -96,41 +96,6 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
     var(--layout-inspector-width, 300px);
 }
 
-/* Drawer Overlay (Unpinned) Mode Drawer floats over canvas — grid column collapses to 0. Canvas stays full width. */
-.layout-shell--drawer-open.layout-shell--drawer-overlay {
-  grid-template-columns:
-    var(--layout-rail-width, 60px)
-    0px
-    1fr
-    0px;
-}
-
-.layout-shell--drawer-open.layout-shell--drawer-overlay.layout-shell--inspector-open {
-  grid-template-columns:
-    var(--layout-rail-width, 60px)
-    0px
-    1fr
-    var(--layout-inspector-width, 300px);
-}
-
-/* Drawer panel in overlay mode — absolutely positioned over canvas */
-.layout-shell__drawer--overlay {
-  position: absolute;
-  top: var(--layout-topbar-height, 56px);
-  left: var(--layout-rail-width, 60px);
-  bottom: 0;
-  width: var(--layout-drawer-width, 280px);
-  z-index: calc(var(--bk-z-drawer) + 6);
-  box-shadow: var(--bk-shadow-overlay);
-  border-right: none;
-  border-radius: 0 var(--bk-radius-lg) var(--bk-radius-lg) 0;
-}
-
-/* When no topbar slot, overlay starts from top */
-.layout-shell--no-topbar .layout-shell__drawer--overlay {
-  top: 0;
-}
-
 /* TopBar */
 .layout-shell__topbar {
   grid-area: topbar;

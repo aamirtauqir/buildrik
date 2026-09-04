@@ -23,8 +23,6 @@ export interface LayoutShellProps {
   children: React.ReactNode;
   /** Whether the drawer panel is open (panel mode only) */
   drawerOpen: boolean;
-  /** Whether the drawer is pinned (takes grid space) or overlays the canvas */
-  drawerPinned?: boolean;
   /** Drawer width in pixels (200 or 280, per-tab) */
   drawerWidth?: number;
   /** Whether a fullpage tab is active (Templates, Settings, History) */
@@ -72,7 +70,6 @@ Rail.displayName = "LayoutShell.Rail";
 
 interface DrawerSlotProps extends SlotProps {
   open?: boolean;
-  overlay?: boolean;
 }
 
 const Drawer: React.FC<DrawerSlotProps> = ({
@@ -80,14 +77,12 @@ const Drawer: React.FC<DrawerSlotProps> = ({
   className = "",
   style,
   open = true,
-  overlay = false,
 }) => (
   <aside
     data-tour-target="left-sidebar"
     className={[
       "layout-shell__drawer",
       open ? "layout-shell__drawer--open" : "",
-      overlay ? "layout-shell__drawer--overlay" : "",
       className,
     ]
       .filter(Boolean)
@@ -197,7 +192,6 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
 } = ({
   children,
   drawerOpen,
-  drawerPinned = true,
   drawerWidth,
   fullPageMode = false,
   inspectorOpen = true,
@@ -245,7 +239,6 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
         case "LayoutShell.Drawer":
           result.drawer = React.cloneElement(child as React.ReactElement<DrawerSlotProps>, {
             open: drawerOpen,
-            overlay: !drawerPinned,
           });
           break;
         case "LayoutShell.Sidebar":
@@ -271,12 +264,13 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
     });
 
     return result;
-    /* `drawerPinned` belongs here: the Drawer clone below reads it
-       (`overlay: !drawerPinned`). Left out, a pin/unpin with referentially
-       stable children never recomputed the memo, so the drawer kept its stale
-       overlay prop while the wrapper class — computed outside the memo — flipped.
-       The two then disagreed about overlay mode. */
-  }, [children, drawerOpen, inspectorOpen, drawerPinned]);
+    /* The drawer-overlay ("pin auto-released") mode that used to hang off a
+       `drawerPinned` prop here is retired (2026-09-04, board 202:2 renamed).
+       It had no door for its whole life: the single production caller never
+       passed the prop, and every test that exercised the overlay supplied the
+       trigger itself — a test that supplies the trigger proves the branch
+       works, never that the feature has a door. */
+  }, [children, drawerOpen, inspectorOpen]);
 
   const shellClass = [
     "layout-shell",
@@ -284,7 +278,6 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
     slots.sidebar ? "layout-shell--has-sidebar" : "",
     fullPageMode ? "layout-shell--fullpage" : "",
     !fullPageMode && !slots.sidebar && drawerOpen ? "layout-shell--drawer-open" : "",
-    !fullPageMode && !slots.sidebar && drawerOpen && !drawerPinned ? "layout-shell--drawer-overlay" : "",
     !fullPageMode && inspectorOpen ? "layout-shell--inspector-open" : "",
     className,
   ]

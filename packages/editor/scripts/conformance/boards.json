@@ -3713,11 +3713,11 @@
       "state": "1280 · pin auto-released (overlay)",
       "width": 1280,
       "height": 720,
-      "status": "active",
+      "status": "retired",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "partial-rail60-drawer320-canvas552-inspector-not-measured",
-      "verified": "drift-open"
+      "verifiedNote": "RETIRED in Figma 2026-09-04 — the overlay (pin auto-released) mode had no door for its whole life: the one production caller never passed drawerPinned, and every test supplied its own trigger. Founder: fix all of them → retire (B-DRAWER-OVERLAY-1280).",
+      "verified": "unreachable"
     },
     {
       "nodeId": "963:4474",
