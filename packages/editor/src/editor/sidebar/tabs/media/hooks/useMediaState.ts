@@ -21,8 +21,12 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();
 
   const showToast = useCallback(
-    (msg: string, type: "success" | "error" | "info" | "warning") => {
-      addToast({ description: msg, tone: type });
+    (
+      msg: string,
+      type: "success" | "error" | "info" | "warning",
+      opts?: { action?: { label: string; onClick: () => void }; duration?: number },
+    ) => {
+      addToast({ description: msg, tone: type, action: opts?.action, duration: opts?.duration });
     },
     [addToast]
   );

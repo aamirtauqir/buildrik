@@ -38,6 +38,9 @@ vi.mock("../OptimizationPanel", () => ({ OptimizationPanel: () => <div /> }));
 vi.mock("../VideoPreview", () => ({ VideoPreview: () => <div /> }));
 
 import { MediaLibraryPanel } from "../MediaLibraryPanel";
+/* The delete offers Undo via a toast; the studio wraps everything in this
+   provider and only these tests rendered the panel bare. */
+import { ToastProvider } from "@/editor/chrome-ui";
 
 const asset: MediaAsset = {
   id: "a1",
@@ -58,7 +61,7 @@ beforeEach(() => {
 });
 
 function openConfirm() {
-  render(<MediaLibraryPanel isOpen onClose={vi.fn()} />);
+  render(<ToastProvider><MediaLibraryPanel isOpen onClose={vi.fn()} /></ToastProvider>);
   /* The card's delete control is reached by its accessible name, which is the
      point: it used to be a bare "✕" with none. */
   const del = screen.getByRole("button", { name: /delete hero\.png/i });

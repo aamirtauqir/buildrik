@@ -10,7 +10,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
-import { Button, ConfirmDialog, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Spinner, Tabs, useToast } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
 import { fetchUrlAsFile, isFetchableUrl } from "./fetchUrlAsFile";
@@ -121,9 +121,25 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
     setPendingDeleteId(id);
   };
 
+  const { addToast } = useToast();
   const confirmDeleteAsset = async () => {
     if (!pendingDeleteId) return;
-    await deleteAsset(pendingDeleteId);
+    /* Same grace path as the drawer, so the two doors to one delete cannot
+       give two answers. Without a composer there is no canvas to clear and
+       no undo to honour, so it falls through to the plain delete. */
+    const graced = composer ? await composer.mediaOps.deleteWithGrace(pendingDeleteId) : null;
+    if (!graced && composer === null) await deleteAsset(pendingDeleteId);
+    if (graced) {
+      addToast({
+        description:
+          graced.usageCount > 0
+            ? `Deleted "${graced.name}" and cleared it from ${graced.usageCount} element${graced.usageCount === 1 ? "" : "s"}.`
+            : `Deleted "${graced.name}".`,
+        tone: "info",
+        action: { label: "Undo", onClick: graced.undo },
+        duration: 8000,
+      });
+    }
     setSelectedIds((prev) => {
       const next = new Set(prev);
       next.delete(pendingDeleteId);

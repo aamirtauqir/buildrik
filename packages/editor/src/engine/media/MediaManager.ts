@@ -117,6 +117,15 @@ interface UploadOptions {
 /**
  * Central manager for media assets and folders
  */
+/** A delete that has left the library but not yet the world. */
+export interface TrashedAsset {
+  asset: MediaAsset;
+  /** Put it back where it was. No-op after commit. */
+  restore(): void;
+  /** Make it permanent: storage, object URL, server row. No-op after restore. */
+  commit(): Promise<void>;
+}
+
 export class MediaManager extends MediaEventEmitter {
   private storage: MediaStorage;
   private optimizer: MediaOptimizer;
@@ -1057,10 +1066,63 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   async deleteAsset(id: string): Promise<void> {
-    // Capture serverId BEFORE local delete so we can mirror to server.
     const asset = this.state.assets.find((a) => a.id === id);
-    const serverId = asset?.serverId;
+    this.state.assets = this.state.assets.filter((a) => a.id !== id);
+    this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
+    await this.finalizeDelete(id, asset?.serverId);
+    this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
+  }
 
+  /**
+   * Delete with a way back. The asset leaves the library at once, but the
+   * stored file, its object URL and the server row stay until `commit()`;
+   * `restore()` puts it back exactly where it was.
+   *
+   * Why not a history transaction: `exportProject()` hardcodes `assets: []`,
+   * so a delete wrapped in one flips canUndo true over an entry that restores
+   * nothing — a control that is confidently wrong instead of plausibly wrong.
+   * Walked 2026-09-03: Undo stayed enabled after a delete, pointed at an
+   * unrelated earlier edit, and restored nothing.
+   *
+   * Returns null when the asset is still uploading. The upload-completion
+   * handler cannot find a trashed asset to tombstone, so a grace period there
+   * would let the server row outlive the delete; that case takes the hard
+   * path immediately, and the caller offers no undo it cannot honour.
+   */
+  async trashAsset(id: string): Promise<TrashedAsset | null> {
+    const index = this.state.assets.findIndex((a) => a.id === id);
+    if (index < 0) return null;
+    if (this.inFlightUploads.has(id)) {
+      await this.deleteAsset(id);
+      return null;
+    }
+    const asset = this.state.assets[index];
+    this.state.assets = this.state.assets.filter((a) => a.id !== id);
+    this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
+    this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
+
+    let settled: "restored" | "committed" | null = null;
+    return {
+      asset,
+      restore: () => {
+        if (settled) return;
+        settled = "restored";
+        const at = Math.min(index, this.state.assets.length);
+        this.state.assets = [...this.state.assets.slice(0, at), asset, ...this.state.assets.slice(at)];
+        this.emit(MEDIA_EVENTS.MEDIA_ADDED, asset);
+      },
+      commit: async () => {
+        if (settled) return;
+        settled = "committed";
+        await this.finalizeDelete(id, asset.serverId);
+      },
+    };
+  }
+
+  /** The irreversible half of a delete: storage, object URL, retry queues and
+   *  the server row. Shared by the immediate and the deferred paths so the
+   *  two cannot drift. */
+  private async finalizeDelete(id: string, serverId: string | undefined): Promise<void> {
     // Phase B5 P1C fix: if uploadAndCreate is in flight for this asset,
     // tombstone it so completion handler immediately deletes the server
     // row instead of leaving an orphan. Without this, deleteAsset returns
@@ -1076,8 +1138,6 @@ export class MediaManager extends MediaEventEmitter {
     this.retryQueue.delete(id);
 
     await this.storage.deleteAsset(id);
-    this.state.assets = this.state.assets.filter((a) => a.id !== id);
-    this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
 
     // Revoke object URL to free memory
     if (this.blobUrlMap.has(id)) {
@@ -1095,8 +1155,6 @@ export class MediaManager extends MediaEventEmitter {
       const ok = await this.remoteSync.deleteRemote(serverId);
       if (!ok) this.pendingRemoteDeletes.add(serverId);
     }
-
-    this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
   }
 
   async updateAsset(id: string, updates: Partial<MediaAsset>): Promise<MediaAsset | null> {

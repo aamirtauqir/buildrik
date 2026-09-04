@@ -37,6 +37,9 @@ vi.mock("../VideoPreview", () => ({
 }));
 
 import { MediaLibraryPanel } from "../MediaLibraryPanel";
+/* The delete offers Undo via a toast; the studio wraps everything in this
+   provider and only these tests rendered the panel bare. */
+import { ToastProvider } from "@/editor/chrome-ui";
 
 function makeAsset(over: Partial<MediaAsset> = {}): MediaAsset {
   return {
@@ -59,7 +62,7 @@ function mount(over: Partial<React.ComponentProps<typeof MediaLibraryPanel>> = {
     onClose: vi.fn(),
     ...over,
   };
-  const utils = render(<MediaLibraryPanel {...props} />);
+  const utils = render(<ToastProvider><MediaLibraryPanel {...props} /></ToastProvider>);
   return { ...utils, props };
 }
 

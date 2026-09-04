@@ -53,8 +53,88 @@ export interface ReplaceAcrossResult {
   clean: boolean;
 }
 
+/** A delete the user can still take back. */
+export interface GraceDelete {
+  name: string;
+  /** Elements whose reference to the file was cleared. */
+  usageCount: number;
+  expiresAt: number;
+  /** Put the file back in the library AND its src back on every element. */
+  undo(): void;
+  /** Stop waiting and make it permanent. Tests use it; the timer does otherwise. */
+  commitNow(): Promise<void>;
+}
+
+const GRACE_MS = 8000;
+
 export class MediaCommandLayer {
   constructor(private readonly composer: Composer) {}
+
+  /**
+   * Delete an asset with a grace period, clearing the dead reference on every
+   * element that used it, and offering ONE way back that restores both.
+   *
+   * Two failures used to compound (walked 2026-09-03): the delete was
+   * unrecoverable, and the canvas element that referenced the file was left
+   * with a dead `src` — not removed, not flagged, not relinked — while Undo
+   * stayed enabled pointing at an unrelated earlier edit.
+   *
+   * Element cleanup and asset restore land as one story on purpose. Restoring
+   * the element without the file just recreates the dead src by another
+   * route, so neither half is offered alone. Nothing here enters history: the
+   * asset cannot (exportProject hardcodes assets: []), and putting only the
+   * element half on the stack would let ⌘Z restore a src whose file is gone.
+   * The whole operation is announced as unrecorded instead, and the toast's
+   * Undo is the single door.
+   *
+   * Returns null when there was no grace to offer (asset missing, or still
+   * uploading — see MediaManager.trashAsset), in which case the delete has
+   * already happened the old way.
+   */
+  async deleteWithGrace(id: string, graceMs = GRACE_MS): Promise<GraceDelete | null> {
+    const trashed = await this.composer.media.trashAsset(id);
+    if (!trashed) return null;
+    const { asset } = trashed;
+
+    /* Raw values, not the src helper's parsed form, so restore is exact. */
+    const cleared: Array<{ element: Element; src?: string; bg?: string }> = [];
+    for (const element of this.composer.elements.findByMediaSrc(asset.src)) {
+      const src = element.getAttribute("src");
+      const bg = element.getStyle("background-image");
+      cleared.push({ element, src, bg });
+      if (src === asset.src) element.removeAttribute("src");
+      if (bg && bg.includes(asset.src)) element.setStyle("background-image", "none");
+    }
+    this.composer.history?.noteUnrecordedAction?.("deleting a file");
+
+    let settled = false;
+    const finish = async () => {
+      if (settled) return;
+      settled = true;
+      await trashed.commit();
+    };
+    const timer = setTimeout(() => void finish(), graceMs);
+
+    return {
+      name: asset.name,
+      usageCount: cleared.length,
+      expiresAt: Date.now() + graceMs,
+      undo: () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        for (const { element, src, bg } of cleared) {
+          if (src !== undefined) element.setAttribute("src", src);
+          if (bg !== undefined) element.setStyle("background-image", bg);
+        }
+        trashed.restore();
+      },
+      commitNow: async () => {
+        clearTimeout(timer);
+        await finish();
+      },
+    };
+  }
 
   /**
    * Insert a media asset onto the active page. Type-aware:

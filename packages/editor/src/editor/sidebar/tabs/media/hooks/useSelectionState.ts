@@ -8,7 +8,11 @@ import { useCallback, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { AssetUsage, ConfirmDeletePayload, LibraryItem, SelectionStateResult } from "../data/mediaTypes";
 
-type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning") => void;
+type ShowToast = (
+  msg: string,
+  type: "success" | "error" | "info" | "warning",
+  opts?: { action?: { label: string; onClick: () => void }; duration?: number },
+) => void;
 
 export function useSelectionState(
   composer: Composer,
@@ -165,13 +169,28 @@ export function useSelectionState(
   const executeDelete = useCallback(async () => {
     if (!confirmDelete) return;
     const { keys } = confirmDelete;
+    /* Every delete goes through the grace path, and the ones that could not
+       be granted one (still uploading) have already happened the old way. */
+    const graced: NonNullable<Awaited<ReturnType<typeof composer.mediaOps.deleteWithGrace>>>[] = [];
     for (const key of keys) {
       try {
-        await composer.media.deleteAsset(key);
+        const g = await composer.mediaOps.deleteWithGrace(key);
+        if (g) graced.push(g);
       } catch {
         const item = libraryItems.find((i) => i.key === key);
         showToast(`Could not delete "${item?.name ?? key}"`, "error");
       }
+    }
+    if (graced.length > 0) {
+      const what = graced.length === 1 ? `"${graced[0].name}"` : `${graced.length} files`;
+      const broke = graced.reduce((n, g) => n + g.usageCount, 0);
+      showToast(
+        broke > 0
+          ? `Deleted ${what} and cleared it from ${broke} element${broke === 1 ? "" : "s"}.`
+          : `Deleted ${what}.`,
+        "info",
+        { action: { label: "Undo", onClick: () => graced.forEach((g) => g.undo()) }, duration: 8000 },
+      );
     }
     setConfirmDelete(null);
     setSelectedKeys(new Set());
