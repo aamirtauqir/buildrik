@@ -592,6 +592,18 @@ describe("approval-gate messages are one contract, not two copies", () => {
 });
 
 describe("unpublished() — the server took the site down, the hook stops saying live", () => {
+  /* Outside the top-level describe, so it owns its own timers: flushMicrotasks
+     advances fake timers, and without these the first full-suite run failed
+     here while every targeted run had skipped this file. */
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockFetchSiteState.mockReset();
+    mockGetSiteId.mockReset();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   /* The shell derives publishedUrl from the last job's status OR the hydrated
      state, so a successful sites.unpublish has to clear both, or the topbar
      keeps a green Published over a site that is a draft again. The hook has
