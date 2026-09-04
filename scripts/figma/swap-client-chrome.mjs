@@ -72,14 +72,19 @@ let swapped = 0, replayed = 0, skippedSelf = 0;
     inst.x = bar.x; inst.y = bar.y;
     try { inst.resize(bar.width, bar.height); } catch (e) {}
     inst.name = bar.name;
+    /* setReactionsAsync REPLACES the whole array. Calling it once per edge means
+       a bar with N edges ends with one — and the counter still says N, which is
+       exactly how this shipped reporting 11 replayed when 8 survived. Build the
+       list first, then write once. */
+    const toSet = [];
     for (const dest of edges) {
       if (dest === b.id) { skippedSelf++; continue; }
-      try {
-        await inst.setReactionsAsync([{ trigger: { type: "ON_CLICK" },
-          actions: [{ type: "NODE", destinationId: dest, navigation: "NAVIGATE",
-                      transition: null, preserveScrollPosition: false, resetVideoPosition: false }] }]);
-        replayed++;
-      } catch (e) {}
+      toSet.push({ trigger: { type: "ON_CLICK" },
+        actions: [{ type: "NODE", destinationId: dest, navigation: "NAVIGATE",
+                    transition: null, preserveScrollPosition: false, resetVideoPosition: false }] });
+    }
+    if (toSet.length) {
+      try { await inst.setReactionsAsync(toSet); replayed += toSet.length; } catch (e) {}
     }
     bar.remove();
     swapped++;
