@@ -329,7 +329,9 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
         composer={composerWith()}
         projectId="site_1"
         publishedUrl="https://bellacucina.com"
-        publishJob={{ ...job({ uiState: "published", publishedUrl: "https://bellacucina.com" }), unpublished }}
+        /* Idle, not "published": the just-published state renders the result
+           section in place of Last deploy, and Unpublish lives in Last deploy. */
+        publishJob={{ ...job({ uiState: "idle", publishedUrl: "https://bellacucina.com" }), unpublished }}
         onVercelPublish={vi.fn()}
       />,
     );
