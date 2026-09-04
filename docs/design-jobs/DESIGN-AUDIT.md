@@ -1111,3 +1111,136 @@ By question: Q1 5 · Q2 2 · Q3 7 · Q4 11 · Q5 10.
   partial-failure layout, the undone panel, or the rename field's action row.
 - **No absence claim here extends past page `1:5`** except where a file-wide
   frame-name scan is cited.
+
+## Site (page 1:4) — coverage
+
+Wave J. Page set explicitly to `1:4` (113 children). **Not** `1:3`.
+
+### The question this page was assigned
+
+**Are the Site page's Domains/Export boards the same job as the editor's
+Settings Domains/Export, or two different surfaces?** Answer: **the same job,
+drawn twice — and the brief's size premise was wrong in both directions.**
+
+- The S7 Settings boards on `1:3` are **also 1440×900**, not drawer-width
+  (`639:3092` Domains, `639:2754` Export, all 45 in section `1776:8387`).
+- The shipping editor Settings surface is **also full-page**, not a drawer:
+  `packages/editor/src/editor/rail/tabsConfig.ts:199` sets `mode: "fullpage"`
+  with the comment "graduated from a 320px drawer to a full-page surface …
+  the drawer path is retired". At 1440 it renders ~1380px wide.
+- So the two treatments differ **only in chrome and IA**, not in size. `1:3`
+  draws the editor shell (Topbar, 60px rail, 140px settings nav, footer);
+  `1:4` draws a standalone admin app (56px header with "‹ Back to editor",
+  240px nav, content max 720).
+
+**Which one the product ships:** `1:3`. Board `1688:7195` is named
+"S7 · Settings · root — NEW 2026-09-02 (from SettingsTab.tsx:75-92 NAV)" and
+its 13 rows and 3 groups match `SettingsTab.tsx:74-90` exactly. Page `1:4`'s
+14 rows and 4 groups (SITE / DISTRIBUTION / DATA / SHIP) match **neither** the
+editor NAV nor the dashboard's `SITE_DETAIL_TABS`
+(`packages/dashboard/components/site-detail/tab-nav.tsx:7-16`, 8 tabs). `1:4`
+still carries Publish history, which the code explicitly retired from Settings
+(`SettingsTab.tsx:721-727`), and omits Branding, which the code ships.
+
+**Recommendation: consolidate onto `1776:8387`** and mark the `1:4` boards
+SUPERSEDED (rename, never delete). Port over the four things `1:4` has that S7
+lacks: the Export state machine, the Integrations catalogue rows, the Webhooks
+delivery detail, and the Forms filtered/exported states.
+
+Note the duplication is real in **code** too, for Domains only: it ships as an
+editor Settings screen (`DomainsScreen.tsx`) *and* a dashboard tab
+(`app/dashboard/sites/[id]/domains/`), both hitting the same tRPC procedures,
+plus a read-only workspace monitor. Export ships **once**, and as a modal
+(`StudioModals.tsx:166`), not as a screen — so both Figma treatments are wrong
+about Export's form.
+
+### Inventory
+
+113 top-level children: **47 FRAMEs (screens)** + 66 TEXT nodes (31
+`caption/…` chips, 15 descriptive `S6.*` captions, 20 section headers/counts).
+The 10 section headers account for all 47 frames exactly.
+
+| Family | Frames |
+|---|---|
+| Site shell | `22:2` |
+| General | `288:1230` saved, `392:1077` editing-dirty |
+| SEO | `284:830` |
+| Analytics & Custom code | `288:845`, `288:900` (locked-Pro only) |
+| Domains | `173:2` none, `173:63` adding, `173:126` pending-dns, `448:3940` checking, `173:316` ssl-provisioning, `173:193` verified, `173:255` failed |
+| Redirects / Headers / Localization | `288:955`, `288:1010`, `288:1065` |
+| Export | `174:2` idle, `174:90` format-selected, `174:179` previewing, `174:276` generating, `174:366` done, `174:456` failed, `174:546` ai-site-warning, `174:638` empty |
+| Integrations | `175:2` none-configured, `175:88` some, `175:180` attention, `175:276` pro-locked, `175:370` loading |
+| Integrations · GA | `176:2`, `176:67`, `176:130`, `176:195`, `176:260`, `176:325`, `176:390` |
+| Webhooks | `176:456`, `176:521`, `176:586`, `176:656`, `176:727` |
+| Forms | `288:1120` inbox, `316:965` empty, `316:1020` submission-detail, `316:1075` filtered, `316:1130` exported |
+| Publish history | `288:1175` |
+
+### What was actually done
+
+- **Fetched: 47 of 47 frames.** Full recursive TEXT dump of every frame (nav
+  collapsed to a single row, since it is byte-identical on all 47).
+- **Reactions: 47 of 47**, swept over `[frame, ...descendants]` in four
+  batches. 112 reactions total; every frame carries at least one and every
+  frame is a destination, so **zero orphans** — but most inbound edges come
+  from `hotspot/state` / `hotspot/back` scaffolding chips parked outside the
+  artboards, not from product affordances (`D-J-15`).
+- **Geometry probe: 47 of 47** — Header / Body / Nav / Content / column width
+  and offset. This is what found the short-shell defect (`D-J-17`).
+- **Nav selected-state fill probe: 47 of 47** — found 32 boards with no
+  selected row (`D-J-13`).
+- **Caption overlap: exact box intersection of all 66 TEXT nodes against all
+  47 frames**, with z-order — 24 collisions, 21 in front (`D-J-16`).
+- **Screenshotted: 21 of 47** via `scripts/baseline/figma-shot.mjs`, all
+  verified complete PNGs. **Viewed by eye: 14 of 47** — `22:2`, `173:126`,
+  `173:193`, `174:2`, `174:179`, `174:546`, `175:180`, `175:370`, `284:830`,
+  `288:900`, `288:1120`, `288:1175`, `316:1075`, `392:1077`.
+- **Cross-page:** section `1776:8387` on `1:3` enumerated (45 frames);
+  `1688:7195` (S7 root), `639:3092` (S7 Domains) and `639:2754` (S7 Export)
+  dumped to depth 3-5 for the duplication comparison.
+- **Code grounded against:** `packages/editor/src/editor/sidebar/tabs/settings/`
+  (`SettingsTab.tsx`, `constants.ts`, `screens/DomainsScreen.tsx`,
+  `screens/AnalyticsScreen.tsx`, `screens/IntegrationsHub.tsx`,
+  `screens/IntegrationsScreen.tsx`, `screens/RedirectsScreen.tsx`,
+  `screens/HeadersScreen.tsx`, `screens/LocalizationScreen.tsx`,
+  `screens/FormsScreen.tsx`, `screens/WebhooksScreen.tsx`),
+  `editor/rail/tabsConfig.ts`, `editor/export/ExportOptions.tsx`,
+  `editor/export/ExportModal.tsx`, `engine/export/ExportEngine.ts`,
+  `editor/chrome-ui/buttonTheme.ts`, `packages/dashboard/components/site-detail/tab-nav.tsx`,
+  `packages/dashboard/app/dashboard/sites/[id]/*`, `server/trpc/routers/site-detail.ts`,
+  `server/services/domain.service.ts`, `server/services/redirect.service.ts`,
+  `server/services/site-detail.service.ts`, `prisma/schema.prisma`.
+
+### Findings
+
+42 rows in `findings/J.jsonl` — **8 Critical, 24 Major, 10 Minor, 0 Polish**.
+
+### Not checked / not verified
+
+- **26 of 47 boards were never screenshotted**, and **33 of 47 were never
+  viewed by eye.** Not screenshotted: `173:63`, `173:316`, `174:90`, `174:276`,
+  `174:366`, `174:456`, `174:638`, `175:88`, `175:276`, `176:2`, `176:67`,
+  `176:130`, `176:195`, `176:260`, `176:325`, `176:390`, `176:456`, `176:521`,
+  `176:656`, `176:727`, `288:845`, `288:1010`, `288:1065`, `288:1230`,
+  `316:965`, `316:1130`. Every one of them was text-dumped, reaction-swept and
+  geometry-probed, so findings touching them rest on measured values and on a
+  viewed sibling in the same family — never on an unviewed image.
+- **Nothing was run in a browser.** Every code claim is read from source. The
+  shipping Settings surface was not opened live, so the "~1380px full-page"
+  figure is computed from `LayoutShell.css` grid values as reported, not
+  measured with `getComputedStyle`.
+- **No contrast ratios were computed** for this page. The colour findings
+  (`D-J-12` disabled-blue, `D-J-28` amber collision) rest on the rendered
+  screenshots and on cited token values, not on measured ratios.
+- **Component masters were not opened.** The `Nav item` (`215:*`),
+  `IntegrationRow` (`I258:*`) and field (`I327:*` / `I330:*`) instances were
+  read as instances; their master definitions on `1:2` were not fetched, so
+  `D-J-27` (missing integration logos) reports the absence of an image fill on
+  the instances, not on the master.
+- **`1:4` was compared only against `1:3`.** The remaining eight pages
+  (`0:1`, `1:2`, `1:5`, `1:7`, `397:2`, `500:2`, `510:2`, `988:2`) were not
+  searched, so no absence claim in `J.jsonl` extends past pages `1:4` and
+  `1:3`. In particular, a site-level Members, Billing or traffic-reporting
+  board may exist on `397:2` or `988:2`; `D-J-05` and `D-J-38` say only that
+  none exists on `1:4`.
+- **The three mis-wired back links** (`D-J-14`) were read from `reactions`;
+  I did not run the Figma prototype to confirm they behave as wired.
