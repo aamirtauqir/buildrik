@@ -17,9 +17,9 @@
       "name": "AI · done",
       "family": "AI",
       "width": 360,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-02 Figma D8 DONE: per-step copy. drift-applied-not-proposed-no-discard",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). Founder ruling 2026-09-03 in AgentPlan.tsx: each approved step applies in its own transaction, so at 'done' there is nothing left to discard. The board's batch Discard+Apply is deliberately not built.",
       "authority": "board"
     },
     {
@@ -41,9 +41,9 @@
       "name": "AI · idle",
       "family": "AI",
       "width": 360,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-02 Figma C1 DONE: scope chip added to idle (1625:7162). drift-scopechip-always-shown-board-has-none",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). The BOARD was edited 2026-09-02 to add the scope chip the census said was missing (node 1625:7162). Board and code now agree.",
       "authority": "board"
     },
     {
@@ -137,9 +137,9 @@
       "name": "AI · thinking",
       "family": "AI",
       "width": 360,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-chat-transcript-vs-prompt-in-input",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). ChatMessage has carried the board's Thinking band since 2026-08-15, inside a persistent transcript architecture chosen deliberately for multi-turn.",
       "authority": "board"
     },
     {
@@ -149,9 +149,9 @@
       "name": "B9.1 · Animation editor — Entrance · Attention · Exit",
       "family": "B9.1",
       "width": 1120,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). AnimationEditor already renders every element the board shows, including all 12/8/5 preset labels. Not rebuilt to tw: utilities — no visual difference, and it would risk 12 pinned tests for zero conformance gain. NOT live-verified.",
       "authority": "code:state-exists"
     },
     {
@@ -258,9 +258,9 @@
       "name": "Brand · import-export",
       "family": "Brand",
       "width": 280,
-      "status": "fix",
-      "owner": "verifier-brand",
-      "evidence": "2026-09-02 Figma D11 copy fixed ('.json or .ts'); P2 verifier-brand: bordered cards double inset; format rows 60-75 vs 48; Copy icon + Download 13px vs both 11px accent text; drop zone 128.5 vs 56. ExportSection.tsx:39-42,217-300; ImportCard.tsx:237. Board copy '.css' names a format accept rejects (D → Figma '.json or .ts')",
+      "status": "done",
+      "owner": "wave-F",
+      "evidence": "LANDED e63e72ed5 (wave F, merged): the import drop zone says the board's one centred line, 'Drop .json or .ts', at h-14 — the old two-line hint only hit 56px by coincidence. The rest of this board was already fixed; re-measured, not rebuilt.",
       "authority": "board"
     },
     {
@@ -270,10 +270,10 @@
       "name": "Brand · lint",
       "family": "Brand",
       "width": 280,
-      "status": "todo",
+      "status": "unbuildable",
       "blocker": "A",
-      "owner": null,
-      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. No lint rule anywhere sets autoFixHint, so the board's 'Fix ›' link is a capability with no producer (LintSection.tsx, re-checked 2026-08-18).",
       "authority": "blocked:no-autofix-producer"
     },
     {
@@ -319,10 +319,10 @@
       "name": "Brand · loading",
       "family": "Brand",
       "width": 280,
-      "status": "todo",
+      "status": "unbuildable",
       "blocker": "A",
-      "owner": null,
-      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. TokenRegistryContext and the Brand root have no async load boundary — no isLoading, no fetch; the panel populates synchronously from memory, so this skeleton state cannot occur in the running app.",
       "authority": "blocked:sync-load"
     },
     {
@@ -344,10 +344,10 @@
       "name": "Brand · presets · bound",
       "family": "Brand",
       "width": 280,
-      "status": "todo",
+      "status": "unbuildable",
       "blocker": "A",
-      "owner": null,
-      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. The Figma board is now titled 'UNBUILDABLE — elements carry no preset reference; TokenUsageTracker counts tokens (SectionStatusBadge.tsx:17-29)' — read live in Figma by the coordinator. 'Is this preset applied on the page' cannot be answered by the data model.",
       "authority": "blocked:no-element-preset-reference"
     },
     {
@@ -369,10 +369,10 @@
       "name": "Brand · presets · unbound",
       "family": "Brand",
       "width": 280,
-      "status": "todo",
+      "status": "unbuildable",
       "blocker": "A",
-      "owner": null,
-      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. Board titled 'UNBUILDABLE — same cause as 306:2111' (read live in Figma by the coordinator).",
       "authority": "blocked:no-element-preset-reference"
     },
     {
@@ -466,10 +466,10 @@
       "name": "Brand · typography",
       "family": "Brand",
       "width": 280,
-      "status": "todo",
+      "status": "unbuildable",
       "blocker": "A",
-      "owner": null,
-      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. Founder call 2026-08-16 in TypographySection.tsx: the ACTIVE FONTS list ships; '+ Add a font', the .woff2 drop zone and the licence checkbox do not, because there is no font storage and no publish-time @font-face pipeline.",
       "authority": "blocked:no-font-upload"
     },
     {
@@ -964,9 +964,9 @@
       "name": "History · Saves · changes",
       "family": "History",
       "width": 360,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-undo-empty-branch-only",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). Approval band, Now row, 'Compare with current' and the prune note were all built to this board on 2026-09-02; SavesChrome cites 163:2 directly.",
       "authority": "board"
     },
     {
@@ -1036,9 +1036,9 @@
       "name": "History · Saves · time-travel",
       "family": "History",
       "width": 360,
-      "status": "fix",
-      "owner": null,
-      "evidence": "partial-scrubber-opens-by-button",
+      "status": "done",
+      "owner": "wave-F",
+      "evidence": "LANDED 15bdec99c (wave F, merged): the time-travel band existed and cited this board, but its only door was ActivityView's button under the 'All changes' filter (plus an undiscoverable chord). A trigger is now visible from Milestones too, with a test.",
       "authority": "board"
     },
     {
@@ -3182,9 +3182,9 @@
       "name": "S7 · Settings · Integrations",
       "family": "S7",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. IntegrationsScreen: 'Real integration API not yet available.' No OAuth or connection backend exists, so every row is status='soon'. Faking Connected would be the convincing-wrong-artifact pattern this codebase has refused elsewhere.",
       "authority": "blocked:integrations-is-pro-gated-needs-pro-fixture",
       "blocker": "A"
     },
@@ -3268,9 +3268,9 @@
       "name": "Shell state 1 · First run",
       "family": "Shell states",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "partial-cta-half-only-coach-not-co-verified",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). CTA and RailCoach are both built and wired to the same completedCount === 0 condition. NOT live-verified — code reading only, no 1440x900 screenshot of them rendering together.",
       "authority": "board"
     },
     {
@@ -3292,9 +3292,9 @@
       "name": "Shell state 11 · Saving → conflict",
       "family": "Shell states",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-02 Figma D5 DONE: Save backup button added (1625:7164). drift-impersonal-3button-vs-attributed-2button-founder-gated",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. Real, substantive drift and explicitly founder-gated: the board is attributed ('Sara saved a change… 40 seconds ago') with Review-both; the code is impersonal with Reload/Backup/Overwrite. Attribution needs to know who else saved, which may not be available, and 'Review both' is an undetermined feature. Not redesigned unilaterally.",
       "authority": "board"
     },
     {
@@ -3365,9 +3365,9 @@
       "name": "Shell state 6 · Comment mode",
       "family": "Shell states",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "partial-comment-pins-not-reproduced",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). Already closed by 15ed4c5 in this arc — 'comment pins are the board's circles, not badges'.",
       "authority": "board"
     },
     {
@@ -3401,9 +3401,9 @@
       "name": "Shell state 9 · AI agent run",
       "family": "Shell states",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "UNBUILDABLE with evidence 2026-09-04 (wave F) — this is what the reopening asked for. The board's inspector activity-log pattern differs from AgentPlan's numbered steps, and confirming it against the running app needs a live paid OpenAI call.",
       "authority": "blocked:unreachable-by-design-paid-openai-call",
       "blocker": "A"
     },
@@ -3657,9 +3657,9 @@
       "name": "History · Saves · loading",
       "family": "History",
       "width": 360,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-skeleton-pitch-18-vs-32",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). Skeleton in VersionHistoryPanel already matches row height, indentation and bar widths, and cites board 1138:4573.",
       "authority": "board"
     },
     {
@@ -4431,9 +4431,9 @@
       "name": "Export · HTML (modal)",
       "family": "Shell",
       "width": 560,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-export-modal-cards-not-pills-oversized",
+      "status": "done",
+      "owner": "wave-F",
+      "evidence": "LANDED c2be7198f (wave F, merged): the format picker is the board's row of compact 11px pills, not FormatRow's title+description cards. Radiogroup semantics kept, Radio visually sr-only. FormatRow left in chrome-ui — its own doc names it for a future Publish-target surface.",
       "authority": "board"
     },
     {
@@ -4792,9 +4792,9 @@
       "name": "S7.0 · navigation-model · drill-in — NEW 2026-08-28",
       "family": "S7",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave-F",
+      "evidence": "SKIPPED code-ahead / already conformant 2026-09-04 (wave F). Board title itself now reads RETIRED 2026-09-02, 'not a screen' — verified live in Figma by the coordinator. SettingsTab.tsx:403-421 already implements the drill-in model it documents.",
       "authority": "founder:drill-in — standing preference reconfirmed 2026-08-28"
     },
     {
