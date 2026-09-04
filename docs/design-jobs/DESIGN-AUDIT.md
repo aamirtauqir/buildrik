@@ -912,3 +912,202 @@ audited page `1:3`, where the client screens exist only as labelled ECHO STUBS.
   `1:6` and `1:3`.
 - The Figma **component libraries** behind the instances on these boards were
   not opened; instance-level overrides were read, master definitions were not.
+
+## Dashboard spine (page 397:2) — coverage
+
+Agent **L**. Page set explicitly via `figma.root.children.find(p => p.id === "397:2")`.
+
+**Screens in module.** 54 children = **34 FRAME** + 20 TEXT. Of the 34 frames,
+**33 are product screens** (1440×900) and one is an annotation
+(`848:215` "Handoff → Editor", 761×204). The 20 TEXT nodes are 14 `caption/…`
+nodes and 6 section headers (`1054:13360`–`1054:13365`, claiming
+Authentication 11 / Dashboard Home 8 / Other 15 = 34, which matches the frame
+count including the handoff note).
+
+**Fetched.** All 34 frames: id, type, position, size, child count and name.
+All 14 captions read in full. A reactions sweep ran over **every** frame with
+carriers = `[frame, ...descendants]` (12–90 carriers per frame); all 34 have
+outbound reactions and every destination stays inside the page.
+
+**Screenshotted (9 of 33 screens).** `397:3` Auth · sign-in · `853:7116` Auth ·
+check inbox · `853:7259` Onboarding · AI · brief · `853:209` Dashboard · Home ·
+`398:14` Dashboard · Sites · `398:3809` Dashboard · Site detail · `398:3868`
+Workspace · Members · `869:375` Dashboard · Sites · empty · plus the annotation
+`848:215`. Chosen as one per archetype: full auth card, stub auth card,
+onboarding stub, shell+cards, shell+list, shell+detail, shell+form, empty state.
+
+**NOT checked — 24 of 33 screens were never rendered.** Their names, sizes,
+child counts, captions and reactions were read; their pixels were not.
+`397:18` sign-up · `397:38` forgot-password · `397:50` session-expired ·
+`398:97` path chooser · `398:3965` Billing · `398:4015` Workspace settings ·
+`398:4114` Notifications · `398:4164` sign out · `448:3899` sign-in submitting ·
+`448:3919` sign-in invalid-credentials · `853:317` Getting started ·
+`853:411` Media · `853:505` Templates · `853:533` template pick ·
+`853:7132` verify email · `853:7148` 2FA · `853:7164` magic link sent ·
+`853:7180` workspace select · `853:7227` Onboarding workspace ·
+`853:7243` first site · `853:7275` AI generating · `853:7291` AI preview ·
+`853:7307` ready · `869:468` Media empty · `869:508` AI generation-failed.
+Findings `D-L-14`, `D-L-15` and `D-L-03` rest on captions, reaction graphs and
+code comparison for screens in this list; `D-L-08` (the shell) was verified on
+the rendered `853:209` and is asserted for the other 19 in-app screens on the
+strength of the shared shell, not on 19 renders.
+
+**Also not checked.** Component masters behind the instances. Text styles, fill
+styles and token bindings — no `getStyleByIdAsync` or variable read was made on
+either page, so every colour, type and spacing claim in `L.jsonl` comes from a
+rendered screenshot or a code file, never from a fetched style value.
+
+## Dashboard v2 (page 988:2) — coverage
+
+Agent **L**. Page set explicitly via `figma.root.children.find(p => p.id === "988:2")`.
+
+**Screens in module.** 175 children = **82 FRAME** + 93 TEXT. All 82 frames are
+product screens; 3 of them are breakpoint variants (`1035:6242` 768,
+`1035:6347` 375, `1035:6434` Site · Overview 375). The 93 TEXT nodes are **79**
+`caption/…` nodes and 14 section headers (`1054:13366`–`1054:13379`). The
+headers total **79**, three short of the 82 frames — the gap is exactly the
+uncaptioned `1731:*` trio (finding `D-L-06`).
+
+**Fetched.** All 82 frames: id, type, position, size, child count, name. All 79
+captions read in full — they are the page's strongest asset, citing routes,
+tRPC procedures, services, components and role gates. A reactions sweep ran
+over **every** frame with carriers = `[frame, ...descendants]` (6–299 carriers
+per frame); all 82 have outbound reactions and every destination stays inside
+the page. A pairwise overlap test ran over all 82 frames (3,321 pairs) and
+returned exactly 2 collisions.
+
+**Screenshotted (16 of 82 screens).** `988:3` Home · `991:203` Site · Overview ·
+`993:360` Settings directory · `1008:3292` Settings · Team · `997:1923` Sites
+list · `1000:2352` Sites · denied · `998:1456` Agency · Clients · `994:639`
+Publish · pre-flight · `1016:5192` Auth · sign-in · `1025:5734` Onboarding · AI
+1 basics · `1024:5519` Templates browse (full-width) · `1035:6347` Home · 375 ·
+`1731:6357` Site · Access · `1006:3128` Site · Sharing · `1032:6275`
+Maintenance · `1021:5206` Share · preview. Chosen as one per archetype plus
+both halves of the duplicate pair in `D-L-04`/`D-L-09`.
+
+**NOT checked — 66 of 82 screens were never rendered.** Named, sized, captioned
+and reaction-swept, but not looked at. In particular: 12 of the 16 Settings
+sub-pages (only Team was rendered; `1008:3466` Billing, `1010:3519` Workspace,
+`1010:3689` Security, `1010:3866` Usage, `1010:4035` Plans, `1013:4343`
+Notifications, `1013:4506` Domains, `1013:4661` Integrations, `1013:4809` API
+tokens, `1014:4767` AI & credits, `1014:4926` Account, `1014:5091` Profile,
+`1014:5231` Delete workspace, `1032:6136` Vercel team picker were not); 7 of the
+8 Site tabs (`1005:2348` Traffic, `1005:2613` Domains, `1005:2865` SEO,
+`1005:3111` Submissions, `1006:2888` Redirects, `1006:3366` Settings, and the
+Overview at `991:203` was rendered); 5 of 6 Agency screens (`998:1635` Reviews,
+`998:1804` Shared theme, `1012:3947` Handover, `1012:4132` Library, `1012:4322`
+Partner, `1031:6049` client detail); 3 of 4 Publish (`994:738`, `994:836`,
+`994:922`); 7 of 8 Auth; 8 of 10 Onboarding; and `1023:5205` Media, `1023:5391`
+Activity, `1023:5568` Notifications, `1024:5619` Marketplace, `1024:5715`
+Learn, `1024:5794` Resources, `1024:5869` Help centre, `1031:5973` Template
+detail, `1031:6220` Help article, `1028:5734` Getting started, `1031:5840` Sites
+new, `1000:1855`/`1000:2016`/`1000:2183` Sites states, `1731:6535`/`1731:6731`
+Access states, `1020:5205` Share password gate, `1020:5219` Review sign-off,
+`1020:5244` Transfer, `1020:5262` Legal, `1035:6242` Home 768, `1035:6434` Site
+Overview 375. `D-L-11` (the Danger card) was read off the rendered `993:360`
+directory; the sub-page `1014:5231` itself was not rendered, only its name.
+
+**Also not checked.** Component masters. Styles and variables — same caveat as
+the spine: no style or token value was fetched on this page. Billing screens
+were confirmed to exist and were deliberately not audited (`D-L-22`), and the
+four Publish boards were audited only for their container shape (`D-L-12`),
+both per the standing out-of-scope decision on payments and deploy.
+
+**Absence claims.** The six auth routes in `D-L-16` and the eleven spine-only
+jobs in `D-L-03` were checked against **all eleven pages** of
+`g4GzQFqzNYz5sosz1QtZXC` by name sweep, so those may say "anywhere in the file".
+The sweep walked page children and SECTION children; a board nested inside
+another FRAME would have been missed.
+
+## Portfolio (page 1:5) — coverage
+
+Agent K. File `g4GzQFqzNYz5sosz1QtZXC`, page `1:5` 🏢 Portfolio — never audited
+before this wave.
+
+### Screens in the module
+
+**33 FRAMEs** (plus 37 caption/label TEXT nodes, audited as furniture, not as
+screens). The page's own group labels split them: Sites 8 · Components 1 ·
+Brand Kits 10 · Handover 4 · Other 10.
+
+- **Portfolio Sites (8)** — `177:42` grid, `177:150` filtered, `177:229` sorted,
+  `177:337` empty, `177:381` one-site, `177:433` loading, `177:503`
+  thumb-missing, `448:3998` load-error.
+- **BrandPush (10)** — `178:2` pick, `178:137` empty-selection, `178:266` diff,
+  `178:397` no-changes, `178:512` blast-radius, `179:2` confirming, `179:145`
+  pushing, `179:285` partial-failure, `179:427` done, `179:569` undone.
+- **Handover (4)** — `181:2` list, `181:142` expanded-row, `181:290` all-clear,
+  `181:400` empty.
+- **SharedLibrary (5)** — `182:2` grid, `182:156` empty, `182:274`
+  in-use-blocked-delete, `182:443` renaming, `182:596` loading.
+- **Agency (4)** — `853:7371` Clients, `869:7010` Clients · empty, `853:7399`
+  Reviews, `853:7427` Partner.
+- **Shell / handoff (2)** — `22:57` Portfolio shell, `850:6789` Handoff →
+  Editor (Components · library).
+
+### What was actually done
+
+- **Fetched: 33 of 33 frames.** Full recursive TEXT dump with frame-relative
+  coordinates for every frame; full reactions sweep over
+  `[frame, ...descendants]` for all 33 (74 edges recorded, destinations resolved
+  to node names).
+- **Screenshotted: 33 of 33** via `scripts/baseline/figma-shot.mjs`, every file
+  verified a complete PNG (header + `IEND`).
+- **Viewed by eye: 15 of 33** — `22:57`, `177:42`, `177:150`, `177:337`,
+  `177:433`, `177:503`, `178:512`, `179:2`, `179:145`, `179:427`, `181:142`,
+  `182:2`, `182:274`, `853:7427`, `869:7010`.
+- **Not viewed by eye (18):** `177:229`, `177:381`, `448:3998`, `178:2`,
+  `178:137`, `178:266`, `178:397`, `179:285`, `179:569`, `181:2`, `181:290`,
+  `181:400`, `182:156`, `182:443`, `182:596`, `850:6789`, `853:7371`,
+  `853:7399`. All 18 were text-dumped and reaction-swept; findings that touch
+  them rest on text, geometry and their viewed siblings, not on their own image.
+- **Geometry / visibility probe** (absolute-transform, per-descendant) on
+  `869:7010`, `853:7371`, `853:7399`, `853:7427`, `177:42`, `181:142`. This is
+  what showed the misaligned Agency card (`D-K-17`) — and what stopped a false
+  finding: the three client rows on `869:7010` are `visible: false`, so the
+  board named "empty" is genuinely empty even though the TEXT dump lists them.
+- **Cross-page (read-only, for the duplication claim in `D-K-01`/`D-K-02`):**
+  descendant and TEXT-node counts plus leading copy for `998:1456`,
+  `1012:4322`, `1031:6049`, `1024:5519` on page `988:2`; a file-wide frame-name
+  scan across all eleven pages for `brand kit | template | member | billing |
+  partner | client | portfolio`.
+- **Code grounded against:** `server/trpc/routers/{theme,sites,clients,reviews,
+  handover,site-component}.ts`, `server/services/{theme,handover,
+  site-component,publish,sites}.service.ts`, `packages/shared/schemas/
+  {theme,sites}.ts`, `prisma/schema.prisma` (Site, Workspace, WorkspacePreset,
+  SiteThemeSnapshot, SiteComponent, WorkspaceTransfer),
+  `packages/dashboard/app/dashboard/agency/(tabs)/{layout,partner/page}.tsx`,
+  `packages/dashboard/components/dashboard/shell/agency-tabs.tsx`,
+  `packages/dashboard/components/sites/{site-filters,site-status}.ts(x)`.
+
+### Findings
+
+35 rows in `findings/K.jsonl` — **6 Critical, 20 Major, 8 Minor, 1 Polish**.
+By question: Q1 5 · Q2 2 · Q3 7 · Q4 11 · Q5 10.
+
+### Not verified
+
+- **Nothing was run in a browser.** No `/dashboard/projects` or
+  `/dashboard/agency` page was opened; every code claim is read from source.
+  The `agency_layer` feature flag gates the whole agency surface and its live
+  state was not checked.
+- **Contrast was not measured.** `D-K-34`'s "low-contrast" reading of the
+  SharedLibrary helper copy is from the render by eye, not a computed ratio.
+- **Figma component masters were not opened.** The `Nav item` instances
+  (`215:700`–`215:714` and their copies on the Agency boards) were read as
+  instances with overrides; the master was not inspected, so the two dead rows
+  in `D-K-04` are dead at the instance level — a master-level reaction was not
+  ruled out.
+- **`850:6789`'s claim that "cross-page navigation [is] not supported by Figma
+  prototypes" was not tested.** The frame carries its own explanation and is
+  not filed as a defect, but if the claim is stale the stand-in frame is
+  unnecessary and the Handover → editor gap in `D-K-06` becomes wirable
+  directly.
+- **The `988:2` boards were counted, not audited.** `D-K-02` rests on
+  descendant/TEXT-node counts and leading copy, not on a screen-by-screen
+  comparison; page `988:2` belongs to another agent's scope.
+- **`177:229`, `178:266`, `179:285`, `179:569`, `182:443` were not eyeballed**,
+  so no craft finding is filed against the sorted grid, the token diff rows, the
+  partial-failure layout, the undone panel, or the rename field's action row.
+- **No absence claim here extends past page `1:5`** except where a file-wide
+  frame-name scan is cited.
