@@ -765,3 +765,150 @@ left alone.)
   were fetched for text (1339:7162, 1339:7171, 1168:4713, 815:4518). The rest I
   know only by name and section — they belong to other agents.
 - **Screenshots for 47 of 74 boards.** Their craft is unaudited.
+
+## Components (page 1:2) — coverage
+
+**Agent I. Scope correction: this page is a component LIBRARY, not product
+screens.** It was audited on variant coverage, state coverage, naming and token
+binding — not on "does the user need this screen". 24 findings in
+`findings/I.jsonl` (3 Critical, 16 Major, 5 Minor).
+
+### What is actually on the page
+
+93 top-level children, which resolve at full depth to **118 component nodes —
+25 `COMPONENT_SET` + 93 `COMPONENT`** — plus 11 documentation frames and 12 TEXT
+index labels. Zero product screens. The library is split in half by product:
+
+| Band | Declared by the page | Actually present |
+|---|---|---|
+| Editor Component Sets (`1054:13380`) | 14 | **19** |
+| Editor Components (`1054:13382`) | 7 | **14** |
+| Dashboard Component Sets (`1054:13384`) | 6 | 6 ✓ |
+| Dashboard Components (`1054:13386`) | 12 | 12 ✓ |
+| Icons (`1054:13388`) | 29 | 29 in that band; **67 on the page** |
+| Documentation & Showcase (`1054:13390`) | 11 | 11 ✓ |
+
+The two editor counts are wrong because ten real components are nested one level
+inside the `Atoms — controls` / `Molecules — chrome` / `Molecules — content`
+frames (D-I-10). Two organisational schemes — a flat by-type index and a nested
+atoms/molecules tree — are running at once.
+
+### Does 1:2 cover the editor's Components PANEL? No.
+
+All 118 component nodes were enumerated and every TEXT node on the page was
+searched for `/component|instance|detach|master|reusable|saved/i` (35 hits).
+**Not one addresses managing saved components.** Every hit is design-system
+vocabulary, Save-status sample copy, or the single Brand-drawer row `20:85`
+("Components · 27 ›", inside `20:56` *320 — Brand*). The panel's own states are
+not here. See D-I-20 and D-I-21.
+
+### Fetched / screenshotted / not checked
+
+- **Fetched (metadata, variant props or measured fills):** all 93 top-level
+  children; all 25 component sets' `variantGroupProperties`; measured fills,
+  strokes, corner radius, height, node opacity and effects for all 40 `Button`
+  variants, all 24 `Dashboard / Button` variants, all 5 `Badge` and all 5
+  `Dashboard / Pill` variants, and all 20 focus variants on the page; full child
+  trees of `20:6`, `11:36`, `16:27`, `14:45`, `17:41`, `1034:750`, `469:3961`,
+  `685:116`, `8:48`, `91:6`; all 67 icon components by name, size and path.
+- **Screenshotted (12):** `9:102`, `981:700`, `14:45`, `16:27`, `17:41`, `20:6`,
+  `91:6`, `8:47`, `1017:810`, `500:3`, `12:16`, `982:694`. All verified complete
+  PNGs.
+- **Not checked — say so plainly:**
+  - **13 of the 25 component sets were never screenshotted** — `10:16` Input,
+    `10:27` Status dot, `12:26` Checkbox, `19:46` Drawer frame, `19:79` Modal
+    frame, `92:30` Slider, `681:122` Topbar, `691:450` Avatar, `692:472`
+    Presence, `697:440` Icon button, `697:461` Save status, `975:632` Dashboard /
+    Nav item, `984:722` Dashboard / Banner, `989:7133` Dashboard / Section tab.
+    Their craft rests on measured geometry only, not on looking at them.
+  - **The 12 Dashboard components** (`976:614` Sidebar, `979:658` Top nav,
+    `982:664`, `982:677`, `984:683`, `985:682`…`985:729`, `992:743`, `997:705`)
+    were fetched by name and size but neither rendered nor measured.
+  - `699:440` *Topbar — every state* (26 children) was read only for its text.
+  - **No live-app verification.** No `getComputedStyle` read, no running editor.
+    Every code claim is a file read; every design claim is a Figma read. The
+    focus-ring finding (D-I-02) in particular describes four *declared* values —
+    which one wins in the browser is **not** verified.
+  - Pages `0:1`, `1:3`, `397:2`, `988:2` were walked only two levels deep for the
+    cross-page component search, so D-I-24's "absent from the library" claim is
+    scoped to page `1:2` alone.
+
+### Two findings retracted before filing
+
+Both were measurement errors caught by re-measuring, and are recorded so nobody
+re-files them:
+
+1. *"`Dashboard / Button` draws disabled with the hover fill."* The fill really
+   is `#1A56DB` on both — but the disabled variants carry `opacity = 0.5` at the
+   node level, which the first probe did not read. The real defect is different
+   and narrower (D-I-03: brand colour at half strength is itself the
+   anti-pattern `buttonTheme.ts` documents as fixed).
+2. *"Button focus states have no visible ring."* They do — it is a
+   `DROP_SHADOW`, not a stroke, and the first probe read `strokes` only. The
+   real defect is that the ring's geometry disagrees with the page's own rule
+   and with two code sources (D-I-02).
+
+## Client review (page 1:6) — coverage
+
+**Agent H.** Figma file `g4GzQFqzNYz5sosz1QtZXC`, page **`1:6` 👤 Client review**.
+This page holds the canonical screens for the external client. The earlier waves
+audited page `1:3`, where the client screens exist only as labelled ECHO STUBS.
+
+### Inventory
+
+50 top-level children: **24 FRAMEs (screens)** + 26 TEXT nodes (20 captions,
+5 section headers, 1 count label).
+
+| Family | Frames |
+|---|---|
+| S5.5 identify / landing | `112:2` empty, `23:2` typing, `112:21` validation-error, `113:3` returning-visitor, `23:21` landing-viewing |
+| S5.5 commenting / verdict | `114:2` commenting, `117:2` request-changes |
+| S5.5 terminal | `117:58` approved, `122:3` changes-requested, `120:2` post-approval-unchanged, `120:50` post-approval-edited-since |
+| S5.5 system states | `121:2` expired-token, `121:25` load-error, `121:48` loading |
+| S5.5 brand | `125:2` brand-colour, `125:49` brand-colour-fails-contrast |
+| S5.5 dead-link (echo-shaped, 1280×720) | `1736:8389` revoked, `1736:8397` not-found, `1736:8405` conflict (self-named UNBUILDABLE) |
+| Share | `854:30` draft preview, `869:7005` expired link |
+| Transfer | `854:35` accept handover, `854:41` accepted, `869:6999` expired link |
+
+### What was actually done
+
+- **Fetched: 24 of 24 frames.** Full recursive TEXT dump of every frame; full
+  reactions sweep over `[frame, ...descendants]` for all 24; absolute-coordinate
+  geometry probe on `23:21`, `114:2`, `117:2`, `112:2`, `122:3`, `117:58`; fill
+  probe on `125:2` / `125:49`.
+- **Screenshotted: 24 of 24** via `scripts/baseline/figma-shot.mjs`, all verified
+  complete PNGs. **Viewed by eye: 21 of 24.**
+- **Not viewed by eye (3):** `23:2` (A0 typing), `1736:8397` (dead-link
+  not-found), `1736:8405` (dead-link conflict). All three were text-dumped,
+  reaction-swept and screenshotted; findings that touch them rest on text and
+  geometry plus the sibling render (`1736:8389`), not on their own image.
+- **Cross-page:** all six echo stubs on `1:3` (`1339:7162`, `1339:7171`,
+  `1340:7162`, `1339:7186`, `1339:7193`, `1340:7174`) plus the three F-state
+  echoes (`1339:7200/7207/7214`) were text-dumped and reaction-read for the
+  drift comparison in `D-H-32`.
+- **Code grounded against:** `packages/dashboard/app/review/[token]/{page,review-client}.tsx`,
+  `app/share/[token]/{page,password-gate,not-published}.tsx`,
+  `app/transfer/accept/page.tsx`, `server/services/client-review.service.ts`,
+  `server/services/review.service.ts`, `server/trpc/routers/client-review.ts`,
+  `packages/shared/schemas/reviews.ts`, `prisma/schema.prisma`,
+  `components/global/cookie-consent.tsx`, `app/layout.tsx`.
+
+### Findings
+
+35 rows in `findings/H.jsonl` — **5 Critical, 23 Major, 5 Minor, 2 Polish**.
+
+### Not verified
+
+- **Nothing was run in a browser.** Every code claim is read from source; no
+  `/review/<token>` was opened live. The mobile-overflow arithmetic in `D-H-24`
+  is computed from the class list, not measured in a viewport.
+- **Contrast ratios** in `D-H-20` are computed from the Figma fill values
+  (`#f59e0b` → 2.15:1, `#0f766e` → 5.47:1 against white), not read off a
+  rendered page.
+- **The other nine pages** of the file remain unaudited by this wave:
+  `0:1` Foundations, `1:2` Components (93), `1:4` Site (113), `1:5` Portfolio
+  (70), `1:7` Archive (159), `397:2` Dashboard spine (54), `500:2`, `510:2`,
+  `988:2` Dashboard v2 (175). No absence claim in `H.jsonl` extends past pages
+  `1:6` and `1:3`.
+- The Figma **component libraries** behind the instances on these boards were
+  not opened; instance-level overrides were read, master definitions were not.
