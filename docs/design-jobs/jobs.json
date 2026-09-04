@@ -6388,12 +6388,12 @@
       "state": null,
       "width": null,
       "height": null,
-      "status": "fix",
+      "status": "done",
       "authority": "product",
       "kind": "flow",
-      "owner": "editor-ed",
+      "owner": "editor-aa",
       "recipe": null,
-      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. unpublishSite() is fully implemented including Vercel teardown, and is exposed only in the dashboard site header - never in the editor SiteMenu or PublishTab. Taking a site down means leaving the editor."
+      "evidence": "FOUND BY JOURNEY WALK 2026-09-03 (TA), driven live in the running product. P2. unpublishSite() is fully implemented including Vercel teardown, and is exposed only in the dashboard site header - never in the editor SiteMenu or PublishTab. Taking a site down means leaving the editor. | LANDED 13b722414 (2026-09-04): Publish panel offers Unpublish site… on a live deploy with the dashboard's confirm; site menu row opens the panel and asks it; the shell's publishedUrl clears through the hook. Marked done after the earlier reconciliation pass, which ran before the commit."
     },
     {
       "id": "F-INSERT-STATES-ORPHAN",
