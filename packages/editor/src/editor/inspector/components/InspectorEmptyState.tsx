@@ -45,7 +45,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     return (
       <div role="status" aria-live="polite" className={CONTAINER_APPLIED}>
         <div className={APPLIED_BANNER}>
-          <h3 className={APPLIED_TITLE}>Template applied.</h3>
+          <h3 className={APPLIED_TITLE}>Template applied!</h3>
           {/* was color: var(--bk-success-tint) — a BACKGROUND tone used as text,
               i.e. pale green on pale green. The name was barely readable. */}
           <p className={APPLIED_NAME}>{appliedName}</p>
@@ -88,7 +88,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           size="xs"
           data-testid="inspector-empty-ask-ai"
           onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
-          variant="link" className="tw:min-h-6 tw:mt-2 tw:font-normal"
+          variant="link" className="tw:min-h-6 tw:mt-2 tw:self-center tw:font-normal"
         >
           ✦ Ask AI ›
         </Button>
@@ -103,11 +103,15 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
 
 /* Top-left, at the panel's own 16px margin — where the first row of a real
    inspector would be, not floating in the middle of an 812px column.
-   Boards 159:99 and 1175:4841 set every child at x=16: the sentence, the AI
-   action, the template banner, the tip. Measured live 2026-08-31 after the
-   change: sentence x17 y64, action x17 y92, against the board's x16 y64 / y92.
-   Horizontally centred, the single action rendered as a 62px link adrift
-   mid-panel above 700px of void; left-aligned it reads as the next step.
+   Boards 159:99 and 1175:4841 place both text nodes as a 268px block
+   centred in the 300px panel (x16..x284) — for the sentence that box is
+   as wide as the line itself, so left vs centre is invisible; the AI link's
+   box is the same 268px even though the glyphs are ~62px, and the panel's
+   own `text-center` ancestor centres them inside it. Read literally as
+   "box starts at x16" (a metadata-only read, not the rendered image) this
+   looked like a flush-left action; the board's own screenshot shows it
+   centred under the sentence, so the sentence stays flush (`DESCRIPTION`)
+   and the link gets `self-center` on its own.
 
    The TOP padding is not shared: 159:99 opens its sentence at y64, while
    1175:4841 opens its banner at y14, so the template-applied branch overrides
@@ -141,9 +145,11 @@ const APPLIED_BANNER =
    a pale tint of it. */
 /* Sized to its label, not to the banner: board 1175:4841 draws it 113px wide
    inside a 288px banner. Full-width it read as a section footer. */
-/* `size="xs"` on the Button, not a height class here: flowbite ships its own
-   `h-10`, and a competing `h-*` in this string loses on stylesheet order the
-   same way the padding did. */
+/* `size="xs"` gives the flowbite Button its own fixed `h-8` (32px, not the
+   board's 27). `min-h-*` is a DIFFERENT property from `h-*` so it never
+   contested that base class — measured 32px with `min-h-6` still in place.
+   `h-auto` IS the same twMerge group as `h-8` and wins as the later class,
+   letting the padding (py-7 top/bottom + the 11px label) size it to 27. */
 const APPLIED_ACTION =
-  "tw:inline-block tw:min-h-6 tw:rounded-md tw:px-3 tw:py-[7px] tw:text-[11px] tw:font-medium tw:text-center " +
+  "tw:inline-block tw:h-auto tw:min-h-6 tw:rounded-md tw:px-3 tw:py-[7px] tw:text-[11px] tw:font-medium tw:text-center " +
   "tw:border-transparent tw:bg-[var(--bk-accent)] tw:text-white";
