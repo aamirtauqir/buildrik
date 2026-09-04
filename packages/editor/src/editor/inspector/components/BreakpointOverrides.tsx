@@ -84,32 +84,43 @@ export const BreakpointOverrides: React.FC<BreakpointOverridesProps> = ({
     <div className="tw:flex tw:flex-col" data-testid="breakpoint-overrides">
       {overrides.map(([property, value]) => (
         <div key={property}>
-          <div className="tw:flex tw:items-center tw:gap-2 tw:border-l-2 tw:border-[var(--bk-accent)] tw:px-3 tw:py-2">
-            <span className="tw:w-[72px] tw:shrink-0 tw:text-[12px] tw:text-[var(--bk-ink-soft)]">
+          {/* Board 160:305 uses the SAME 96px-label / 1fr-control grid every
+              other property row uses (16 + 96 + 8 = 120, where its control
+              starts) — the row used to run its own 72px label column and a
+              subtle-tint value chip instead of the standard white/bordered
+              field, reading as a different, unrelated control type. The 2px
+              accent bar is a `border-left`, which ADDS to box width, so the
+              left inset is 14px, not 16 — 14 + the border's own 2 lands
+              content at the same x16 every other row uses. */}
+          <div
+            className="tw:grid tw:items-center tw:gap-2 tw:border-l-2 tw:border-[var(--bk-accent)] tw:py-[3px] tw:pl-[14px] tw:pr-4"
+            style={{ gridTemplateColumns: "96px 1fr" }}
+          >
+            <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
               {humanise(property)}
             </span>
-            <span className="tw:flex-1 tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-1 tw:text-[12px] tw:text-[var(--bk-ink)]">
+            <span className="tw:relative tw:flex tw:h-7 tw:items-center tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:pl-2 tw:pr-6 tw:text-[12px] tw:text-[var(--bk-ink)]">
               {value}
+              <Button
+                color="light"
+                size="xs"
+                className="tw:absolute tw:right-0.5 tw:top-1/2 tw:h-auto tw:min-h-0 tw:-translate-y-1/2 tw:border-transparent tw:bg-transparent tw:p-1 tw:text-[var(--bk-accent)]"
+                aria-label={`Revert ${humanise(property).toLowerCase()} to base`}
+                title={`Revert to base`}
+                onClick={() => {
+                  composer?.beginTransaction?.(`revert-${property}-${breakpoint}`);
+                  try {
+                    composer?.styles?.removeBreakpointStyleProperty(elementId, breakpoint, property);
+                  } finally {
+                    composer?.endTransaction?.();
+                  }
+                }}
+              >
+                <RotateCcw size={12} aria-hidden="true" />
+              </Button>
             </span>
-            <Button
-              color="light"
-              size="xs"
-              className="tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[var(--bk-accent)]"
-              aria-label={`Revert ${humanise(property).toLowerCase()} to base`}
-              title={`Revert to base`}
-              onClick={() => {
-                composer?.beginTransaction?.(`revert-${property}-${breakpoint}`);
-                try {
-                  composer?.styles?.removeBreakpointStyleProperty(elementId, breakpoint, property);
-                } finally {
-                  composer?.endTransaction?.();
-                }
-              }}
-            >
-              <RotateCcw size={12} aria-hidden="true" />
-            </Button>
           </div>
-          <p className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-accent)]">
+          <p className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px] tw:text-[var(--bk-accent)]">
             Overridden on {breakpointName} — Base is {base[property] || "not set"}
           </p>
         </div>
