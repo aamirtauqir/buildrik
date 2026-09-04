@@ -64,7 +64,10 @@ export const BindingBanner: React.FC<BindingBannerProps> = ({
 
   return (
     <div
-      className="tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2"
+      // Board 160:204 is edge-to-edge (x0, w300) with its children inset
+      // 16px, not the 12px this used to carry — the label/note both sit
+      // flush with the panel's own 16px column margin.
+      className="tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:pt-2.5 tw:pb-2"
       data-testid="binding-banner"
     >
       <div className="tw:flex tw:items-start tw:gap-2">
@@ -74,13 +77,16 @@ export const BindingBanner: React.FC<BindingBannerProps> = ({
         <Button
           color="light"
           size="xs"
-          className="tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent)]"
+          // Board's "Unbind" is 11px regular text, not a boxed control —
+          // and `h-auto` beats flowbite's fixed `h-8` the same way it does
+          // everywhere else in this family (min-h-6 is a different property).
+          className="tw:h-auto tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)]"
           onClick={() => composer?.cms?.bindings?.unbindAll?.(elementId)}
         >
           Unbind
         </Button>
       </div>
-      <p className="tw:m-0 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+      <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
         Edit the record in Content, or unbind to type here.
       </p>
     </div>
