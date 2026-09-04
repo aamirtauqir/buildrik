@@ -1,7 +1,29 @@
 # Design audit brief — every screen must earn its place
 
 You are auditing the Buildrik editor's Figma file as a **senior product
-designer**, not a checklist runner. File `g4GzQFqzNYz5sosz1QtZXC`, page `1:3`.
+designer**, not a checklist runner. File `g4GzQFqzNYz5sosz1QtZXC`.
+
+**The file has ELEVEN pages. Your assignment names yours — set it explicitly and
+never assume `1:3`.** The first six waves were scoped to `1:3` because CLAUDE.md
+names it as the rebuild checklist, and that cost three refuted findings: they
+measured deliberate ECHO STUBS on `1:3` while the canonical screens sat on `1:6`.
+
+| page | name | children |
+|---|---|---|
+| `0:1` | 📕 Foundations | 2 |
+| `1:2` | 🧩 Components | 93 |
+| `1:3` | 🖥️ Editor | 27 sections / 898 |
+| `1:4` | 🗔 Site | 113 |
+| `1:5` | 🏢 Portfolio | 70 |
+| `1:6` | 👤 Client review | 50 |
+| `1:7` | 🗃️ Archive | 159 |
+| `397:2` | 🏠 Dashboard — spine | 54 |
+| `500:2` / `510:2` | Components 1 / 2 | 1 / 6 |
+| `988:2` | 🏠 Dashboard v2 — screens | 175 |
+
+**No absence claim may say "anywhere" unless you searched every page.** Write
+"no board on page 1:3" instead. A "no board anywhere" finding of mine was
+refuted twice over on this exact point.
 
 ## The order is not negotiable
 
@@ -38,7 +60,11 @@ or the product surface where the job exists but the design does not.
 ## Rules
 
 - **You are READ-ONLY.** Do not rename, move, delete or create any Figma node.
-  Do not edit source. Report only. A later pass makes changes.
+  Do not edit source. Report only. **The coordinator executes rearrangements**
+  from your findings — that division is the point, so that every move is made
+  against a verified finding rather than mid-audit. (A verifier correctly flagged
+  the coordinator's own `D-X-11` move against this rule when it was written as a
+  blanket "you"; it applies to audit agents.)
 - **Never delete a Figma node** is a standing project rule, and it applies to
   whoever acts on your report too — recommend renames, never deletions.
 - **Cite everything.** Every claim carries a node id and a fetched value. A
