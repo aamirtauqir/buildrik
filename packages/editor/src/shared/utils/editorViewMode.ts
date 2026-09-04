@@ -5,12 +5,20 @@
  * read one place (no drifting URLSearchParams copies).
  *
  *   (default)      → Figma-contract rail (F1 promoted 2026-07 — the 02 · Editor
- *                    design supersedes E3). Five rail tools: Add / Assets /
- *                    Components / Layers / Pages. AI is contextual (canvas + ⌘K),
- *                    everything else lives in the topbar. Revert-by-URL below.
+ *                    design supersedes E3). SIX rail tools, read off the running
+ *                    editor 2026-09-04: Insert / Layers / Pages / Media /
+ *                    Content / Brand. AI is contextual (canvas + ⌘⇧P), everything
+ *                    else lives in the topbar. This block said "Five rail tools:
+ *                    Add / Assets / Components / Layers / Pages" — a count and
+ *                    four names that no longer match anything on screen, and the
+ *                    "Components" it named is one of the four doors IA-10 was
+ *                    about.
  *   ?rail=e3       → the 4-tool E3 rail (Insert/Pages/Styles/Site + ✨ AI +
- *                    ⌗ structure). Was the default until F1; kept as an escape hatch.
- *   ?rail=legacy   → the old 11-tab zone rail (deepest escape hatch)
+ *                    ⌗ structure). Was the default until F1. DEV-ONLY.
+ *   ?rail=legacy   → the old 11-tab zone rail. DEV-ONLY.
+ *
+ *   Both rail escape hatches resolve to "figma" in a production bundle — see
+ *   resolveRailMode below (IA-14). They are comparison tools, not user-facing.
  *   ?density=fewer → trimmed inspector
  *   ?view=readonly → a read-only VIEW, the way Figma's is: no rail, no drawer,
  *                    no inspector, no owner controls, and a Composer that runs

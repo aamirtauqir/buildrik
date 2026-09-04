@@ -188,8 +188,14 @@ the code and not just in what happens to ship.
 `IS_DEV_BUILD`; a production bundle resolves every `?rail=` value to `figma`.
 Both renderers still compile and stay reachable in dev, so the alternatives
 remain available for comparison without being one URL away for a customer.
-Five tests pinned the old behaviour and were rewritten in the same commit —
-they now assert BOTH halves (hatches live in dev, ignored in production).
+Seven tests pinned the old behaviour. Five were rewritten in the same commit;
+`editorViewMode.test.ts` carries the production half (a negative control
+confirmed it: delete the gate and it fails on `railMode:"e3"` vs `"figma"`),
+while the three combos cases assert only the dev half. **Two more were missed
+and shipped red** — `DesignRailButton.test.tsx:31` and `StudioFooter.test.tsx:241`
+drive `?rail=legacy`/`?rail=e3` and live in `src/editor/rail` and
+`src/editor/shell`, outside the directories that commit ran. Fixed in the
+follow-up; the lesson is the older one: a scoped test run is not a suite.
 
 ### IA-15 · Insert and Layers open with no purpose copy — **Minor, fixed**
 
@@ -217,7 +223,7 @@ Layers' names only drop positions that exist (`panels/layers/types.ts:56` —
 `"before" | "after" | "inside"`). Layers' line is hidden while the tree is empty
 so it does not stutter against the empty state, and both hide during search.
 
-Two defects surfaced while fixing it, both caught by measuring rather than
+Three defects surfaced while fixing it, each caught by measuring rather than
 reading:
 
 1. **I nearly "fixed" a panel that wasn't broken.** Source said Insert shows a
@@ -230,7 +236,15 @@ reading:
    whatever was selected at mount. Now subscribed to the same five selection
    events `useLayerSelection` uses. Verified live: the line moved from "end of
    the page" to "into or beside Container" on selecting a row.
-3. **The line collapsed to 24px** when its styles moved from a CSS class to
+3. **The copy overstated two of its own claims** — caught by a codex review,
+   not by me. "or drag onto the canvas" was false for blocks, components and
+   mine rows: only the ELEMENTS group passes `draggable`
+   (`GroupSection.tsx:189`). And "into or beside" omitted the case where no
+   ancestor accepts the block and it lands at the page root. The line now reads
+   "Click a row to add it inside or next to X **where it fits**. **Drag
+   elements** onto the canvas instead." Writing copy that names a control that
+   does not exist is exactly IA-13 — which I had fixed four commits earlier.
+4. **The line collapsed to 24px** when its styles moved from a CSS class to
    `tw:` utilities — its parent is a flex row, so it shrank to fit. `tw:w-full`
    restored 279px. A screenshot would have shown text and looked fine.
 

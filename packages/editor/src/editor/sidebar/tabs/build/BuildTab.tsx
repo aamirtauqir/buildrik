@@ -172,17 +172,23 @@ export const BuildTab: React.FC<BuildTabProps> = ({
         </div>
 
         {/* What this panel is for. Insert opened straight onto a wall of 53
-            element tiles with nothing saying what a click does — the two
-            affordances (click to add, drag to place) were discoverable only by
-            trying one. The destination is the real smart-placement rule in
-            useBlockInsertion: into the selected element when it can hold the
-            block, beside it when it cannot, and at the end of the page when
-            nothing is selected. Stated, not guessed. */}
+            element tiles with nothing saying what a click does.
+
+            Every clause here is scoped to what the code actually does:
+            - "Click a row" covers all four groups — clicking inserts everywhere.
+            - "Drag elements" is deliberately narrow. Only the ELEMENTS group
+              passes `draggable` (GroupSection.tsx:189); blocks, components and
+              mine rows do not, so a blanket "drag onto the canvas" would have
+              been false for most of the panel — the same defect IA-13 fixed.
+            - "inside or next to … where it fits" is the smart-placement walk in
+              useBlockInsertion.ts:67-80, which climbs to the nearest ancestor
+              that accepts the block; "where it fits" carries the case where
+              none does and it lands at the page root. */}
         {!isSearching && (
           <p data-testid="insert-purpose" className="tw:m-0 tw:w-full tw:pt-1 tw:px-3 tw:pb-2 tw:text-[length:var(--bk-text-11)] tw:leading-snug tw:text-[var(--bk-ink-soft)]">
             {tab.insertionContext
-              ? `Click to add into or beside ${tab.insertionContext.label}, or drag onto the canvas.`
-              : "Click to add at the end of the page, or drag onto the canvas."}
+              ? `Click a row to add it inside or next to ${tab.insertionContext.label} where it fits. Drag elements onto the canvas instead.`
+              : "Click a row to add it at the end of the page. Drag elements onto the canvas instead."}
           </p>
         )}
 

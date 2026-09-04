@@ -12,6 +12,16 @@ import { render } from "@testing-library/react";
 
 // Suspense tab bundles are lazy — stub them before the import chain runs.
 vi.mock("../../sidebar/tabs/build", () => ({ BuildTab: () => null }));
+
+/* These cases drive a legacy rail via ?rail=, and those escape hatches are
+   DEV-ONLY now (IA-14) — a production bundle resolves every rail value to the
+   shipping Figma rail. Mock the flag so the case still exercises the rail it
+   is about. */
+vi.mock("@/shared/utils/runtimeEnv", async (orig) => ({
+  ...(await orig<Record<string, unknown>>()),
+  IS_DEV_BUILD: true,
+}));
+
 vi.mock("../../sidebar/tabs/layers/LayersTab", () => ({ default: () => null }));
 vi.mock("../../sidebar/tabs/pages/PagesTab", () => ({ default: () => null }));
 vi.mock("../../sidebar/tabs/ComponentsTab", () => ({ default: () => null }));
