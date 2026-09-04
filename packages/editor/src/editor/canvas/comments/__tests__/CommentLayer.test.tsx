@@ -142,6 +142,32 @@ describe("CommentLayer", () => {
       expect(composer.emit).toHaveBeenCalledWith("comments:orphans", { ids: ["dead"] }),
     );
     expect(await screen.findByText("A comment lost its element")).toBeInTheDocument();
+    // Board 184:56: 560-wide (`form`), not the 720 (`lg`) it shipped with.
+    expect(document.querySelector(".tw\\:w-\\[560px\\]")).toBeInTheDocument();
+    // No captured label for this session — the generic fallback, not a lie.
+    expect(screen.getByText("was pinned to a deleted element")).toBeInTheDocument();
+  });
+
+  it("names the deleted element when ELEMENT_DELETED captured it this session (board 184:56 'was on:')", async () => {
+    // A second, still-anchored comment keeps `pinnedHere !== ids.length` — the
+    // "everything vanished at once" render-not-ready guard would otherwise
+    // suppress a single orphan on a DOM that renders only one element.
+    comments.push(
+      openComment({ id: "dead", targetSelector: anchorSelector("deleted-el") }),
+      openComment({ id: "ok", targetSelector: anchorSelector("el-1") }),
+    );
+    const composer = makeComposer();
+    mount(composer);
+    const fakeElement = {
+      getId: () => "deleted-el",
+      getType: () => "button",
+      getContent: () => "<span>Book a table</span>",
+    };
+    act(() => composer.emit("element:deleted", fakeElement));
+    await waitFor(() =>
+      expect(composer.emit).toHaveBeenCalledWith("comments:orphans", { ids: ["dead"] }),
+    );
+    expect(await screen.findByText('was on: "Book a table"')).toBeInTheDocument();
   });
 
   it("reattach flow: banner shows, element click re-pins and emits comments:reattached", async () => {
