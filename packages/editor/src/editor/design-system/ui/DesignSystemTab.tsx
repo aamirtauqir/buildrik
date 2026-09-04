@@ -130,7 +130,7 @@ type DesignSection = "tokens" | "typography" | "styles" | "starters" | "classes"
 /* Board 1333:7162's order, top to bottom. Typography used to sit second here and
    sits sixth on the board — the list is the whole screen, so its order is the
    layout. */
-const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
+const SECTIONS = [
   { id: "tokens",     label: "Tokens",          hint: "Colours, type, spacing" },
   { id: "styles",     label: "Presets",         hint: "Component style presets" },
   { id: "starters",   label: "Starters",        hint: "Whole-brand starting points" },
@@ -146,7 +146,17 @@ const SECTIONS: Array<{ id: DesignSection; label: string; hint: string }> = [
   { id: "colour-mode", label: "Colour mode",    hint: "Light and dark values" },
   { id: "lint",       label: "Lint",            hint: "What breaks the brand" },
   { id: "export",     label: "Import / export", hint: "Move the brand in and out" },
-];
+] satisfies ReadonlyArray<{ id: DesignSection; label: string; hint: string }>;
+
+/* The header renders `Brand › ${SECTIONS.find(...)?.label ?? ""}`, so a section
+   id that reaches the drill level without a row here would print "Brand › " —
+   a header that is worse than the constant it replaced. The annotation this
+   list used to carry could not catch that: it constrained each entry's id to a
+   DesignSection but never required every DesignSection to appear. `satisfies`
+   keeps the literal ids, so this line fails the build instead. */
+type UncoveredSection = Exclude<DesignSection, (typeof SECTIONS)[number]["id"]>;
+const _everySectionHasARow: UncoveredSection extends never ? true : UncoveredSection = true;
+void _everySectionHasARow;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
