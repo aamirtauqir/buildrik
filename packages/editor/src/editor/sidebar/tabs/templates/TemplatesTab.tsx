@@ -417,8 +417,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         />
       ) : (
       <>
-      {/* Search input */}
-      {showSearch && (
+      {/* Search input — board 807:7252 draws it visible by default in the
+          new-page picker (no toggle icon to find first); the plain Templates
+          tab keeps the header's search-icon toggle. */}
+      {(showSearch || newPageMode) && (
         <div className="tpl-search-wrap">
           <div className="tpl-search-input-box">
             <Search size={16} className="tpl-search-icon" />
