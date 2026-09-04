@@ -79,8 +79,20 @@ Traps that have cost this project real time:
   never a JSON dump. A truncated return breaks `JSON.parse` silently.
 - `figma.currentPage` resets between calls — `await figma.setCurrentPageAsync(page)`
   once per script.
-- Screenshots: `await node.screenshot()` returns inline. Use them for craft
-  findings; a metadata read is not a substitute for looking at an archetype.
+- **Screenshots: use the committed downloader, not `exportAsync`.**
+
+  ```bash
+  node scripts/baseline/figma-shot.mjs <outDir> 166:2 1177:4804 ...
+  ```
+
+  It calls `get_screenshot`, which returns a hosted `image_url`, and downloads
+  real PNGs, verifying each is a complete PNG (header + `IEND`). Then `Read` the
+  file — images render. **Do not use `exportAsync` + `base64Encode`**: the
+  ~20KB transport truncates the base64 and you get a valid PNG header over
+  incomplete pixels. That cost one audit wave every screenshot it tried (0 of
+  48) and left its craft findings resting on geometry alone.
+
+  A metadata read is not a substitute for looking at the board.
 
 ## Output
 
