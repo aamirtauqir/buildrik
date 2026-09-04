@@ -125,3 +125,30 @@ right-aligned content — roughly 7 nodes per board across 22 boards.
 
 The height half of the same recommendation was safe and **is done**: the seven
 280×776 boards are now 280×812, so the 280-wide drawer has one size.
+
+
+---
+
+## 9. Group labels — TESTED, and my detector was the problem
+
+**718 unbound 11px "caps" labels across 8 recipes.**
+
+Piloted on `1159:4593 Media · fullpage · library`, which the detector said had 9
+group labels. Seven of them were **count badges** — `6`, `14`, `10`, `24`, `8`,
+`5` — because **a number is equal to its own uppercase**, so `ch === ch.toUpperCase()`
+matches every numeral in the file. Binding them to `ui/11 · section header` made
+count badges carry a section-header style: visually subtle, semantically wrong,
+and it would have mislabelled every count in the product.
+
+Reverted the 7 to Regular/AUTO/0%. The 2 genuine labels on that board (`SMART`,
+`FOLDERS`, `TAGS`) were correctly bound and kept.
+
+**So the 718 figure is not trustworthy** — it is an upper bound containing an
+unknown number of numerals, badges and codes. Before any bulk change, the
+detector needs a real definition of a group label: at minimum excluding pure
+numerals, and probably requiring a letter and a minimum length.
+
+The underlying decision is unchanged and still real — the tracking is `+8%` on
+537 bound labels and `+0.5px` or `0%` on the unbound ones, and 477 carry AUTO
+leading no `--bk-leading-*` token can express. But the population needs
+re-counting first.
