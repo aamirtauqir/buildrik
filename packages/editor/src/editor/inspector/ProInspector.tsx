@@ -460,8 +460,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             same pill that turned it on — which now reads "All like this", so the
             banner and the control agree about where you are. */}
         {reachAll && (
+          // Board 160:510 ("Reach note") carries no left accent bar at all —
+          // the extra 2px `border-l-2` was never in the frame, and the
+          // banner's own inset is x16 in a 300-wide frame (px-4, not px-3).
           <p
-            className="tw:m-0 tw:border-l-2 tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-warning-text)]"
+            className="tw:m-0 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:pt-2.5 tw:pb-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-warning-text)]"
             role="status"
             data-testid="reach-all-banner"
           >
@@ -484,8 +487,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             which state was picked, not that the panel below it had changed
             meaning. */}
         {currentPseudoState !== "normal" && (
+          // Board 160:410 ("Pseudo note") is 11px regular at a 16px inset,
+          // sized to a 32-tall band (px-4 pt-2 pb-2) — this carried 12px at
+          // a 12px inset instead.
           <p
-            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-1.5 tw:text-[12px] tw:text-[var(--bk-accent)]"
+            className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)]"
             data-testid="pseudo-state-banner"
           >
             Editing {pseudoStateLabel(currentPseudoState)} — not Base

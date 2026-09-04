@@ -198,7 +198,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`tw:min-h-6 tw:rounded-md tw:border-0 tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-medium ${
+            className={`tw:h-auto tw:rounded-md tw:border-0 tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-medium ${
               tab === t
                 ? "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
                 : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"

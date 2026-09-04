@@ -52,4 +52,16 @@ describe("binding banner", () => {
     );
     expect(container).toBeEmptyDOMElement();
   });
+
+  /* Board 160:204 is edge-to-edge (x0, w300) at a 16px child inset, and
+     "Unbind" is 11px regular text, not a boxed control at flowbite's fixed
+     height. */
+  it("insets the banner 16px and drops flowbite's fixed height off Unbind", () => {
+    const { composer } = makeComposer([{ collectionId: "c1", fieldSlug: "name" }]);
+    render(<BindingBanner composer={composer} elementId="el-1" elementLabel="Text" />);
+    expect(screen.getByTestId("binding-banner").className).toContain("tw:px-4");
+    const unbind = screen.getByRole("button", { name: "Unbind" });
+    expect(unbind.className).toContain("tw:h-auto");
+    expect(unbind.className).toContain("tw:text-[11px]");
+  });
 });

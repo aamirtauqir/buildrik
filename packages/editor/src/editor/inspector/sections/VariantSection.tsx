@@ -140,7 +140,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
       <Button
         color="light"
         size="xs"
-        className="tw:mt-1 tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[12px] tw:text-[var(--bk-accent)]"
+        className="tw:mt-1 tw:h-auto tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-normal tw:text-[var(--bk-accent)]"
         onClick={() => {
           if (componentInfo.instanceId) {
             void composer?.components?.resetInstance?.(componentInfo.instanceId);

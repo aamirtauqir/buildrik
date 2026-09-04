@@ -39,17 +39,22 @@ export interface MultiSelectToolbarProps {
 // STYLES
 // ============================================================================
 
+/* Board 159:123 stacks Header (48 tall) / Align (72) / Distribute (44)
+   CONTIGUOUSLY — the next inspector row starts at y164, exactly Header +
+   Align + Distribute with no seam between them. A single outer padding
+   used to wrap all three, which both inset ALIGN's tint 16px off the panel
+   edges (never full-bleed) and put a 16px gap between blocks the board
+   never draws. Each section now owns its own inset instead. */
 const toolbarStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--bk-space-16)",
-  padding: "var(--bk-space-16)",
 };
 
 const sectionStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--bk-space-8)",
+  gap: "6px", // no --bk-space-6 token; label-to-buttons gap per board 159:126
+  padding: "var(--bk-space-8) var(--bk-space-16) 14px", // 8 top / 16 sides / 14 bottom = 72 total with the content below
 };
 
 /* Board 159:123 bands ALIGN and only ALIGN: a full-width tinted strip that
@@ -60,11 +65,14 @@ const sectionStyles: React.CSSProperties = {
 /* Inside the band the buttons are white boxes; outside it, on the plain
    panel, DISTRIBUTE's two are the tinted ones. The board inverts them that
    way, and transparent buttons on a tinted band had no edge at all. */
+/* No border-radius: the board's Align frame (159:126) is `w-full`, x0..x300,
+   square corners — Gate 13 caps chrome radius at 4 anyway. A prior pass read
+   the frame's OWN 16px child inset as the band's outer margin and wrapped it
+   in `--bk-radius-lg` (8px, rounded) inside a padded parent, so the tint
+   never reached the panel edge and carried a corner the board doesn't draw. */
 const bandedSectionStyles: React.CSSProperties = {
   ...sectionStyles,
   background: "var(--bk-bg-subtle)",
-  padding: "var(--bk-space-8) var(--bk-space-12)",
-  borderRadius: "var(--bk-radius-lg)",
 };
 
 const sectionLabelStyles: React.CSSProperties = {
@@ -77,7 +85,7 @@ const sectionLabelStyles: React.CSSProperties = {
 
 const buttonGroupStyles: React.CSSProperties = {
   display: "flex",
-  gap: "var(--bk-space-4)",
+  gap: "6px", // no --bk-space-6 token; board's 42-wide pitch on the 36-wide (w-9) buttons
 };
 
 /* w-9, not flowbite xs's intrinsic 42 wide. Board 159:123 lays six align
@@ -104,6 +112,19 @@ const headerRowStyles: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "space-between",
   gap: "var(--bk-space-8)",
+  padding: "var(--bk-space-12) var(--bk-space-16)", // ~46 total against the board's 48; no --bk-space token lands on 48 without also tripping Gate 14's bare-48 literal
+};
+
+/* Board 159:126's DISTRIBUTE label and its two buttons sit on ONE row — label
+   left, buttons right — not stacked. The label-above-buttons layout that fit
+   ALIGN's six buttons read as a second, taller section here where the board
+   draws a compact strip the same height as its two 28-tall buttons plus padding. */
+const distributeRowStyles: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "var(--bk-space-8)",
+  padding: "var(--bk-space-8) var(--bk-space-16)",
 };
 
 /* Board 159:123 writes the count the way the single-selection header writes
@@ -269,10 +290,10 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
         </div>
       </div>
 
-      {/* Distribution */}
-      <div style={sectionStyles}>
+      {/* Distribution — one row, label left / buttons right, per board 159:134. */}
+      <div style={distributeRowStyles}>
         <span style={sectionLabelStyles}>Distribute</span>
-        <div style={{ ...buttonGroupStyles, alignSelf: "flex-end" }}>
+        <div style={buttonGroupStyles}>
           <Tooltip content={getDistributeTooltip("Horizontally")} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
             <Button
               color="light"

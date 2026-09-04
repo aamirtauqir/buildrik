@@ -89,4 +89,18 @@ describe("breakpoint overrides", () => {
     );
     expect(container).toBeEmptyDOMElement();
   });
+
+  /* Board 160:305 draws the value as the SAME white/bordered control every
+     other property row uses (96px label column, control starting at x120)
+     — not a subtle-tint chip, which is what this row carried before. */
+  it("shows the value in the standard white bordered control, not a tint chip", () => {
+    const { composer } = makeComposer({ padding: "24px" }, { padding: "16px" });
+    render(
+      <BreakpointOverrides composer={composer} elementId="el-1" breakpoint="tablet" />
+    );
+    const value = screen.getByText("24px");
+    expect(value.className).toContain("tw:bg-white");
+    expect(value.className).toContain("tw:border-[var(--bk-border)]");
+    expect(value.className).not.toContain("tw:bg-[var(--bk-bg-subtle)]");
+  });
 });
