@@ -603,3 +603,46 @@ via `scripts/baseline/figma-shot.mjs`, 22 of 49 rendered and looked at,
 37 findings (2 Critical · 25 Major · 10 Minor · 0 Polish). Q1, all 49:
 32 KEEP · 6 MERGE-INTO · 1 CUT · 6 UNSURE · 4 pre-labelled and not re-filed.
 No Figma node was created, renamed, moved or deleted.**
+
+## Settings — coverage
+
+Agent C. Section `1776:8387`, **45 frames**.
+
+| | count | which |
+|---|---|---|
+| Screens in module | 45 | 12 detail + 26 async-state variants + root + Pro-lock + Branding pointer + retired model note + 2 site-health + 1 project-settings modal |
+| Fetched (name, size, out-edges w/ descendants, in-degree) | **45 / 45** | whole-page reaction walk over all 898 frames in 28 sections |
+| Text-read | **45 / 45** | full text for the 19 non-state frames; Settings-pane text for all 26 state frames |
+| Screenshotted (verified PNG via `scripts/baseline/figma-shot.mjs`) | **26 / 45** | 1688:7195 · 638:2378 · 638:3070 · 639:2754 · 639:3092 · 639:3443 · 639:3795 · 639:4144 · 640:2440 · 640:2789 · 640:3135 · 640:3488 · 640:3849 · 1138:13436 · 1702:7095 · 1702:7261 · 1703:7606 · 1703:7914 · 1703:8882 · 1703:10352 · 1703:10515 · 1344:7162 · 1344:7165 · 817:5289 · 1157:4649 · 1172:4867 |
+| Geometry measured (child x/y/w/h) | 2 | 638:2378, 1688:7195 — this is what settled the two-navigation-models finding |
+
+**Not screenshotted — 19 frames.** All were text-read and edge-walked, so their Q1–Q3 verdicts stand. No claim about *visual* craft (layout, hierarchy, colour, control state) is made about any of them; the Q4 rows that cite them — D-C-13, D-C-17, D-C-23 — rest on fetched copy, state names and frame geometry, not on looking:
+1702:6931 · 1702:7425 · 1703:7127 · 1703:7286 · 1703:7445 · 1703:7760 · 1703:8070 · 1703:8232 · 1703:8394 · 1703:8556 · 1703:8720 · 1703:9046 · 1703:9208 · 1703:9370 · 1703:9532 · 1703:9694 · 1703:9857 · 1703:10022 · 1703:10185.
+
+**Rail check (asked for by the coordinator).** All 39 rail-bearing Settings boards draw exactly the six shipping tools — Insert, Layers, Pages, Media, Content, Brand — at w=60. No legacy 11-button rail, no 4-tool E3 rail anywhere in this section. The prototyping of the rail on these boards is already filed as D-X-01 and is not re-filed here; what it exposed is D-C-49 (the settings dirty-dot is wired to a rail id the shipping rail never renders).
+
+**Findings:** D-C-01 … D-C-30, D-C-48, D-C-49 (32 rows) — 2 Critical, 20 Major, 10 Minor.
+
+## Shell — coverage
+
+Agent C. Section `1776:8385`, **17 frames**.
+
+| | count | which |
+|---|---|---|
+| Screens in module | 17 | 12 full-shell states + 1 retired 1280 board + 1 slot-proof + 2 modals + the presence board |
+| Fetched (name, size, out-edges w/ descendants, in-degree) | **17 / 17** | same whole-page walk |
+| Text-read (topbar + rail + body) | **16 / 17** | all but 963:4474, which was read by screenshot and by a full reaction-carrier walk instead |
+| Screenshotted (verified PNG) | **17 / 17** | 65:2 · 65:211 · 65:412 · 66:4 · 66:225 · 66:441 · 66:640 · 199:2 · 199:205 · 199:409 · 200:2 · 200:213 · 202:2 · 642:3696 · 963:4474 · 927:4474 · 1175:4804 |
+| Geometry measured (Middle band children) | 7 | 199:2 · 199:205 · 199:409 · 200:2 · 66:4 · 66:441 · 65:412 — this settled the transient-vs-pinned drawer finding |
+| Fill/opacity measured | 1 | 66:640 scrim |
+| Reaction carriers walked child-by-child | 17 / 17 | which is how the ‹ Exit wiring gap was found |
+
+**Not checked in Shell:** nothing was skipped, but two things inside boards were not opened — the `Batch style rows` (300×205) group on 66:4, and the Review bar contents on 200:213 beyond its text.
+
+`65:2` is annotated `ENTRY POINT` and was not filed as an orphan. `202:2` and `1344:7162` are annotated `RETIRED` and were not filed as defects — `1344:7162` is cited only because 39 live boards contradict it.
+
+**Findings:** D-C-31 … D-C-47 (17 rows) — 2 Critical, 9 Major, 6 Minor.
+
+**Read but not audited** (cited as evidence for placement only, they belong to other agents): 297:2139, 297:2027, 294:1976, 1347:7162, 815:4518 (Journeys `1776:8388`); 1172:4804, 1175:4849, 1176:4925 (Notes `1776:8389`); 307:2223, 876:4532 (Reference `862:6859`).
+
+**Limit on every row in `C.jsonl`:** nothing was verified in a running editor. Figma claims are fetched values; code claims are static reads of `SettingsTab.tsx`, `settings.css`, `LeftSidebar.tsx`, `tabsConfig.ts` and a cited file:line map produced by two research passes over `packages/editor/src`, `server/trpc/routers/` and `packages/dashboard/app/`.
