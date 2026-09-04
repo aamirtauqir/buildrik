@@ -110,13 +110,45 @@ const kids = s.children.filter(c => typeof c.width === "number" && c.width > 0)
     (hBand(a.height) - hBand(b.height)) ||
     natural(a.name, b.name));
 
+/* CAPTION PAIRING. Once a caption has been moved into its board's section
+   (pair-captions.mjs), it should sit UNDER that board as one unit — that is the
+   whole point of moving it. Matched captions are pulled out of the grid stream
+   and drawn beneath their board; the unit's height covers both, so rows stay
+   level and nothing collides. A caption wider than its board is narrowed to the
+   board's width where the text node allows it; where it does not, the unit
+   simply takes the caption's width. */
+const capNorm = (n) => String(n || "").toLowerCase().replace(/^caption\\//, "")
+  .split(" — ")[0].replace(/[^a-z0-9]+/g, " ").trim();
+const capByKey = new Map();
+for (const c of kids) if (c.type === "TEXT" && /^caption\\//i.test(c.name || "")) {
+  const k = capNorm(c.name); if (k && !capByKey.has(k)) capByKey.set(k, c);
+}
+/* A Map, not a property on the node: Figma nodes reject arbitrary properties
+   and throw on read ("no such property '__caption' on FRAME node"). */
+const paired = new Set(), captionOf = new Map();
+for (const b of kids) {
+  if (b.type === "TEXT" || !(b.height > 100)) continue;
+  const c = capByKey.get(capNorm(b.name));
+  if (c && c !== b) { paired.add(c.id); captionOf.set(b.id, c); }
+}
+const layoutKids = kids.filter(k => !paired.has(k.id));
+const CAP_GAP = 20;
+
 let x = PAD_X, y = PAD_TOP, rowH = 0, maxX = 0, moved = 0;
-for (const k of kids) {
-  if (x > PAD_X && x + k.width > MAX_ROW) { x = PAD_X; y += rowH + GUTTER; rowH = 0; }
+for (const k of layoutKids) {
+  const cap = captionOf.get(k.id);
+  if (cap && cap.width > k.width) {
+    /* Narrow the caption to its board where the text node permits it. */
+    try { cap.textAutoResize = "HEIGHT"; cap.resize(k.width, cap.height); } catch (e) {}
+  }
+  const unitW = Math.max(k.width, cap ? cap.width : 0);
+  const unitH = k.height + (cap ? CAP_GAP + cap.height : 0);
+  if (x > PAD_X && x + unitW > MAX_ROW) { x = PAD_X; y += rowH + GUTTER; rowH = 0; }
   if (Math.round(k.x) !== Math.round(x) || Math.round(k.y) !== Math.round(y)) moved++;
   k.x = x; k.y = y;
-  rowH = Math.max(rowH, k.height);
-  x += k.width + GUTTER;
+  if (cap) { cap.x = x; cap.y = y + k.height + CAP_GAP; }
+  rowH = Math.max(rowH, unitH);
+  x += unitW + GUTTER;
   maxX = Math.max(maxX, x);
 }
 const w = Math.max(maxX - GUTTER + PAD_X, 1200);
@@ -127,6 +159,7 @@ s.resizeWithoutConstraints(Math.round(w), Math.round(h));
 let ov = 0;
 for (let i = 0; i < kids.length; i++) for (let j = i + 1; j < kids.length; j++) {
   const a = kids[i], b = kids[j];
+  if (a.height <= 1 || b.height <= 1) continue;   /* hairline rules never "overlap" meaningfully */
   if (a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height) ov++;
 }
 return "laid out " + kids.length + " frames, moved " + moved
