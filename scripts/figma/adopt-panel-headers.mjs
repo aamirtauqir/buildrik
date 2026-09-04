@@ -31,19 +31,31 @@ for (const s of page.children) {
   for (const b of s.children) {
     if (b.type === "TEXT") continue;
     for (const k of kidsOf(b)) {
-      if (k.type !== "FRAME" || !/^Panel header$/i.test(k.name || "") || Math.round(k.height) !== 44) continue;
+      /* Also "Header": 36 frames in Journeys and Shell carry that name at the same
+         280x44 with the same title+close anatomy. The name differs; the thing does
+         not. Width is checked so a full-page header at another size cannot match. */
+      if (k.type !== "FRAME") continue;
+      if (!/^(Panel header|Header)$/i.test(k.name || "")) continue;
+      if (Math.round(k.height) !== 44 || Math.round(k.width) !== 280) continue;
       targets.push({ b, k, texts: k.children.filter(c => c.type === "TEXT").length });
     }
   }
 }
+/* Capture wiring per target instead of refusing on it. Widening the match from
+   "Panel header" to "Header" pulled in 3 edges that the narrower set did not
+   have, and the guard is what surfaced them. */
 let edges = 0;
-for (const t of targets) for (const d of [t.k, ...kidsOf(t.k)]) {
-  let rs=[]; try{rs=d.reactions||[];}catch(e){continue;} edges += rs.filter(r=>r.action&&r.action.destinationId).length; }
-if (edges) return "REFUSING: targets carry " + edges + " edges; capture them first";
-if (!APPLY) return "DRY RUN targets=" + targets.length + " edges=0  "
-  + targets.map(t => t.texts + "-text").join(",");
+for (const t of targets) {
+  t.edges = [];
+  for (const d of [t.k, ...kidsOf(t.k)]) {
+    let rs=[]; try{rs=d.reactions||[];}catch(e){continue;}
+    for (const r of rs) if (r.action && r.action.destinationId) t.edges.push(r.action.destinationId);
+  }
+  edges += t.edges.length;
+}
+if (!APPLY) return "DRY RUN targets=" + targets.length + " edgesToReplay=" + edges;
 
-let done = 0;
+let done = 0, replayed = 0;
 for (const { b, k, texts } of targets) {
   if (k.removed) continue;
   const variant = texts === 3 ? byIcons["refresh-close"] : byIcons["close"];
@@ -60,10 +72,20 @@ for (const { b, k, texts } of targets) {
     try { for (const seg of t.getStyledTextSegments(["fontName"])) await figma.loadFontAsync(seg.fontName);
       t.characters = title; } catch (e) {}
   }
+  /* One write, not one per edge — the bug that cost 3 edges on the client swap. */
+  const keep = (targets.find(x => x.k === k) || { edges: [] }).edges.filter(d => d !== b.id);
+  if (keep.length) {
+    try {
+      await inst.setReactionsAsync(keep.map(d => ({ trigger: { type: "ON_CLICK" },
+        actions: [{ type: "NODE", destinationId: d, navigation: "NAVIGATE",
+                    transition: null, preserveScrollPosition: false, resetVideoPosition: false }] })));
+      replayed += keep.length;
+    } catch (e) {}
+  }
   k.remove();
   done++;
 }
-return "ADOPTED " + done + " local headers onto the matching variant";
+return "ADOPTED " + done + " local headers, edges replayed=" + replayed;
 `;
 const r = await rpc("tools/call", { name: "use_figma", arguments: {
   fileKey: "g4GzQFqzNYz5sosz1QtZXC", code,
