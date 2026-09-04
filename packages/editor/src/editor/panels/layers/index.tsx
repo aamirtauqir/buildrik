@@ -13,6 +13,7 @@ import { LayerBreadcrumb } from "./components/LayerBreadcrumb";
 import { LayerContextMenu } from "./components/LayerContextMenu";
 import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
 import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
+import { LayersScrollThumb } from "./components/LayersScrollThumb";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
@@ -404,7 +405,11 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <Button className="bdc-btn bdc-btn-ghost" onClick={() => setPendingBannerDelete(false)}>Cancel</Button>
         </div>
       )}
-      {/* Clean Tree View - Maximum space for content */}
+      {/* Clean Tree View - Maximum space for content. Wrapped so
+          LayersScrollThumb (board 1082:4835) can sit OUTSIDE the scrollable
+          element — a thumb rendered inside it would scroll away with the
+          rows it is meant to describe. */}
+      <div className="tw:relative tw:flex tw:flex-1 tw:min-h-0 tw:flex-col">
       <div
         ref={state.treeContainerRef}
         id="bd-layers-tree"
@@ -456,6 +461,8 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             displayPrefs={state.displayPrefs}
           />
         ))}
+      </div>
+      <LayersScrollThumb containerRef={state.treeContainerRef} />
       </div>
       {state.contextMenu && (
         <LayerContextMenu

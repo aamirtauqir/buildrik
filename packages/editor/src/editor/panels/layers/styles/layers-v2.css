@@ -607,11 +607,11 @@
 /* panel body container — holds the scrollable tree region */
 .bdc-pbody { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .bdc-pbody-scroll { overflow-y: auto; }
-/* Board 1082:4835 — the thumb is drawn at rest, not on hover. */
+/* Board 1082:4835: a styled ::-webkit-scrollbar-thumb still rides the OS's show-on-scroll timing, so .bdc-layers-tree hides its native bar for LayersScrollThumb (tw: utilities) instead — .bdc-pbody-scroll (other panels) keeps this one. */
 .bdc-pbody-scroll, .bdc-layers-tree { scrollbar-width: thin; scrollbar-color: var(--bk-border-medium) transparent; }
-.bdc-pbody-scroll::-webkit-scrollbar, .bdc-layers-tree::-webkit-scrollbar { width: 4px; }
-.bdc-pbody-scroll::-webkit-scrollbar-track, .bdc-layers-tree::-webkit-scrollbar-track { background: transparent; }
-.bdc-pbody-scroll::-webkit-scrollbar-thumb, .bdc-layers-tree::-webkit-scrollbar-thumb { background: var(--bk-border-medium); border-radius: 2px; }
+.bdc-pbody-scroll::-webkit-scrollbar { width: 4px; } .bdc-layers-tree::-webkit-scrollbar { display: none; width: 0; }
+.bdc-pbody-scroll::-webkit-scrollbar-track { background: transparent; }
+.bdc-pbody-scroll::-webkit-scrollbar-thumb { background: var(--bk-border-medium); border-radius: 2px; }
 
 /* ==========================================================================
    Panel root wrapper (inner flex column inside the LayersTab pbody)

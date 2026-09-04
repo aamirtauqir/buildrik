@@ -4120,8 +4120,8 @@
       "status": "active",
       "authority": "board",
       "recipe": null,
-      "verifiedNote": "2026-08-31 — scroll-overflow: header/toolbar/footer pin correctly; drift — no scrollbar drawn at rest on a 66-row tree (board draws a 4px thumb)",
-      "verified": "drift-open"
+      "verifiedNote": "2026-09-04 (J-1082:4835) — the 08-31 drift fixed: LayersScrollThumb renders the 4px thumb itself from scrollTop/scrollHeight/clientHeight (computeThumbGeometry), independent of the OS's overlay-scrollbar show-on-scroll timing that a styled ::-webkit-scrollbar-thumb alone still rode. header/toolbar/footer still pin correctly.",
+      "verified": "drift-fixed"
     },
     {
       "nodeId": "1082:5004",
@@ -4133,7 +4133,8 @@
       "status": "design-ahead",
       "authority": "blocked:no-list-view",
       "recipe": null,
-      "verified": "no"
+      "verifiedNote": "2026-09-04 (J-1082:5004) — re-investigated, not a hollow exclusion: flattenTree()+getDisplayName() (data/layerUtils.ts) already produce exactly the flat, depth-0 row set this board draws (search results use the identical pattern today). What's missing is the INTERACTION surface: the board's own toolbar (1082:5009) draws no tree/list toggle of its own — identical ⊞⊟⚙ to the tree-view board — so there is no control on this board to wire a mode switch to, and LayersPanel's drag/drop, keyboard nav and context-menu are all written against the nested LayerItem/LayerTreeItem shape. A real second render mode needs its own spec (where the toggle lives, what selection/DnD/keyboard mean over a flat order) — not a per-row conformance pass. Left `verified: unreachable`, status stays `design-ahead` (still counted, not swept out of the denominator).",
+      "verified": "unreachable"
     },
     {
       "nodeId": "1124:4527",
