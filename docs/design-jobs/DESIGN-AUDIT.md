@@ -1244,3 +1244,132 @@ The 10 section headers account for all 47 frames exactly.
   none exists on `1:4`.
 - **The three mis-wired back links** (`D-J-14`) were read from `reactions`;
   I did not run the Figma prototype to confirm they behave as wired.
+
+---
+
+## Design system — Typography & Colour (module M) — coverage
+
+**Scope.** Not a screen-by-screen walk — a full property census across five
+pages: `1:3` Editor, `1:2` Components, `1:4` Site, `1:5` Portfolio,
+`988:2` Dashboard v2. Findings in `docs/design-jobs/findings/M.jsonl`
+(`D-M-01` … `D-M-29`); the proposed scale and colour set in
+`docs/design-jobs/TYPE-COLOR-SYSTEM.md`.
+
+### What was actually measured
+
+- **54,058 nodes walked** (1:3 36,560 · 988:2 9,497 · 1:4 3,267 · 1:5 2,473 ·
+  1:2 2,261). Every node's `fills`, `strokes`, `boundVariables` and
+  `effectStyleId` read; every `TEXT` node's `textStyleId`, `fontName`,
+  `fontSize`, `lineHeight`, `letterSpacing` and `fillStyleId` read.
+  **20,509 TEXT nodes** in total — 100% of the text on those five pages.
+- **Every one of the 11 text styles, 10 effect styles and 157 variables**
+  (93 COLOR, 64 FLOAT) fetched with its full definition. 0 paint styles and
+  0 grid styles exist — confirmed, not assumed.
+- **Bound-style verification**: all 8,335 bound TEXT nodes had their live
+  values compared against their bound style's definition (0 overrides found).
+- **Code side**: `packages/editor/src/themes/tokens.generated.css` read in
+  full and diffed against the Figma variable set both ways; `DESIGN.md`
+  §Typography read; the banned-font grep run over all of
+  `packages/editor/src` with consumer checks on every hit.
+
+### Screenshots
+
+**2 boards screenshotted** — `8:48` (Accent guard — proof) and `9:102`
+(Button component set). Both via `scripts/baseline/figma-shot.mjs`, both
+verified complete PNGs. The Button screenshot led to the measurement that
+found the accent's root cause (`D-M-13`).
+
+This is a small number and it is the honest one: this module's claims are
+counts, not compositions, and a screenshot cannot verify a `textStyleId`.
+**No craft or layout finding is filed in `M.jsonl`** — every row rests on a
+fetched property value.
+
+### What was NOT checked
+
+- **Six of the eleven pages were not censused**: `0:1` Foundations (read
+  structurally only — its 2 frames, the colour sheet `67:5` and the elevation
+  sheet `481:3981` were enumerated, but its text was not included in the
+  20,509), `1:6` Client review, `1:7` Archive, `397:2` Dashboard spine,
+  `500:2`, `510:2`. Every count and ratio in `M.jsonl` is therefore
+  "across the five product pages", never "in the file". A style or colour used
+  only on `1:6`/`1:7`/`397:2` would read as unused in `D-M-16`.
+- **Contrast ratios were not computed.** No WCAG claim is made anywhere in
+  `M.jsonl`, including for the 905 sub-11px nodes (`D-M-08`) — that finding is
+  about the token floor, not about measured legibility.
+- **Nothing was run in a browser.** No `getComputedStyle` read; the code side
+  is read from source. In particular the claim that the three banned font
+  stacks have no live consumer (`D-M-12`) rests on grep + import tracing, not
+  on a running app.
+- **Chrome text was not separated from canvas-mock text** except by a
+  name-based heuristic (ancestor named canvas/viewport/artboard/preview/
+  device/hero), which found only 1,939 of 20,509 nodes canvas-like. The
+  weight-700 finding (`D-M-09`) is reported through that heuristic — 562 of
+  575 outside it — and a canvas mock named otherwise would be miscounted.
+- **`textStyleId` on the `1:6`/`1:7` component instances was not sampled**, so
+  the "0 overrides" result (`D-M-05`) covers the five censused pages only.
+- **Gradient, image and video fills were counted but not inspected.** 0
+  gradients exist on the five pages; image fills were not enumerated.
+- **No Figma node was written to.** Read-only throughout, including the
+  proposed style names in `TYPE-COLOR-SYSTEM.md` — none has been created.
+
+## Forms & Tables — coverage
+
+Two element families, censused structurally across **all eight populated
+pages** (`1:2`, `1:3`, `1:4`, `1:5`, `988:2`, `1:6`, `1:7`, `397:2`) rather
+than the five named in the brief — so absence claims in `P.jsonl` are
+file-wide except where a row says otherwise. 62,520 nodes were walked.
+
+### What was measured
+
+- **Form controls — 1,153 nodes.** 955 local (hand-drawn) vs 198 instances of
+  a library component. Counted twice by two independent methods that agree to
+  one node: a name-matched walk that stops at every `INSTANCE` boundary (so
+  component internals never count as local), and a `mainComponent` tally over
+  every instance on every page.
+- **Field containers — 186** (183 in the typography pass, which excluded
+  three `COMPONENT_SET` nodes). Orientation, `itemSpacing`, child anatomy,
+  label and help typography.
+- **Variant states — every instance of the six form component sets**, read via
+  `mainComponent.name`, which is how the "19 of 25 drawn states have zero
+  placements" figure in `D-P-04` was obtained.
+- **Tables — 262 structures**, from a shape detector (≥3 contiguous siblings
+  of identical height and width, height 16–72px, width ≥240px, row gap −1…8px,
+  ≥2 text columns) rather than from names. Row source, row height, column
+  count, header presence/fill/typography, per-row fill variation.
+- **Library health — all 118 component roots on `1:2`**, each with its
+  file-wide instance count.
+
+### Screenshotted
+
+10 boards read as images: the six form component sets (`10:16`, `14:37`,
+`12:26`, `14:20`, `14:14`, `92:30`), `Row` (`8:47`), two Dashboard v2 tables
+(`998:1954`, `998:1596`) and Publish pre-checks (`833:4518`). `D-P-23` (the
+error variant has no message slot) and `D-P-16` (Row already ships the
+selected treatment the bespoke rows hand-copy) rest on those images.
+
+### What was NOT checked
+
+- **`0:1` Foundations, `500:2` and `510:2` were not walked at all.** They hold
+  2, 1 and 6 children respectively; a control or row drawn only there would
+  read as absent.
+- **Nothing was run in a browser.** Every code claim (`D-P-02`, `D-P-05`,
+  `D-P-15`, `D-P-24`) is read from source — `tokens.generated.css:123-127` and
+  `chrome-ui/textInputTheme.ts` — not from `getComputedStyle`. The assertion
+  that the shipping input renders at flowbite's ~40px box is the *stated
+  intent* in that file's own header comment, not a measured height.
+- **Disabled local controls cannot be separated from filled ones.** 85 control
+  boxes carry a grey fill (`#f3f4f6` 39, `#f9fafb` 46); fill alone does not
+  distinguish disabled from a search field's resting tint, so `D-P-04`'s
+  zero-disabled claim is made only about *instances*, where the variant is
+  explicit.
+- **Contrast was not computed.** No WCAG claim appears in `P.jsonl`, including
+  for the two error reds and two focus blues in `D-P-05`.
+- **The table detector is structural and will miss two shapes**: a table whose
+  rows differ in height (an expanded row, a group header inline) and a table
+  drawn as a single flattened frame. It will also over-count a stack of
+  identical cards as a table where the cards are wide and short. 262 is a
+  floor with a known error bar, not a census.
+- **Hover and focus states that exist only as prototype interactions** were
+  not read — `node.reactions` was not walked for this module, so `D-P-17`'s
+  "197 tables draw no row state" is about *drawn* states only.
+- **No Figma node was written to.** Read-only throughout.
