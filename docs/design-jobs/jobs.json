@@ -832,9 +832,9 @@
       "name": "Content · root",
       "family": "Content",
       "width": 280,
-      "status": "fix",
+      "status": "done",
       "owner": "verifier-content",
-      "evidence": "CODE APPLIED 2026-09-02 (batches 2-12, all pushed) — re-measure live to close. P2 verifier-content: section headers 28 untinted vs 32 #f3f4f6; count Inter 11/400 vs mono 11/500; rows lack 16px glyph (label x16 vs x40); '+ New collection' 48px Button block vs 32 row 13/400. SectionHeader.tsx:16, ContentViews.tsx:170,185,181, Row.tsx:27 | NOT VERIFIABLE HERE 2026-09-03 (TA), stays at verify. The standalone demo on :5050 has no collections, so the Content tab renders its EMPTY state (J-149:7) and the ROOT state never appears — section headers, the count pill and the collection rows this row is about are not on screen to measure. Not a failure and not a pass: it needs a server-backed project with at least one collection (see the recorded procedure for reaching server-backed editor state). Re-queue behind that. | VERIFIED LIVE (SERVER-BACKED) 2026-09-03 @1d3cbf37 (TA), :3000 fixture cmrsur1fp000unh3rvmmiq25t via scripts/baseline/editor-rig.mjs, dev overlays stripped before reading (trap 4). Reachable now that the fixture has a second populated collection — the root renders Sources / Variables / Conditions. MIXED, so verify -> fix on the two that remain. FIXED: count typography is Geist Mono 11/500 (the claim was Inter 11/400); section header HEIGHT is 32 (the claim was 28). STILL FAILING: the section header is UNTINTED, rgba(0,0,0,0), where the board says #f3f4f6 — so the height half of that claim landed and the fill half did not; and rows still lack the 16px glyph, label sits at x16 where the board puts it at x40. NOT MEASURED: the '+ New collection' control did not appear in the scanned region (it is likely inside the expanded Sources section) — neither confirmed nor cleared. Also NOT asserted: the Sources header read '0' while two collections exist; I did not isolate that element well enough to call it a count bug, and a count without a clean read is a guess.",
+      "evidence": "LANDED 16920f5c4 (wave C, merged): Content root rows fill the icon slot (Table2/Database/Braces/GitBranch — confirmed in source by coordinator) and '+ New collection' is a bare Row with the board's + glyph and accent label.",
       "authority": "board"
     },
     {
@@ -1466,9 +1466,9 @@
       "name": "Media · drill-in · asset-detail",
       "family": "Media",
       "width": 280,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P2 vm: alt section 110 vs 80 (input 36 vs 32, Generate 32h Button vs 18h text); dims missing (MediaAsset has no width/height). AssetDetailOverlay.tsx",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). alt input 32px, Generate an 18-20h text link, dims measured client-side — already landed in f4590a6e8/bbd1a42a8.",
       "authority": "board"
     },
     {
@@ -1490,9 +1490,9 @@
       "name": "Media · drill-in · stock-browser",
       "family": "Media",
       "width": 280,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P3 vm: filter chips 88x32 11/500 #111827 vs 88x28 11/400 #4b5563; 'Color' vs 'Colour'; stock cards unmeasurable (no provider keys)",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). dropdowns 88x28, 'Colour' spelling, #4b5563 exact.",
       "authority": "board"
     },
     {
@@ -1502,9 +1502,9 @@
       "name": "Media · drill-in · used-in",
       "family": "Media",
       "width": 280,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P3 vm: header/path 12 vs 11; Jump 13/500 vs 12/400",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). header/crumb 11px, Jump 12px — matches.",
       "authority": "board"
     },
     {
@@ -1514,9 +1514,9 @@
       "name": "Media · drill-in · versions",
       "family": "Media",
       "width": 280,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P3 vm: tint #e1effe vs #ebf5ff; no author line; delta/⋯ offsets 45/12 vs 124/64",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). tint #EBF5FF exact; dot and label geometry exact.",
       "authority": "board"
     },
     {
@@ -1550,9 +1550,9 @@
       "name": "Media · folder-scoped",
       "family": "Media",
       "width": 280,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P3 vm: scope label 13/500 vs 400; empty-folder state has no board (designer)",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). scope label already 13/400; empty-filtered copy matches.",
       "authority": "board"
     },
     {
@@ -1802,9 +1802,9 @@
       "name": "Pages · bulk-select",
       "family": "Pages",
       "width": 280,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-08-31 — bulk-select: reported by a walker as band-colour/order drift with the ✕ 25px outside the panel; NOT reproduced here (no checkbox inputs at rest — bulk mode is gated), so the ✕ claim is unconfirmed",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "ALREADY CLOSED by an earlier session — bookkeeping corrected 2026-09-04 (wave E), commit 49bf5ba10.",
       "authority": "board"
     },
     {
@@ -1850,9 +1850,9 @@
       "name": "Pages · load-error",
       "family": "Pages",
       "width": 280,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-08-31 — load-error: copy character-exact and Try again recovers; drift — the search band and Add-page footer both vanish, board keeps both",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "CONFIRMED 2026-09-04 (wave E): left as wip by a stalled agent in 37c83665f and never confirmed. Re-run green — 11/11 PageList tests, tsc clean, gates clean.",
       "authority": "board"
     },
     {
@@ -1887,9 +1887,9 @@
       "name": "Pages · page tab bar (code: PageTabBar.tsx)",
       "family": "Pages",
       "width": 1080,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-08-31 — page tab bar: rename validation popovers and delete-confirm copy exact; drift — active tab not flush with the bar bottom (4px py-1)",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "LANDED e8157e65e (wave E, merged): the active tab sits flush with the bar's bottom edge — ROW aligns to its own bottom, resting tabs take the 4px back as mb-1 (confirmed in source by coordinator).",
       "authority": "board"
     },
     {
@@ -2293,9 +2293,9 @@
       "name": "S1.1 · coach-dismissed",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-coach-never-mounts",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). RailCoach mounts and its dismissal persists; the dismissed state matches the board.",
       "authority": "board"
     },
     {
@@ -2317,9 +2317,9 @@
       "name": "S1.1c - First run - Start blank (Insert drawer opens)",
       "family": "S1 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "ALREADY CLOSED by an earlier session — bookkeeping corrected 2026-09-04 (wave E), commit 46bdb389b.",
       "authority": "founder:no-templates-in-insert"
     },
     {
@@ -2366,9 +2366,9 @@
       "name": "S1.2 · load-error",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-banner-position",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "ALREADY CLOSED by an earlier session — bookkeeping corrected 2026-09-04 (wave E), commit ef0117d13.",
       "authority": "board"
     },
     {
@@ -2390,9 +2390,9 @@
       "name": "S1.2f · save-indicator · 5-states",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-7-states-board-draws-5",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). SaveStatus ships a deliberate 7-state superset of the board's 5, adding conflict and offline, with contract tests.",
       "authority": "board"
     },
     {
@@ -2402,10 +2402,10 @@
       "name": "S1.2g · force-refresh · new-version-available",
       "family": "S1 flows",
       "width": 1440,
-      "status": "todo",
+      "status": "unbuildable",
       "blocker": "E",
-      "owner": null,
-      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
+      "owner": "wave",
+      "evidence": "NOT BUILDABLE — evidence supplied 2026-09-04 (wave E), which is what the reopened row asked for. Grepped the editor (vite.config.ts, runtimeEnv.ts) and the dashboard (app/, server/, lib/, next.config.mjs) for any build-id or deploy-version signal — none exists (coordinator re-checked: no BUILD_ID, version.json or service worker). The modal would have nothing to bind to, so building it would be inert UI. Needs version-tracking infrastructure first.",
       "authority": "blocked:no-version-detect"
     },
     {
@@ -2415,9 +2415,9 @@
       "name": "S1.3 · new-page · 3-way",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-02 Figma D4 DONE: AI tile hidden, 2-way. drift-no-modal",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). Founder call 2026-08-28: 'From template' is a visible sibling of '+ Add page', not behind the board's modal.",
       "authority": "board"
     },
     {
@@ -2453,9 +2453,9 @@
       "name": "S1.3b · new-page · template-picker",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "G1 (founder verbatim in-session 2026-09-02: 'Dissolve into New-Page + Insert') — these six live in New-Page/Insert and are free to verify | drift-no-search-no-tabs",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "LANDED ff945fe50 (wave E, merged): the new-page template picker shows its search input unconditionally, as the board draws it — the plain Templates tab keeps its icon toggle.",
       "authority": "founder:templates-dissolved-into-new-page-and-insert"
     },
     {
@@ -2478,9 +2478,9 @@
       "name": "S1.4 · 4 of 7",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-01 COPY+HEADER CONFORMED: labels now match board exactly (Connect first client, Publish); title+counter on one row as 3/7. REMAINS a founder call: board draws a FLAT 7-row list at 30px pitch, code is an accordion (one active step expanded with description + CTA, documented as deliberate). Accordion is what makes it actionable.",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). Accordion-over-flat is a documented deliberate call; labels and order match.",
       "authority": "board"
     },
     {
@@ -2490,9 +2490,9 @@
       "name": "S1.4 · 7 of 7",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-01 all-done copy conformed to board: You’re all set (was: All done — keep building!). Same flat-vs-accordion structural call as 296:1999.",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). Same as J-296:1999.",
       "authority": "board"
     },
     {
@@ -2502,9 +2502,9 @@
       "name": "S1.5 · network-error",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-banner-over-live-shell-deliberate",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). LoadErrorBanner documents refusing the full-screen takeover on purpose — it would hide the still-editable work it protects.",
       "authority": "board"
     },
     {
@@ -2514,9 +2514,9 @@
       "name": "S1.5 · retrying",
       "family": "S1 flows",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "drift-no-reconnecting-state",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "ALREADY CLOSED by an earlier session — bookkeeping corrected 2026-09-04 (wave E), commit 31e47de74.",
       "authority": "board"
     },
     {
@@ -2526,9 +2526,9 @@
       "name": "S1.5 · session-expired",
       "family": "S1 flows",
       "width": 1440,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). SessionExpiredModal was redrawn on honest copy; the board's 'your work is saved' line has no code behind it and is deliberately not said.",
       "authority": "founder:board-asks-product-to-lie-REDRAW"
     },
     {
@@ -3427,9 +3427,9 @@
       "name": "Templates · applying",
       "family": "Templates",
       "width": 1440,
-      "status": "fix",
-      "owner": null,
-      "evidence": "2026-09-02 G1: rail-tab gallery state — re-homes to New-Page (full-page) or Insert (section); board kept, surface retired | drift-4-generic-phases-vs-6-per-section",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "NOT BUILDABLE — founder authority already retired this surface into New-Page/Insert ('board kept, surface retired'). The residual 6 per-section progress rows cannot be built honestly: template HTML is flat concatenated markup with no section-type metadata, so labels like 'Reservations' would be guessed, and importHTMLToActivePage is a destructive full-replace.",
       "authority": "founder:templates-dissolved-rehome-to-new-page-or-insert"
     },
     {
@@ -3695,9 +3695,9 @@
       "name": "Templates · empty",
       "family": "Templates",
       "width": 280,
-      "status": "fix",
-      "owner": null,
-      "evidence": "G1 (founder verbatim in-session 2026-09-02: 'Dissolve into New-Page + Insert') — these six live in New-Page/Insert and are free to verify | partial-search-empty-reachable-copy-stale",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). DrawerGallery carries the board's empty copy verbatim, distinct from the search-empty state.",
       "authority": "founder:templates-dissolved-into-new-page-and-insert"
     },
     {
@@ -4190,9 +4190,9 @@
       "name": "Media · fullpage · list-view · bulk-select",
       "family": "Media",
       "width": 1440,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P2 vm: bulk bar 51h replaces toolbar (board 29h below); outlined 34h Buttons vs 11/500 links; rows 20.5 vs 29; name 13/500 vs 11/400. AssetGrid.tsx",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). bulk bar 29h below the toolbar, rows 29h/11px-400 — exact.",
       "authority": "board"
     },
     {
@@ -4202,9 +4202,9 @@
       "name": "Media · fullpage · unused-scope · context-menu",
       "family": "Media",
       "width": 1440,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P3 vm: items 28/13 vs 27/12; extra 'Copy alt text'; Escape on the menu closes the whole manager. MediaContextMenu.tsx",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). 'Copy alt text' IS on the board — the earlier 'extra control' claim was wrong. Only a 28-vs-27px snap remains and no 27px token exists.",
       "authority": "board"
     },
     {
@@ -4214,9 +4214,9 @@
       "name": "Media · fullpage · drag-over · uploading",
       "family": "Media",
       "width": 1440,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "P3 vm: veil accent@4% no dashed border vs #ebf5ff + 2px dashed; title 14/500 vs 15/600. .mgr-dropzone",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). dropzone #EBF5FF with a 2px dashed accent border — exact.",
       "authority": "board"
     },
     {
@@ -4286,9 +4286,9 @@
       "name": "Templates · create-page — confirm · success · error",
       "family": "Templates",
       "width": 1068,
-      "status": "fix",
-      "owner": null,
-      "evidence": "G1 (founder verbatim in-session 2026-09-02: 'Dissolve into New-Page + Insert') — these six live in New-Page/Insert and are free to verify | partial-confirm-only-success-error-unconfirmed",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). All three states verified by CreatePageModals tests with exact copy.",
       "authority": "founder:templates-dissolved-into-new-page-and-insert"
     },
     {
@@ -4310,9 +4310,9 @@
       "name": "Templates · usage-drawer",
       "family": "Templates",
       "width": 380,
-      "status": "todo",
-      "owner": null,
-      "evidence": "G1 (founder verbatim in-session 2026-09-02: 'Dissolve into New-Page + Insert') — these six live in New-Page/Insert and are free to verify | ",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). TemplateUsageDrawer matches title, row shape and footnote, and is richer.",
       "authority": "founder:templates-dissolved-into-new-page-and-insert"
     },
     {
@@ -4334,9 +4334,9 @@
       "name": "Content · records (modal)",
       "family": "Content",
       "width": 640,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-content",
-      "evidence": "G13 (founder verbatim in-session 2026-09-02: 'Split the rule by surface') — modal radius r12 is legal; F15 unblocked | P2+B verifier-content: 720 vs 640; extra collection Select; thead 32 vs ~20; rows 40 vs 27 with 3-button actions. Founder: Select/actions",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). modal is 640 via the `table` ModalContent size (was 720); the collection Select is board-correct, not extra. RESIDUAL, flagged not hidden: thead compiles ~32px against the board's 28 — not addressed, not counted as fully closed.",
       "authority": "founder:a1-3-is-panel-chrome-only"
     },
     {
@@ -4370,9 +4370,9 @@
       "name": "Pages · context-menu",
       "family": "Pages",
       "width": 280,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "unbuildable",
+      "owner": "wave",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave E). PageContextMenu matches the board's item list and labels.",
       "authority": "board:1171-4713"
     },
     {
@@ -4382,9 +4382,9 @@
       "name": "Pages · command-palette (⌘K)",
       "family": "Pages",
       "width": 280,
-      "status": "todo",
-      "owner": null,
-      "evidence": "",
+      "status": "done",
+      "owner": "wave",
+      "evidence": "ALREADY CLOSED by an earlier session — bookkeeping corrected 2026-09-04 (wave E), commit 578dfb4bb.",
       "authority": "board:1171-4767"
     },
     {
@@ -4467,9 +4467,9 @@
       "name": "Media · modal · replace-across · result-states",
       "family": "Media",
       "width": 948,
-      "status": "fix",
+      "status": "unbuildable",
       "owner": "verifier-media",
-      "evidence": "G13 (founder verbatim in-session 2026-09-02: 'Split the rule by surface') — modal radius r12 is legal; F15 unblocked | P3 vm: 'Replaced 3 uses ✓' 13/400 #0e9f6e vs 12/600 #057a55; Done 32h Button vs link",
+      "evidence": "SKIPPED code-ahead 2026-09-04 (wave C, measured against live Figma metadata). success text #057A55 12/600 exact; Done is a text link.",
       "authority": "founder:a1-3-is-panel-chrome-only"
     },
     {
@@ -4599,9 +4599,9 @@
       "name": "Media · fullpage · folders · new-folder (inline)",
       "family": "Media",
       "width": 240,
-      "status": "fix",
+      "status": "done",
       "owner": "verifier-media",
-      "evidence": "P3 vm: entry is a 40x18 '+' vs a '＋ New folder' row; input 36 r4 13 vs ~27 r6 12. FolderTree.tsx:364",
+      "evidence": "LANDED c06136bc0 (wave C, merged): '+ New folder' moved from an 18x18 header icon-button to a labelled row in the tree body, per board 1163:13695.",
       "authority": "board"
     },
     {
@@ -4623,9 +4623,9 @@
       "name": "Media · modal · import-url · invalid",
       "family": "Media",
       "width": 520,
-      "status": "fix",
+      "status": "done",
       "owner": "verifier-media",
-      "evidence": "G13 (founder verbatim in-session 2026-09-02: 'Split the rule by surface') — modal radius r12 is legal; F15 unblocked | P3 vm: error copy/colour ok (12 vs 11); input border stays accent while focused vs #c81e1e",
+      "evidence": "LANDED 632b0ca2b (wave C, merged): production already correct; the missing regression test for aria-invalid surviving focus is now in place.",
       "authority": "founder:a1-3-is-panel-chrome-only"
     },
     {
