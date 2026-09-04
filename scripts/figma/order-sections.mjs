@@ -16,13 +16,13 @@ const ORDER = [
   ["1776:8385", "Shell"], ["1776:8379", "Insert"], ["1776:8375", "Layers"],
   ["1776:8377", "Pages"], ["1776:8372", "Media"], ["1776:8376", "Content"],
   ["1776:8373", "Brand"], ["1776:8381", "Inspector"], ["1779:5", "Canvas"],
-  ["1938:8372", "Components"], ["1776:8380", "AI"], ["1779:3", "Command palette"],
+  ["1938:8372", "Components"], ["1084:4527", "Templates"], ["1776:8380", "AI"], ["1779:3", "Command palette"],
   ["1779:4", "Preview"], ["1776:8378", "Publish"], ["1776:8374", "History"],
   ["1776:8382", "Compare"], ["1776:8383", "Review"], ["1776:8384", "Client sign-off"],
   ["1779:2", "Notifications"], ["1776:8387", "Settings/S7"], ["1779:6", "Ecommerce"],
   ["1776:8388", "Journeys · S-flows"], ["1776:8389", "Notes · captions & annotations"],
   ["862:6859", "Reference · specs & completeness"], ["862:6860", "Reference · UX analysis docs"],
-  ["1084:4527", "REVIEW · Templates + Components"], ["1090:4527", "REVIEW · Insert"],
+  ["1090:4527", "REVIEW · Insert"],
   ["957:4474", "Archive · superseded"],
 ];
 
@@ -31,7 +31,6 @@ const NOTES = {
   "1938:8372": "the editor's saved-components panel; page 1:2 is the LIBRARY",
   "1776:8388": "S-numbers are a journey narrative, not a screen index",
   "1776:8389": "unmatched captions, orphan headers and divider rules",
-  "1084:4527": "holds 10 Templates boards and 0 component boards",
 };
 
 await connect();

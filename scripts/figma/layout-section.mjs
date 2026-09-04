@@ -156,8 +156,17 @@ const kids = s.children.filter(c => typeof c.width === "number" && c.width > 0)
    level and nothing collides. A caption wider than its board is narrowed to the
    board's width where the text node allows it; where it does not, the unit
    simply takes the caption's width. */
-const capNorm = (n) => String(n || "").toLowerCase().replace(/^caption\\//, "")
-  .split(" — ")[0].replace(/[^a-z0-9]+/g, " ").trim();
+/* The same closed alias table pair-captions-aliased.mjs uses: 8 captions name
+   their board by a pre-rename prefix ("Versions · changes" for what is now
+   "History · Saves · changes"). Without it they move to the right section and
+   then sit loose in the grid instead of under their board. */
+const CAP_ALIASES = [[/^versions · /, "history · saves · "], [/^rollback · /, "history · published · "]];
+const capNorm = (n) => {
+  let x = String(n || "").toLowerCase().replace(/^caption\\//, "").split(" — ")[0]
+    .replace(/[^a-z0-9·]+/g, " ").replace(/\\s+/g, " ").trim();
+  for (const [re, rep] of CAP_ALIASES) if (re.test(x)) x = x.replace(re, rep);
+  return x.replace(/[^a-z0-9]+/g, " ").trim();
+};
 const capByKey = new Map();
 for (const c of kids) if (c.type === "TEXT" && /^caption\\//i.test(c.name || "")) {
   const k = capNorm(c.name); if (k && !capByKey.has(k)) capByKey.set(k, c);
