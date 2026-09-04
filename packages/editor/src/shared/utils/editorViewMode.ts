@@ -37,6 +37,8 @@
  *
  * @license BSD-3-Clause
  */
+import { IS_DEV_BUILD } from "./runtimeEnv";
+
 export type RailMode = "figma" | "e3" | "legacy";
 
 export interface EditorViewMode {
@@ -48,7 +50,17 @@ export interface EditorViewMode {
   readOnlyView: boolean;
 }
 
+/* Three rail hierarchies live in this codebase — the legacy 11-button zone
+   rail, the E3 four-tool rail, and the shipping six-item Figma rail — and a
+   query string chose between them in every build. One navigation model is the
+   whole point of a rail, so the two escape hatches are now DEV-ONLY: in a
+   production bundle `?rail=e3` and `?rail=legacy` resolve to "figma".
+
+   Gated rather than deleted: both renderers still compile and are still
+   reachable in dev, so the alternatives stay available for comparison without
+   being one URL away for a customer. Flagged as IA-14 in docs/design-jobs/IA-AUDIT.md. */
 function resolveRailMode(raw: string | null): RailMode {
+  if (!IS_DEV_BUILD) return "figma";
   if (raw === "e3") return "e3";
   if (raw === "legacy") return "legacy";
   return "figma";

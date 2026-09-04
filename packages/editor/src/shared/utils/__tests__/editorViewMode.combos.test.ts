@@ -5,7 +5,17 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
+
+/* ?rail=e3 and ?rail=legacy are DEV-ONLY escape hatches now (IA-14) — a
+   production bundle resolves every rail value to the one rail that ships.
+   These combos still describe dev behaviour, so they run with the flag on;
+   editorViewMode.test.ts owns the production half. */
+vi.mock("../runtimeEnv", async (orig) => ({
+  ...(await orig<Record<string, unknown>>()),
+  IS_DEV_BUILD: true,
+}));
+
 import { getEditorViewMode } from "../editorViewMode";
 
 function setSearch(s: string) {

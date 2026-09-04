@@ -1,4 +1,14 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
+
+/* The rail escape hatches are DEV-ONLY now: three rail hierarchies shipping
+   behind a query string is three navigation models, and a customer was one URL
+   from the other two. These tests pin BOTH halves — the hatches still work in
+   a dev build, and a production bundle ignores them. */
+vi.mock("../runtimeEnv", async (orig) => ({
+  ...(await orig<Record<string, unknown>>()),
+  IS_DEV_BUILD: true,
+}));
+
 import { getEditorViewMode } from "../editorViewMode";
 
 function setSearch(s: string) {
@@ -46,5 +56,24 @@ describe("getEditorViewMode (F1/E3/E4 SSOT)", () => {
   it("unknown ?rail value falls back to the Figma default", () => {
     setSearch("?rail=banana");
     expect(getEditorViewMode()).toMatchObject({ railMode: "figma", fourToolRail: false });
+  });
+});
+
+describe("the rail escape hatches do not ship", () => {
+  /* Re-imported with IS_DEV_BUILD false: a production bundle must resolve every
+     ?rail= value to the one rail the product actually ships. */
+  it("ignores ?rail=e3 and ?rail=legacy in a production build", async () => {
+    vi.resetModules();
+    vi.doMock("../runtimeEnv", async (orig) => ({
+      ...(await orig<Record<string, unknown>>()),
+      IS_DEV_BUILD: false,
+    }));
+    const { getEditorViewMode: prod } = await import("../editorViewMode");
+    for (const q of ["?rail=e3", "?rail=legacy"]) {
+      setSearch(q);
+      expect(prod()).toMatchObject({ railMode: "figma", fourToolRail: false });
+    }
+    vi.doUnmock("../runtimeEnv");
+    vi.resetModules();
   });
 });

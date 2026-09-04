@@ -596,10 +596,19 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     addToast({ description: `Token "${name}" added`, tone: "success" });
   };
 
-  // Short titles — the section tablist below the toolbar row already shows
-  // Tokens / Styles / Components / Export, so the header just needs the panel
-  // identity ("Brand" per Figma board 52:2 rail naming, P1 convergence).
-  const headerTitle = "Brand";
+  /* The header tracks the drill level. It was the constant "Brand", justified
+     by "the section tablist below the toolbar row already shows Tokens /
+     Styles / Components" — and that tablist is gone: line 473 records the tab
+     bar's removal and its handler going with it. So at Brand › Tokens › color
+     the only location cue left was a small in-body back link, and the fixed
+     header a user glances at for "where am I" said Brand at every depth.
+     Measured live across all nine destinations, 2026-09-04.
+
+     The token KIND stays out of the title: the header is an 11px caps label in
+     a fixed 44px bar, and the body crumb below already carries "· color". */
+  const headerTitle = activeSection
+    ? `Brand › ${SECTIONS.find((sec) => sec.id === activeSection)?.label ?? ""}`
+    : "Brand";
 
   return (
     <div data-ds-preview={resolvedMode} className={PANEL}>
