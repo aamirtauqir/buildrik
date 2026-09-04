@@ -270,10 +270,10 @@
       "name": "Brand · lint",
       "family": "Brand",
       "width": 280,
-      "status": "unbuildable",
+      "status": "todo",
       "blocker": "A",
       "owner": null,
-      "evidence": "",
+      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
       "authority": "blocked:no-autofix-producer"
     },
     {
@@ -319,10 +319,10 @@
       "name": "Brand · loading",
       "family": "Brand",
       "width": 280,
-      "status": "unbuildable",
+      "status": "todo",
       "blocker": "A",
       "owner": null,
-      "evidence": "",
+      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
       "authority": "blocked:sync-load"
     },
     {
@@ -344,10 +344,10 @@
       "name": "Brand · presets · bound",
       "family": "Brand",
       "width": 280,
-      "status": "unbuildable",
+      "status": "todo",
       "blocker": "A",
       "owner": null,
-      "evidence": "",
+      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
       "authority": "blocked:no-element-preset-reference"
     },
     {
@@ -369,10 +369,10 @@
       "name": "Brand · presets · unbound",
       "family": "Brand",
       "width": 280,
-      "status": "unbuildable",
+      "status": "todo",
       "blocker": "A",
       "owner": null,
-      "evidence": "",
+      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
       "authority": "blocked:no-element-preset-reference"
     },
     {
@@ -466,10 +466,10 @@
       "name": "Brand · typography",
       "family": "Brand",
       "width": 280,
-      "status": "unbuildable",
+      "status": "todo",
       "blocker": "A",
       "owner": null,
-      "evidence": "",
+      "evidence": "REACHABILITY MEASURED 2026-09-04 (editor-aa), live at 1440x900 on :5050, one fresh boot per destination. Brand root lists all eight destinations (positive control). Presets → Button 3 variants / Card 2 / Form input 1 / Link 2 / Badge 2 / Alert. Typography → ACTIVE FONTS with Inter Display, Inter Body, Geist Mono. Colour mode → Light/Dark with 'NO DARK VALUE 17'. Lint → real violations listed. Every one renders real data, so these are ordinary buildable rows; the earlier 'unbuildable' carried no reason and was wrong.",
       "authority": "blocked:no-font-upload"
     },
     {
@@ -1063,7 +1063,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1076,7 +1076,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1089,7 +1089,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1102,7 +1102,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1115,7 +1115,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1926,7 +1926,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1939,7 +1939,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1965,7 +1965,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1978,7 +1978,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -1991,7 +1991,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -2127,7 +2127,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -2402,10 +2402,10 @@
       "name": "S1.2g · force-refresh · new-version-available",
       "family": "S1 flows",
       "width": 1440,
-      "status": "unbuildable",
+      "status": "todo",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
       "authority": "blocked:no-version-detect"
     },
     {
@@ -2998,7 +2998,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3011,7 +3011,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3036,7 +3036,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3049,7 +3049,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3062,7 +3062,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3075,7 +3075,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3088,7 +3088,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3182,9 +3182,9 @@
       "name": "S7 · Settings · Integrations",
       "family": "S7",
       "width": 1440,
-      "status": "unbuildable",
+      "status": "todo",
       "owner": null,
-      "evidence": "",
+      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
       "authority": "blocked:integrations-is-pro-gated-needs-pro-fixture",
       "blocker": "A"
     },
@@ -3256,9 +3256,9 @@
       "name": "Shell · 1280 · pin auto-released (overlay)",
       "family": "Shell",
       "width": 1280,
-      "status": "fix",
-      "owner": null,
-      "evidence": "partial-rail60-drawer320-canvas552-inspector-not-measured",
+      "status": "unbuildable",
+      "owner": "editor-aa",
+      "evidence": "RETIRED 2026-09-04 (editor-aa, commit 44a40874f). The 1280 drawer-overlay mode had no door for its whole life — the one production caller never passed drawerPinned, and every test supplied its own trigger. Founder decision B-DRAWER-OVERLAY-1280: retire. Board 202:2 renamed '— RETIRED 2026-09-04' in Figma; code, CSS and tests removed. There is nothing left to implement.",
       "authority": "board"
     },
     {
@@ -3401,9 +3401,9 @@
       "name": "Shell state 9 · AI agent run",
       "family": "Shell states",
       "width": 1440,
-      "status": "unbuildable",
+      "status": "todo",
       "owner": null,
-      "evidence": "",
+      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
       "authority": "blocked:unreachable-by-design-paid-openai-call",
       "blocker": "A"
     },
@@ -3417,7 +3417,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -3608,10 +3608,10 @@
       "name": "Layers · list-view",
       "family": "Layers",
       "width": 280,
-      "status": "unbuildable",
+      "status": "todo",
       "blocker": "A",
       "owner": null,
-      "evidence": "",
+      "evidence": "REOPENED 2026-09-04 (editor-aa): excluded as unbuildable with no reason recorded anywhere. An exclusion with no stated reason flatters the percentage, so it goes back in the denominator until someone states why it cannot be built.",
       "authority": "blocked:no-list-view"
     },
     {
@@ -4052,7 +4052,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -4065,7 +4065,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -4078,7 +4078,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -4104,7 +4104,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -4117,7 +4117,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -4130,7 +4130,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
@@ -4143,7 +4143,7 @@
       "status": "unbuildable",
       "blocker": "E",
       "owner": null,
-      "evidence": "",
+      "evidence": "Excluded because the FEATURE does not exist, per the tag in its own name. Reason was only in the name, so an evidence sweep read it as unexplained. 2026-09-04 editor-aa.",
       "authority": "undecided"
     },
     {
