@@ -19,6 +19,11 @@ import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PublishTab } from "../PublishTab";
 import type { UsePublishJobResult } from "../../../../shell/hooks/usePublishJob";
+import { ToastProvider } from "@/editor/chrome-ui";
+/* PublishTab hosts the unpublish confirm and reports its outcome through the
+   toast context the studio always provides; these renders were bare. */
+const renderTab = (ui: React.ReactElement) => render(<ToastProvider>{ui}</ToastProvider>);
+
 
 vi.mock("../../../../../services/PublishService", async () => {
   const actual = await vi.importActual<Record<string, unknown>>(
@@ -69,7 +74,7 @@ beforeEach(() => vi.clearAllMocks());
 afterEach(cleanup);
 
 const renderFailed = (steps: UsePublishJobResult["steps"]) =>
-  render(
+  renderTab(
     <PublishTab
       composer={composer}
       projectId="site_1"
@@ -95,7 +100,7 @@ describe("PublishTab — board 784:4250 progress line", () => {
   ];
 
   it("names the running step and its position, per the board", async () => {
-    render(
+    renderTab(
       <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(IN_FLIGHT)} />,
     );
     await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
@@ -108,7 +113,7 @@ describe("PublishTab — board 784:4250 progress line", () => {
 
   it("falls back to the percentage when no step is running yet", async () => {
     const pending = STEPS.map((s) => ({ ...s, status: "pending" }));
-    render(
+    renderTab(
       <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(pending)} />,
     );
     await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
@@ -116,7 +121,7 @@ describe("PublishTab — board 784:4250 progress line", () => {
   });
 
   it("falls back when the job carries no steps at all", async () => {
-    render(
+    renderTab(
       <PublishTab composer={composer} projectId="site_1" onVercelPublish={vi.fn()} publishJob={publishing(null)} />,
     );
     await waitFor(() => expect(screen.getByText("Publishing to production…")).toBeTruthy());
