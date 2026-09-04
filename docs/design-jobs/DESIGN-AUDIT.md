@@ -646,3 +646,122 @@ Agent C. Section `1776:8385`, **17 frames**.
 **Read but not audited** (cited as evidence for placement only, they belong to other agents): 297:2139, 297:2027, 294:1976, 1347:7162, 815:4518 (Journeys `1776:8388`); 1172:4804, 1175:4849, 1176:4925 (Notes `1776:8389`); 307:2223, 876:4532 (Reference `862:6859`).
 
 **Limit on every row in `C.jsonl`:** nothing was verified in a running editor. Figma claims are fetched values; code claims are static reads of `SettingsTab.tsx`, `settings.css`, `LeftSidebar.tsx`, `tabsConfig.ts` and a cited file:line map produced by two research passes over `packages/editor/src`, `server/trpc/routers/` and `packages/dashboard/app/`.
+
+---
+
+## Journeys — coverage
+
+Agent G. Section `1776:8388`, **74 frames in module, 74 fetched** — name, type,
+x/y/size, and `reactions` on the frame **and every descendant** (carrier counts
+ran 4–321 per frame; 210 outbound edges recorded). **In-edges were resolved by a
+full-page scan** of every frame under all 27 sections on page `1:3`, so the
+orphan/in-degree numbers below are file-wide facts, not section-local ones.
+**27 screenshotted** as verified-complete PNGs via `scripts/baseline/figma-shot.mjs`
+(`png=true complete=true` on all 27); **7 opened and looked at**.
+
+Fetched (74): 52:2, 55:2, 58:2, 128:2, 129:2, 129:223, 129:451, 130:2, 130:201,
+130:400, 130:599, 130:798, 130:997, 131:2, 131:201, 131:415, 132:2, 133:2,
+133:212, 133:422, 133:630, 294:1976, 294:1984, 294:1992, 295:1972, 295:1989,
+295:1994, 296:1972, 296:1999, 296:2030, 297:1972, 297:2027, 297:2139, 301:1979,
+301:2186, 301:2393, 302:1978, 302:2004, 302:2026, 303:1997, 303:2032, 307:2193,
+307:2203, 307:2213, 430:2348, 430:2375, 807:6558, 807:7000, 807:7301, 807:7775,
+807:8069, 807:8663, 807:8723, 807:8756, 807:8787, 813:4836, 813:4888, 814:7027,
+815:4518, 815:4608, 817:5006, 817:5114, 817:5195, 817:5220, 817:5262, 878:4518,
+1124:4527, 1124:4562, 1156:4593, 1306:2, 1342:7162, 1343:7162, 1345:7162,
+1347:7162.
+
+**Screenshotted (26):** 52:2, 128:2, 130:201, 130:400, 130:798, 130:997, 131:2,
+131:201, 131:415, 294:1976, 296:1972, 296:2030, 302:1978, 303:1997, 307:2193,
+807:6558, 807:8663, 807:8723, 807:8756, 814:7027, 815:4518, 815:4608, 817:5114,
+1342:7162, 1343:7162, 1345:7162, 1347:7162. **Rendered and looked at (7):**
+52:2, 130:201, 130:400, 131:201, 296:1972, 307:2193, 807:8723. The other 20
+captures were downloaded and verified complete but never opened; findings on those boards rest on fetched text,
+fetched fills/geometry and reactions, never on a look, and say so in `evidence`.
+
+**Not screenshotted (47):** 55:2, 58:2, 129:2, 129:223, 129:451, 130:2, 130:599,
+132:2, 133:2, 133:212, 133:422, 133:630, 294:1984, 294:1992, 295:1972, 295:1989,
+295:1994, 296:1999, 297:1972, 297:2027, 297:2139, 301:1979, 301:2186, 301:2393,
+302:2004, 302:2026, 303:2032, 307:2203, 307:2213, 430:2348, 430:2375, 807:7000,
+807:7301, 807:7775, 807:8069, 807:8787, 813:4836, 813:4888, 817:5006, 817:5195,
+817:5220, 817:5262, 878:4518, 1124:4527, 1124:4562, 1156:4593, 1306:2. **No Q4
+craft finding is filed against any of them** — their rows are Q1/Q2/Q3/Q5 only.
+
+Boards carrying their own explanation were read, not re-filed as defects:
+`130:2` (ENTRY POINT), `807:8723` (ENTRY POINT — but see D-G-10, which is about
+its *content* contradicting the canonical board, not about its entry status),
+`132:2` / `133:2` / `133:212` / `133:422` / `133:630` (SUPERSEDED — D-G-27 files
+the live *edges into* them, not the boards), `295:1989` / `295:1994` / `1306:2` /
+`1345:7162` (RETIRED — D-G-02 treats 1345:7162 as the S2 *flow* question, which
+its label does not answer), `807:8787` / `817:5220` ([not-implemented]),
+`817:5006` / `817:5195` / `817:5262` / `878:4518` / `1156:4593` ([design-ahead]).
+
+**Orphans: none unexplained.** Six of the 74 have zero in-edges file-wide and
+every one carries its own label: 130:2 (ENTRY POINT), 807:8723 (ENTRY POINT),
+295:1989, 295:1994, 1306:2, 1345:7162 (all RETIRED). **Dead ends: two**, both
+RETIRED (1306:2, 1345:7162).
+
+### Per-flow verdict — is each S-flow a real flow?
+
+| Flow | Boards | Real flow? | Why |
+|---|---|---|---|
+| **S1** open / return | 24 | **No — hub-and-spoke** | 52:2 has 84 in-edges (file's highest) and 52 out; almost every other S1 board's only exit is back to it. No start: the one first-run board (807:6558) has 1 in-edge and leaves to Shell. D-G-06, D-G-08. |
+| **S2** AI | 1 | **No — it is a decision note** | 1345:7162, RETIRED, 0 edges in, 0 out; its content is a founder ruling. The 11 boards it superseded are in Archive. D-G-02. |
+| **S3** canvas editing | 18 | **Partly — one ring + two orphaned pairs** | S3.1/3.2/3.11 is a closed 5-cycle of whole-frame hotspots (D-G-22); S3.6's 303 pair is a closed 2-cycle duplicating boards the code already cites (D-G-11/12/23); S3.7 is a Pages-module surface (D-G-14). What survives as a flow is one chain that dead-ends on a [not-implemented] board (D-G-26). |
+| **S5** review & sign-off | 26 | **Yes — the only one, and it is wrong in three places** | It has a start (128:2 compose), a middle and a branch structure. But two edges assert transitions the server cannot make (D-G-24), two boards are textually identical (D-G-18), the bar prints a string the code documents as a defect (D-G-17), and it ends at Publish · pre-checks rather than live (D-G-04). |
+| **S6** publish | 6 | **No — one live board, and it is about DNS** | Five are [not-implemented] or [design-ahead]. The sixth (807:8756) is Step 2 of 3 of a wizard that does not exist, its 10 in-edges and 3 out-edges are all Settings·Domains. D-G-03, D-G-21. |
+| **S7** settings | 0 | **No — a feature module** | Zero S7 frames in this section; all 45 are in `1776:8387`. D-G-07. |
+
+**S4 has no frame in this section at all** — its subjects live in Preview and
+Brand, under two *different* S4 series that collide number-for-number (D-G-37).
+
+Q1 verdicts, all 74: **44 KEEP** · **10 MERGE-INTO / re-file** (131:2→130:798;
+302:1978 / 302:2004 / 302:2026→Pages; 807:8756→Settings; 55:2 / 58:2→Reference;
+1345:7162→Notes; 131:201→beside the S5.4 gate; 130:400→130:201 unless redrawn)
+· **4 CUT-and-rename-SUPERSEDED** (303:1997, 303:2032, 807:8723, 817:5114) ·
+**16 pre-labelled and not re-judged** · **0 nodes changed in Figma.**
+
+(44 + 10 + 4 + 16 = 74. Eighteen boards carry a protective label; I gave a
+verdict to two of them anyway and say so: `807:8723` is labelled ENTRY POINT,
+which explains its *entry*, not its *content* — D-G-10 is about the content;
+`1345:7162` is labelled RETIRED, which explains the board, not whether the S2
+slot should exist — D-G-02 is about the slot. The other sixteen were read and
+left alone.)
+
+### Code read for ground truth (not inferred)
+
+`packages/shared/schemas/reviews.ts`, `server/services/review.service.ts`,
+`server/services/publish-approval.ts`, `server/services/action-confirmation.service.ts`,
+`server/services/share-link.service.ts`,
+`packages/editor/src/editor/shell/{StudioHeader,ReviewBar,SiteMenu}.tsx`,
+`shell/modals/{StaleApprovalModal,ConflictModal}.tsx`,
+`shell/hooks/useEditorShortcuts.ts`,
+`editor/media/{ImageEditorModal,OptimizationPanel}.tsx`,
+`editor/onboarding/{OnboardingChecklist,OnboardingMount}.tsx`,
+`shared/constants/onboardingSteps.ts`,
+`editor/sidebar/tabs/settings/screens/DomainsScreen.tsx`,
+`editor/sidebar/tabs/ai/hooks/useAiActionGate.ts`,
+`packages/dashboard/app/review/[token]/review-client.tsx`,
+`packages/dashboard/components/site-detail/overview-tab.tsx`,
+`packages/editor/src/themes/tokens.generated.css`.
+
+### Not verified
+
+- **The running editor was never opened.** No review was sent, no gate was
+  tripped, no checklist was expanded, no image was edited. Every product claim
+  here is board data plus source, never observed behaviour. The two claims most
+  worth re-checking live are D-G-17 (that the shipped bar really renders
+  "Sent — waiting on your client") and D-G-16 (that ⌘/ and `?` really open two
+  different overlays — that one already rests on a comment whose author says
+  they measured it, which is second-hand).
+- **Contrast, type scale and token conformance were not checked** on any
+  Journeys board, except the two fills D-G-20 and D-G-29 rest on. Worth noting
+  for whoever does: every primary button measured in this section is `#1c64f2`
+  (Flowbite blue-600), while `tokens.generated.css:81` sets `--bk-accent: #1A56DB`.
+  I measured that on 6 boards only and have **not** swept the section, so it is
+  recorded here rather than filed.
+- **The 15 out-of-section boards this module points at** (807:7252, 1124:4527's
+  Media parents, 1339:7162/7171/7186/7193, 156:2, 833:4518, 641:2652, 784:4326,
+  1168:4713, 199:2/199:205, 817:4856, 876:4532) were resolved by name, and four
+  were fetched for text (1339:7162, 1339:7171, 1168:4713, 815:4518). The rest I
+  know only by name and section — they belong to other agents.
+- **Screenshots for 47 of 74 boards.** Their craft is unaudited.
