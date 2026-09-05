@@ -194,7 +194,7 @@ Three cannot be adopted, each for a different and specific reason:**
 | component | result | why |
 |---|---|---|
 | **Radio** `14:20` | **adopted** | structurally identical; done |
-| **Slider** `92:30` | cannot | the knob position *is* the value, and an instance cannot override `relative-transform`. Swapping rewrote a board's "Opacity 100" to 62. |
+| **Slider** `92:30` | **adopted — see §13** | I called this unadoptable after one swap. All 49 sliders in the file read 100; there was no range to express. |
 | **Row** `8:47` | superseded — see below | its Label carries no depth. **All 369 candidates are tree rows** — measured by grouping rows by parent: 41 groups, 41 with varying label offsets, **zero flat lists**. Swapping nine flattened the hierarchy and erased the selection. |
 | **Status dot** `10:27` | cannot | the five variants are `#0e9f6e / #e3a008 / #f05252 / #9ca3af`; the 28 same-size local dots are `#d1d5db` and `#1a56db`. Different objects that share a shape. |
 
@@ -274,3 +274,24 @@ would be 120 cells for one real shape.
 **The lesson worth keeping:** "this needs a decision" deserves the same scrutiny
 as "this is a defect". I was wrong here in the conservative direction, which is
 cheaper than the alternative but still wrong.
+
+
+---
+
+## 13. Slider — RESOLVED, and I was conservative-wrong twice
+
+Filed as "cannot be adopted: the knob position *is* the value and
+`relative-transform` is not overridable on an instance". True about the API,
+wrong about the problem.
+
+**Every slider in the file reads 100, knob at x=108. All 49 of them.** There is
+no range to express — the component's default of 62 was simply wrong. Setting
+the master to 100 and adopting took one edit and one swap.
+
+That is twice in this session I filed a component as unadoptable and was wrong,
+both times because I inferred a limitation from one failed swap instead of
+measuring what the boards contain. Tree rows were the other.
+
+**The check that would have caught both, in one line:** *before concluding a
+component cannot express the boards, census what the boards actually hold.* Six
+depths. One value. Both trivially encodable once looked at.
