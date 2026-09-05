@@ -102,7 +102,7 @@ should follow it — not the other way round.
 
 ---
 
-## 8. The 360-wide drawers — TESTED, and it is a redraw
+## 8. The 360-wide drawers — RESOLVED, not a redraw after all
 
 **22 boards: AI 11, Notifications 6, History 5, against 154 at 280×812.**
 
@@ -119,12 +119,22 @@ The cause is structural, not incidental: these boards are VERTICAL auto-layout
 whose *rows* are not, so setting each child to FILL reflows the column and
 leaves everything pinned inside a row exactly where it was.
 
-**So this is a redraw of three modules, not a resize**, and the cost is now
-known rather than guessed. Whoever takes it needs to re-pin each row's
-right-aligned content — roughly 7 nodes per board across 22 boards.
+**Then I built the re-anchoring instead of accepting that.** The failure had a
+specific, mechanical cause: every node has a *right inset* — board width minus
+its right edge — and for right-aligned content that inset is the thing the
+designer chose. Capture it before the resize, restore it after, and the control
+lands the same distance from the new edge. Nodes are classified by measurement:
+full-bleed (both insets ~0) gets resized, right-pinned (right inset small, left
+inset large) gets shifted, everything else is untouched. A final pass trims any
+box still wider than the panel.
 
-The height half of the same recommendation was safe and **is done**: the seven
-280×776 boards are now 280×812, so the 280-wide drawer has one size.
+**All 29 boards are now 280×812, with `stillOverflowing=0` on every single one.**
+Notifications keeps its close button and all three timestamps; AI's copy wraps;
+History's rows are intact. Verified by screenshot on three of them.
+
+**RESOLVED.** The drawer is one size: 177 boards at 280×812 across fifteen
+modules. `360×776` no longer exists in the file. Inspector's 300×812 stays — it
+is the right panel, not a drawer.
 
 
 ---
