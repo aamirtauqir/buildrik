@@ -180,6 +180,19 @@ const isRoot = (c) => (rank(c.name) === 0 && segs(c.name).length <= 2 ? 0 : 1);
    Inspector board LED the row of live popovers. Segregation has to outrank
    grouping, or a designer builds from a board that was withdrawn. */
 const buildable = (c) => (rank(c.name) === 9 ? 1 : 0);
+
+/* EXPLICIT ORDINALS BEAT SUBJECT. Where the author numbered the boards, the
+   number IS the reading order and subject-alphabetical destroys it: the Shell
+   section's last row read 12, 10, 11, 15, 13 because it sorted on
+   loading/offline/saving/save-failed/presence instead of on the numbers written
+   in the names. Measured page-wide, "state N" naming appears in ONE section
+   (27 of 33 nodes in Shell and nowhere else), so this is surgical rather than a
+   change to how every section sorts. Unnumbered boards return Infinity and keep
+   their existing subject ordering. */
+const ordinal = (n) => {
+  const m = String(n || "").match(/\\bstate\\s+(\\d+)\\b/i);
+  return m ? Number(m[1]) : Infinity;
+};
 /* Height band as a tiebreak keeps rows level: six frames of 632/470/259/560/812
    top-aligned in one row read as a staircase with up to 553px of hole. */
 /* Coarse on purpose. At /100 the height band outranked the name and inverted
@@ -202,6 +215,7 @@ const byModule = (a, b) =>
   (isBoard(a) - isBoard(b)) ||
   (buildable(a) - buildable(b)) ||
   (isRoot(a) - isRoot(b)) ||
+  (ordinal(a.name) - ordinal(b.name) || 0) ||
   (subject(a.name) < subject(b.name) ? -1 : subject(a.name) > subject(b.name) ? 1 : 0) ||
   (rank(a.name) - rank(b.name)) ||
   /* Name BEFORE the size bands. Sizing is a layout concern and meaning is a
