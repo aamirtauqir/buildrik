@@ -1,0 +1,1339 @@
+### 1084:4527 11 · Templates · 18
+   781:4372 'Templates · load-error'
+      B 781:4432 'Try again' (bare text)
+   642:2556 'Templates · preview'
+      A 642:2830 'Apply template' 119x28
+      A 642:2602 'Search' 248x28
+   642:2832 'Templates · applying'
+      A 642:3110 'Cancel' 67x28
+      A 642:2878 'Search' 248x28
+   807:4299 'S1.1b · First run → Browse templates ('
+      A 807:6537 'Search templates...' 248x32
+      A 807:4347 'Snap Guides' 112x28
+      A 807:4328 'Start blank' 97x34
+      A 807:4326 'Browse templates' 140x34
+   807:7252 'S1.3b · new-page · template-picker'
+      A 807:7294 'Use template' 120x36
+      B 807:7254 'New page from template' (bare text)
+   813:4489 'S1.1e · template-preview (modal)'
+      A 1711:8407 'Use this template' 148x32
+      A 813:4500 'Get started' 120x40
+   807:6694 'S1.1d - Template applied - First conte'
+      B 807:6963 'Publish' (bare text)
+      B 807:6959 'Send for review' (bare text)
+      B 807:6957 'Connect first client' (bare text)
+      B 807:6953 'Add your first page' (bare text)
+      A 807:6904 '8' 82x28
+      B 807:6888 'BACKGROUND' (bare text)
+      A 807:6885 '1.5' 82x28
+      A 807:6883 '14' 82x28
+   1169:4725 'Templates · create-page — confirm · su'
+      A 1169:4747 'Cancel' 61x27
+      A 1169:4729 'Cancel' 61x27
+   1169:4753 'Templates · save-as-template (modal)'
+      B 1169:4754 'Save page as template' (bare text)
+TOTAL candidates: 37 across 9 boards in 1 section(s)
+### 1776:8372 05 · Media · 60
+   144:2 'Media · grid'
+      A 144:23 'icon/370' 63x22
+      A 144:20 'svg/24' 53x22
+      A 144:17 'video/6' 56x22
+      A 144:14 'image/128' 73x22
+   145:2 'Media · filtered'
+      A 145:23 'icon/370' 63x22
+      A 145:20 'svg/24' 53x22
+      A 145:17 'video/6' 56x22
+      A 145:14 'image/128' 73x22
+      A 145:8 'Search' 248x28
+   145:49 'Media · folder-scoped'
+      A 145:70 'icon/370' 63x22
+      A 145:67 'svg/24' 53x22
+      A 145:64 'video/6' 56x22
+      A 145:61 'image/128' 73x22
+      A 145:55 'Search' 248x28
+   145:96 'Media · uploading'
+      A 145:117 'icon/370' 63x22
+      A 145:114 'svg/24' 53x22
+      A 145:111 'video/6' 56x22
+      A 145:108 'image/128' 73x22
+      A 145:102 'Search' 248x28
+   145:148 'Media · upload-failed'
+      A 145:169 'icon/370' 63x22
+      A 145:166 'svg/24' 53x22
+      A 145:163 'video/6' 56x22
+      A 145:160 'image/128' 73x22
+      A 145:154 'Search' 248x28
+   145:199 'Media · quota-warn'
+      A 145:220 'icon/370' 63x22
+      A 145:217 'svg/24' 53x22
+      A 145:214 'video/6' 56x22
+      A 145:211 'image/128' 73x22
+      A 145:205 'Search' 248x28
+   145:250 'Media · quota-full'
+      A 145:271 'icon/370' 63x22
+      A 145:268 'svg/24' 53x22
+      A 145:265 'video/6' 56x22
+      A 145:262 'image/128' 73x22
+      A 145:256 'Search' 248x28
+   145:300 'Media · bulk-select'
+      A 145:321 'icon/370' 63x22
+      A 145:318 'svg/24' 53x22
+      A 145:315 'video/6' 56x22
+      A 145:312 'image/128' 73x22
+      A 145:306 'Search' 248x28
+   145:359 'Media · empty'
+      A 145:380 'icon/0' 49x22
+      A 145:377 'svg/0' 46x22
+      A 145:374 'video/0' 56x22
+      A 145:371 'image/0' 59x22
+      A 145:365 'Search' 248x28
+   146:2 'Media · drill-in · asset-detail'
+      A 146:13 'Dark restaurant interior wit' 248x32
+   147:2 'Media · drill-in · icon-picker'
+      A 147:10 'Search 370 icons' 248x28
+   147:55 'Media · drill-in · stock-browser'
+      A 147:70 'Type ▾' 56x28
+      A 147:68 'Colour ▾' 88x28
+      A 147:66 'Orientation ▾' 88x28
+      A 147:63 'restaurant interior' 248x28
+   453:3931 'Media · load-error'
+      B 453:3954 'Try again' (bare text)
+      A 453:3943 'video/6' 45x22
+      A 453:3940 'image/128' 48x22
+      A 453:3934 'Search' 248x28
+   777:4093 'Media · loading'
+      A 777:4105 'video/6' 45x22
+      A 777:4102 'image/128' 48x22
+      A 777:4096 'Search' 248x28
+   782:4353 'Media · no-results'
+      A 782:4371 'icon/370' 63x22
+      A 782:4368 'svg/24' 53x22
+      A 782:4365 'video/6' 56x22
+      A 782:4362 'image/128' 73x22
+      A 782:4356 'logo dark' 248x28
+   1159:4593 'Media · fullpage · library'
+      A 1161:150 'Rename' 142x29
+      A 1161:148 'Edit image' 142x29
+      A 1161:49 'Date added ▾' 84x21
+      A 1160:28 '🏠  All assets/24' 112x27
+      A 1160:13 '+ Add from stock' 124x27
+      A 1160:9 '⭳ Import URL' 96x27
+   1162:4617 'Media · fullpage · empty'
+      A 1162:4858 'Browse stock' 99x29
+      A 1162:4710 'Date added ▾' 84x21
+      A 1162:4669 '🏠  All assets/0' 105x27
+      A 1162:4652 '+ Add from stock' 124x27
+      A 1162:4650 '↑ Upload' 80x27
+      A 1162:4648 '⭳ Import URL' 96x27
+   1163:4641 'Media · fullpage · list-view · bulk-se'
+      A 1163:4836 'Rename' 142x29
+      A 1163:4834 'Edit image' 142x29
+      A 1163:4734 'Date added ▾' 84x21
+      A 1163:4693 '🏠  All assets/24' 112x27
+      A 1163:4676 '+ Add from stock' 124x27
+      A 1163:4674 '↑ Upload' 80x27
+      A 1163:4672 '⭳ Import URL' 96x27
+   1163:13695 'Media · fullpage · unused-scope · cont'
+      A 1163:13788 'Date added ▾' 84x21
+      A 1163:13742 '○  Unused/10' 98x27
+      A 1163:13730 '+ Add from stock' 124x27
+      A 1163:13728 '↑ Upload' 80x27
+   1163:13948 'Media · fullpage · drag-over · uploadi'
+      A 1163:14143 'Rename' 142x29
+      A 1163:14141 'Edit image' 142x29
+      A 1163:14041 'Date added ▾' 84x21
+      A 1163:14000 '🏠  All assets/24' 112x27
+      A 1163:13983 '+ Add from stock' 124x27
+      A 1163:13981 '↑ Upload' 80x27
+      A 1163:13979 '⭳ Import URL' 96x27
+   1164:4713 'Media · modal · picker (choose for ele'
+      A 1746:8394 'List' 41x28
+      A 1746:8392 'Grid' 45x28
+      B 1173:4808 'Upload' (bare text)
+      A 1173:4805 'Library' 57x23
+   1175:4827 'Media · delete-confirm · bulk type-DEL'
+      A 1175:4838 'Delete 34 files' 101x27
+      A 1175:4836 'Cancel' 61x27
+   1205:4816 'Media · modal · import-url · invalid'
+      A 1205:4827 'Import' 59x29
+      B 1205:4817 'Import from URL' (bare text)
+   1716:8391 'Media · stock · photos · results'
+      A 1716:8407 'Unsplash' 75x24
+      B 1716:8392 'Add from Stock' (bare text)
+   1716:8453 'Media · stock · searching'
+      A 1716:8469 'Unsplash' 75x24
+      B 1716:8454 'Add from Stock' (bare text)
+   1716:8497 'Media · stock · no-results'
+      A 1716:8513 'Unsplash' 75x24
+      B 1716:8498 'Add from Stock' (bare text)
+   1716:8541 'Media · stock · icons · empty'
+      B 1716:8542 'Add from Stock' (bare text)
+   1716:8557 'Media · stock · quota-strip'
+      A 1716:8576 'Unsplash' 75x24
+      B 1716:8558 'Add from Stock' (bare text)
+   1717:17203 'Media · context-menu · move-to-folder '
+      A 1717:17214 '(Root)' 160x40
+      B 1717:17213 'Delete' (bare text)
+      B 1717:17212 'Download' (bare text)
+      B 1717:17207 'Rename…' (bare text)
+   1738:8394 'Media · stock · search-failed'
+      B 1738:8395 'Add from Stock' (bare text)
+   75:2 'Media drill-ins — the five destination'
+      A 75:125 'Save as v5' 90x28
+      A 75:123 'Replace' 66x28
+      A 75:121 'Adjust' 57x28
+      A 75:119 'Rotate' 58x28
+      A 75:117 'Crop' 48x28
+   1174:4849 'Media · modal · replace-across · resul'
+      B 1174:4856 'Done' (bare text)
+   1205:4804 'Media · modal · import-url'
+      A 1205:4814 'Import' 59x29
+      B 1205:4805 'Import from URL' (bare text)
+   1205:4829 'Media · fullpage · folders · new-folde'
+      A 1205:4858 'Menu photos' 216x27
+TOTAL candidates: 123 across 34 boards in 1 section(s)
+### 1776:8373 07 · Brand · 51
+   152:83 'Brand · token-detail'
+      B 1700:6962 'Delete token' (bare text)
+      B 1700:6961 'Rename ID' (bare text)
+   152:137 'Brand · starters'
+      B 152:160 'Editorial' (bare text)
+   153:92 'Brand · colour-mode'
+      A 1751:8398 'Filter' 47x26
+      A 1751:8396 'Sort' 43x26
+      A 1751:8394 'Group by' 69x26
+      A 153:100 'Light/Dark' 136x28
+      A 153:101 'Light' 69x28
+   153:120 'Brand · import-export'
+      B 1749:8403 'Cancel' (bare text)
+      A 1749:8401 'Apply 22 valid only' 132x28
+      A 1749:8393 'CSS variables/⌄' 140x26
+      B 153:146 'Download' (bare text)
+      B 153:145 'Copy' (bare text)
+      B 153:141 'Download' (bare text)
+      B 153:140 'Copy' (bare text)
+      B 153:136 'Download' (bare text)
+   154:26 'Brand · lint-warnings'
+      B 1691:7400 'Move the brand in and out' (bare text)
+      B 1691:7399 'Import / export' (bare text)
+      B 1691:7367 'Starters' (bare text)
+   154:78 'Brand · dirty'
+      B 1691:7339 'Move the brand in and out' (bare text)
+      B 1691:7338 'Import / export' (bare text)
+      B 1691:7306 'Starters' (bare text)
+   154:132 'Brand · root · Beginner mode'
+      B 1691:7278 'Move the brand in and out' (bare text)
+      B 1691:7277 'Import / export' (bare text)
+      B 1691:7245 'Starters' (bare text)
+   306:2049 'Brand · tokens · add'
+      A 333:2348 'Add token' 79x20
+   306:2080 'Brand · tokens · replace'
+      A 333:2350 'Replace across usages' 112x20
+   306:2186 'Brand · starters · applied'
+      B 306:2206 'Editorial' (bare text)
+      A 333:2358 'Starter applied' 106x20
+   306:2217 'Brand · lint · suppressed'
+      A 333:2360 'Warnings suppressed' 105x22
+      B 1691:7461 'Move the brand in and out' (bare text)
+      B 1691:7460 'Import / export' (bare text)
+      B 1691:7428 'Starters' (bare text)
+   306:2232 'Brand · export · exported'
+      A 333:2362 'Exported CSS' 100x20
+      B 306:2254 'Download' (bare text)
+      B 306:2253 'Copy' (bare text)
+      B 306:2249 'Download' (bare text)
+      B 306:2248 'Copy' (bare text)
+      B 306:2244 'Download' (bare text)
+      B 306:2243 'Copy' (bare text)
+   306:2265 'Brand · export · imported'
+      A 333:2364 'Imported tokens' 115x20
+      B 306:2287 'Download' (bare text)
+      B 306:2286 'Copy' (bare text)
+      B 306:2282 'Download' (bare text)
+      B 306:2281 'Copy' (bare text)
+      B 306:2277 'Download' (bare text)
+      B 306:2276 'Copy' (bare text)
+   306:2298 'Brand · export · error'
+      A 333:2366 'Import failed' 93x20
+      B 306:2320 'Download' (bare text)
+      B 306:2319 'Copy' (bare text)
+      B 306:2315 'Download' (bare text)
+      B 306:2314 'Copy' (bare text)
+      B 306:2310 'Download' (bare text)
+      B 306:2309 'Copy' (bare text)
+   781:4311 'Brand · load-error'
+      B 781:4371 'Try again' (bare text)
+   1333:7162 'Brand · root — NEW 2026-08-27 (CURRENT'
+      B 1334:7223 'Move the brand in and out' (bare text)
+      B 1334:7222 'Import / export' (bare text)
+      B 1334:7190 'Starters' (bare text)
+      A 1747:8397 'Beginner' 68x24
+      B 1747:8393 'Open Shared theme ↗' (bare text)
+   1706:8467 'Modal · Brand · AI prompt · idle'
+      A 1706:8475 'Cancel' 64x28
+      A 1706:8473 'Generate' 78x28
+   1706:8476 'Modal · Brand · AI prompt · generating'
+      A 1706:8482 'Cancel generation' 129x28
+   1706:8483 'Modal · Brand · AI prompt · success'
+      A 1706:8491 'Discard' 68x28
+      A 1706:8489 'Retry' 55x28
+   433:2391 'B9.5 · Migration progress modal — runn'
+      A 433:2439 'Restore snapshot' 113x23
+   1706:8492 'Modal · Brand · AI prompt · error'
+      A 1706:8500 'Cancel' 64x28
+      A 1706:8498 'Retry' 55x28
+TOTAL candidates: 69 across 21 boards in 1 section(s)
+### 1776:8374 16 · History · 34
+   162:2 'History · Saves'
+      A 229:1134 'Compare with current' 160x28
+      A 1656:7154 'Search saves...' 256x36
+      A 1656:7152 'All changes' 82x24
+      A 1656:7150 'Milestones' 79x24
+   163:2 'History · Saves · changes'
+      A 229:1136 'Compare with current' 160x28
+   163:64 'History · Saves · empty'
+      A 1657:7163 'Search saves...' 256x36
+      A 1657:7161 'All changes' 82x24
+      A 1657:7159 'Milestones' 79x24
+   163:113 'History · Saves · time-travel'
+      A 229:1142 'Compare with current' 160x28
+      A 229:1140 'Restore this version' 46x28
+      A 229:1138 'Exit' 48x28
+   163:167 'History · Saves · restore-confirm'
+      A 229:1148 'Compare with current' 160x28
+      A 229:1146 'Restore' 72x28
+      A 229:1144 'Cancel' 67x28
+      A 1657:7235 'Search saves...' 256x36
+      A 1657:7233 'All changes' 82x24
+      A 1657:7231 'Milestones' 79x24
+   163:220 'History · Saves · restoring'
+      A 229:1150 'Compare with current' 160x28
+      A 1657:7259 'Search saves...' 256x36
+      A 1657:7257 'All changes' 82x24
+      A 1657:7255 'Milestones' 79x24
+   163:269 'History · Saves · pruned-notice'
+      A 229:1152 'Compare with current' 160x28
+      A 1657:7211 'Search saves...' 256x36
+      A 1657:7209 'All changes' 82x24
+      A 1657:7207 'Milestones' 79x24
+   184:45 'History · Published · restored'
+      A 229:1176 'Close' 70x32
+   433:2348 'History · milestone suggestion banner '
+      B 433:2389 'Dismiss' (bare text)
+      A 433:2386 'Edit' 41x23
+      A 433:2373 'Save' 46x23
+      A 433:2369 'Added pricing page' 135x22
+      B 433:2364 'EDITING' (bare text)
+      B 433:2362 'Dismiss' (bare text)
+      A 433:2359 'Edit' 41x23
+      A 433:2357 'Save' 46x23
+   453:4031 'History · Saves · load-error'
+      B 453:4045 'Try again' (bare text)
+      A 1657:7187 'Search saves...' 256x36
+      A 1657:7185 'All changes' 82x24
+      A 1657:7183 'Milestones' 79x24
+   453:4064 'History · Published · failed'
+      A 453:4073 'Try again' 95x32
+   1704:8256 'History · Published · load-error'
+      A 1704:8306 'Retry' 70x28
+TOTAL candidates: 40 across 12 boards in 1 section(s)
+### 1776:8375 03 · Layers · 29
+   143:2 'Layers · filtered'
+      A 143:8 'but' 208x28
+   143:60 'Layers · dragging'
+      A 143:66 'Search' 166x28
+   143:119 'Layers · invalid-drop'
+      A 143:125 'Search' 208x28
+   143:179 'Layers · hidden'
+      A 143:185 'Search' 208x28
+   143:237 'Layers · locked'
+      A 143:243 'Search' 208x28
+   143:295 'Layers · multi-select'
+      A 143:301 'Search' 208x28
+   775:4130 'Layers · loading'
+      A 776:4090 'Search' 208x28
+   781:4217 'Layers · load-error'
+      B 781:4310 'Try again' (bare text)
+      A 781:4220 'Search' 208x28
+   782:4260 'Layers · no-results'
+      A 782:4263 'hero' 208x28
+   1082:4527 'Layers · context-menu'
+      B 1082:4585 'Copy link' (bare text)
+      B 1082:4583 'Move to page…' (bare text)
+      B 1082:4578 'Rename' (bare text)
+      B 1082:4575 'Delete' (bare text)
+      B 1082:4573 'Duplicate' (bare text)
+      B 1082:4568 'Copy' (bare text)
+      A 1082:4533 'Search' 208x28
+   1082:4589 'Layers · renaming'
+      A 1082:4595 'Search' 208x28
+   1082:4640 'Layers · expanded'
+      A 1082:4646 'Search' 208x28
+   1082:4739 'Layers · component-instance — NOT A ST'
+      A 1082:4745 'Search' 208x28
+   1082:4835 'Layers · scroll-overflow — NOT A STATE'
+      B 1082:4957 'Copyright' (bare text)
+      A 1082:4841 'Search' 208x28
+TOTAL candidates: 22 across 14 boards in 1 section(s)
+### 1776:8376 06 · Content · 33
+   149:84 'Content · record'
+      B 149:104 'Published' (bare text)
+      A 149:101 'Tomato, mozzarella, basil' 248x32
+      A 149:97 '$12' 248x32
+      A 149:93 'Margherita' 248x32
+   149:108 'Content · unsaved-record'
+      B 149:128 'Published' (bare text)
+      A 149:125 'Tomato, mozzarella, basil' 248x32
+      A 149:121 '$12' 248x32
+      A 149:117 'Margherita' 248x32
+   151:46 'Content · data-sources'
+      B 151:56 'Connected · synced 4m ago' (bare text)
+   453:4010 'Content · load-error'
+      B 453:4015 'Try again' (bare text)
+   1170:4713 'Content · collection-setup (modal)'
+      A 1753:8418 'Rich text/⌄' 112x42
+      A 1753:8410 'Image/⌄' 112x42
+      A 1753:8402 'Number/⌄' 112x42
+      A 1753:8394 'Text/⌄' 112x42
+   1170:4749 'Content · records (modal)'
+      A 1744:8410 'Publish' 54x22
+      A 1744:8403 'Unpublish' 66x22
+      A 1744:8396 'Unpublish' 66x22
+   1706:8437 'Modal · CMS records · none-published'
+      A 1706:8443 '+ Add record' 99x28
+   1706:8444 'Modal · CMS records · empty'
+      A 1706:8450 '+ Add record' 99x28
+   1706:8451 'Modal · CMS records · publish-error'
+      A 1706:8457 '+ Add record' 99x28
+TOTAL candidates: 20 across 9 boards in 1 section(s)
+### 1776:8377 04 · Pages · 25
+   141:2 'Pages · folders-collapsed'
+      A 141:8 'Search' 166x28
+   141:40 'Pages · searching'
+      A 141:46 'menu' 166x28
+   141:78 'Pages · bulk-select'
+      A 141:84 'Search' 166x28
+   141:124 'Pages · empty'
+      A 141:130 'Search' 166x28
+   141:165 'Pages · load-error'
+      B 141:206 'Try again' (bare text)
+      A 141:171 'Search' 166x28
+   141:207 'Pages · listings'
+      B 141:266 'Open full listings ›' (bare text)
+      A 141:213 'Search' 166x28
+   435:2348 'Pages · page tab bar (code: PageTabBar'
+      A 435:2434 '"Pricing" deleted/Undo' 181x36
+      B 435:2431 'Cancel' (bare text)
+      A 435:2417 'Pricing' 67x28
+      B 435:2411 'Delete' (bare text)
+      B 435:2407 'Duplicate' (bare text)
+      B 435:2405 'Rename' (bare text)
+      A 435:2398 '/pricing-plans' 95x23
+      A 435:2395 'Pricing plans' 100x20
+   782:4212 'Pages · no-results'
+      A 782:4215 'checkout' 166x28
+   1717:17217 'Pages · rename · name-conflict'
+      A 1717:17227 'About' 244x26
+   1706:8505 'Modal · page-settings · save-failed'
+      B 1706:8428 'Retry' (bare text)
+   1706:8509 'Modal · page-settings · crash'
+      A 1706:8431 'Try again' 84x28
+TOTAL candidates: 24 across 11 boards in 1 section(s)
+### 1776:8378 15 · Publish · 20
+   781:4489 'Publish · load-error'
+      B 781:4548 'Try again' (bare text)
+   784:4250 'Publish · publishing'
+      B 784:4307 'Publishing to production…' (bare text)
+   784:4326 'Publish · live'
+      B 784:4387 'Compare v14 → v15' (bare text)
+      B 784:4386 'View live site' (bare text)
+   784:4403 'Publish · failed'
+      B 784:4464 'View log' (bare text)
+      B 784:4463 'Try again' (bare text)
+   833:4518 'Publish · pre-checks'
+      A 833:4525 '3. Confirm' 61x28
+      A 833:4523 '2. Options' 60x28
+      A 833:4521 '1. Review' 54x28
+   893:4518 'Publish · pre-checks · blocked'
+      B 893:4585 'Connect' (bare text)
+      A 893:4525 '3. Confirm' 61x28
+      A 893:4523 '2. Options' 60x28
+      A 893:4521 '1. Review' 54x28
+   914:4507 'Publish · Confirm'
+      B 914:4536 'Rollback' (bare text)
+      B 914:4534 'Approved 2 Jul' (bare text)
+      A 914:4514 '3. Confirm' 81x28
+      A 914:4512 '2. Options' 80x28
+      A 914:4510 '1. Review' 74x28
+   1172:4825 'Export · HTML (modal)'
+      A 1174:4827 'Code' 49x23
+      A 1174:4819 'Next.js/Soon' 93x27
+      A 1174:4814 'Vue/Soon' 77x27
+      A 1174:4811 'React' 51x27
+      B 1172:4826 'Export site as HTML' (bare text)
+TOTAL candidates: 23 across 8 boards in 1 section(s)
+### 1776:8379 02 · Insert · 22
+   138:2 'Insert · group-expanded'
+      A 138:8 'Search elements/⌘F' 248x28
+   138:53 'Insert · searching'
+      A 138:59 'button/⌘F' 248x28
+   138:106 'Insert · no-results'
+      A 138:112 'pizza oven/⌘F' 248x28
+   138:153 'Insert · dragging — CONDITION-ONLY — l'
+      A 138:159 'Search elements/⌘F' 248x28
+   138:244 'Insert · tip-dismissed'
+      A 138:250 'Search elements/⌘F' 248x28
+   1069:4529 'Insert · elements-expanded'
+      A 1069:4534 'Search elements/⌘F' 256x28
+   1069:4707 'Insert · blocks-expanded'
+      A 1069:4712 'Search elements/⌘F' 256x28
+   1706:8501 'Modal · Add Child Element'
+      B 1706:8502 'Add Child Element' (bare text)
+TOTAL candidates: 8 across 8 boards in 1 section(s)
+### 1776:8380 12 · AI · 22
+   170:41 'AI · planning'
+      A 170:68 'Run 3 steps' 162x32
+      A 170:66 'Edit plan' 150x32
+   170:70 'AI · running'
+      A 170:95 'Stop' 120x32
+   170:97 'AI · step-gate'
+      A 170:126 'Approve' 96x30
+      A 170:124 'Skip' 80x30
+   171:2 'AI · step-failed'
+      A 171:34 'Retry' 96x30
+      A 171:32 'Undo all' 96x30
+      A 171:27 'Stop' 120x32
+   171:36 'AI · stopped'
+      B 171:66 'Undo all' (bare text)
+      A 171:61 'Stop' 120x32
+   171:67 'AI · done'
+      A 171:101 'Apply' 96x30
+      A 171:99 'Discard' 96x30
+      B 171:97 'Background → warmer tint' (bare text)
+      A 171:92 'Stop' 120x32
+   171:105 'AI · error-quota'
+      B 171:135 'See plans' (bare text)
+TOTAL candidates: 15 across 7 boards in 1 section(s)
+### 1776:8381 08 · Inspector · 37
+   807:8342 'Inspector · profile · TEXT'
+      B 807:8393 'BACKGROUND' (bare text)
+      A 807:8389 '0 auto' 160x28
+      A 807:8386 '0' 72x28
+      A 807:8384 '0' 80x28
+      A 807:8379 '0' 160x28
+      A 807:8376 '0' 160x28
+      A 807:8373 'none' 160x28
+      A 807:8370 'none' 160x28
+   807:8412 'Inspector · profile · FLEX'
+      B 807:8456 'BACKGROUND' (bare text)
+      A 807:8454 '16' 72x28
+      A 807:8452 '24' 80x28
+      A 807:8447 'Hug' 160x28
+      A 807:8444 'Fill' 160x28
+      A 807:8439 '16' 160x28
+      A 807:8436 'nowrap' 160x28
+      A 807:8433 'center' 160x28
+   807:8475 'Inspector · profile · GRID'
+      B 807:8502 'BACKGROUND' (bare text)
+      A 807:8496 '16' 160x28
+      A 807:8493 '16' 160x28
+      A 807:8490 'repeat(3, 1fr)' 160x28
+      A 807:8485 'flex' 160x28
+      A 956:6856 'Base ▾' 49x22
+      A 956:6854 'Desktop ▾' 67x22
+      A 956:6852 'This ▾' 46x22
+   807:8521 'Inspector · profile · MEDIA'
+      B 807:8546 'BACKGROUND' (bare text)
+      A 807:8544 '16' 160x28
+      A 807:8541 '16' 72x28
+      A 807:8539 '24' 80x28
+      A 807:8534 'Hug' 160x28
+      A 807:8531 'Fill' 160x28
+      A 956:6864 'Base ▾' 49x22
+      A 956:6862 'Desktop ▾' 67x22
+   807:8567 'Inspector · profile · BUTTON'
+      A 807:8589 'none' 160x28
+      B 807:8582 'BACKGROUND' (bare text)
+      A 807:8580 '14' 160x28
+      A 807:8577 'Inter Tight' 160x28
+      A 956:6872 'Base ▾' 49x22
+      A 956:6870 'Desktop ▾' 67x22
+      A 956:6868 'This ▾' 46x22
+      A 807:8569 'Button' 51x22
+   807:8614 'Inspector · profile · INPUT'
+      B 807:8642 'BACKGROUND' (bare text)
+      A 807:8632 '1' 160x28
+      A 807:8627 '14' 160x28
+      A 807:8624 'Inter Tight' 160x28
+      A 956:6880 'Base ▾' 49x22
+      A 956:6878 'Desktop ▾' 67x22
+      A 956:6876 'This ▾' 46x22
+      A 807:8616 'Input' 42x22
+   824:5095 'Inspector · flat scroll body (profile-'
+      A 824:5152 'Delete' 87x32
+      A 824:5150 'Group' 87x32
+      A 824:5148 'Duplicate' 87x32
+      A 824:5139 '◆ heading-primary' 105x20
+      A 824:5097 'Style' 69x32
+   32:2 'Inspector · profile · CONTAINER (fallb'
+      A 2118:23 '100' 46x26
+      A 32:86 '8' 82x28
+      B 32:70 'BACKGROUND' (bare text)
+      A 32:67 '1.5' 82x28
+      A 32:65 '14' 82x28
+      A 32:60 'Inter Tight ▾' 172x28
+      A 32:52 '16' 82x28
+      A 32:47 '16' 82x28
+   1707:8456 'Inspector · error-boundary'
+      A 1707:8464 'Try Again' 88x26
+   429:2350 'B9.1 · Animation editor — Entrance · A'
+      A 429:2517 '1/⌄' 50x29
+      A 429:2512 'Ease Out/⌄' 79x29
+      A 429:2494 'Slide Out Up' 93x40
+      A 429:2492 'Zoom Out' 93x40
+      A 429:2489 'Fade Out Down' 93x40
+      A 429:2487 'Fade Out Up' 93x40
+      A 429:2485 'Fade Out' 93x40
+      A 429:2467 '1/⌄' 50x29
+   159:123 'Inspector · multi-select'
+      A 238:1430 'Mixed' 160x28
+      A 236:1422 '16' 160x28
+      A 238:1426 'Mixed' 160x28
+      A 238:1422 '#334155' 160x28
+      A 238:1418 'Mixed' 160x28
+      B 238:1417 'Background' (bare text)
+   160:2 'Inspector · instance-selected'
+      A 160:86 '8' 82x28
+      B 160:70 'BACKGROUND' (bare text)
+      A 160:67 '1.5' 82x28
+      A 160:65 '14' 82x28
+      A 160:60 'Inter Tight ▾' 172x28
+      A 160:52 '16' 82x28
+      A 160:47 '16' 82x28
+      A 160:45 '24' 82x28
+   160:105 'Inspector · bound-to-CMS'
+      A 160:189 '8' 82x28
+      B 160:173 'BACKGROUND' (bare text)
+      A 160:170 '1.5' 82x28
+      A 160:168 '14' 82x28
+      A 160:163 'Inter Tight ▾' 172x28
+      A 160:155 '16' 82x28
+      A 160:150 '16' 82x28
+      A 160:148 '24' 82x28
+   160:208 'Inspector · breakpoint-override'
+      A 160:292 '8' 82x28
+      B 160:276 'BACKGROUND' (bare text)
+      A 160:273 '1.5' 82x28
+      A 160:271 '14' 82x28
+      A 160:266 'Inter Tight ▾' 172x28
+      A 160:258 '16' 82x28
+      A 160:253 '16' 82x28
+      A 160:251 '24' 82x28
+   160:313 'Inspector · pseudo-state'
+      A 160:397 '8' 82x28
+      B 160:381 'BACKGROUND' (bare text)
+      A 160:378 '1.5' 82x28
+      A 160:376 '14' 82x28
+      A 160:371 'Inter Tight ▾' 172x28
+      A 160:363 '16' 82x28
+      A 160:358 '16' 82x28
+      A 160:356 '24' 82x28
+   160:412 'Inspector · reach-all-like-this'
+      A 160:496 '8' 82x28
+      B 160:480 'BACKGROUND' (bare text)
+      A 160:477 '1.5' 82x28
+      A 160:475 '14' 82x28
+      A 160:470 'Inter Tight ▾' 172x28
+      A 160:462 '16' 82x28
+      A 160:457 '16' 82x28
+      A 160:455 '24' 82x28
+   189:2 'Inspector · reach-whole-site'
+      B 1698:6947 'Back to this element' (bare text)
+      A 1698:6944 'Open Brand' 88x28
+      A 189:12 'Base ▾' 49x22
+      A 189:10 'Desktop ▾' 67x22
+      A 189:8 'This ▾' 46x22
+   1176:4804 'Inspector · token-picker popover'
+      A 1176:4810 'Search tokens…' 212x24
+      A 1176:4806 'Tokens' 55x20
+   1706:8458 'Modal · Inspector · delete-confirm'
+      A 1706:8466 'Cancel' 64x28
+      A 1706:8464 'Delete Button' 103x28
+   1707:8406 'Popover · Inspector · token-picker · e'
+      B 1707:8405 'Add tokens in the Design tab' (bare text)
+      A 1707:8400 'Search tokens…' 212x24
+   1707:8417 'Popover · Inspector · token-picker · n'
+      A 1707:8413 'Search tokens…' 224x24
+TOTAL candidates: 201 across 21 boards in 1 section(s)
+### 1776:8382 17 · Compare · 16
+   168:2 'Compare · side-by-side'
+      A 168:6 'Side by side' 98x28
+   168:26 'Compare · overlay'
+      A 168:32 'Overlay' 72x28
+   168:48 'Compare · list'
+      A 168:56 'List' 49x28
+   168:82 'Compare · no-changes'
+      A 168:86 'Side by side' 98x28
+   169:2 'Compare · single-page'
+      A 169:6 'Side by side' 98x28
+   169:28 'Compare · loading-render'
+      A 169:32 'Side by side' 98x28
+TOTAL candidates: 6 across 6 boards in 1 section(s)
+### 1776:8383 18 · Review · 38
+   156:2 'Review panel · open'
+      A 1753:8437 'Revoke link' 91x32
+      A 1753:8435 'Send' 60x26
+      A 229:1088 'Re-send for review' 119x32
+      A 229:1086 'Compare with v3' 131x28
+   157:2 'Review panel · detached-present'
+      A 229:1092 'Re-send for review' 119x32
+      A 229:1090 'Compare with v3' 131x28
+   157:58 'Review panel · all-resolved'
+      A 229:1096 'Re-send for review' 119x32
+      A 229:1094 'Compare with v3' 131x28
+   157:109 'Review panel · resolved-expanded'
+      A 229:1100 'Re-send for review' 119x32
+      A 229:1098 'Compare with v3' 131x28
+   157:169 'Review panel · older-round'
+      A 229:1104 'Re-send for review' 119x32
+      A 229:1102 'Compare with v3' 131x28
+   157:221 'Review panel · empty'
+      A 229:1108 'Re-send for review' 119x32
+      A 229:1106 'Compare with v3' 131x28
+   158:2 'Review panel · re-send-confirm'
+      A 229:1114 'Re-send' 77x28
+      A 229:1112 'Cancel' 67x28
+      A 229:1110 'Compare with v3' 131x28
+   158:57 'Review panel · re-sending'
+      A 229:1120 'Sending round 3…' 114x32
+      A 229:1118 'Compare with v3' 131x28
+   158:105 'Review panel · revoke-confirm'
+      A 229:1128 'Re-send for review' 119x32
+      A 229:1126 'Compare with v3' 131x28
+      A 229:1124 'Revoke' 70x28
+      A 229:1122 'Cancel' 67x28
+   158:162 'Review panel · revoked'
+      A 229:1132 'Send a new link' 137x32
+      A 229:1130 'Compare with v3' 131x28
+   453:3974 'Review panel · load-error'
+      A 453:3993 'Try again' 95x32
+      A 453:3991 'Compare with v3' 131x28
+   1705:8566 'Review · reply-failed'
+      A 1705:8633 'Send' 56x32
+   1705:8704 'Review · reply-composer band'
+      A 1705:8770 'Send' 56x32
+   1705:8773 'Review · foot · revoke + invite'
+      B 1705:8838 'Invite a client…' (bare text)
+      A 1705:8836 'Re-send for review' 256x40
+   1717:17235 'Review · compare · load-error'
+      A 1717:17244 'Retry' 66x26
+   184:56 'Orphan comments · detected'
+      A 229:1178 'Open Review panel' 161x32
+   184:70 'Orphan comments · reattach'
+      A 229:1182 'Re-attach' 99x32
+      A 229:1180 'Cancel' 79x32
+   184:87 'Orphan comments · dismissed'
+      A 229:1186 'Keep as resolved' 147x32
+      A 229:1184 'Cancel' 79x32
+TOTAL candidates: 37 across 18 boards in 1 section(s)
+### 1776:8384 19 · Client sign-off · 10
+   1339:7171 'Client sign-off · A · viewing · 1280 —'
+      A 1339:7182 'Approve this design' 157x36
+      A 1339:7180 'Request changes' 143x36
+TOTAL candidates: 2 across 1 boards in 1 section(s)
+### 1776:8385 01 · Shell · 33
+   65:2 'Shell state 1 · First run — ENTRY POIN'
+      A 463:3979 'Snap Guides' 112x28
+      A 65:206 'Start blank' 97x34
+      A 65:204 'Browse templates' 140x34
+   65:412 'Shell state 12 · Loading'
+      A 65:593 '8' 82x28
+      B 65:577 'BACKGROUND' (bare text)
+      A 65:574 '1.5' 82x28
+      A 65:572 '14' 82x28
+      A 65:567 'Inter Tight ▾' 172x28
+      A 65:559 '16' 82x28
+      A 65:554 '16' 82x28
+      A 65:552 '24' 82x28
+   66:4 'Shell state 4 · Multi-select'
+      A 1709:8413 'Mixed' 160x24
+      A 1709:8409 'Mixed' 160x24
+      A 1709:8405 'Mixed' 160x24
+      A 1709:8401 'Mixed' 160x24
+      A 1709:8397 'Mixed' 160x24
+      B 1709:8396 'Background' (bare text)
+      A 66:222 'Vertically' 73x28
+      A 66:220 'Horizontally' 88x28
+   66:225 'Shell state 9 · AI agent run'
+      A 463:4061 'Snap Guides' 112x28
+      A 66:295 'Home/✕' 68x28
+      A 66:271 'Search' 248x28
+   66:441 'Shell state 10 · Offline'
+      A 66:622 '8' 82x28
+      B 66:606 'BACKGROUND' (bare text)
+      A 66:603 '1.5' 82x28
+      A 66:601 '14' 82x28
+      A 66:596 'Inter Tight ▾' 172x28
+      A 66:588 '16' 82x28
+      A 66:583 '16' 82x28
+      A 66:581 '24' 82x28
+   66:640 'Shell state 11 · Saving → conflict'
+      A 66:849 'Keep mine' 93x32
+      A 1625:7164 'Save backup' 108x32
+      A 66:847 'Review both' 105x32
+      A 66:821 '8' 82x28
+      B 66:805 'BACKGROUND' (bare text)
+      A 66:802 '1.5' 82x28
+      A 66:800 '14' 82x28
+      A 66:795 'Inter Tight ▾' 172x28
+   199:2 'Shell state 2 · Returning (default)'
+      A 199:48 'Search' 248x28
+      A 463:4184 'Snap Guides' 112x28
+      A 199:72 'Home/✕' 68x28
+   199:205 'Shell state 3 · Element selected'
+      A 199:386 '8' 82x28
+      B 199:370 'BACKGROUND' (bare text)
+      A 199:367 '1.5' 82x28
+      A 199:365 '14' 82x28
+      A 199:360 'Inter Tight ▾' 172x28
+      A 199:352 '16' 82x28
+      A 199:347 '16' 82x28
+      A 199:345 '24' 82x28
+   199:409 'Shell state 5 · Drawer closed'
+      A 199:590 '8' 82x28
+      B 199:574 'BACKGROUND' (bare text)
+      A 199:571 '1.5' 82x28
+      A 199:569 '14' 82x28
+      A 199:564 'Inter Tight ▾' 172x28
+      A 199:556 '16' 82x28
+      A 199:551 '16' 82x28
+      A 199:549 '24' 82x28
+   200:2 'Shell state 6 · Comment mode'
+      A 200:183 '8' 82x28
+      B 200:167 'BACKGROUND' (bare text)
+      A 200:164 '1.5' 82x28
+      A 200:162 '14' 82x28
+      A 200:157 'Inter Tight ▾' 172x28
+      A 200:149 '16' 82x28
+      A 200:144 '16' 82x28
+      A 200:142 '24' 82x28
+   200:213 'Shell state 8 · Review active'
+      A 200:394 '8' 82x28
+      B 200:378 'BACKGROUND' (bare text)
+      A 200:375 '1.5' 82x28
+      A 200:373 '14' 82x28
+      A 200:368 'Inter Tight ▾' 172x28
+      A 200:360 '16' 82x28
+      A 200:355 '16' 82x28
+      A 200:353 '24' 82x28
+   963:4474 'Shell · 360 overlay panel (slot proof)'
+      A 963:4503 'Search' 248x28
+   1175:4804 'Upgrade modal (403 gate)'
+      A 1175:4825 'Upgrade to Pro' 104x27
+      A 1175:4823 'Maybe Later' 90x27
+      B 1175:4805 'Upgrade Your Plan' (bare text)
+   1172:4804 'Exit · guard — dirty · risky-offline ·'
+      A 1309:9 'Leave anyway' 99x27
+      A 1309:7 'Stay' 48x27
+   2162:11660 'Shell state 14 · Saving'
+      A 2162:11740 'Search' 248x28
+      A 2162:11709 'Snap Guides' 112x28
+      A 2162:11666 'Home/✕' 68x28
+   2162:11838 'Shell state 15 · Save failed'
+      A 2162:11918 'Search' 248x28
+      A 2162:11887 'Snap Guides' 112x28
+      A 2162:11844 'Home/✕' 68x28
+TOTAL candidates: 149 across 16 boards in 1 section(s)
+### 1776:8387 21 · Settings/S7 · 45
+   638:2378 'S7 · Settings · General'
+      A 638:2702 'English (en-US)' 220x36
+      A 638:2687 'Save changes' 111x28
+   638:3070 'S7 · Settings · SEO'
+      A 638:3379 'Save changes' 111x28
+   639:2754 'S7 · Settings · Export'
+      A 639:3070 'Static HTML + CSS' 220x36
+      A 639:3063 'Download .zip' 112x28
+   639:3092 'S7 · Settings · Domains'
+      A 639:3401 'Add domain' 99x28
+   639:3443 'S7 · Settings · Analytics'
+      A 639:3752 'Save changes' 111x28
+   639:3795 'S7 · Settings · Localization'
+      A 639:4111 'English (en-US)' 220x36
+      A 639:4104 'Add locale' 90x28
+   639:4144 'S7 · Settings · Custom code'
+      A 639:4453 'Save changes' 111x28
+   640:2440 'S7 · Settings · Redirects'
+      A 640:2775 'Edit' 49x28
+      A 640:2769 'Edit' 49x28
+      A 640:2763 'Edit' 49x28
+      A 640:2749 'Add redirect' 102x28
+   640:2789 'S7 · Settings · Headers'
+      A 640:3131 '2 years (recommended)' 220x36
+      A 640:3098 'Save changes' 111x28
+   640:3135 'S7 · Settings · Forms'
+      A 640:3451 'Formspree' 220x36
+      A 640:3444 'Export CSV' 96x28
+   640:3488 'S7 · Settings · Integrations'
+      A 640:3847 'Connect' 77x28
+      A 640:3840 'Connect' 77x28
+      A 640:3833 'Connect' 77x28
+      A 640:3819 'Manage' 74x28
+      A 640:3812 'Manage' 74x28
+      A 640:3797 'Browse all' 88x28
+   640:3849 'S7 · Settings · Webhooks'
+      A 640:4158 'Add endpoint' 108x28
+   1138:13436 'S7 · Settings · Custom code · locked ('
+      A 1138:13503 'Upgrade' 78x28
+   1344:7165 'S7.2 · Branding · pointer — NEW 2026-0'
+      A 1344:7170 'Open Brand panel' 150x32
+   1702:6931 'S7 · Settings · Domains · loading'
+      A 1702:6998 'Add domain' 99x28
+   1702:7095 'S7 · Settings · Domains · empty'
+      A 1702:7259 'Add domain' 104x28
+      A 1702:7162 'Add domain' 99x28
+   1702:7261 'S7 · Settings · Domains · load-error'
+      A 1702:7328 'Add domain' 99x28
+   1702:7425 'S7 · Settings · Domains · save-error'
+      A 1702:7598 'Cancel' 70x28
+      A 1702:7596 'Connect' 78x28
+      A 1702:7492 'Add domain' 99x28
+   1703:7127 'S7 · Settings · Localization · loading'
+      A 1703:7194 'Add locale' 90x28
+   1703:7286 'S7 · Settings · Localization · load-er'
+      A 1703:7353 'Add locale' 90x28
+   1703:7445 'S7 · Settings · Localization · save-er'
+      A 1703:7605 'Save locales' 102x28
+      A 1703:7512 'Add locale' 90x28
+   1703:7606 'S7 · Settings · Headers · loading'
+      A 1703:7673 'Save changes' 111x28
+   1703:7760 'S7 · Settings · Headers · load-error'
+      A 1703:7827 'Save changes' 111x28
+   1703:7914 'S7 · Settings · Headers · save-error'
+      A 1703:8069 'Save headers' 109x28
+      A 1703:7981 'Save changes' 111x28
+   1703:8070 'S7 · Settings · Redirects · loading'
+      A 1703:8137 'Add redirect' 102x28
+   1703:8232 'S7 · Settings · Redirects · empty'
+      A 1703:8299 'Add redirect' 102x28
+   1703:8394 'S7 · Settings · Redirects · load-error'
+      A 1703:8461 'Add redirect' 102x28
+   1703:8556 'S7 · Settings · Redirects · save-error'
+      A 1703:8719 'Add redirect' 102x28
+      A 1703:8623 'Add redirect' 102x28
+   1703:8720 'S7 · Settings · Forms · loading'
+      A 1703:8787 'Export CSV' 96x28
+   1703:8882 'S7 · Settings · Forms · empty'
+      A 1703:8949 'Export CSV' 96x28
+   1703:9046 'S7 · Settings · Forms · error'
+      A 1703:9113 'Export CSV' 96x28
+   1703:9208 'S7 · Settings · Forms · action-error'
+      A 1703:9275 'Export CSV' 96x28
+   1703:9370 'S7 · Settings · Forms · inbox-loading'
+      A 1703:9437 'Export CSV' 96x28
+   1703:9532 'S7 · Settings · Forms · inbox-empty'
+      A 1703:9599 'Export CSV' 96x28
+   1703:9694 'S7 · Settings · Webhooks · loading'
+      A 1703:9761 'Add endpoint' 108x28
+   1703:9857 'S7 · Settings · Webhooks · empty'
+      A 1703:10021 'Connect endpoint' 136x28
+      A 1703:9924 'Add endpoint' 108x28
+   1703:10022 'S7 · Settings · Webhooks · load-error'
+      A 1703:10089 'Add endpoint' 108x28
+   1703:10185 'S7 · Settings · Webhooks · save-error'
+      A 1703:10351 'Connect' 77x28
+      A 1703:10252 'Add endpoint' 108x28
+   1703:10352 'S7 · Settings · Webhooks · forbidden'
+      A 1703:10419 'Add endpoint' 108x28
+   1703:10515 'S7 · Settings · Analytics · validation'
+      A 1703:10582 'Save changes' 111x28
+   1172:4867 'Project settings (modal — ⌃,)'
+      A 1172:4870 'General' 61x23
+TOTAL candidates: 62 across 41 boards in 1 section(s)
+### 1776:8388 23 · Journeys · S-flows · 107
+   52:2 'S1 · Editor — ASSEMBLED (1440, drawer '
+      A 52:34 'Search' 248x28
+   55:2 'S1-stress · 40 pages · depth-5 tree · '
+      A 55:183 '8' 82x28
+      B 55:167 'BACKGROUND' (bare text)
+      A 55:164 '1.5' 82x28
+      A 55:162 '14' 82x28
+      A 55:149 '16' 82x28
+      A 55:144 '16' 82x28
+      A 55:142 '24' 82x28
+      A 55:134 'Hug' 74x28
+   58:2 'S1-keyboard · F6 region cycle + focus '
+      A 58:183 '8' 82x28
+      B 58:167 'BACKGROUND' (bare text)
+      A 58:164 '1.5' 82x28
+      A 58:162 '14' 82x28
+      A 58:157 'Inter Tight ▾' 172x28
+      A 58:149 '16' 82x28
+      A 58:144 '16' 82x28
+      A 58:142 '24' 82x28
+   128:2 'S5.1 · compose'
+      A 128:183 '8' 82x28
+      B 128:167 'BACKGROUND' (bare text)
+      A 128:164 '1.5' 82x28
+      A 128:162 '14' 82x28
+      A 128:157 'Inter Tight ▾' 172x28
+      A 128:149 '16' 82x28
+      A 128:144 '16' 82x28
+      A 128:142 '24' 82x28
+   129:2 'S5.1 · sending'
+      A 129:183 '8' 82x28
+      B 129:167 'BACKGROUND' (bare text)
+      A 129:164 '1.5' 82x28
+      A 129:162 '14' 82x28
+      A 129:157 'Inter Tight ▾' 172x28
+      A 129:149 '16' 82x28
+      A 129:144 '16' 82x28
+      A 129:142 '24' 82x28
+   129:223 'S5.1 · sent'
+      A 229:1042 'Done' 68x32
+      A 129:404 '8' 82x28
+      B 129:388 'BACKGROUND' (bare text)
+      A 129:385 '1.5' 82x28
+      A 129:383 '14' 82x28
+      A 129:378 'Inter Tight ▾' 172x28
+      A 129:370 '16' 82x28
+      A 129:365 '16' 82x28
+   129:451 'S5.1 · error'
+      A 229:1046 'Try again' 95x32
+      A 229:1044 'Copy link' 94x32
+      A 129:632 '8' 82x28
+      B 129:616 'BACKGROUND' (bare text)
+      A 129:613 '1.5' 82x28
+      A 129:611 '14' 82x28
+      A 129:606 'Inter Tight ▾' 172x28
+      A 129:598 '16' 82x28
+   130:2 'S5.2 · none — ENTRY POINT: initial sta'
+      A 130:183 '8' 82x28
+      B 130:167 'BACKGROUND' (bare text)
+      A 130:164 '1.5' 82x28
+      A 130:162 '14' 82x28
+      A 130:157 'Inter Tight ▾' 172x28
+      A 130:149 '16' 82x28
+      A 130:144 '16' 82x28
+      A 130:142 '24' 82x28
+   130:201 'S5.2 · pending'
+      A 130:382 '8' 82x28
+      B 130:366 'BACKGROUND' (bare text)
+      A 130:363 '1.5' 82x28
+      A 130:361 '14' 82x28
+      A 130:356 'Inter Tight ▾' 172x28
+      A 130:348 '16' 82x28
+      A 130:343 '16' 82x28
+      A 130:341 '24' 82x28
+   130:400 'S5.2 · opened-not-acted'
+      A 130:581 '8' 82x28
+      B 130:565 'BACKGROUND' (bare text)
+      A 130:562 '1.5' 82x28
+      A 130:560 '14' 82x28
+      A 130:555 'Inter Tight ▾' 172x28
+      A 130:547 '16' 82x28
+      A 130:542 '16' 82x28
+      A 130:540 '24' 82x28
+   130:599 'S5.2 · changes-requested'
+      A 130:780 '8' 82x28
+      B 130:764 'BACKGROUND' (bare text)
+      A 130:761 '1.5' 82x28
+      A 130:759 '14' 82x28
+      A 130:754 'Inter Tight ▾' 172x28
+      A 130:746 '16' 82x28
+      A 130:741 '16' 82x28
+      A 130:739 '24' 82x28
+   130:798 'S5.2 · approved'
+      A 130:979 '8' 82x28
+      B 130:963 'BACKGROUND' (bare text)
+      A 130:960 '1.5' 82x28
+      A 130:958 '14' 82x28
+      A 130:953 'Inter Tight ▾' 172x28
+      A 130:945 '16' 82x28
+      A 130:940 '16' 82x28
+      A 130:938 '24' 82x28
+   130:997 'S5.2 · approved-but-edited-since'
+      A 130:1178 '8' 82x28
+      B 130:1162 'BACKGROUND' (bare text)
+      A 130:1159 '1.5' 82x28
+      A 130:1157 '14' 82x28
+      A 130:1152 'Inter Tight ▾' 172x28
+      A 130:1144 '16' 82x28
+      A 130:1139 '16' 82x28
+      A 130:1137 '24' 82x28
+   131:2 'S5.6 · approved-clean (topbar identica'
+      A 131:183 '8' 82x28
+      B 131:167 'BACKGROUND' (bare text)
+      A 131:164 '1.5' 82x28
+      A 131:162 '14' 82x28
+      A 131:157 'Inter Tight ▾' 172x28
+      A 131:149 '16' 82x28
+      A 131:144 '16' 82x28
+      A 131:142 '24' 82x28
+   131:201 'S5.6 · approved-edited-since'
+      A 131:413 'Publish anyway' 136x36
+      A 229:1048 'Re-send for approval' 173x32
+      A 131:382 '8' 82x28
+      B 131:366 'BACKGROUND' (bare text)
+      A 131:363 '1.5' 82x28
+      A 131:361 '14' 82x28
+      A 131:356 'Inter Tight ▾' 172x28
+      A 131:348 '16' 82x28
+   131:415 'S5.6 · re-sent'
+      A 131:596 '8' 82x28
+      B 131:580 'BACKGROUND' (bare text)
+      A 131:577 '1.5' 82x28
+      A 131:575 '14' 82x28
+      A 131:570 'Inter Tight ▾' 172x28
+      A 131:562 '16' 82x28
+      A 131:557 '16' 82x28
+      A 131:555 '24' 82x28
+   294:1976 'S1.5 · session-expired'
+      A 334:2218 'Sign in' 78x32
+   294:1984 'S1.5 · network-error'
+      A 334:2226 'Retry' 68x32
+   294:1992 'S1.5 · retrying'
+      A 334:2233 'Cancel' 79x32
+   295:1972 'S1.3 · new-page · 3-way'
+      B 295:1978 'Start blank' (bare text)
+      B 295:1974 'New page' (bare text)
+   296:1972 'S1.4 · 0 of 7'
+      B 296:1998 'Publish' (bare text)
+      B 296:1992 'Send for review' (bare text)
+      B 296:1989 'Connect first client' (bare text)
+      B 296:1983 'Add your first page' (bare text)
+   296:1999 'S1.4 · 4 of 7'
+      B 296:2029 'Publish' (bare text)
+      B 296:2023 'Send for review' (bare text)
+      B 296:2020 'Connect first client' (bare text)
+      B 296:2012 'Add your first page' (bare text)
+   296:2030 'S1.4 · 7 of 7'
+      B 296:2063 'Publish' (bare text)
+      B 296:2055 'Send for review' (bare text)
+      B 296:2051 'Connect first client' (bare text)
+      B 296:2043 'Add your first page' (bare text)
+   297:1972 'S1.1 · coach-dismissed'
+      A 297:2013 'Start blank' 97x34
+      A 338:2326 'Browse templates' 153x32
+   297:2027 'S1.2 · crash-recovery'
+      A 297:2136 'Discard' 72x28
+      A 297:2134 'Restore' 72x28
+      A 297:2104 'Search' 248x28
+      A 338:2330 'Section · Hero' 127x32
+   297:2139 'S1.2 · load-error'
+      A 297:2246 'Retry' 58x28
+      A 297:2216 'Search' 248x28
+      A 338:2334 'Section · Hero' 127x32
+      A 297:2181 'Home/✕' 68x28
+   301:1979 'S3.1 · dragging'
+      A 333:2332 'Dragging element' 122x20
+      A 301:2165 '8' 82x28
+      B 301:2149 'BACKGROUND' (bare text)
+      A 301:2146 '1.5' 82x28
+      A 301:2144 '14' 82x28
+      A 301:2139 'Inter Tight ▾' 172x28
+      A 301:2131 '16' 82x28
+      A 301:2126 '16' 82x28
+   301:2186 'S3.1 · pick-mode'
+      A 333:2334 'Pick an element' 111x20
+      A 301:2372 '8' 82x28
+      B 301:2356 'BACKGROUND' (bare text)
+      A 301:2353 '1.5' 82x28
+      A 301:2351 '14' 82x28
+      A 301:2346 'Inter Tight ▾' 172x28
+      A 301:2338 '16' 82x28
+      A 301:2333 '16' 82x28
+   301:2393 'S3.1 · inline-edit'
+      A 333:2336 'Editing text inline' 119x20
+      A 301:2579 '8' 82x28
+      B 301:2563 'BACKGROUND' (bare text)
+      A 301:2560 '1.5' 82x28
+      A 301:2558 '14' 82x28
+      A 301:2553 'Inter Tight ▾' 172x28
+      A 301:2545 '16' 82x28
+      A 301:2540 '16' 82x28
+   303:1997 'S3.6 · media · editing'
+      A 303:2015 'icon/370' 63x22
+      A 303:2012 'svg/24' 53x22
+      A 303:2009 'video/6' 56x22
+      A 303:2006 'image/128' 73x22
+      A 303:2000 'Search' 248x28
+   303:2032 'S3.6 · media · optimizing'
+      A 333:2342 'Optimizing → WebP…' 142x20
+      A 303:2050 'icon/370' 63x22
+      A 303:2047 'svg/24' 53x22
+      A 303:2044 'video/6' 56x22
+      A 303:2041 'image/128' 73x22
+      A 303:2035 'Search' 248x28
+   307:2193 'S5.4 · gate · pending'
+      A 337:2242 'Cancel' 79x32
+   307:2203 'S5.4 · gate · changes-requested'
+      A 337:2246 'Cancel' 79x32
+      A 337:2244 'See comments' 132x32
+   307:2213 'S5.4 · gate · no-review-sent'
+      A 337:2250 'Cancel' 79x32
+   807:6558 'S1.1c - First run - Start blank (Inser'
+      A 807:6667 'Search elements' 248x32
+      A 807:6606 'Snap Guides' 112x28
+   807:7000 'S1.2e - Offline - Connection restored '
+      A 807:7205 '8' 82x28
+      B 807:7189 'BACKGROUND' (bare text)
+      A 807:7186 '1.5' 82x28
+      A 807:7184 '14' 82x28
+      A 807:7179 'Inter Tight ▾' 172x28
+      A 807:7171 '16' 82x28
+      A 807:7166 '16' 82x28
+      A 807:7164 '24' 82x28
+   807:7301 'S3.2 · drop-target · insertion-indicat'
+      A 807:7487 'Drop target shown' 127x20
+      A 807:7469 '8' 82x28
+      B 807:7453 'BACKGROUND' (bare text)
+      A 807:7450 '1.5' 82x28
+      A 807:7448 '14' 82x28
+      A 807:7443 'Inter Tight ▾' 172x28
+      A 807:7435 '16' 82x28
+      A 807:7430 '16' 82x28
+   807:7775 'S3.3 · context-menu · right-click'
+      A 807:7985 '8' 82x28
+      B 807:7969 'BACKGROUND' (bare text)
+      A 807:7966 '1.5' 82x28
+      A 807:7964 '14' 82x28
+      A 807:7959 'Inter Tight ▾' 172x28
+      A 807:7951 '16' 82x28
+      A 807:7946 '16' 82x28
+      A 807:7944 '24' 82x28
+   807:8069 'S3.4 · responsive-viewport · breakpoin'
+      A 807:8279 '8' 82x28
+      B 807:8263 'BACKGROUND' (bare text)
+      A 807:8260 '1.5' 82x28
+      A 807:8258 '14' 82x28
+      A 807:8253 'Inter Tight ▾' 172x28
+      A 807:8245 '16' 82x28
+      A 807:8240 '16' 82x28
+      A 807:8238 '24' 82x28
+   807:8663 'S3.8 · preview-responsive · mobile-dev'
+      A 807:8681 'Done' 110x36
+      A 807:8717 'Share preview' 110x28
+      A 807:8714 'Mobile/375px' 94x28
+   807:8723 'S5.5 · reviewer-view · external-review'
+      B 807:8754 'View all comments' (bare text)
+      A 807:8733 'Approve' 90x32
+      A 807:8731 'Request changes' 130x32
+      A 807:8726 'In review' 80x22
+   807:8756 'S6.2 · custom-domain · DNS-verificatio'
+      A 807:8784 'Check DNS now' 130x36
+      B 807:8783 'Back' (bare text)
+      B 807:8758 'Connect domain' (bare text)
+   813:4836 'S1.2f · save-indicator · 5-states'
+      A 813:4865 'Save failed — retry' 228x40
+      A 813:4859 'Unsaved changes' 228x40
+      A 813:4853 'Saved 2m ago' 228x40
+      A 813:4847 'Saved just now' 228x40
+      A 813:4841 'Saving...' 228x40
+   813:4888 'S1.2g · force-refresh · new-version-av'
+      A 813:4896 'Refresh now' 120x36
+      B 813:4894 'See what's new' (bare text)
+      B 813:4892 'New version available' (bare text)
+   814:7027 'S3.9 · undo-redo-toast · 6-variants'
+      A 814:7062 'Nothing to undo' 196x36
+      A 814:7056 'Undo: Fill changed on 'Hero'' 196x36
+      B 814:7055 'Undo style' (bare text)
+      A 814:7050 'Redo: Deleted 'Button'/Undo' 196x36
+      B 814:7049 'Redo delete' (bare text)
+      B 814:7043 'Undo move' (bare text)
+      B 814:7037 'Undo text edit' (bare text)
+      A 814:7032 'Undo: Deleted 'Button'/Redo' 196x36
+   815:4518 'S3.10 · keyboard-shortcuts-overlay'
+      B 815:4604 'Publish' (bare text)
+      A 815:4562 'Space + drag' 93x24
+      A 815:4553 '⌘ −' 40x24
+      A 815:4550 '⌘ +' 40x24
+      B 815:4544 'Delete' (bare text)
+      B 815:4541 'Duplicate' (bare text)
+      B 815:4535 'Copy' (bare text)
+      B 815:4532 'Redo' (bare text)
+   817:5114 'S5.10 · activity-log'
+      B 817:5161 'Published' (bare text)
+      B 817:5143 'New page: Reservations' (bare text)
+      A 817:5123 'Publish' 55x22
+      A 817:5121 'Comments' 74x22
+      A 817:5119 'Edits' 43x22
+   1124:4527 'S3.6 · media · image-editor (modal)'
+      B 1124:4560 'Save version' (bare text)
+      B 1124:4558 'Cancel' (bare text)
+   1342:7162 'S1.4 · setup-chip · footer-band — NEW '
+      A 1342:7167 '2/7 done' 96x24
+   1343:7162 'S1.6 · view-mode · stripped-chrome — N'
+      A 1343:7166 'Opened · no reply' 120x24
+   1347:7162 'S1.5b · session-expired · unsaved-warn'
+      A 1347:7177 'Sign in' 100x34
+      A 1347:7175 'Try saving again' 128x34
+      A 1347:7173 'Keep editing' 100x34
+   430:2348 'Onboarding · achievement prompt · step'
+      B 430:2369 'NEXT UP' (bare text)
+      B 430:2365 'Add your first section' (bare text)
+      A 430:2361 '✓' 40x40
+   430:2375 'Onboarding · achievement prompt · fina'
+      A 430:2388 '★' 40x40
+TOTAL candidates: 471 across 53 boards in 1 section(s)
+### 1779:2 20 · Notifications · 12
+   453:4051 'Notifications · load-error'
+      B 786:4301 'Try again' (bare text)
+TOTAL candidates: 1 across 1 boards in 1 section(s)
+### 1779:3 13 · Command palette · 13
+   166:2 'CmdK · empty — the SHELL palette (Cmd+'
+      B 166:13 'Send for review' (bare text)
+   166:18 'CmdK · typing — the SHELL palette (Cmd'
+      B 166:22 'Send for review' (bare text)
+   166:27 'CmdK · results — the SHELL palette (Cm'
+      B 166:33 'Send for review' (bare text)
+   166:58 'CmdK · disabled-command — the SHELL pa'
+      B 166:67 'Rollback' (bare text)
+      B 166:64 'Publish' (bare text)
+TOTAL candidates: 5 across 4 boards in 1 section(s)
+TOTAL candidates: 0 across 0 boards in 1 section(s)
+### 1779:5 09 · Canvas · 10
+   817:4649 'Canvas · toolbar states'
+      A 817:4664 '⌘ ⇧ ;' 44x20
+   817:4723 'Canvas · zoom levels'
+      A 817:4768 '400%' 56x28
+      A 817:4763 '200%' 56x28
+      A 817:4758 '100%' 56x28
+      A 817:4753 '50%' 56x28
+      A 817:4748 '10%' 56x28
+   1707:8433 'Popover · Canvas · AI · prompt'
+      A 1707:8431 'Generate' 72x24
+   1707:8452 'Popover · Canvas · AI · diff'
+      A 1707:8450 'Apply' 56x24
+      B 1707:8449 'Discard' (bare text)
+      B 1707:8438 'background' (bare text)
+   1176:4824 'Canvas · inline-edit toolbar (18 contr'
+      A 1176:4827 '16px ▾' 45x20
+      A 1176:4825 'Paragraph ▾' 72x20
+TOTAL candidates: 12 across 5 boards in 1 section(s)
+### 1779:6 22 · Ecommerce · 5
+   1719:8391 'Ecommerce · collection-setup (modal)'
+      A 1719:8412 'Create Collection' 152x34
+   1719:8421 'Ecommerce · bound · inspector'
+      A 1719:8426 '⛓ Bound' 60x20
+   1719:8443 'Ecommerce · bind · popover · collectio'
+      A 1719:8445 'Products/8 fields' 216x28
+TOTAL candidates: 3 across 3 boards in 1 section(s)
+### 1938:8372 10 · Components · 10
+   642:3112 'Components · create'
+      A 642:3399 'Create component' 140x28
+      A 642:3384 'This site' 240x36
+      A 642:3380 'Menu card' 240x42
+      B 642:3377 'Create component' (bare text)
+      A 642:3158 'Search' 248x28
+   781:4433 'Components · load-error'
+      B 781:4488 'Try again' (bare text)
+   1138:13394 'Components · empty'
+      B 1138:13399 'Create component' (bare text)
+   1170:4777 'Components · create (modal)'
+      A 1712:8431 'Create component' 152x34
+      B 1712:8430 'Cancel' (bare text)
+      A 1712:8422 'Theme/(Light, Dark)' 138x28
+      A 1712:8419 'State/(Default, Hover, Disab' 204x28
+      A 1712:8416 'Size/(S, M, L)' 100x28
+      B 1712:8391 'Create Component' (bare text)
+TOTAL candidates: 13 across 4 boards in 1 section(s)

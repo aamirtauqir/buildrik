@@ -87,6 +87,9 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
      so this row can be refused. Say which fields, on the row that was clicked —
      the list has no per-field form to mark up. */
   const [publishError, setPublishError] = React.useState<{ id: string; message: string } | null>(null);
+  /* The edit form needs its OWN error slot: publishError is keyed by row id and
+     rendered in the list, and a new record has no row yet (editingId === ""). */
+  const [saveError, setSaveError] = React.useState<string | null>(null);
 
   const collection = collections.find((c) => c.id === collectionId) ?? null;
   /* Columns follow the collection's field order, which is the order the user
@@ -129,11 +132,13 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     if (!collection) return;
     setForm({ ...emptyForm(collection.fields), ...item.data });
     setEditingId(item.id);
+    setSaveError(null);
   };
 
   const save = async () => {
     if (!composer || !collection || editingId === null) return;
     setBusy(true);
+    setSaveError(null);
     try {
       if (editingId === "") {
         await composer.cms.collections.createContentItem(collection.id, form);
@@ -142,6 +147,15 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
       }
       setEditingId(null);
       await reloadItems();
+    } catch (e) {
+      /* updateContentItem validates a PUBLISHED record against its collection's
+         own rules and throws (CollectionManager.ts:305). Its docstring says the
+         error is "caught by the two record editors" — setStatus below did, this
+         did not, so blanking a required field on a published record threw past
+         an empty finally: the form stayed open, nothing was said, and the edit
+         was gone. Same shape as setStatus, surfaced where the form is. */
+      if (e instanceof CMSValidationError) setSaveError(e.message);
+      else throw e;
     } finally {
       setBusy(false);
     }
@@ -273,11 +287,27 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
               {editingId !== null && collection ? (
                 <div>
                   {collection.fields.map(renderField)}
+                  {saveError ? (
+                    <div
+                      role="alert"
+                      style={{
+                        marginTop: 8,
+                        padding: "8px 10px",
+                        fontSize: 12,
+                        borderRadius: 4,
+                        color: "var(--bk-error-text, var(--bk-error))",
+                        background: "var(--bk-error-tint)",
+                        border: "1px solid var(--bk-error-text)",
+                      }}
+                    >
+                      Can&apos;t save: {saveError}
+                    </div>
+                  ) : null}
                   <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                     <Button size="xs" disabled={busy} onClick={save} aria-busy={busy || undefined}>
                       {editingId === "" ? "Add record" : "Save"}
                     </Button>
-                    <Button color="light" size="xs" onClick={() => setEditingId(null)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+                    <Button color="light" size="xs" onClick={() => { setEditingId(null); setSaveError(null); }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
                       Cancel
                     </Button>
                   </div>
