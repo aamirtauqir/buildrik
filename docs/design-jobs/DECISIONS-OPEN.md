@@ -139,7 +139,7 @@ is the right panel, not a drawer.
 
 ---
 
-## 9. Group labels — RE-COUNTED, and now one narrow decision
+## 9. Group labels — RESOLVED (see §15); the decision was never one
 
 **718 unbound 11px "caps" labels across 8 recipes.**
 
@@ -325,3 +325,34 @@ instances of it; they are different objects that happen to be circles.
 
 **No action, and no decision needed either** — this one is simply not the same
 component. Recorded so the next audit does not re-file "221 unadopted dots".
+
+
+---
+
+## 15. Section-header tracking — RESOLVED, and it was never a decision either
+
+I filed "is section-header tracking `+8%` or `+0.5px`?" as a founder call.
+**Three independent sources already agreed on 8%, and I had not looked at any of
+them:**
+
+| source | value |
+|---|---|
+| `tokens.generated.css:193` | `--bk-tracking-wide: 0.08em` — generated **from Figma** |
+| `SectionHeader.tsx:17` | `tw:tracking-[0.08em]` |
+| `PanelHeader.tsx:110` | `tw:tracking-[0.08em]` |
+| `Popover.tsx:283` | `tw:tracking-[0.08em]` |
+| Figma style `ui/11 · section header` | `+8%` |
+
+The labels drawn at `+0.5px` are the deviation — exactly as `ui/14 · panel
+title`'s 14/21 was, and settled the same way.
+
+**128 labels retracked to 8%**, 127 boxes widened to fit and one left tight
+where widening would have pushed it past its board. The earlier blocker —
+"28 of 34 would clip" — was a box-width problem, not a value question, and
+treating it as one is what turned a correction into a decision for three rounds.
+
+**Third time today.** Tree row, Slider, and now this: filed as needing a
+decision, resolved by looking at what the file and the code already contain.
+The pattern is specific enough to name — *when two values disagree, check
+whether a generated token or shipping code already picks one, before asking a
+human to.*
