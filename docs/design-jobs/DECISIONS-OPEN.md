@@ -196,7 +196,7 @@ Three cannot be adopted, each for a different and specific reason:**
 | **Radio** `14:20` | **adopted** | structurally identical; done |
 | **Slider** `92:30` | **adopted — see §13** | I called this unadoptable after one swap. All 49 sliders in the file read 100; there was no range to express. |
 | **Row** `8:47` | superseded — see below | its Label carries no depth. **All 369 candidates are tree rows** — measured by grouping rows by parent: 41 groups, 41 with varying label offsets, **zero flat lists**. Swapping nine flattened the hierarchy and erased the selection. |
-| **Status dot** `10:27` | cannot | the five variants are `#0e9f6e / #e3a008 / #f05252 / #9ca3af`; the 28 same-size local dots are `#d1d5db` and `#1a56db`. Different objects that share a shape. |
+| **Status dot** `10:27` | cannot — **confirmed by census, §14** | six different semantic jobs share the circle; none is site-publish status |
 
 **So "zero uses" does not mean neglect.** In three of four cases it means the
 component cannot express what the boards need. An adoption count is not a health
@@ -295,3 +295,33 @@ measuring what the boards contain. Tree rows were the other.
 **The check that would have caught both, in one line:** *before concluding a
 component cannot express the boards, census what the boards actually hold.* Six
 depths. One value. Both trivially encodable once looked at.
+
+
+---
+
+## 14. Status dot — the one that really is a non-starter, now with evidence
+
+Having been conservative-wrong twice, I re-tested this with the census rule
+rather than trusting the earlier read. It holds, and the numbers are better than
+the reasoning was.
+
+**The "221 local dots" figure was inflated.** 251 of the dots on the editor page
+sit **inside component instances** — topbar save and review pills, already
+owned and never hand-drawn. Only **101 are free-standing**, and they label six
+different things:
+
+| what it marks | example label |
+|---|---|
+| version-history timeline | `Today`, `Auto-save` |
+| current version | `Now — 12 changes since v3` |
+| issue severity | `Low contrast: 'Read the page'` |
+| audit score disc | `91`, `98` |
+| integration health | `Google Sheets · me…` |
+| uptime | `Uptime — last 30…` |
+
+`Status dot`'s five variants are **site publish status** — live / review /
+changes / draft / failed. That is a seventh thing. These are not neglected
+instances of it; they are different objects that happen to be circles.
+
+**No action, and no decision needed either** — this one is simply not the same
+component. Recorded so the next audit does not re-file "221 unadopted dots".
