@@ -195,7 +195,7 @@ Three cannot be adopted, each for a different and specific reason:**
 |---|---|---|
 | **Radio** `14:20` | **adopted** | structurally identical; done |
 | **Slider** `92:30` | cannot | the knob position *is* the value, and an instance cannot override `relative-transform`. Swapping rewrote a board's "Opacity 100" to 62. |
-| **Row** `8:47` | cannot | its Label carries no depth. **All 369 candidates are tree rows** — measured by grouping rows by parent: 41 groups, 41 with varying label offsets, **zero flat lists**. Swapping nine flattened the hierarchy and erased the selection. |
+| **Row** `8:47` | superseded — see below | its Label carries no depth. **All 369 candidates are tree rows** — measured by grouping rows by parent: 41 groups, 41 with varying label offsets, **zero flat lists**. Swapping nine flattened the hierarchy and erased the selection. |
 | **Status dot** `10:27` | cannot | the five variants are `#0e9f6e / #e3a008 / #f05252 / #9ca3af`; the 28 same-size local dots are `#d1d5db` and `#1a56db`. Different objects that share a shape. |
 
 **So "zero uses" does not mean neglect.** In three of four cases it means the
@@ -242,3 +242,35 @@ Same shape, same call needed:
 
 If the answer is "code leads on copy", that is a one-line amendment to CLAUDE.md
 and roughly a dozen boards follow from it.
+
+
+---
+
+## 12. Tree rows — RESOLVED (this was never a decision)
+
+I filed "Row cannot take the 369 tree rows" as a decision awaiting a `Depth`
+axis. **That was my own misclassification**, and the Panel header work earlier in
+the same session is the proof: adding an axis for control sets *already drawn in
+the file* is describing what exists, not proposing something new. Depth is the
+same act.
+
+The data was regular enough to encode exactly:
+
+| | |
+|---|---|
+| depths | 16 / 32 / 48 / 64 / 80 / 96 — six levels, 16px each |
+| states | no fill (328 rows), `#e1effe` selected (41) |
+| height | 28 on all 369 |
+
+So `Tree row` (`2142:11082`) is 12 variants — `Depth 0–5 × State rest|selected`
+— built from a real row. **All 369 adopted; zero hand-drawn tree rows remain.**
+Each went to the variant matching its *own* depth and selection, so nothing was
+flattened and no selection lost. Verified by screenshot on two boards.
+
+Kept separate from `Row` rather than extending it: `Row` is a flat-list row at
+five sizes, a tree row carries depth and only ever appears at 28. Merging them
+would be 120 cells for one real shape.
+
+**The lesson worth keeping:** "this needs a decision" deserves the same scrutiny
+as "this is a defect". I was wrong here in the conservative direction, which is
+cheaper than the alternative but still wrong.
