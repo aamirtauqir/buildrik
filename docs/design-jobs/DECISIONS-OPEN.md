@@ -389,3 +389,29 @@ states, or confirm the code's wording for them."*
 **Correction:** an audit agent reported `Opened · no reply` as appearing on no
 board. It appears on one, `S1.6 · view-mode`. I repeated that claim without
 checking it.
+
+
+---
+
+## 17. `opened-not-acted` — fixed, and the ask is now one state
+
+Fourth time I tested something I had filed as yours and found part of it mine.
+
+`S5.2 · opened-not-acted` printed `0 open`, character-for-character identical to
+`S5.2 · pending`. The product distinguishes them — `StudioHeader.tsx:138` ships
+**"Opened · no reply"** for exactly this state, and the code's own comment says
+*"'she hasn't opened it' and 'she opened it and said nothing' are different
+conversations"*.
+
+Crucially, **that string is already drawn on a board** (`S1.6 · view-mode`). So
+applying it here is not authoring copy — it is using copy the design already
+contains for a state whose board duplicated its sibling. Changed; the box grew
+44 → 110 and still fits its parent.
+
+**What is genuinely left is one state.** `Sent — waiting on your client` appears
+in the code and on no board, and there is no existing board copy to draw from.
+Writing it would be authoring product copy.
+
+That is the whole remaining ask: **one string, one state.** Everything else that
+looked like a decision this session turned out to be a measurement I had not
+taken.
