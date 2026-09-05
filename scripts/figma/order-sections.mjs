@@ -21,14 +21,20 @@ const ORDER = [
   ["1776:8382", "Compare"], ["1776:8383", "Review"], ["1776:8384", "Client sign-off"],
   ["1779:2", "Notifications"], ["1776:8387", "Settings/S7"], ["1779:6", "Ecommerce"],
   ["1776:8388", "Journeys · S-flows"], ["1776:8389", "Notes · captions & annotations"],
-  ["862:6859", "Reference · specs & completeness"], ["862:6860", "Reference · UX analysis docs"],
+  ["862:6859", "Reference · specs & completeness"],
   ["1090:4527", "REVIEW · Insert"],
   ["957:4474", "Archive · superseded"],
   ["2040:8372", "Library · shared chrome"],
+  /* LAST on purpose. This is a single 10,296px-tall document in a 1,400px-wide
+     section. Sitting at position 26 it buried the three sections after it behind
+     ~11,500px of scroll, and its 1,400px width left 7,400px of dead page beside
+     it next to 8.8k-wide neighbours. Nothing references it in a flow, so it
+     costs nothing at the end and costs three sections' discoverability here. */
+  ["862:6860", "Reference · UX analysis docs"],
 ];
 
 const NOTES = {
-  "2040:8372": "the Rail component set — every editor board instances it",
+  "2040:8372": "Rail, Settings nav row and Tree row — the sets every editor board instances",
   "1779:3": "two palettes ship: shell ⌘K and canvas ⌘⇧P — one decision open",
   "1938:8372": "the editor's saved-components panel; page 1:2 is the LIBRARY",
   "1776:8388": "S-numbers are a journey narrative, not a screen index",

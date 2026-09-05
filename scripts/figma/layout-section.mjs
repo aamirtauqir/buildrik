@@ -17,6 +17,7 @@ const [sectionId, maxRowArg, modeArg] = process.argv.slice(2);
 const SEQ = modeArg === "seq";   // sequence sections: no ragged wrap, J-headers as row labels
 if (!sectionId) { console.error("usage: layout-section.mjs <sectionId> [maxRowWidth]"); process.exit(2); }
 const MAX_ROW = Number(maxRowArg) || 9000;
+const MAX_PER_ROW = Number(process.env.MAX_PER_ROW) || 6;
 
 await connect();
 
@@ -27,6 +28,7 @@ const s = await figma.getNodeByIdAsync(${JSON.stringify(sectionId)});
 if (!s || s.type !== "SECTION") return "NOT A SECTION";
 
 const GUTTER = 120, PAD_X = 100, PAD_TOP = 220, PAD_BOTTOM = 140, MAX_ROW = ${MAX_ROW};
+const MAX_PER_ROW = ${MAX_PER_ROW};   // ribbon guard, see the wrap below
 const SEQ = ${SEQ};
 
 /* SEQUENCE MODE (Journeys). Seven "J<n> — TITLE" headers were stranded in the
@@ -86,6 +88,20 @@ const rank = (n) => {
   if (/loading|skeleton|pending/.test(last)) return 6;
   if (/empty|no-results|none|zero/.test(last)) return 5;
   if (/^(modal|popover|menu|drawer|dialog|sheet|confirm)\b/.test(first)) return 4;
+  /* A board that declares itself the way in must LEAD its section. "Shell
+     state 1 · First run — ENTRY POINT" failed the /^state 1$/ test below
+     because that test reads the LAST segment and this name carries a
+     descriptive tail — so the file's own entry point sorted as an ordinary
+     state and the Shell section, and therefore the whole page, opened with the
+     Exit guard. */
+  if (/entry point/.test(full)) return 0;
+  /* A panel's resting state is its root even when it is phrased as an absence.
+     The Inspector's "no-selection" is what a user sees before touching
+     anything; sorted alphabetically it landed 8th of 10 behind ai-agent-run. */
+  if (/no[- ]selection|nothing[- ]selected/.test(full)) return 0;
+  /* The fallback profile is the one every unmatched element gets, so it leads
+     its family: CONTAINER (fallback) sat second behind BUTTON. */
+  if (/\(fallback\)|·\s*fallback\b/.test(full)) return 0;
   if (/^(default|root|idle|base|landing|panel)$/.test(last)) return 0;
   if (p.length <= 2 && /^(tree|grid|library|overview|list)$/.test(last)) return 0;
   if (/^state 1$|^1$/.test(last)) return 0;
@@ -145,7 +161,25 @@ const subject = (n) => {
   if (mid.length > 1 && STATE_WORD.test(mid[mid.length - 1])) mid.pop();
   return mid.join(" ");
 };
-const isRoot = (c) => (rank(c.name) === 0 ? 0 : 1);
+/* MODULE ROOT ONLY. This hoists a board to the head of the whole section, so it
+   must mean "the state this module opens in" and nothing else. As rank(...)===0
+   alone it also caught every FAMILY root — and hoisting those pooled all three
+   History roots into row 1, each divorced from its own states, with the Saves
+   root three rows and 2300px above the Saves family. A module landing has at
+   most two name segments ("Layers · tree"); a family root has three
+   ("Settings · Headers · root") and belongs inside its subject, where rank
+   already puts it first. */
+const isRoot = (c) => (rank(c.name) === 0 && segs(c.name).length <= 2 ? 0 : 1);
+
+/* BUILDABLE BEFORE SUBJECT. rank() already returns 9 for retired / superseded /
+   unbuildable / not-implemented / design-ahead, but rank was applied AFTER
+   subject in the comparator — so a non-buildable board whose subject matched a
+   live family sorted right into the middle of it. Measured on three sections:
+   "[design-ahead] Shell state 13" sat in the live state row, "Templates ·
+   loading — RETIRED" sat mid-row between two live states, and an UNBUILDABLE
+   Inspector board LED the row of live popovers. Segregation has to outrank
+   grouping, or a designer builds from a board that was withdrawn. */
+const buildable = (c) => (rank(c.name) === 9 ? 1 : 0);
 /* Height band as a tiebreak keeps rows level: six frames of 632/470/259/560/812
    top-aligned in one row read as a staircase with up to 553px of hole. */
 /* Coarse on purpose. At /100 the height band outranked the name and inverted
@@ -166,6 +200,7 @@ const bySequence = (a, b) =>
 
 const byModule = (a, b) =>
   (isBoard(a) - isBoard(b)) ||
+  (buildable(a) - buildable(b)) ||
   (isRoot(a) - isRoot(b)) ||
   (subject(a.name) < subject(b.name) ? -1 : subject(a.name) > subject(b.name) ? 1 : 0) ||
   (rank(a.name) - rank(b.name)) ||
@@ -214,7 +249,7 @@ for (const b of kids) {
 const layoutKids = kids.filter(k => !paired.has(k.id));
 const CAP_GAP = 20;
 
-let x = PAD_X, y = PAD_TOP, rowH = 0, maxX = 0, moved = 0;
+let x = PAD_X, y = PAD_TOP, rowH = 0, maxX = 0, moved = 0, perRow = 0;
 for (const k of layoutKids) {
   const cap = captionOf.get(k.id);
   if (cap && cap.width > k.width) {
@@ -236,7 +271,14 @@ for (const k of layoutKids) {
      empty flow shows as a labelled gap rather than being merely absent. Ragged
      wrapping is off in sequence mode: order is the point of that section. */
   const ragged = isJHeader || (!SEQ && rowH > 0 && (unitH > rowH * 2.4 || unitH * 2.4 < rowH));
-  if (x > PAD_X && (x + unitW > MAX_ROW || ragged)) { x = PAD_X; y += rowH + GUTTER; rowH = 0; }
+  /* MAX_ROW is a pixel cap and it never bites for 280-wide drawer boards: Layers
+     packed all 18 of its boards onto ONE 7080px line, and AI (11), Command
+     palette (7) and Review (13) did the same. A ribbon is not a grid — you
+     cannot scan it — so cap the COUNT as well as the width. Wide boards are
+     still limited by MAX_ROW first, which is why this only reshapes the narrow
+     sections that needed it. */
+  if (x > PAD_X && (x + unitW > MAX_ROW || perRow >= MAX_PER_ROW || ragged)) { x = PAD_X; y += rowH + GUTTER; rowH = 0; perRow = 0; }
+  perRow++;
   if (Math.round(k.x) !== Math.round(x) || Math.round(k.y) !== Math.round(y)) moved++;
   k.x = x; k.y = y;
   if (cap) { cap.x = x; cap.y = y + k.height + CAP_GAP; }
