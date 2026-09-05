@@ -87,3 +87,85 @@ shape alone, the exact nodes the Publish agent had found by hand.
   the previous arc were wrong in the direction of looking easier than they were.
 - No agent ran the live app. Every claim is a board fetch or a `file:line` read.
 - Craft, contrast and token conformance were explicitly out of scope here.
+
+---
+
+## 6. Adversarial verification — closed
+
+Four verifiers attacked the 106 Criticals with one instruction: **refute them.**
+
+| | |
+|---|---|
+| CONFIRMED | 78 |
+| CONFIRMED, already fixed this pass | 5 |
+| PARTIAL | 24 |
+| REFUTED | 4 |
+| **total verdicts** | **111** |
+
+(Counted from `findings/VERDICTS-W.jsonl`, not from the agents' own summaries —
+the first draft of this table said 87/23/2 because I added up what four agents
+each reported rather than reading the file they wrote.)
+
+**The refutations and partials are the output that mattered**, and six of them
+landed on work of mine.
+
+### The thesis survived its own attack
+
+I asked a verifier to kill §1 by showing that reaching an outcome through a
+hotspot chip IS the file's convention. It measured the opposite, decisively: the
+file uses **two** names and uses them consistently —
+
+- **386 `hotspot/state`** — reviewer chips, parked on hub and root boards.
+- **36 `hotspot/alt`** — an alternate-**outcome** edge, carried **on the producer**.
+
+History's restore chain is wired with real controls plus `hotspot/alt` on the
+producer. Publish's outcomes were reached only by state chips on a *different*
+board. The convention defence fails and the thesis stands — in a sharper form
+than filed: the producer `784:4250` **is** properly reached (2 real inbound
+edges), so the gap is **purely downstream**, and it was a two-edge fix.
+
+### What the verifiers took away from me
+
+- **W-J-02 REFUTED on the board's own name** — `Insert · dragging —
+  CONDITION-ONLY — leaves on drop/dragend, no control`. Zero reactions is intent.
+- **W-I-01/32 PARTIAL — my own supplied premise was false.** The three pill
+  dropdowns are *not* the only door to four boarded states; all four are reachable
+  via a walk chain. The undrawn menus are real; the ranking rationale was not.
+- **W-G-03 REFUTED, and I had been closer to right than the module agent.** The
+  `theme` router *is* called — from the dashboard (`theme-manager.tsx`), which
+  the agent never searched. The narrow residual survives: the push carries
+  StyleEngine CSS while this panel's 14 registries persist elsewhere.
+- **W-E-16, W-N-20 PARTIAL on board names** — the approved end-state and the
+  re-send surface both exist; their names carry the decision. Not missing screens.
+- **W-N-01 PARTIAL** — the supersede sweep only touches *tokened* rounds, so an
+  internally-approved round does still yield a snapshot. The absolute claim died;
+  the ungated doors survived.
+- **W-P-01, W-H-07 PARTIAL** — each contradicted by its own evidence line.
+
+### What the verifiers took away from my hands specifically
+
+- The Topbar set has **six variants**; I matched one and missed **28 of 104
+  instances**, including the file's named ENTRY POINT and every `Publish=ready`
+  board. Fixed: exit guard in-degree **1 → 75 → 103**.
+- My two new publish hotspots used the **wrong convention name** — outcome edges
+  on a producer are `alt`, not `state`.
+- I re-seated Brand's hotspots by Y and left X, because **my own detector flagged
+  right-overhang and my writer only ever moved `c.y`**.
+- **`verify-invariants.mjs` skipped every hotspot**, so its `PASS` was silent on
+  that entire class. Earlier PASS claims in this session partly rested on a blind
+  checker. Honest count now reported.
+
+### Settled after two sessions
+
+`"Sent — waiting on your client"` (`ReviewBar.tsx:131`) is **drawn on no board**.
+0 hits across **14,396** TEXT nodes on page `1:3` and 352 on `1:6` — with a
+positive control proving instance subtrees were traversed (3,322 of the 14,396
+sit inside instances and were returned). It exists in code only.
+
+## 7. Left undone on purpose
+
+**110 hotspots on 48 clipping boards, 104 with zero board intersection.** The
+premise that a clipped hotspot is un-hittable *in the prototype player* is mine,
+and the verifier said plainly it did not check it. On canvas review none of it is
+a defect. Moving them costs 79 visible annotation labels. That is a question for
+the founder, not a queue — `W-CO-12`, with the one board to test it on.
