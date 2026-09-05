@@ -215,7 +215,7 @@ fill width and knob position.
 
 ---
 
-## 11. When the code changes copy the board owns
+## 11. Review-bar copy — a STATE-COVERAGE gap, not a copy dispute
 
 `ReviewBar.tsx:121-134` renders **"Sent — waiting on your client"** where the
 boards print **"0 open"**, and the code carries its own reasoning:
@@ -356,3 +356,36 @@ decision, resolved by looking at what the file and the code already contain.
 The pattern is specific enough to name — *when two values disagree, check
 whether a generated token or shipping code already picks one, before asking a
 human to.*
+
+
+---
+
+## 16. What the copy conflict actually is
+
+I described §11 as "the code changed copy the board owns" and left it for you.
+Applying the same census used on the other three, it is not a value dispute —
+it is missing state coverage, which is a different and more useful problem.
+
+| string | shipped by | drawn on |
+|---|---|---|
+| `0 open` | code, only when a count exists | **5 boards** — `S5.1 · sent`, `S5.1 · error`, `S5.2 · pending`, `S5.2 · opened-not-acted`, `S5.6 · re-sent` |
+| `Sent — waiting on your client` | code, when count is 0 | **no board** |
+| `Changes requested — nothing left open` | code, on that status | **no board** |
+| `Opened · no reply` | `StudioHeader.tsx:138` | **1 board** — `S1.6 · view-mode` |
+
+So the code distinguishes **three** review states and the boards draw **one
+string across five of them** — including on `S5.2 · opened-not-acted`, which is
+character-for-character identical to `S5.2 · pending`.
+
+**That reframes it.** CLAUDE.md's rule protects what the board says about a state
+it has drawn. Two of these states are not drawn at all, so there is nothing for
+the rule to protect — the gap is coverage, not conflict.
+
+**Still yours, and now for a sharper reason:** choosing what a screen says in a
+state nobody has drawn is design work, not reconciliation. But it is a much
+smaller ask than "settle a precedence rule" — it is *"draw two missing review
+states, or confirm the code's wording for them."*
+
+**Correction:** an audit agent reported `Opened · no reply` as appearing on no
+board. It appears on one, `S1.6 · view-mode`. I repeated that claim without
+checking it.
