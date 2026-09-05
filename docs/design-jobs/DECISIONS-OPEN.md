@@ -139,7 +139,7 @@ is the right panel, not a drawer.
 
 ---
 
-## 9. Group labels — TESTED, and my detector was the problem
+## 9. Group labels — RE-COUNTED, and now one narrow decision
 
 **718 unbound 11px "caps" labels across 8 recipes.**
 
@@ -153,12 +153,28 @@ and it would have mislabelled every count in the product.
 Reverted the 7 to Regular/AUTO/0%. The 2 genuine labels on that board (`SMART`,
 `FOLDERS`, `TAGS`) were correctly bound and kept.
 
-**So the 718 figure is not trustworthy** — it is an upper bound containing an
-unknown number of numerals, badges and codes. Before any bulk change, the
-detector needs a real definition of a group label: at minimum excluding pure
-numerals, and probably requiring a letter and a minimum length.
+**Re-counted with a correct detector** — at least two letters, no lowercase
+anywhere, so numerals, single glyphs and strings like `2h` or `v3` are excluded.
 
-The underlying decision is unchanged and still real — the tracking is `+8%` on
-537 bound labels and `+0.5px` or `0%` on the unbound ones, and 477 carry AUTO
-leading no `--bk-leading-*` token can express. But the population needs
-re-counting first.
+**The real population is 278, not 718.** 440 of the original count were not
+labels at all. The recipes:
+
+| count | recipe |
+|---|---|
+| 103 | Medium, AUTO leading, 0% |
+| 75 | Semi Bold, 16, +0.5px |
+| 35 | Medium, 16, **+0.5px** — differs from the style in *tracking only* |
+| 24 | Regular, 16, +0.5px |
+| 41 | a tail of six more |
+
+The 35 looked bindable, and 6 of them were — the rest **would clip**. Their
+boxes are sized tight to the text at 0.5px, and the style's 8% is 0.88px at
+11px, so a nine-character label grows ~3px and 28 of 34 end up wider than their
+own box. Each was measured before deciding, and the probe restores the node
+before the decision so the measurement is not itself the change.
+
+**What is left is one narrow decision, not a bulk job:** is section-header
+tracking `+8%` (537 bound labels, the style as written) or `+0.5px` (134
+unbound labels)? Whichever loses needs its boxes re-measured, which is a layout
+change on real boards. The 103 at AUTO leading need the separate question of
+whether AUTO is admitted to the ramp at all.
