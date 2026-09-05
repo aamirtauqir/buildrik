@@ -415,3 +415,40 @@ Writing it would be authoring product copy.
 That is the whole remaining ask: **one string, one state.** Everything else that
 looked like a decision this session turned out to be a measurement I had not
 taken.
+
+---
+
+## 18. §11/§16 partly answered itself — the state gap was smaller than filed
+
+§11 called the review-bar strings a state-coverage gap and §16 called the copy
+conflict a governance question. A second pass tested the neighbouring family —
+the topbar save pill — and the same shape resolved without a decision:
+
+- The `Save status` component set (`697:461`) already carries **all six** states
+  the code ships. The audit said five of six had no board; four were drawn.
+- One of the six was drawn **wrong at the master**: `State=offline` read
+  "Offline — saved locally", which `SaveStatus.tsx:50` rejects by name because
+  nothing is written to the device and nothing replays on reconnect. A board
+  promising a user their work is safe when it is not is not a copy preference.
+- The two genuinely undrawn states were built by cloning a shell board and
+  switching one variant. No copy was authored — it came from the master.
+
+**What this changes about §11:** "the boards draw one string, the code ships
+three" is worth re-testing the same way before it is treated as a decision. The
+question to ask first is not "which string wins" but "does a component or a
+sibling board already contain the missing one" — for `Opened · no reply` it did
+(§17), and for the save states it did.
+
+**What it does not change:** `Sent — waiting on your client` is still absent
+from every board and every component, on both pages searched. That one is
+unchanged and still the single item that needs a person.
+
+## 19. Retired: "the interiors need decisions this session could measure but not make"
+
+That sentence, from `FINAL-STATE.md` §5, was too strong. Re-tested against the
+code, five of seven sampled Criticals had determinate answers — a feature flag,
+a shipped hint string, a component master, a call site. The honest version is:
+**some interiors need decisions; more of them than expected need a measurement I
+had not taken.** The distinguishing test is cheap — does a generated token,
+shipping code, an existing component, or another board already contain the
+answer — and it should be run on a finding before it is ever written down here.

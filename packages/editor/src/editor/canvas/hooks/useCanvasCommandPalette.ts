@@ -11,6 +11,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
+import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
 import type { CommandAction } from "../controls";
 
 interface UseCanvasCommandPaletteParams {
@@ -178,6 +179,11 @@ export function useCanvasCommandPalette({
         handler: () => composer.emit(EVENTS.TEMPLATE_SAVE_REQUESTED, {}),
       },
       {
+        /* Gated out of the registry below when the collab flag is off, mirroring
+           StudioHeader.tsx:217 which withholds the Collaborate CTA the same way.
+           Collaboration is demo-only (last-write-wins, 6 known P1 non-convergence
+           bugs) and CLAUDE.md's env table says NEXT_PUBLIC_FEATURE_COLLAB must
+           never be on in production — so ⌘⇧P must not be a second door to it. */
         id: "start-collab",
         label: "Start collaboration session",
         category: "Tools",
@@ -317,7 +323,7 @@ export function useCanvasCommandPalette({
           composer.emit("ui:switch-tab", { tab: "assets" });
         },
       },
-    ];
+    ].filter((command) => command.id !== "start-collab" || isFeatureEnabled("collab"));
   }, [composer, selectedId, clear]);
 
   return { isPaletteOpen, closePalette, openPalette, commands };

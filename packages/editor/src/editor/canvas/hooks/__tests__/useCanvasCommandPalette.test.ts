@@ -9,6 +9,14 @@ import type { Composer } from "../../../../engine/Composer";
 import { EVENTS } from "../../../../shared/constants/events";
 import { useCanvasCommandPalette } from "../useCanvasCommandPalette";
 
+/* Collab is demo-only and its flag is off in production, so the palette gates
+   the row out of the registry entirely (mirroring StudioHeader.tsx:217). Both
+   sides of that gate are asserted below. */
+const featureState = { collab: false };
+vi.mock("../../../../shared/utils/featureFlags", () => ({
+  isFeatureEnabled: (flag: string) => featureState[flag as "collab"] ?? false,
+}));
+
 // ---------------------------------------------------------------------------
 // Fixtures
 // ---------------------------------------------------------------------------
@@ -299,7 +307,16 @@ describe("useCanvasCommandPalette — commands", () => {
     expect(composer.emit).not.toHaveBeenCalled();
   });
 
-  it("start-collab starts a session with the siteId from the URL", () => {
+  it("withholds start-collab entirely while the collab flag is off", () => {
+    /* The whole point: ⌘⇧P must not be a second door to a feature the header
+       withholds. Before the gate, a production user could open the palette,
+       type "collab", and start a multiplayer session on a client's live site. */
+    const { result } = renderPalette(makeComposer());
+    expect(result.current.commands.find((c) => c.id === "start-collab")).toBeUndefined();
+  });
+
+  it("start-collab starts a session with the siteId from the URL when the flag is on", () => {
+    featureState.collab = true;
     const composer = makeComposer();
     const { result } = renderPalette(composer);
 
@@ -309,15 +326,20 @@ describe("useCanvasCommandPalette — commands", () => {
       expect(composer.collab.manager.startSession).toHaveBeenCalledWith("site-42", "Editor");
     } finally {
       window.history.pushState({}, "", "/");
+      featureState.collab = false;
     }
   });
 
   it("start-collab no-ops when the URL carries no siteId", () => {
-    const composer = makeComposer();
-    const { result } = renderPalette(composer);
-
-    findCommand(result, "start-collab").handler();
-    expect(composer.collab.manager.startSession).not.toHaveBeenCalled();
+    featureState.collab = true;
+    try {
+      const composer = makeComposer();
+      const { result } = renderPalette(composer);
+      findCommand(result, "start-collab").handler();
+      expect(composer.collab.manager.startSession).not.toHaveBeenCalled();
+    } finally {
+      featureState.collab = false;
+    }
   });
 
   /* Board 1177:4804 groups the palette into exactly four sections. Nine

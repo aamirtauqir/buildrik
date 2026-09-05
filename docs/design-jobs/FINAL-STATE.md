@@ -97,3 +97,60 @@ drawn, and separate screens elsewhere.** The shell is now drawn everywhere it
 should be, from components, with zero duplication and no lost wiring.
 
 The interiors need decisions this session could measure but not make.
+
+---
+
+## 6. Second pass — the Criticals that were code-authoritative after all
+
+Section 3 said the module interiors "are decisions". That was true of some and
+**wrong about others**: of a 7-Critical sample re-tested against the code, five
+had a determinate answer sitting in a shipped string, a component master, or a
+feature flag. The pattern that produced §3's conclusion — treating a finding as
+a decision without testing it — is the same one that produced four earlier
+false "founder decisions".
+
+| finding | what the code said | done |
+|---|---|---|
+| D-X-25 · ungated collab in ⌘⇧P | `StudioHeader.tsx:217` gates the CTA; the palette had no guard at all, and CLAUDE.md says the flag must never be on in production | command filtered out of the registry; 2 tests rewritten to assert **both** sides of the gate |
+| D-X-09 · "Apply lands as one undo step" | false only on the agent path (`useAgentRunner.ts:280` applies one transaction per approved step). True at the other **two** call sites the agent never found | scoped the one false line, in code and on board `170:2` |
+| D-C-46 · offline board | **refuted** — the board drew the pill and a disabled Publish. The real defect was worse: it read "Offline — **saved locally**", the exact wording `SaveStatus.tsx:50` rejects by name | fixed on the board **and at the component master** (`697:460`), which still carried it |
+| D-B-01 / D-X-33 · Brand paywall | `DSModeContext` documents the mode as display-only; the shipped segments are "Beginner"/"Pro", not "Basic"/a plan | copy rebuilt from the shipped `DSModeToggle` hints, board renamed, and the upgrade-modal edge **moved** to `Templates · gallery` — the board that actually draws a "Pro" row |
+| D-C-31 · save pill | **substantially refuted** — First run already drew "Unsaved changes", conflict drew "Conflict — reload". Of six shipped states, four were drawn, not one | the two genuinely missing states (`saving`, `error`) added as boards `2162:11660` / `2162:11838` |
+
+### A number in §2 was wrong
+
+**"loose / out-of-bounds / overlaps — 0 / 0 / 0" was measured with an instrument
+that did not descend the tree.** A real check found **467** out-of-bounds
+children. Classifying them dropped that to **116** real ones (bottom-only
+overflow inside a clipping frame is a scroll region; `RETIRED` boards carry
+their own explanation) — and 93 of those were one class: children still sized
+for the 360px drawer, overflowing the 280px panel, visible in any screenshot of
+the Templates gallery. Refitted across 11 boards, 30 changes, mostly by giving
+the child `layoutSizingHorizontal = "FILL"` so the next width change cannot
+reintroduce it.
+
+Then the detector itself was wrong twice more, in the direction of inventing
+work: it counted `hotspot/*` rows parked off-board on purpose (the file's own
+convention), and it only exempted downward scroll, so a canvas scrolled down —
+nav above the viewport — read as broken. With both corrected the count went
+**467 → 116 → 79 → 11**, and the 11 were real: a detach-confirm modal clipping
+100px off the sentence that explains what detaching costs, a Generate button
+4px below its popover, a caption 5px below its panel. All fixed. The page now
+reads **0 / 0 / 0 / 0 / 0** with 2,851 edges and no dangling destination —
+`node scripts/figma/verify-invariants.mjs 1:3` prints `PASS`.
+
+`scripts/figma/verify-invariants.mjs` is committed so this is checkable rather
+than claimed. It found one regression I had just introduced — a menu glyph
+shifted onto four timestamps — which is the argument for having it.
+
+### Not fixed, and why
+
+- **Text-on-text collisions**: a detector found 465 pairs, then 178 after making
+  it ancestor-aware and excluding variant sets. Sampling showed the remainder is
+  still dominated by false positives — an opaque drawer legitimately overlaying
+  canvas text reads identically to a collision in a bounding-box test. Two real
+  ones were found and fixed by eye. **The 178 is not a work queue**; publishing
+  it as a defect count would repeat the mistake §3 warns about.
+- **`Sent — waiting on your client`** still exists in `ReviewBar.tsx` and on no
+  board, with no existing board copy to draw from. Unchanged: authoring it is
+  writing product copy.

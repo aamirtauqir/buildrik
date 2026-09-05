@@ -3,7 +3,10 @@
  *
  * What the panel says before anyone has asked it anything: three prompts worth
  * trying, the promise that governs everything it does (a diff, never a direct
- * write, and one undo step), and the way into a longer job.
+ * write, and one undo step), and the way into a longer job. The DRAFT row below
+ * is the only entrance to agent mode (AITab.tsx:338), and that path applies one
+ * transaction per approved step (useAgentRunner.ts:280) — so the promise above it
+ * is scoped per-Apply, not per-run.
  *
  * It replaced one sentence — "Try a quick action or type a prompt to start." —
  * which named quick actions the panel does not have.
@@ -49,7 +52,8 @@ export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
     ))}
 
     <p className="tw:mx-4 tw:mt-3 tw:mb-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-      AI proposes a diff and never writes directly. Apply lands as one undo step.
+      AI proposes a diff and never writes directly. Each Apply lands as one undo step — a
+      multi-step draft applies one step at a time.
     </p>
 
     <div className={BAND}>DRAFT</div>
