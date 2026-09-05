@@ -91,12 +91,29 @@ describe("useTemplateSelection — pill → templateType sync", () => {
   });
 
   it("filters by templateType — no current SITE_TEMPLATE is type 'section', so 'sections' yields none", () => {
-    // Every SITE_TEMPLATES entry is type "hero"; selecting the Sections pill
-    // sets templateType="section", which none match. This pins the type
-    // filter's exclusion behaviour, not a defect in the hook.
+    // Every SITE_TEMPLATES entry is type "page", so the Sections pill sets
+    // templateType="section" and none match. This pins the type filter's
+    // exclusion behaviour, not a defect in the hook.
+    //
+    // This comment used to read 'every entry is type "hero"' and called that
+    // intentional. It was not: the same field is what the Site Pages pill
+    // filters on, so the category all ten belong to returned an EMPTY grid.
+    // The sibling test below is what would have caught it.
     const { result } = renderHook(() => useTemplateSelection(false));
     act(() => result.current.setActiveFilter("sections"));
     expect(result.current.filteredTemplates).toHaveLength(0);
+  });
+});
+
+describe("useTemplateSelection — the Site Pages pill returns its own templates", () => {
+  /* The pill maps to templateType "page" (useTemplateSelection.ts:58) and the
+     filter requires t.type === templateType (:73). Every catalog entry carried
+     type "hero", so browsing by the category all ten belong to showed nothing. */
+  it("returns every SITE_TEMPLATE, not an empty grid", () => {
+    const { result } = renderHook(() => useTemplateSelection(false));
+    act(() => result.current.setActiveFilter("site-pages"));
+    expect(result.current.templateType).toBe("page");
+    expect(result.current.filteredTemplates).toHaveLength(SITE_TEMPLATES.length);
   });
 });
 
