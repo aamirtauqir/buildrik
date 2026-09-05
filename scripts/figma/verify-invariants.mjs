@@ -48,7 +48,12 @@ for(const s of secs){
       /* hotspot/* rows are prototype scaffolding parked outside the board on
          purpose - the file's own convention for "click here to see this state".
          Skip the whole subtree: the paired state label is their child. */
-      if(c.name.indexOf("hotspot/")===0) continue;
+      /* A hotspot parked off-board is convention ONLY where the board does not
+         clip. On a clipping board it is neither rendered nor clickable, so
+         skipping every hotspot made this checker print PASS over 21 hotspots
+         with zero intersection with their own board. Skip them only on
+         non-clipping boards. */
+      if(c.name.indexOf("hotspot/")===0 && !b.clipsContent) continue;
       /* Vertical-only overflow inside a clipping frame is a SCROLL REGION, not
          a defect - an expanded Insert panel runs past 812px, and a canvas
          scrolled down puts its nav above the viewport. Only unclipped overflow,

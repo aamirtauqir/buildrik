@@ -48,7 +48,24 @@ for(const s of pg.children){
       OUT.push("      "+c.id+" '"+c.name.slice(0,34)+"' overhang below="+below+" right="+right+(APPLY?("  -> y="+target):""));
       if(APPLY && target>=0){
         const cur=Math.round(c.absoluteBoundingBox.y-bb.y);
-        c.y = c.y + (target-cur); fixed++; seat = target + h + 4;
+        c.y = c.y + (target-cur);
+        /* x as well as y. The detector flagged right-overhang from the start and the
+           writer only ever moved y, so a hotspot laid out as a horizontal strip
+           past the board's right edge stayed exactly where it was — one on the
+           Brand root begins 28px beyond a 280-wide clipping board and has zero
+           intersection with it. */
+        const w=Math.round(c.width);
+        const curX=Math.round(c.absoluteBoundingBox.x-bb.x);
+        const maxX=Math.round(bb.width)-w;
+        if(curX>maxX||curX<0) c.x = c.x + (Math.max(0,maxX)-curX);
+        /* 79 of these carry a visible TEXT label naming the state. That label
+           is an annotation for a reviewer looking at the board from OUTSIDE;
+           once the hotspot sits inside a clipping board the label would print
+           on the design. The layer NAME still carries the state, which is what
+           a reviewer reads in the layer panel, so hide the text and keep the
+           hotspot. */
+        for(const k of (c.children||[])) if(k.type==="TEXT") k.visible=false;
+        fixed++; seat = target + h + 4;
       }
     }
   }

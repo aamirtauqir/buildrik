@@ -46,7 +46,15 @@ for(const s of pg.children){
     // find this board's topbar instance
     let tb=null; const st=[b];
     while(st.length){ const n=st.pop();
-      if(n.type==="INSTANCE"){ const mc=await n.getMainComponentAsync(); if(mc&&mc.id==="681:27"){ tb=n; break; } }
+      /* Match the SET, not one variant. 681:122 Topbar has SIX variants and the
+         first pass matched only 681:27, so 28 instances on five other variants
+         got nothing - including 65:2 "Shell state 1 · First run", the file's own
+         named ENTRY POINT, and all 22 Publish=ready instances. Their controls
+         carry the same NAMES at different child ids, which is why name-matching
+         below works across every variant. */
+      if(n.type==="INSTANCE"){ const mc=await n.getMainComponentAsync();
+        const setId = mc && mc.parent && mc.parent.type==="COMPONENT_SET" ? mc.parent.id : (mc?mc.id:null);
+        if(setId==="681:122"||(mc&&mc.id==="681:27")){ tb=n; break; } }
       if(CONT.has(n.type)&&n.children) for(const c of n.children) st.push(c); }
     if(!tb) continue;
     boards++;
