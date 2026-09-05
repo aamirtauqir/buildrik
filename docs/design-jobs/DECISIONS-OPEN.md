@@ -211,3 +211,34 @@ wrong in the direction of looking easier than they are.
 What would make Row adoptable: a `Depth` variant axis or a component property
 driving `paddingLeft`. What would make Slider adoptable: a property driving the
 fill width and knob position.
+
+
+---
+
+## 11. When the code changes copy the board owns
+
+`ReviewBar.tsx:121-134` renders **"Sent — waiting on your client"** where the
+boards print **"0 open"**, and the code carries its own reasoning:
+
+> *A zero here was a count where a sentence belongs. The bar renders only while a
+> round is live, so `0 open` meant "your client has not replied yet" — and
+> printed a number that says none of that.*
+
+That is a good argument. It is also a **copy change**, and CLAUDE.md's precedence
+rule is explicit: *behaviour → the CODE contract; everything VISUAL — layout,
+colour, type, **copy on screen** — → the BOARD.*
+
+So the two sources disagree, and the rule says the board wins on copy while the
+code has documented why it should not. Updating the boards to match the code
+would invert the stated precedence; reverting the code would discard a
+deliberate improvement. **Neither is mine to choose.**
+
+Same shape, same call needed:
+- `StudioHeader.tsx:138` ships an **"Opened · no reply"** pill that appears on no
+  board.
+- The Publish panel's ENVIRONMENT block draws `brk-preview.vercel.app`, a
+  Buildrik-hosted preview that cannot exist under per-workspace Vercel — and the
+  code honours the board by shipping the row permanently blank.
+
+If the answer is "code leads on copy", that is a one-line amendment to CLAUDE.md
+and roughly a dozen boards follow from it.
