@@ -178,3 +178,36 @@ tracking `+8%` (537 bound labels, the style as written) or `+0.5px` (134
 unbound labels)? Whichever loses needs its boxes re-measured, which is a layout
 change on real boards. The 103 at AUTO leading need the separate question of
 whether AUTO is admitted to the ramp at all.
+
+
+---
+
+## 10. Forms & tables adoption — TESTED PER FAMILY, and it is not a backlog
+
+The forms/tables audit reported **955 hand-drawn form controls** and **222 table
+structures**, and recommended adopting three "zero-use" library components to
+convert about ninety shapes "with no further design work".
+
+Every one was piloted on a real board with a before/after render. **One worked.
+Three cannot be adopted, each for a different and specific reason:**
+
+| component | result | why |
+|---|---|---|
+| **Radio** `14:20` | **adopted** | structurally identical; done |
+| **Slider** `92:30` | cannot | the knob position *is* the value, and an instance cannot override `relative-transform`. Swapping rewrote a board's "Opacity 100" to 62. |
+| **Row** `8:47` | cannot | its Label carries no depth. **All 369 candidates are tree rows** — measured by grouping rows by parent: 41 groups, 41 with varying label offsets, **zero flat lists**. Swapping nine flattened the hierarchy and erased the selection. |
+| **Status dot** `10:27` | cannot | the five variants are `#0e9f6e / #e3a008 / #f05252 / #9ca3af`; the 28 same-size local dots are `#d1d5db` and `#1a56db`. Different objects that share a shape. |
+
+**So "zero uses" does not mean neglect.** In three of four cases it means the
+component cannot express what the boards need. An adoption count is not a health
+metric.
+
+**The consequence for the remaining estimate:** 955 and 222 are upper bounds, not
+work queues — the same way 718 group labels turned out to be 278 real ones with
+6 bindable. Any family should be piloted on one board with a render either side
+before it is costed, because four of the five estimates tested this session were
+wrong in the direction of looking easier than they are.
+
+What would make Row adoptable: a `Depth` variant axis or a component property
+driving `paddingLeft`. What would make Slider adoptable: a property driving the
+fill width and knob position.
