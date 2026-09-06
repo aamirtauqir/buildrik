@@ -1,0 +1,6 @@
+[
+ {"on":"32:2","to":"2474:11972","label":"Inspector · profile · FORM","x":6,"y":770,"why":"FIG-D-01"},
+ {"on":"817:4649","to":"2474:12031","label":"Canvas · drop feedback","x":24,"y":452,"why":"FIG-D-16"},
+ {"on":"817:4649","to":"2474:12065","label":"Canvas · element manipulated","x":200,"y":452,"why":"FIG-O-13"},
+ {"on":"162:2","to":"2474:12093","label":"Editor · reopened with unsaved work","x":6,"y":770,"why":"FIG-G-11"}
+]
