@@ -14,6 +14,21 @@
  *             token-bound, or it will contradict its own caption again.
  *   the rest  ordinary accent use. `#1A56DB`, bound to color/accent.
  *
+ * THAT SPLIT WAS WRONG AND THIS SCRIPT SHIPPED THE ERROR. All three are
+ * swatches. Only 807:8367 was checked against its neighbouring label before
+ * running; the other two were classified as "the rest" on the strength of the
+ * first one being different. 807:8586 happens to caption `#1A56DB`, so accent
+ * blue was accidentally correct there. 807:8636 captions `#E2E5F8` — a pale
+ * blue — and this script painted it accent and BOUND it, so the chip
+ * contradicted its own caption and would follow the accent forever after. It is
+ * the exact defect the visual pass had just reported on 807:8367, reintroduced
+ * one row down by the fix for it, and it was found only because the same check
+ * was finally run on all three instead of one.
+ *
+ * The rule, stated so it is not re-derived: a swatch equals the value it
+ * captions and is NEVER token-bound. Check every candidate against its own
+ * label; never classify one from its neighbour.
+ *
  * Usage: node scripts/figma/fix-accent-near-miss.mjs [--apply]
  */
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
