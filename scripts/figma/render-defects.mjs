@@ -77,7 +77,8 @@ if (secText && !secText.trim().startsWith("[")) {
 }
 const sections = ONLY ? [ONLY] : JSON.parse(secText);
 
-let total = 0;
+let total = 0, read = 0;
+const throttled = [];
 for (const sid of sections) {
   const code = `
 const CONT=new Set(["FRAME","COMPONENT","COMPONENT_SET","INSTANCE","GROUP"]);
@@ -188,9 +189,24 @@ for(const b of sec.children){
 return out.join(String.fromCharCode(10));
 `;
   const t = await call(code, "measure render defects in " + sid);
+  /* A spent rate window comes back as prose from THIS call too, not just the
+     section-list one. Counting it as a line made the headline number report
+     throttle messages as defects: one run printed "29 defects" that were 29
+     rate-limit sentences and one real row. A number that inflates precisely
+     when the tool is not reading anything is worse than no number. */
+  if (/tool call limit|rate.?limit/i.test(t)) { throttled.push(sid); continue; }
   const lines = t.split("\n").filter((l) => l.trim());
   if (lines.length) { console.log("--- " + sid + "  (" + lines.length + ")"); for (const l of lines.slice(0, 12)) console.log(l); }
   total += lines.length;
+  read += 1;
 }
 console.log("");
-console.log("render defects >= " + MIN + "px: " + total);
+if (throttled.length) {
+  console.error("INCOMPLETE — " + throttled.length + " of " + sections.length +
+    " sections were rate-limited and never read; " + read + " read.");
+  console.error("The count below covers only what was read. A silent sweep is not a clean sweep — re-run when the window opens.");
+}
+console.log("render defects >= " + MIN + "px: " + total + " (across " + read + " of " + sections.length + " sections)");
+/* Exit non-zero when the sweep did not actually cover the file, so a caller
+   cannot bank an unread pass as a green one. */
+if (throttled.length) process.exit(75);

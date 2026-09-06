@@ -26,11 +26,20 @@ window opens, re-run the command — all are idempotent.
 | A0 form, seeded + applied twice to PROVE idempotency | `node scratchpad_audit/mod/seed-cta.mjs --apply` then `node scripts/figma/fix-signoff-boards.mjs --apply` twice |
 | TEXT profile LINK row + park the stray Revoke button | `node scripts/figma/fix-text-profile-link-row.mjs --apply` |
 | Is the TEXT-profile colour swatch variable-bound? | `node scratchpad_audit/mod/check-swatch.mjs` |
-| Full sweep with all seven detectors | `node scripts/figma/render-defects.mjs --min=8` |
+| **Post-fix confirmation sweep — the one check this arc owes** | `node scripts/figma/render-defects.mjs --min=8` |
 
-The seventh detector (CONTAINER) has **never been run** — it was written after
-the last clear window. Its first run is the highest-value thing left, because it
-generalises three defects that were each found by eye.
+All seven detectors, CONTAINER included, have now run. The last sweep that
+actually completed read 927 boards and returned **one** defect row — the
+`807:6965` overprint — and that board has since been marked and its geometry
+fixed, both read back from the file node by node.
+
+**What is owed is one more full sweep, to confirm the file is at zero.** The
+attempt made after the fix did not run: 25 retries over ~33 minutes returned 29
+rate-limit responses and read no section at all. It printed no defect rows, and
+that zero is the quota, not the file — the same null-result-is-your-instrument
+trap this arc has already paid for four times. Do not read a silent sweep as a
+clean one. Re-run the command above when the window is open; if it returns rows,
+they are new information, not a regression from the fix.
 
 ## 1b. Where the visual passes actually stopped
 
