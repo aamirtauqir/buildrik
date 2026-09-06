@@ -357,7 +357,6 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
 }
 
 const pend=[
-            [8,"Phase 4","Corrected module screens. Blocked on Phase 3 by the founder's own ordering: components before polish."],
             [11,"Phase 4","The assembled editor. Last, by the same ordering."]];
 /* ============ 8 · COMPONENT LIBRARY ============ */
 {
@@ -474,6 +473,121 @@ const pend=[
   made.push(s.name);
 }
 
+/* ============ 12 · FINAL POLISHED EDITOR ============ */
+{
+  const s=mkSection(SECTIONS[11], 1700, 1200);
+  const b=board(s,"Editor · 1440x900 — the corrected shell assembled",40,40,1600,1060);
+  put(b,T("Final Polished Editor",24,"Semi Bold",INK),28,26);
+  put(b,T("The corrected panels in one frame at 1440x900. Every dimension is the sizing rule's, every decision traces to a spec, and the two things the audit says the product cannot yet honour are marked ON the screen rather than drawn over.",13,"Regular",SOFT,1540),28,66);
+
+  const SX=28, SY=130, SW=1440, SH=900;
+  const shell=F("editor",SW,SH,BG); shell.cornerRadius=4; shell.strokes=solid(LINE); shell.strokeWeight=1;
+  put(b,shell,SX,SY);
+
+  /* topbar 56 */
+  const top=F("topbar",SW,56,PANEL); put(shell,top,0,0);
+  top.strokes=solid(LINE); top.strokeWeight=1;
+  put(top,T("‹ Exit",12,"Regular",SOFT),16,20);
+  put(top,T("Bella Cucina",13,"Medium",INK),80,19);
+  const sv=F("save",70,22,"#DEF7EC"); sv.cornerRadius=11; put(top,sv,190,17);
+  put(sv,T("Saved",10,"Medium","#057A55"),16,6);
+  put(top,T("Preview",12,"Regular",SOFT),SW-330,20);
+  put(top,T("3 issues",12,"Regular",WARN),SW-250,20);
+  const pub=F("publish",92,30,ACCENT); pub.cornerRadius=4; put(top,pub,SW-150,13);
+  put(pub,T("Publish",12,"Medium","#FFFFFF"),22,8);
+
+  /* rail 60 — six seats, and the truth about the other six */
+  const rail=F("rail",60,SH-56,PANEL); put(shell,rail,0,56);
+  rail.strokes=solid(LINE); rail.strokeWeight=1;
+  const seats=["Insert","Layers","Pages","Media","Content","Brand"];
+  let ry=16;
+  for(const s2 of seats){
+    const cell=F("seat",44,44, s2==="Insert"?"#EBF1FE":PANEL); cell.cornerRadius=4;
+    put(rail,cell,8,ry);
+    put(cell,T(s2.slice(0,2),11,"Medium", s2==="Insert"?ACCENT:MUTED),13,16);
+    ry+=52;
+  }
+  const div=F("divider",28,1,"#E5E7EB"); put(rail,div,16,ry+4);
+  const more=["Tmpl","Comp","AI","Pub","Hist","Rev"];
+  ry+=16;
+  for(const m of more){
+    const cell=F("seat2",44,44,PANEL); cell.cornerRadius=4; cell.strokes=solid("#D1D5DB"); cell.strokeWeight=1;
+    put(rail,cell,8,ry);
+    put(cell,T(m,9,"Regular",MUTED),10,17);
+    ry+=48;
+  }
+
+  /* drawer 280 — Insert, corrected */
+  const dr=F("drawer",280,SH-56,PANEL); put(shell,dr,60,56);
+  dr.strokes=solid(LINE); dr.strokeWeight=1;
+  const sf=F("search",248,30,BG); sf.cornerRadius=4; sf.strokes=solid(LINE); sf.strokeWeight=1; put(dr,sf,16,16);
+  put(sf,T("⌕  Search elements, sections…",11,"Regular",MUTED),10,9);
+  put(dr,T("RECENT",9,"Medium",MUTED),16,60);
+  let cx=16;
+  for(const r of ["Heading","Image","Button"]){
+    const chip=F("chip",76,26,BG); chip.cornerRadius=13; chip.strokes=solid(LINE); chip.strokeWeight=1;
+    put(dr,chip,cx,76); put(chip,T(r,10,"Regular",INK),10,7); cx+=82;
+  }
+  put(dr,T("SECTIONS                                    50",9,"Medium",MUTED),16,124);
+  let sy2=142;
+  for(let i=0;i<2;i++){
+    for(let j=0;j<2;j++){
+      const card=F("section-card",120,84,BG); card.cornerRadius=4; card.strokes=solid(LINE); card.strokeWeight=1;
+      put(dr,card,16+j*128,sy2);
+      const pv=F("preview",104,48,"#E5E7EB"); pv.cornerRadius=2; put(card,pv,8,8);
+      put(card,T(["Hero","Features","Pricing","Footer"][i*2+j],10,"Medium",INK),8,62);
+    }
+    sy2+=92;
+  }
+  put(dr,T("ELEMENTS                                    53",9,"Medium",MUTED),16,sy2+8);
+  let ey=sy2+26;
+  for(const g of ["Layout","Text","Forms","Media"]){
+    const row=F("group",248,30,PANEL); row.cornerRadius=3; row.strokes=solid(LINE); row.strokeWeight=1;
+    put(dr,row,16,ey); put(row,T(g,11,"Regular",INK),10,9); put(row,T("⌄",10,"Regular",MUTED),228,9);
+    ey+=36;
+  }
+  put(dr,T("COMPONENTS       14        ⌃",9,"Medium",MUTED),16,ey+8);
+  put(dr,T("MINE                    6        ⌃",9,"Medium",MUTED),16,ey+30);
+
+  /* canvas */
+  const cv=F("canvas",SW-60-280-300,SH-56,"#FFFFFF"); put(shell,cv,340,56);
+  const pageTabs=F("pagetabs",cv.width,32,PANEL); put(cv,pageTabs,0,0);
+  pageTabs.strokes=solid(LINE); pageTabs.strokeWeight=1;
+  put(pageTabs,T("Home",11,"Medium",INK),14,10);
+  put(pageTabs,T("About",11,"Regular",MUTED),64,10);
+  put(pageTabs,T("Menu",11,"Regular",MUTED),116,10);
+  const art=F("artboard",cv.width-120,SH-200,"#FFFFFF"); art.cornerRadius=2;
+  art.strokes=solid("#D1D5DB"); art.strokeWeight=1; put(cv,art,60,60);
+  const heroSel=F("hero",art.width-80,150,"#F9FAFB"); heroSel.cornerRadius=2;
+  heroSel.strokes=solid(ACCENT); heroSel.strokeWeight=2; put(art,heroSel,40,40);
+  put(heroSel,T("Hero section",12,"Medium",MUTED),16,12);
+  const tag=F("tag",70,18,ACCENT); tag.cornerRadius=2; put(art,tag,40,22);
+  put(tag,T("Section",9,"Medium","#FFFFFF"),12,4);
+
+  /* inspector 300 */
+  const insp=F("inspector",300,SH-56,PANEL); put(shell,insp,SW-300,56);
+  insp.strokes=solid(LINE); insp.strokeWeight=1;
+  const ih=F("insp-head",300,36,PANEL); put(insp,ih,0,0); ih.strokes=solid(LINE); ih.strokeWeight=1;
+  put(ih,T("Section",12,"Medium",INK),16,11);
+  const scope=F("scope",84,22,BG); scope.cornerRadius=3; scope.strokes=solid(LINE); scope.strokeWeight=1;
+  put(ih,scope,196,7); put(scope,T("This ▾",10,"Regular",SOFT),12,6);
+  const isf=F("insp-search",268,28,BG); isf.cornerRadius=4; isf.strokes=solid(LINE); isf.strokeWeight=1;
+  put(insp,isf,16,48); put(isf,T("⌕  Search properties",10,"Regular",MUTED),10,8);
+  let iy=88;
+  for(const sec of ["Layout","Size & spacing","Typography","Background","Border","Effects","Interactions","Visibility"]){
+    const row=F("insp-sec",268,32,PANEL); row.cornerRadius=3; row.strokes=solid(LINE); row.strokeWeight=1;
+    put(insp,row,16,iy);
+    put(row,T(sec,11,"Medium",INK),10,10); put(row,T("⌄",10,"Regular",MUTED),246,10);
+    iy+=38;
+  }
+  put(insp,T("ONE animation system, not two",10,"Regular",WARN,268),16,iy+8);
+
+  /* the honesty layer */
+  const note=board(s,"What this screen still depends on",40,1120,1600,60);
+  put(note,T("Drawn honestly: the rail's second cluster shows the six panels that today have no seat, the Insert drawer shows Sections openable and draggable (needs useDropExecution.ts:302-303), and the inspector shows ONE animation system where the product ships two sharing 18 identical preset labels.",12,"Regular",SOFT,1540),24,20);
+  made.push(s.name);
+}
+
 for(const [i,phase,note] of pend){
   const s=mkSection(SECTIONS[i], 800, 420);
   const b=board(s,"Not yet built",40,40,700,300);
@@ -529,7 +643,12 @@ for(const [i,phase,note] of pend){
   made.push(s.name);
 }
 
-return "PAGE "+pg.name+" id="+pg.id+" sections="+made.length+String.fromCharCode(10)+made.join(String.fromCharCode(10));
+/* A silently-unmatched edit once left one section built twice, and the only
+   thing that revealed it was reading the printed count. Assert instead. */
+const dupes=made.filter((n,i)=>made.indexOf(n)!==i);
+if(dupes.length) return "ERROR duplicate sections: "+dupes.join(", ");
+if(made.length!==SECTIONS.length) return "ERROR built "+made.length+" of "+SECTIONS.length+" sections; missing: "+SECTIONS.filter(n=>made.indexOf(n)<0).join(", ");
+return "PAGE "+pg.name+" id="+pg.id+" sections="+made.length+"/"+SECTIONS.length+String.fromCharCode(10)+made.join(String.fromCharCode(10));
 `;
 
 if (!APPLY) { console.log("dry run — pass --apply to build. Script length:", code.length); process.exit(0); }
