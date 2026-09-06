@@ -270,6 +270,18 @@ sweep could not see**, each now a detector:
 | **OVERPRINT** | the collision is with a SIBLING, not a parent | a timestamp printed straight through the word "enabled" |
 | **ESCAPES** | overflow measured against the BOARD, not the parent frame | a caption 19px wider than its card went unreported while 8px cases elsewhere were flagged |
 | **clipping** | a clip is not an overflow, and a clipped pill is not tall-and-narrow | the `STOCK` badge cut mid-K on every board instancing `Card / media` |
+| **STACK** | no child is out of ITS parent and no two text nodes intersect — the panel is simply short | `Media · no-results` lost its ENTIRE footer, sitting at y827 in an 812-tall board |
+
+Five of the six became detectors. **Clipping did not, and that is a result rather
+than a gap**: a targeted clip-risk query over 116 boards returned 9 candidates
+and every one was benign, because a clipped label's own measured width IS the
+clipped width — the node reports as fitting. It is the one class in this file
+where eyes are the only instrument.
+
+The sixth, STACK, is the opposite and the most valuable of the set: one line of
+arithmetic — the last child's bottom must equal the panel height — catching a
+failure that silently DELETES a UI region from a spec. A reviewer sees a panel
+with no footer and cannot tell whether the product has one.
 
 The sweep itself was wrong three more times and each is fixed in it: it exempted
 a hotspot but not the label inside one; it exempted downward overflow in a
