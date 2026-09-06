@@ -224,7 +224,81 @@ new boards reachable 22 of 22, zero orphans
 
 ---
 
-## 8. What was NOT verified
+## 8. The closing pass — the three checks §7 said it had not run
+
+§7 listed three gaps. All three were then run, and each found a class of defect
+nothing before it could see.
+
+### Coverage — 93 of the 131 boards no lane had opened
+
+| section | opened | of |
+|---|---|---|
+| Settings/S7 | 30 | 42 |
+| Media | 16 | 28 |
+| Review | 15 | 27 |
+| Layers | 10 | 12 |
+| Inspector + AI captions | 22 | 22 |
+| **Client sign-off** | **0** | **10** |
+
+54 findings, 12 Critical. The largest: **thirty Settings boards draw a pane
+header with a right-aligned primary button** — "Add domain", "Save changes",
+"Export CSV". The shipped header is `DrillInHeader`, whose props interface has
+no action slot at all; Save and Discard live in a bottom savebar. One lane
+caught it on one board. It is on thirty.
+
+### Conformance — the first colour and type measurement of this file
+
+31,356 paints, 14,837 text nodes, measured as histograms rather than sampled.
+**Purple/violet/indigo: clean** — every purple is the allowlisted PRO/avatar
+ramp, swatch content, or a violet-tinted *neutral*, and there are zero
+gradients. Two indigo defects turned out to be in the CODE, not the file:
+`Canvas.css:693-698` ships `var(--bk-accent, #667eea)` on every contenteditable.
+
+It also convicted this arc's own boards: **16 of the 22 were raw hex with 0%
+bound paint and 0% bound text style**, using four colours that exist in neither
+`tokens.generated.css` nor anywhere under `packages/`. Fixed — 109 values
+remapped, 733 paints bound to variables, 15 Inter Bold nodes down to Semi Bold.
+
+### Visual — 70 of 253 changed boards actually looked at, 19 defects
+
+The number that matters is not 19, it is **the four defect CLASSES the geometric
+sweep could not see**, each now a detector:
+
+| class | why the sweep missed it | example |
+|---|---|---|
+| **SQUEEZED** | the node is inside its parent, just unreadable | "☁ Browse stock" at 16px wide and 160px tall, on eleven Media boards |
+| **OVERPRINT** | the collision is with a SIBLING, not a parent | a timestamp printed straight through the word "enabled" |
+| **ESCAPES** | overflow measured against the BOARD, not the parent frame | a caption 19px wider than its card went unreported while 8px cases elsewhere were flagged |
+| **clipping** | a clip is not an overflow, and a clipped pill is not tall-and-narrow | the `STOCK` badge cut mid-K on every board instancing `Card / media` |
+
+The sweep itself was wrong three more times and each is fixed in it: it exempted
+a hotspot but not the label inside one; it exempted downward overflow in a
+clipping frame as a scroll region but not upward; and it crashed on the rate
+limiter's prose instead of reporting a throttle.
+
+### And one regression of my own, caught only by looking
+
+The variable-binding pass blanked **318 hotspots** file-wide, on the assumption
+that a hotspot is an invisible click target. That is true of 599 of them. The
+file also uses a labelled parked marker — a filled rectangle carrying a state
+name — and I destroyed those, including their colours, across boards this arc
+does not own. 117 were repaired to the convention; the exact prior pixels are
+gone. Recorded rather than quietly patched.
+
+### Still open
+
+- **Client sign-off: 0 of 10 boards opened.**
+- **183 of 253 changed boards never looked at.** Two lots are queued and paused.
+- **Publish's declared gap is untouched** — 20 boards read text-only, with no
+  claim made about fill, type, spacing or auto-layout.
+- Effect styles, shadows, focus rings, tracking and radius: **not measured at
+  all**.
+- Pages `1:2`, `1:4`, `1:5` and `988:2` are outside every number here.
+- **The app was never run.**
+
+---
+
+## 9. What was NOT verified
 
 - **The app was never run.** Every verdict is a static read of source plus a
   read or screenshot of the file. This repo's own rule calls a code reading a

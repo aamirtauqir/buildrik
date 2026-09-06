@@ -19,6 +19,16 @@
  *                 is inside its parent, it is simply unreadable — and a visual QA
  *                 pass found four Criticals of exactly this shape that the
  *                 geometric sweep had passed clean.
+ *  OVERPRINT      a full-width title and a right-aligned sibling (a timestamp, a
+ *                 count, a tag) whose boxes intersect, because the title reserves
+ *                 no gutter for the meta beside it. Found by eye on a
+ *                 Notifications row where a timestamp printed straight through
+ *                 the word "enabled"; latent on the toast catalog, which survives
+ *                 only because its strings happen to be short today.
+ *  ESCAPES        a node whose x + width passes its PARENT's width. The
+ *                 out-of-bounds check measures against the BOARD, so a caption
+ *                 19px wider than the card it sits in went unreported while 8px
+ *                 cases elsewhere were flagged.
  *  SIBLING OVERLAP  two visible siblings intersecting inside a non-auto-layout
  *                 frame, ignoring pairs where one is a backing rect (no text,
  *                 fully containing the other) — that is a card, not a defect.
@@ -37,9 +47,17 @@ const call = async (code, description) => {
   return r?.result?.content?.[0]?.text ?? JSON.stringify(r).slice(0, 500);
 };
 
-const sections = ONLY ? [ONLY] : JSON.parse(await call(
+const secText = ONLY ? null : await call(
   'const pg=figma.root.children.find(p=>p.id==="1:3");await figma.setCurrentPageAsync(pg);' +
-  'return JSON.stringify(pg.children.filter(s=>s.type==="SECTION").map(s=>s.id));', "list sections"));
+  'return JSON.stringify(pg.children.filter(s=>s.type==="SECTION").map(s=>s.id));', "list sections");
+/* The MCP answers a spent rate window with a prose sentence, not JSON. Parsing
+   it blind turns "wait a few minutes" into a stack trace, and a crash here looks
+   nothing like the throttle it actually is. */
+if (secText && !secText.trim().startsWith("[")) {
+  console.error("RATE LIMITED — " + secText.slice(0, 120));
+  process.exit(75);
+}
+const sections = ONLY ? [ONLY] : JSON.parse(secText);
 
 let total = 0;
 for (const sid of sections) {
@@ -77,6 +95,11 @@ for(const b of sec.children){
         const worst=Math.max(overR,overL, clip?0:overT, clip?0:overB);
         if(worst>=MIN) out.push("OUT\\t"+b.id+"\\t"+String(b.name).slice(0,34)+"\\t"+n.id+" "+String(n.name).slice(0,22)+"\\tby "+worst);
       }
+      if(n.type==="TEXT" && n.parent && n.parent.width && n.parent!==sec && n.parent.id!==b.id){
+        const esc=Math.round((n.x+n.width)-n.parent.width);
+        if(esc>=MIN && !isHotspot(n))
+          out.push("ESCAPES\t"+b.id+"\t"+String(b.name).slice(0,34)+"\t"+n.id+"\tby "+esc+" past "+n.parent.id);
+      }
       if(n.type==="TEXT"){
         const fs=typeof n.fontSize==="number"?n.fontSize:12;
         const chars=String(n.characters||"");
@@ -89,7 +112,19 @@ for(const b of sec.children){
         }
       }
     }
-    if(CONT.has(n.type)&&n.children) for(const c of n.children) st.push([c, n===b?0:ox+(n.x||0), n===b?0:oy+(n.y||0)]);
+    if(CONT.has(n.type)&&n.children){
+      /* two TEXT siblings whose boxes intersect on the same row: a full-width
+         title with a right-aligned meta beside it and no gutter reserved */
+      const ts=n.children.filter(c=>c.type==="TEXT"&&c.visible!==false&&!isHotspot(c));
+      for(let i=0;i<ts.length;i++) for(let j=i+1;j<ts.length;j++){
+        const a=ts[i], c2=ts[j];
+        const ovX=Math.min(a.x+a.width,c2.x+c2.width)-Math.max(a.x,c2.x);
+        const ovY=Math.min(a.y+a.height,c2.y+c2.height)-Math.max(a.y,c2.y);
+        if(ovX>=MIN && ovY>=4)
+          out.push("OVERPRINT\t"+b.id+"\t"+String(b.name).slice(0,34)+"\t"+a.id+" x "+c2.id+"\tby "+Math.round(ovX));
+      }
+      for(const c of n.children) st.push([c, n===b?0:ox+(n.x||0), n===b?0:oy+(n.y||0)]);
+    }
   }
 }
 return out.join(String.fromCharCode(10));
