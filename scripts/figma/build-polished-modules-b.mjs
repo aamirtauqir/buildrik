@@ -34,7 +34,14 @@ const F=(n,w,h,f,r)=>{const x=figma.createFrame();x.name=n;x.resize(w,h);x.fills
 const put=(p,n,x,y)=>{p.appendChild(n);n.x=x;n.y=y;return n;};
 const st=(n,c,w)=>{n.strokes=solid(c);n.strokeWeight=w||1;return n;};
 const chip=(p,l,x,y,f,i)=>{const c=F("chip",0,18,f,9);const t=T(l,9,"Medium",i);c.resize(Math.round(t.width)+16,18);put(p,c,x,y);put(c,t,8,4);return c;};
-const head=(p,t2,d)=>{put(p,T(t2,15,"Semi Bold",INK),20,16);put(p,T(d,11,"Regular",CRIT,p.width-40),20,40);};
+/* The defect line sat at a fixed y40 under a title whose rendered height
+   varies with the face and size, so on four boards it overlapped the title.
+   Place it under the MEASURED bottom of the title instead — the same rule
+   every other fix in this arc came down to. */
+const head=(p,t2,d)=>{
+  const h=put(p,T(t2,15,"Semi Bold",INK),20,16);
+  put(p,T(d,11,"Regular",CRIT,p.width-40),20,Math.round(h.y+h.height)+8);
+};
 const btn=(p,l,x,y,primary)=>{const b=F("btn",0,28,primary?ACCENT:PANEL,4);const t=T(l,10,"Medium",primary?"#FFFFFF":INK);
  b.resize(Math.round(t.width)+28,28); if(!primary) st(b,LMED,1); put(p,b,x,y); put(b,t,14,8); return b;};
 
