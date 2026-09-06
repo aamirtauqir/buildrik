@@ -64,11 +64,20 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
        geometry — and only the render showed it. */
     const wipe=(p)=>{ for(const c of [...(p.children||[])]) if(String(c.name).indexOf("a0/")===0) c.remove(); };
     const prior=[];
-    ${APPLY ? 'wipe(b);' : ''}
+    const wipeAll=(root)=>{ const q=[root];
+      while(q.length){ const n=q.pop();
+        if(String(n.name).indexOf("a0/")===0){ n.remove(); continue; }
+        if(CONT.has(n.type)&&n.children) for(const c of [...n.children]) q.push(c); } };
+    ${APPLY ? 'wipeAll(b);' : ''}
     /* place under the widest text block on the board, above the CTA */
+    /* Wipe BEFORE choosing the anchor, and never anchor to our own output. The
+       second run picked one of its own field labels as the anchor — the widest
+       low text on the board was the thing it had just drawn — and stacked a new
+       form below the CTA. Order of operations, and only the render showed it. */
     let anchor=null, cta=null;
     const st=[b];
     while(st.length){ const n=st.pop();
+      if(String(n.name).indexOf("a0/")===0) continue;
       if(n.type==="TEXT" && n.width>240 && (!anchor || n.y>anchor.y)) anchor=n;
       if(n.type!=="TEXT" && /btn|button|cta/i.test(String(n.name)) && (!cta || n.y<cta.y)) cta=n;
       if(CONT.has(n.type)&&n.children) for(const c of n.children) st.push(c); }
@@ -80,7 +89,6 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
       out.push((${APPLY}?"FORM\\t":"WOULD FORM\\t")+"1339:7162\\tanchor "+anchor.id+" -> fields at y"+top+(cta?(", CTA "+cta.id+" at y"+Math.round(cta.y)):", no CTA found"));
       ${APPLY ? `
       const host=anchor.parent;   /* the CARD the anchor lives in, not the board */
-      wipe(host);
       const mk=(s,size,style,color,x,y,w)=>{ const t=figma.createText();
         t.fontName={family:"Inter",style:style}; t.fontSize=size; t.characters=s;
         t.fills=[{type:"SOLID",color:rgb(color)}]; t.textAutoResize="HEIGHT"; t.name="a0/"+s.slice(0,18);
@@ -104,11 +112,28 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
       /* The form is 176px tall and the CTA sat at y236 — writing it without
          making room would have dropped two inputs straight onto the button,
          which is the same mistake three earlier writes in this arc made. */
-      if(cta && cta.y < y){
-        const shift=Math.round(y - cta.y) + 8;
+      /* Idempotent. The first version shifted every node below the CTA by the
+         collision distance and re-ran that shift on every apply, so the CTA
+         crept 236 -> 316 -> 511 across three runs. Each node now records its
+         pre-shift y once, and every later run restores from that record before
+         recomputing — so applying twice lands in the same place as applying
+         once. A repair that is not idempotent is a repair you can only run
+         exactly one time, and nothing enforced that. */
+      const KEY="a0-origY";
+      for(const c of (host.children||[])){
+        if(String(c.name).indexOf("a0/")===0) continue;
+        const rec=c.getPluginData(KEY);
+        if(rec) c.y=Number(rec);
+      }
+      const cta2=cta ? await figma.getNodeByIdAsync(cta.id) : null;
+      if(cta2 && cta2.y < y){
+        const shift=Math.round(y - cta2.y) + 8;
         for(const c of (host.children||[])){
           if(String(c.name).indexOf("a0/")===0) continue;
-          if(c.y >= cta.y) c.y = Math.round(c.y) + shift;
+          if(c.y >= cta2.y){
+            if(!c.getPluginData(KEY)) c.setPluginData(KEY, String(Math.round(c.y)));
+            c.y = Math.round(c.y) + shift;
+          }
         }
         if(host.height < y + 80) host.resize(host.width, Math.round(y) + 80);
       }

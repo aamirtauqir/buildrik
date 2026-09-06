@@ -30,7 +30,14 @@ for(const id of ${JSON.stringify(BOARDS)}){
   const last=kids.reduce((a,c)=>(c.y+c.height)>(a.y+a.height)?c:a, kids[0]);
   const gap=Math.round(last.y+last.height)-H;
   if(gap<=0){ out.push("OK\\t"+id+"\\talready reconciles"); continue; }
-  /* the spacer is the slack in the stack; prefer the one ABOVE the overrunning node */
+  /* the simplest case: the overrunning node IS the spacer, so it is just too
+     tall and nothing needs moving */
+  if(/spacer/i.test(String(last.name))){
+    out.push((${APPLY}?"FIX\t":"WOULD\t")+id+"\t"+String(b.name).slice(0,30)+"\tspacer "+last.id+" is itself the overrun: h"+Math.round(last.height)+"->"+(Math.round(last.height)-gap));
+    ${APPLY ? 'last.resize(last.width, Math.round(last.height)-gap);' : ''}
+    continue;
+  }
+  /* otherwise the spacer is the slack in the stack; prefer the one ABOVE the overrunning node */
   const spacers=kids.filter(c=>/spacer/i.test(String(c.name)) && c.y < last.y && c.height > gap);
   const sp = spacers.sort((a,c)=>(c.height-a.height))[0];
   if(!sp){

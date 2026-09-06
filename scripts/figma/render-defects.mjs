@@ -29,6 +29,18 @@
  *                 out-of-bounds check measures against the BOARD, so a caption
  *                 19px wider than the card it sits in went unreported while 8px
  *                 cases elsewhere were flagged.
+ *  CONTAINER      a frame whose children's union no longer fits it, in EITHER
+ *                 axis and EITHER direction. ESCAPES only ever tested one edge
+ *                 on one axis (x + width past the parent's width), which sees
+ *                 none of: a footer lost downward off an 812 board, a toolbar
+ *                 whose wrapped second row was never given height, or content
+ *                 sitting at y = -8, ABOVE its own frame. Three defects that
+ *                 looked unrelated — an overprint, a clipped-away region, chips
+ *                 outside their pill — are all this one test.
+ *                 Only clipping frames are checked: a non-clipping frame lets
+ *                 its children spill by design and flagging those produced a
+ *                 false positive on a board that renders correctly.
+ *
  *  CLIPPED        a fixed-height TEXT whose glyphs are cut. The BOX fits, so
  *                 every box-based check above passes it. Measured by cloning the
  *                 node, letting the clone auto-height, and comparing.
@@ -106,6 +118,21 @@ for(const b of sec.children){
         const pinned = cv==="BOTTOM" || cv==="STRETCH" || n.layoutPositioning==="ABSOLUTE";
         const worst=Math.max(overR,overL, clip?0:overT, (clip&&!pinned)?0:overB);
         if(worst>=MIN) out.push("OUT\\t"+b.id+"\\t"+String(b.name).slice(0,34)+"\\t"+n.id+" "+String(n.name).slice(0,22)+"\\tby "+worst);
+      }
+      if(CONT.has(n.type) && n.clipsContent && n.children && n.children.length && !isHotspot(n)){
+        let l=Infinity,t2=Infinity,r2=-Infinity,b2=-Infinity;
+        for(const c of n.children){
+          if(c.visible===false || !c.width || isHotspot(c)) continue;
+          l=Math.min(l,c.x); t2=Math.min(t2,c.y);
+          r2=Math.max(r2,c.x+c.width); b2=Math.max(b2,c.y+c.height);
+        }
+        if(l!==Infinity){
+          const over=[["right",Math.round(r2-n.width)],["bottom",Math.round(b2-n.height)],
+                      ["left",Math.round(-l)],["top",Math.round(-t2)]].filter(([,v])=>v>=MIN);
+          if(over.length)
+            out.push("CONTAINER\\t"+b.id+"\\t"+String(b.name).slice(0,34)+"\\t"+n.id+" \\""+String(n.name).slice(0,20)+"\\"\\t"+
+              over.map(([k,v])=>k+" +"+v).join(", "));
+        }
       }
       if(n.type==="TEXT" && n.textAutoResize==="NONE" && String(n.characters||"").length>2){
         /* The BOX fits; only the glyphs are cut, so every box-based check passes
