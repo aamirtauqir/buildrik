@@ -86,7 +86,13 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
       const px=Math.round(anchor.x), top=Math.round(anchor.y+anchor.height)+24;
       /* anchor.x/y are relative to anchor.parent, so the fields must be
          appended THERE — see the wipe() note above. */
-      out.push((${APPLY}?"FORM\\t":"WOULD FORM\\t")+"1339:7162\\tanchor "+anchor.id+" -> fields at y"+top+(cta?(", CTA "+cta.id+" at y"+Math.round(cta.y)):", no CTA found"));
+      /* Report the SETTLED position, not the pre-restore read. The first version
+         captured cta.y during the walk, before the idempotent restore ran, so two
+         applies that landed identically printed "236" then "316" and read as a
+         regression. A log that misreports its own outcome costs exactly one false
+         alarm, and it cost one. */
+      const settled = cta ? Math.round((await figma.getNodeByIdAsync(cta.id)).y) : null;
+      out.push((${APPLY}?"FORM\\t":"WOULD FORM\\t")+"1339:7162\\tanchor "+anchor.id+" -> fields at y"+top+(settled!==null?(", CTA "+cta.id+" settled at y"+settled):", no CTA found"));
       ${APPLY ? `
       const host=anchor.parent;   /* the CARD the anchor lives in, not the board */
       const mk=(s,size,style,color,x,y,w)=>{ const t=figma.createText();
