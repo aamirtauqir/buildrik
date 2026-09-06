@@ -146,3 +146,28 @@ Not "looks better". Each is observable:
 Item 6 depends on the one-line code fix in `useDropExecution.ts:302-303`. Until
 that lands, the panel cannot honour its own affordances, and this spec should
 not be drawn as though it can.
+
+
+---
+
+## 7. Code fixes this spec depends on
+
+A Phase 4 QA pass found this was the only spec with no dependency table, and
+four of its six acceptance items rest on code that does not exist yet. Drawing
+the panel without naming them would sign off affordances the product cannot
+honour.
+
+| # | Acceptance item | Depends on | Where |
+|---|---|---|---|
+| 2 | every entry drawn as draggable can be dragged | BLOCKS cards, COMPONENTS rows and MINE do not pass `draggable`; only the 53 ELEMENTS rows do | `UX-A-06` |
+| 2 | a refused drop says why | no refusal surface exists; the dispatcher hardcodes `dropSucceeded = true` | `useDropExecution.ts:302-303` |
+| 4 | search returns MINE | the search index covers elements, shipped blocks and shipped components only | `UX-A-11` |
+| 5 | open/closed state survives leaving the tab | it is component-local state and `TabRouter` unmounts the tab | `UX-A-08` |
+| 6 | a drag that places nothing shows an error | `handleBlockDrop` returns a success boolean the caller discards | `useDropExecution.ts:302-303`, `dropOperations.tsx:375` |
+
+Items 1 and 3 — one entry per thing, and reaching a hero without expanding a
+group — are pure design and need no code change.
+
+**The single highest-value fix is one line.** `handleBlockDrop` already computes
+whether the drop succeeded; the caller throws it away. Using the return value
+turns items 2 and 6 from undrawable into drawable.

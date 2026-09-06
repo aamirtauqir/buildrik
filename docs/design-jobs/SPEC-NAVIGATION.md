@@ -413,7 +413,7 @@ app — a code reading is not acceptance, per the repo's own rule.
 2. **The rail reports its selected item with the drawer shut.** Read
    `aria-selected` in the accessibility tree with the drawer closed; exactly
    one rail tab is selected.
-3. **Every door opens the panel.** Press each of the thirteen bare letters
+3. **Every door opens the panel.** Press each of the twelve bare letters (Components is ⇧A — the thirteenth shortcut is not a bare letter)
    with the drawer shut, then arrow through the rail with the drawer shut. In
    every case a panel is on screen afterwards. (Today the ⌘K and ⋯ routes pass
    this and the keystrokes do not.)
