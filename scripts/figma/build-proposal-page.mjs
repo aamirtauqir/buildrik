@@ -435,45 +435,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   put(head,T("12",26,"Semi Bold",CRIT),28,170); put(head,T("code fixes the Publish panel alone depends on, two of them server-side",12,"Regular",SOFT,420),70,178);
   put(head,T("2",26,"Semi Bold",WARN),520,170); put(head,T("things the lanes REFUSED to draw, because the board or the schema disagrees",12,"Regular",SOFT,420),545,178);
 
-  const panels=[
-    ["Insert · corrected",280,
-      ["One catalog, one entry per thing","SECTIONS opens by default, not ELEMENTS","53 elements sub-grouped, not one flat list","descriptions render on hover (they already exist)","everything drawn draggable IS draggable"],
-      "Removes 53 duplicate offerings before a pixel changes.","needs useDropExecution.ts:302-303"],
-    ["Navigation · corrected",280,
-      ["12 panels get 12 doors, or fewer panels","one command palette, not two","one help surface, not two","one Settings home, not two","bare key opens the drawer like ⌘K does"],
-      "The rail shows 6; TabRouter renders 12.","bare key is a tab-only switcher today"],
-    ["Inspector · corrected",300,
-      ["composite elements get real editors","forms get a destination, not 5 attributes","ONE animation system, not two","search / expand-all / reset wired up","disabled controls say why"],
-      "The entire PROPERTIES map — 185 defs — is imported by nothing.","FormSettingsSection is a rebuild, not a move"],
-    ["Publish · corrected",280,
-      ["read the topbar's lifecycle, don't re-derive","seven states drawn, incl. cancelled + lost contact","approval row added to the checklist","cancel control wired (it exists, 0 call sites)","the log names the step that actually failed"],
-      "The panel greys its own CTA on every reopen.","12 fixes, 2 server-side"],
-    ["Pages · corrected",280,
-      ["one vocabulary: what the deploy actually does","visibility writes only when chosen","delete counts inbound links first","homepage is explicit, never position","navigation gets a producer"],
-      "A page announced as Draft publishes.","row chip needs board 140:2 redrawn first"],
-  ];
-  let px=40;
-  for(const [name,w,bullets,thesis,dep] of panels){
-    const col=board(s,name,px,320,w+80,600);
-    put(col,T(name,15,"Semi Bold",INK),20,18);
-    put(col,T(thesis,12,"Regular",CRIT,w+40),20,44);
-    /* the panel silhouette at its real width */
-    const shell=F("panel",w,300,BG); shell.cornerRadius=3; shell.strokes=solid(LINE); shell.strokeWeight=1;
-    put(col,shell,20,96);
-    put(shell,T(String(w)+"px",10,"Medium",MUTED),8,6);
-    const hdr=F("hdr",w-16,28,PANEL); hdr.cornerRadius=2; hdr.strokes=solid(LINE); hdr.strokeWeight=1; put(shell,hdr,8,24);
-    put(hdr,T(name.split(" ·")[0],11,"Medium",INK),8,8);
-    let ry=60;
-    for(const bl of bullets){
-      const row=F("row",w-16,34,PANEL); row.cornerRadius=2; row.strokes=solid(LINE); row.strokeWeight=1;
-      put(shell,row,8,ry);
-      put(row,T(bl,10,"Regular",INK,w-40),8,6);
-      ry+=40;
-    }
-    put(col,T("DEPENDS ON",9,"Medium",WARN),20,412);
-    put(col,T(dep,11,"Regular",SOFT,w+40),20,428);
-    px+=w+100;
-  }
+  put(head,T("The five corrected panels are drawn below, at their real widths, by build-polished-{insert,panels,nav}.mjs. This board owned silhouette versions of them until 2026-09-07; keeping both meant section 9 carried two generations of the same screens, and the older one still labelled a band for recents, which the product does not have.",12,"Regular",MUTED,1740),28,206);
   made.push(s.name);
 }
 
@@ -484,111 +446,8 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   put(b,T("Final Polished Editor",24,"Semi Bold",INK),28,26);
   put(b,T("The corrected panels in one frame at 1440x900. Every dimension is the sizing rule's, every decision traces to a spec, and the two things the audit says the product cannot yet honour are marked ON the screen rather than drawn over.",13,"Regular",SOFT,1540),28,66);
 
-  const SX=28, SY=130, SW=1440, SH=900;
-  const shell=F("editor",SW,SH,BG); shell.cornerRadius=4; shell.strokes=solid(LINE); shell.strokeWeight=1;
-  put(b,shell,SX,SY);
-
-  /* topbar 56 */
-  const top=F("topbar",SW,56,PANEL); put(shell,top,0,0);
-  top.strokes=solid(LINE); top.strokeWeight=1;
-  put(top,T("‹ Exit",12,"Regular",SOFT),16,20);
-  put(top,T("Bella Cucina",13,"Medium",INK),80,19);
-  const sv=F("save",70,22,"#DEF7EC"); sv.cornerRadius=11; put(top,sv,190,17);
-  put(sv,T("Saved",10,"Medium","#057A55"),16,6);
-  put(top,T("Preview",12,"Regular",SOFT),SW-330,20);
-  put(top,T("3 issues",12,"Regular",WARN),SW-250,20);
-  const pub=F("publish",92,30,ACCENT); pub.cornerRadius=4; put(top,pub,SW-150,13);
-  put(pub,T("Publish",12,"Medium","#FFFFFF"),22,8);
-
-  /* rail 60 — six seats, and the truth about the other six */
-  const rail=F("rail",60,SH-56,PANEL); put(shell,rail,0,56);
-  rail.strokes=solid(LINE); rail.strokeWeight=1;
-  const seats=["Insert","Layers","Pages","Media","Content","Brand"];
-  let ry=16;
-  for(const s2 of seats){
-    const cell=F("seat",44,44, s2==="Insert"?"#EBF1FE":PANEL); cell.cornerRadius=4;
-    put(rail,cell,8,ry);
-    put(cell,T(s2.slice(0,2),11,"Medium", s2==="Insert"?ACCENT:MUTED),13,16);
-    ry+=52;
-  }
-  const div=F("divider",28,1,"#E5E7EB"); put(rail,div,16,ry+4);
-  const more=["Tmpl","Comp","AI","Pub","Hist","Rev"];
-  ry+=16;
-  for(const m of more){
-    const cell=F("seat2",44,44,PANEL); cell.cornerRadius=4; cell.strokes=solid("#D1D5DB"); cell.strokeWeight=1;
-    put(rail,cell,8,ry);
-    put(cell,T(m,9,"Regular",MUTED),10,17);
-    ry+=48;
-  }
-
-  /* drawer 280 — Insert, corrected */
-  const dr=F("drawer",280,SH-56,PANEL); put(shell,dr,60,56);
-  dr.strokes=solid(LINE); dr.strokeWeight=1;
-  const sf=F("search",248,30,BG); sf.cornerRadius=4; sf.strokes=solid(LINE); sf.strokeWeight=1; put(dr,sf,16,16);
-  put(sf,T("⌕  Search elements, sections…",11,"Regular",MUTED),10,9);
-  put(dr,T("RECENT",9,"Medium",MUTED),16,60);
-  let cx=16;
-  for(const r of ["Heading","Image","Button"]){
-    const chip=F("chip",76,26,BG); chip.cornerRadius=13; chip.strokes=solid(LINE); chip.strokeWeight=1;
-    put(dr,chip,cx,76); put(chip,T(r,10,"Regular",INK),10,7); cx+=82;
-  }
-  put(dr,T("SECTIONS                                    50",9,"Medium",MUTED),16,124);
-  let sy2=142;
-  for(let i=0;i<2;i++){
-    for(let j=0;j<2;j++){
-      const card=F("section-card",120,84,BG); card.cornerRadius=4; card.strokes=solid(LINE); card.strokeWeight=1;
-      put(dr,card,16+j*128,sy2);
-      const pv=F("preview",104,48,"#E5E7EB"); pv.cornerRadius=2; put(card,pv,8,8);
-      put(card,T(["Hero","Features","Pricing","Footer"][i*2+j],10,"Medium",INK),8,62);
-    }
-    sy2+=92;
-  }
-  put(dr,T("ELEMENTS                                    53",9,"Medium",MUTED),16,sy2+8);
-  let ey=sy2+26;
-  for(const g of ["Layout","Text","Forms","Media"]){
-    const row=F("group",248,30,PANEL); row.cornerRadius=3; row.strokes=solid(LINE); row.strokeWeight=1;
-    put(dr,row,16,ey); put(row,T(g,11,"Regular",INK),10,9); put(row,T("⌄",10,"Regular",MUTED),228,9);
-    ey+=36;
-  }
-  put(dr,T("COMPONENTS       14        ⌃",9,"Medium",MUTED),16,ey+8);
-  put(dr,T("MINE                    6        ⌃",9,"Medium",MUTED),16,ey+30);
-
-  /* canvas */
-  const cv=F("canvas",SW-60-280-300,SH-56,"#FFFFFF"); put(shell,cv,340,56);
-  const pageTabs=F("pagetabs",cv.width,32,PANEL); put(cv,pageTabs,0,0);
-  pageTabs.strokes=solid(LINE); pageTabs.strokeWeight=1;
-  put(pageTabs,T("Home",11,"Medium",INK),14,10);
-  put(pageTabs,T("About",11,"Regular",MUTED),64,10);
-  put(pageTabs,T("Menu",11,"Regular",MUTED),116,10);
-  const art=F("artboard",cv.width-120,SH-200,"#FFFFFF"); art.cornerRadius=2;
-  art.strokes=solid("#D1D5DB"); art.strokeWeight=1; put(cv,art,60,60);
-  const heroSel=F("hero",art.width-80,150,"#F9FAFB"); heroSel.cornerRadius=2;
-  heroSel.strokes=solid(ACCENT); heroSel.strokeWeight=2; put(art,heroSel,40,40);
-  put(heroSel,T("Hero section",12,"Medium",MUTED),16,12);
-  const tag=F("tag",70,18,ACCENT); tag.cornerRadius=2; put(art,tag,40,22);
-  put(tag,T("Section",9,"Medium","#FFFFFF"),12,4);
-
-  /* inspector 300 */
-  const insp=F("inspector",300,SH-56,PANEL); put(shell,insp,SW-300,56);
-  insp.strokes=solid(LINE); insp.strokeWeight=1;
-  const ih=F("insp-head",300,36,PANEL); put(insp,ih,0,0); ih.strokes=solid(LINE); ih.strokeWeight=1;
-  put(ih,T("Section",12,"Medium",INK),16,11);
-  const scope=F("scope",84,22,BG); scope.cornerRadius=3; scope.strokes=solid(LINE); scope.strokeWeight=1;
-  put(ih,scope,196,7); put(scope,T("This ▾",10,"Regular",SOFT),12,6);
-  const isf=F("insp-search",268,28,BG); isf.cornerRadius=4; isf.strokes=solid(LINE); isf.strokeWeight=1;
-  put(insp,isf,16,48); put(isf,T("⌕  Search properties",10,"Regular",MUTED),10,8);
-  let iy=88;
-  for(const sec of ["Layout","Size & spacing","Typography","Background","Border","Effects","Interactions","Visibility"]){
-    const row=F("insp-sec",268,32,PANEL); row.cornerRadius=3; row.strokes=solid(LINE); row.strokeWeight=1;
-    put(insp,row,16,iy);
-    put(row,T(sec,11,"Medium",INK),10,10); put(row,T("⌄",10,"Regular",MUTED),246,10);
-    iy+=38;
-  }
-  put(insp,T("ONE animation system, not two",10,"Regular",WARN,268),16,iy+8);
-
-  /* the honesty layer */
-  const note=board(s,"What this screen still depends on",40,1120,1600,60);
-  put(note,T("Drawn honestly: the rail's second cluster shows the six panels that today have no seat, the Insert drawer shows Sections openable and draggable (needs useDropExecution.ts:302-303), and the inspector shows ONE animation system where the product ships two sharing 18 identical preset labels.",12,"Regular",SOFT,1540),24,20);
+  put(b,T("The editor is drawn below at 1440x900 by build-polished-editor.mjs, at the fidelity of the section 9 panels. A silhouette version lived on this board until 2026-09-07; it is gone because two generations of the same screen on one section is duplicate content, and the silhouette asserted a recents band that the product does not have.",13,"Regular",SOFT,1540),28,110);
+  b.resize(1600,200);
   made.push(s.name);
 }
 
