@@ -364,7 +364,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
 
 /* ============ 8 · COMPONENT LIBRARY ============ */
 {
-  const s=mkSection(SECTIONS[7], 1300, 1100);
+  const s=mkSection(SECTIONS[7], 1300, 1140);
   const b=board(s,"Census — what already exists",40,40,1200,470);
   put(b,T("Component Library",24,"Semi Bold",INK),28,26);
   put(b,T("Read before proposing anything. Variants are rolled up to their sets, because an instance resolves to a VARIANT and never to the set holding it — counting raw masters reported 204 dead components where there are 49.",13,"Regular",SOFT,1140),28,66);
@@ -383,7 +383,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   put(b,T("Fixing the STOCK badge inside one master (Card / media) cleared the defect on 46 instances at once. That is the leverage this census exists to find.",12,"Regular",SOFT,1140),28,y+12);
 
   /* the merged nav row — the founder's decision, drawn rather than applied */
-  const b2=board(s,"Proposed · Nav row (merged)",40,540,1200,470);
+  const b2=board(s,"Decided · Nav row (merged) — active is FILL",40,540,1200,510);
   put(b2,T("Nav row — one component for 1,626 instances",18,"Semi Bold",INK),28,24);
   put(b2,T("Founder decision, 6 Sep: merge. Same interaction model in both masters — a label row with a selected state — so the 'different interaction model' exception does not apply.",13,"Regular",SOFT,1140),28,56);
   put(b2,T("MEASURED, BEFORE MERGING",10,"Medium",MUTED),28,104);
@@ -397,11 +397,12 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
     put(b2,T(r[3],12,"Regular",SOFT,320),545,y);
     y+=24;
   }
-  put(b2,T("THE ONE FORCED CHOICE",10,"Medium",WARN),28,192);
-  put(b2,T("The two masters disagree on how ACTIVE is shown. Merging must pick one, and either choice changes the look of 600 or 1,026 instances. Proposed: keep the 3px bar — more legible, and it is already the larger master's convention. This is the only visible change the merge makes to Settings.",12,"Regular",SOFT,1140),28,212);
-  put(b2,T("PROPOSED AXES",10,"Medium",MUTED),28,268);
-  put(b2,T("Size[compact 140x30 | default 240x32]  ×  State[rest | hover | active]",13,"Medium",ACCENT),28,288);
-  put(b2,T("Compact is the BASELINE and default derives from it. Deriving the other way overflows the 140px case — that was the founder's own constraint and it is the right one: the tightest box is the one that can fail.",12,"Regular",SOFT,1140),28,314);
+  put(b2,T("DECIDED — FILL, NOT THE BAR",10,"Medium",OK),28,192);
+  put(b2,T("The masters disagreed on how ACTIVE reads: Nav item adds a 3px Active bar, Settings nav row repaints the row. I first proposed keeping the bar because Nav item has more instances. That was an argument from instance count, not evidence, and reading the code overturned it: settings.css:93-97 ships .on with background accent-tint, color accent and font-weight 600. The editor renders FILL. The bar matches nothing that ships — the dashboard's own nav uses a third treatment again, a 2px bottom underline (top-nav.tsx:60).",12,"Regular",SOFT,1140),28,212);
+  put(b2,T("So active = accent tint + accent label + weight 600, and the Active bar rectangle retires with the old master. The weight bump is the part NEITHER master drew and the product does.",12,"Medium",INK,1140),28,262);
+  put(b2,T("PROPOSED AXES",10,"Medium",MUTED),28,300);
+  put(b2,T("Size[compact 140x30 | default 240x32]  ×  State[rest | hover | active]",13,"Medium",ACCENT),28,320);
+  put(b2,T("Compact is the BASELINE and default derives from it. Deriving the other way overflows the 140px case — the founder's own constraint, and the right one: the tightest box is the one that can fail.",12,"Regular",SOFT,1140),28,346);
   /* draw the six proposed variants */
   const dims=[[140,30],[240,32]];
   const states=["rest","hover","active"];
@@ -415,8 +416,9 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
       const cell=F("nav/"+(w===140?"compact":"default")+"/"+st, w, h, st==="hover"?"#F3F4F6":(st==="active"?"#EBF1FE":PANEL));
       cell.cornerRadius=3; cell.strokes=solid(LINE); cell.strokeWeight=1;
       put(b2,cell,vx,vy);
-      if(st==="active"){ const barN=F("Active bar",3,h-8,ACCENT); barN.cornerRadius=2; put(cell,barN,0,4); }
-      put(cell,T("General",12,st==="active"?"Medium":"Regular",st==="active"?ACCENT:INK),st==="active"?12:10,Math.round(h/2)-8);
+      /* active is FILL: the cell above is already tinted. No bar node — that is
+         the decision. Weight goes to Semi Bold because settings.css:96 does. */
+      put(cell,T("General",12,st==="active"?"Semi Bold":"Regular",st==="active"?ACCENT:INK),10,Math.round(h/2)-8);
       put(b2,T((w===140?"compact":"default")+" · "+st,9,"Regular",MUTED,w),vx,vy+h+6);
       vx+=w+16;
     }
