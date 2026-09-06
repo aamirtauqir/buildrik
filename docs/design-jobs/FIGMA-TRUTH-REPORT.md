@@ -297,9 +297,31 @@ name — and I destroyed those, including their colours, across boards this arc
 does not own. 117 were repaired to the convention; the exact prior pixels are
 gone. Recorded rather than quietly patched.
 
-### Still open
+### Client sign-off — closed, and it convicted the harness
 
-- **Client sign-off: 0 of 10 boards opened.**
+The one section no pass had opened is now **10 of 10 boards opened and 10 of 10
+screenshotted**. It found something worth more than its own defects:
+
+`boards.json` records **seven of those ten as `verified: "match"`** — 13% of every
+match in a 439-row harness — and **all ten carry `recipe: null`**, meaning
+`diff.mjs` has never run against any of them. The clean-pass rate is 0 of 10.
+Every one of the seven has a nameable defect, including an A0 identify board that
+draws **no form at all**: a form-shaped void between the paragraph and the
+button.
+
+No edit was made — `boards.json` is code. But it is the shape this repo has paid
+for twice: a gate reporting a number nobody keyed, and a `verified` field
+outranking the thing it claims to verify.
+
+It also inverted a premise everyone had accepted. For three of the ten boards the
+**echo direction is backwards** — the 1280×720 "canonicals" on page `1:6`
+borrowed the echo's height *and* its superseded shell, so they are the
+derivatives while the names still call them the source. All seven genuine pairs
+have drifted, and on `F · expired` the drift runs the other way: the echo's body
+matches `DEAD_LINK_COPY.EXPIRED` verbatim and the canonical's does not. "The
+canonical wins" is not a rule that can be applied here.
+
+### Still open
 - **183 of 253 changed boards never looked at.** Two lots are queued and paused.
 - **Publish's declared gap is untouched** — 20 boards read text-only, with no
   claim made about fill, type, spacing or auto-layout.
