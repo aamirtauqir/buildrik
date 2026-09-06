@@ -70,9 +70,31 @@ rows.sort((a,b)=>b.n-a.n);
 out.push("--- TOP BY INSTANCE COUNT ---");
 for(const r of rows.slice(0,30)) out.push(r.n+"\\t"+r.id+"\\t"+r.name.slice(0,52)+"\\t"+r.pages.slice(0,60));
 
-const zero=rows.filter(r=>r.n===0);
-out.push("--- ZERO-USE ("+zero.length+") — adopt, retire, or explain; do NOT assume neglect ---");
+/* An instance resolves to a VARIANT, never to the COMPONENT_SET that holds it,
+   so every set reads as zero-use. And nobody places a hover/disabled/loading
+   variant on a board — those are states, not orphans. Counting either as an
+   adoption candidate is the exact "adoption count is not a health metric"
+   error this file's header warns about, and the first run committed it: 204
+   "zero-use" masters, almost all of them sets and state variants.
+   So roll every variant's count up to its parent set, and judge SETS and
+   standalone components — never a variant on its own. */
+const setTotal={};
+for(const r of rows){
+  let parentId=null;
+  try{ const n=await figma.getNodeByIdAsync(r.id);
+       if(n&&n.parent&&n.parent.type==="COMPONENT_SET") parentId=n.parent.id; }catch(e){}
+  r.setKey=parentId||r.id;
+  setTotal[r.setKey]=(setTotal[r.setKey]||0)+r.n;
+}
+const judged=rows.filter(r=>r.type==="COMPONENT_SET"||r.setKey===r.id);
+for(const r of judged) r.total=setTotal[r.id]||0;
+judged.sort((a,b)=>b.total-a.total);
+const zero=judged.filter(r=>r.total===0);
+out.push("--- UNITS JUDGED ("+judged.length+" sets + standalone; "+rows.length+" raw masters incl. variants) ---");
+out.push("--- TRULY ZERO-USE ("+zero.length+") — no variant of these is placed anywhere ---");
 for(const r of zero.slice(0,40)) out.push("0\\t"+r.id+"\\t"+r.name.slice(0,60)+"\\t"+r.page);
+out.push("--- TOP UNITS BY TOTAL (variants rolled up) ---");
+for(const r of judged.slice(0,20)) out.push(r.total+"\\t"+r.id+"\\t"+r.name.slice(0,50)+"\\t"+r.type);
 
 /* name collisions: two masters sharing a name is how a merge proposal nearly
    pushed five parts into 387 instances of the wrong component */
