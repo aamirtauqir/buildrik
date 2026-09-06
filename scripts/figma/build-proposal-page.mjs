@@ -191,15 +191,24 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   /* the 55 criticals, in full */
   const bc=board(s,"The 55 Criticals",40,940,1400,20+CRITS.length*46+40);
   put(bc,T("Every Critical, with its evidence",18,"Semi Bold",INK),24,20);
+  /* Fixed 46px rows and a column at x1230 of width 340 both assumed text
+     extents instead of measuring them: the evidence column ran 170px past the
+     1400 board and wrapped findings collided with the row below. Lay the
+     columns out from the board width, then advance by the tallest cell in the
+     row — the same rule this arc has applied to every other repair. */
+  const PAD=24, IDX=24, MODX=104, FINX=290, FINW=700, EVX=1010, EVW=366;
   y=60;
   for(const c of CRITS){
-    put(bc,T(c.id,11,"Medium",CRIT),24,y);
-    put(bc,T(c.m,11,"Regular",MUTED),104,y);
-    put(bc,T(c.f,12,"Regular",INK,900),300,y);
-    put(bc,T(c.e,10,"Regular",MUTED,340),1230,y);
-    y+=46;
+    const nId=put(bc,T(c.id,11,"Medium",CRIT),IDX,y);
+    const nMod=put(bc,T(c.m,11,"Regular",MUTED,170),MODX,y);
+    const nFin=put(bc,T(c.f,12,"Regular",INK,FINW),FINX,y);
+    const nEv=put(bc,T(c.e,10,"Regular",MUTED,EVW),EVX,y);
+    const tallest=Math.max(nId.height,nMod.height,nFin.height,nEv.height);
+    y+=Math.round(tallest)+18;
   }
-  bc.resize(1400, y+24);
+  bc.resize(1400, y+PAD);
+  /* the widest cell must land inside the board by construction */
+  /* EVX+EVW = 1376, inside 1400-24. Checked at authoring time. */
   s.resizeWithoutConstraints(1500, y+1000);
   made.push(s.name);
 }
