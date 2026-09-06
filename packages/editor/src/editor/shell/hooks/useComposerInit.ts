@@ -62,7 +62,7 @@ export interface UseComposerInitParams {
   /** S1.5: surface a dashboard load failure as a persistent banner instead of
    *  a transient toast. `auth` = session expired, `network` = generic failure.
    *  When wired, it replaces the toast; when omitted, the toast is kept (back-compat). */
-  onLoadError?: (kind: "auth" | "network" | "missing") => void;
+  onLoadError?: (kind: "auth" | "network" | "missing" | "forbidden") => void;
   /** Board 813:4870: a mid-session 401 during AUTOSAVE opens the blocking
    *  recovery surface. Same back-compat shape as onLoadError. */
   onAuthExpired?: () => void;
@@ -291,6 +291,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                someone whose work could not be stored anywhere. */
             const isMissing =
               err instanceof Error && /not_found/i.test(err.message);
+            /* FORBIDDEN fell through to "network", so a role refusal on load
+               got "You're seeing local changes for now" and a Retry that can
+               never succeed. This file already imports the helper for the
+               autosave path (:34); the load path just never used it. */
+            const isForbidden =
+              err instanceof Error && isForbiddenSaveError(err.message);
             // S1.5: prefer a persistent banner over a transient toast when the
             // shell wired onLoadError; the toast stays as the back-compat path.
             if (isMissing) {
@@ -299,7 +305,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               instance.emit(EVENTS.PROJECT_UNAVAILABLE, { reason: "missing" });
             }
             if (onLoadErrorRef.current) {
-              onLoadErrorRef.current(isAuth ? "auth" : isMissing ? "missing" : "network");
+              onLoadErrorRef.current(isAuth ? "auth" : isMissing ? "missing" : isForbidden ? "forbidden" : "network");
             } else if (isAuth) {
               addToastRef.current({
                 title: "Session expired",

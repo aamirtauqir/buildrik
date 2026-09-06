@@ -43,6 +43,7 @@ import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { useEditorRole } from "./hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import { CommandPalette } from "./modals/CommandPalette";
 import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
 import { totalPendingMirrors } from "@/services/syncRetryQueue";
@@ -207,7 +208,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   addToast,
 }) => {
   const { users, currentUser, state: collaborationState, isConnected } = useCollaboration(composer);
-  const isViewer = useEditorRole() === "VIEWER";
+  const editorRole = useEditorRole();
+  const isViewer = editorRole === "VIEWER";
+  /* Unpublish is ADMIN on the server (sites.ts:425) and the row was shown to
+     every role, so a VIEWER or EDITOR could open it and collect a 403. The
+     `!== false` keeps the house rule: an unknown role still asks the server,
+     a known-insufficient one does not. Same shape as PublishHistory.tsx:104,
+     which already gates rollback this way two files over. */
+  const canUnpublish = roleAtLeast(editorRole, "ADMIN") !== false;
   const viewMode = getEditorViewMode();
   const publishEnabled = isFeatureEnabled("publish");
   // Recovery Phase 0: collaboration is DEMO-ONLY (last-write-wins, 6 known P1s)
@@ -796,7 +804,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenPublish={viewMode.readOnlyView ? undefined : onOpenPublish}
             onOpenPublishHistory={viewMode.readOnlyView ? undefined : onOpenPublishHistory}
             onUnpublish={
-              viewMode.readOnlyView || !publishedUrl
+              viewMode.readOnlyView || !publishedUrl || !canUnpublish
                 ? undefined
                 : () => {
                     onOpenPublish?.();

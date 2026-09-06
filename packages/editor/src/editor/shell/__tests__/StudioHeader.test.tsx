@@ -661,6 +661,34 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("menuitem", { name: "Copy live URL" })).toBeTruthy();
     });
 
+    /* SH-A-11: Unpublish is ADMIN on the server (sites.ts:425) and the row was
+       offered to every role, so a VIEWER or EDITOR could open it and collect a
+       403. PublishHistory.tsx:104 already gated rollback this way. The null
+       case is the house rule — an unknown role still asks the server. */
+    it("offers Unpublish to an ADMIN, withholds it from lesser roles", () => {
+      const live = { publishedUrl: "https://x.vercel.app" };
+
+      roleState.role = "ADMIN";
+      render(<StudioHeader {...makeProps(live)} />);
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      expect(screen.getByRole("menuitem", { name: /Unpublish/ })).toBeTruthy();
+      cleanup();
+
+      for (const role of ["EDITOR", "VIEWER"]) {
+        roleState.role = role;
+        render(<StudioHeader {...makeProps(live)} />);
+        fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+        expect(screen.queryByRole("menuitem", { name: /Unpublish/ })).toBeNull();
+        cleanup();
+      }
+
+      // Unknown role: let the server decide rather than hiding a real control.
+      roleState.role = null;
+      render(<StudioHeader {...makeProps(live)} />);
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      expect(screen.getByRole("menuitem", { name: /Unpublish/ })).toBeTruthy();
+    });
+
     it("fires a handler and closes", () => {
       const onOpenHistory = vi.fn();
       render(<StudioHeader {...makeProps({ onOpenHistory })} />);

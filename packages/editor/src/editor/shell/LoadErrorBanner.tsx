@@ -30,7 +30,7 @@
 
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
-export type LoadErrorKind = "auth" | "network" | "missing" | null;
+export type LoadErrorKind = "auth" | "network" | "missing" | "forbidden" | null;
 
 export interface LoadErrorBannerProps {
   kind: LoadErrorKind;
@@ -64,7 +64,19 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
 
   const isAuth = kind === "auth";
   const isMissing = kind === "missing";
-  const label = isAuth ? "Session expired" : isMissing ? "Site not found" : "Load failed";
+  /* A role refusal is not a blip and not a session problem. Retry can never
+     succeed and Sign in changes nothing — the same distinction useSaveCallback
+     already draws for the save path (:237-246, "Different truths, different
+     surfaces"). It shares `missing`'s shape: no Retry, dashboard instead. */
+  const isForbidden = kind === "forbidden";
+  const noRetry = isMissing || isForbidden;
+  const label = isAuth
+    ? "Session expired"
+    : isMissing
+      ? "Site not found"
+      : isForbidden
+        ? "You don't have access to this site"
+        : "Load failed";
   return (
     <div className={BAR} role="alert" aria-label={label}>
       <div className="tw:flex-1">
@@ -72,12 +84,14 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
           ? "Session expired. Sign in to load this site from the dashboard — you're seeing local changes for now."
           : isMissing
             ? "This site isn't there anymore. It was deleted, or it isn't yours to open. Deleting is permanent — there is no trash to restore from — so nothing you do here can be saved."
-            : "Couldn't load the latest version of this site. You're seeing local changes for now."}
+            : isForbidden
+              ? "Your role changed, or the site isn't yours to open. Ask the owner — signing in again won't change it, and nothing you do here can be saved."
+              : "Couldn't load the latest version of this site. You're seeing local changes for now."}
       </div>
       <div className="tw:flex tw:items-center tw:gap-2">
         {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className={QUIET}>Dismiss</Button>}
         {isAuth && <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>Sign in</Button>}
-        {isMissing ? (
+        {noRetry ? (
           <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>Go to dashboard</Button>
         ) : (
           <Button

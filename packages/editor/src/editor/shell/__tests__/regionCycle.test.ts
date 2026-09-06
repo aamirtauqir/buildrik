@@ -79,3 +79,52 @@ describe("cycleRegion", () => {
     expect(document.activeElement).toBe(region);
   });
 });
+
+/* SH-C-16 / SH-C-18: F6 walked regions the user cannot see.
+   `offsetParent === null` is true only for display:none, position:fixed and
+   detached nodes. Fullpage mode hides the drawer, canvas and inspector with
+   `visibility:hidden; position:absolute; width:0; height:0`
+   (LayoutShell.css:310-320), so all three stayed in the cycle — and
+   `.layout-shell__fullpage`, a real role="region", was not in the list at all,
+   so the one region actually on screen was unreachable. */
+describe("regionCycle — hidden regions drop out", () => {
+  function shell(html: string) {
+    document.body.innerHTML = html;
+    // jsdom: offsetParent is null for everything — patch it, as buildShell does.
+    for (const el of document.body.querySelectorAll<HTMLElement>("*")) {
+      Object.defineProperty(el, "offsetParent", { get: () => document.body, configurable: true });
+    }
+    return document.body;
+  }
+
+  it("skips a region hidden the way fullpage mode hides it", () => {
+    const root = shell(`
+      <header role="banner">a</header>
+      <div id="layout-canvas" style="visibility:hidden;position:absolute;width:0;height:0">b</div>
+      <footer role="contentinfo">c</footer>
+    `);
+    const names = visibleRegions(root).map((e) => e.tagName.toLowerCase());
+    expect(names).toEqual(["header", "footer"]);
+  });
+
+  it("skips a region hidden the way the closed inspector hides it", () => {
+    const root = shell(`
+      <header role="banner">a</header>
+      <div class="bdi-panel" style="opacity:0;width:0">b</div>
+      <footer role="contentinfo">c</footer>
+    `);
+    expect(visibleRegions(root).some((e) => e.classList.contains("bdi-panel"))).toBe(false);
+  });
+
+  it("includes the fullpage view, which replaces canvas and inspector", () => {
+    const root = shell(`
+      <header role="banner">a</header>
+      <div id="layout-canvas" style="visibility:hidden;position:absolute;width:0;height:0">b</div>
+      <div class="layout-shell__fullpage" role="region" aria-label="Full-page view">c</div>
+      <footer role="contentinfo">d</footer>
+    `);
+    const cls = visibleRegions(root).map((e) => e.className || e.tagName.toLowerCase());
+    expect(cls).toContain("layout-shell__fullpage");
+    expect(cls.some((c) => c === "layout-canvas")).toBe(false);
+  });
+});
