@@ -356,8 +356,6 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   made.push(s.name);
 }
 
-const pend=[
-            [11,"Phase 4","The assembled editor. Last, by the same ordering."]];
 /* ============ 8 · COMPONENT LIBRARY ============ */
 {
   const s=mkSection(SECTIONS[7], 1300, 1100);
@@ -588,19 +586,6 @@ const pend=[
   made.push(s.name);
 }
 
-for(const [i,phase,note] of pend){
-  const s=mkSection(SECTIONS[i], 800, 420);
-  const b=board(s,"Not yet built",40,40,700,300);
-  put(b,T(SECTIONS[i],20,"Semi Bold",INK),24,24);
-  /* the chip has to be sized to its LABEL, not to a guessed 96px — the first
-     build drew a 96px chip under a ~130px string and the sweep flagged it */
-  const chipT=T(phase+" — pending",11,"Medium",WARN);
-  const chip=F("chip",Math.round(chipT.width)+20,24,"#FDFDEA"); chip.cornerRadius=3; put(b,chip,24,64);
-  put(b,chipT,34,70);
-  put(b,T(note,13,"Regular",SOFT,650),24,110);
-  put(b,T("Deliberately left empty rather than filled with placeholder design. A board that looks finished and is not costs more than an empty one that says so.",12,"Regular",MUTED,650),24,210);
-  made.push(s.name);
-}
 
 /* ============ 10 · MAJOR USER FLOWS ============ */
 {
