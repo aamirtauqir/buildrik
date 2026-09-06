@@ -74,6 +74,7 @@ import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { ExportSection } from "./sections/ExportSection";
 import { STARTER_DS_REGISTRY } from "../starters";
 import { CATALOG } from "../../components-catalog/catalog";
@@ -834,7 +835,15 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           {activeSection === "components" && (
             <ComponentsSection
               composer={composer}
-              onOpenAIAssist={() => setAiOpen(true)}
+              /* Gated on the SAME flag that decides whether an AIClient is
+                 built at all (useComposerInit.ts:132), the way the sidebar's
+                 publish action is gated on the flag behind the Topbar's
+                 dropdown (TabRouter.tsx:195). The flag guarded the client and
+                 nothing guarded this entry, so the modal opened over a service
+                 with no client and Generate answered every user with
+                 AIAssistService's developer string. Absent callback → the
+                 section blocks the CTA and says why. */
+              onOpenAIAssist={isFeatureEnabled("dsAi") ? () => setAiOpen(true) : undefined}
             />
           )}
           {activeSection === "starters"   && <StartersSection projectId={projectId} />}

@@ -23,7 +23,7 @@ import type { Composer } from "../../../../engine/Composer";
 import { CATALOG } from "../../../components-catalog/catalog";
 import type { ComponentType } from "../../../components-catalog/types";
 import type { ComponentDefinition } from "../../../../shared/types/components";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 
 export interface ComponentsSectionProps {
   composer: Composer | null;
@@ -54,6 +54,12 @@ const CARD_NAME = "tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)]";
 const CARD_META = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)] tw:leading-[1.4]";
 const AI_ROW = "tw:flex tw:flex-none tw:h-11 tw:items-center tw:px-4 tw:gap-2 tw:border-t tw:border-[var(--bk-gray-100)] tw:bg-white";
 const AI_CTA = "tw:text-xs tw:font-medium tw:text-[var(--bk-accent-text)]";
+/* What a user is told when AI is not switched on, phrased the way the blocked
+   Publish button phrases its own flag ("Publishing isn't switched on for this
+   workspace yet" — lifecycle.ts:105). It replaces what the service used to say
+   through this button: "no AIClient configured (stub the service in tests;
+   wire a real provider in production)". */
+const AI_UNAVAILABLE = "AI generation isn't switched on for this workspace yet";
 const AI_DESC = "tw:px-3 tw:pb-3 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const SAVED_HEADER =
   "tw:px-3 tw:pt-2 tw:pb-1.5 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)] tw:uppercase tw:tracking-[0.04em]";
@@ -124,6 +130,22 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
 }) => {
   const savedComponents = React.useMemo(() => getSavedComponents(composer), [composer]);
 
+  /* One element for both states: the blocked CTA must be the same control the
+     board draws, differing only in whether it can be pressed. */
+  const aiCta = (
+    <Button
+      type="button"
+      color="light"
+      size="xs"
+      onClick={onOpenAIAssist ?? (() => {})}
+      aria-disabled={onOpenAIAssist ? undefined : "true"}
+      data-open-ai-assist
+      variant="link" className="tw:w-full tw:justify-start tw:gap-1.5 tw:font-normal"
+    >
+      ✨ Generate with AI
+    </Button>
+  );
+
   return (
     <div className={CONTAINER} data-components-catalog data-mode="summary">
       {/* Board 153:29 is a list and one CTA at its foot. The catalogue's own
@@ -161,19 +183,23 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
 
       {/* Board 153:29 pins ONE call to action at the foot of the list —
           "✨ Generate with AI" — where the code had a label, a bordered button
-          and a paragraph stacked in three rows. */}
+          and a paragraph stacked in three rows.
+
+          No `onOpenAIAssist` means the `dsAi` flag is off, so no AIClient was
+          ever built (useComposerInit.ts:132) and pressing this reached
+          AIAssistService's "no AIClient configured" throw — a sentence written
+          for a developer, shown to a customer. Blocked, never hidden, and
+          `aria-disabled` rather than `disabled` so the control stays focusable
+          and the reason is reachable by keyboard (Topbar.tsx:295 does this for
+          the blocked Publish button). */}
       <div className={AI_ROW} data-ai-assist-cta>
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          onClick={onOpenAIAssist}
-          disabled={!onOpenAIAssist}
-          data-open-ai-assist
-          variant="link" className="tw:w-full tw:justify-start tw:gap-1.5 tw:font-normal"
-        >
-          ✨ Generate with AI
-        </Button>
+        {onOpenAIAssist ? (
+          aiCta
+        ) : (
+          <Tooltip content={AI_UNAVAILABLE} placement="top" arrow={false}>
+            {aiCta}
+          </Tooltip>
+        )}
       </div>
 
       <div className={SAVED_HEADER} data-saved-header>

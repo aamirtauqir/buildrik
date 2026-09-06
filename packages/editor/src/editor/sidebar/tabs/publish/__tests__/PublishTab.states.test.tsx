@@ -44,7 +44,7 @@ function composerWith(entries: Array<{ id: string; label: string; timestamp: num
 }
 
 const job = (over: Partial<NonNullable<PublishTabProps["publishJob"]>> = {}) =>
-  ({ uiState: "idle", progress: 0, publishedUrl: null, error: null, blockedReason: null, ...over }) as NonNullable<
+  ({ uiState: "idle", jobId: null, progress: 0, publishedUrl: null, error: null, blockedReason: null, ...over }) as NonNullable<
     PublishTabProps["publishJob"]
   >;
 
@@ -127,6 +127,10 @@ describe("PublishTab — board 784:4250, publishing", () => {
 });
 
 describe("PublishTab — board 784:4326, just published", () => {
+  /* The job id is the scenario, not decoration: this board is the moment after
+     a publish THIS session finished. Without it the case was indistinguishable
+     from opening an already-live site, which is how that load came to render
+     this board. */
   it("states the result, offers the live site, and greys the CTA", async () => {
     fetchPublishHistory.mockResolvedValue([
       { id: "j1", version: 15, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
@@ -136,7 +140,7 @@ describe("PublishTab — board 784:4326, just published", () => {
         composer={composerWith()}
         projectId="site_1"
         onVercelPublish={vi.fn()}
-        publishJob={job({ uiState: "published", publishedUrl: "https://bellacucina.com" })}
+        publishJob={job({ uiState: "published", jobId: "job-1", publishedUrl: "https://bellacucina.com" })}
       />,
     );
 
@@ -148,6 +152,40 @@ describe("PublishTab — board 784:4326, just published", () => {
     expect(
       (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
     ).toBe(true);
+  });
+});
+
+describe("PublishTab — a fresh load is not a fresh publish", () => {
+  /* `justPublished` read two facts that are BOTH true the moment the editor
+     opens an already-live site, and neither of which means a publish happened:
+     `uiState` is "published" for any site with a hydrated URL and no job in
+     flight (usePublishJob), and the undo stack is empty because HistoryManager
+     clears it on every project load. The panel therefore hid both "what would
+     go out" sections and greyed the CTA on first paint — the site could not be
+     published at all — while the topbar, reading the save clock, offered
+     "Publish changes" beside it. Same defect and same fix as the rollback job
+     in TabRouter: a job id is what says something actually ran. */
+  it("a previously-published site with no job in flight can still publish", async () => {
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 15, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    renderTab(
+      <PublishTab
+        /* HistoryManager empties the undo stack on load, by design. */
+        composer={composerWith()}
+        projectId="site_1"
+        onVercelPublish={vi.fn()}
+        publishJob={job({ uiState: "published", jobId: null, publishedUrl: "https://bellacucina.com" })}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByText("Since last deploy")).toBeTruthy());
+    // Nothing was published in this session, so the result board must not show.
+    expect(screen.queryByText("Published to production.")).toBeNull();
+    expect(screen.getByText("Last deploy")).toBeTruthy();
+    expect(
+      (screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled,
+    ).toBe(false);
   });
 });
 

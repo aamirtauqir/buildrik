@@ -12,8 +12,10 @@ import type {
 } from "../../../../../engine/media/MediaManager";
 import type { MediaSortBy, SortDirection, UploadProgress } from "../../../../../shared/types/media";
 import type { MediaAsset } from "../../../../../shared/types/media";
+import type { StockFailureReason } from "../../../../../services/stock/StockService";
 
 export type { MediaSortBy, SortDirection, UploadProgress, MediaAsset };
+export type { StockFailureReason };
 export type { StockPhoto, StockVideo, DiscIcon, DiscFont };
 
 // --- Nav ---
@@ -217,9 +219,11 @@ export interface DiscoveryStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
-  /** The last search THREW. Separate from "no results" — the modal used to
-      render both as "No photos found for …" (blocker A-STOCK). */
-  searchFailed: boolean;
+  /** WHY the last search failed, or null when it did not. A reason and an
+      empty result are different facts — the modal used to render both as
+      "No photos found for …" (blocker A-STOCK). Truthy on any failure, so
+      callers that only care whether it broke can still just test it. */
+  searchFailed: StockFailureReason | null;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
@@ -303,9 +307,11 @@ export interface MediaStateResult {
   discFonts: DiscFont[];
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
-  /** The last search THREW. Separate from "no results" — the modal used to
-      render both as "No photos found for …" (blocker A-STOCK). */
-  searchFailed: boolean;
+  /** WHY the last search failed, or null when it did not. A reason and an
+      empty result are different facts — the modal used to render both as
+      "No photos found for …" (blocker A-STOCK). Truthy on any failure, so
+      callers that only care whether it broke can still just test it. */
+  searchFailed: StockFailureReason | null;
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
@@ -420,9 +426,10 @@ export interface DiscoveryViewProps {
   fonts: DiscFont[];
   loading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   searchQuery: string;
-  /** The last search THREW. Without it this surface renders a failed request
-      as "No photos found for …" — see blocker A-STOCK. */
-  searchFailed?: boolean;
+  /** WHY the last search failed, or null/absent when it did not. Without it
+      this surface renders a failed request as "No photos found for …" — see
+      blocker A-STOCK. */
+  searchFailed?: StockFailureReason | null;
   orientation: DiscOrientation;
   color: DiscColor;
   /** S19: current source provider (Unsplash / Pexels / Pixabay). */

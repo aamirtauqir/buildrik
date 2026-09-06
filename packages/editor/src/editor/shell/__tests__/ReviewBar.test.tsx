@@ -183,6 +183,31 @@ describe("ReviewBar — Re-send", () => {
     await waitFor(() => expect(fetchCurrentRound).toHaveBeenCalledTimes(2));
   });
 
+  /* `submitReview` mints a review token only when it is given an email, so a
+     re-send that passes nothing produces a round with `token: null` that the
+     client can never open — while the button says it re-sent. The panel
+     already carries the round's `invitedEmail` forward; the bar is wired to
+     the same handler and must do the same. */
+  it("carries the round's invited email forward, so the client gets a link", async () => {
+    const onResend = vi.fn().mockResolvedValue(undefined);
+    fetchCurrentRound.mockResolvedValue(round());
+    fetchReviewComments.mockResolvedValue([comment()]);
+    mount(makeComposer(), { onResend });
+
+    fireEvent.click(await screen.findByRole("button", { name: "Re-send" }));
+    await waitFor(() => expect(onResend).toHaveBeenCalledWith("client@example.test"));
+  });
+
+  it("passes undefined for an internal round, which stays internal", async () => {
+    const onResend = vi.fn().mockResolvedValue(undefined);
+    fetchCurrentRound.mockResolvedValue(round({ invitedEmail: null }));
+    fetchReviewComments.mockResolvedValue([comment()]);
+    mount(makeComposer(), { onResend });
+
+    fireEvent.click(await screen.findByRole("button", { name: "Re-send" }));
+    await waitFor(() => expect(onResend).toHaveBeenCalledWith(undefined));
+  });
+
   it("shows no Re-send when the shell supplies none", async () => {
     fetchCurrentRound.mockResolvedValue(round());
     fetchReviewComments.mockResolvedValue([comment()]);

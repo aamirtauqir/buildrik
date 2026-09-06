@@ -218,8 +218,20 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      panel's CTA opens the gate rather than firing the deploy. */
   const [wizardOpen, setWizardOpen] = React.useState(false);
   /* Board 784:4326 is the just-published panel: the result leads and the
-     "what would go out" sections are empty by definition. */
-  const justPublished = publishJob?.uiState === "published" && snapshot.changeCount === 0;
+     "what would go out" sections are empty by definition.
+
+     Gated on there BEING a job — the same gate TabRouter puts on the rollback
+     job it hands the History panel, for the same reason. `uiState` alone is
+     "published" for any site with a hydrated URL and nothing in flight, and
+     `changeCount` is 0 on every load because HistoryManager empties the undo
+     stack when a project opens. Both halves were therefore true the moment the
+     editor opened an already-live site: the panel hid both "what would go out"
+     sections and greyed the CTA, so a published site could not be published
+     again, while the topbar — reading the save clock rather than the undo
+     stack — offered "Publish changes" beside it. A job id is what says a
+     publish actually ran in this session, which is what this name claims. */
+  const justPublished =
+    publishJob?.jobId != null && publishJob.uiState === "published" && snapshot.changeCount === 0;
   /* Board 784:4403. "View log" is drawn beside Try again; this editor has no
      log destination — the job reports a message, not a build log — so the row
      carries the retry only rather than a link to nowhere. */

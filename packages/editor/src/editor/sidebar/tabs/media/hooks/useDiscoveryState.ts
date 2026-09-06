@@ -6,7 +6,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
-import { stockService } from "../../../../../services/stock/StockService";
+import {
+  stockService,
+  StockSearchError,
+  type StockFailureReason,
+} from "../../../../../services/stock/StockService";
 import type {
   DiscFont,
   DiscIcon,
@@ -27,8 +31,10 @@ import type {
  * discarded mid-fetch (prototype §25 critical contract #4) + source provider
  * state (Unsplash / Pexels / Pixabay).
  *
- * Future: when dashboard.media.searchStock tRPC ships with quota+rate-limit,
- * swap stockService → tRPC client. Until then, stockService stub returns [].
+ * 2026-09-07: stockService throws a StockSearchError naming WHY a search
+ * failed instead of returning []. The catch below already existed and could
+ * never run — every failure arrived as an empty array, so the modal reported
+ * the user's query as fruitless whatever had actually gone wrong.
  */
 
 function isAbortError(err: unknown): boolean {
@@ -36,6 +42,17 @@ function isAbortError(err: unknown): boolean {
     err instanceof DOMException && err.name === "AbortError"
   );
 }
+
+function reasonOf(err: unknown): StockFailureReason {
+  return err instanceof StockSearchError ? err.reason : "request-failed";
+}
+
+/** One line each, because these are three different things to go and do. */
+const FAILURE_TOAST: Record<StockFailureReason, string> = {
+  "not-configured": "Stock search isn't set up on this site",
+  unauthorized: "The stock provider rejected our API key",
+  "request-failed": "Couldn't reach the stock library",
+};
 
 export function useDiscoveryState(
   composer: Composer,
@@ -46,9 +63,10 @@ export function useDiscoveryState(
   const [discIcons, setDiscIcons] = useState<DiscIcon[]>([]);
   const [discFonts, setDiscFonts] = useState<DiscFont[]>([]);
   const [discoverySearch, setDiscoverySearch] = useState("");
-  /** True when the last stock search threw. Distinguishes "the request failed"
-      from "there are genuinely no results" — the modal rendered both the same. */
-  const [searchFailed, setSearchFailed] = useState(false);
+  /** WHY the last stock search failed, or null. Distinguishes "not configured"
+      from "key refused" from "request failed" from "genuinely no results" —
+      the modal rendered all four the same. */
+  const [searchFailed, setSearchFailed] = useState<StockFailureReason | null>(null);
   const [discOrientation, setDiscOrientation_] = useState<DiscOrientation>("all");
   const [discColor, setDiscColor_] = useState<DiscColor>("all");
   const [discSource, setDiscSource_] = useState<DiscSource>("unsplash");
@@ -89,12 +107,12 @@ export function useDiscoveryState(
       if (!query.trim()) {
         setStockPhotos([]);
         setStockVideos([]);
-        setSearchFailed(false);
+        setSearchFailed(null);
         setPageState({ img: 1, vid: 1 });
         return;
       }
 
-      setSearchFailed(false);
+      setSearchFailed(null);
       setPageState({ img: 1, vid: 1 });
       setDiscLoading((prev) => ({ ...prev, img: true, vid: true }));
       // P5: stockService expects "landscape"|"portrait"|"squarish"|undefined.
@@ -113,13 +131,12 @@ export function useDiscoveryState(
         setStockVideos(videos as StockVideo[]);
       } catch (err) {
         if (isAbortError(err) || controller.signal.aborted) return;
-        /* The toast was the ONLY signal. `setStockPhotos` is never reached on
-           failure, so the modal fell through to its empty-result branch and
-           told the user "No photos found for …" — a failed request and a
-           genuinely empty result rendered identically, minus a toast that
-           auto-dismisses (blocker A-STOCK). */
-        setSearchFailed(true);
-        showToast("Discovery search failed", "error");
+        /* The toast used to be the ONLY signal, and it auto-dismissed. The
+           modal reads `searchFailed` for the persistent message, so the reason
+           has to outlive the toast (blocker A-STOCK). */
+        const reason = reasonOf(err);
+        setSearchFailed(reason);
+        showToast(FAILURE_TOAST[reason], "error");
       } finally {
         if (!controller.signal.aborted) {
           setDiscLoading((prev) => ({ ...prev, img: false, vid: false }));
@@ -193,7 +210,9 @@ export function useDiscoveryState(
         setPageState((prev) => ({ ...prev, [type]: nextPage }));
       } catch (err) {
         if (isAbortError(err) || controller.signal.aborted) return;
-        showToast("Could not load more results", "error");
+        // Page 2+ keeps the results already on screen, so this reports through
+        // the toast only — replacing the grid with an error would discard them.
+        showToast(FAILURE_TOAST[reasonOf(err)], "error");
       } finally {
         if (!controller.signal.aborted) {
           setDiscLoading((prev) => ({ ...prev, [type]: false }));

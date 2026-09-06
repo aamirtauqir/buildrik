@@ -43,6 +43,29 @@ describe("ComponentsSection (Arc D2) — read-only summary", () => {
     expect(container.querySelector("[data-open-ai-assist]")).toBeTruthy();
   });
 
+  /* The CTA used to render live with no AI behind it: `disabled` keyed off a
+     callback the parent always passed, so pressing it reached AIAssistService
+     with a null client and threw "no AIClient configured (stub the service in
+     tests; wire a real provider in production)" at a customer. Blocked, not
+     hidden, and aria-disabled so the reason stays reachable — the house rule
+     the blocked Publish button and the CommandPalette rows already follow. */
+  it("blocks the AI action with a plain-English reason when AI is not wired", () => {
+    const { container } = render(<ComponentsSection composer={null} />);
+    const btn = container.querySelector("[data-open-ai-assist]") as HTMLButtonElement;
+    expect(btn.getAttribute("aria-disabled")).toBe("true");
+    const row = container.querySelector("[data-ai-assist-cta]")!;
+    expect(row.textContent).toMatch(/isn't switched on/i);
+    expect(row.textContent).not.toMatch(/AIClient|stub the service|provider in production/);
+  });
+
+  it("does not block the AI action when AI is wired", () => {
+    const { container } = render(
+      <ComponentsSection composer={null} onOpenAIAssist={() => {}} />
+    );
+    const btn = container.querySelector("[data-open-ai-assist]") as HTMLButtonElement;
+    expect(btn.hasAttribute("aria-disabled")).toBe(false);
+  });
+
   it("Open AI-assist click invokes onOpenAIAssist callback", () => {
     const onOpen = vi.fn();
     const { container } = render(

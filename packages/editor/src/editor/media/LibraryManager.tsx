@@ -474,6 +474,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         fonts={state.discFonts}
         loading={state.discLoading}
         searchQuery={state.discoverySearch}
+        searchFailed={state.searchFailed}
         orientation={state.discOrientation}
         color={state.discColor}
         onSearch={state.discSearchAll}

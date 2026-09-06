@@ -14,6 +14,7 @@ import type {
   DiscColor,
   DiscSource,
   MediaTypeFilter,
+  StockFailureReason,
 } from "../data/mediaTypes";
 import type { IconConfig } from "../../../../../shared/types/media";
 
@@ -53,6 +54,29 @@ const SOURCES: ReadonlyArray<{ id: DiscSource; label: string }> = [
   { id: "pexels", label: "Pexels" },
   { id: "pixabay", label: "Pixabay" },
 ];
+
+/**
+ * Each failure gets its own sentence because each has a different next step,
+ * and none of them is "try a different search term" — which is the only thing
+ * the old shared "No photos found for …" copy could ever suggest.
+ *
+ * `retryable` gates the Try again button: re-running the query cannot conjure
+ * an API key, so offering it on a configuration fault just wastes the click.
+ */
+const FAILURE_COPY: Record<StockFailureReason, { message: string; retryable: boolean }> = {
+  "not-configured": {
+    message: "Stock search isn't configured for this site yet. Ask an admin to add a stock provider key.",
+    retryable: false,
+  },
+  unauthorized: {
+    message: "The stock provider rejected our API key. It may have expired — an admin will need to renew it.",
+    retryable: false,
+  },
+  "request-failed": {
+    message: "Couldn't reach the stock library.",
+    retryable: true,
+  },
+};
 
 export function StockSourceModal({
   open,
@@ -348,20 +372,25 @@ export function StockSourceModal({
             </div>
           )}
 
-          {/* A failed request is not an empty result. Until `searchFailed`
-              existed both rendered "No photos found for …" and the only
-              difference was a toast that auto-dismissed (blocker A-STOCK). */}
+          {/* A failed request is not an empty result, and the three failures
+              are not each other. Until the service carried a reason, all four
+              rendered "No photos found for …" (blocker A-STOCK). */}
           {!isLoading && searchFailed && searchQuery.length > 0 && (
             <div className="stock-empty" role="alert">
-              Couldn&rsquo;t reach the stock library.{" "}
-              <Button
-                color="light"
-                size="xs"
-                className="tw:h-auto tw:min-h-0 tw:p-0 tw:font-normal tw:text-[var(--bk-accent-text)]"
-                onClick={() => onSearch(searchQuery, orientation, color)}
-              >
-                Try again
-              </Button>
+              {FAILURE_COPY[searchFailed].message}
+              {FAILURE_COPY[searchFailed].retryable && (
+                <>
+                  {" "}
+                  <Button
+                    color="light"
+                    size="xs"
+                    className="tw:h-auto tw:min-h-0 tw:p-0 tw:font-normal tw:text-[var(--bk-accent-text)]"
+                    onClick={() => onSearch(searchQuery, orientation, color)}
+                  >
+                    Try again
+                  </Button>
+                </>
+              )}
             </div>
           )}
           {/* Empty state */}

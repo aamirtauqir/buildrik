@@ -18,6 +18,14 @@ import { DSModeProvider } from "../../state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { AIAssistService } from "../../../../engine/designSystem/services/AIAssistService";
 import { EventEmitter } from "../../../../engine/EventEmitter";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
+
+/* The entry is gated on the same `dsAi` flag that decides whether an AIClient
+   is built at all (useComposerInit.ts:132). Default the mock ON so the three
+   entry tests below exercise the wired path; the flag-off test flips it. */
+vi.mock("@/shared/utils/featureFlags", () => ({
+  isFeatureEnabled: vi.fn(() => true),
+}));
 
 type Listener = (payload: unknown) => void;
 
@@ -65,6 +73,7 @@ const wrap = (ui: React.ReactNode) => (
 );
 
 beforeEach(() => {
+  vi.mocked(isFeatureEnabled).mockReturnValue(true);
   localStorage.clear();
   if (!(document as Document & { fonts?: unknown }).fonts) {
     Object.defineProperty(document, "fonts", {
@@ -135,5 +144,24 @@ describe("DesignSystemTab AI assist entry (C1)", () => {
     // textarea existence is the proxy for the modal being live).
     expect(getByLabelText("Component description")).toBeTruthy();
     expect(getByText("Generate")).toBeTruthy();
+  });
+
+  /* `dsAi` is set in no env file, so this is what EVERY user got: the flag
+     gated the CLIENT (useComposerInit.ts:132) and nothing gated the BUTTON, so
+     the modal opened over a service with no client and Generate answered with
+     AIAssistService's developer string. The entry now agrees with the flag. */
+  test("flag off: the entry is blocked and cannot open the modal", () => {
+    vi.mocked(isFeatureEnabled).mockReturnValue(false);
+    const composer = makeFakeComposer();
+    const { container, queryByText } = render(
+      wrap(<DesignSystemTab composer={composer as never} />),
+    );
+    const btn = openComponents(container);
+
+    expect(btn.getAttribute("aria-disabled")).toBe("true");
+    act(() => {
+      fireEvent.click(btn);
+    });
+    expect(queryByText("Generate component with AI")).toBeNull();
   });
 });

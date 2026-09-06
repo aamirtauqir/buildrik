@@ -106,3 +106,62 @@ describe("StockSourceModal — S19 additions", () => {
     expect(true).toBe(true);
   });
 });
+
+/**
+ * The empty state is the product's only voice here. Before 2026-09-07 a
+ * deployment with no UNSPLASH_ACCESS_KEY told every user "No photos found for
+ * 'x'" — a sentence about their query, describing our configuration. These
+ * pin the three failures apart from each other and from a real empty result.
+ */
+describe("StockSourceModal — a failure never poses as an empty result", () => {
+  it("says nothing matched when the search genuinely returned nothing", () => {
+    const { getByText, queryByRole } = render(
+      <StockSourceModal {...makeProps({ searchQuery: "asdfgh", searchFailed: null })} />
+    );
+    expect(getByText(/No photos found for/i)).toBeTruthy();
+    expect(queryByRole("alert")).toBeNull();
+  });
+
+  it("names the missing configuration instead of blaming the query", () => {
+    const { getByRole, queryByText } = render(
+      <StockSourceModal {...makeProps({ searchQuery: "cats", searchFailed: "not-configured" })} />
+    );
+    expect(getByRole("alert").textContent).toMatch(/not set up|isn't configured|not configured/i);
+    expect(queryByText(/No photos found for/i)).toBeNull();
+  });
+
+  it("distinguishes a rejected key from an unconfigured one", () => {
+    const { getByRole } = render(
+      <StockSourceModal {...makeProps({ searchQuery: "cats", searchFailed: "unauthorized" })} />
+    );
+    expect(getByRole("alert").textContent).toMatch(/key/i);
+  });
+
+  it("offers Try again only for a failure retrying can fix", () => {
+    const onSearch = vi.fn();
+    const retryable = render(
+      <StockSourceModal {...makeProps({ searchQuery: "cats", searchFailed: "request-failed", onSearch })} />
+    );
+    fireEvent.click(retryable.getByText("Try again"));
+    expect(onSearch).toHaveBeenCalledWith("cats", "all", "all");
+    retryable.unmount();
+
+    // Retrying cannot conjure an API key — offering the button would be a lie.
+    const unconfigured = render(
+      <StockSourceModal {...makeProps({ searchQuery: "cats", searchFailed: "not-configured" })} />
+    );
+    expect(unconfigured.queryByText("Try again")).toBeNull();
+  });
+
+  it("the three failure messages are all different from one another", () => {
+    const texts = (["not-configured", "unauthorized", "request-failed"] as const).map((reason) => {
+      const { getByRole, unmount } = render(
+        <StockSourceModal {...makeProps({ searchQuery: "cats", searchFailed: reason })} />
+      );
+      const text = getByRole("alert").textContent ?? "";
+      unmount();
+      return text;
+    });
+    expect(new Set(texts).size).toBe(3);
+  });
+});

@@ -50,12 +50,50 @@ export interface StockService {
 /**
  * #24 (2026-06-24): the provider is wired via the dashboard tRPC
  * `media.searchStockPhotos` / `searchStockVideos` proxy (keys stay server-side).
- * The server returns `[]` when its provider keys (UNSPLASH_ACCESS_KEY /
- * PEXELS_API_KEY) are unset — the "no results" empty state handles that.
- * (An `IS_STOCK_CONFIGURED` flag + not-configured banner existed here but was
- * hardcoded `true` and unreachable; removed 2026-07-25. A real configured-ness
- * signal needs a server capability endpoint.)
+ *
+ * This module used to answer EVERY failure with `[]`, which meant an
+ * unconfigured deployment, an expired key and a dropped network all reached the
+ * user as "No photos found for '<their query>'". The `searchFailed` state in
+ * useDiscoveryState and its branch in StockSourceModal were written for exactly
+ * this and were unreachable, because nothing ever threw. Failures now throw a
+ * StockSearchError carrying the reason. (An `IS_STOCK_CONFIGURED` flag existed
+ * here too, hardcoded `true`; removed 2026-07-25 — the configured-ness signal
+ * it wanted is now the "not-configured" reason below.)
  */
+
+/** Why a search failed. `null` on the state side means it did not. */
+export type StockFailureReason = "not-configured" | "unauthorized" | "request-failed";
+
+export class StockSearchError extends Error {
+  constructor(
+    public reason: StockFailureReason,
+    message: string,
+  ) {
+    super(message);
+    this.name = "StockSearchError";
+  }
+}
+
+/**
+ * Recover the server's reason from the transport error.
+ *
+ * Only the tRPC code crosses the wire, and only codes with a unique JSON-RPC
+ * number survive it: PRECONDITION_FAILED is -32012 and FORBIDDEN is -32003, so
+ * the router picks those two deliberately. BAD_GATEWAY shares -32603 with
+ * INTERNAL_SERVER_ERROR and arrives under that name — which is why
+ * "request-failed" is the fallback rather than a code match. It is also what a
+ * bare network error becomes, since that carries no tRPC code at all.
+ */
+function toStockSearchError(err: unknown): StockSearchError {
+  const code = (err as { data?: { code?: string } } | null | undefined)?.data?.code;
+  if (code === "PRECONDITION_FAILED") {
+    return new StockSearchError("not-configured", "Stock search is not configured on the server.");
+  }
+  if (code === "FORBIDDEN") {
+    return new StockSearchError("unauthorized", "The stock provider rejected the server's API key.");
+  }
+  return new StockSearchError("request-failed", "The stock search request could not be completed.");
+}
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -64,8 +102,8 @@ function client() {
 /**
  * Live stock search via the server proxy. Honors `extras.signal` (passed to the
  * tRPC query so an aborted request rejects with AbortError, preserving the
- * stale-response-discard contract). Any non-abort error falls back to `[]` so a
- * provider/network hiccup degrades to the empty state, never a thrown UI.
+ * stale-response-discard contract). An abort still wins over a failure — a
+ * superseded search must stay silent, not report itself as broken.
  */
 export const stockService: StockService = {
   async searchPhotos(query, page, orientation, color, extras) {
@@ -77,9 +115,9 @@ export const stockService: StockService = {
         { signal: extras?.signal }
       );
       return res as StockPhoto[];
-    } catch {
+    } catch (err) {
       if (extras?.signal?.aborted) throw makeAbortError();
-      return [];
+      throw toStockSearchError(err);
     }
   },
   async searchVideos(query, page, _orientation, extras) {
@@ -91,9 +129,9 @@ export const stockService: StockService = {
         { signal: extras?.signal }
       );
       return res as StockVideo[];
-    } catch {
+    } catch (err) {
       if (extras?.signal?.aborted) throw makeAbortError();
-      return [];
+      throw toStockSearchError(err);
     }
   },
 };

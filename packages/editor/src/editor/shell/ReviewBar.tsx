@@ -105,7 +105,11 @@ export const ReviewBar: React.FC<ReviewBarProps> = ({ composer, onCompare, onRes
     if (!onResend || resending) return;
     setResending(true);
     try {
-      await onResend();
+      // Carry the round's client forward, the same way the Review panel does.
+      // `submitReview` only mints a token when it is given an email, so a
+      // re-send without this produced a round with `token: null` that the
+      // client could never open — while the button said it re-sent.
+      await onResend(round?.invitedEmail ?? undefined);
       load();
     } finally {
       setResending(false);
