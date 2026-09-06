@@ -16,6 +16,22 @@ command against a clear window.
 `scratchpad_audit/mod/run-when-clear.sh` runs the first and third with a 60s
 backoff and no hammering. It exits as soon as the window answers.
 
+## 1a. Queued behind the quota right now
+
+Each is a background runner with 30 x 80s backoff. If they expire before the
+window opens, re-run the command — all are idempotent.
+
+| what | command |
+|---|---|
+| A0 form, seeded + applied twice to PROVE idempotency | `node scratchpad_audit/mod/seed-cta.mjs --apply` then `node scripts/figma/fix-signoff-boards.mjs --apply` twice |
+| TEXT profile LINK row + park the stray Revoke button | `node scripts/figma/fix-text-profile-link-row.mjs --apply` |
+| Is the TEXT-profile colour swatch variable-bound? | `node scratchpad_audit/mod/check-swatch.mjs` |
+| Full sweep with all seven detectors | `node scripts/figma/render-defects.mjs --min=8` |
+
+The seventh detector (CONTAINER) has **never been run** — it was written after
+the last clear window. Its first run is the highest-value thing left, because it
+generalises three defects that were each found by eye.
+
 ## 1b. Where the visual passes actually stopped
 
 Both lots stopped on **hard seat-quota exhaustion**, not on choice. Lot A got two
