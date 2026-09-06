@@ -28,6 +28,58 @@ dashboard is a product decision.
 auto-layout parents, so a 2px leading increase may grow those rows and the
 1440×60 bar with them. Verify the bar height after, not before.
 
+**Correction, 2026-09-06 — the premise is wrong in the code, and the narrow
+question is close to forced.** Re-derived from source rather than from this
+file's own earlier note:
+
+- **The shipping nav renders neither value.** `top-nav.tsx:56,73` draws its links
+  at `text-[13.5px] font-[530]` — 13.5px, weight 530, **no leading class at
+  all** — from the `--color-*` namespace, not `--bk-*`. The question "14/18 or
+  14/20?" is being asked about a component that ships as neither.
+- **The dashboard already has a complete type system of its own**
+  (`globals.css:191-217`): display 28/1.2/700, page-title 20/1.2/700,
+  section-title 15/1.3/650, eyebrow 11/1.2/600, metric 22/1/700, body 14/1.45,
+  body-sm 12/1.35, plus a separate ten-token `--text-auth-*` scale. Its leadings
+  are **unitless ratios**; the editor's are **fixed px**. Two structurally
+  different systems, not one system with a drifted value. It is also actively
+  maintained by the founder — the comments carry a dated density pass
+  (2026-08-28, *"text kabhi bara hai"*) and an explicit rule that these tokens
+  exist to kill arbitrary `text-[Npx]` literals. Which makes the nav's own 13.5px
+  a defect against the DASHBOARD's scale, not against the editor's.
+- **The two systems already agree on the number in dispute.** 14 × 1.45 = **20.3**.
+  The dashboard's body token is effectively 14/20.3 against the editor's 14/20 —
+  they differ on notation, not on size.
+- **In Figma, 14/20 already outnumbers 14/18.** Page `988:2`'s top combos are
+  Inter Medium **14/20 (437)**, Inter Medium 14/18 (280), Inter Semi Bold 14/20
+  (279) — see D-M-02. The page is not "at 14/18"; three near-identical 14px
+  treatments coexist and the ramp-matching one is the largest.
+- **Where Figma and code were both checked, they match exactly.** `979:661` is
+  Inter Extra Bold 15; `top-nav.tsx:44` is `text-[15px] font-extrabold`. The nav
+  master is accurate about the product — it is the 14/18 on the links that has no
+  code counterpart.
+- **`--bk-leading-18` has zero consumers** anywhere in the editor. It is generated
+  *from Figma*, so the 14/18 is what created it: a token brought into existence by
+  a design decision no code has ever used.
+
+So 14/20 wins on three independent counts and is arguably a **correction**.
+
+**What is genuinely a decision is the larger question underneath: is the dashboard
+one design system with the editor, or two?** For two: its own namespace, unitless
+leadings, weights to 800 the editor forbids, a separate auth scale, founder
+density calls applied to it alone. For one: the accent is already unified to
+`#1A56DB`, the neutrals are the same Flowbite grays, and the body text already
+agrees to within a third of a pixel.
+
+That answer changes what §3 even means. If the dashboard is its own system,
+DESIGN.md's weight cap needs scoping to the editor explicitly and the 575
+weight-700/800 nodes (D-M-09, 562 of them chrome) stop being violations. If it is
+one system, those 575 are the real work — not the 280 at 14/18.
+
+**Not re-verified:** the "339 nodes" figure and the attribution of 14/18 to the
+nav LINKS specifically both come from the earlier Figma census; the quota was
+spent and neither could be re-queried. Everything else above was read from source
+on 2026-09-06.
+
 ---
 
 ## 2. 12/16 or 12/18?
