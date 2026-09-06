@@ -13,7 +13,14 @@
  *   node scripts/figma/apply-text-fixes.mjs <plan.json>            # dry run
  *   node scripts/figma/apply-text-fixes.mjs <plan.json> --apply
  *
- * plan.json: [{ "id":"172:3", "text":"...", "expect":"optional prefix", "why":"FIG-G-01" }]
+ * plan.json: [{ "id":"172:3", "text":"...", "expect":"optional prefix",
+ *                "width": 248, "why":"FIG-G-01" }]
+ *
+ * `width` is for the case that bit once: a node whose textAutoResize is
+ * WIDTH_AND_HEIGHT does not wrap, so a longer string makes it WIDER. One row
+ * would have run a 50px label out to ~460px across a 280px board, over the
+ * buttons beside it. Passing a width switches the node to HEIGHT autoresize and
+ * sets it, so the new string wraps instead of escaping.
  */
 import fs from "node:fs";
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
@@ -40,9 +47,9 @@ for (let i = 0; i < plan.length; i += CHUNK) {
   const code = [
     'const pg=figma.root.children.find(p=>p.id==="'+PAGE+'");',
     'await figma.setCurrentPageAsync(pg);',
-    'const rows=' + JSON.stringify(rows.map((r) => [r.id, r.text, r.expect ?? null])) + ';',
+    'const rows=' + JSON.stringify(rows.map((r) => [r.id, r.text, r.expect ?? null, r.width ?? 0])) + ';',
     'const out=[];',
-    'for(const [id,want,expect] of rows){',
+    'for(const [id,want,expect,width] of rows){',
     '  const n=await figma.getNodeByIdAsync(id);',
     '  if(!n){ out.push("MISSING\\t"+id); continue; }',
     '  if(n.type!=="TEXT"){ out.push("NOTTEXT\\t"+id+"\\t"+n.type); continue; }',
@@ -50,6 +57,7 @@ for (let i = 0; i < plan.length; i += CHUNK) {
     '  if(had===want){ out.push("SAME\\t"+id); continue; }',
     '  if(expect && had.indexOf(expect)!==0){ out.push("REFUSED\\t"+id+"\\thas: "+had.slice(0,90)); continue; }',
     APPLY ? '  await figma.loadFontAsync(n.fontName);' : '',
+    APPLY ? '  if(width){ n.textAutoResize="HEIGHT"; n.resize(width, n.height); }' : '',
     APPLY ? '  n.characters=want;' : '',
     APPLY ? '  const again=await figma.getNodeByIdAsync(id);' : '  const again={characters:had};',
     APPLY ? '  out.push((again.characters===want?"OK\\t":"MISMATCH\\t")+id+"\\t"+had.slice(0,70));'
