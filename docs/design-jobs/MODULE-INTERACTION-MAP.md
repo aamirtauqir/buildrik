@@ -44,6 +44,30 @@ fact stated so a designer can decide what to draw.
 >   writes it on save and `:569-572` imports both field and collection bindings
 >   on load. The chain's claim — "reload the editor and every binding is gone" —
 >   was true at HEAD and is false in the tree. Uncommitted, so it can still change.
+>
+> **Correction to that correction, same day.** "Stale" was over-general, and the
+> nuance is the founder's problem, not a bookkeeping one: the fix round-trips in
+> the STANDALONE editor and is inert for REAL SITES.
+>
+> - `useComposerInit.ts:523-526` picks the save path by `siteId`:
+>   `const snapshot = siteId ? composer.exportProject() : null;` then
+>   `snapshot ? saveProject(siteId!, snapshot) : composer.saveProject()`.
+>   No siteId (the port-5050 demo) takes `composer.saveProject()` — the
+>   localStorage path the new code serves, which works.
+> - With a siteId it goes through tRPC, and
+>   `packages/shared/schemas/sites.ts:192-214` declares
+>   `editorSaveProjectSchema.projectData` as a plain `z.object({...})` with **no
+>   `.passthrough()`**. Zod strips unknown keys, so `cmsBindings` is discarded at
+>   the transport boundary. The same file uses `.passthrough()` on three other
+>   schemas (`:91`, `:115`, `:132`), one commented "shaped with passthrough so
+>   unknown future keys still round-trip" — so the mechanism is known here and
+>   simply was not applied to this one.
+> - `BuildrikSyncProvider.ts:294` rebuilds `ProjectData` field by field on load
+>   and never sets `cmsBindings` either, so even a stored value would not return.
+>
+> Net: MOD-A-03 is FIXED for the demo and STILL TRUE for every real site. This is
+> the same shape as the `VITE_`/`NEXT_PUBLIC_` flag trap in CLAUDE.md — it works
+> in the place a developer tests and fails in the place customers live.
 
 
 
