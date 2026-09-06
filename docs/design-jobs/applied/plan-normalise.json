@@ -1,0 +1,122 @@
+[
+ {
+  "id": "164:42",
+  "name": "[not-implemented] Issues \u00b7 fixing \u2014 generic autofix in progress; no generic autofix producer exists (LintSection.tsx has no fix door; the only one is contrast at ColorTokenList.tsx:294-306)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "164:57",
+  "name": "[not-implemented] Issues \u00b7 fix-failed \u2014 generic autofix failure; no generic autofix producer exists (LintSection.tsx has no fix door; the only one is contrast at ColorTokenList.tsx:294-306)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "306:2111",
+  "name": "[not-implemented] Brand \u00b7 presets \u00b7 bound \u2014 elements carry no preset reference; TokenUsageTracker counts tokens (SectionStatusBadge.tsx:17-29)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "306:2136",
+  "name": "[not-implemented] Brand \u00b7 presets \u00b7 unbound \u2014 same cause as 306:2111",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "306:2161",
+  "name": "[not-implemented] Brand \u00b7 presets \u00b7 draft \u2014 updatePreset/addPreset/deletePreset have zero UI callers, so isDirty is permanently false (usePresetsForCategory.ts:67-88)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "950:4474",
+  "name": "[not-implemented] History \u00b7 Backups (tab) \u2014 no backup service, schedule or store exists anywhere; history/types.ts:22 says so in the code's own words",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "1156:4620",
+  "name": "[not-implemented] History \u00b7 Backups \u00b7 empty \u2014 no backup service, schedule or store exists anywhere (history/types.ts:22)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "879:4518",
+  "name": "[not-implemented] History \u00b7 Backups \u00b7 restore-confirm \u2014 no backup service, schedule or store exists anywhere (history/types.ts:22)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "879:4526",
+  "name": "[not-implemented] History \u00b7 Backups \u00b7 restoring \u2014 no backup service, schedule or store exists anywhere (history/types.ts:22)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "879:4531",
+  "name": "[not-implemented] History \u00b7 Backups \u00b7 restored \u2014 no backup service, schedule or store exists anywhere (history/types.ts:22)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "879:4536",
+  "name": "[not-implemented] History \u00b7 Backups \u00b7 creating \u2014 no backup service, schedule or store exists anywhere (history/types.ts:22)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "1156:4665",
+  "name": "[not-implemented] History \u00b7 Backups \u00b7 restore-failed \u2014 no backup service, schedule or store exists anywhere (history/types.ts:22)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "143:355",
+  "name": "[unreachable] Layers \u00b7 empty \u2014 buildLayersFromEngine always emits a root row, so layers.length===0 means no page/composer, never an empty page (useLayerTree.ts:97,63-72)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "912:4520",
+  "name": "[not-implemented] Publish \u00b7 Options",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "1175:4841",
+  "name": "[unreachable] Inspector \u00b7 empty \u00b7 template-applied \u2014 the appliedName branch exists but nothing writes buildrick-last-applied-template (InspectorEmptyState.tsx:44,27)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "1339:7221",
+  "name": "[unreachable] Client sign-off \u00b7 F \u00b7 dead-link \u00b7 conflict \u00b7 1280 \u2014 clientReview.get throws only INVALID_TOKEN/REVOKED/EXPIRED; CONFLICT comes from resolveReview, whose error is never rendered (client-review.service.ts:119-125, 278-280) \u2014 echo of 1:6 (canonical); kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "642:3696",
+  "name": "[not-implemented] Shell state 13 \u00b7 Presence (multiplayer) \u2014 collaboration is demo-only and NEXT_PUBLIC_FEATURE_COLLAB must never be on in production (last-write-wins, 6 known OT bugs)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "817:5289",
+  "name": "[not-implemented] S7.1 \u00b7 site-health-monitor \u00b7 with-incidents (filled half of a pair \u2014 1157:4649 is the empty half, NOT a duplicate)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "1157:4649",
+  "name": "[not-implemented] S7.1 \u00b7 site-health-monitor \u00b7 healthy (empty half of a pair \u2014 817:5289 is the filled half, NOT a duplicate)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "817:5195",
+  "name": "[not-implemented] S5.8 \u00b7 multiplayer-cursor-following \u2014 collaboration is demo-only and NEXT_PUBLIC_FEATURE_COLLAB must never be on in production (last-write-wins, 6 known OT bugs)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "817:5262",
+  "name": "[not-implemented] S6.5 \u00b7 scheduled-publish \u2014 no publish scheduling exists; a repo-wide search for scheduledAt/schedulePublish finds only account and workspace DELETION scheduling",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "878:4518",
+  "name": "[not-implemented] S6.5b \u00b7 scheduled-publish \u00b7 scheduled \u2014 no publish scheduling exists (searched scheduledAt/schedulePublish/scheduledFor across editor, server, prisma and lib)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "1156:4593",
+  "name": "[not-implemented] S6.5d \u00b7 scheduled-publish \u00b7 invalid-date \u2014 no publish scheduling exists (searched scheduledAt/schedulePublish/scheduledFor across editor, server, prisma and lib)",
+  "why": "marker normalisation (FIG-CO-05)"
+ },
+ {
+  "id": "878:4543",
+  "name": "[not-implemented] S6.5c \u00b7 scheduled-publish \u00b7 cancel-confirm \u2014 no publish scheduling exists (searched scheduledAt/schedulePublish/scheduledFor across editor, server, prisma and lib)",
+  "why": "marker normalisation (FIG-CO-05)"
+ }
+]

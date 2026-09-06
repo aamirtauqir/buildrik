@@ -1,0 +1,423 @@
+[
+ {
+  "id": "429:2416",
+  "text": "animation: bd-anim-fadeInUp 600ms ease-out 0ms 1 normal forwards;",
+  "expect": "animation: fadeInUp",
+  "why": "FIG-D-06"
+ },
+ {
+  "id": "429:2473",
+  "text": "animation: bd-anim-pulse 600ms ease-out 0ms 1 normal forwards;",
+  "expect": "animation: pulse",
+  "why": "FIG-D-06"
+ },
+ {
+  "id": "429:2523",
+  "text": "animation: bd-anim-zoomOut 600ms ease-out 0ms 1 normal forwards;",
+  "expect": "animation: zoomOut",
+  "why": "FIG-D-06"
+ },
+ {
+  "id": "429:2524",
+  "text": "The generated-CSS row is the string ElementOperations writes to the element (generateAnimationCSS, animations.ts:113-119). The shipped panel prints a SECOND, shorter copy directly above it \u2014 AnimationEditor.tsx:205-209 drops the bd-anim- prefix, the direction and the fill mode \u2014 and that one is never written anywhere. A code defect the board must not mirror.",
+  "expect": "ttt",
+  "why": "FIG-D-06 (caption was the placeholder \"ttt\")"
+ },
+ {
+  "id": "153:70",
+  "text": "3 weights in use",
+  "expect": "3 weights",
+  "why": "FIG-D-12"
+ },
+ {
+  "id": "153:76",
+  "text": "4 weights in use",
+  "expect": "4 weights",
+  "why": "FIG-D-12"
+ },
+ {
+  "id": "153:82",
+  "text": "2 weights in use",
+  "expect": "2 weights",
+  "why": "FIG-D-12"
+ },
+ {
+  "id": "1176:4945",
+  "text": "+ accent badge, 16px round, on any level",
+  "expect": "\u2295 green badge",
+  "why": "FIG-D-17"
+ },
+ {
+  "id": "1169:4715",
+  "text": "Everything on Home will be replaced by the template (48 elements). The template brings its own colours and type \u2014 your brand tokens are not applied to it.",
+  "expect": "Everything on Home will be replaced by the template.",
+  "why": "FIG-D-23"
+ },
+ {
+  "id": "146:65",
+  "text": "Restore this version? It is used in 3 places \u2014 those will update too.",
+  "expect": "Restore?",
+  "why": "FIG-E-03",
+  "width": 248
+ },
+ {
+  "id": "145:197",
+  "text": "Upload failed \u2014 file is 24 MB, your plan\u2019s limit is 10 MB",
+  "expect": "Upload failed \u2014 file is 24 MB, limit is",
+  "why": "FIG-E-10"
+ },
+ {
+  "id": "144:48",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "145:48",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "145:95",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "145:142",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "145:194",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "145:245",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "145:296",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "145:405",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "453:3959",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "777:4124",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "782:4384",
+  "text": "\u2601  Browse stock",
+  "expect": "\u2601  Stock",
+  "why": "FIG-E-16"
+ },
+ {
+  "id": "1334:7201",
+  "text": "Component styles",
+  "expect": "Components",
+  "why": "FIG-F-02"
+ },
+ {
+  "id": "1691:7256",
+  "text": "Component styles",
+  "expect": "Components",
+  "why": "FIG-F-02"
+ },
+ {
+  "id": "154:16",
+  "text": "Token \"color-accent\" uses a purple/violet/indigo hue (\"#8b5cf6\").",
+  "expect": "Hard-coded",
+  "why": "FIG-F-13 (rule banned-hue, DSLinter.ts:112)"
+ },
+ {
+  "id": "154:17",
+  "text": "Banned hue \u2014 purple, violet or indigo \u00b7 color-accent",
+  "expect": "Section \u00b7 Hero",
+  "why": "FIG-F-13 (RULE_LABEL[banned-hue] \u00b7 tokenId)"
+ },
+ {
+  "id": "154:21",
+  "text": "Color token \"color-muted\" missing darkValue.",
+  "expect": "Font not in the brand",
+  "why": "FIG-F-13 (rule missing-dark, DSLinter.ts:148)"
+ },
+ {
+  "id": "154:22",
+  "text": "No dark variant \u00b7 color-muted",
+  "expect": "Arial on Footer note",
+  "why": "FIG-F-13 (RULE_LABEL[missing-dark] \u00b7 tokenId)"
+ },
+ {
+  "id": "154:25",
+  "text": "Auto-fix isn\u2019t available yet \u2014 the linter reports what is wrong, not what to replace it with. Edit the token in Tokens.",
+  "expect": "Auto-fix only appears",
+  "why": "FIG-F-14"
+ },
+ {
+  "id": "155:66",
+  "text": "One row per finding \u2014 severity dot, message, and the token it is about. No Fix action: no rule produces an auto-fix hint, so a Fix link here would claim what nothing can deliver.",
+  "expect": "Issues with one-click auto-fix",
+  "why": "FIG-F-14"
+ },
+ {
+  "id": "152:145",
+  "text": "Applying a starter replaces your colour, type and spacing tokens. Radius, shadow and the other foundations keep their current values. Per-token undo is cleared \u2014 the only way back is Discard, which drops every staged brand edit.",
+  "expect": "Applying a starter overwrites",
+  "why": "FIG-F-22 + FIG-F-24"
+ },
+ {
+  "id": "306:2191",
+  "text": "Applying a starter replaces your colour, type and spacing tokens. Radius, shadow and the other foundations keep their current values. Per-token undo is cleared \u2014 the only way back is Discard, which drops every staged brand edit.",
+  "expect": "Applying a starter overwrites",
+  "why": "FIG-F-22 + FIG-F-24"
+ },
+ {
+  "id": "152:150",
+  "text": "Buildrik Default",
+  "expect": "Warm",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "152:153",
+  "text": "Stripe Blue",
+  "expect": "Clean",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "152:157",
+  "text": "Notion Warm",
+  "expect": "Bold",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "152:160",
+  "text": "Apple Minimal",
+  "expect": "Editorial",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "152:164",
+  "text": "Linear Dark",
+  "expect": "Mono",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "152:167",
+  "text": "Vercel Mono",
+  "expect": "Soft",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "306:2196",
+  "text": "Buildrik Default",
+  "expect": "Warm",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "306:2199",
+  "text": "Stripe Blue",
+  "expect": "Clean",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "306:2203",
+  "text": "Notion Warm",
+  "expect": "Bold",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "306:2206",
+  "text": "Apple Minimal",
+  "expect": "Editorial",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "306:2210",
+  "text": "Linear Dark",
+  "expect": "Mono",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "306:2213",
+  "text": "Vercel Mono",
+  "expect": "Soft",
+  "why": "FIG-F-23"
+ },
+ {
+  "id": "1172:4851",
+  "text": "spacing/lg",
+  "expect": "radius/card",
+  "why": "FIG-F-25"
+ },
+ {
+  "id": "1172:4853",
+  "text": "24 \u2192 32",
+  "expect": "8 \u2192 12",
+  "why": "FIG-F-25"
+ },
+ {
+  "id": "1172:4841",
+  "text": "Review 3 staged changes",
+  "expect": "Review 4 staged changes",
+  "why": "FIG-F-26 (row count after the 'removed' row is deleted \u2014 see COMPILE-B.md)"
+ },
+ {
+  "id": "1172:4864",
+  "text": "Apply 3 changes",
+  "expect": "Apply 4 changes",
+  "why": "FIG-F-26 (row count after the 'removed' row is deleted \u2014 see COMPILE-B.md)"
+ },
+ {
+  "id": "306:2261",
+  "text": "Drop .json or .ts",
+  "expect": "Drop .css or .json",
+  "why": "FIG-F-35 (shipped copy is ImportCard.tsx:272 'Drop .json or .ts' \u2014 see COMPILE-B.md)"
+ },
+ {
+  "id": "306:2294",
+  "text": "Drop .json or .ts",
+  "expect": "Drop .css or .json",
+  "why": "FIG-F-35 (shipped copy is ImportCard.tsx:272 'Drop .json or .ts' \u2014 see COMPILE-B.md)"
+ },
+ {
+  "id": "306:2327",
+  "text": "Drop .json or .ts",
+  "expect": "Drop .css or .json",
+  "why": "FIG-F-35 (shipped copy is ImportCard.tsx:272 'Drop .json or .ts' \u2014 see COMPILE-B.md)"
+ },
+ {
+  "id": "788:4314",
+  "text": "Component list fetching \u2014 four skeleton rows with a 24px avatar under the one section header. The primary button stays live because it does not depend on the list.",
+  "expect": "Component list fetching.",
+  "why": "FIG-F-46"
+ },
+ {
+  "id": "788:4309",
+  "text": "NOT IMPLEMENTED \u2014 the Brand panel reads its tokens synchronously from project settings, so there is no fetch to show. Kept as design intent if brand ever moves behind a request.",
+  "expect": "Brand system fetching.",
+  "why": "FIG-F-28"
+ },
+ {
+  "id": "155:69",
+  "text": "Beginner is a display density, not a plan \u2014 it is a per-user localStorage flag, and no row is ever gated by billing. What it hides: token IDs and CSS vars, the delete action on a token, and empty foundation kinds (folded behind \u201cMore token kinds\u201d). Pro shows them.",
+  "expect": "Beginner DS-mode hides depth",
+  "why": "FIG-F-01"
+ },
+ {
+  "id": "155:63",
+  "text": "Active fonts only (56h rows, family name set in its own face). The add-a-font and .woff2 upload blocks below are NOT IMPLEMENTED \u2014 there is no font storage and no publish-time @font-face, so a drop zone here would accept a file it cannot keep. Shipped today: a .woff2 in the Media library is draggable onto selected text and sets font-family to the file URL, with no @font-face and no visible change \u2014 any upload flow drawn here must replace that path, not sit beside it.",
+  "expect": "Three stacked blocks in ONE drill-in",
+  "why": "FIG-F-05 + FIG-D-20"
+ },
+ {
+  "id": "155:58",
+  "text": "Value \u00b7 used-in \u00b7 replace-on-delete. Editing here repaints every consumer immediately, which is why used-in sits next to the value. Rename is inert for type and spacing tokens, and there is no auto-fix \u2014 no linter rule produces a fix hint.",
+  "expect": "Value \u00b7 used-in \u00b7 safe rename",
+  "why": "FIG-F-70"
+ },
+ {
+  "id": "155:60",
+  "text": "6-card gallery, a drill-in rather than the old modal. Applying warns first because it replaces colour, type and spacing tokens \u2014 the other eleven kinds keep their values.",
+  "expect": "6-card gallery, a drill-in rather than the old modal.",
+  "why": "FIG-F-22"
+ },
+ {
+  "id": "641:2564",
+  "text": "6 on this site",
+  "expect": "6 instances",
+  "why": "FIG-F-69"
+ },
+ {
+  "id": "641:2569",
+  "text": "6 on this site",
+  "expect": "6 instances",
+  "why": "FIG-F-69"
+ },
+ {
+  "id": "641:2574",
+  "text": "18 on this site",
+  "expect": "18 instances",
+  "why": "FIG-F-69"
+ },
+ {
+  "id": "641:2579",
+  "text": "3 on this site",
+  "expect": "3 instances",
+  "why": "FIG-F-69"
+ },
+ {
+  "id": "155:33",
+  "text": "2 fractional columns, 16 gutter \u2014 the cell reflows with the panel (founder D2, 2026-09-01). Source badge bottom-left of the thumb, but only STOCK ever paints: \"ai\" has no writer and the field is browser-local, so an asset loaded from the server shows no badge. View and sort are drawn but disabled in the drawer until the folder work lands; both are live on the fullpage grid. The type-pill row measures 290 of 320 \u2014 this is the Gate A cargo.",
+  "expect": "2 cols, cell 136",
+  "why": "FIG-E-11 + FIG-E-09"
+ },
+ {
+  "id": "155:34",
+  "text": "Type pills are a multi-select filter, each carrying its own count. A pill at zero renders disabled with the reason; an active pill stays enabled at zero so it can be cleared. There is no audio pill \u2014 audio has no bucket in the drawer.",
+  "expect": "Type pills are a multi-select filter",
+  "why": "FIG-E-19"
+ },
+ {
+  "id": "155:35",
+  "text": "\ud83d\udcc1 All \u25be opens a flat list of the site\u2019s folders as a dropdown. Deliberately not a breadcrumb strip \u2014 the audit was right that a strip is a different object. Smart folders (Recent / In use / Unused) are fullpage-only \u2014 see 1159:4593\u2019s rail.",
+  "expect": "\ud83d\udcc1 All \u25be opens the folder tree",
+  "why": "FIG-E-08"
+ },
+ {
+  "id": "155:36",
+  "text": "One 44h progress row PER FILE, not one bar for the batch. Three accept-lists, three contracts \u2014 the fullpage and picker take audio, the 280 drawer refuses it in the browser, the server allow-list has no audio type at all, and an audio asset never gets the localOnly flag the device-only warnings read.",
+  "expect": "One 44h progress row PER FILE",
+  "why": "FIG-E-20"
+ },
+ {
+  "id": "155:37",
+  "text": "Names the file and the reason, and offers retry. A failure with no filename is unactionable when six are uploading. The limit is per plan (FREE 10 MB / PRO 50 MB); anything over 50 MB is refused before it reaches this row \u2014 see the pre-flight rejection state, W-A-42.",
+  "expect": "Names the file and the reason",
+  "why": "FIG-E-10"
+ },
+ {
+  "id": "155:40",
+  "text": "Right-click a card to enter selection; the checkbox appears on every thumb once the mode is on, and the bar replaces the footer.",
+  "expect": "Checkbox on thumb hover",
+  "why": "FIG-E-07"
+ },
+ {
+  "id": "155:42",
+  "text": "Preview \u00b7 dimensions \u00b7 alt text with \u2728 Generate \u00b7 then five rows. Alt text sits above the fold because it is the one field with a legal consequence. It rides onto the element on insert and on drop, and stays editable in Inspector \u2192 Element properties \u2192 Alt Text. The AI-provenance line is browser-local \u2014 it does not survive a load from the server. tags and metadata (caption, focal point, EXIF, AI tags) exist on the type and have no writer \u2014 do not draw them until something sets them.",
+  "expect": "Preview \u00b7 dimensions \u00b7 alt text",
+  "why": "FIG-E-21 + FIG-E-27 + FIG-E-31"
+ },
+ {
+  "id": "155:43",
+  "text": "56h rows: dot \u00b7 relative time \u00b7 size delta. No author \u2014 AssetVersion carries none. Current pinned at the top with a 3px accent bar. Restore confirms INLINE in a 32h row \u2014 a drill-in that spawns a modal has lost the plot.",
+  "expect": "56h rows: dot \u00b7 relative time \u00b7 author",
+  "why": "FIG-E-06"
+ },
+ {
+  "id": "155:45",
+  "text": "368 icons across 17 categories: category list \u2192 5-up grid at 40\u00d740 \u00b7 search \u00b7 recent 12.",
+  "expect": "370 icons across 17 categories",
+  "why": "FIG-E-15"
+ }
+]

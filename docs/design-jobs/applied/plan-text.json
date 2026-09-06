@@ -1,0 +1,92 @@
+[
+ {
+  "id": "172:3",
+  "text": "Session-only activity feed, derived from the undo stack: what changed and when, in this tab. The project load resets the stack, so it is empty after every reload \u2014 not persisted, not per user.",
+  "expect": "Flat activity feed",
+  "why": "FIG-G-01"
+ },
+ {
+  "id": "163:317",
+  "text": "Past 50. Named versions were kept.",
+  "expect": "Past 50.",
+  "why": "FIG-G-03"
+ },
+ {
+  "id": "172:8",
+  "text": "Cap 50. Auto-saves prune oldest-first; named versions never prune. Approval is not tracked per version, so it protects nothing \u2014 do not imply it does.",
+  "expect": "Cap 50.",
+  "why": "FIG-G-03"
+ },
+ {
+  "id": "172:5",
+  "text": "Ctrl+Shift+T turns the list into a scrubber over the undo stack, showing each entry's label. The canvas does NOT change while scrubbing \u2014 no version carries a visual snapshot. Only Restore writes.",
+  "expect": "Ctrl+Shift+T",
+  "why": "FIG-G-05"
+ },
+ {
+  "id": "163:215",
+  "text": "Your current work is saved as a version first. Pages, styles and brand settings are replaced \u2014 content records, media and saved components are not.",
+  "expect": "Your current work",
+  "why": "FIG-G-04"
+ },
+ {
+  "id": "172:6",
+  "text": "Restore always confirms and always saves the current state as a version first. It replaces pages, styles and brand settings; content records, media and saved components are untouched \u2014 so \u201cnothing is lost\u201d would be too strong.",
+  "expect": "Restore always confirms",
+  "why": "FIG-G-04"
+ },
+ {
+  "id": "172:9",
+  "text": "Two independent panes. Left is the approved snapshot, right is the site as it is now. Each pane is a sandboxed frame and they scroll separately \u2014 the labels carry the asymmetry, not colour.",
+  "expect": "Two panes",
+  "why": "FIG-G-20"
+ },
+ {
+  "id": "172:10",
+  "text": "One pane. The current page is blended over the approved one and a slider moves between them, so a change reads as a shift when you scrub. Nothing is tinted or outlined \u2014 the frames are sandboxed and cannot be marked up.",
+  "expect": "One pane",
+  "why": "FIG-G-21"
+ },
+ {
+  "id": "170:28",
+  "text": "Scoped runs edit only the selection \u2014 but page settings (title, description, slug) and a publish request are not element edits and can still come back. Clearing the selection widens the scope to the page.",
+  "expect": "Scoped runs",
+  "why": "FIG-K-01"
+ },
+ {
+  "id": "171:133",
+  "text": "AI is out of credit.",
+  "expect": "AI is out of credit",
+  "why": "FIG-K-02"
+ },
+ {
+  "id": "171:134",
+  "text": "Nothing was changed. Daily limit reached (10). Resets at midnight UTC.",
+  "expect": "Nothing was changed.",
+  "why": "FIG-K-02"
+ },
+ {
+  "id": "172:42",
+  "text": "Out of credit, and it says nothing was changed \u2014 the first question anyone asks when a run dies mid-way. The limit is DAILY (Free 10 / Pro 200), resetting at midnight UTC, not monthly.",
+  "expect": "Out of credit",
+  "why": "FIG-K-02"
+ },
+ {
+  "id": "170:16",
+  "text": "AI proposes a diff for anything you ask it to change \u2014 alt text for a new image is the one exception, written automatically. Each Apply lands as one undo step; a multi-step draft applies one step at a time.",
+  "expect": "AI proposes a diff",
+  "why": "FIG-K-05"
+ },
+ {
+  "id": "1706:8397",
+  "text": "No records published yet. Dynamic pages generate only from published records \u2014 and only once a template page is bound.",
+  "expect": "No records published yet",
+  "why": "FIG-A-05"
+ },
+ {
+  "id": "161:17",
+  "text": "\ud83d\udd17 chip in the header; bound fields go read-only with the collection and field named, plus an unbind action. A field that silently refuses typing is a bug report. Two things this state does not say: a binding to a DRAFT record publishes that draft's text, and publishing a record does not refresh the canvas.",
+  "expect": "\ud83d\udd17 chip in the header",
+  "why": "FIG-A-15"
+ }
+]

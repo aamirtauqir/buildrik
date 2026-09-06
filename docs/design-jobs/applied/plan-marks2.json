@@ -1,0 +1,67 @@
+[
+ {
+  "id": "1705:8704",
+  "name": "[not-implemented] Review \u00b7 reply-composer band \u2014 comments are flat (no parentId in the schema) and a reply is filed against the round's FIRST comment's page, not the one being answered (ReviewTab.tsx:242)",
+  "why": "FIG-D-28"
+ },
+ {
+  "id": "184:87",
+  "name": "[not-implemented] Orphan comments \u00b7 dismissed \u2014 there is no keep-as-resolved dialog; the orphan modal has one action, Open Review panel, and dismissal persists nothing (CommentLayer.tsx:550-560)",
+  "why": "FIG-N-07/FIG-D-29"
+ },
+ {
+  "id": "153:57",
+  "name": "Brand \u00b7 typography \u2014 [not-implemented] \"+ Add a font\", the .woff2 drop zone and the licence checkbox: no font storage and no publish-time @font-face. The ACTIVE FONTS list above them DOES ship",
+  "why": "FIG-F-04"
+ },
+ {
+  "id": "154:2",
+  "name": "Brand \u00b7 lint \u2014 [not-implemented] the Fix / Open row actions: no rule produces an autoFixHint, so the Fix branch is unreachable (LintSection.tsx:9-27)",
+  "why": "FIG-F-12"
+ },
+ {
+  "id": "152:112",
+  "name": "[not-implemented] Brand \u00b7 presets \u2014 read-only: updatePreset/addPreset/deletePreset have zero UI callers, so Draft and the dirty dot are unreachable",
+  "why": "FIG-F-17"
+ },
+ {
+  "id": "1172:4840",
+  "name": "Brand \u00b7 review-changes (modal) \u2014 [not-implemented] for 11 of 14 token kinds; only colour, type and spacing reach the review (ReviewModal.tsx:17-30)",
+  "why": "FIG-F-25"
+ },
+ {
+  "id": "775:4305",
+  "name": "[not-implemented] Brand \u00b7 loading \u2014 the panel loads synchronously from project settings (DesignSystemTab.tsx:376-411); there is no async fetch to show",
+  "why": "FIG-F-27"
+ },
+ {
+  "id": "1333:7162",
+  "name": "Brand \u00b7 root \u2014 NEW 2026-08-27 (CURRENT) \u2014 [not-implemented] the shared-theme strip: capture/push moves projectStyles CSS rules, not designTokens (theme.service.ts:79,184), so no brand syncs",
+  "why": "FIG-F-38"
+ },
+ {
+  "id": "433:2391",
+  "name": "B9.5 \u00b7 Migration progress modal \u2014 running \u00b7 failed \u2014 [not-implemented] as drawn: the runner is fed projectStyles as project.tokens (useComposerInit.ts:196), so no token migrates and success is reported over a corrupted styles array",
+  "why": "FIG-F-40"
+ },
+ {
+  "id": "1170:4792",
+  "name": "Components \u00b7 variant-picker \u00b7 detach-confirm \u2014 [not-implemented] the variant-picker half: component.variants is always empty and addVariant/updateVariant/removeVariant have no callers (ComponentManager.ts:320,331,347). The detach-confirm half ships",
+  "why": "FIG-F-50"
+ },
+ {
+  "id": "824:5095",
+  "name": "[not-implemented] Inspector \u00b7 flat scroll body \u2014 the tab bar, Quick Actions, Data Binding row and \"+ Add effect\" do not exist; the panel is one flat profile-ordered column (ProInspector.tsx:547 passes tabId=\"style\" as a literal)",
+  "why": "FIG-J-23"
+ },
+ {
+  "id": "1169:4713",
+  "name": "Templates \u00b7 replace-confirm (modal) \u2014 [not-implemented] the backup checkbox: the backup page falls inside the same 500ms history coalesce as the apply, so the first Cmd+Z destroys template and backup together (TemplatesTab.tsx:611-632)",
+  "why": "FIG-D-22"
+ },
+ {
+  "id": "1779:6",
+  "name": "22 \u00b7 Ecommerce \u00b7 5 \u2014 [not-implemented] beyond 4 HTML blocks and the Products CMS collection; no cart, order or checkout exists, and Cart Button exports inert",
+  "why": "FIG-M-28"
+ }
+]

@@ -1,0 +1,17 @@
+[
+ {
+  "id": "121:25",
+  "name": "[not-implemented] S5.5 \u00b7 load-error \u2014 a transport failure renders the not-found dead-link copy; there is no load-error screen and no retry (review-client.tsx:159-176)",
+  "why": "FIG-N-33"
+ },
+ {
+  "id": "125:2",
+  "name": "[not-implemented] S5.5 \u00b7 brand-colour \u2014 the client review page has no theming: every colour is a hardcoded hex and the payload carries no brand field (review-client.tsx; client-review.service.ts:141-173)",
+  "why": "FIG-N-39"
+ },
+ {
+  "id": "125:49",
+  "name": "[not-implemented] S5.5 \u00b7 brand-colour-fails-contrast \u2014 depends on brand-colour, which does not exist; the page's colours are hardcoded hex",
+  "why": "FIG-N-39"
+ }
+]

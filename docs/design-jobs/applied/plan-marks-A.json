@@ -1,0 +1,32 @@
+[
+ {
+  "id": "774:4044",
+  "why": "FIG-B-06",
+  "name": "Pages · loading"
+ },
+ {
+  "id": "1171:4749",
+  "why": "FIG-B-06",
+  "name": "hotspot/state · Pages · loading"
+ },
+ {
+  "id": "141:124",
+  "why": "FIG-B-07",
+  "name": "Pages · one-page"
+ },
+ {
+  "id": "155:22",
+  "why": "FIG-B-07",
+  "name": "caption/Pages · one-page"
+ },
+ {
+  "id": "784:4480",
+  "why": "FIG-C-01",
+  "name": "Publish · unavailable (feature off)"
+ },
+ {
+  "id": "817:4774",
+  "why": "FIG-C-28",
+  "name": "[not-implemented · superseded by 988:2 · Site · Access] Preview · share link — same hand-off; share links are owned by access-tab.tsx + share-link.service.ts. Expiry and password are REAL there (createShareLink, both plan-gated); the QR code and Invite-via-email drawn here are backed by nothing in either tree"
+ }
+]

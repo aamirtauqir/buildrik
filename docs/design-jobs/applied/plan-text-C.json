@@ -1,0 +1,422 @@
+[
+ {
+  "id": "172:3",
+  "text": "Session-only activity feed, derived from the undo stack: what changed and when, in this tab. The project load resets the stack, so it is empty after every reload — not persisted, not per user. The stack holds the last 100 steps; older ones drop with nothing said, so a named version is the only thing that survives a long session.",
+  "expect": "Session-only activity feed, derived from the undo stack",
+  "why": "FIG-G-02"
+ },
+ {
+  "id": "137:14",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "138:14",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "138:165",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "138:256",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "1069:4541",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "1069:4719",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "1069:4802",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "1069:4982",
+  "text": "53",
+  "expect": "48",
+  "why": "FIG-H-02 (ELEMENTS = flatCatalog.length)"
+ },
+ {
+  "id": "137:27",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "138:27",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "138:178",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "138:269",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "1069:4689",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "1069:4723",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 + FIG-H-01 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "1069:4806",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "1069:4986",
+  "text": "50",
+  "expect": "63",
+  "why": "FIG-H-02 (BLOCKS = 64 registry - 14 component)"
+ },
+ {
+  "id": "137:31",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "138:31",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "138:182",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "138:273",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "1069:4693",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "1069:4776",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "1069:4810",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "1069:4990",
+  "text": "14",
+  "expect": "27",
+  "why": "FIG-H-02 (COMPONENTS = componentBlockDefinitions.length)"
+ },
+ {
+  "id": "155:11",
+  "text": "Four groups by SOURCE. ELEMENTS opens on first render, the rest collapsed. No switcher, no recents, no favourites — the order is fixed.",
+  "expect": "Groups collapsed, five of them",
+  "why": "FIG-H-04"
+ },
+ {
+  "id": "155:12",
+  "text": "BLOCKS opens into an auto-fill grid (min 128px per card, so it earns extra columns in the expanded drawer); card = 136×80 thumb + 11px label. One flat list of 50 — no category sub-headers.",
+  "expect": "Thumbnail groups open into a 2-col grid",
+  "why": "FIG-H-05"
+ },
+ {
+  "id": "155:13",
+  "text": "Filters ELEMENTS, BLOCKS and COMPONENTS at once; results go flat with a group label per row. MINE is not searched.",
+  "expect": "Filters all five groups at once",
+  "why": "FIG-H-06"
+ },
+ {
+  "id": "137:44",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "138:44",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "138:95",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "138:148",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "138:195",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "1069:4788",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "1069:5014",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "1069:4705",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "1069:4903",
+  "text": "💡  Tip 2/4",
+  "expect": "💡  Tip 2/",
+  "why": "FIG-H-07 (TIPS array has four entries)"
+ },
+ {
+  "id": "I233:1108;232:8",
+  "text": "Heading",
+  "expect": "Container",
+  "why": "FIG-H-08 (flatCatalog row 1)"
+ },
+ {
+  "id": "I233:1132;232:8",
+  "text": "Heading",
+  "expect": "Container",
+  "why": "FIG-H-08 (flatCatalog row 1)"
+ },
+ {
+  "id": "I233:1162;232:8",
+  "text": "Heading",
+  "expect": "Container",
+  "why": "FIG-H-08 (flatCatalog row 1)"
+ },
+ {
+  "id": "I233:1202;232:8",
+  "text": "Heading",
+  "expect": "Container",
+  "why": "FIG-H-08 (flatCatalog row 1)"
+ },
+ {
+  "id": "I233:1118;232:8",
+  "text": "Link",
+  "expect": "Button",
+  "why": "FIG-H-08 (flatCatalog row 3)"
+ },
+ {
+  "id": "I233:1142;232:8",
+  "text": "Link",
+  "expect": "Button",
+  "why": "FIG-H-08 (flatCatalog row 3)"
+ },
+ {
+  "id": "I233:1172;232:8",
+  "text": "Link",
+  "expect": "Button",
+  "why": "FIG-H-08 (flatCatalog row 3)"
+ },
+ {
+  "id": "I233:1212;232:8",
+  "text": "Link",
+  "expect": "Button",
+  "why": "FIG-H-08 (flatCatalog row 3)"
+ },
+ {
+  "id": "1706:8418",
+  "text": "⌕  Search elements...",
+  "expect": "⌕  Search elements",
+  "why": "FIG-H-09 (BlockPickerModal.tsx:177) - placeholder half only; the 4->6 category rows are a redraw, see COMPILE-C.md"
+ },
+ {
+  "id": "155:16",
+  "text": "RETIRED 2026-09-02 — no producer. Disabled, never hidden: 45% opacity, no drag, and a tooltip naming what is missing. (The card board described a drop rejection here — that is invalid-drop, a different state.)",
+  "expect": "Disabled, never hidden: 45% opacity, no ",
+  "why": "FIG-H-17"
+ },
+ {
+  "id": "788:4299",
+  "text": "RETIRED 2026-09-02 — no producer. Library still fetching. Search and the tips footer stay live — only the catalogue is skeletoned, so the panel never collapses to nothing.",
+  "expect": "Library still fetching. Search and the t",
+  "why": "FIG-H-17"
+ },
+ {
+  "id": "788:4300",
+  "text": "RETIRED 2026-09-02 — no producer. Catalogue failed to load. Everything already on the canvas is still editable, so this is a retry and not a dead end.",
+  "expect": "Catalogue failed to load. Everything alr",
+  "why": "FIG-H-17"
+ },
+ {
+  "id": "155:17",
+  "text": "Dismissed once, never shown again, including on a new site. A tip that returns reads as a bug. CODE DEFECT — the ✕ is labelled “Hide tips for this session” and promises “bring them back from Help” (TipsFooter.tsx:125-126); the dismissal is permanent per-browser and no Help path restores it.",
+  "expect": "Dismissed once, never shown again",
+  "why": "FIG-H-19"
+ },
+ {
+  "id": "155:25",
+  "text": "28h dense rows. At depth 5 the name gets 86px: 280 − 92 indent − 12 chevron − 12 icon − 4×8 gaps − 40 for the two toggles − 6 right pad. The long row here is the stress case. A row shows a custom name, else the element’s own first 32 characters, else the type label.",
+  "expect": "28h dense rows. At depth 5 the name gets 120px",
+  "why": "FIG-I-05 + FIG-I-11 (both target 155:25 - merged, see COMPILE-C.md)"
+ },
+ {
+  "id": "155:26",
+  "text": "Only matching rows, rendered flat — no indent, no chevrons. Ancestors are dropped; the breadcrumb above the tree is how the path comes back.",
+  "expect": "Only matching nodes, ancestors kept",
+  "why": "FIG-I-06"
+ },
+ {
+  "id": "155:28",
+  "text": "The line is drawn over illegal targets too — the drop is what refuses, not the hover. The reason appears as an alert at the top of the panel and clears itself after 3s.",
+  "expect": "Refused with the reason, and no line",
+  "why": "FIG-I-07"
+ },
+ {
+  "id": "1082:4770",
+  "text": "◇",
+  "expect": "◆",
+  "why": "FIG-I-09 (no master badge exists) - glyph half only; clearing Nav item 1/2/3 and re-anchoring inline is in COMPILE-C.md"
+ },
+ {
+  "id": "1082:4763",
+  "text": "◇",
+  "expect": "◆",
+  "why": "FIG-I-09 (no master badge exists) - glyph half only; clearing Nav item 1/2/3 and re-anchoring inline is in COMPILE-C.md"
+ },
+ {
+  "id": "1082:4757",
+  "text": "◇",
+  "expect": "◆",
+  "why": "FIG-I-09 (no master badge exists) - glyph half only; clearing Nav item 1/2/3 and re-anchoring inline is in COMPILE-C.md"
+ },
+ {
+  "id": "I244:1598;243:12",
+  "text": "Build your site in minutes",
+  "expect": "Heading",
+  "why": "FIG-I-11 (text-ish rows preview their own copy)"
+ },
+ {
+  "id": "I244:1607;243:12",
+  "text": "Get started free",
+  "expect": "Button",
+  "why": "FIG-I-11 (text-ish rows preview their own copy)"
+ },
+ {
+  "id": "155:29",
+  "text": "Hidden is not deleted. 45% opacity, keeps its place in the tree. Dimming is not undoable — ⌘Z skips it — and it is stored in this browser only, so a collaborator does not see it.",
+  "expect": "Hidden is not deleted",
+  "why": "FIG-I-18"
+ },
+ {
+  "id": "788:4303",
+  "text": "Tree fetching. The toolbar stays for position, not for use — its controls talk to the panel that has not mounted. The count is a skeleton, not a number: a count of a list that has not loaded is not a fact.",
+  "expect": "Tree fetching. Toolbar and the layer count stay put",
+  "why": "FIG-I-22"
+ },
+ {
+  "id": "807:8411",
+  "text": "2 of 11 sections apply",
+  "expect": "2 of 12 sections apply",
+  "why": "FIG-J-06 - PAIRED: apply only together with the LINK-row deletion (807:8399), see COMPILE-C.md"
+ },
+ {
+  "id": "807:8566",
+  "text": "2 of 11 sections apply",
+  "expect": "2 of 12 sections apply",
+  "why": "FIG-J-07 - PAIRED: apply only together with the hidden LINK-row deletion (807:8554), see COMPILE-C.md"
+ },
+ {
+  "id": "160:217",
+  "text": "Tablet ▾",
+  "expect": "Desktop ▾",
+  "why": "FIG-J-08 - text half; the 5px override dot is in COMPILE-C.md"
+ },
+ {
+  "id": "160:324",
+  "text": ":hover ▾",
+  "expect": "Base ▾",
+  "why": "FIG-J-09 - text half; the 5px dot, pill width and header tint are in COMPILE-C.md"
+ },
+ {
+  "id": "160:419",
+  "text": "All like this ▾",
+  "expect": "This ▾",
+  "why": "FIG-J-10 - text half; widening the pill 46 -> ~90 is in COMPILE-C.md"
+ },
+ {
+  "id": "160:511",
+  "text": "Editing all 12 sections — All like this",
+  "expect": "Editing all 12 buttons",
+  "why": "FIG-J-11 - resolved toward the banner, NOT the header, so FIG-J-01's TYPOGRAPHY deletion still holds. See COMPILE-C.md."
+ },
+ {
+  "id": "160:205",
+  "text": "Section is bound to menu.name",
+  "expect": "Text is bound to menu.name",
+  "why": "FIG-J-12 - resolved toward the banner, NOT the header, for the same reason as FIG-J-11"
+ },
+ {
+  "id": "161:20",
+  "text": "Reach ≠ This item: a persistent warning-tint note, and no left edge — the 2px bar was never in the frame. Three reaches, not two — ScopeDropdown.tsx offers This item · All like this · Whole site; this is the middle one, and it carries the peer count. Reaches peers for single-property edits ONLY: Spacing, Border, Flexbox and Grid write in batch and land on this element alone (useStyleHandlers.ts:277-370).",
+  "expect": "Reach ≠ This item",
+  "why": "FIG-J-24 (corrected: the caption cited a non-existent ReachScopeStrip.tsx and a 2px amber edge the code says was never in the frame)"
+ },
+ {
+  "id": "1707:8405",
+  "text": "Add tokens in the Brand panel",
+  "expect": "Add tokens in the Design tab",
+  "why": "FIG-J-26"
+ },
+ {
+  "id": "1176:4822",
+  "text": "Empty states: 🎨 'No color tokens yet — Add tokens in the Brand panel' · 'No tokens found'",
+  "expect": "Empty states:",
+  "why": "FIG-J-26 (annotation on 1176:4804)"
+ }
+]

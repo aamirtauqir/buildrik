@@ -1,0 +1,102 @@
+[
+ {
+  "id": "1173:4825",
+  "name": "[not-implemented] dynamic-pages \u2014 a typed template path can never match an exported page path, so this block generates ZERO pages (cms.service.ts:240-241 does an exact-string find() then continue; ExportEngine.ts:788-797 emits only index.html / <slug>.html)",
+  "why": "FIG-A-03"
+ },
+ {
+  "id": "817:4856",
+  "name": "[not-implemented] Preview \u00b7 interaction test \u2014 the preview strips every <script> (ExportUtils.ts:36-42) and its iframe is sandbox=\"\", so no interaction can run there; interactions DO work on the published page",
+  "why": "FIG-C-25"
+ },
+ {
+  "id": "817:4899",
+  "name": "[not-implemented] Preview \u00b7 accessibility checker \u2014 no a11y rule engine exists in either tree (no axe, no contrast or alt-text audit); the only a11y artefact is themes/design-system/a11y.css",
+  "why": "FIG-C-26"
+ },
+ {
+  "id": "817:4950",
+  "name": "[not-implemented] Preview \u00b7 performance audit \u2014 no performance measurement exists; the publish worker's \"Performance check\" step is in SKIPPED_STEPS (route.ts:34-37) and never runs, and publishResultSchema.lighthouseScore has no writer",
+  "why": "FIG-C-27"
+ },
+ {
+  "id": "879:6896",
+  "name": "[not-implemented] Preview \u00b7 performance audit \u00b7 running \u2014 no performance measurement exists (route.ts:34-37 SKIPPED_STEPS; lighthouseScore has no writer)",
+  "why": "FIG-C-27"
+ },
+ {
+  "id": "879:6901",
+  "name": "[not-implemented] Preview \u00b7 performance audit \u00b7 issue detail \u2014 no performance measurement exists (route.ts:34-37 SKIPPED_STEPS; lighthouseScore has no writer)",
+  "why": "FIG-C-27"
+ },
+ {
+  "id": "1157:4593",
+  "name": "[not-implemented] Preview \u00b7 performance audit \u00b7 all-clear \u2014 no performance measurement exists (route.ts:34-37 SKIPPED_STEPS; lighthouseScore has no writer)",
+  "why": "FIG-C-27"
+ },
+ {
+  "id": "153:84",
+  "name": "[not-implemented] Add a font \u2014 no font storage and no publish @font-face path; the ACTIVE FONTS list above it does ship (TypographySection.tsx, founder call 2026-08-16)",
+  "why": "FIG-D-11"
+ },
+ {
+  "id": "153:86",
+  "name": "[not-implemented] Drop zone \u2014 the uploader accepts .woff2 and nothing anywhere can apply the result",
+  "why": "FIG-D-11"
+ },
+ {
+  "id": "153:89",
+  "name": "[not-implemented] Licence \u2014 no licence state is stored or checked anywhere",
+  "why": "FIG-D-11"
+ },
+ {
+  "id": "143:119",
+  "name": "[not-implemented] Layers \u00b7 invalid-drop \u2014 no drag-time refusal exists; the tree draws its insertion line on rows that will reject the drop, and the refusal arrives only after the drop",
+  "why": "FIG-D-14"
+ },
+ {
+  "id": "641:2523",
+  "name": "[not-implemented] Section header \u00b7 SECTION TEMPLATES \u2014 every catalogue entry is a page template, so this group is always empty",
+  "why": "FIG-D-21"
+ },
+ {
+  "id": "641:2527",
+  "name": "[not-implemented] Row \u00b7 Hero \u00b7 image left \u2014 no section templates exist in the catalogue",
+  "why": "FIG-D-21"
+ },
+ {
+  "id": "641:2532",
+  "name": "[not-implemented] Row \u00b7 Menu grid \u00b7 3-up \u2014 no section templates exist in the catalogue",
+  "why": "FIG-D-21"
+ },
+ {
+  "id": "641:2537",
+  "name": "[not-implemented] Row \u00b7 Testimonials \u00b7 slider \u2014 no section templates exist in the catalogue",
+  "why": "FIG-D-21"
+ },
+ {
+  "id": "147:2",
+  "name": "[not-implemented] Media \u00b7 drill-in \u00b7 icon-picker \u2014 the picker itself works; the inserted icon renders as an empty <span> and is invisible on the canvas",
+  "why": "FIG-E-04"
+ },
+ {
+  "id": "1069:4694",
+  "name": "[not-implemented] Group header \u00b7 TEMPLATES \u2014 removed from Insert on 2026-08-07; the panel builds four groups (catalog/groups.ts:1-6)",
+  "why": "FIG-H-03"
+ },
+ {
+  "id": "1069:4777",
+  "name": "[not-implemented] Group header \u00b7 TEMPLATES \u2014 removed from Insert on 2026-08-07; the panel builds four groups (catalog/groups.ts:1-6)",
+  "why": "FIG-H-03"
+ },
+ {
+  "id": "1082:5004",
+  "name": "[not-implemented] Layers \u00b7 list-view \u2014 no list view exists; zero hits for list-view/listView/viewMode under panels/layers/. The panel has one presentation and only a density preference",
+  "why": "FIG-I-08"
+ },
+ {
+  "id": "640:3488",
+  "name": "[not-implemented] S7 \u00b7 Settings \u00b7 Integrations \u2014 no connect backend; every row is a docs link (status=\"soon\") and IntegrationsScreen says so in its own words",
+  "why": "FIG-M-16"
+ }
+]

@@ -1,0 +1,14 @@
+[
+ {
+  "id": "122:3",
+  "name": "S5.5 \u00b7 changes-requested \u2014 TERMINAL by design \u2014 the branch renders text + 'Signed as', zero controls (review-client.tsx:250-275, signature at :269-271)",
+  "why": "FIG-N-43 (same stale citation on the canonical)",
+  "page": "1:6"
+ },
+ {
+  "id": "1736:8405",
+  "name": "[unreachable] S5.5 \u00b7 dead-link \u00b7 conflict \u2014 clientReview.get raises only INVALID_TOKEN/REVOKED/EXPIRED; CONFLICT comes from resolveReviewByToken and resolve.error is never rendered (client-review.service.ts:119-125,278-280)",
+  "why": "FIG-N-34 (marker convention: its echo 1339:7221 is already [unreachable])",
+  "page": "1:6"
+ }
+]

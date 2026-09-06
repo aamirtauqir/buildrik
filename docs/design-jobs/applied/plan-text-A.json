@@ -1,0 +1,200 @@
+[
+ {
+  "id": "1173:4829",
+  "why": "FIG-A-04",
+  "expect": "\u2713 Generate a page per entry",
+  "text": "Generate a page per entry"
+ },
+ {
+  "id": "155:52",
+  "why": "FIG-A-08",
+  "expect": "The schema, not the data.",
+  "text": "The schema, not the data. Deleting a field strips its values from every record and silently blanks every element bound to it \u2014 nothing can count those."
+ },
+ {
+  "id": "155:50",
+  "why": "FIG-A-09",
+  "expect": "Field-driven form.",
+  "text": "Field-driven form. One of two publish doors \u2014 the records table (1170:4749) publishes and unpublishes per row too."
+ },
+ {
+  "id": "1706:8399",
+  "why": "FIG-A-19",
+  "expect": "NAME",
+  "text": "TITLE           PRICE           PHOTO           Updated"
+ },
+ {
+  "id": "1753:8419",
+  "why": "FIG-A-20",
+  "expect": "Rich text",
+  "text": "Text"
+ },
+ {
+  "id": "155:18",
+  "why": "FIG-B-02+FIG-B-03+FIG-B-04 (merged \u2014 three findings rewrite this one caption)",
+  "expect": "Folders nest one level only.",
+  "text": "Row: checkbox \u00b7 drag grip \u00b7 icon (home \u2302 / external \u2197 only) \u00b7 name \u00b7 in-folder tag while searching \u00b7 dirty \u25cf \u00b7 \u22ef overflow \u2014 the \u22ef is the only mouse door to every page action. Folders nest one level and reveal rename + delete on hover (delete keeps the pages). They live in this browser's localStorage only (pg-folders-v1-<siteId>), so a teammate or a second device sees a flat list."
+ },
+ {
+  "id": "155:19",
+  "why": "FIG-B-03",
+  "expect": "Counts survive the collapse, so nothing looks deleted.",
+  "text": "Counts survive the collapse, so nothing looks deleted. The counts are local too."
+ },
+ {
+  "id": "155:21",
+  "why": "FIG-B-09 (+ FIG-B-08's 'arms at one' note, which the finding offered as the alternative to editing 141:120)",
+  "expect": "The bulk bar replaces",
+  "text": "The bulk bar replaces \"Add page\" rather than stacking on it, and it arms at ONE selection, not three. Delete-all silently spares the home page (and the first page, if the selection would empty the site) \u2014 the confirm lists only what goes, never what was kept."
+ },
+ {
+  "id": "788:4321",
+  "why": "FIG-C-01",
+  "expect": "No Vercel connection.",
+  "text": "Publishing is not wired in this build (NEXT_PUBLIC_FEATURE_PUBLISH off). The missing-Vercel-connection case is board 893:4518, not this one."
+ },
+ {
+  "id": "784:4461",
+  "why": "FIG-C-04",
+  "expect": "Build error on Menu",
+  "text": "VERCEL_TOKEN_INVALID. Nothing was deployed."
+ },
+ {
+  "id": "788:4320",
+  "why": "FIG-C-04",
+  "expect": "Nothing was deployed.",
+  "text": "Nothing was deployed. The line is the job's raw error code \u2014 never a page name; nothing validates links. Try again re-opens the wizard."
+ },
+ {
+  "id": "788:4316",
+  "why": "FIG-C-05 (option (a) \u2014 keep the design, record the gap)",
+  "expect": "Deploy state unknown.",
+  "text": "Deploy state unknown. The button should be disabled here; the shipping panel leaves it live (PublishTab.tsx:687 does not gate on loading)."
+ },
+ {
+  "id": "784:4308",
+  "why": "FIG-C-06",
+  "expect": "Building \u00b7 step 2 of 4",
+  "text": "Deploying to CDN \u00b7 step 3 of 5 \u00b7 started 14s ago"
+ },
+ {
+  "id": "788:4318",
+  "why": "FIG-C-06",
+  "expect": "In flight.",
+  "text": "In flight. Five steps; two never run (Optimizing images, Performance check) and report skipped. The step line never renders \u2014 the panel reads \"running\", the worker writes \"active\" \u2014 so it degrades to a percentage. Button disabled: no double deploy."
+ },
+ {
+  "id": "788:4319",
+  "why": "FIG-C-07",
+  "expect": "Done. Confirms the version",
+  "text": "Done. Confirms the version and offers the live site. \"Compare v14 \u2192 v15\" only switches to the History tab \u2014 no ids carried, no diff opened, though sites.publishDiff exists. Button disabled \u2014 nothing left to publish."
+ },
+ {
+  "id": "641:2675",
+  "why": "FIG-C-08 (chevron 641:2676 still needs deleting \u2014 COMPILE-A.md \u00a7D1)",
+  "expect": "brk-preview.vercel.app",
+  "text": "None"
+ },
+ {
+  "id": "784:4323",
+  "why": "FIG-C-08 (chevron 784:4324 still needs deleting)",
+  "expect": "brk-preview.vercel.app",
+  "text": "None"
+ },
+ {
+  "id": "784:4400",
+  "why": "FIG-C-08 (chevron 784:4401 still needs deleting)",
+  "expect": "brk-preview.vercel.app",
+  "text": "None"
+ },
+ {
+  "id": "784:4477",
+  "why": "FIG-C-08 (chevron 784:4478 still needs deleting)",
+  "expect": "brk-preview.vercel.app",
+  "text": "None"
+ },
+ {
+  "id": "641:2688",
+  "why": "FIG-C-09",
+  "expect": "Sara \u00b7 2m",
+  "text": "2m"
+ },
+ {
+  "id": "641:2692",
+  "why": "FIG-C-09",
+  "expect": "Sara \u00b7 41m",
+  "text": "41m"
+ },
+ {
+  "id": "641:2696",
+  "why": "FIG-C-09",
+  "expect": "Imran \u00b7 3h",
+  "text": "3h"
+ },
+ {
+  "id": "1168:4715",
+  "why": "FIG-C-15",
+  "expect": "Sara approved round 3 on Aug 5",
+  "text": "Sara approved round 3 on Aug 5 \u2014 since then, 3 things changed. Publishing now would go live with work the client hasn't seen."
+ },
+ {
+  "id": "1168:4719",
+  "why": "FIG-C-15",
+  "expect": "hero copy + image",
+  "text": "edited"
+ },
+ {
+  "id": "1168:4722",
+  "why": "FIG-C-15",
+  "expect": "3 items re-priced",
+  "text": "edited"
+ },
+ {
+  "id": "1168:4725",
+  "why": "FIG-C-15",
+  "expect": "form field added",
+  "text": "added"
+ },
+ {
+  "id": "1168:4737",
+  "why": "FIG-C-16 (real DSLinter empty-value message, severity error \u2014 keeps the \u25cf)",
+  "expect": "Home \u00b7 hero image missing alt text",
+  "text": "Brand \u203a radius.md \u00b7 Token \"radius.md\" has empty value."
+ },
+ {
+  "id": "1168:4740",
+  "why": "FIG-C-16 (real banned-hue message, first sentence only \u2014 see COMPILE-A.md \u00a7Q3)",
+  "expect": "Contact \u00b7 form has no submit action",
+  "text": "Brand \u203a color.brand \u00b7 Token \"color.brand\" uses a purple/violet/indigo hue (\"#7C3AED\")."
+ },
+ {
+  "id": "1168:4743",
+  "why": "FIG-C-16 (real contrast message, severity warning \u2014 keeps the \u25b2)",
+  "expect": "Menu \u00b7 heading order skips a level",
+  "text": "Brand \u203a color.accent \u00b7 Accent fails WCAG AA against the page background"
+ },
+ {
+  "id": "1168:4734",
+  "why": "FIG-C-16 (the conditional review sentence is appended in the SAME node in code, StudioHeader.tsx:873-876)",
+  "expect": "These will ship to every visitor exactly as they are now.",
+  "text": "These will ship to every visitor exactly as they are now. A review round is open \u2014 Sara will see the published site."
+ },
+ {
+  "id": "1172:4827",
+  "why": "FIG-C-17",
+  "expect": "A .zip with every page",
+  "text": "One HTML file with styles inlined \u2014 open it anywhere."
+ },
+ {
+  "id": "1172:4833",
+  "why": "FIG-C-19 (no page/asset counter exists; continue the markup instead)",
+  "expect": "  \u20265 pages \u00b7 24 assets",
+  "text": "  </head>"
+ },
+ {
+  "id": "788:4321",
+  "text": "NOT the missing-Vercel state. PublishTab renders this body when the publish FEATURE FLAG is off (PublishTab.tsx:160,312-318; TabRouter.tsx:195), which in a production bundle without NEXT_PUBLIC_FEATURE_PUBLISH is what every user sees. The copy drawn here is the shipped copy, verbatim \u2014 and it asks for a Vercel connection that cannot unblock anything. The real missing-connection state is board 893:4518.",
+  "expect": "No Vercel connection.",
+  "why": "FIG-C-01 \u2014 board renamed, copy left as shipped, defect recorded here"
+ }
+]

@@ -1,0 +1,20 @@
+[
+ {
+  "id": "I641:2581;16:17",
+  "text": "FROM BRAND \u00b7 NOT IMPLEMENTED",
+  "expect": "FROM BRAND",
+  "why": "FIG-F-45"
+ },
+ {
+  "id": "I641:2611;16:17",
+  "text": "PROPERTIES \u00b7 NOT IMPLEMENTED",
+  "expect": "PROPERTIES",
+  "why": "FIG-F-47"
+ },
+ {
+  "id": "I641:2627;16:17",
+  "text": "USED ON \u00b7 PER-PAGE NOT IMPLEMENTED",
+  "expect": "USED ON",
+  "why": "FIG-F-48"
+ }
+]

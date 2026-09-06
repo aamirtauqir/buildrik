@@ -1,0 +1,702 @@
+[
+ {
+  "id": "170:122",
+  "text": "Step 3: Swap the hero photo",
+  "expect": "Step 3 replaces an image you uploaded.",
+  "why": "FIG-K-06",
+  "page": "1:3"
+ },
+ {
+  "id": "170:123",
+  "text": "Replace the hero image with the warm interior shot. Approve it, or skip it and keep the rest.",
+  "expect": "This one cannot be undone by re-running.",
+  "why": "FIG-K-06",
+  "page": "1:3"
+ },
+ {
+  "id": "I220:947;16:17",
+  "text": "PLANNING",
+  "expect": "PLAN · 3 STEPS",
+  "why": "FIG-K-10",
+  "page": "1:3"
+ },
+ {
+  "id": "166:8",
+  "text": "Open Insert panel",
+  "expect": "Insert section",
+  "why": "FIG-L-02",
+  "page": "1:3"
+ },
+ {
+  "id": "166:9",
+  "text": "A",
+  "expect": "⌘I",
+  "why": "FIG-L-02",
+  "page": "1:3"
+ },
+ {
+  "id": "166:13",
+  "text": "Open AI panel",
+  "expect": "Send for review",
+  "why": "FIG-L-03/FIG-L-12",
+  "page": "1:3"
+ },
+ {
+  "id": "166:14",
+  "text": "I",
+  "expect": "⌘⇧R",
+  "why": "FIG-L-03/FIG-L-12",
+  "page": "1:3"
+ },
+ {
+  "id": "166:16",
+  "text": "Open Templates panel",
+  "expect": "Preview",
+  "why": "FIG-L-12",
+  "page": "1:3"
+ },
+ {
+  "id": "166:17",
+  "text": "T",
+  "expect": "⌘P",
+  "why": "FIG-L-12",
+  "page": "1:3"
+ },
+ {
+  "id": "166:22",
+  "text": "Open Review panel",
+  "expect": "Send for review",
+  "why": "FIG-L-03/FIG-L-19",
+  "page": "1:3"
+ },
+ {
+  "id": "166:23",
+  "text": "R",
+  "expect": "⌘⇧R",
+  "why": "FIG-L-03/FIG-L-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I220:935;16:17",
+  "text": "GO TO",
+  "expect": "ACTIONS",
+  "why": "FIG-L-03/FIG-L-19",
+  "page": "1:3"
+ },
+ {
+  "id": "166:33",
+  "text": "Open Review panel",
+  "expect": "Send for review",
+  "why": "FIG-L-03",
+  "page": "1:3"
+ },
+ {
+  "id": "166:34",
+  "text": "R",
+  "expect": "⌘⇧R",
+  "why": "FIG-L-03/FIG-L-05",
+  "page": "1:3"
+ },
+ {
+  "id": "166:60",
+  "text": "up",
+  "expect": "pub",
+  "why": "FIG-L-07",
+  "page": "1:3"
+ },
+ {
+  "id": "166:64",
+  "text": "Group",
+  "expect": "Publish",
+  "why": "FIG-L-06/FIG-L-07",
+  "page": "1:3"
+ },
+ {
+  "id": "166:65",
+  "text": "select two or more",
+  "expect": "needs approval",
+  "why": "FIG-L-06",
+  "page": "1:3"
+ },
+ {
+  "id": "166:67",
+  "text": "Ungroup",
+  "expect": "Rollback",
+  "why": "FIG-L-06/FIG-L-07",
+  "page": "1:3"
+ },
+ {
+  "id": "166:68",
+  "text": "select a group",
+  "expect": "admin only",
+  "why": "FIG-L-06",
+  "page": "1:3"
+ },
+ {
+  "id": "166:70",
+  "text": "Duplicate",
+  "expect": "Publish settings",
+  "why": "FIG-L-07",
+  "page": "1:3"
+ },
+ {
+  "id": "166:71",
+  "text": "⌘D",
+  "expect": "⌘,",
+  "why": "FIG-L-07",
+  "page": "1:3"
+ },
+ {
+  "id": "172:22",
+  "text": "Shown WITH its reason, never hidden. A command you cannot run is still worth seeing — hiding it means the shortcut someone memorised silently vanishes. The reasons come from the selection and clipboard: nothing selected · select two or more · select a group · nothing copied.",
+  "expect": "Shown WITH its reason, never hidden.",
+  "why": "FIG-L-06",
+  "page": "1:3"
+ },
+ {
+  "id": "172:17",
+  "text": "Recent, then the first five commands in build order — Suggested is not curated. The palette opens on 55 rows.",
+  "expect": "Recent and suggested before typing",
+  "why": "FIG-L-12",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4829",
+  "text": "⌘1",
+  "expect": "⌘0",
+  "why": "FIG-L-08",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4827",
+  "text": "Zoom to fit",
+  "expect": "Zoom to Fit",
+  "why": "FIG-L-09",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4821",
+  "text": "Replace selected media",
+  "expect": "Replace Selected Media",
+  "why": "FIG-L-09",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4831",
+  "text": "Preview site",
+  "expect": "Preview Site",
+  "why": "FIG-L-09",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4836",
+  "text": "Add text",
+  "expect": "Add Text",
+  "why": "FIG-L-09",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4839",
+  "text": "Add container",
+  "expect": "Add Container",
+  "why": "FIG-L-09",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4844",
+  "text": "Manage CMS records",
+  "expect": "Manage CMS Records",
+  "why": "FIG-L-09",
+  "page": "1:3"
+ },
+ {
+  "id": "1177:4850",
+  "text": "Search stock photos",
+  "expect": "Search Stock Photos",
+  "why": "FIG-L-09",
+  "page": "1:3"
+ },
+ {
+  "id": "I220:923;16:17",
+  "text": "3 SEP",
+  "expect": "THIS WEEK",
+  "why": "FIG-L-21",
+  "page": "1:3"
+ },
+ {
+  "id": "165:82",
+  "text": "What this points to was deleted",
+  "expect": "This page was deleted",
+  "why": "FIG-L-22",
+  "page": "1:3"
+ },
+ {
+  "id": "165:83",
+  "text": "The notification is kept, but there’s nothing to jump to.",
+  "expect": "Her comment is kept, but there is nothing to jump to.",
+  "why": "FIG-L-22",
+  "page": "1:3"
+ },
+ {
+  "id": "165:79",
+  "text": "Two-factor authentication was enabled on your account",
+  "expect": "Sara commented on Opening hours",
+  "why": "FIG-L-20",
+  "page": "1:3"
+ },
+ {
+  "id": "165:11",
+  "text": "Site “Bella Cucina” is live at bella-cucina.vercel.app",
+  "expect": "Sara approved Bella Cucina",
+  "why": "FIG-L-24/FIG-L-25",
+  "page": "1:3"
+ },
+ {
+  "id": "165:16",
+  "text": "New form submission on “Bella Cucina”",
+  "expect": "Sara left 3 comments",
+  "why": "FIG-L-24/FIG-L-25",
+  "page": "1:3"
+ },
+ {
+  "id": "165:22",
+  "text": "Site “Osteria” didn’t publish: build failed",
+  "expect": "Publish failed — Osteria",
+  "why": "FIG-L-24/FIG-L-25",
+  "page": "1:3"
+ },
+ {
+  "id": "165:32",
+  "text": "Site “Bella Cucina” is live at bella-cucina.vercel.app",
+  "expect": "Sara approved Bella Cucina",
+  "why": "FIG-L-24/FIG-L-25",
+  "page": "1:3"
+ },
+ {
+  "id": "165:36",
+  "text": "New form submission on “Bella Cucina”",
+  "expect": "Sara left 3 comments",
+  "why": "FIG-L-24/FIG-L-25",
+  "page": "1:3"
+ },
+ {
+  "id": "165:42",
+  "text": "Site “Osteria” didn’t publish: build failed",
+  "expect": "Publish failed — Osteria",
+  "why": "FIG-L-24/FIG-L-25",
+  "page": "1:3"
+ },
+ {
+  "id": "165:49",
+  "text": "You’re all caught up",
+  "expect": "Nothing new.",
+  "why": "FIG-L-26",
+  "page": "1:3"
+ },
+ {
+  "id": "165:50",
+  "text": "New activity on this site shows up here.",
+  "expect": "Client replies and publish results land here.",
+  "why": "FIG-L-26",
+  "page": "1:3"
+ },
+ {
+  "id": "172:30",
+  "text": "Nothing yet. The shipped body names nothing specific — only that new activity lands here.",
+  "expect": "Nothing yet, and it names what will eventually land here.",
+  "why": "FIG-L-26",
+  "page": "1:3"
+ },
+ {
+  "id": "2209:11971",
+  "text": "1 unsaved",
+  "expect": "3 unsaved",
+  "why": "FIG-M-01",
+  "page": "1:3"
+ },
+ {
+  "id": "1688:7370",
+  "text": "301 / 302 redirects",
+  "expect": "301 / 302 + 404 suggester",
+  "why": "FIG-M-10",
+  "page": "1:3"
+ },
+ {
+  "id": "1688:7354",
+  "text": "GA4, GTM, Meta Pixel, Clarity",
+  "expect": "GA4, Plausible, PostHog, Pixel",
+  "why": "FIG-M-10",
+  "page": "1:3"
+ },
+ {
+  "id": "638:2693",
+  "text": "Site name (social / og:site_name)",
+  "expect": "Site Name",
+  "why": "FIG-M-13",
+  "page": "1:3"
+ },
+ {
+  "id": "1719:8442",
+  "text": "Bound row is seeded from composer.cms.bindings on mount and re-syncs on BINDING_CREATED / BINDING_REMOVED (BindingPopover.tsx:81-110) — A-EC1 closed.",
+  "expect": "Only the chip and the banner are live.",
+  "why": "FIG-M-25",
+  "page": "1:3"
+ },
+ {
+  "id": "156:46",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "157:46",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "157:98",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "157:149",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "157:261",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "158:42",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "158:97",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "158:145",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "158:202",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "453:3988",
+  "text": "Round 3 of 3",
+  "expect": "Round 2 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "157:209",
+  "text": "Round 7 of 7",
+  "expect": "Round 1 of 3",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "1705:8699",
+  "text": "Round 3 of 3 ▾",
+  "expect": "Round 2 of 3 ▾",
+  "why": "FIG-N-04",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1086;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1090;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1094;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1098;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1102;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1106;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1110;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1118;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1126;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I229:1130;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "I453:3991;9:31",
+  "text": "Compare with approved",
+  "expect": "Compare with v3",
+  "why": "FIG-N-05",
+  "page": "1:3"
+ },
+ {
+  "id": "157:56",
+  "text": "element deleted",
+  "expect": "was on: “Book a table” — element deleted",
+  "why": "FIG-N-08",
+  "page": "1:3"
+ },
+ {
+  "id": "157:271",
+  "text": "Their reply shows up here when you next open Review.",
+  "expect": "You will be notified.",
+  "why": "FIG-N-12",
+  "page": "1:3"
+ },
+ {
+  "id": "161:12",
+  "text": "PENDING, no comments yet. Nothing notifies the designer — no Notification row, no email — so the panel has to say the reply appears the next time they open it.",
+  "expect": "PENDING, no comments yet.",
+  "why": "FIG-N-12",
+  "page": "1:3"
+ },
+ {
+  "id": "161:8",
+  "text": "In flight. The button holds its place rather than swapping to a spinner elsewhere. Two Re-send paths exist: the panel passes the round’s invitedEmail (ReviewTab.tsx:295); the ReviewBar strip calls the same handler with no argument (ReviewBar.tsx:108), which on a CHANGES_REQUESTED round opens a new round, revokes the client’s live token and mints no replacement. This board draws the panel path.",
+  "expect": "In flight. The button holds its place",
+  "why": "FIG-N-13",
+  "page": "1:3"
+ },
+ {
+  "id": "161:11",
+  "text": "The panel and the rail entry both stay — the rail row is unconditional and ReviewTab renders a round in any status. Only the ReviewBar strip under the topbar hides (ReviewBar.tsx:50,115). Redraw this frame as the approved-round panel.",
+  "expect": "This frame documents an ABSENCE",
+  "why": "FIG-N-02",
+  "page": "1:3"
+ },
+ {
+  "id": "1753:8433",
+  "text": "Reply to the client…",
+  "expect": "Reply…",
+  "why": "FIG-N-16",
+  "page": "1:3"
+ },
+ {
+  "id": "1753:8434",
+  "text": "Internal note — posts to this page’s comments, not under a reply.",
+  "expect": "Replies are internal notes on the thread.",
+  "why": "FIG-N-18",
+  "page": "1:3"
+ },
+ {
+  "id": "1705:8632",
+  "text": "Internal note — posts to this page’s comments, not under a reply.",
+  "expect": "Replies are internal notes on the thread.",
+  "why": "FIG-N-18",
+  "page": "1:3"
+ },
+ {
+  "id": "1705:8769",
+  "text": "Internal note — posts to this page’s comments, not under a reply.",
+  "expect": "Replies are internal notes on the thread.",
+  "why": "FIG-N-18",
+  "page": "1:3"
+ },
+ {
+  "id": "158:212",
+  "text": "Sara can no longer open it. Earlier comments are kept below.",
+  "expect": "Sara can no longer open it. Her earlier comments are kept below.",
+  "why": "FIG-N-24",
+  "page": "1:3"
+ },
+ {
+  "id": "817:4650",
+  "text": "Canvas toolbar — 6 toggle states + Inspector",
+  "expect": "Canvas toolbar — 7 toggle states",
+  "why": "FIG-O-01",
+  "page": "1:3"
+ },
+ {
+  "id": "817:4661",
+  "text": "Magenta alignment guides appear during drag, snapping to sibling edges/centers within 5px. Drag-time only — persistent ruler guides are shown by the Rulers toggle.",
+  "expect": "Magenta alignment guides appear during drag.",
+  "why": "FIG-O-03",
+  "page": "1:3"
+ },
+ {
+  "id": "817:4681",
+  "text": "Square mesh overlay on canvas, 10px default. Display only — snap-to-grid is a separate Project Settings option and is off by default.",
+  "expect": "Column grid overlay on canvas.",
+  "why": "FIG-O-03",
+  "page": "1:3"
+ },
+ {
+  "id": "817:4725",
+  "text": "Bottom-right corner of footer. Click percentage to open flyout. Range: 10%–400%.",
+  "expect": "Bottom-right corner of footer.",
+  "why": "FIG-O-05",
+  "page": "1:3"
+ },
+ {
+  "id": "96:51",
+  "text": "· Zoom-to-fit runs when the frame is wider than the canvas: zoom = min((canvasW − 64)/frameW, (canvasH − 64)/frameH), clamped 10–500%.",
+  "expect": "· Zoom-to-fit runs when the frame is wider than the canvas",
+  "why": "FIG-O-06",
+  "page": "1:3"
+ },
+ {
+  "id": "96:52",
+  "text": "· Manual range 10–400%, steps 10 / 25 / 50 / 75 / 100 / 150 / 200 / 400. Zoom-to-selection (⌘2) fits the selected element, clamped to 400%, and centres it.",
+  "expect": "· Manual range 25–200%",
+  "why": "FIG-O-06",
+  "page": "1:3"
+ },
+ {
+  "id": "96:39",
+  "text": "fills canvas (min 1024)",
+  "expect": "1440",
+  "why": "FIG-O-07",
+  "page": "1:3"
+ },
+ {
+  "id": "96:36",
+  "text": "none — uses Desktop styles",
+  "expect": "≥1440",
+  "why": "FIG-O-07",
+  "page": "1:3"
+ },
+ {
+  "id": "96:44",
+  "text": "768–1023",
+  "expect": "≤1023",
+  "why": "FIG-O-07",
+  "page": "1:3"
+ },
+ {
+  "id": "1176:4898",
+  "text": "⌘G",
+  "expect": "⌃G",
+  "why": "FIG-O-11",
+  "page": "1:3"
+ },
+ {
+  "id": "1176:4889",
+  "text": "Reveal in layers",
+  "expect": "Reveal in Layers",
+  "why": "FIG-O-11 (extension)",
+  "page": "1:3"
+ },
+ {
+  "id": "1176:4892",
+  "text": "Select parent",
+  "expect": "Select Parent",
+  "why": "FIG-O-11 (extension)",
+  "page": "1:3"
+ },
+ {
+  "id": "1169:4746",
+  "text": "The template failed to load. The new page was created but is empty. Delete it, or try again.",
+  "expect": "The template failed to load. Your pages are unchanged.",
+  "why": "FIG-O-25",
+  "page": "1:3"
+ },
+ {
+  "id": "1169:4772",
+  "text": "The Versions tab flags pages applied from an older version of this template.",
+  "expect": "Changes to the template never touch pages already created from it.",
+  "why": "FIG-O-26",
+  "page": "1:3"
+ },
+ {
+  "id": "642:3102",
+  "text": "Resolving brand tokens — done",
+  "expect": "Hero — done",
+  "why": "FIG-O-27",
+  "page": "1:3"
+ },
+ {
+  "id": "642:3103",
+  "text": "Importing template HTML — done",
+  "expect": "Menu grid — done",
+  "why": "FIG-O-27",
+  "page": "1:3"
+ },
+ {
+  "id": "642:3104",
+  "text": "Rendering on canvas — applying…",
+  "expect": "Reservations — applying…",
+  "why": "FIG-O-27",
+  "page": "1:3"
+ },
+ {
+  "id": "642:3105",
+  "text": "Saving applied state — queued",
+  "expect": "Gallery — queued",
+  "why": "FIG-O-27",
+  "page": "1:3"
+ }
+]

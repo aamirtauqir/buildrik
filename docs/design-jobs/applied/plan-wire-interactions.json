@@ -1,0 +1,8 @@
+[
+ {"from":"807:8401","to":"2430:11940","why":"FIG-D-09 · TEXT profile INTERACTIONS row -> list"},
+ {"from":"807:8464","to":"2430:11940","why":"FIG-D-09 · FLEX profile"},
+ {"from":"807:8510","to":"2430:11940","why":"FIG-D-09 · GRID profile"},
+ {"from":"807:8556","to":"2430:11940","why":"FIG-D-09 · MEDIA profile"},
+ {"from":"807:8601","to":"2430:11940","why":"FIG-D-09 · BUTTON profile"},
+ {"from":"807:8650","to":"2430:11940","why":"FIG-D-09 · INPUT profile"}
+]
