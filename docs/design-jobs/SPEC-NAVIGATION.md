@@ -418,7 +418,10 @@ app — a code reading is not acceptance, per the repo's own rule.
    every case a panel is on screen afterwards. (Today the ⌘K and ⋯ routes pass
    this and the keystrokes do not.)
 4. **A keypress inside an open modal does not change the panel behind it.**
-5. **One palette answers ⌘K and ⌘⇧P; one shortcuts screen answers `?` and
+5. **⌘K opens the only palette, and ⌘⇧P opens nothing** — the merge retires it
+   (§2.5), so testing that it "answers" would test the state this spec removes.
+   Rewritten from "one palette answers ⌘K and ⌘⇧P", which was unsatisfiable
+   against its own proposal. One shortcuts screen answers `?` and
    ⌘/.** Every chord printed in either is pressed and does what the row says —
    including "Fit to view", which today prints `Ctrl+0` and is bound to ⌘1.
 6. **"Site settings" reaches Domains.** From the ⋯ menu, in one click, without
@@ -436,11 +439,16 @@ app — a code reading is not acceptance, per the repo's own rule.
 11. **Every width in the shell resolves to a class token.** Grep for numeric
     `width:` / `w-[` literals across `editor/`; the ten sites in §5.1 return
     zero.
-12. **At 1439px the editor says it is desktop-only** instead of squeezing.
+12. **Below 1024px the editor says it is desktop-only** instead of squeezing —
+    1024 is the frame floor this spec uses everywhere else (`canvasStyles.ts:57`).
+    This read "at 1439px" and would have failed a viewport the spec expects to
+    work: 1439 is one pixel under the reference width, not under the floor.
 
 ### The code fixes this design cannot paper over
 
-Four of the twelve depend on changes no drawing can make. Naming them here so
+At least ten of the twelve depend on changes no drawing can make — a Phase 4 QA
+pass found this said "four" over a list of five, and that six more criteria
+(#2, #5, #6, #7, #11, #12) carry code dependencies with no row. Naming them here so
 the spec is not drawn as though they have landed:
 
 | # | Fix | Where |
