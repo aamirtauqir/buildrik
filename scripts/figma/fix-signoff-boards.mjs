@@ -58,8 +58,13 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
   const b=await figma.getNodeByIdAsync("1339:7162");
   if(!b) out.push("MISSING\\t1339:7162");
   else {
-    const prior=(b.children||[]).filter(c=>String(c.name).indexOf("a0/")===0);
-    ${APPLY ? 'for(const c of prior) c.remove();' : ''}
+    /* Clear a previous attempt from BOTH places: the first run appended the
+       fields to the board while using coordinates relative to the anchor's
+       CARD, so they rendered outside the card entirely. Coordinate space, not
+       geometry — and only the render showed it. */
+    const wipe=(p)=>{ for(const c of [...(p.children||[])]) if(String(c.name).indexOf("a0/")===0) c.remove(); };
+    const prior=[];
+    ${APPLY ? 'wipe(b);' : ''}
     /* place under the widest text block on the board, above the CTA */
     let anchor=null, cta=null;
     const st=[b];
@@ -70,34 +75,42 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
     if(!anchor){ out.push("REFUSED\\t1339:7162\\tno text block to anchor the form to"); }
     else {
       const px=Math.round(anchor.x), top=Math.round(anchor.y+anchor.height)+24;
+      /* anchor.x/y are relative to anchor.parent, so the fields must be
+         appended THERE — see the wipe() note above. */
       out.push((${APPLY}?"FORM\\t":"WOULD FORM\\t")+"1339:7162\\tanchor "+anchor.id+" -> fields at y"+top+(cta?(", CTA "+cta.id+" at y"+Math.round(cta.y)):", no CTA found"));
       ${APPLY ? `
+      const host=anchor.parent;   /* the CARD the anchor lives in, not the board */
+      wipe(host);
       const mk=(s,size,style,color,x,y,w)=>{ const t=figma.createText();
         t.fontName={family:"Inter",style:style}; t.fontSize=size; t.characters=s;
         t.fills=[{type:"SOLID",color:rgb(color)}]; t.textAutoResize="HEIGHT"; t.name="a0/"+s.slice(0,18);
-        b.appendChild(t); if(b.layoutMode&&b.layoutMode!=="NONE") t.layoutPositioning="ABSOLUTE";
+        host.appendChild(t); if(host.layoutMode&&host.layoutMode!=="NONE") t.layoutPositioning="ABSOLUTE";
         t.x=x; t.y=y; t.resize(w,t.height); return t; };
       const box=(x,y,w,h,nm)=>{ const q=figma.createRectangle(); q.resize(w,h);
         q.fills=[{type:"SOLID",color:rgb("ffffff")}]; q.strokes=[{type:"SOLID",color:rgb("d1d5db")}];
         q.strokeWeight=1; q.cornerRadius=8; q.name="a0/"+nm;
-        b.appendChild(q); if(b.layoutMode&&b.layoutMode!=="NONE") q.layoutPositioning="ABSOLUTE";
+        host.appendChild(q); if(host.layoutMode&&host.layoutMode!=="NONE") q.layoutPositioning="ABSOLUTE";
         q.x=x; q.y=y; return q; };
       let y=top;
       for(const lab of ["Your name","The email this link was sent to"]){
         mk(lab,12,"Regular","4b5563",px,y,392); y+=20;
         box(px,y,392,42,"input"); y+=58;
       }
-      mk("Enter the email this link was sent to.",12,"Regular","e02424",px,y,392); y+=24;
+      /* A0 is the IDLE board. A permanent red "Enter the email…" line would be
+         its own small lie — the error belongs on the validation-error state
+         FIG-N-31 asks for, which is only buildable now that the fields exist.
+         The 24px is left as the slot that state will fill. */
+      y+=24;
       /* The form is 176px tall and the CTA sat at y236 — writing it without
          making room would have dropped two inputs straight onto the button,
          which is the same mistake three earlier writes in this arc made. */
       if(cta && cta.y < y){
         const shift=Math.round(y - cta.y) + 8;
-        for(const c of (b.children||[])){
+        for(const c of (host.children||[])){
           if(String(c.name).indexOf("a0/")===0) continue;
           if(c.y >= cta.y) c.y = Math.round(c.y) + shift;
         }
-        if(b.height < y + 80) b.resize(b.width, Math.round(y) + 80);
+        if(host.height < y + 80) host.resize(host.width, Math.round(y) + 80);
       }
       ` : ''}
     }
