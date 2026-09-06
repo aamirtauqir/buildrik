@@ -651,7 +651,17 @@ if(made.length!==SECTIONS.length) return "ERROR built "+made.length+" of "+SECTI
 return "PAGE "+pg.name+" id="+pg.id+" sections="+made.length+"/"+SECTIONS.length+String.fromCharCode(10)+made.join(String.fromCharCode(10));
 `;
 
-if (!APPLY) { console.log("dry run — pass --apply to build. Script length:", code.length); process.exit(0); }
+/* The sandbox rejects code over 50,000 chars. Without this check the failure
+   arrives as a server-side validation error AFTER the run is reported as
+   started, which is how a build that never landed got described as complete.
+   Refuse locally, with the number and the margin. */
+const LIMIT = 50000;
+if (code.length > LIMIT) {
+  console.error("REFUSED: generated code is " + code.length + " chars, over the " + LIMIT +
+    " sandbox limit by " + (code.length - LIMIT) + ". Trim the embedded payload or split the build.");
+  process.exit(2);
+}
+if (!APPLY) { console.log("dry run — pass --apply to build. Script length:", code.length, "of", LIMIT); process.exit(0); }
 const r = await rpc("tools/call", { name: "use_figma",
   arguments: { fileKey: "g4GzQFqzNYz5sosz1QtZXC", code,
     description: "build the Editor v2 proposal page (new page; 1:3 untouched)", skillNames: "figma-use" } }, 1);
