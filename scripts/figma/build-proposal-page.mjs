@@ -355,9 +355,67 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   made.push(s.name);
 }
 
-const pend=[[7,"Phase 3","Reuse before creating. The audit already names one master worth fixing over duplicating: Card / media, whose STOCK badge fix retired 46 instances at once."],
+const pend=[
             [8,"Phase 4","Corrected module screens. Blocked on Phase 3 by the founder's own ordering: components before polish."],
             [11,"Phase 4","The assembled editor. Last, by the same ordering."]];
+/* ============ 8 · COMPONENT LIBRARY ============ */
+{
+  const s=mkSection(SECTIONS[7], 1300, 1000);
+  const b=board(s,"Census — what already exists",40,40,1200,420);
+  put(b,T("Component Library",24,"Semi Bold",INK),28,26);
+  put(b,T("Read before proposing anything. Variants are rolled up to their sets, because an instance resolves to a VARIANT and never to the set holding it — counting raw masters reported 204 dead components where there are 49.",13,"Regular",SOFT,1140),28,66);
+  const cs=[["338","raw masters"],["125","judged units (sets + standalone)"],["49","truly zero-use"],["0","real name collisions"]];
+  let x=28;
+  for(const [n,l] of cs){ put(b,T(n,30,"Semi Bold",INK),x,130); put(b,T(l,12,"Regular",MUTED,260),x,172); x+=300; }
+  put(b,T("LARGEST UNITS — where a single master edit has the most reach",10,"Medium",MUTED),28,230);
+  const top=[["Nav item","1026"],["Settings nav row","600"],["Button","528"],["List row · indented","387"],["Icon button","226"],["Panel header","216"]];
+  let y=254;
+  for(const [n,c] of top){
+    put(b,T(n,13,"Medium",INK,240),28,y);
+    const bar=F("bar",Math.round(Number(c)*(600/1026)),10,ACCENT); put(b,bar,290,y+3);
+    put(b,T(c,12,"Medium",MUTED),920,y);
+    y+=26;
+  }
+  put(b,T("Fixing the STOCK badge inside one master (Card / media) cleared the defect on 46 instances at once. That is the leverage this census exists to find.",12,"Regular",SOFT,1140),28,y+12);
+
+  /* the merged nav row — the founder's decision, drawn rather than applied */
+  const b2=board(s,"Proposed · Nav row (merged)",40,490,1200,440);
+  put(b2,T("Nav row — one component for 1,626 instances",18,"Semi Bold",INK),28,24);
+  put(b2,T("Founder decision, 6 Sep: merge. Same interaction model in both masters — a label row with a selected state — so the 'different interaction model' exception does not apply.",13,"Regular",SOFT,1140),28,56);
+  put(b2,T("MEASURED, BEFORE MERGING",10,"Medium",MUTED),28,104);
+  const cmp=[["Nav item · 1026","240x32","State[rest|hover|active]","active = 3px bar + label"],
+             ["Settings nav row · 600","140x30","Active[Off|On]","no hover state; active = fill only"]];
+  y=126;
+  for(const r of cmp){
+    put(b2,T(r[0],12,"Medium",INK,180),28,y);
+    put(b2,T(r[1],12,"Regular",MUTED,80),220,y);
+    put(b2,T(r[2],12,"Regular",MUTED,220),310,y);
+    put(b2,T(r[3],12,"Regular",SOFT,320),545,y);
+    y+=24;
+  }
+  put(b2,T("THE ONE FORCED CHOICE",10,"Medium",WARN),28,192);
+  put(b2,T("The two masters disagree on how ACTIVE is shown. Merging must pick one, and either choice changes the look of 600 or 1,026 instances. Proposed: keep the 3px bar — more legible, and it is already the larger master's convention. This is the only visible change the merge makes to Settings.",12,"Regular",SOFT,1140),28,212);
+  put(b2,T("PROPOSED AXES",10,"Medium",MUTED),28,268);
+  put(b2,T("Size[compact 140x30 | default 240x32]  ×  State[rest | hover | active]",13,"Medium",ACCENT),28,288);
+  put(b2,T("Compact is the BASELINE and default derives from it. Deriving the other way overflows the 140px case — that was the founder's own constraint and it is the right one: the tightest box is the one that can fail.",12,"Regular",SOFT,1140),28,314);
+  /* draw the six proposed variants */
+  const dims=[[140,30],[240,32]];
+  const states=["rest","hover","active"];
+  let vx=28;
+  for(const [w,h] of dims){
+    for(const st of states){
+      const cell=F("nav/"+(w===140?"compact":"default")+"/"+st, w, h, st==="hover"?"#F3F4F6":(st==="active"?"#EBF1FE":PANEL));
+      cell.cornerRadius=3; cell.strokes=solid(LINE); cell.strokeWeight=1;
+      put(b2,cell,vx,360);
+      if(st==="active"){ const barN=F("Active bar",3,h-8,ACCENT); barN.cornerRadius=2; put(cell,barN,0,4); }
+      put(cell,T("General",12,st==="active"?"Medium":"Regular",st==="active"?ACCENT:INK),st==="active"?12:10,Math.round(h/2)-8);
+      put(b2,T((w===140?"compact":"default")+" · "+st,9,"Regular",MUTED,w),vx,360+h+6);
+      vx+=w+16;
+    }
+  }
+  made.push(s.name);
+}
+
 for(const [i,phase,note] of pend){
   const s=mkSection(SECTIONS[i], 800, 420);
   const b=board(s,"Not yet built",40,40,700,300);
