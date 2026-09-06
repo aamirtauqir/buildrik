@@ -26,6 +26,27 @@ fact stated so a designer can decide what to draw.
 
 ## Content / CMS  ·  25 chains
 
+> **Re-verified 2026-09-06 against the working tree, not just HEAD.** Three
+> Critical CMS chains were re-tested; one has already been overtaken by
+> uncommitted founder work and is marked stale inline below. This matters
+> generally: every chain here was measured against *committed* code, and the CMS
+> area is being actively changed right now, so a chain that reads BROKEN may
+> already be fixed in the tree. Re-run the grep in a chain's evidence before
+> acting on it.
+>
+> - `MOD-A-01` **still holds.** `bindCollection` exists (`CMSBindingManager.ts:208`,
+>   `DataManager.ts:394`) and no UI file calls either — the only caller is
+>   Composer's load path, which restores a binding rather than creating one.
+> - `MOD-A-02` **still holds.** `RepeaterRenderer` is exported from
+>   `engine/cms/index.ts:9` and called by nothing.
+> - `MOD-A-03` **is now STALE — do not act on it.** Bindings ARE persisted in the
+>   working tree: `project.ts:62` declares `cmsBindings`, `Composer.ts:629`
+>   writes it on save and `:569-572` imports both field and collection bindings
+>   on load. The chain's claim — "reload the editor and every binding is gone" —
+>   was true at HEAD and is false in the tree. Uncommitted, so it can still change.
+
+
+
 
 ### Critical
 
