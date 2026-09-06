@@ -1,0 +1,34 @@
+{
+ "arc": "figma-truth",
+ "applied": "2026-09-06",
+ "script": "scripts/figma/fix-known-batch.mjs --apply",
+ "results": [
+  {
+   "target": "306:2161",
+   "op": "move pill clear of heading",
+   "detail": "pill 333:2356 y60->88, clears heading 306:2163 by 8",
+   "verified": "pill y now 88",
+   "status": "FIXED"
+  },
+  {
+   "target": "218:6 / 218:7",
+   "op": "widen the STOCK pill in the Card / media master",
+   "detail": "label right edge was 45 against a 40-wide pill; pill 40->52",
+   "verified": "pending a separate read of 218:6 — the apply's own VERIFY line re-read the LABEL, not the pill it grew, which is not proof",
+   "status": "APPLIED-UNVERIFIED"
+  },
+  {
+   "target": "138:153",
+   "op": "auto-height a sheared annotation",
+   "detail": "refused twice: the node's fonts will not load in this sandbox, and a measurement without them reports the clipped size as the natural one",
+   "status": "REFUSED"
+  },
+  {
+   "target": "1704:8361, 1704:8396",
+   "op": "shrink an over-tall spacer",
+   "detail": "both stacks already end at exactly 812",
+   "status": "ALREADY-FIXED (queue was stale)"
+  }
+ ],
+ "note": "Three of the five queued items needed nothing. The two that did shared one cause: a TEXT clone whose font is not loaded keeps the original box, so a natural-width read returns the CLIPPED width and the tool concludes the sheared label fits. Fixing that is what let the STOCK escape be seen at all — 'fits itself' was never the test, since a clipped label's own width IS the clipped width."
+}
