@@ -196,7 +196,12 @@ return out.join(String.fromCharCode(10));
      when the tool is not reading anything is worse than no number. */
   if (/tool call limit|rate.?limit/i.test(t)) { throttled.push(sid); continue; }
   const lines = t.split("\n").filter((l) => l.trim());
-  if (lines.length) { console.log("--- " + sid + "  (" + lines.length + ")"); for (const l of lines.slice(0, 12)) console.log(l); }
+  /* Print every row. This used to cap at 12 per section while `total` counted
+     all of them, so the headline number and the listing disagreed silently —
+     a section with 29 defects showed 12 and any grep over the output undercounted
+     by more than half. A cap that hides rows from the reader but not from the
+     total is a lie with a number attached. */
+  if (lines.length) { console.log("--- " + sid + "  (" + lines.length + ")"); for (const l of lines) console.log(l); }
   total += lines.length;
   read += 1;
 }
