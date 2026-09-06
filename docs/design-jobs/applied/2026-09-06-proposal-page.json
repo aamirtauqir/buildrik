@@ -24,7 +24,7 @@
  ],
  "scaffolded": [],
  "note": "Sections 8, 9 and 12 carry an explicit 'not yet built' chip naming the phase that owns them. Filling them with placeholder design would have made the page look complete while hiding which parts are actually done.",
- "status": "COMPLETE — 12/12 sections built, 0 render defects across 12 of 12",
+ "status": "COMPLETE — 12/12 sections; 0 render defects; content check CLEAN over 954 strings",
  "build_history": [
   "93 defects on the first sweep of my own page — bar charts overflowing their boards, a chip narrower than its label, a board 11px shorter than its content",
   "60 after computing bar widths from available space",
@@ -32,5 +32,23 @@
   "0 after fixing the Tokens overprint: colour name and hex 12px apart while a 9px text renders a ~16px line box",
   "Then three build-level failures the page never showed: a name collision (CRIT the colour vs CRIT the payload), a silent .replace no-op that built section 9 twice, and a 54,505-char payload the sandbox rejected while I reported success",
   "Final: sections=12/12 asserted by the builder itself, 0 defects swept"
+ ],
+ "verification": {
+  "render": "render-defects.mjs --page=2668:2 --min=8 — 0 across 12 of 12 sections, run from a cleared cache, twice independently",
+  "content": "verify-proposal-content.mjs — 954 strings read IN THE SANDBOX, no banned claim, every required correction present",
+  "non_destructive": "board-baseline.mjs — page 1:3 at 29 sections / 927 boards, matching the pre-arc record, per-section counts stored for future diffing",
+  "why_two_checks": "A render sweep proves nothing overlaps. It is blind by construction to a board asserting something false, and one did: a band labelled for a feature that is not built. The content check exists because five clean sweeps could not see it."
+ },
+ "instrument_failures": [
+  "render sweep counted rate-limit prose as defects, and printed 12 rows per section while totalling all of them — the two errors cancelled into a plausible small number",
+  "sweep hardcoded page 1:3, so pointing it at another page measured the wrong one",
+  "component census counted COMPONENT_SETs and state variants as zero-use (204 reported, 49 real), and compared variant property strings as component names (12 collisions reported, 0 real)",
+  "board count read 872 against a recorded 927 because it walked pages without loading them — read as data loss in a file the arc promised not to damage",
+  "content checker shipped 1,107 strings to Node and was truncated at the MCP's 20,000-char limit, reading 373 and reporting the missing tail as absent content",
+  "page builder collided its error colour with its data payload; a .replace matched nothing and built one section twice; a 54,505-char payload was rejected while the commit was reported as a build"
+ ],
+ "still_open": [
+  "Bar vs fill for the merged nav row's active state — 600 instances either way. Asked in the artifact thread; the proposed default is drawn and marked.",
+  "Twelve code fixes the Publish panel depends on, seven server-side. The panel is fully specified and its board asserts nothing the server refuses, but it cannot be called buildable today."
  ]
 }
