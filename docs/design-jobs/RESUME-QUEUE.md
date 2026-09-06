@@ -16,6 +16,22 @@ command against a clear window.
 `scratchpad_audit/mod/run-when-clear.sh` runs the first and third with a 60s
 backoff and no hammering. It exits as soon as the window answers.
 
+## 1b. Where the visual passes actually stopped
+
+Both lots stopped on **hard seat-quota exhaustion**, not on choice. Lot A got two
+boards and eleven consecutive rejections in thirty minutes at 150s spacing —
+about fourteen hours for its remaining 83 at that rate — and killed its own
+fetcher so the other lot could convert quota into coverage instead.
+
+| lot | opened | of | resume |
+|---|---|---|---|
+| A | **32** | 115 | `node scratchpad_audit/vis2/shot3.mjs` — reads `done.txt`, skips what is filed, 83 remain |
+| B | **24** | 116 | index 21 |
+| Client sign-off | **10** | 10 | closed, opened AND screenshotted |
+
+**87 boards visually opened, 33 defects.** That is the honest coverage figure for
+this arc and it should be quoted as 87 of 253, not rounded up.
+
 ## 2. Paused mid-pass, resumable from an exact index
 
 Two visual QA agents opened 47 of their 231 boards before being paused so a
@@ -42,6 +58,10 @@ like successful screenshots. `shot2.mjs` checks PNG magic bytes and backs off.
 | VIS-2-05 | `2474:12093` | toast body's second line sits flush against the action link | 8px leading |
 | VIS-3-17/19/20/21 | `Card / media` | the `STOCK` badge is clipped mid-K — **fix once in the component**, it repeats on every board instancing it | auto-width the pill with 6px padding, or widen the fixed pill to 48px |
 | COVER-1-01 | 30 Settings boards | a pane header with a right-aligned primary button; `DrillInHeader` has no action slot | replace with Back + breadcrumb; Save/Discard belong in the bottom savebar |
+| VIS-2-34 | `158:213` | toast title wraps, body prints through it, and the toast runs off the board | 2-line title height, body down the same, grow the toast ~18px and raise y ~36px |
+| VIS-2-24 | `165:2`, `165:24` | OVERPRINT on both panel variants — the class is PER-ROW and PROPAGATES across states of one panel | make the row a component with the gutter baked in, rather than fixing states one by one |
+| — | `1704:8361`, `1704:8396` | spacer 20px too tall, refused by the fixer's floor | shrink the spacer itself |
+| COVER-2-02 note | `1339:7162` | the A0 form now exists, so FIG-N-31's validation-error clone is finally buildable | clone A0, fill the reserved error slot |
 
 ## 4. Never opened
 
