@@ -77,6 +77,7 @@ like successful screenshots. `shot2.mjs` checks PNG magic bytes and backs off.
 | VIS-2-34 | `158:213` | toast title wraps, body prints through it, and the toast runs off the board | 2-line title height, body down the same, grow the toast ~18px and raise y ~36px |
 | VIS-2-24 | `165:2`, `165:24` | OVERPRINT on both panel variants — the class is PER-ROW and PROPAGATES across states of one panel | make the row a component with the gutter baked in, rather than fixing states one by one |
 | — | `1704:8361`, `1704:8396` | spacer 20px too tall, refused by the fixer's floor | shrink the spacer itself |
+| — | `807:8342` | 8px more content than 812 allows. Rows are 28px, one already compressed to 22, the last ends at 820. Which row to compress is a judgement, so the fixer's floor refused it and so did I | either compress one row 28→20, or accept 820 and break the 300×812 family convention. Needs a call, not a script |
 | COVER-2-02 note | `1339:7162` | the A0 form now exists, so FIG-N-31's validation-error clone is finally buildable | clone A0, fill the reserved error slot |
 
 ## 4. Never opened
