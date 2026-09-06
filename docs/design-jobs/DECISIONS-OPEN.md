@@ -119,6 +119,31 @@ drift.
 
 ## 5. Are three nav rows one component?
 
+> **DECIDED 2026-09-06 (founder, artifact thread): MERGE.** One base row
+> component; size and label handled by variants and props rather than by three
+> separate designs. The tightest case — Editor Settings at 140x30 — is the
+> baseline variant and the others derive from it, because deriving the other way
+> round overflows the compact case.
+>
+> **The decision carried an exception, and it is load-bearing:** a row whose
+> INTERACTION MODEL genuinely differs (a nested control, different keyboard
+> behaviour) is not merged, because a shared component there becomes a forced
+> abstraction. So the merge is gated on measuring the candidates, not on the
+> word "nav" appearing in three names.
+>
+> **The scale is larger than this section says.** The component census
+> (2026-09-06) rolls variants up to their sets and finds `Nav item` (`16:26`) at
+> **1,026 instances** and `Settings nav row` (`2041:19572`) at **600** — 1,626
+> across two masters, the two largest units in the file. This section's 585 /
+> ~900 / 251 split predates that census.
+>
+> A merge at this scale is the one operation in this file where being wrong is
+> expensive: an earlier proposal in this arc would have pushed five parts into
+> 387 instances of a component that merely shared a name. The comparison runs
+> first; the merge is written only if the shapes agree.
+
+
+
 Three designs serve one job:
 
 | where | size | component | instances |
