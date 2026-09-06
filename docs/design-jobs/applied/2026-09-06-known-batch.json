@@ -7,15 +7,16 @@
    "target": "306:2161",
    "op": "move pill clear of heading",
    "detail": "pill 333:2356 y60->88, clears heading 306:2163 by 8",
-   "verified": "pill y now 88",
-   "status": "FIXED"
+   "verified": "Read back separately: pill 333:2356 sits at y88. Held.",
+   "status": "FIXED-VERIFIED"
   },
   {
    "target": "218:6 / 218:7",
    "op": "widen the STOCK pill in the Card / media master",
    "detail": "label right edge was 45 against a 40-wide pill; pill 40->52",
-   "verified": "pending a separate read of 218:6 — the apply's own VERIFY line re-read the LABEL, not the pill it grew, which is not proof",
-   "status": "APPLIED-UNVERIFIED"
+   "verified": "Read back separately: 218:6 is now 52x14 and the STOCK label's right edge is 45 -> CONTAINED. The master is 17:6 'Card / media' with 46 instances, so the one edit retires the sheared badge on all 46.",
+   "status": "FIXED-VERIFIED",
+   "residual": "The same read shows a defect the horizontal test could not see: the label is 40x16 inside a 52x14 pill, so it overflows its own pill by 2px VERTICALLY. Pre-existing, not introduced by this edit, and left alone deliberately — 2px is below the 8px sweep threshold and changing a master's height touches all 46 instances, which wants its own measurement rather than a follow-on tweak."
   },
   {
    "target": "138:153",
