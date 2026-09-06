@@ -422,6 +422,58 @@ const pend=[
   made.push(s.name);
 }
 
+/* ============ 9 · CORRECTED MODULE SCREENS ============ */
+{
+  const s=mkSection(SECTIONS[8], 1900, 1000);
+  const head=board(s,"Corrected screens — what changes, and what it depends on",40,40,1800,240);
+  put(head,T("Corrected Module Screens",24,"Semi Bold",INK),28,26);
+  put(head,T("Five panels, drawn at their real widths. Each fixes the STRUCTURE the audit found broken before any visual change — the founder's ordering. Where a screen cannot be honoured by the product as it stands, the dependency is named on the board rather than drawn over.",13,"Regular",SOFT,1740),28,66);
+  put(head,T("Full specs: docs/design-jobs/SPEC-{INSERT-PANEL,NAVIGATION,INSPECTOR,PUBLISH-PANEL,PAGES-PANEL}.md — 1,662 lines, each closing with a table of the exact code fixes it depends on.",12,"Regular",MUTED,1740),28,130);
+  put(head,T("12",26,"Semi Bold",CRIT),28,170); put(head,T("code fixes the Publish panel alone depends on, two of them server-side",12,"Regular",SOFT,420),70,178);
+  put(head,T("2",26,"Semi Bold",WARN),520,170); put(head,T("things the lanes REFUSED to draw, because the board or the schema disagrees",12,"Regular",SOFT,420),545,178);
+
+  const panels=[
+    ["Insert · corrected",280,
+      ["One catalog, one entry per thing","SECTIONS opens by default, not ELEMENTS","53 elements sub-grouped, not one flat list","descriptions render on hover (they already exist)","everything drawn draggable IS draggable"],
+      "Removes 53 duplicate offerings before a pixel changes.","needs useDropExecution.ts:302-303"],
+    ["Navigation · corrected",280,
+      ["12 panels get 12 doors, or fewer panels","one command palette, not two","one help surface, not two","one Settings home, not two","bare key opens the drawer like ⌘K does"],
+      "The rail shows 6; TabRouter renders 12.","bare key is a tab-only switcher today"],
+    ["Inspector · corrected",300,
+      ["composite elements get real editors","forms get a destination, not 5 attributes","ONE animation system, not two","search / expand-all / reset wired up","disabled controls say why"],
+      "The entire PROPERTIES map — 185 defs — is imported by nothing.","FormSettingsSection is a rebuild, not a move"],
+    ["Publish · corrected",280,
+      ["read the topbar's lifecycle, don't re-derive","seven states drawn, incl. cancelled + lost contact","approval row added to the checklist","cancel control wired (it exists, 0 call sites)","the log names the step that actually failed"],
+      "The panel greys its own CTA on every reopen.","12 fixes, 2 server-side"],
+    ["Pages · corrected",280,
+      ["one vocabulary: what the deploy actually does","visibility writes only when chosen","delete counts inbound links first","homepage is explicit, never position","navigation gets a producer"],
+      "A page announced as Draft publishes.","row chip needs board 140:2 redrawn first"],
+  ];
+  let px=40;
+  for(const [name,w,bullets,thesis,dep] of panels){
+    const col=board(s,name,px,320,w+80,600);
+    put(col,T(name,15,"Semi Bold",INK),20,18);
+    put(col,T(thesis,12,"Regular",CRIT,w+40),20,44);
+    /* the panel silhouette at its real width */
+    const shell=F("panel",w,300,BG); shell.cornerRadius=3; shell.strokes=solid(LINE); shell.strokeWeight=1;
+    put(col,shell,20,96);
+    put(shell,T(String(w)+"px",10,"Medium",MUTED),8,6);
+    const hdr=F("hdr",w-16,28,PANEL); hdr.cornerRadius=2; hdr.strokes=solid(LINE); hdr.strokeWeight=1; put(shell,hdr,8,24);
+    put(hdr,T(name.split(" ·")[0],11,"Medium",INK),8,8);
+    let ry=60;
+    for(const bl of bullets){
+      const row=F("row",w-16,34,PANEL); row.cornerRadius=2; row.strokes=solid(LINE); row.strokeWeight=1;
+      put(shell,row,8,ry);
+      put(row,T(bl,10,"Regular",INK,w-40),8,6);
+      ry+=40;
+    }
+    put(col,T("DEPENDS ON",9,"Medium",WARN),20,412);
+    put(col,T(dep,11,"Regular",SOFT,w+40),20,428);
+    px+=w+100;
+  }
+  made.push(s.name);
+}
+
 for(const [i,phase,note] of pend){
   const s=mkSection(SECTIONS[i], 800, 420);
   const b=board(s,"Not yet built",40,40,700,300);
