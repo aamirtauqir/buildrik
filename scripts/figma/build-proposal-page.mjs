@@ -67,6 +67,23 @@ const DATA = {
     ["Settings surfaces", "2", "a 3-tab modal and a 13-screen full page, no link between them"],
     ["AI homes", "2", "right inspector (⌘J) and left drawer (bare I), two independent threads"],
   ],
+  tokens: {
+    text: ["11","12","13","14","16","20","24"],
+    leading: ["16","18","20","21","24","30","32"],
+    space: ["2","4","8","12","16","20","24","28","32","36","40","48","64"],
+    radius: [["sm","4"],["md","6"],["lg","8"],["full","9999"]],
+    colour: [["ink","#111827"],["ink-soft","#4B5563"],["ink-muted","#6B7280"],["border","#E5E7EB"],
+             ["border-medium","#D1D5DB"],["bg-app","#F3F4F6"],["bg-panel","#FFFFFF"],
+             ["accent","#1A56DB"],["accent-hover","#1E429F"],["success","#0E9F6E"],
+             ["warning","#C27803"],["error","#E02424"]],
+    notes: [
+      "Generated FROM Figma (scripts/tokens/generate.mjs). Hand-editing the generated files fails the build — change the value in Figma and regenerate.",
+      "Weights cap at 600. No 700 anywhere in chrome — though 575 nodes currently breach it, 562 of them chrome.",
+      "One accent. Purple, violet and indigo are banned outside the allow-listed PRO badge and avatar tones.",
+      "--bk-leading-18 exists and has ZERO consumers in the editor. It was generated from a Figma value nothing uses.",
+      "22.4% of the file's text uses AUTO line-height, which no --bk-leading-* token can express.",
+    ],
+  },
   ai: [
     ["Entry points shipping today", "14", "across 5 glyph vocabularies (Sparkles, ✨, ✦, ▶, 🕘) and 3 verbs"],
     ["AI flags that exist", "1", "FEATURE_DS_AI — set in no env file"],
@@ -284,8 +301,52 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
 }
 
 /* ============ 7, 8, 9, 12 — scaffolded, honestly ============ */
-const pend=[[6,"Phase 3","Audit the file's existing components first, then consolidate. Not started: needs Figma reads, and the account's quota grants roughly one operation per window."],
-            [7,"Phase 3","Reuse before creating. The audit already names one master worth fixing over duplicating: Card / media, whose STOCK badge fix retired 46 instances at once."],
+/* ============ 7 · DESIGN SYSTEM ============ */
+{
+  const s=mkSection(SECTIONS[6], 1200, 900);
+  const b=board(s,"Tokens — the system that already exists",40,40,1100,780);
+  put(b,T("Design System",24,"Semi Bold",INK),28,26);
+  put(b,T("Not a new system. This is the generated token set the product already ships, stated so the proposal can be built ON it rather than beside it.",13,"Regular",SOFT,1040),28,66);
+  const K=D.tokens;
+  /* colour */
+  put(b,T("COLOUR",10,"Medium",MUTED),28,120);
+  let x=28;
+  for(const [n,h] of K.colour){
+    const sw=F("swatch",64,40,h); sw.cornerRadius=3; sw.strokes=solid(LINE); sw.strokeWeight=1; put(b,sw,x,142);
+    put(b,T(n,9,"Regular",INK,64),x,188);
+    put(b,T(h,9,"Regular",MUTED,64),x,200);
+    x+=86;
+  }
+  /* type + leading */
+  put(b,T("TYPE — px",10,"Medium",MUTED),28,240);
+  x=28;
+  for(const t of K.text){ put(b,T(t,Number(t),"Regular",INK),x,258); x+=60; }
+  put(b,T("LEADING — px",10,"Medium",MUTED),28,310);
+  put(b,T(K.leading.join("  ·  "),13,"Regular",INK),28,330);
+  /* spacing */
+  put(b,T("SPACING — px, 4px base",10,"Medium",MUTED),28,370);
+  x=28;
+  for(const sp of K.space){
+    const bar=F("sp",Math.max(2,Number(sp)),12,ACCENT); put(b,bar,x,390);
+    put(b,T(sp,9,"Regular",MUTED),x,408);
+    x+=Math.max(22,Number(sp)+10);
+  }
+  /* radius */
+  put(b,T("RADIUS",10,"Medium",MUTED),28,446);
+  x=28;
+  for(const [n,v] of K.radius){
+    const r=F("r",44,32,BG); r.cornerRadius=Math.min(16,Number(v)); r.strokes=solid(LINE); r.strokeWeight=1; put(b,r,x,466);
+    put(b,T(n,9,"Regular",MUTED,44),x,502);
+    x+=58;
+  }
+  /* the rules that bind */
+  put(b,T("RULES THAT BIND",10,"Medium",MUTED),28,548);
+  let y=568;
+  for(const n of K.notes){ put(b,T("· "+n,12,"Regular",SOFT,1040),28,y); y+=38; }
+  made.push(s.name);
+}
+
+const pend=[[7,"Phase 3","Reuse before creating. The audit already names one master worth fixing over duplicating: Card / media, whose STOCK badge fix retired 46 instances at once."],
             [8,"Phase 4","Corrected module screens. Blocked on Phase 3 by the founder's own ordering: components before polish."],
             [11,"Phase 4","The assembled editor. Last, by the same ordering."]];
 for(const [i,phase,note] of pend){
