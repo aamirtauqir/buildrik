@@ -54,9 +54,19 @@
  * Usage: node scripts/figma/render-defects.mjs [sectionId] [--min=N]
  */
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 
 const ONLY = (process.argv[2] && !process.argv[2].startsWith("--")) ? process.argv[2] : null;
 const MIN = Number((process.argv.find((a) => a.startsWith("--min=")) || "--min=4").split("=")[1]);
+/* Resumable state. The Figma quota does not stop dead — it trickles, granting a
+   few calls at a time. A sweep that restarts at section 1 on every attempt
+   spends the whole trickle re-reading sections it already has and never reaches
+   the end: twelve attempts over an hour advanced this file by ONE section.
+   With --state, each section's result is written as it lands and skipped on the
+   next run, so every grant of quota buys new coverage. Delete the file to force
+   a fresh read. */
+const STATE = (process.argv.find((a) => a.startsWith("--state=")) || "").split("=")[1] || null;
+const saved = STATE && existsSync(STATE) ? JSON.parse(readFileSync(STATE, "utf8")) : {};
 
 await connect();
 const call = async (code, description) => {
@@ -188,6 +198,12 @@ for(const b of sec.children){
 }
 return out.join(String.fromCharCode(10));
 `;
+  if (STATE && Object.prototype.hasOwnProperty.call(saved, sid)) {
+    const cached = saved[sid];
+    if (cached.length) { console.log("--- " + sid + "  (" + cached.length + ") [cached]"); for (const l of cached) console.log(l); }
+    total += cached.length; read += 1;
+    continue;
+  }
   const t = await call(code, "measure render defects in " + sid);
   /* A spent rate window comes back as prose from THIS call too, not just the
      section-list one. Counting it as a line made the headline number report
@@ -204,11 +220,13 @@ return out.join(String.fromCharCode(10));
   if (lines.length) { console.log("--- " + sid + "  (" + lines.length + ")"); for (const l of lines) console.log(l); }
   total += lines.length;
   read += 1;
+  if (STATE) { saved[sid] = lines; writeFileSync(STATE, JSON.stringify(saved)); }
 }
 console.log("");
 if (throttled.length) {
   console.error("INCOMPLETE — " + throttled.length + " of " + sections.length +
-    " sections were rate-limited and never read; " + read + " read.");
+    " sections were rate-limited and never read; " + read + " read." +
+    (STATE ? " Progress saved to " + STATE + "; re-run the same command to continue from here." : " Pass --state=<file> to make progress resumable."));
   console.error("The count below covers only what was read. A silent sweep is not a clean sweep — re-run when the window opens.");
 }
 console.log("render defects >= " + MIN + "px: " + total + " (across " + read + " of " + sections.length + " sections)");
