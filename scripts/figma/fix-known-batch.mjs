@@ -35,6 +35,19 @@ await figma.setCurrentPageAsync(pg);
 const APPLY=${APPLY};
 const out=[];
 const get=async(id)=>await figma.getNodeByIdAsync(id);
+/* Cloning or resizing a TEXT node whose font is not loaded fails silently —
+   the clone keeps the ORIGINAL box, so a natural-width read returns the
+   clipped width and the measurement says "already fits". That single cause
+   produced both REFUSED rows and the STOCK no-op on the first dry run, and it
+   is the same reason the render sweep reported UNMEASURED nodes. Load every
+   font a node uses before measuring it. */
+const loadFonts=async(t)=>{
+  try{
+    const fs=t.getRangeAllFontNames(0,t.characters.length);
+    for(const f of fs) await figma.loadFontAsync(f);
+    return true;
+  }catch(e){ return false; }
+};
 const say=(tag,id,msg)=>out.push(tag+String.fromCharCode(9)+id+String.fromCharCode(9)+msg);
 
 /* ---- 1. VIS-2-21 · 138:153 — annotation sheared through its own glyphs ---- */
@@ -43,7 +56,9 @@ try{
   if(!t){ say("MISSING","138:153",""); }
   else{
     let need=-1;
-    try{ const c=t.clone(); c.textAutoResize="HEIGHT"; c.resize(t.width, t.height); need=Math.round(c.height); c.remove(); }catch(e){ need=-1; }
+    const ok=await loadFonts(t);
+    if(!ok) say("REFUSED","138:153","fonts would not load — a measurement without them reports the clipped size as the natural one");
+    else try{ const c=t.clone(); c.textAutoResize="HEIGHT"; c.resize(t.width, t.height); need=Math.round(c.height); c.remove(); }catch(e){ need=-1; }
     if(need<0) say("REFUSED","138:153","could not measure the wrapped height — not guessing at 34");
     else if(need<=Math.round(t.height)) say("OK-NOOP","138:153","already tall enough ("+Math.round(t.height)+" >= "+need+")");
     else{
@@ -69,9 +84,20 @@ try{
   if(!b) say("MISSING","306:2161","");
   else{
     const kids=(b.children||[]).filter(c=>c.visible!==false && String(c.name).indexOf("hotspot/")!==0);
-    const pill=kids.find(c=>/pill|preset|badge|chip/i.test(String(c.name)));
-    const head=kids.filter(c=>c.type==="TEXT").sort((a,c)=>a.y-c.y)[0];
-    if(!pill||!head) say("REFUSED","306:2161","could not identify both the pill and the heading by name/type");
+    /* Name matching failed on the first run, so identify by GEOMETRY: find the
+       overlapping pair and treat the wider/lower-placed one as the heading. A
+       heuristic on names is a guess; an intersection is a measurement. */
+    const inter=(a,c)=>Math.min(a.x+a.width,c.x+c.width)-Math.max(a.x,c.x)>0 &&
+                       Math.min(a.y+a.height,c.y+c.height)-Math.max(a.y,c.y)>0;
+    let pill=null, head=null;
+    for(let i=0;i<kids.length&&!pill;i++) for(let j=i+1;j<kids.length;j++){
+      if(!inter(kids[i],kids[j])) continue;
+      const a=kids[i], c=kids[j];
+      head = a.width>=c.width ? a : c;
+      pill = a.width>=c.width ? c : a;
+      break;
+    }
+    if(!pill||!head) say("REFUSED","306:2161","no two visible children of this board intersect — nothing to separate");
     else{
       const ovX=Math.min(pill.x+pill.width,head.x+head.width)-Math.max(pill.x,head.x);
       const ovY=Math.min(pill.y+pill.height,head.y+head.height)-Math.max(pill.y,head.y);
@@ -134,11 +160,23 @@ try{
       if(!pills.length){ say("OK-NOOP",comp.id,"'"+String(comp.name).slice(0,28)+"' has no STOCK label"); continue; }
       for(const t of pills){
         let need=-1;
+        if(!(await loadFonts(t))){ say("REFUSED",t.id,"fonts would not load — the natural width would read back as the clipped width"); continue; }
         try{ const c=t.clone(); c.textAutoResize="WIDTH_AND_HEIGHT"; need=Math.ceil(c.width); c.remove(); }catch(e){ need=-1; }
         if(need<0){ say("REFUSED",t.id,"could not measure the STOCK label's natural width"); continue; }
+        /* "The label fits itself" is not the test — a clipped label's own width
+           IS the clipped width. The question is whether the label's BOX escapes
+           its parent pill, which is what shears the K. Compare against the
+           parent, and report both numbers so a no-op is checkable. */
         const box=t.parent;
         const haveInner=Math.round(t.width);
-        if(need<=haveInner){ say("OK-NOOP",t.id,"label already fits ("+haveInner+" >= "+need+")"); continue; }
+        const boxW=box&&box.width?Math.round(box.width):null;
+        const rightEdge=box?Math.round(t.x+Math.max(t.width,need)):null;
+        const escapes=boxW!==null && rightEdge>boxW;
+        if(need<=haveInner && !escapes){
+          say("OK-NOOP",t.id,"fits: natural "+need+" <= box "+haveInner+(boxW!==null?", label right edge "+rightEdge+" within pill "+boxW:""));
+          continue;
+        }
+        if(escapes) say("NOTE",t.id,"label escapes its pill: right edge "+rightEdge+" vs pill width "+boxW);
         say(APPLY?"FIX":"WOULD",t.id,"STOCK label w"+haveInner+"->"+need+"; pill "+(box?box.id+" w"+Math.round(box.width)+"->"+(need+12):"(no parent)"));
         if(APPLY){
           t.textAutoResize="WIDTH_AND_HEIGHT";
