@@ -20,6 +20,9 @@ import { connect, rpc } from "../baseline/figma-mcp.mjs";
 
 const planPath = process.argv[2];
 const APPLY = process.argv.includes("--apply");
+// Most of this arc lives on page 1:3, but the client-review family is canonical
+// on 1:6 — a node id alone is not enough, the page has to be current first.
+const PAGE = (process.argv.find((a) => a.startsWith("--page=")) || "--page=1:3").split("=")[1];
 if (!planPath) { console.error("usage: apply-text-fixes.mjs <plan.json> [--apply]"); process.exit(1); }
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
 
@@ -35,7 +38,7 @@ const CHUNK = 6;               // these strings are long; keep well under the 20
 for (let i = 0; i < plan.length; i += CHUNK) {
   const rows = plan.slice(i, i + CHUNK);
   const code = [
-    'const pg=figma.root.children.find(p=>p.id==="1:3");',
+    'const pg=figma.root.children.find(p=>p.id==="'+PAGE+'");',
     'await figma.setCurrentPageAsync(pg);',
     'const rows=' + JSON.stringify(rows.map((r) => [r.id, r.text, r.expect ?? null])) + ';',
     'const out=[];',
