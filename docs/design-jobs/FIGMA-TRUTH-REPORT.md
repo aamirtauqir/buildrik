@@ -338,11 +338,20 @@ canonical wins" is not a rule that can be applied here.
 
 - **The app was run once, at the very end, and it reached almost nothing.** The
   standalone demo came up clean on `localhost:5051` with zero console errors, and
-  its rail exposes seven tabs — Insert, Layers, Pages, Media, Content, Brand,
-  Home. There is no Review tab, so the whole Review/Compare family, including the
-  board this pass closed, **cannot be reached in the standalone demo at all**;
-  that needs the unified editor (`NEXT_PUBLIC_UNIFIED_EDITOR`) against a real
-  project with a review round. Every other verdict in this report remains a
+  its rail exposes six panel tabs — Insert, Layers, Pages, Media, Content, Brand.
+  **Corrected 2026-09-06: I read that rail wrong, twice over.** The seventh tab I
+  counted was not a rail tab at all but the homepage tab from `PageTabBar.tsx:234`
+  — a SECOND `role="tablist"` in the shell that switches pages, not panels. And I
+  wrote that the Review/Compare family "cannot be reached in the standalone demo
+  at all", which is false: Review is off-rail BY DESIGN and has three doors —
+  the `R` key and `mode: "panel"` (`tabsConfig.ts:236-243`), a row in the ⋯ menu
+  (`SiteMenu.tsx:203`), and ⌘K. The config comment says so outright: "No `zone` →
+  the zone-driven rail render leaves it out; the below-divider rail button is a
+  follow-up (the panel is routable today via TabRouter)." What is true is that it
+  has no RAIL BUTTON, which is a discoverability finding, not an unreachable one.
+  The wider fact the rail hid: `TabRouter.tsx:125-244` renders **12** panels
+  behind 6 rail buttons — Templates, Components, AI, Publish, History and Review
+  are all door-less in the same way. Every other verdict in this report remains a
   static read of source plus a read or screenshot of the file. This repo's own
   rule calls a code reading a claim about code, and code here has passed three
   suites over a broken feature.
