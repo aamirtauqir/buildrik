@@ -31,7 +31,8 @@ await connect();
 const code = `
 const pg=figma.root.children.find(p=>p.id==="1:3");
 await figma.setCurrentPageAsync(pg);
-const H=812, out=[];
+const H=812, TOL_OK=2, out=[];
+let failures=0;
 for(const id of ${JSON.stringify(BOARDS)}){
   const b=await figma.getNodeByIdAsync(id);
   if(!b){ out.push("MISSING\\t"+id); continue; }
@@ -75,13 +76,26 @@ for(const id of ${JSON.stringify(BOARDS)}){
   const after=await figma.getNodeByIdAsync(id);
   const ak=(after.children||[]).filter(c=>c.visible!==false && String(c.name).indexOf("hotspot/")!==0 && c.height);
   const al=ak.reduce((a,c)=>(c.y+c.height)>(a.y+a.height)?c:a, ak[0]);
-  out.push("  VERIFY\\t"+id+"\\t"+(bad?bad+" of "+want.length+" moves did NOT take":"all "+want.length+" moves took")+
-    ", stack now ends at "+Math.round(al.y+al.height)+" (board "+H+")");
+  /* The FIX line above states intent. THIS line states outcome, and when the
+     outcome disagrees the row is relabelled FAILED — printing FIX for a partial
+     no-op is the whole failure mode this script exists to prevent. */
+  const stillOver=Math.round(al.y+al.height)-H;
+  if(bad||stillOver>TOL_OK){
+    out.push("  FAILED\\t"+id+"\\t"+(bad?bad+" of "+want.length+" moves did NOT take":"all moves took")+
+      ", stack ends at "+Math.round(al.y+al.height)+" (board "+H+(stillOver>TOL_OK?", still +"+stillOver+" over":"")+") — the FIX line above did NOT hold");
+    failures++;
+  } else {
+    out.push("  VERIFY\\t"+id+"\\tall "+want.length+" moves took, stack now ends at "+Math.round(al.y+al.height)+" (board "+H+")");
+  }
   ` : ''}
 }
-return out.join(String.fromCharCode(10));
+return (failures?("FAILURES "+failures+String.fromCharCode(10)):"")+out.join(String.fromCharCode(10));
 `;
 const r = await rpc("tools/call", { name: "use_figma",
   arguments: { fileKey: "g4GzQFqzNYz5sosz1QtZXC", code,
     description: (APPLY ? "reconcile" : "dry-run reconciling") + " the panels whose stack runs off the bottom", skillNames: "figma-use" } }, 1);
-console.log(r?.result?.content?.[0]?.text ?? JSON.stringify(r).slice(0, 400));
+const txt = r?.result?.content?.[0]?.text ?? JSON.stringify(r).slice(0, 400);
+console.log(txt);
+/* A repair that did not hold must not exit 0 — a caller reading only the exit
+   code would otherwise bank a partial no-op as a completed fix. */
+if (/^FAILURES /.test(String(txt))) process.exit(1);

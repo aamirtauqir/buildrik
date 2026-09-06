@@ -66,7 +66,22 @@ const MIN = Number((process.argv.find((a) => a.startsWith("--min=")) || "--min=4
    next run, so every grant of quota buys new coverage. Delete the file to force
    a fresh read. */
 const STATE = (process.argv.find((a) => a.startsWith("--state=")) || "").split("=")[1] || null;
-const saved = STATE && existsSync(STATE) ? JSON.parse(readFileSync(STATE, "utf8")) : {};
+const FRESH = process.argv.includes("--fresh");
+/* The cache is keyed by DETECTOR VERSION. Changing a detector changes what a
+   section's result means, so results measured by an older build must not be
+   mixed into a new total — that is the same mixed-age error as stale file
+   state, and harder to see because nothing about the file changed. Bump
+   DETECTOR_VERSION whenever a detector's logic changes; a mismatched cache is
+   discarded with a message rather than silently reused. */
+const DETECTOR_VERSION = 3;   /* 3 = overT no longer exempt for clipping frames; CLIPPED reports UNMEASURED */
+let _st = STATE && !FRESH && existsSync(STATE) ? JSON.parse(readFileSync(STATE, "utf8")) : {};
+if (_st.__v !== undefined && _st.__v !== DETECTOR_VERSION) {
+  console.error("CACHE DISCARDED — " + STATE + " was measured by detector v" + _st.__v +
+    ", this build is v" + DETECTOR_VERSION + ". Mixing them would report two different tests as one number.");
+  _st = {};
+}
+const saved = _st;
+saved.__v = DETECTOR_VERSION;
 
 await connect();
 const call = async (code, description) => {
@@ -87,8 +102,9 @@ if (secText && !secText.trim().startsWith("[")) {
 }
 const sections = ONLY ? [ONLY] : JSON.parse(secText);
 
-let total = 0, read = 0;
+let total = 0, read = 0, fromCache = 0;
 const throttled = [];
+const failed = [];
 for (const sid of sections) {
   const code = `
 const CONT=new Set(["FRAME","COMPONENT","COMPONENT_SET","INSTANCE","GROUP"]);
@@ -127,7 +143,10 @@ for(const b of sec.children){
            a board and report clean. */
         const cv=(n.constraints&&n.constraints.vertical)||"";
         const pinned = cv==="BOTTOM" || cv==="STRETCH" || n.layoutPositioning==="ABSOLUTE";
-        const worst=Math.max(overR,overL, clip?0:overT, (clip&&!pinned)?0:overB);
+        /* Only BOTTOM overflow is a scroll region. Content ABOVE its own frame
+           at negative y is never scrolling — it is the defect the CONTAINER
+           comment describes — so overT is no longer exempted for clipping frames. */
+        const worst=Math.max(overR,overL, overT, (clip&&!pinned)?0:overB);
         if(worst>=MIN) out.push("OUT\\t"+b.id+"\\t"+String(b.name).slice(0,34)+"\\t"+n.id+" "+String(n.name).slice(0,22)+"\\tby "+worst);
       }
       if(CONT.has(n.type) && n.clipsContent && n.children && n.children.length && !isHotspot(n)){
@@ -150,8 +169,12 @@ for(const b of sec.children){
            a node that renders visibly broken. Measure it by cloning, letting the
            clone auto-height, and comparing — non-destructive, and it emits the
            height fit-text-frames.mjs needs. */
-        let need=0;
-        try{ const c=n.clone(); c.textAutoResize="HEIGHT"; need=Math.round(c.height); c.remove(); }catch(e){}
+        /* A failed clone or font load used to leave need=0, which reads as
+           "fits" — a clipped label passing clean without ever being measured.
+           Unmeasured is now its own outcome, reported, never silently passed. */
+        let need=-1;
+        try{ const c=n.clone(); c.textAutoResize="HEIGHT"; need=Math.round(c.height); c.remove(); }catch(e){ need=-1; }
+        if(need<0){ out.push("UNMEASURED\t"+b.id+"\t"+String(b.name).slice(0,34)+"\t"+n.id+"\tclone/font failed — clipping NOT checked"); }
         const short=need-Math.round(n.height);
         if(short>=4)
           out.push("CLIPPED\\t"+b.id+"\\t"+String(b.name).slice(0,34)+"\\t"+n.id+"\\tneeds "+need+"px, has "+Math.round(n.height));
@@ -198,10 +221,10 @@ for(const b of sec.children){
 }
 return out.join(String.fromCharCode(10));
 `;
-  if (STATE && Object.prototype.hasOwnProperty.call(saved, sid)) {
+  if (STATE && sid !== "__v" && Object.prototype.hasOwnProperty.call(saved, sid)) {
     const cached = saved[sid];
     if (cached.length) { console.log("--- " + sid + "  (" + cached.length + ") [cached]"); for (const l of cached) console.log(l); }
-    total += cached.length; read += 1;
+    total += cached.length; read += 1; fromCache += 1;
     continue;
   }
   const t = await call(code, "measure render defects in " + sid);
@@ -211,7 +234,20 @@ return out.join(String.fromCharCode(10));
      rate-limit sentences and one real row. A number that inflates precisely
      when the tool is not reading anything is worse than no number. */
   if (/tool call limit|rate.?limit/i.test(t)) { throttled.push(sid); continue; }
+  /* Guarding only the rate-limit phrase left every OTHER failure counted as
+     defects: a sandbox stack trace, malformed JSON, or any prose reply was
+     split on newlines and each line became a "defect row". Validate the SHAPE
+     instead of blocklisting one message — a real row always starts with a known
+     detector name. A section whose reply contains anything else did not measure
+     cleanly and is reported as a FAILED read, never as findings. */
+  const KNOWN = /^(OUT|TEXTOVER|SQUEEZED|OVERPRINT|ESCAPES|CLIPPED|CONTAINER|UNMEASURED)\t/;
   const lines = t.split("\n").filter((l) => l.trim());
+  const junk = lines.filter((l) => !KNOWN.test(l));
+  if (junk.length) {
+    failed.push(sid);
+    console.error("FAILED READ\t" + sid + "\t" + junk.length + " line(s) that are not defect rows; first: " + junk[0].slice(0, 160));
+    continue;
+  }
   /* Print every row. This used to cap at 12 per section while `total` counted
      all of them, so the headline number and the listing disagreed silently —
      a section with 29 defects showed 12 and any grep over the output undercounted
@@ -229,7 +265,20 @@ if (throttled.length) {
     (STATE ? " Progress saved to " + STATE + "; re-run the same command to continue from here." : " Pass --state=<file> to make progress resumable."));
   console.error("The count below covers only what was read. A silent sweep is not a clean sweep — re-run when the window opens.");
 }
-console.log("render defects >= " + MIN + "px: " + total + " (across " + read + " of " + sections.length + " sections)");
+if (failed.length) {
+  console.error("FAILED — " + failed.length + " section(s) replied with something that is not a defect row: " + failed.join(", "));
+}
+/* Cached sections were measured by an EARLIER run, against an earlier state of
+   the file. Reporting them inside one total presents a mixed-age number as a
+   current one — so the split is always stated, and a total carrying any cached
+   section is never called current. --fresh ignores the cache entirely. */
+if (fromCache) {
+  console.error("MIXED AGE — " + fromCache + " of the " + read + " sections read came from " + STATE +
+    " and reflect the file as it was when that run measured them, not as it is now. Re-run with --fresh for a single-moment count.");
+}
+console.log("render defects >= " + MIN + "px: " + total +
+  " (across " + read + " of " + sections.length + " sections" +
+  (fromCache ? ", " + fromCache + " of them cached" : "") + ")");
 /* Exit non-zero when the sweep did not actually cover the file, so a caller
    cannot bank an unread pass as a green one. */
-if (throttled.length) process.exit(75);
+if (throttled.length || failed.length) process.exit(75);
