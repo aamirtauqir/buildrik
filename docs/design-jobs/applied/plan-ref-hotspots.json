@@ -1,0 +1,4 @@
+[
+ {"on":"876:4532","to":"2429:11904","label":"Preview · what the sandbox drops","x":24,"y":1090,"why":"FIG-C-29 — reference boards reach nothing unless the index links them"},
+ {"on":"876:4532","to":"2357:11981","label":"Module Interaction Map","x":200,"y":1090,"why":"the arc's own map board"}
+]

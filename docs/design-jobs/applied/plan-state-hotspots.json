@@ -1,0 +1,6 @@
+[
+ {"on":"2429:12111","to":"2429:21243","label":"dynamic-pages · no-pattern","x":6,"y":690,"why":"FIG-A-06"},
+ {"on":"2429:12111","to":"2429:21262","label":"dynamic-pages · none-published","x":6,"y":722,"why":"FIG-A-06"},
+ {"on":"2429:12111","to":"2429:21281","label":"dynamic-pages · no-template","x":6,"y":754,"why":"FIG-A-06"},
+ {"on":"144:2","to":"2430:21365","label":"Media · local-only assets","x":0,"y":606,"why":"FIG-E-01"}
+]
