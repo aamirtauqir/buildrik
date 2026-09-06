@@ -22,7 +22,7 @@ Measured, not impression. Every claim carries its finding id.
 | **BLOCKS is 50 blank grey rectangles.** The card renders `b.preview`; no block in the registry defines `preview`. The one group drawn as a picture grid has no pictures. | `UX-A-05` |
 | **Three of the four groups are collapsed below 53 rows.** Only ELEMENTS opens by default, which is why a live walk sees one flat list. Open/closed state is component-local and the tab unmounts, so it resets every visit. | `UX-A-08` |
 | **Every entry has a written description that never renders.** All 53 carry a one-liner (*"Swipeable image or content carousel"*); the row shows it only when `disabled` is true, and nothing is disabled. | `UX-A-09` |
-| **Favourites and recents are fully built and rendered nowhere.** | lane A |
+| **Favourites are fully built and rendered nowhere** — `favs`, `toggleFav`, `favOpen`, `clearFavs` in `useBuildTab.ts`, backed by `BUILD_FAVORITES`. **Recents are NOT built**: a grep for `recent` across the whole build tab returns nothing, and `BUILD_RECENT` (`storageKeys.ts:59`) is an orphan constant with no consumer. This row said "favourites and recents" until a Phase 4 QA pass caught it — it was the one row in this table with no finding id. | verified 2026-09-07 |
 | **Search never covers MINE** — the user's own saved components are the one thing search cannot find. | `UX-A-11` |
 | **The two insert paths disagree about feedback.** A click raises *"Inserted: Heading"*. A drag raises nothing, and can silently place nothing at all. | `UX-A-20`, `UX-A-01` |
 
@@ -60,7 +60,7 @@ dragged, it must not be drawn in the affordance vocabulary of a droppable card.
 ┌─ Insert ─────────────────────────── 280 ─┐
 │  ⌕ Search elements, sections…        ⌫   │   search clears; covers MINE
 ├──────────────────────────────────────────┤
-│  RECENT                             ⌃    │   the built-but-unrendered feature
+│  FAVOURITES                         ⌃    │   built, rendered nowhere (recents are NOT built)
 │  ▢ Heading   ▢ Image   ▢ Button          │   3 chips, one row, no scroll
 ├──────────────────────────────────────────┤
 │  SECTIONS                     50    ⌄    │   OPEN by default — see below

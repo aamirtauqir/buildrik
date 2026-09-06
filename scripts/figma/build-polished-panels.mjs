@@ -101,10 +101,10 @@ put(pb,T("The panel today has three and opens in the wrong one: on every reload 
 const ps=[
  ["ready","Ready to publish","3 pages · 12 changes since v4",ACCENT,"Publish to production",PANEL],
  ["checks","Running pre-publish checks","4 of 5 · checking client approval",WARN,"",WW],
- ["publishing","Publishing…","Building · 0:42 elapsed",ACCENT,"Cancel",WASH],
+ ["publishing","Publishing…","Building · 0:42 elapsed · cancellable until deploy starts",ACCENT,"Cancel",WASH],
  ["published","Published","brk-site.vercel.app · 2 min ago",OK,"View site",OKW],
  ["failed","Build failed","Step 3 · Uploading assets — 502 from host",CRIT,"View log · Retry",EW],
- ["cancelled","Cancelled","Nothing was deployed. v4 is still live.",MUTED,"Publish again",BG],
+ ["cancelled","Cancellation requested","If the deploy had already started it may still finish. We will tell you which.",MUTED,"Publish again",BG],
  ["lost","Lost contact with the build","Last seen Building, 3:10 ago.",WARN,"Check status · Cancel",WW],
 ];
 /* Three per row, placed from the index. The previous version incremented px

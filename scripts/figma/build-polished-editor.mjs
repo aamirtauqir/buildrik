@@ -89,7 +89,7 @@ for(const label of ["Tmpl","Comp","AI","Pub","Hist","Rev"]){
 const dr=F("drawer · Insert",280,SH-56,PANEL); st(dr,LINE,1); dr.clipsContent=true; put(shell,dr,60,56);
 const sf=F("search",248,32,BG,4); st(sf,LINE,1); put(dr,sf,16,14);
 icon(sf,"search",10,9,MUTED); put(sf,T("Search elements, sections…",10,"Regular",FAINT),32,10);
-put(dr,T("RECENT",8,"Medium",FAINT),16,58);
+put(dr,T("FAVOURITES",8,"Medium",FAINT),16,58);
 let cx=16;
 for(const r of ["Heading","Image","Button"]){const c=F("chip",74,24,PANEL,12); st(c,LMED,1); put(dr,c,cx,72);
  put(c,T(r,9,"Regular",INK),Math.round((74-T(r,9,"Regular",INK).width)/2),7); cx+=78;}

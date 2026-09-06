@@ -314,3 +314,31 @@ Two of these — 8 and 12 — are server-side and land in
 `packages/dashboard` / `server/`, not in the editor. A design review that signs
 off this panel without them signs off a screen that will still certify a publish
 the server refuses, and detail pages that all wear the same name.
+
+
+---
+
+## Correction — cancellation is NOT built end to end (added 2026-09-07)
+
+A Phase 4 QA pass challenged this spec's claim that "cancellation is built end
+to end… the worker checks between steps". Verified, and the claim is wrong:
+
+- `publish.service.ts:412-415` — `cancelPublish` throws `NOT_CANCELLABLE`
+  unless the job is `QUEUED` or `BUILDING`. **`DEPLOYING` cannot be cancelled.**
+- There is **no cancellation check in the worker at all** — no `checkCancelled`
+  anywhere in the publish route. So a cancel accepted during `BUILDING` marks
+  the database row and the worker keeps running; the deploy can still land.
+
+What this changes on the board, and it is not cosmetic:
+
+- The publishing state's Cancel is scoped: *"cancellable until deploy starts"*.
+- The cancelled state no longer says **"Nothing was deployed"** — a sentence the
+  product cannot honour. It says *"Cancellation requested. If the deploy had
+  already started it may still finish. We will tell you which."*
+- Acceptance #5 as written ("says nothing was deployed") was **unsatisfiable**
+  and is replaced by: the cancelled state must not assert an outcome the server
+  has not confirmed.
+
+Making a real cancel honest needs two code changes, both server-side: a
+cancellation check between worker steps, and `DEPLOYING` either made cancellable
+or explicitly surfaced as past the point of no return.

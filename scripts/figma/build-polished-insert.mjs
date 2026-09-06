@@ -75,8 +75,13 @@ const sf=F("search",256,32,BG,4); stroke(sf,LINE,1); put(panel,sf,12,12);
 icon(sf,"search",10,9,MUTED);
 put(sf,T("Search elements, sections…",11,"Regular",FAINT),32,10);
 
-/* RECENT — the built-and-unrendered feature the audit found */
-put(panel,T("RECENT",9,"Medium",FAINT),12,58);
+/* FAVOURITES — genuinely built and rendered nowhere: favs / toggleFav /
+   favOpen / clearFavs in useBuildTab.ts, backed by BUILD_FAVORITES. This band
+   said RECENT until a QA pass caught it: recents are NOT built. A grep for
+   "recent" across the whole build tab returns nothing and BUILD_RECENT is an
+   orphan constant with no consumer. Drawing it would have put a fabricated
+   affordance on the board — the exact failure this arc exists to prevent. */
+put(panel,T("FAVOURITES",9,"Medium",FAINT),12,58);
 let cx=12;
 for(const r of ["Heading","Image","Button"]){
   const chip=F("chip/"+r,78,26,PANEL,13); stroke(chip,LMED,1); put(panel,chip,cx,74);
