@@ -98,8 +98,15 @@ for(const r of judged.slice(0,20)) out.push(r.total+"\\t"+r.id+"\\t"+r.name.slic
 
 /* name collisions: two masters sharing a name is how a merge proposal nearly
    pushed five parts into 387 instances of the wrong component */
+/* Collisions must compare the names of SETS and standalone components. A
+   variant's own name is its property string — "State=rest", "Tone=Warning" — so
+   comparing raw masters reports every component that has a rest variant as
+   colliding with every other one. The first run did exactly that and produced
+   twelve "collisions" that were all just variant vocabulary. Third method
+   error in this one script; each was the same shape: counting the parts
+   instead of the things. */
 const byName={};
-for(const r of rows){ (byName[r.name]=byName[r.name]||[]).push(r); }
+for(const r of judged){ (byName[r.name]=byName[r.name]||[]).push(r); }
 const dupes=Object.keys(byName).filter(k=>byName[k].length>1);
 out.push("--- NAME COLLISIONS ("+dupes.length+") ---");
 for(const k of dupes.slice(0,25)){

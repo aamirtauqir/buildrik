@@ -1,0 +1,34 @@
+9f9cbd52d fix(figma): the census counted sets and state variants as zero-use
+=== CENSUS v2 ===
+MASTERS	338
+--- UNITS JUDGED (125 sets + standalone; 338 raw masters incl. variants) ---
+--- TRULY ZERO-USE (49) — no variant of these is placed anywhere ---
+--- NAME COLLISIONS (12) ---
+--- top units ---
+--- TOP UNITS BY TOTAL (variants rolled up) ---
+1026	16:26	Nav item	COMPONENT_SET
+600	2041:19572	Settings nav row	COMPONENT_SET
+528	9:102	Button	COMPONENT_SET
+387	2142:11082	List row · indented (label only) — Depth 0-5 × Sta	COMPONENT_SET
+226	697:440	Icon button	COMPONENT_SET
+216	2100:11651	Panel header	COMPONENT_SET
+169	11:28	Icon / content	COMPONENT
+156	989:7133	Dashboard / Section tab	COMPONENT_SET
+144	11:9	Icon / insert	COMPONENT
+124	681:122	Topbar	COMPONENT_SET
+114	681:4338	icon/bell	COMPONENT
+112	10:16	Input	COMPONENT_SET
+--- collisions ---
+--- NAME COLLISIONS (12) ---
+State=rest	16:19(998 inst, 240x32)  vs  697:424(223 inst, 32x32)  vs  92:13(49 inst, 172x26)  vs  12:17(40 inst, 16x16)  vs  10:6(17 inst, 240x42)  vs  14:21(12 inst, 180x36)
+State=Default	989:7125(135 inst, 120x42)  vs  975:615(5 inst, 265x30)
+State=Active	989:7129(21 inst, 121x44)  vs  975:623(1 inst, 265x30)
+State=on	14:8(18 inst, 44x24)  vs  14:16(0 inst, 16x16)
+Tone=Warning	982:688(11 inst, 72x20)  vs  984:692(2 inst, 680x73)
+State=error	701:2(6 inst, 136x22)  vs  10:12(0 inst, 240x42)
+Tone=Error	982:690(4 inst, 56x20)  vs  984:702(0 inst, 680x73)
+State=off	14:6(3 inst, 44x24)  vs  14:15(1 inst, 16x16)
+State=hover	697:429(1 inst, 32x32)  vs  16:21(0 inst, 240x32)
+State=focus	697:434(1 inst, 32x32)  vs  10:8(0 inst, 240x42)  vs  12:24(0 inst, 16x16)  vs  14:10(0 inst, 44x24)  vs  14:18(0 inst, 16x16)  vs  14:29(0 inst, 180x36)
+
+[exited with code 0]
