@@ -29,6 +29,11 @@
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
 import { readFileSync } from "node:fs";
 const APPLY = process.argv.includes("--apply");
+/* The criticals payload is generated with the QA pass's refutations REMOVED.
+   The first version read the raw findings file, so the page's most prominent
+   board displayed UX-I-17 — a finding a QA pass had overturned — as a Critical.
+   A board asserting a refuted claim is the exact failure this arc exists to
+   prevent, and it sat in section 1. */
 const crit = JSON.parse(readFileSync("scratchpad_audit/mod/criticals.json", "utf8"));
 
 const DATA = {
@@ -158,7 +163,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   const b=board(s,"Audit — what was found",40,40,1400,300);
   put(b,T("UX Audit",28,"Semi Bold",INK),32,28);
   put(b,T("Eight module lanes read the CODE, not the boards. Every finding carries a file:line someone opened. An independent QA lane then re-verified 48 of them and refuted 11 — including two of the coordinator's own claims.",14,"Regular",SOFT,1330),32,72);
-  const stats=[["295","findings"],["283","distinct after de-duplication"],["55","Critical"],["171","Major"],["13","modules"],["11","refuted by QA"]];
+  const stats=[["295","findings"],["283","distinct after de-duplication"],[String(CRITS.length),"Critical (refuted excluded)"],["171","Major"],["13","modules"],["11","refuted by QA"]];
   let x=32;
   for(const [n,l] of stats){
     put(b,T(n,30,"Semi Bold", n==="55"?CRIT:INK),x,150);
@@ -191,6 +196,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   /* the 55 criticals, in full */
   const bc=board(s,"The 55 Criticals",40,940,1400,20+CRITS.length*46+40);
   put(bc,T("Every Critical, with its evidence",18,"Semi Bold",INK),24,20);
+  put(bc,T("Ten findings a QA pass refuted or overstated are excluded — UX-B-01, B-05, C-04, C-25, E-01, E-04, E-13, F-07, I-17, I-30.",10,"Regular",MUTED,900),300,24);
   /* Fixed 46px rows and a column at x1230 of width 340 both assumed text
      extents instead of measuring them: the evidence column ran 170px past the
      1400 board and wrapped findings collided with the row below. Lay the
