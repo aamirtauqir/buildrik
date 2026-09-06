@@ -37,14 +37,26 @@ const chip=(p,label,x,y,fill,ink)=>{const c=F("chip",0,18,fill,9);const t=T(labe
    varies with the face and size, so on four boards it overlapped the title.
    Place it under the MEASURED bottom of the title instead — the same rule
    every other fix in this arc came down to. */
+/* AUTO LAYOUT, not computed offsets.
+   Three times now a fix has derived ONE y from a measured height and left the
+   rest fixed, so the shifted content collided further down. Computing a
+   vertical flow by hand is the bug; Figma already has one. These panels are
+   VERTICAL auto-layout frames — children are appended in order and Figma owns
+   every y, so a heading that wraps to four lines pushes what follows instead
+   of landing on it. This is also what the brief asks for.
+   flow(p, node) just appends; gap(p, n) inserts a spacer. */
+const vstack=(n,w,pad,space,fill)=>{
+  const f=figma.createFrame(); f.name=n; f.fills=fill?solid(fill):[];
+  f.layoutMode="VERTICAL"; f.primaryAxisSizingMode="AUTO"; f.counterAxisSizingMode="FIXED";
+  f.resize(w,10); f.paddingLeft=pad; f.paddingRight=pad; f.paddingTop=pad; f.paddingBottom=pad;
+  f.itemSpacing=space; f.clipsContent=false;
+  return f;
+};
+const flow=(p,n)=>{ p.appendChild(n); return n; };
+const gap=(p,h)=>{ const g=F("gap",1,h,null); p.appendChild(g); g.layoutAlign="STRETCH"; return g; };
 const head=(p,t2,d)=>{
-  const h=put(p,T(t2,15,"Semi Bold",INK),20,16);
-  const dn=put(p,T(d,11,"Regular",CRIT,p.width-40),20,Math.round(h.y+h.height)+8);
-  /* Return the bottom. Fixing the header's own spacing was not enough — the
-     content below still used fixed offsets, so a defect line that wraps to four
-     lines ran straight into whatever sat at y92. A header that measures itself
-     and a body that assumes its height is the same bug one level out. */
-  return Math.round(dn.y+dn.height)+16;
+  flow(p,T(t2,15,"Semi Bold",INK));
+  flow(p,T(d,11,"Regular",CRIT,p.width-40));
 };
 
 const pg=figma.root.children.find(p=>p.name==="Editor v2 — Proposal");
