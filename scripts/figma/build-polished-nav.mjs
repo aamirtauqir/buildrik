@@ -68,10 +68,14 @@ for(const [n,rail,key,cmd,menu,drawer] of panels){
 put(M,T("The bare letter key routes through safeTabChange, which calls onTabChange and never setIsLeftPanelOpen. ⌘K and the ⋯ menu route through openLeftPanelToTab, which does. Six panels are advertised by a shortcut that shows the user nothing.",10,"Regular",CRIT,820),20,y+10);
 
 /* ---- the corrected rail, at 60 ---- */
-const R=F("nav/rail · corrected",240,470,PANEL,4); st(R,LINE,1); put(sec,R,940,1800);
+const R=F("nav/rail · corrected",240,92+(10+6*44+16+6*36+10)+24,PANEL,4); st(R,LINE,1); put(sec,R,940,1800);
 put(R,T("Rail — 12 seats",13,"Semi Bold",INK),20,18);
 put(R,T("Six primary, a divider, six secondary. Every panel has a seat; the ones that are not daily work sit below the line.",10,"Regular",SOFT,200),20,42);
-const rail=F("rail",60,340,BG); st(rail,LINE,1); put(R,rail,20,92);
+/* Height derived from the seats, not typed: 10 + 6*44 + 16 divider + 6*36 + 10.
+   The typed 340 held six seats and the board reported the other six as OUT by
+   up to 120. */
+const RAIL_H = 10 + 6*44 + 16 + 6*36 + 10;
+const rail=F("rail",60,RAIL_H,BG); st(rail,LINE,1); put(R,rail,20,92);
 let ry=10;
 for(const [label,on] of [["Insert",1],["Layers",0],["Pages",0],["Media",0],["Content",0],["Brand",0]]){
  const c=F("seat/"+label,44,40, on?WASH:PANEL,6); if(on) st(c,ACCENT,1); put(rail,c,8,ry);
@@ -94,7 +98,7 @@ for(const [n,fill,bord,ink] of [["rest",PANEL,LINE,MUTED],["hover",BG,LMED,INK],
 }
 
 /* ---- the sizing rule ---- */
-const S=F("nav/sizing-rule",860,300,PANEL,4); st(S,LINE,1); put(sec,S,40,2300);
+const S=F("nav/sizing-rule",860,84+8*27+64,PANEL,4); st(S,LINE,1); put(sec,S,40,2300);
 put(S,T("One width per surface class",15,"Semi Bold",INK),20,18);
 put(S,T("Fifteen distinct widths ship today; ten match no token and one token has zero consumers. A width is a property of a surface CLASS, not of a component.",11,"Regular",SOFT,820),20,44);
 const classes=[["Rail","60","--bk-size-rail","in use"],["Topbar","56","--bk-size-topbar","in use"],
