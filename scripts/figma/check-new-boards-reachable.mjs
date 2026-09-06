@@ -11,26 +11,45 @@
  */
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
 
-const NEW = {
-  "2429:12111": "Content · dynamic-pages",
-  "2429:21243": "Content · dynamic-pages · no-pattern",
-  "2429:21262": "Content · dynamic-pages · none-published",
-  "2429:21281": "Content · dynamic-pages · no-template",
-  "2429:11904": "Preview · what the sandbox drops (reference)",
-  "2430:11940": "Inspector · INTERACTIONS · list",
-  "2430:11959": "Inspector · INTERACTIONS · add-trigger",
-  "2430:11996": "Inspector · INTERACTIONS · edit",
-  "2430:12214": "Pages · structure",
-  "2430:21365": "Media · local-only assets",
-  "2357:11981": "Module Interaction Map",
-};
+/* Boards are looked up by NAME, not by id. Rebuilding a board gives it a new
+   id, and a hardcoded list quietly stops checking the thing it names — which
+   is what happened to the map board the first time it was corrected. */
+const NEW_NAMES = [
+  "Content · dynamic-pages",
+  "Content · dynamic-pages · no-pattern",
+  "Content · dynamic-pages · none-published",
+  "Content · dynamic-pages · no-template",
+  "Preview · what the sandbox drops (reference)",
+  "Inspector · INTERACTIONS · list",
+  "Inspector · INTERACTIONS · add-trigger",
+  "Inspector · INTERACTIONS · edit",
+  "Pages · structure",
+  "Media · local-only assets",
+  "Module Interaction Map · Collections → Publish — measured, hop by hop",
+  "Inspector · profile · FORM",
+  "Canvas · drop feedback — anatomy",
+  "Canvas · element manipulated — resize · rotate (anatomy)",
+  "Editor · reopened with unsaved work — anatomy",
+  "Canvas · element locked · element hidden (anatomy)",
+  "Canvas · empty page — first run · after Start blank (anatomy)",
+  "AI · in-canvas popover — 4 states",
+  "[not-implemented] Brand · generate component with AI — the schema has nowhere to go",
+  "AI · publish confirm — idle · busy",
+  "Components · update-from-selection — confirm · outcomes",
+  "Components · delete-confirm (modal)"
+];
+
 
 await connect();
 const code = `
 const CONT=new Set(["FRAME","COMPONENT","COMPONENT_SET","INSTANCE","GROUP"]);
 const pg=figma.root.children.find(p=>p.id==="1:3");
 await figma.setCurrentPageAsync(pg);
-const WANT=${JSON.stringify(Object.keys(NEW))};
+const WANT_NAMES=${JSON.stringify(NEW_NAMES)};
+const nameSet=new Set(WANT_NAMES);
+const WANT=[];
+for(const s2 of pg.children){ if(s2.type!=="SECTION") continue;
+  for(const b of s2.children) if(nameSet.has(b.name)) WANT.push(b.id); }
 const boardOf=new Map(), boardName=new Map();
 for(const s of pg.children){ if(s.type!=="SECTION") continue;
   for(const b of s.children){ boardName.set(b.id,b.name);
@@ -48,6 +67,8 @@ for(const s of pg.children){ if(s.type!=="SECTION") continue;
         } }
       if(CONT.has(n.type)&&n.children) for(const c of n.children) st.push(c); } } }
 const out=[];
+const missing=WANT_NAMES.filter(n=>![...boardName.values()].includes(n));
+for(const m of missing) out.push("NOT FOUND  "+m);
 for(const w of WANT){
   const h=hits.get(w);
   out.push((h.length?"REACHABLE  ":"ORPHAN     ")+w+"  "+String(boardName.get(w)||"?").slice(0,44)+"  inbound="+h.length);

@@ -1,0 +1,57 @@
+[
+ {
+  "id": "807:8787",
+  "name": "S6.3 \u00b7 publish-changelog \u00b7 diff-summary \u2014 SHIPS. PublishDiffView.tsx:35 is mounted at PublishHistory.tsx:292 against server procedure sites.ts:466, and a test pins its copy. The [not-implemented] marker on this board was wrong.",
+  "why": "QA-B"
+ },
+ {
+  "id": "817:5220",
+  "name": "S6.4 \u00b7 deploy-progress-pipeline \u2014 SHIPS: the worker emits a five-step pipeline (workers/publish/[jobId]/route.ts:22-51), rendered in both dashboard and editor. [not-implemented] was wrong \u2014 and it MASKED a real defect: the worker emits status \"active\" while PublishTab.tsx:239 looks for \"running\", so the editor's \"step N of 5\" line is always null.",
+  "why": "QA-B"
+ },
+ {
+  "id": "642:3696",
+  "name": "Shell state 13 \u00b7 Presence (multiplayer) \u2014 BUILT AND FLAG-GATED, not unbuilt. The producer is StudioHeader.tsx:757-762; what stops it reaching users is NEXT_PUBLIC_FEATURE_COLLAB, which must never be on in production (last-write-wins, 6 known OT bugs). A deploy policy is not a missing producer, and the earlier [not-implemented] marker conflated the two.",
+  "why": "QA-B"
+ },
+ {
+  "id": "817:5195",
+  "name": "S5.8 \u00b7 multiplayer-cursor-following \u2014 PARTLY BUILT. Remote cursors ship and render (CanvasOverlayGroup.tsx:390); what does not exist is viewport-FOLLOWING, which is the thing this board is named for. Behind NEXT_PUBLIC_FEATURE_COLLAB, which must never be on in production.",
+  "why": "QA-B"
+ },
+ {
+  "id": "817:4899",
+  "name": "[not-implemented] Preview \u00b7 accessibility checker \u2014 narrower than first written: a WCAG-AA CONTRAST lint with auto-fix does ship (contrastLint.ts; ColorTokenList.tsx:382 \"Fix all\"). What does not exist is a PAGE-level audit \u2014 no axe, no alt-text or heading-order rule, and no per-page score. The 72 drawn here has no producer.",
+  "why": "QA-B"
+ },
+ {
+  "id": "1779:6",
+  "name": "22 \u00b7 Ecommerce \u00b7 5 \u2014 [not-implemented] ORDERS only. Narrower than first written: the cart and Stripe checkout runtimes exist and are wired into export (StripeInjector.ts via ExportEngine.ts:40), and are inert only because no screen writes config.stripe. What genuinely does not exist is any order, fulfilment or customer model.",
+  "why": "QA-B"
+ },
+ {
+  "id": "158:213",
+  "name": "[unreachable] Review panel \u00b7 review-closed \u2014 the panel does not disappear on approval: ReviewTab renders a round in ANY status. And Review has NO rail row at all \u2014 tabsConfig.figma.test.ts:46-49 pins its absence \u2014 so the earlier note claiming the row is \"unconditional\" said the opposite of the code. Only the ReviewBar strip under the topbar hides (ReviewBar.tsx:50,116). REDRAW as 'Review panel \u00b7 approved', cloned from 157:58.",
+  "why": "QA-B"
+ },
+ {
+  "id": "138:198",
+  "name": "Insert \u00b7 disabled-item \u2014 BUILT, MOUNTED NOWHERE. The earlier \"RETIRED (no producer)\" was wrong in a way that costs work: the component exists, is unit-tested and is annotated with this board id \u2014 it simply has zero mounts. RETIRED tells a builder to delete finished code.",
+  "why": "QA-B"
+ },
+ {
+  "id": "775:4053",
+  "name": "Insert \u00b7 loading \u2014 BUILT, MOUNTED NOWHERE. Same correction as 138:198: the component ships and is tested; nothing renders it. Not retired, not producer-less.",
+  "why": "QA-B"
+ },
+ {
+  "id": "781:4154",
+  "name": "Insert \u00b7 load-error \u2014 BUILT, MOUNTED NOWHERE. Same correction as 138:198.",
+  "why": "QA-B"
+ },
+ {
+  "id": "143:355",
+  "name": "[not-implemented] Layers \u00b7 empty \u2014 the component ships and renders (index.tsx:431); what cannot be true is its COPY. buildLayersFromEngine always emits a root row, so layers.length===0 means no page or no composer, never an empty page (useLayerTree.ts:97,63-72). Re-bucketed from [unreachable]: the state is drawable, the sentence on it is not.",
+  "why": "QA-B"
+ }
+]

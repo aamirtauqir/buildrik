@@ -1,0 +1,104 @@
+[
+ {
+  "id": "161:17",
+  "text": "A \u201cBound\u201d chip (Lucide link icon) in the header; the banner names the collection and field and offers Unbind \u2014 but nothing below it is read-only. Typing here or on the canvas is accepted and silently reverted on the next content refresh. Two more things this state does not say: a binding to a DRAFT record publishes that draft's text, and publishing a record does not refresh the canvas.",
+  "expect": "\ud83d\udd17 chip in the header",
+  "why": "QA-C"
+ },
+ {
+  "id": "170:16",
+  "text": "AI proposes a diff for anything you ask it to change, except two writes that land straight away: alt text for a new image, and \u201cWrite with AI\u201d on a page's SEO title. Each Apply lands as one undo step; a multi-step draft applies one step at a time.",
+  "expect": "AI proposes a diff",
+  "why": "QA-C"
+ },
+ {
+  "id": "155:52",
+  "text": "The schema, not the data. Deleting a field hides its values rather than deleting them \u2014 every record keeps them until it is next saved \u2014 and silently blanks every element bound to it. Nothing can count those.",
+  "expect": "The schema, not the data.",
+  "why": "QA-C"
+ },
+ {
+  "id": "788:4303",
+  "text": "Tree fetching. The toolbar stays for position, not for use \u2014 its controls talk to the panel that has not mounted. The footer keeps counting: it renders the literal \u201c0 layers\u201d for the whole load, which is not a count of anything.",
+  "expect": "Tree fetching.",
+  "why": "QA-C"
+ },
+ {
+  "id": "155:18",
+  "text": "Row: checkbox \u00b7 drag grip \u00b7 icon (home \u2302 / external \u2197 only) \u00b7 name \u00b7 in-folder tag while searching \u00b7 dirty \u25cf \u00b7 \u22ef overflow \u2014 \u22ef or right-click opens the same menu, and double-clicking the name renames in place. Folders nest one level and reveal rename + delete on hover (delete keeps the pages). They live in this browser's localStorage only (pg-folders-v1-<siteId>), so a teammate or a second device sees a flat list.",
+  "expect": "Row: checkbox",
+  "why": "QA-C"
+ },
+ {
+  "id": "172:6",
+  "text": "Restore from the Saves list always confirms and always saves the current state as a version first \u2014 if that save fails the restore is abandoned. It replaces pages, styles, every project setting (brand tokens, SEO, analytics, custom code) and the element\u2192content bindings; the content records themselves, media and saved components are untouched. Restoring from the activity list or the scrubber does neither.",
+  "expect": "Restore always confirms",
+  "why": "QA-C"
+ },
+ {
+  "id": "155:25",
+  "text": "28h dense rows. At depth 5 the name gets 96px: 280 \u2212 92 indent \u2212 12 chevron \u2212 12 icon \u2212 4\u00d78 gaps \u2212 30 for the two toggles \u2212 6 right pad. The long row here is the stress case. A row shows a custom name, else the element\u2019s own first 32 characters, else the type label.",
+  "expect": "28h dense rows.",
+  "why": "QA-C"
+ },
+ {
+  "id": "1176:4822",
+  "text": "Empty states: \ud83c\udfa8 'No color tokens yet \u2014 Add tokens in the Design tab' (the code still says \u201cDesign tab\u201d; the rail calls it Brand) \u00b7 'No tokens found'",
+  "expect": "Empty states:",
+  "why": "QA-C"
+ },
+ {
+  "id": "155:16",
+  "text": "RETIRED 2026-09-02 \u2014 no producer. Disabled, never hidden: a \u201cSoon\u201d badge beside the label, no drag, and a tooltip carrying the element's own description. The 45% dim was never built. (The card board described a drop rejection here \u2014 that is invalid-drop, a different state.)",
+  "expect": "RETIRED 2026-09-02",
+  "why": "QA-C"
+ },
+ {
+  "id": "155:29",
+  "text": "Hidden is not deleted. 45% opacity, keeps its place in the tree. Dimming opens no undo step, so \u2318Z undoes your previous edit instead and the dim stays on \u2014 and it is stored in this browser only, so a collaborator does not see it.",
+  "expect": "Hidden is not deleted.",
+  "why": "QA-C"
+ },
+ {
+  "id": "172:3",
+  "text": "Session-only activity feed, derived from the undo stack: what changed and when, in this tab. The project load resets the stack, so it is empty after every reload \u2014 not persisted, not per user. The stack holds the last 100 steps; older ones drop with nothing said, so a named version is the only thing GUARANTEED to survive a long session.",
+  "expect": "Session-only activity feed",
+  "why": "QA-C"
+ },
+ {
+  "id": "172:9",
+  "text": "Two independent panes. Left is the approved snapshot, right is the site as it is now. Each pane is a sandboxed frame and nothing syncs them \u2014 the labels carry the asymmetry, not colour. (A third mode, List, shows the same comparison as rows.)",
+  "expect": "Two independent panes.",
+  "why": "QA-C"
+ },
+ {
+  "id": "784:4461",
+  "text": "VERCEL_TOKEN_INVALID Nothing was deployed.",
+  "expect": "VERCEL_TOKEN_INVALID",
+  "why": "QA-C"
+ },
+ {
+  "id": "788:4316",
+  "text": "Deploy state unknown. The button should be disabled here; the shipping panel leaves it live (PublishTab.tsx:698 does not gate on loading).",
+  "expect": "Deploy state unknown.",
+  "why": "QA-C"
+ },
+ {
+  "id": "1172:4833",
+  "text": "</head>",
+  "expect": "  </head>",
+  "why": "QA-C"
+ },
+ {
+  "id": "1706:8399",
+  "text": "TITLE           PRICE           PHOTO           UPDATED",
+  "expect": "TITLE",
+  "why": "QA-C"
+ },
+ {
+  "id": "788:4321",
+  "text": "Publishing is not wired in this build (NEXT_PUBLIC_FEATURE_PUBLISH off), and this is what PublishTab renders then \u2014 noPublishPath at PublishTab.tsx:324. In a production bundle without that flag it is the panel EVERY user sees, and its \u201cConnect Vercel\u201d CTA cannot unblock anything. The copy drawn here is the shipped copy, verbatim. The real missing-connection state is board 893:4518.",
+  "expect": "Publishing is not wired in this build",
+  "why": "QA-C"
+ }
+]

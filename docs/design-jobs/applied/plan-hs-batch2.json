@@ -1,0 +1,9 @@
+[
+ {"on":"817:4649","to":"2476:11972","label":"Canvas · locked · hidden","x":380,"y":452,"why":"FIG-O-15"},
+ {"on":"817:4649","to":"2476:11987","label":"Canvas · empty page","x":560,"y":452,"why":"FIG-O-16"},
+ {"on":"170:2","to":"2476:12001","label":"AI · in-canvas popover","x":6,"y":690,"why":"FIG-K-11"},
+ {"on":"170:2","to":"2476:12029","label":"Brand · generate component with AI","x":6,"y":722,"why":"FIG-K-13"},
+ {"on":"170:2","to":"2476:12044","label":"AI · publish confirm","x":6,"y":754,"why":"FIG-K-14"},
+ {"on":"641:2599","to":"2476:12064","label":"Components · update-from-selection","x":6,"y":690,"why":"FIG-F-60"},
+ {"on":"641:2599","to":"2476:12081","label":"Components · delete-confirm","x":6,"y":722,"why":"FIG-F-61"}
+]

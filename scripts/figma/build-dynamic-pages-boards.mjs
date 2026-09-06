@@ -30,7 +30,7 @@ const BOARDS = [
     tone: "muted", state: "Generates 4 pages from published records.",
     pattern: "/menu/{slug}", template: "menu.html" },
   { id: "2429:21243", crumb: "‹  Menu items · dynamic pages", meta: "Dynamic pages",
-    tone: "warn", state: "No URL pattern set — this collection generates no pages.",
+    tone: "warn", state: "No pattern set — this collection generates no pages.",
     pattern: "", template: "menu.html" },
   { id: "2429:21262", crumb: "‹  Menu items · dynamic pages", meta: "Dynamic pages",
     tone: "warn", state: "No records published yet. Dynamic pages generate only from published records.",
@@ -96,10 +96,15 @@ for(const B of BOARDS){
   await mk(B.pattern||"/collection/{slug}",12,"Regular",B.pattern?"#111827":"#9CA3AF",22,y+8,236,16,"val-pattern"); y+=38;
   const h1=await mk("One page per record. Use a field slug in braces \\u2014 {slug} \\u2014 to build the URL.",11,"Regular","#6B7280",12,y,256,15,"hint-pattern"); y+=h1.height+18;
 
-  await mk("TEMPLATE PAGE",11,"Semi Bold","#6B7280",12,y,256,14,"lbl-template"); y+=18;
-  box(12,y,256,32,"in-template");
-  await mk(B.template||"Choose a page\\u2026",12,"Regular",B.template?"#111827":"#9CA3AF",22,y+8,236,16,"val-template"); y+=38;
-  const h2=await mk("Free text today. It must match an EXPORTED page path exactly \\u2014 index.html or <slug>.html \\u2014 or the publish emits none of these pages (cms.service.ts:240-241).",11,"Regular","#723B13",12,y,256,15,"hint-template"); y+=h2.height+18;
+  /* There is NO template control on this screen. ContentViews.tsx:630 says it
+     outright - "Nothing in this panel sets it" - and :635 only READS
+     pageTemplatePath, to decide a warning. An earlier version of this board drew
+     a "Choose a page..." picker that exists nowhere, which is precisely the
+     defect this arc exists to remove. */
+  const h2=await mk(B.template
+    ? "Template page: menu.html \\u2014 shown here, never set here. Nothing in this panel binds one (ContentViews.tsx:630); the only writer in either tree is the create-collection wizard, as free text. It must match an EXPORTED page path exactly \\u2014 index.html or <slug>.html \\u2014 or the publish emits none of these pages (cms.service.ts:240-241)."
+    : "No template page is bound, and nothing in this panel can bind one (ContentViews.tsx:630). It is set once, in the create-collection wizard, as free text.",
+    11,"Regular","#723B13",12,y,256,15,"hint-template"); y+=h2.height+18;
 
   await mk("The \\u201cGenerates N pages\\u201d count reads LOCAL records; generation reads SERVER entries, so a queued sync makes it overstate (ContentViews.tsx:623 vs cms.service.ts:198-202).",11,"Regular","#9CA3AF",12,y,256,15,"note-count");
   OUT.push("filled "+B.id+"  "+b.name);
