@@ -113,11 +113,18 @@ export function usePages(composer: Composer | null): UsePagesReturn {
             ).router?.getPath?.(p.id),
             isHome: p.isHome,
             isActive: p.id === active?.id,
-            // Default to "draft" when visibility is unset (CAN-013).
-            // A new page can't be Live before the project is published —
-            // the top-bar Publish button correctly shows "Draft" in that
-            // state, so the per-page badge must match.
-            status: (p.settings?.visibility as PageItem["status"]) ?? "draft",
+            /* Unset visibility is "live", because that is what the deploy
+               does with it: `isPageLive` (ExportEngine) ships a page whose
+               settings say nothing, and nothing writes the field unless the
+               user opens Advanced. This read "draft" (CAN-013) to match the
+               top-bar Publish badge, but that badge is a SITE fact — the
+               project has never been published — and a per-page field cannot
+               carry it. The result was a page the panel called "Draft", in
+               its chip and in PageRow's aria-label, that publishing shipped.
+               Every other reader already agrees: PageRow falls back to
+               "live", and the settings drawer persists only live/hidden/
+               password and reads anything else as "live". */
+            status: (p.settings?.visibility as PageItem["status"]) ?? "live",
             seo: p.settings?.seo,
             head: p.settings?.head,
             updatedAt: p.updatedAt,
