@@ -134,7 +134,7 @@ const SECTIONS=${JSON.stringify([
   "9 · Corrected Module Screens","10 · Major User Flows","11 · Panel / Drawer / Modal Rules",
   "12 · Final Polished Editor"])};
 const D=${JSON.stringify(DATA)};
-const CRIT=${JSON.stringify(crit)};
+const CRITS=${JSON.stringify(crit)};
 
 const made=[];
 let sx=0;
@@ -189,10 +189,10 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   }
 
   /* the 55 criticals, in full */
-  const bc=board(s,"The 55 Criticals",40,940,1400,20+CRIT.length*46+40);
+  const bc=board(s,"The 55 Criticals",40,940,1400,20+CRITS.length*46+40);
   put(bc,T("Every Critical, with its evidence",18,"Semi Bold",INK),24,20);
   y=60;
-  for(const c of CRIT){
+  for(const c of CRITS){
     put(bc,T(c.id,11,"Medium",CRIT),24,y);
     put(bc,T(c.m,11,"Regular",MUTED),104,y);
     put(bc,T(c.f,12,"Regular",INK,900),300,y);
@@ -212,7 +212,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   put(b,T("Thirteen modules audited. Width of the bar is finding count; the number beside it is Criticals.",13,"Regular",SOFT,740),28,66);
   let y=120;
   for(const [m,n] of D.modules){
-    const c=CRIT.filter(x=>x.m===m).length;
+    const c=CRITS.filter(x=>x.m===m).length;
     put(b,T(m,14,"Medium",INK),28,y);
     const bar=F("bar", Math.round(n*13), 10, c>4?CRIT:ACCENT); put(b,bar,420,y+3);
     put(b,T(c+" critical",11,"Regular",c>4?CRIT:MUTED),700,y+1);
