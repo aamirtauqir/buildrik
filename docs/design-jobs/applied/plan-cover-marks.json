@@ -1,0 +1,7 @@
+[
+ {"id":"640:2778","name":"[not-implemented] Card · 404 SUGGESTER — no 404 log and no suggester exist; a repo-wide search for suggestRedirect / 404Suggest / suggester returns one hit, the nav subtitle string","why":"COVER-1-02"},
+ {"id":"640:3448","name":"[not-implemented] Card · PROVIDER — no provider configuration exists on this screen. FormsScreen renders a form selector and a submissions inbox only; the Formspree integration lives in engine/export/FormspreeInjector.ts","why":"COVER-1-06"},
+ {"id":"1162:4694","name":"[not-implemented] Trash row — Trash toasts \"Trash coming soon\"; there is no soft-delete, no trash view and no restore (LibraryManager.tsx:356). Drawn live on purpose: that is what the user sees","why":"COVER-1-22"},
+ {"id":"1163:4718","name":"[not-implemented] Trash row — Trash toasts \"Trash coming soon\"; there is no soft-delete, no trash view and no restore (LibraryManager.tsx:356). Drawn live on purpose: that is what the user sees","why":"COVER-1-22"},
+ {"id":"1163:13772","name":"[not-implemented] Trash row — Trash toasts \"Trash coming soon\"; there is no soft-delete, no trash view and no restore (LibraryManager.tsx:356). Drawn live on purpose: that is what the user sees","why":"COVER-1-22"}
+]
