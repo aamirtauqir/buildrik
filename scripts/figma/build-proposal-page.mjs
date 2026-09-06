@@ -172,7 +172,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   let y=64;
   for(const [m,n] of D.modules){
     put(b2,T(m,13,"Medium",INK),24,y);
-    const bar=F("bar", Math.round(n*11), 8, ACCENT); put(b2,bar,420,y+4);
+    const bar=F("bar", Math.max(4,Math.round(n*(212/36))), 8, ACCENT); put(b2,bar,420,y+4);
     put(b2,T(String(n),12,"Medium",MUTED),640,y);
     y+=34;
   }
@@ -183,7 +183,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   y=88;
   for(const [k,n] of D.kinds){
     put(b3,T(k,13,"Medium",INK),24,y);
-    const bar=F("bar", Math.round(n*11), 8, k==="missing-feedback"?CRIT:ACCENT); put(b3,bar,300,y+4);
+    const bar=F("bar", Math.max(4,Math.round(n*(332/45))), 8, k==="missing-feedback"?CRIT:ACCENT); put(b3,bar,300,y+4);
     put(b3,T(String(n),12,"Medium",MUTED),640,y);
     y+=38;
   }
@@ -214,8 +214,8 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   for(const [m,n] of D.modules){
     const c=CRITS.filter(x=>x.m===m).length;
     put(b,T(m,14,"Medium",INK),28,y);
-    const bar=F("bar", Math.round(n*13), 10, c>4?CRIT:ACCENT); put(b,bar,420,y+3);
-    put(b,T(c+" critical",11,"Regular",c>4?CRIT:MUTED),700,y+1);
+    const bar=F("bar", Math.max(4,Math.round(n*(272/36))), 10, c>4?CRIT:ACCENT); put(b,bar,420,y+3);
+    put(b,T(c+" critical",11,"Regular",c>4?CRIT:MUTED),706,y+1);
     y+=48;
   }
   made.push(s.name);
@@ -315,12 +315,12 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
     const sw=F("swatch",64,40,h); sw.cornerRadius=3; sw.strokes=solid(LINE); sw.strokeWeight=1; put(b,sw,x,142);
     put(b,T(n,9,"Regular",INK,64),x,188);
     put(b,T(h,9,"Regular",MUTED,64),x,200);
-    x+=86;
+    x+=84;
   }
   /* type + leading */
   put(b,T("TYPE — px",10,"Medium",MUTED),28,240);
   x=28;
-  for(const t of K.text){ put(b,T(t,Number(t),"Regular",INK),x,258); x+=60; }
+  for(const t of K.text){ put(b,T(t,Number(t),"Regular",INK),x,258); x+=Math.max(52,Number(t)*2.6); }
   put(b,T("LEADING — px",10,"Medium",MUTED),28,310);
   put(b,T(K.leading.join("  ·  "),13,"Regular",INK),28,330);
   /* spacing */
@@ -329,7 +329,7 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   for(const sp of K.space){
     const bar=F("sp",Math.max(2,Number(sp)),12,ACCENT); put(b,bar,x,390);
     put(b,T(sp,9,"Regular",MUTED),x,408);
-    x+=Math.max(22,Number(sp)+10);
+    x+=Math.max(24,Number(sp)+12);
   }
   /* radius */
   put(b,T("RADIUS",10,"Medium",MUTED),28,446);
@@ -353,8 +353,11 @@ for(const [i,phase,note] of pend){
   const s=mkSection(SECTIONS[i], 800, 420);
   const b=board(s,"Not yet built",40,40,700,300);
   put(b,T(SECTIONS[i],20,"Semi Bold",INK),24,24);
-  const chip=F("chip",96,24,"#FDFDEA"); chip.cornerRadius=3; put(b,chip,24,64);
-  put(b,T(phase+" — pending",11,"Medium",WARN),34,70);
+  /* the chip has to be sized to its LABEL, not to a guessed 96px — the first
+     build drew a 96px chip under a ~130px string and the sweep flagged it */
+  const chipT=T(phase+" — pending",11,"Medium",WARN);
+  const chip=F("chip",Math.round(chipT.width)+20,24,"#FDFDEA"); chip.cornerRadius=3; put(b,chip,24,64);
+  put(b,chipT,34,70);
   put(b,T(note,13,"Regular",SOFT,650),24,110);
   put(b,T("Deliberately left empty rather than filled with placeholder design. A board that looks finished and is not costs more than an empty one that says so.",12,"Regular",MUTED,650),24,210);
   made.push(s.name);
@@ -362,8 +365,8 @@ for(const [i,phase,note] of pend){
 
 /* ============ 10 · MAJOR USER FLOWS ============ */
 {
-  const s=mkSection(SECTIONS[9], 1300, 700);
-  const b=board(s,"Five journeys, led by where they stop",40,40,1200,560);
+  const s=mkSection(SECTIONS[9], 1300, 780);
+  const b=board(s,"Five journeys, led by where they stop",40,40,1200,640);
   put(b,T("Major User Flows",24,"Semi Bold",INK),28,26);
   put(b,T("Each journey is led by its FIRST STOP — the step at which a real user is stopped or misled. That is more useful than the step count.",13,"Regular",SOFT,1140),28,66);
   let y=125;
