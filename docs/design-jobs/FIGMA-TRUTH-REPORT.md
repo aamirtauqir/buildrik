@@ -328,15 +328,24 @@ canonical wins" is not a rule that can be applied here.
 - Effect styles, shadows, focus rings, tracking and radius: **not measured at
   all**.
 - Pages `1:2`, `1:4`, `1:5` and `988:2` are outside every number here.
-- **The app was never run.**
+- **The app was run, and proved only that it boots.** No board was verified
+  against a running screen; the one family this pass touched is not reachable in
+  the demo build.
 
 ---
 
 ## 9. What was NOT verified
 
-- **The app was never run.** Every verdict is a static read of source plus a
-  read or screenshot of the file. This repo's own rule calls a code reading a
-  claim about code, and code here has passed three suites over a broken feature.
+- **The app was run once, at the very end, and it reached almost nothing.** The
+  standalone demo came up clean on `localhost:5051` with zero console errors, and
+  its rail exposes seven tabs — Insert, Layers, Pages, Media, Content, Brand,
+  Home. There is no Review tab, so the whole Review/Compare family, including the
+  board this pass closed, **cannot be reached in the standalone demo at all**;
+  that needs the unified editor (`NEXT_PUBLIC_UNIFIED_EDITOR`) against a real
+  project with a review round. Every other verdict in this report remains a
+  static read of source plus a read or screenshot of the file. This repo's own
+  rule calls a code reading a claim about code, and code here has passed three
+  suites over a broken feature.
 - **Board coverage varies by lane and each lane states its own.** Some read every
   board in their section; others read a third and said so. No lane's coverage
   should be read as complete unless it says so.

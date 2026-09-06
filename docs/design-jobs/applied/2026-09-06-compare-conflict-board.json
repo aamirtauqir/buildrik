@@ -1,0 +1,23 @@
+{
+ "arc": "figma-truth",
+ "applied": "2026-09-06",
+ "script": "scripts/figma/fix-compare-conflict-board.mjs --apply",
+ "board": "807:6965",
+ "edits": [
+  {
+   "node": "807:6965",
+   "op": "rename",
+   "to": "[not-implemented] S1.2d - Conflict - Review both (Compare opens with conflict context) — Compare has no conflict state: ApprovedCompareView.tsx renders no bar title at all and the panel contains \"conflict\" zero times; \"Review both\" is in no source file; the only conflict code is OTEngine, engine-internal and behind the off-by-default collab flag",
+   "verified": "marked=true"
+  },
+  {
+   "node": "807:6968",
+   "op": "move-x",
+   "from": 100,
+   "to": 145,
+   "why": "clear the title by the 22px gutter the eight sibling Compare boards use",
+   "verified": "strip.x=145 gap=22"
+  }
+ ],
+ "note": "The sweep reported this only as a 23px OVERPRINT. Reading the code first turned it from a geometry defect into a truth defect — see findings/FIG-COORD.jsonl FIG-CO-16. The geometry was fixed anyway so the marked board stays readable and the sweep stops reporting it."
+}
