@@ -39,7 +39,12 @@ const chip=(p,label,x,y,fill,ink)=>{const c=F("chip",0,18,fill,9);const t=T(labe
    every other fix in this arc came down to. */
 const head=(p,t2,d)=>{
   const h=put(p,T(t2,15,"Semi Bold",INK),20,16);
-  put(p,T(d,11,"Regular",CRIT,p.width-40),20,Math.round(h.y+h.height)+8);
+  const dn=put(p,T(d,11,"Regular",CRIT,p.width-40),20,Math.round(h.y+h.height)+8);
+  /* Return the bottom. Fixing the header's own spacing was not enough — the
+     content below still used fixed offsets, so a defect line that wraps to four
+     lines ran straight into whatever sat at y92. A header that measures itself
+     and a body that assumes its height is the same bug one level out. */
+  return Math.round(dn.y+dn.height)+16;
 };
 
 const pg=figma.root.children.find(p=>p.name==="Editor v2 — Proposal");
@@ -52,8 +57,8 @@ const Y=2600;
 
 /* ============ CONTENT / CMS ============ */
 const cm=F("cms/panel · corrected",320,620,PANEL,4); st(cm,LINE,1); cm.clipsContent=true; put(sec,cm,40,Y);
-head(cm,"Content · corrected","No repeater exists in any UI. One binding = one record, so a 40-item menu means 40 hand-bound elements — and that is the reason to have a CMS at all.");
-const ch=F("h",288,32,BG,4); st(ch,LINE,1); put(cm,ch,16,84);
+const HY_cm=head(cm,"Content · corrected","No repeater exists in any UI. One binding = one record, so a 40-item menu means 40 hand-bound elements — and that is the reason to have a CMS at all.");
+const ch=F("h",288,32,BG,4); st(ch,LINE,1); put(cm,ch,16,HY_cm);
 put(ch,T("Menu items",11,"Medium",INK),10,9); chip(ch,"12 records",190,7,BG,MUTED);
 put(cm,T("BIND TO",9,"Medium",FAINT),16,128);
 const modes=[["One record","a single element shows one row",false],["Repeat with collection","the element becomes a template; one design, every row",true]];
@@ -78,10 +83,10 @@ put(cm,T("Status filter is honoured on export: a record set to Draft does not sh
 
 /* ============ LAYERS ============ */
 const ly=F("lyr/panel · corrected",280,620,PANEL,4); st(ly,LINE,1); ly.clipsContent=true; put(sec,ly,400,Y);
-head(ly,"Layers · corrected","Lock lives in two stores that never reconcile: the padlock is per-page localStorage, the canvas reads the engine. In another browser the canvas refuses a row this panel draws unlocked.");
+const HY_ly=head(ly,"Layers · corrected","Lock lives in two stores that never reconcile: the padlock is per-page localStorage, the canvas reads the engine. In another browser the canvas refuses a row this panel draws unlocked.");
 const rows=[["Section · hero",0,false,false,true],["Heading",1,false,false,false],["Text",1,false,false,false],
             ["Image",1,true,false,false],["Section · menu",0,false,true,false],["Grid",1,false,false,false]];
-let ry=110;
+let ry=HY_ly;
 for(const [n,depth,locked,hidden,sel] of rows){
  const r=F("row/"+n,248,28,sel?WASH:PANEL,3); if(sel) st(r,ACCENT,1); put(ly,r,16,ry);
  /* indent 12 + depth*16, the product's own rule */
@@ -99,8 +104,8 @@ put(ly,T("Lock and hide are document state, not per-browser localStorage — so 
 
 /* ============ MEDIA ============ */
 const md=F("med/panel · corrected",320,620,PANEL,4); st(md,LINE,1); md.clipsContent=true; put(sec,md,720,Y);
-head(md,"Media · corrected","Stock search cannot report failure — every path catches to return []. An unconfigured key, an expired key, a dropped network and a genuinely empty result all render identically.");
-const ms=F("search",288,32,BG,4); st(ms,LINE,1); put(md,ms,16,88);
+const HY_md=head(md,"Media · corrected","Stock search cannot report failure — every path catches to return []. An unconfigured key, an expired key, a dropped network and a genuinely empty result all render identically.");
+const ms=F("search",288,32,BG,4); st(ms,LINE,1); put(md,ms,16,HY_md);
 put(ms,T("Search stock photos…",10,"Regular",FAINT),10,10);
 put(md,T("RESULT STATES — all four, told apart",9,"Medium",FAINT),16,132);
 const states=[["No photos match “ramen”","Try a broader word, or upload your own.",BG,MUTED],
@@ -125,8 +130,8 @@ put(md,T("An asset that never reached the server is marked on the TILE, not only
 
 /* ============ BRAND ============ */
 const bd=F("brd/panel · corrected",340,620,PANEL,4); st(bd,LINE,1); bd.clipsContent=true; put(sec,bd,1080,Y);
-head(bd,"Brand · corrected","Import pre-answers its own question with the destructive option: the box says “Choose how to handle them” while the active strategy already replaces all twelve.");
-put(bd,T("IMPORT — 12 tokens, 3 collide",9,"Medium",FAINT),20,88);
+const HY_bd=head(bd,"Brand · corrected","Import pre-answers its own question with the destructive option: the box says “Choose how to handle them” while the active strategy already replaces all twelve.");
+put(bd,T("IMPORT — 12 tokens, 3 collide",9,"Medium",FAINT),20,HY_bd);
 const opts=[["Keep mine","the 3 that collide stay as they are",true],
             ["Replace with imported","the 3 that collide are overwritten",false]];
 let oy=106;
