@@ -322,8 +322,9 @@ const put=(parent,node,x,y)=>{ parent.appendChild(node); node.x=x; node.y=y; ret
   let x=28;
   for(const [n,h] of K.colour){
     const sw=F("swatch",64,40,h); sw.cornerRadius=3; sw.strokes=solid(LINE); sw.strokeWeight=1; put(b,sw,x,142);
-    put(b,T(n,9,"Regular",INK,64),x,188);
-    put(b,T(h,9,"Regular",MUTED,64),x,200);
+    /* 12px apart with ~16px line boxes overlapped by exactly the detector's
+       4px threshold. One text, two lines — no gap to get wrong. */
+    put(b,T(n+String.fromCharCode(10)+h,9,"Regular",MUTED,72),x,188);
     x+=84;
   }
   /* type + leading */
@@ -360,8 +361,8 @@ const pend=[
             [11,"Phase 4","The assembled editor. Last, by the same ordering."]];
 /* ============ 8 · COMPONENT LIBRARY ============ */
 {
-  const s=mkSection(SECTIONS[7], 1300, 1000);
-  const b=board(s,"Census — what already exists",40,40,1200,420);
+  const s=mkSection(SECTIONS[7], 1300, 1100);
+  const b=board(s,"Census — what already exists",40,40,1200,470);
   put(b,T("Component Library",24,"Semi Bold",INK),28,26);
   put(b,T("Read before proposing anything. Variants are rolled up to their sets, because an instance resolves to a VARIANT and never to the set holding it — counting raw masters reported 204 dead components where there are 49.",13,"Regular",SOFT,1140),28,66);
   const cs=[["338","raw masters"],["125","judged units (sets + standalone)"],["49","truly zero-use"],["0","real name collisions"]];
@@ -379,7 +380,7 @@ const pend=[
   put(b,T("Fixing the STOCK badge inside one master (Card / media) cleared the defect on 46 instances at once. That is the leverage this census exists to find.",12,"Regular",SOFT,1140),28,y+12);
 
   /* the merged nav row — the founder's decision, drawn rather than applied */
-  const b2=board(s,"Proposed · Nav row (merged)",40,490,1200,440);
+  const b2=board(s,"Proposed · Nav row (merged)",40,540,1200,470);
   put(b2,T("Nav row — one component for 1,626 instances",18,"Semi Bold",INK),28,24);
   put(b2,T("Founder decision, 6 Sep: merge. Same interaction model in both masters — a label row with a selected state — so the 'different interaction model' exception does not apply.",13,"Regular",SOFT,1140),28,56);
   put(b2,T("MEASURED, BEFORE MERGING",10,"Medium",MUTED),28,104);
@@ -401,17 +402,22 @@ const pend=[
   /* draw the six proposed variants */
   const dims=[[140,30],[240,32]];
   const states=["rest","hover","active"];
-  let vx=28;
+  /* six cells in one line reach 1,236 from x28 in a 1,200 board. One row per
+     size instead — which also reads better, since the comparison is across
+     states within a size. */
+  let vy=360;
   for(const [w,h] of dims){
+    let vx=28;
     for(const st of states){
       const cell=F("nav/"+(w===140?"compact":"default")+"/"+st, w, h, st==="hover"?"#F3F4F6":(st==="active"?"#EBF1FE":PANEL));
       cell.cornerRadius=3; cell.strokes=solid(LINE); cell.strokeWeight=1;
-      put(b2,cell,vx,360);
+      put(b2,cell,vx,vy);
       if(st==="active"){ const barN=F("Active bar",3,h-8,ACCENT); barN.cornerRadius=2; put(cell,barN,0,4); }
       put(cell,T("General",12,st==="active"?"Medium":"Regular",st==="active"?ACCENT:INK),st==="active"?12:10,Math.round(h/2)-8);
-      put(b2,T((w===140?"compact":"default")+" · "+st,9,"Regular",MUTED,w),vx,360+h+6);
+      put(b2,T((w===140?"compact":"default")+" · "+st,9,"Regular",MUTED,w),vx,vy+h+6);
       vx+=w+16;
     }
+    vy+=h+34;
   }
   made.push(s.name);
 }
