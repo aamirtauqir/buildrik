@@ -12,6 +12,15 @@
  * put the difference just relocates the defect, and this arc has already shipped
  * one repair that left the file worse than it found it.
  *
+ * The move is guarded. Writing `y` on a child whose `layoutPositioning` is
+ * "AUTO" inside an auto-layout parent is SILENTLY IGNORED by Figma — the write
+ * returns, nothing throws, and a script that trusts its own intent prints a
+ * success for a move that never happened. This one refuses that board instead,
+ * because flipping the children to ABSOLUTE to force the move would quietly
+ * convert a flow-laid panel into a positioned one, which is a bigger edit than
+ * the defect. And every applied move is RE-MEASURED afterwards: the line printed
+ * is what the file now says, not what was asked for.
+ *
  * Usage: node scripts/figma/fix-panel-stacks.mjs [--apply]
  */
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
@@ -45,12 +54,29 @@ for(const id of ${JSON.stringify(BOARDS)}){
       " and has no spacer taller than that to absorb it — needs eyes");
     continue;
   }
-  out.push((${APPLY}?"FIX\\t":"WOULD\\t")+id+"\\t"+String(b.name).slice(0,30)+"\\tspacer "+sp.id+" h"+Math.round(sp.height)+"->"+(Math.round(sp.height)-gap)+", "+
-    kids.filter(c=>c.y>sp.y).length+" nodes below pulled up "+gap);
-  ${APPLY ? `
   const below=kids.filter(c=>c.y>sp.y);
+  /* the write that lies: y on an AUTO-positioned child of an auto-layout parent */
+  const stuck=b.layoutMode&&b.layoutMode!=="NONE"
+    ? below.filter(c=>(c.layoutPositioning||"AUTO")!=="ABSOLUTE") : [];
+  if(stuck.length){
+    out.push("REFUSED\\t"+id+"\\t"+String(b.name).slice(0,30)+"\\tboard is "+b.layoutMode+
+      " auto-layout and "+stuck.length+" of the "+below.length+" nodes below the spacer are AUTO — a y write on them is ignored, not applied. Needs eyes.");
+    continue;
+  }
+  out.push((${APPLY}?"FIX\\t":"WOULD\\t")+id+"\\t"+String(b.name).slice(0,30)+"\\tspacer "+sp.id+" h"+Math.round(sp.height)+"->"+(Math.round(sp.height)-gap)+", "+
+    below.length+" nodes below pulled up "+gap);
+  ${APPLY ? `
+  const want=below.map(c=>({id:c.id,y:Math.round(c.y)-gap}));
   sp.resize(sp.width, Math.round(sp.height)-gap);
   for(const c of below) c.y=Math.round(c.y)-gap;
+  /* read the outcome back — the write is not the proof */
+  let bad=0;
+  for(const w of want){ const n=await figma.getNodeByIdAsync(w.id); if(!n||Math.round(n.y)!==w.y) bad++; }
+  const after=await figma.getNodeByIdAsync(id);
+  const ak=(after.children||[]).filter(c=>c.visible!==false && String(c.name).indexOf("hotspot/")!==0 && c.height);
+  const al=ak.reduce((a,c)=>(c.y+c.height)>(a.y+a.height)?c:a, ak[0]);
+  out.push("  VERIFY\\t"+id+"\\t"+(bad?bad+" of "+want.length+" moves did NOT take":"all "+want.length+" moves took")+
+    ", stack now ends at "+Math.round(al.y+al.height)+" (board "+H+")");
   ` : ''}
 }
 return out.join(String.fromCharCode(10));
