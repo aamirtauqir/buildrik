@@ -58,6 +58,11 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 
 const ONLY = (process.argv[2] && !process.argv[2].startsWith("--")) ? process.argv[2] : null;
 const MIN = Number((process.argv.find((a) => a.startsWith("--min=")) || "--min=4").split("=")[1]);
+/* The page was hardcoded to 1:3 in BOTH the section-list call and the
+   per-section measurement. Passing another page's id as the positional
+   argument therefore set the current page to 1:3 and measured against it —
+   a sweep that reports on a page you did not ask about, silently. */
+const PAGE = (process.argv.find((a) => a.startsWith("--page=")) || "--page=1:3").split("=")[1];
 /* Resumable state. The Figma quota does not stop dead — it trickles, granting a
    few calls at a time. A sweep that restarts at section 1 on every attempt
    spends the whole trickle re-reading sections it already has and never reaches
@@ -91,7 +96,9 @@ const call = async (code, description) => {
 };
 
 const secText = ONLY ? null : await call(
-  'const pg=figma.root.children.find(p=>p.id==="1:3");await figma.setCurrentPageAsync(pg);' +
+  'const pg=figma.root.children.find(p=>p.id===' + JSON.stringify(PAGE) + ');' +
+  'if(!pg) return "PAGE " + ' + JSON.stringify(PAGE) + ' + " NOT FOUND";' +
+  'await figma.setCurrentPageAsync(pg);' +
   'return JSON.stringify(pg.children.filter(s=>s.type==="SECTION").map(s=>s.id));', "list sections");
 /* The MCP answers a spent rate window with a prose sentence, not JSON. Parsing
    it blind turns "wait a few minutes" into a stack trace, and a crash here looks
@@ -108,7 +115,8 @@ const failed = [];
 for (const sid of sections) {
   const code = `
 const CONT=new Set(["FRAME","COMPONENT","COMPONENT_SET","INSTANCE","GROUP"]);
-const pg=figma.root.children.find(p=>p.id==="1:3");
+const pg=figma.root.children.find(p=>p.id===${JSON.stringify(PAGE)});
+if(!pg) return "PAGE NOT FOUND";
 await figma.setCurrentPageAsync(pg);
 const sec=await figma.getNodeByIdAsync(${JSON.stringify(sid)});
 if(!sec||sec.type!=="SECTION") return "";
