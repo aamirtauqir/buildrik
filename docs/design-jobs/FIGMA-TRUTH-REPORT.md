@@ -162,7 +162,69 @@ drawn on top of its neighbour. **None of them appeared in any tool result.**
 
 ---
 
-## 6. What was NOT verified
+## 7. QA — three independent lanes, and what they overturned
+
+Every module was reviewed by an agent that did not audit it, per the founder's
+rule. They read 119 marked nodes, 295 rewritten strings and 22 new boards.
+
+| | |
+|---|---|
+| confirmed | **75** |
+| wrong | **54** |
+| regressed | **12** |
+| verdict rows filed | 146 across `QA-A/B/C.jsonl` |
+
+Everything actionable they found is fixed. The three that matter most were all
+mine:
+
+**The map board asserted something false, on my own bad grep.** Hop 3 said "the
+link does not exist in the editor at all — a grep for `dynamicPages` returns
+ZERO hits", marked `verified`. The codebase spells it `dynamic-pages`. The
+screen is fully wired, **and this same arc built four boards for it** — the
+board was refuting its own file. I had broadcast "a null result is your
+instrument until proven otherwise" to twelve agents and then failed to apply it.
+
+**Four boards drew a control that does not exist** — a TEMPLATE PAGE picker on
+the dynamic-pages screen. `ContentViews.tsx:630` says outright "Nothing in this
+panel sets it". Inventing an affordance is the precise defect this arc exists to
+remove.
+
+**Eleven boards were marked not-implemented and are shipping**, including one
+whose marker *masked a real bug*: the deploy pipeline is built, and the reason it
+looks dead is that the worker emits `"active"` while `PublishTab.tsx:239` looks
+for `"running"`. A wrong "not implemented" costs more than a missing one — three
+Insert boards marked `RETIRED (no producer)` are built, unit-tested components
+with zero mounts, and RETIRED tells a builder to delete finished work.
+
+QA also caught a Critical regression that no automated check could see: a
+rewritten restore-confirm body grew from two lines to four inside a clipping
+frame and rendered **through** its Cancel and Restore buttons. The section scan
+said `overlaps=0` because it measures top-level boards — exactly as the QA brief
+predicted.
+
+### Acceptance, measured against the file
+
+```
+sections             29
+boards              927
+section-count drift  none
+top-level overlaps   0
+markers              [not-implemented] 66 · [unreachable] 3 · RETIRED 21
+old marker spellings 0
+new boards reachable 22 of 22, zero orphans
+```
+
+### What QA could not check
+
+- **5 of 119 marked nodes were screenshotted.** A rendering defect could exist on
+  any of the other 114.
+- The 23 `SUPERSEDED` nodes' successor targets were never opened.
+- No colour, type-ramp or token conformance was checked on any board.
+- **The app was never run**, so no verdict here is a live observation.
+
+---
+
+## 8. What was NOT verified
 
 - **The app was never run.** Every verdict is a static read of source plus a
   read or screenshot of the file. This repo's own rule calls a code reading a
