@@ -1,0 +1,229 @@
+--- 862:6859  (4) [cached]
+UNMEASURED	96:6	Device frames + zoom — §5.5	96:47	clone/font failed — clipping NOT checked
+UNMEASURED	96:6	Device frames + zoom — §5.5	96:43	clone/font failed — clipping NOT checked
+UNMEASURED	96:6	Device frames + zoom — §5.5	96:39	clone/font failed — clipping NOT checked
+UNMEASURED	96:6	Device frames + zoom — §5.5	96:35	clone/font failed — clipping NOT checked
+--- 957:4474  (3) [cached]
+OVERPRINT	300:2018	[dashboard-flow] S2.5 · chat · rej	300:2045 x 338:2338	by 55
+CONTAINER	813:4676	S1.6 · viewer-editor-state · read-	813:4678 "Middle band"	bottom +68
+CONTAINER	813:4676	S1.6 · viewer-editor-state · read-	813:4699 "Canvas"	bottom +11
+--- 1084:4527  (29) [cached]
+CONTAINER	778:4102	Templates · loading — RETIRED 2026	778:4119 "skeleton · card 2"	right +16
+OUT	778:4102	Templates · loading — RETIRED 2026	778:4163 sk/thumb	by 16
+CONTAINER	778:4102	Templates · loading — RETIRED 2026	778:4113 "skeleton · card 1"	right +16
+OUT	778:4102	Templates · loading — RETIRED 2026	778:4161 sk/thumb	by 16
+CONTAINER	778:4102	Templates · loading — RETIRED 2026	778:4107 "skeleton · card 0"	right +16
+OUT	778:4102	Templates · loading — RETIRED 2026	778:4159 sk/thumb	by 16
+CONTAINER	778:4102	Templates · loading — RETIRED 2026	778:4104 "Search"	right +16
+OUT	778:4102	Templates · loading — RETIRED 2026	778:4105 Input	by 16
+CONTAINER	642:2556	Templates · preview	642:2652 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	642:2832	Templates · applying	642:2928 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	807:4299	S1.1b · First run → Browse templat	807:4301 "Middle band"	bottom +32
+CONTAINER	807:4299	S1.1b · First run → Browse templat	807:4330 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	807:7252	S1.3b · new-page · template-picker	807:7290 "template-card/Blog G"	bottom +9
+TEXTOVER	807:7252	S1.3b · new-page · template-picker	807:7291	by 9
+CONTAINER	807:7252	S1.3b · new-page · template-picker	807:7288 "template-card/Produc"	bottom +9
+TEXTOVER	807:7252	S1.3b · new-page · template-picker	807:7289	by 9
+CONTAINER	807:7252	S1.3b · new-page · template-picker	807:7286 "template-card/Team &"	bottom +9
+TEXTOVER	807:7252	S1.3b · new-page · template-picker	807:7287	by 9
+CONTAINER	807:7252	S1.3b · new-page · template-picker	807:7284 "template-card/Restau"	bottom +9
+TEXTOVER	807:7252	S1.3b · new-page · template-picker	807:7285	by 9
+CONTAINER	807:7252	S1.3b · new-page · template-picker	807:7282 "template-card/Minima"	bottom +9
+TEXTOVER	807:7252	S1.3b · new-page · template-picker	807:7283	by 9
+CONTAINER	807:7252	S1.3b · new-page · template-picker	807:7280 "template-card/Hero +"	bottom +9
+TEXTOVER	807:7252	S1.3b · new-page · template-picker	807:7281	by 9
+CONTAINER	813:4489	S1.1e · template-preview (modal)	1711:8404 "modal/1100 · templat"	bottom +72
+CONTAINER	807:6694	S1.1d - Template applied - First c	807:6745 "Canvas"	bottom +195
+CONTAINER	807:6694	S1.1d - Template applied - First c	807:6778 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	807:6694	S1.1d - Template applied - First c	807:6757 "canvas viewport"	bottom +14, top +14
+CONTAINER	807:6694	S1.1d - Template applied - First c	807:6773 "selection box"	top +18
+--- 1090:4527  (1) [cached]
+CONTAINER	1069:4790	Insert · components-expanded	1069:4798 "Body"	bottom +200
+--- 1776:8372  (16) [cached]
+OVERPRINT	144:2	Media · grid	144:48 x 1124:4588	by 51
+OVERPRINT	146:2	Media · drill-in · asset-detail	146:15 x 146:13	by 72
+OVERPRINT	453:3931	Media · load-error	453:3954 x 453:3955	by 28
+ESCAPES	453:3931	Media · load-error	453:3951	by 17 past 453:3949
+ESCAPES	453:3931	Media · load-error	453:3948	by 10 past 453:3946
+ESCAPES	453:3931	Media · load-error	453:3942	by 17 past 453:3940
+ESCAPES	777:4093	Media · loading	777:4113	by 17 past 777:4111
+ESCAPES	777:4093	Media · loading	777:4110	by 10 past 777:4108
+ESCAPES	777:4093	Media · loading	777:4104	by 17 past 777:4102
+CONTAINER	1175:4827	Media · delete-confirm · bulk type	1175:4829 "in-use-warn"	right +8
+ESCAPES	1175:4827	Media · delete-confirm · bulk type	1175:4830	by 8 past 1175:4829
+TEXTOVER	1717:17203	Media · detail · context-menu · mo	1717:17213	by 9
+OVERPRINT	1738:8394	Media · stock · search-failed	1738:8412 x 1738:8407	by 360
+OVERPRINT	2430:21365	Media · local-only assets	2430:21547 x 2430:21393	by 256
+OVERPRINT	2430:21365	Media · local-only assets	2430:21547 x 2430:21396	by 256
+OVERPRINT	2430:21365	Media · local-only assets	2430:21399 x 2430:21400	by 18
+--- 1776:8373  (11) [cached]
+CONTAINER	152:137	Brand · starters	152:162 "Card / starter"	right +20
+CONTAINER	152:137	Brand · starters	152:155 "Card / starter"	right +20
+CONTAINER	152:137	Brand · starters	152:148 "Card / starter"	right +20
+CLIPPED	153:120	Brand · import-export	153:149	needs 32px, has 28
+CLIPPED	154:2	Brand · lint — [not-implemented] t	154:25	needs 48px, has 28
+CLIPPED	154:132	Brand · root · Beginner mode	154:186	needs 32px, has 28
+ESCAPES	306:2080	Brand · tokens · replace	I333:2350;12:7	by 30 past 333:2350
+ESCAPES	306:2217	Brand · lint · suppressed	I333:2360;12:11	by 30 past 333:2360
+CLIPPED	306:2232	Brand · export · exported	306:2257	needs 32px, has 28
+CLIPPED	306:2265	Brand · export · imported	306:2290	needs 32px, has 28
+CLIPPED	306:2298	Brand · export · error	306:2323	needs 32px, has 28
+--- 1776:8374  (5) [cached]
+OUT	163:113	History · Saves · time-travel	I229:1140;9:7 Button	by 23
+ESCAPES	163:113	History · Saves · time-travel	I229:1140;9:7	by 39 past 229:1140
+OVERPRINT	950:4474	[not-implemented] History · Backup	950:4481 x 950:4482	by 43
+OVERPRINT	1156:4620	[not-implemented] History · Backup	1156:4627 x 1156:4628	by 43
+OVERPRINT	2474:12093	Editor · reopened with unsaved wor	2474:12096 x 2474:12100	by 24
+--- 1776:8375  (1) [cached]
+CONTAINER	1171:4829	Layers · display-settings	1171:4850 "display-popover"	right +28
+--- 1776:8376  (4) [cached]
+CONTAINER	149:84	Content · record	149:99 "Field · Description"	bottom +16
+CONTAINER	149:108	Content · unsaved-record	149:123 "Field · Description"	bottom +16
+OVERPRINT	151:46	Content · data-sources	151:54 x 151:56	by 107
+CONTAINER	1170:4713	Content · collection-setup (modal)	1170:4720 "fields-list"	bottom +18
+--- 1776:8377  (5) [cached]
+OVERPRINT	141:78	Pages · bulk-select	141:121 x 141:122	by 24
+OVERPRINT	2430:12214	Pages · structure	2430:21528 x 2430:21529	by 8
+OVERPRINT	2430:12214	Pages · structure	2430:21530 x 2430:21531	by 8
+OVERPRINT	2430:12214	Pages · structure	2430:21534 x 2430:21535	by 8
+OVERPRINT	2430:12214	Pages · structure	2430:21536 x 2430:21537	by 8
+--- 1776:8379  (6) [cached]
+CONTAINER	138:53	Insert · searching	138:103 "Result · CTA button"	bottom +8
+TEXTOVER	138:53	Insert · searching	138:105	by 8
+CONTAINER	138:153	Insert · dragging — CONDITION-ONLY	155:2 "drag note"	bottom +8
+TEXTOVER	138:153	Insert · dragging — CONDITION-ONLY	155:3	by 8
+CONTAINER	1069:4529	Insert · elements-expanded	1069:4537 "Body"	bottom +816
+CONTAINER	1069:4707	Insert · blocks-expanded	1069:4724 "Blocks grid"	bottom +1752
+--- 1776:8380  (3) [cached]
+CONTAINER	170:2	AI · idle	170:15 "note"	bottom +8
+TEXTOVER	170:2	AI · idle	170:16	by 8
+OVERPRINT	171:36	AI · stopped	171:65 x 171:66	by 47
+--- 1776:8381  (34) [cached]
+OVERPRINT	32:2	Inspector · profile · CONTAINER (f	32:6 x 32:5	by 11
+CONTAINER	32:2	Inspector · profile · CONTAINER (f	1696:7622 "Icon / corner-left-u"	right +12, bottom +12
+CONTAINER	32:2	Inspector · profile · CONTAINER (f	1696:7614 "Icon / crosshair"	right +12, bottom +12
+CONTAINER	160:2	Inspector · instance-selected	160:74 "control"	right +16
+CONTAINER	160:2	Inspector · instance-selected	160:64 "control"	right +12
+CONTAINER	160:2	Inspector · instance-selected	160:59 "control"	right +12
+CONTAINER	160:2	Inspector · instance-selected	160:44 "control"	right +12
+CONTAINER	160:2	Inspector · instance-selected	160:32 "control"	right +12
+CONTAINER	160:2	Inspector · instance-selected	160:19 "control"	right +10
+CONTAINER	160:105	Inspector · bound-to-CMS	160:177 "control"	right +16
+CONTAINER	160:105	Inspector · bound-to-CMS	160:167 "control"	right +12
+CONTAINER	160:105	Inspector · bound-to-CMS	160:162 "control"	right +12
+CONTAINER	160:105	Inspector · bound-to-CMS	160:147 "control"	right +12
+CONTAINER	160:105	Inspector · bound-to-CMS	160:135 "control"	right +12
+CONTAINER	160:105	Inspector · bound-to-CMS	160:122 "control"	right +10
+CONTAINER	160:208	Inspector · breakpoint-override	160:280 "control"	right +16
+CONTAINER	160:208	Inspector · breakpoint-override	160:270 "control"	right +12
+CONTAINER	160:208	Inspector · breakpoint-override	160:265 "control"	right +12
+CONTAINER	160:208	Inspector · breakpoint-override	160:250 "control"	right +12
+CONTAINER	160:208	Inspector · breakpoint-override	160:238 "control"	right +12
+CONTAINER	160:208	Inspector · breakpoint-override	160:225 "control"	right +10
+CONTAINER	160:313	Inspector · pseudo-state	160:385 "control"	right +16
+CONTAINER	160:313	Inspector · pseudo-state	160:375 "control"	right +12
+CONTAINER	160:313	Inspector · pseudo-state	160:370 "control"	right +12
+CONTAINER	160:313	Inspector · pseudo-state	160:355 "control"	right +12
+CONTAINER	160:313	Inspector · pseudo-state	160:343 "control"	right +12
+CONTAINER	160:313	Inspector · pseudo-state	160:330 "control"	right +10
+CONTAINER	160:412	Inspector · reach-all-like-this	160:484 "control"	right +16
+CONTAINER	160:412	Inspector · reach-all-like-this	160:474 "control"	right +12
+CONTAINER	160:412	Inspector · reach-all-like-this	160:469 "control"	right +12
+CONTAINER	160:412	Inspector · reach-all-like-this	160:454 "control"	right +12
+CONTAINER	160:412	Inspector · reach-all-like-this	160:442 "control"	right +12
+CONTAINER	160:412	Inspector · reach-all-like-this	160:429 "control"	right +10
+CLIPPED	189:2	Inspector · reach-whole-site	189:103	needs 48px, has 36
+--- 1776:8382  (2) [cached]
+CONTAINER	169:2	Compare · single-page	169:15 "Body"	bottom +12
+CONTAINER	169:28	Compare · loading-render	169:41 "Body"	bottom +12
+--- 1776:8383  (6) [cached]
+OVERPRINT	156:2	Review panel · open	1753:8434 x 1753:8435	by 60
+OVERPRINT	157:2	Review panel · detached-present	157:55 x 157:56	by 135
+OVERPRINT	157:2	Review panel · detached-present	157:55 x 157:57	by 84
+OVERPRINT	158:2	Review panel · re-send-confirm	158:51 x 158:52	by 214
+OVERPRINT	158:105	Review panel · revoke-confirm	158:156 x 158:157	by 106
+OVERPRINT	1705:8704	[not-implemented] Review · reply-c	1705:8769 x 1705:8770	by 56
+--- 1776:8385  (17) [cached]
+CONTAINER	65:412	Shell state 12 · Loading	65:509 "Inspector — 300 · CO"	bottom +560
+CONTAINER	66:4	Shell state 4 · Multi-select	463:4003 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	66:225	Shell state 9 · AI agent run	463:4044 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	66:441	Shell state 10 · Offline	463:4085 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	66:640	Shell state 11 · Saving → conflict	463:4126 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	199:2	Shell state 2 · Returning (default	463:4167 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	199:205	Shell state 3 · Element selected	463:4208 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	199:205	Shell state 3 · Element selected	199:404 "selection box"	top +18
+CONTAINER	200:2	Shell state 6 · Comment mode	463:4290 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	200:213	Shell state 8 · Review active	463:4331 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	202:2	Shell · 1280 · pin auto-released (	202:21 "Middle band"	bottom +34
+CONTAINER	202:2	Shell · 1280 · pin auto-released (	463:4372 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	642:3696	Shell state 13 · Presence (multipl	642:3792 "Canvas toolbar (floa"	bottom +8, top +8
+CLIPPED	963:4474	Shell · 360 overlay panel (slot pr	963:4753	needs 32px, has 24
+CONTAINER	963:4474	Shell · 360 overlay panel (slot pr	963:4552 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	2162:11660	Shell state 14 · Saving	2162:11692 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	2162:11838	Shell state 15 · Save failed	2162:11870 "Canvas toolbar (floa"	bottom +8, top +8
+--- 1776:8387  (3) [cached]
+CLIPPED	640:2789	S7 · Settings · Headers	I640:3119;14:22	needs 40px, has 36
+CLIPPED	640:3849	S7 · Settings · Webhooks	I640:4169;14:22	needs 40px, has 36
+CLIPPED	2209:11816	S7 · Settings · Headers · dirty (u	I2209:11867;14:22	needs 40px, has 36
+--- 1776:8388  (32) [cached]
+CONTAINER	52:2	S1 · Editor — ASSEMBLED (1440, dra	462:3961 "Canvas toolbar (floa"	bottom +8, top +8
+CLIPPED	55:2	S1-stress · 40 pages · depth-5 tre	55:158	needs 36px, has 16
+CLIPPED	55:2	S1-stress · 40 pages · depth-5 tre	I2143:20623;2142:11080	needs 40px, has 20
+OVERPRINT	133:212	S5.3 · replied — SUPERSEDED 2026-0	133:266 x 133:420	by 98
+OVERPRINT	133:212	S5.3 · replied — SUPERSEDED 2026-0	133:420 x 133:421	by 48
+CONTAINER	133:630	S5.3 · show-resolved — SUPERSEDED 	133:698 "panel footer"	bottom +8
+TEXTOVER	133:630	S5.3 · show-resolved — SUPERSEDED 	133:700	by 8
+CONTAINER	297:2027	S1.2 · crash-recovery	297:2046 "Middle band"	bottom +34
+CONTAINER	301:1979	S3.1 · dragging	301:2075 "selection box"	top +18
+CONTAINER	301:2186	S3.1 · pick-mode	301:2282 "selection box"	top +18
+CONTAINER	301:2393	S3.1 · inline-edit	301:2489 "selection box"	top +18
+ESCAPES	303:1997	S3.6 · media · editing	I333:2340;12:7	by 30 past 333:2340
+CONTAINER	807:6558	S1.1c - First run - Start blank (I	807:6560 "Middle band"	bottom +32
+CONTAINER	807:6558	S1.1c - First run - Start blank (I	807:6589 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	807:7000	S1.2e - Offline - Connection resto	807:7079 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	807:7301	S3.2 · drop-target · insertion-ind	807:7379 "selection box"	top +18
+CONTAINER	807:7775	S3.3 · context-menu · right-click	807:7859 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	807:7775	S3.3 · context-menu · right-click	807:7838 "canvas viewport"	bottom +124, top +124
+CONTAINER	807:7775	S3.3 · context-menu · right-click	807:7854 "selection box"	top +18
+OUT	807:7775	S3.3 · context-menu · right-click	807:7839 site page	by 32
+OUT	807:7775	S3.3 · context-menu · right-click	807:7840 site nav	by 32
+OUT	807:7775	S3.3 · context-menu · right-click	807:7844 Find us	by 15
+OUT	807:7775	S3.3 · context-menu · right-click	807:7843 Book	by 15
+OUT	807:7775	S3.3 · context-menu · right-click	807:7842 Menu	by 15
+OUT	807:7775	S3.3 · context-menu · right-click	807:7841 Bella Cucina	by 16
+CONTAINER	807:8069	S3.4 · responsive-viewport · break	807:8153 "Canvas toolbar (floa"	bottom +8, top +8
+CONTAINER	807:8069	S3.4 · responsive-viewport · break	807:8148 "selection box"	top +18
+OVERPRINT	813:4888	S1.2g · force-refresh · new-versio	813:4893 x 813:4894	by 90
+OVERPRINT	814:7027	S3.9 · undo-redo-toast · 6-variant	814:7045 x 814:7046	by 28
+OVERPRINT	814:7027	S3.9 · undo-redo-toast · 6-variant	814:7039 x 814:7040	by 17
+OVERPRINT	817:5220	S6.4 · deploy-progress-pipeline — 	817:5225 x 817:5223	by 26
+OVERPRINT	1124:4562	S3.6 · media · optimise (drill-in)	1124:4566 x 1124:4567	by 119
+--- 1779:2  (7) [cached]
+OVERPRINT	165:2	Notifications · unread	165:22 x 165:23	by 14
+OVERPRINT	165:2	Notifications · unread	165:16 x 165:17	by 14
+OVERPRINT	165:2	Notifications · unread	165:11 x 165:12	by 14
+OVERPRINT	165:24	Notifications · all-read — NO CODE	165:42 x 165:43	by 14
+OVERPRINT	165:24	Notifications · all-read — NO CODE	165:36 x 165:37	by 14
+OVERPRINT	165:24	Notifications · all-read — NO CODE	165:32 x 165:33	by 14
+OVERPRINT	453:4051	Notifications · load-error	453:4057 x 786:4301	by 240
+--- 1779:3  (1) [cached]
+CLIPPED	166:58	CmdK · disabled-command — the SHEL	166:73	needs 32px, has 28
+--- 1779:4  (10) [cached]
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4913 x 817:4914	by 63
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4917 x 817:4918	by 62
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4921 x 817:4922	by 62
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4925 x 817:4926	by 70
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4929 x 817:4930	by 50
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4933 x 817:4934	by 83
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4937 x 817:4938	by 74
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4941 x 817:4942	by 91
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4908 x 817:4909	by 16
+OVERPRINT	817:4899	[not-implemented] Preview · access	817:4908 x 817:4910	by 24
+--- 1779:5  (1)
+OVERPRINT	2474:12031	Canvas · drop feedback — anatomy	2474:12058 x 2474:12041	by 140
+--- 1938:8372  (2)
+CONTAINER	642:3112	Components · create	642:3208 "Canvas toolbar (floa"	bottom +8, top +8
+OVERPRINT	1170:4777	Components · create (modal)	1712:8430 x 1712:8431	by 15
+
+MIXED AGE — 26 of the 29 sections read came from scratchpad_audit/mod/sweep-state.json and reflect the file as it was when that run measured them, not as it is now. Re-run with --fresh for a single-moment count.
+render defects >= 8px: 203 (across 29 of 29 sections, 26 of them cached)
