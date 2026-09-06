@@ -15,8 +15,14 @@
  *
  * The assertion, for any fixed-height panel:
  *
- *     sum(direct children heights) == panel height
- *     last child's bottom          == panel height
+ *     no child's bottom may pass the panel height
+ *
+ * The first version also asserted the converse — that the last child must REACH
+ * the bottom — and that is simply wrong. It reported 97 panels as defective for
+ * the crime of not being full: a Notifications panel with three rows genuinely
+ * ends at y236, and a spec board is not obliged to fill 812px. 97 false
+ * positives would have buried the 6 real ones, which is the same failure as a
+ * gate that counts instead of keying a set.
  *
  * It matters because the failure silently DELETES a whole UI region from a spec
  * — a reviewer sees a panel with no footer and has no way to tell whether the
@@ -44,9 +50,9 @@ for(const s of pg.children){
     const last=kids.reduce((a,c)=>(c.y+c.height)>(a.y+a.height)?c:a, kids[0]);
     const bottom=Math.round(last.y+last.height);
     const gap=bottom-H;
-    if(Math.abs(gap)>TOL){
-      out.push((gap>0?"OVERRUN \\t":"SHORT   \\t")+b.id+"\\t"+String(b.name).slice(0,38)+
-        "\\tlast child "+last.id+" \\""+String(last.name).slice(0,20)+"\\" ends at "+bottom+" (board "+H+", "+(gap>0?("+"+gap+" off the bottom"):(gap+" short")) +")");
+    if(gap>TOL){
+      out.push("OVERRUN\\t"+b.id+"\\t"+String(b.name).slice(0,38)+
+        "\\t"+last.id+" \\""+String(last.name).slice(0,20)+"\\" ends at "+bottom+" (board "+H+", +"+gap+" off the bottom)");
     }
   }
 }
