@@ -119,10 +119,12 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
          recomputing — so applying twice lands in the same place as applying
          once. A repair that is not idempotent is a repair you can only run
          exactly one time, and nothing enforced that. */
+      /* getPluginData is unavailable in this host runtime — only private web
+         plugins may use it. getSharedPluginData needs an explicit namespace. */
       const KEY="a0-origY";
       for(const c of (host.children||[])){
         if(String(c.name).indexOf("a0/")===0) continue;
-        const rec=c.getPluginData(KEY);
+        const rec=c.getSharedPluginData("bk.figmatruth",KEY);
         if(rec) c.y=Number(rec);
       }
       const cta2=cta ? await figma.getNodeByIdAsync(cta.id) : null;
@@ -131,7 +133,7 @@ out.push((${APPLY}?"renamed ":"would rename ")+renamed+" back-hotspots that name
         for(const c of (host.children||[])){
           if(String(c.name).indexOf("a0/")===0) continue;
           if(c.y >= cta2.y){
-            if(!c.getPluginData(KEY)) c.setPluginData(KEY, String(Math.round(c.y)));
+            if(!c.getSharedPluginData("bk.figmatruth",KEY)) c.setSharedPluginData("bk.figmatruth",KEY, String(Math.round(c.y)));
             c.y = Math.round(c.y) + shift;
           }
         }
