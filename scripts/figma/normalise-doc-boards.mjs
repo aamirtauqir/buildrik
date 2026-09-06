@@ -13,6 +13,10 @@
  *   #333340  ->  #4B5563   --bk-ink-soft
  *   #FAFCFF  ->  #F3F4F6   --bk-bg-subtle
  *   #000000  ->  #111827   --bk-ink        (DESIGN.md: no black)
+ *   #FAFAFA  ->  #F3F4F6   near-miss on --bk-bg-subtle
+ *   #D9D9D9  ->  #D1D5DB   near-miss on --bk-border-medium
+ *   #6B7380  ->  #6B7280   near-miss on --bk-ink-muted, one digit out
+ *   #0000FF  ->  #1A56DB   pure blue, in nothing
  *   Inter Bold -> Inter Semi Bold           (DESIGN.md:148, weights <= 600)
  *
  * #F38BA8 is deliberately NOT remapped: it mirrors Canvas.css:241, where the
@@ -50,7 +54,10 @@ const CONT=new Set(["FRAME","COMPONENT","COMPONENT_SET","INSTANCE","GROUP"]);
 const pg=figma.root.children.find(p=>p.id==="1:3");
 await figma.setCurrentPageAsync(pg);
 const want=new Set(${JSON.stringify(BOARDS)});
-const MAP={"1a264d":"111827","333340":"4b5563","fafcff":"f3f4f6","000000":"111827"};
+const MAP={"1a264d":"111827","333340":"4b5563","fafcff":"f3f4f6","000000":"111827",
+  /* near-misses the conformance sweep found: one hex off a real token, which is
+     worse than a wrong colour because nothing catches it by eye */
+  "fafafa":"f3f4f6","d9d9d9":"d1d5db","6b7380":"6b7280","0000ff":"1a56db"};
 const hex=(c)=>[c.r,c.g,c.b].map(v=>Math.round(v*255).toString(16).padStart(2,"0")).join("");
 const rgb=(h)=>({r:parseInt(h.slice(0,2),16)/255,g:parseInt(h.slice(2,4),16)/255,b:parseInt(h.slice(4,6),16)/255});
 let fills=0, strokes=0, bolds=0, boards=0, missing=[];
