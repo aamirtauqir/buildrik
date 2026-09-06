@@ -334,3 +334,27 @@ Two things this spec explicitly leaves open rather than drawing over:
   is used only by `CollaborationManager.ts:746` today, so nothing is broken now —
   but the redirect proposal in §4 makes `slugHistory` load-bearing, and the two
   shapes must be reconciled before it is.
+
+
+---
+
+## Cross-spec reconciliation — the expanded drawer is 560, not 700 (2026-09-07)
+
+A Phase 4 QA pass filed this spec as contradicting `SPEC-NAVIGATION`, which puts
+the wide drawer at 560 where this one says 700. Reading both, the finding is
+**partly overstated**: this spec DESCRIBES 700 as the value that ships today,
+while Navigation PROPOSES 560 to replace it. A description and a proposal are not
+a contradiction.
+
+What is real is the risk to a reader: nothing here says the 700 is on its way
+out, so someone building from this spec alone would build the wrong width.
+
+**The proposal wins, and its arithmetic is why.** At 1440, a 700 drawer plus the
+60 rail and the 300 inspector leaves 380px of canvas, against a 1024 desktop
+frame floor (`canvasStyles.ts:57`) — the editor would be showing a site preview
+narrower than the narrowest device it claims to support. 560 leaves 520.
+
+So: every expanded-drawer state in this spec inherits
+`--bk-size-drawer-wide: 560` from `SPEC-NAVIGATION`'s surface-class table. The
+700 references here are historical and should be read as "the value being
+replaced".
