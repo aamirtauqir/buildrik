@@ -95,7 +95,7 @@ for(const s2 of ["Typography","Background","Border","Effects","Visibility"]){
 put(ip,T("185 property definitions exist in the registry and render in no panel. Composite elements get ID / Title / Tab index only.",9,"Regular",CRIT,268),16,y+6);
 
 /* ================= PUBLISH · seven states ================= */
-const pb=F("pub/states",900,470,PANEL,4); st(pb,LINE,1); put(sec,pb,1300,OY);
+const pb=F("pub/states",900,88+Math.ceil(7/3)*120+20,PANEL,4); st(pb,LINE,1); put(sec,pb,1300,OY);
 put(pb,T("Publish — seven states",15,"Semi Bold",INK),20,18);
 put(pb,T("The panel today has three and opens in the wrong one: on every reload of a published site it claims 'Published to production' and disables its own button, while the topbar offers 'Publish changes'.",11,"Regular",SOFT,860),20,44);
 const ps=[
@@ -107,8 +107,15 @@ const ps=[
  ["cancelled","Cancelled","Nothing was deployed. v4 is still live.",MUTED,"Publish again",BG],
  ["lost","Lost contact with the build","Last seen Building, 3:10 ago.",WARN,"Check status · Cancel",WW],
 ];
-let px=20, py=88;
+/* Three per row, placed from the index. The previous version incremented px
+   and THEN tested it, so it fitted two per row, turned seven cards into four
+   rows and pushed the last one 88px past a 470-tall board. Deriving the
+   position from the index cannot drift. */
+const PER=3, CW=282, CH=110, GAPX=10, GAPY=10;
+let idx=0;
 for(const [k,title,body,col,cta,fill] of ps){
+ const px=20+(idx%PER)*(CW+GAPX), py=88+Math.floor(idx/PER)*(CH+GAPY);
+ idx++;
  const c=F("state/"+k,282,110,fill,4); st(c, col===MUTED?LINE:col,1); put(pb,c,px,py);
  const dot=F("dot",8,8,col,4); put(c,dot,14,18);
  put(c,T(title,11,"Medium",INK),28,14);
@@ -116,7 +123,6 @@ for(const [k,title,body,col,cta,fill] of ps){
  if(k==="publishing"){const tr=F("track",254,4,LINE,2); put(c,tr,14,62); const fl=F("fill",150,4,ACCENT,2); put(tr,fl,0,0);}
  if(cta){const b=F("cta",0,26, k==="ready"?ACCENT:PANEL,4); const t2=T(cta,10,"Medium", k==="ready"?"#FFFFFF":INK);
   b.resize(Math.round(t2.width)+24,26); if(k!=="ready") st(b,LMED,1); put(c,b,14,74); put(b,t2,12,7);}
- px+=292; if(px>860-282){px=20;py+=120;}
 }
 
 /* ================= PAGES · 280 ================= */

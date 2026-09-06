@@ -177,7 +177,9 @@ for(const [title,body,kind] of boxes){
     for(let i=0;i<3;i++){ const sk=F("sk",[180,120,150][i],10,"#E5E7EB",5); put(bx,sk,16,14+i*16); }
   } else {
     put(bx,T(title,11,"Medium", kind===".error"?CRIT:INK),16,14);
-    if(body) put(bx,T(body,10,"Regular",MUTED,480),16,34);
+    /* 480 wide from x16 ends at 496 and the Retry button starts at 440 —
+       the body ran under the button by exactly 56. Stop short of it. */
+    if(body) put(bx,T(body,10,"Regular",MUTED,400),16,34);
     if(kind===".error"){ const btn=F("retry",56,22,PANEL,3); stroke(btn,LMED,1); put(bx,btn,440,20); put(btn,T("Retry",10,"Medium",INK),14,6); }
   }
   by+=76;
