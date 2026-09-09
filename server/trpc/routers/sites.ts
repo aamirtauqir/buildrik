@@ -45,6 +45,12 @@ import {
   getProjectDataSchema,
   editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
+import {
+  schedulePublish,
+  cancelScheduledPublish,
+  getScheduledPublish,
+  ScheduledPublishError,
+} from "@/server/services/scheduled-publish.service";
 import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
@@ -423,6 +429,69 @@ export const sitesRouter = router({
           });
         throw e;
       }
+    }),
+
+  /* Scheduled publish — E2, taken 2026-09-08. The gate is the SAME EDITOR role
+     the `publish` mutation checks, and deliberately no more: scheduling a
+     publish is publishing, moved in time, so it must not be easier to schedule
+     one than to press the button. The approval gate is not re-checked here —
+     it belongs to `startPublish`, which the sweep calls when the time comes, so
+     the gate is evaluated against the site as it will be THEN rather than as it
+     was when someone picked a date. */
+  schedulePublish: protectedProcedure
+    .input(z.object({ siteId: z.string(), scheduledFor: z.coerce.date() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      const workspaceId = await getWorkspaceId(ctx);
+      try {
+        return await schedulePublish({
+          siteId: input.siteId,
+          workspaceId,
+          userId: ctx.session.user!.id!,
+          scheduledFor: input.scheduledFor,
+        });
+      } catch (e) {
+        if (e instanceof ScheduledPublishError) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: e.message });
+        }
+        throw e;
+      }
+    }),
+
+  cancelScheduledPublish: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return await cancelScheduledPublish(input.siteId);
+      } catch (e) {
+        if (e instanceof ScheduledPublishError) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: e.message });
+        }
+        throw e;
+      }
+    }),
+
+  getScheduledPublish: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      /* Read access, not a role gate: `checkSiteRole` takes OWNER | ADMIN |
+         EDITOR | DESIGNER and has no viewer tier, so asking it for "VIEWER"
+         does not compile. Anyone who can open the site can see that a publish
+         is scheduled — the same `assertSiteAccess` the site read and the
+         pre-publish check already use. */
+      await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      return getScheduledPublish(input.siteId);
     }),
 
   unpublish: protectedProcedure
