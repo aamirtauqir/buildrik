@@ -67,7 +67,7 @@ const BAR =
    floor of the type ramp is a CHROME rule; this is a canvas overlay label
    inside a 20px pill. */
 const SEG_BASE =
-  "tw:shrink-0 tw:h-auto tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[10px] tw:leading-[normal] " +
+  "tw:shrink-0 tw:h-auto tw:rounded tw:px-1.5 tw:py-[3px] tw:text-[11px] tw:leading-[normal] " +
   "tw:whitespace-nowrap tw:border-0 tw:font-normal tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 /* `disabled:bg-white` is load-bearing, not defensive. The `Canvas` root
    segment is rendered `disabled` (there is nowhere above it to go), and

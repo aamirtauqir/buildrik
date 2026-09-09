@@ -238,7 +238,7 @@
    already carries the tone. */
 .med-rx-failed {
   margin: 0;
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-soft);
 }
 

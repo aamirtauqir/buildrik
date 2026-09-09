@@ -55,7 +55,7 @@ const ROW_BTN =
    `px-1.5` on every cell is the board's 12px column gap read as cell padding,
    since a <tr> takes neither padding nor gap; `first:pl-2.5` is its row inset. */
 const CELL = "tw:px-1.5 tw:first:pl-2.5 tw:last:pr-2.5";
-const TH = `${CELL} tw:py-1 tw:text-left tw:text-[10px] tw:font-semibold tw:text-[var(--bk-ink-muted)]`;
+const TH = `${CELL} tw:py-1 tw:text-left tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-muted)]`;
 const TD = `${CELL} tw:py-[7px]`;
 
 /** "today" for same-day, else "MMM D" — the board's own two shapes. */
@@ -403,7 +403,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                 key={f.id}
                                 className={`${TD} ${
                                   f.type === "image"
-                                    ? "tw:text-[10px] tw:text-[var(--bk-ink-muted)]"
+                                    ? "tw:text-[11px] tw:text-[var(--bk-ink-muted)]"
                                     : idx === 0
                                       ? "tw:text-[var(--bk-ink)]"
                                       : "tw:text-[var(--bk-ink-soft)]"
@@ -421,7 +421,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                 )}
                               </td>
                             ))}
-                            <td className={`${TD} tw:text-[10px] tw:text-[var(--bk-ink-muted)]`}>
+                            <td className={`${TD} tw:text-[11px] tw:text-[var(--bk-ink-muted)]`}>
                               {updatedLabel(item.updatedAt)}
                             </td>
                             <td className={TD}>

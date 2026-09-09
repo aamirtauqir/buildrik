@@ -92,7 +92,7 @@
    and loses this one — the same pair, and the same call, as the folder rail's
    captions. */
 .mgr-search .mgr-kbd {
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-soft);
   border: 1px solid var(--bk-border);
   padding: 1px 5px;
@@ -209,7 +209,7 @@
    a defect. --bk-ink-soft is 7.0:1. */
 .mgr-tree-section {
   margin: 0 0 var(--bk-space-8);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 600;
   color: var(--bk-ink-soft);
   text-transform: uppercase;
@@ -283,7 +283,7 @@
   border-radius: var(--bk-radius-full);
   background: var(--bk-bg-panel);
   color: var(--bk-ink-soft);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   line-height: 14px;
   cursor: pointer;
 }
@@ -486,7 +486,7 @@
 }
 
 .mgr-asset-name {
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   color: var(--bk-ink-soft);
   font-weight: 500;
   overflow: hidden;
@@ -884,7 +884,7 @@
   background: var(--bk-warning-tint);
   color: var(--bk-warning-text);
   border-radius: var(--bk-radius-full);
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 600;
 }
 
@@ -1010,7 +1010,7 @@
   display: flex;
   align-items: center;
   gap: var(--bk-space-4);
-  font: 400 9px var(--bk-font-ui);
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
 .mgr-use-dot {
@@ -1035,7 +1035,7 @@
   border-radius: var(--bk-radius-sm);
   background: transparent;
   color: var(--bk-ink-muted);
-  font: 500 9px var(--bk-font-ui);
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
   cursor: pointer;
 }
 .mgr-fmt.active {
@@ -1050,7 +1050,7 @@
   border-radius: var(--bk-radius-sm);
   background: transparent;
   color: var(--bk-ink-muted);
-  font: 400 10px var(--bk-font-ui);
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
   cursor: pointer;
 }
 .mgr-gridn-btn.active {
@@ -1085,7 +1085,7 @@
 }
 .mgr-list-head {
   padding: 6px var(--bk-space-12);
-  font: 600 10px var(--bk-font-ui);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
   border: 0 solid var(--bk-border);
   border-bottom-width: 1px;
@@ -1109,7 +1109,7 @@
 .mgr-list-type,
 .mgr-list-size,
 .mgr-list-use {
-  font: 400 10px var(--bk-font-ui);
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }
 .mgr-list-use.unused { color: var(--bk-ink-muted); }
@@ -1120,7 +1120,7 @@
   padding: 6px var(--bk-space-12);
   border-radius: var(--bk-radius-md);
   background: var(--bk-bg-subtle);
-  font: 400 10px var(--bk-font-ui);
+  font: 400 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-soft);
 }
 
