@@ -84,3 +84,5 @@ packages/dashboard/newdeisgn/
 .pnpm-store/
 undefined/
 scratchpad_audit/
+packages/editor/.scratch/
+lib/__tests__/.live-pages.json

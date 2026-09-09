@@ -14,7 +14,9 @@
 
 **Theme modes**: `light|dark|system` (`types.ts:125`); ColorMode persists `buildrik:colorMode`, system via `prefers-color-scheme` (`engine/colorMode/ColorMode.ts:4,16,58-70`). **DarkResolver**: dark → `darkValue ?? value`, emits `tokens:dark-missing`; empty-string darkValue = explicit (`engine/darkResolver/DarkResolver.ts:19-28`). UI = 2-pill Light/Dark — **System dropped from UI**, kept in state (`ui/ColorModeToggle.tsx:8-13,53-54`). DS panel dark-previews via `data-ds-preview`; chrome stays light (`ui/DesignSystemTab.tsx:147-161,487`).
 
-**Style presets** ×11 categories (button/card/form/link/badge/alert/tooltip/modal/nav/table/layout — `types.ts:137-158`); 22 defaults seeded (`constants.ts:735-907`); property → `{tokenId}` bindings, raw values forbidden.
+**Style presets** ×11 categories (button/card/form/link/badge/alert/tooltip/modal/nav/table/layout — `types.ts:137-158`); 22 defaults seeded (`constants.ts:735-907`); each preset property **resolves to** a `{tokenId}`, raw values forbidden.
+
+> **"Bound" means element → preset** (founder call 2026-09-08, closing `BLOCKERS.md` B4). This line previously read "property → `{tokenId}` **bindings**", which made "bound" mean preset-property → token, while every board uses it for an element carrying a preset. One word, two relationships, and the no-op picker at `14:310` had no target under either reading. The property → token relationship is real and keeps its own word — a property **resolves to** a token — so the two are no longer named the same thing.
 
 **Starter themes ×6**: cobaltDefault, stripeBlue, notionWarm, appleMinimal, linearDark, vercelMono (`starters/index.ts:18-25`) — applying restyles tokens, keeps elements (`ui/StarterGalleryModal.tsx:93-94`). Auto-open disabled (D3 2026-05-22) — "Browse themes" button only (`StarterGalleryMount.tsx:68-95`).
 

@@ -1,5 +1,34 @@
 # BLOCKERS — what stops a design job
 
+> ## Taken 2026-09-08/09 — eight rows closed in code
+>
+> Decisions in `docs/design-jobs/FIGMA-TO-CODE/DECISIONS-2026-09-08.md`; the
+> rows below still read as they did when they were written. Verified by a full
+> 208-surface conformance sweep: **7,306 properties, 0 fail.**
+>
+> | row | what shipped |
+> |---|---|
+> | **B1** Compare at 1080 | Split and overlay open at 1080 through chrome-ui `OverlayMount`; list stays in the 280 drawer. Unblocking it exposed **8 real failures the 280 mount had hidden** — panes 528 against the board's 516 (`STAGE` had `p-2 gap-2` where 516×2 needs 48), panes filled gray-50 not card-white, and the bar asking for gray-100 while shipping gray-200. That last one was `Toolbar` composing classes with `.join(" ")`, so a caller's `border-[…]` and the base's both compiled and **stylesheet order decided**; it uses `twMerge` now. `compare-side-by-side` went 36 → 44 properties compared. |
+> | **B4** "bound" | Settled as **element → preset** (the boards' meaning). PRD `06:17` amended — a preset property now *resolves to* a token, so one word no longer names two relationships — and `14:310`'s picker has an unambiguous target for the first time. |
+> | **B5** apply phases | The "artificial 500ms" **and both files this row cites are already gone** (`templateActions.ts`, `TemplateLibrary.tsx` no longer exist) — the row was stale, not a live defect. What was missing is now built: `importHTMLToActivePage` reports **each top-level landmark as it converts**, labelled from the template's own markup, **inside the single transaction** so a template apply stays one undo step. Measured: the largest shipped template is 3,488 chars / 3 landmarks, single-digit ms — so the rows are a record of what ran and **no delay was added to make them visible**. |
+> | **B6** Layers empty | Root **excluded** (PRD 04:7 over the contradicting 05:12). An empty page reads **0 layers** and board 143:355 is reachable. Two follow-ons the tests caught: the auto-expand only ever revealed the top level, which is now visible with nothing expanded, and storage hydration was seeding an id that is no longer a row. |
+> | **B13** Media folder column | **Already closed** during the 2026-09-08 conformance arc — `FolderTree.tsx` ships the three named groups (SMART / FOLDERS / TAGS) of boards 1160:16/27/43. This file did not know. |
+> | **E1** perf audit | **Half done, and the half that was a real defect.** `DEPLOYING` is now written at the deploy boundary; it was an enum value two `publish.service.ts` filters READ and nothing ever wrote. The Lighthouse half is **not** done: there is no `lighthouseScore` column and no PSI/Lighthouse code anywhere, so it needs a provider choice and a credential. "Performance check" correctly keeps reporting `skipped` rather than a score nobody computed. |
+> | **E2** scheduled publish | **Built**: `ScheduledPublish` model + migration, service, three tRPC endpoints, and a `/api/cron/scheduled-publish` sweep registered every 5 minutes. Uniqueness is a **partial unique index in the database**, not a service check — the lesson `publish_job_active_unique` already records. The sweep hands off to `startPublish` and re-implements nothing, so a scheduled publish obeys exactly the rules the button obeys. It stores **when**, never a frozen copy of the site. 11 tests. |
+> | **E7** media dimensions | **Built**: `MediaAsset.width/height` and `MediaAssetVersion.createdBy`, all nullable — every existing row predates the measurement and a back-filled guess would put an unmeasured number on screen. Dimensions are measured **client-side** (the browser already decodes the file to preview it) and never block an upload; the update branch only ever writes them, never clears them. `createdBy` comes from the authenticated caller, never client input. |
+>
+> **Two migrations are written and NOT applied** —
+> `20260909020000_media_asset_dimensions_and_version_author` and
+> `20260909021000_scheduled_publish`. Both are purely additive (new nullable
+> columns; one new table), safe on a live database, and need no backfill.
+> Written by hand because no shadow database was reachable for
+> `prisma migrate diff`. `prisma validate` passes.
+>
+> Still open and owned elsewhere: **E1's Lighthouse half** (provider + credential),
+> and the two Figma-side edits — `--bk-ink-muted` → `#646C79` and re-pointing
+> boards that name `--color/success` for text.
+
+
 From `LEDGER.jsonl` (376 lines) + `jobs.json` (**519 rows @2026-09-03**: done 83 · fix 60 · fix-figma 12 · todo 36 · unbuildable 60 · verify 268). **`decide` is 0** — every G row is answered.
 
 **Read the counts below as of the 09-02 rewrite; the 09-03 arc moved them.** That arc
