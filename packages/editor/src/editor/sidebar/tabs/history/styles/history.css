@@ -30,7 +30,7 @@
    and resolves off Inter's own metrics. */
 .view-switcher {
   display: flex;
-  height: 40px;
+  height: var(--bk-space-40);
   /* `border: 0 solid <colour>` then a bottom WIDTH, rather than the shorthand
      `border-bottom: 1px solid <colour>`. Same paint, but the element's
      border-COLOR is now the board's on all four edges — and border-top-color
@@ -106,11 +106,11 @@
    4 where the board draws 6. */
 .bd-history-container .search-input {
   width: 100%;
-  height: 36px;
+  height: var(--bk-space-36);
   background: var(--bk-bg-subtle);
   border: 1px solid var(--bk-border);
   border-radius: var(--bk-radius-md);
-  padding: 0 28px 0 var(--bk-space-32);
+  padding: 0 var(--bk-space-28) 0 var(--bk-space-32);
   font-size: 12px;
   line-height: normal;
   color: var(--bk-ink);
@@ -1185,7 +1185,7 @@
   align-items: stretch;
   justify-content: center;
   gap: var(--bk-space-4);
-  padding: 40px var(--bk-space-20) var(--bk-space-24);
+  padding: var(--bk-space-40) var(--bk-space-20) var(--bk-space-24);
   text-align: center;
   color: var(--bk-ink-muted);
   flex: 0 0 auto;

@@ -7,7 +7,7 @@
      56 / 1fr / 36 while .mgr-top and .mgr-status set 52 and 32 on themselves,
      so the middle column was 752: eight pixels lost to two rows taller than
      the thing inside them. */
-  grid-template-rows: 52px 1fr 32px;
+  grid-template-rows: 52px 1fr var(--bk-size-footer);
   overflow: hidden;
   font-size: 13px;
   color: var(--bk-ink);
@@ -959,7 +959,7 @@
   color: var(--bk-gray-400);
 }
 
-.mgr-empty-ring svg { width: 28px; height: 28px; }
+.mgr-empty-ring svg { width: var(--bk-space-28); height: var(--bk-space-28); }
 
 .mgr-empty-hero h4 {
   margin: 0;

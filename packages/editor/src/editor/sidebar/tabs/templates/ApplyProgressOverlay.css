@@ -102,8 +102,8 @@
    defaults to. Two classes deep so a `tw:` utility cannot win on source
    order (CLAUDE.md §Chrome — "Overriding a flowbite default"). */
 .tmpl-progress__foot .tmpl-progress__cancel {
-  height: 28px;
-  min-height: 28px;
+  height: var(--bk-size-row-dense);
+  min-height: var(--bk-size-row-dense);
   padding: 6px var(--bk-space-12);
   /* --color/border, not flowbite `light`'s gray-300 (board 642:3110). */
   border-color: var(--bk-border);

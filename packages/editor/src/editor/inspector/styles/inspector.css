@@ -84,7 +84,7 @@
      draws a fill here at all (32:3 has none, so the panel shows through), so
      the flat token says the same thing the gradient did and one fewer gate
      has to allow it. */
-  height: 48px;
+  height: var(--bk-space-48);
   padding: 0 var(--bk-space-16);
   background: var(--bk-bg-panel);
   border-bottom: 1px solid var(--bk-border);
@@ -145,7 +145,7 @@
      section rows below, both of which sit at 16. Board 956:6859 (the MEDIA
      profile) draws the same strip at 40h; that is the one board of the three
      that disagrees and it loses on count. Recorded in the recipe. */
-  height: 32px;
+  height: var(--bk-size-row);
   padding: 0 var(--bk-space-16);
   gap: var(--bk-space-8);
 }

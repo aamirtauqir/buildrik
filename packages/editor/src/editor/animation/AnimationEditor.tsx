@@ -115,7 +115,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
                 // Board 429:2362 fixes the chip at 40 tall; 12/6 on an 11px
                 // line box measured 37, so any chip whose label wrapped grew
                 // taller than the rest of its row.
-                height: 40,
+                height: "var(--bk-space-40)",
                 padding: "12px 6px",
                 background:
                   animation.type === anim.value

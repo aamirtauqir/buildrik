@@ -510,7 +510,7 @@ textarea.bd-set-input {
   gap: var(--bk-space-8);
   font: 400 var(--bk-text-12) var(--bk-font-mono);
   color: var(--bk-gray-700);
-  height: 36px;
+  height: var(--bk-space-36);
   padding: 0 var(--bk-space-8);
   background: var(--bk-gray-50);
   border: 0;

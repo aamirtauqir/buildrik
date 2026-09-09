@@ -395,7 +395,7 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
         backgroundColor: "var(--bk-ink)",
         /* Board 807:7517 draws the pill 28 tall with the label at x=8. 6/8
            padding on an 11px line box measured 25. */
-        height: 28,
+        height: "var(--bk-size-row-dense)",
         padding: "0 8px",
         borderRadius: 4,
         fontSize: 11,

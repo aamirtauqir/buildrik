@@ -158,8 +158,10 @@ export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
            of every hover. */
         padding: "6px 0",
         /* 8, not PANEL_STYLE's 10 (1176:4867 / 4902). Overridden here rather
-           than in PANEL_STYLE, which twenty-six other canvas surfaces read. */
-        borderRadius: 8,
+           than in PANEL_STYLE, which twenty-six other canvas surfaces read.
+           Through the token, not the literal: both files are on the
+           green-panel allowlist, where a raw radius is a hard zero. */
+        borderRadius: "var(--bk-radius-lg)",
         zIndex: Z_INDEX.contextMenu,
         minWidth: MENU_WIDTH,
         color: CANVAS_COLORS.textPrimary,

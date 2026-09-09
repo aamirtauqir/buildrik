@@ -569,7 +569,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
                  only thing that reaches past it, and it is the same escape
                  hatch CommentRow uses for geometry that has to win. */
               style={{
-                height: 32,
+                height: "var(--bk-size-row)",
                 paddingLeft: 16,
                 paddingRight: 16,
                 paddingTop: 10,
