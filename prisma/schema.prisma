@@ -1023,6 +1023,13 @@ model MediaAsset {
   mimeType          String
   filename          String
   altText           String?
+  /// Intrinsic pixel dimensions, written at upload. Boards 146:2 and 146:32
+  /// draw "2400x1600" and the model had no way to supply it — E7 in
+  /// docs/design-jobs/BLOCKERS.md, confirmed 2026-09-03 and taken 2026-09-08.
+  /// Nullable because every row that predates this column has no measurement,
+  /// and inventing one would be worse than showing nothing.
+  width             Int?
+  height            Int?
   generatedMetadata Json?
   userMetadata      Json?
   lastJobKey        String?
@@ -1069,6 +1076,11 @@ model MediaAssetVersion {
   url       String
   bytes     Int      @default(0)
   edits     Json
+  /// Who saved this version. Board 146:32 draws an author line the model could
+  /// not supply (E7). Nullable for rows written before the column existed, and
+  /// deliberately NOT a relation: a version should survive the account that
+  /// made it being deleted, the same way `MediaAsset.userId` is a bare id.
+  createdBy String?
   createdAt DateTime @default(now())
 
   asset MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
@@ -1333,6 +1345,43 @@ model LoginAttempt {
 /// way to express partial unique indexes, so the constraint lives only
 /// in SQL. Do NOT add an `@@unique([siteId])` here — that would create
 /// a separate, conflicting full unique index on next migrate.
+/// E2 (docs/design-jobs/BLOCKERS.md) — scheduled publish. Confirmed absent
+/// 2026-09-03: no `scheduledFor`, `schedulePublish` or `scheduled_publish`
+/// existed anywhere in `server/`, `prisma/` or the editor, so four boards drew
+/// a feature with no producer of any kind. Taken 2026-09-08.
+///
+/// A row per PENDING schedule, not a column on Site, for two reasons the column
+/// shape cannot carry: a schedule has its own author and audit trail, and
+/// cancelling one must leave a record rather than nulling a field. At most one
+/// PENDING row per site is enforced in the service, mirroring the single-active
+/// -job rule PublishBuildJob already has.
+model ScheduledPublish {
+  id          String    @id @default(cuid())
+  siteId      String
+  workspaceId String
+  /// Who scheduled it. Kept as a bare id, like MediaAsset.userId — the schedule
+  /// should survive the account that made it being deleted.
+  createdBy   String
+  /// When the publish should run, in UTC. The cron sweeps for rows at or before
+  /// `now`, so a missed window fires late rather than never.
+  scheduledFor DateTime
+  /// PENDING → PUBLISHED | CANCELLED | FAILED. A string for the same reason
+  /// PublishBuildJob.status is one.
+  status      String    @default("PENDING")
+  /// Set when the sweep starts it, so a crashed run is visible rather than
+  /// looking like it never fired.
+  startedAt   DateTime?
+  /// The job the sweep created, so the schedule can be traced to its publish.
+  jobId       String?
+  error       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, scheduledFor])
+  @@index([siteId, status])
+  @@map("scheduled_publishes")
+}
+
 model PublishBuildJob {
   id             String    @id @default(cuid())
   siteId         String
