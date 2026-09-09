@@ -184,26 +184,45 @@
 }
 
 /* ── Section pane body (inside .bd-set-screen--section) ── */
+/* 638:2689 — the pane body is the ground the cards sit on: --color/bg-app,
+   32 either side, 24 top and bottom, 16 between cards. */
 .bd-set-pane-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-16);
+  padding: var(--bk-space-24) var(--bk-space-32);
+  background: var(--bk-bg-app);
 }
 
-/* ── Section block ── */
+/* ── Section block ──
+   Board 638:2690 draws a settings section as a CARD: white on a
+   --color/border hairline, 8 radius, 16 all round, 12 between its rows. It
+   shipped as a borderless block with a rule underneath and asymmetric 12/16
+   padding, which read as one long scroll rather than as grouped settings.
+   The pane ground behind them is --bk-bg-app, which is what makes the white
+   card read as a card at all (see .bd-set-pane-body below). */
 .bd-set-section {
-  padding: var(--bk-space-12) var(--bk-space-12) var(--bk-space-16);
-  border-bottom: 1px solid var(--bk-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-12);
+  padding: var(--bk-space-16);
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
 }
-.bd-set-section:last-child {
-  border-bottom: none;
-}
+/* 638:2691 — the card's title is 11/16 MEDIUM in ink-muted at 0.88 tracking,
+   in caps. It shipped 12/600 in full ink, which competed with the field
+   labels under it instead of heading them. */
 .bd-set-section-h {
-  margin: 0 0 2px;
-  font: 600 var(--bk-text-12) var(--bk-font-ui);
-  color: var(--bk-ink);
-  letter-spacing: -0.005em;
+  margin: 0;
+  font: 500 var(--bk-text-11) var(--bk-font-ui);
+  line-height: 16px;
+  letter-spacing: 0.88px;
+  text-transform: uppercase;
+  color: var(--bk-ink-muted);
 }
 .bd-set-section-d {
   font: 500 var(--bk-text-11) var(--bk-font-ui);
@@ -212,21 +231,27 @@
   margin-bottom: 10px;
 }
 
-/* ── Field ── */
+/* ── Field ──
+   638:2692 lays a field out SIDE BY SIDE: a 180 label column, 16 gap, then
+   the control — not a label stacked over a full-width input. 638:2693 gives
+   the label 13/20 in ink-soft, Inter, not the 11px mono it shipped as. The
+   card's own `gap: 12` now spaces the rows, so the per-field margin is gone. */
 .bd-set-field {
-  margin-bottom: 10px;
-}
-.bd-set-field:last-child {
-  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-16);
 }
 .bd-set-field-lbl {
+  flex: none;
+  width: 180px;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: baseline;
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
+  gap: var(--bk-space-4);
+  font: 400 var(--bk-text-13) var(--bk-font-ui);
+  line-height: 20px;
   color: var(--bk-ink-soft);
-  letter-spacing: -0.01em;
-  margin-bottom: var(--bk-space-4);
+  margin-bottom: 0;
 }
 .bd-set-field-hint {
   color: var(--bk-ink-muted);
@@ -426,8 +451,13 @@ textarea.bd-set-input {
   flex-direction: column;
   gap: var(--bk-space-8);
   padding: 10px;
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border-medium);
+  /* Board 807:8757 puts the DNS block on WHITE, and everything above hangs off
+     that: 807:8766's rows are --flowbite/gray/50, which on the --bk-bg-subtle
+     ground this card used to have is one step from invisible; and 807:8762's
+     ink-muted column headers measure 4.39:1 on bg-subtle against a 4.5 floor
+     but 4.83:1 on white. Two problems, one ground. */
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-border);
   border-radius: var(--bk-radius-md);
   margin-bottom: 10px;
 }
@@ -439,7 +469,11 @@ textarea.bd-set-input {
 .bd-set-domain-status {
   font: 500 var(--bk-text-11) var(--bk-font-ui);
   line-height: 1.4;
-  color: var(--bk-ink-muted);
+  /* Was --bk-ink-muted, which on the card's --bk-bg-subtle ground measures
+     4.39:1 — under the 4.5 floor, on the one line that tells you whether the
+     domain is live. ink-soft is 7.0:1 there. The ok/err tones below are
+     unaffected. */
+  color: var(--bk-ink-soft);
 }
 .bd-set-domain-status[data-tone="ok"] {
   color: var(--bk-success);
@@ -450,17 +484,36 @@ textarea.bd-set-input {
 .bd-set-domain-records {
   display: flex;
   flex-direction: column;
-  gap: var(--bk-space-4);
+  gap: var(--bk-space-8);
 }
+/* 807:8762-8765 — the board heads the four columns. Without them a row reads
+   `A  @  76.76.21.21  verified` and nothing on screen says which is the host
+   and which is the value, which is the one thing a person has to get right
+   at their registrar. */
+.bd-set-domain-rec-head {
+  display: flex;
+  align-items: center;
+  gap: var(--bk-space-8);
+  padding: 0 var(--bk-space-8);
+  font: 600 var(--bk-text-11) var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+.bd-set-domain-rec-state.ok { color: var(--bk-success-text); font-weight: 600; }
+.bd-set-domain-rec-state.pending { color: var(--bk-warning-text); font-weight: 600; }
+/* Board 807:8766/8772 — a DNS record is a 36-high --flowbite/gray/50 bar on a
+   4 radius with 12px cells in --flowbite/gray/700 and NO border. It shipped as
+   an 11px mono chip on 4/6 padding inside a --bk-border-medium hairline, which
+   at that size was closer to a tag than to a row of a table. */
 .bd-set-domain-record {
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  padding: 4px 6px;
-  background: var(--bk-bg-app);
-  border: 1px solid var(--bk-border-medium);
+  font: 400 var(--bk-text-12) var(--bk-font-mono);
+  color: var(--bk-gray-700);
+  height: 36px;
+  padding: 0 var(--bk-space-8);
+  background: var(--bk-gray-50);
+  border: 0;
   border-radius: var(--bk-radius-sm);
   min-width: 0;
 }
@@ -500,14 +553,17 @@ textarea.bd-set-input {
 }
 
 /* ── Webhooks screen (P6) ── */
+/* Board 640:4161 draws the connected endpoint as rows INSIDE the ENDPOINT
+   card — a URL, its events, its delivery line and the Signing secret field, on
+   the card's own white. This was a second card inside that one: a bg-subtle
+   wash on a border, at 10px, which the board does not draw and which also
+   dropped every 11px --bk-ink-muted string it contained to 4.39:1 (the
+   delivery line and the secret's hint both measured it). Grouping is what the
+   card around it is for. */
 .bd-set-webhook-card {
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-8);
-  padding: 10px;
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border-medium);
-  border-radius: var(--bk-radius-md);
 }
 .bd-set-webhook-url {
   font: 600 11px var(--bk-font-mono);

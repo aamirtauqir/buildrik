@@ -222,6 +222,10 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
               disabled={!canManage}
               title={canManage ? undefined : ADMIN_REASON}
               onClick={() => setAdding(true)}
+              /* The Domain field (board 639:3406) only exists behind this
+                 click, so without an anchor here the one field the board draws
+                 on this card is unreachable by any probe or test. */
+              data-testid="domain-add"
             >
               Add domain
             </Button>
@@ -257,13 +261,33 @@ export const DomainsScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
             {renderStatus(row)}
 
             {row.status !== "VERIFIED" && row.dnsRecords.length > 0 && (
-              <div className="bd-set-domain-records">
+              <div className="bd-set-domain-records" data-testid={`domain-records-${row.id}`}>
+                {/* Board 807:8762-8765 heads the four columns. Without them a
+                    row reads "A @ 76.76.21.21 verified" and nothing on screen
+                    says which cell is the host and which is the value — the
+                    one thing a person has to get right at their registrar. */}
+                <div className="bd-set-domain-rec-head" data-testid={`domain-rec-head-${row.id}`}>
+                  <span className="bd-set-domain-rec-type">Type</span>
+                  <span className="bd-set-domain-rec-host">Name</span>
+                  <span className="bd-set-domain-rec-value">Value</span>
+                  <span className="bd-set-domain-rec-state">Status</span>
+                </div>
                 {row.dnsRecords.map((rec) => (
-                  <div key={rec.id} className="bd-set-domain-record">
+                  <div key={rec.id} className="bd-set-domain-record" data-testid={`domain-rec-${rec.id}`}>
                     <span className="bd-set-domain-rec-type">{rec.type}</span>
                     <span className="bd-set-domain-rec-host">{rec.host}</span>
                     <span className="bd-set-domain-rec-value" title={rec.value}>{rec.value}</span>
-                    <span className="bd-set-domain-rec-state">{rec.verified ? "✓" : "…"}</span>
+                    {/* 807:8770/8776 name the state in WORDS, coloured —
+                        "verified" in success-text, "pending" in the warning
+                        ink. A bare ✓ / … said it only to someone who already
+                        knew, and a glyph is not a status a screen reader can
+                        read out. */}
+                    <span
+                      className={`bd-set-domain-rec-state ${rec.verified ? "ok" : "pending"}`}
+                      data-testid={`domain-rec-state-${rec.id}`}
+                    >
+                      {rec.verified ? "verified" : "pending"}
+                    </span>
                     <CopyValue value={rec.value} />
                   </div>
                 ))}

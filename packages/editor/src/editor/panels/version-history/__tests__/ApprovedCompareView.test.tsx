@@ -76,6 +76,35 @@ describe("ApprovedCompareView", () => {
     expect(count?.className).toContain("tw:tabular-nums");
   });
 
+  /* Boards 168:2 / 168:26 / 168:48 draw ONE 48-tall compare bar and put the way
+     out of Compare at its right end (168:14 "✕"). The view used to draw no exit
+     at all — ReviewTab stacked a second toolbar above this one carrying a
+     "‹ Back". These two lock the control's owner and its position. */
+  it("carries the way out of Compare in its own bar, not in a second one", () => {
+    const onBack = vi.fn();
+    renderView({ onBack });
+    const bar = document.querySelector('[data-testid="compare-bar"]');
+    const close = screen.getByRole("button", { name: /close compare/i });
+    expect(bar?.contains(close)).toBe(true);
+    // Last control in the bar: the board puts it at the far right.
+    const controls = [...(bar?.querySelectorAll("button") ?? [])];
+    expect(controls[controls.length - 1]).toBe(close);
+    fireEvent.click(close);
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it("draws the three modes as one segmented strip, active segment marked", () => {
+    renderView();
+    const strip = document.querySelector('[data-testid="compare-mode-strip"]');
+    const segs = [...(strip?.querySelectorAll("button") ?? [])];
+    expect(segs.map((b) => b.textContent)).toEqual(["Side by side", "Overlay", "List"]);
+    expect(segs.map((b) => b.getAttribute("aria-pressed"))).toEqual(["true", "false", "false"]);
+    fireEvent.click(segs[2]);
+    expect(
+      [...(strip?.querySelectorAll("button") ?? [])].map((b) => b.getAttribute("aria-pressed")),
+    ).toEqual(["false", "false", "true"]);
+  });
+
   it("renders the full legend so kinds read by icon+label, not color", () => {
     renderView();
     for (const label of ["Added", "Removed", "Moved", "Content", "Style"]) {

@@ -178,3 +178,84 @@ describe("FormsScreen — pagination", () => {
     expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
   });
 });
+
+/* Delete used to be a one-click server mutation: the row button called
+   `forms.deleteSubmission.mutate` directly, so a mis-click destroyed a
+   visitor's own message with no undo and no copy kept anywhere. It now routes
+   through the same chrome-ui ConfirmDialog the tab itself uses. */
+describe("FormsScreen — delete submission", () => {
+  const deleteMock = api.forms.deleteSubmission.mutate;
+
+  async function expandRow() {
+    listBlocks.mockResolvedValue([block("f1", "Contact")]);
+    listSubs.mockResolvedValue(
+      pageOf([sub("sub-1", { email: "visitor@example.com" }, { isRead: true })], 1)
+    );
+    setup();
+    fireEvent.click(await screen.findByText("visitor@example.com"));
+  }
+
+  const clickRowDelete = () =>
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+  it("does NOT reach the server on the first click — it asks first", async () => {
+    await expandRow();
+
+    clickRowDelete();
+
+    expect(deleteMock).not.toHaveBeenCalled();
+  });
+
+  it("names the submission and says the data is unrecoverable", async () => {
+    await expandRow();
+
+    clickRowDelete();
+
+    expect(screen.getByText("Delete this submission?")).toBeInTheDocument();
+    const message = screen.getByText(/can't be recovered/i);
+    expect(message).toHaveTextContent("visitor@example.com");
+    expect(message).toHaveTextContent(/visitor's own/i);
+  });
+
+  it("cancelling leaves the submission on the server", async () => {
+    await expandRow();
+
+    clickRowDelete();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    await waitFor(() => expect(screen.queryByText("Delete this submission?")).toBeNull());
+    expect(deleteMock).not.toHaveBeenCalled();
+  });
+
+  it("deletes once confirmed", async () => {
+    await expandRow();
+
+    clickRowDelete();
+    fireEvent.click(screen.getByRole("button", { name: "Delete submission" }));
+
+    await waitFor(() => expect(deleteMock).toHaveBeenCalledWith({ id: "sub-1" }));
+  });
+});
+
+describe("FormsScreen — submissions error is recoverable (F11)", () => {
+  /* The audit found this screen reduced to one sentence — "Failed to load
+     submissions." — with no way forward, so a transient failure cost the whole
+     task. The board was faithful to the code; the code was the thing missing a
+     retry. */
+  it("offers Retry on a failed load and re-issues the same query", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 2)]);
+    listSubs.mockRejectedValueOnce(new Error("Failed to load submissions."));
+    setup();
+
+    expect(await screen.findByText("Failed to load submissions.")).toBeInTheDocument();
+    const retry = screen.getByTestId("subs-error-retry");
+
+    listSubs.mockResolvedValue(pageOf([sub("s1", { email: "a@b.com" })], 1));
+    fireEvent.click(retry);
+
+    // The point of the retry is that it recovers the screen, not merely that
+    // it fires: the submission the first call never delivered is now on it.
+    expect(await screen.findByText("a@b.com")).toBeInTheDocument();
+    expect(screen.queryByText("Failed to load submissions.")).toBeNull();
+  });
+});

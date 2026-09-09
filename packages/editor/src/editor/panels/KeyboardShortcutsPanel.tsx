@@ -35,6 +35,11 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     label: "Edit",
     shortcuts: [
+      /* Board 815:4518 opens its General group with Save ⌘S, and the chord IS
+         bound — useEditorShortcuts.ts:135 calls saveProject() on it. The sheet
+         simply never advertised it, which is the one direction of drift that
+         costs a user something real: a working shortcut nobody can find. */
+      { key: "Ctrl+S", desc: "Save" },
       { key: "Ctrl+Z", desc: "Undo" },
       /* The handler takes Shift+Z OR Y (useEditorShortcuts:146). The sheet
          shows the convention (⇧⌘Z on Mac); Y keeps working unlisted. */
@@ -61,7 +66,11 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
          binds (CanvasFooterToolbar). The fit chord was advertised under the
          wrong key and the other two were not advertised at all. */
       { key: "Ctrl+0", desc: "Zoom to 100%" },
-      { key: "Ctrl+1", desc: "Fit to view" },
+      /* "Zoom to fit" is the board's wording (815:4518) AND the zoom flyout's
+         own (StudioFooter.tsx:267) and the canvas cheat sheet's
+         (KeyboardCheatSheet.tsx:88). This sheet was the only place calling the
+         same chord "Fit to view". */
+      { key: "Ctrl+1", desc: "Zoom to fit" },
       { key: "Ctrl+2", desc: "Zoom to selection" },
       { key: "Ctrl++", desc: "Zoom in" },
       { key: "Ctrl+-", desc: "Zoom out" },
@@ -86,21 +95,36 @@ export function displayKey(key: string): string {
     .replace(/Alt/g, isMac ? "⌥" : "Alt");
 }
 
-const KeyBadge: React.FC<{ children: string }> = ({ children }) => {
+/* Board 815:4527/4528 draws the chord as a 24-high chip on a 4 radius:
+   bg-subtle inside a --color/border-medium hairline, the glyphs 12px in
+   ink-soft at a 7 inset. It shipped 11px ink inside --bk-border (#E5E7EB,
+   one step lighter) on 2/6 padding with no height, so a row of chips had no
+   common baseline box.
+
+   The FAMILY is deliberately NOT moved. 815:4528 draws Inter Medium; board
+   2838:12148 draws the same object — a chord chip — in Geist Mono Medium, and
+   DESIGN.md calls mono the data face, which is what both chips ship as today.
+   Two boards, one question, neither of them `verified` in boards.json: under
+   the conformance rule neither re-settles the control, so the properties the
+   harness can measure move and the typeface stays where the product already
+   is. Flagged for the founder rather than picked by me. */
+const KeyBadge: React.FC<{ children: string; testId?: string }> = ({ children, testId }) => {
   const display = displayKey(children);
 
   return (
     <span
+      data-testid={testId}
       style={{
         display: "inline-flex",
         alignItems: "center",
-        padding: "2px 6px",
+        height: 24,
+        padding: "0 7px",
         background: "var(--bk-bg-subtle)",
-        border: "1px solid var(--bk-border)",
+        border: "1px solid var(--bk-border-medium)",
         borderRadius: "var(--bk-radius-sm)",
-        fontSize: 11,
+        fontSize: 12,
         fontFamily: "var(--bk-font-mono)",
-        color: "var(--bk-ink)",
+        color: "var(--bk-ink-soft)",
         whiteSpace: "nowrap",
         flexShrink: 0,
       }}
@@ -109,6 +133,9 @@ const KeyBadge: React.FC<{ children: string }> = ({ children }) => {
     </span>
   );
 };
+
+/** A stable anchor per row: the description, kebab-cased. */
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 // =============================================================================
 // COMPONENT
@@ -149,7 +176,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
     : SHORTCUT_GROUPS;
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="lg">
+      <ModalContent size="table">
         <ModalTitle>Keyboard Shortcuts</ModalTitle>
         <ModalClose aria-label="Close modal">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -164,16 +191,21 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
       placeholder="Search shortcuts…"
       aria-label="Search shortcuts"
       className="tw:mb-3"
+      data-testid="kb-search"
     />
     {q && visibleGroups.length === 0 && (
       <p className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
         Nothing matches &lsquo;{query.trim()}&rsquo;.
       </p>
     )}
+    {/* Board 815:4518 is 640 x 934 and stacks the groups in ONE column, each
+        heading over a full-width rule with its rows under it. Three columns
+        at 720 packed four groups into a grid the board never draws and made
+        every row 200 wide. */}
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
+        display: "flex",
+        flexDirection: "column",
         gap: 24,
         maxHeight: "60vh",
         overflowY: "auto",
@@ -183,15 +215,18 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
       {visibleGroups.map((group) => (
         <div key={group.label}>
           {/* Group heading */}
+          {/* 815:4524 draws the heading in TITLE case at 12/600 ink-muted —
+              "General", not "GENERAL" — over 815:4525's 1px bg-subtle rule.
+              The uppercase + 0.5 tracking came from nowhere on this board,
+              and the rule was --bk-border, one step darker. */}
           <div
+            data-testid={`kb-group-${slug(group.label)}`}
             style={{
               fontSize: 12,
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
               color: "var(--bk-ink-muted)",
               marginBottom: 8,
               paddingBottom: 6,
-              borderBottom: "1px solid var(--bk-border)",
+              borderBottom: "1px solid var(--bk-bg-subtle)",
               fontWeight: 600,
             }}
           >
@@ -211,10 +246,13 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                   padding: "3px 0",
                 }}
               >
+                {/* 815:4526 — the action reads at 13 in --flowbite/gray/700,
+                    a step darker than the ink-soft it shipped in. */}
                 <span
+                  data-testid={`kb-label-${slug(row.desc)}`}
                   style={{
                     fontSize: 13,
-                    color: "var(--bk-ink-soft)",
+                    color: "var(--bk-gray-700)",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -223,7 +261,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                 >
                   {row.desc}
                 </span>
-                <KeyBadge>{row.key}</KeyBadge>
+                <KeyBadge testId={`kb-badge-${slug(row.desc)}`}>{row.key}</KeyBadge>
               </div>
             ))}
           </div>

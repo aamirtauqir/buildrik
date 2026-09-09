@@ -176,13 +176,60 @@ describe("RedirectsScreen — add redirect", () => {
   });
 });
 
+/* Delete used to be a one-click server mutation: the row button called
+   `redirects.delete.mutate` directly, so a mis-click destroyed the only record
+   of an old-URL → new-URL mapping with nothing to undo it. It now routes
+   through the same chrome-ui ConfirmDialog the tab itself uses for its
+   discard guard. */
 describe("RedirectsScreen — delete", () => {
-  it("deletes a row and removes it from the list optimistically", async () => {
+  const clickRowDelete = () =>
+    fireEvent.click(screen.getByRole("button", { name: /delete redirect from \/a/i }));
+
+  it("does NOT reach the server on the first click — it asks first", async () => {
     listMock.mockResolvedValue([row("r1", "/a", "/b"), row("r2", "/c", "/d")]);
     setup();
     await screen.findByText("/a");
 
-    fireEvent.click(screen.getByRole("button", { name: /delete redirect from \/a/i }));
+    clickRowDelete();
+
+    expect(deleteMock).not.toHaveBeenCalled();
+    expect(screen.getByText("/a")).toBeInTheDocument();
+  });
+
+  it("names the rule and the 404 the deletion causes, not just 'are you sure'", async () => {
+    listMock.mockResolvedValue([row("r1", "/a", "/b")]);
+    setup();
+    await screen.findByText("/a");
+
+    clickRowDelete();
+
+    expect(screen.getByText("Delete this redirect?")).toBeInTheDocument();
+    const message = screen.getByText(/404/);
+    expect(message).toHaveTextContent("/a");
+    expect(message).toHaveTextContent(/can.t be undone/i);
+  });
+
+  it("cancelling leaves the rule on the server and in the list", async () => {
+    listMock.mockResolvedValue([row("r1", "/a", "/b")]);
+    setup();
+    await screen.findByText("/a");
+
+    clickRowDelete();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    await waitFor(() => expect(screen.queryByText("Delete this redirect?")).toBeNull());
+    expect(deleteMock).not.toHaveBeenCalled();
+    expect(screen.getByText("/a")).toBeInTheDocument();
+  });
+
+  it("deletes the row once confirmed, and removes it from the list optimistically", async () => {
+    listMock.mockResolvedValue([row("r1", "/a", "/b"), row("r2", "/c", "/d")]);
+    setup();
+    await screen.findByText("/a");
+
+    clickRowDelete();
+    fireEvent.click(screen.getByRole("button", { name: "Delete redirect" }));
+
     await waitFor(() => expect(deleteMock).toHaveBeenCalledWith({ id: "r1" }));
     await waitFor(() => expect(screen.queryByText("/a")).toBeNull());
     expect(screen.getByText("/c")).toBeInTheDocument();

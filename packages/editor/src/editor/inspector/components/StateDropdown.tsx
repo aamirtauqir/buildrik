@@ -55,6 +55,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ current, onChange,
       <Button
         type="button"
         className="bdi-bpr-pill"
+        data-testid="inspector-state-pill"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -94,6 +95,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ current, onChange,
                 key={s}
                 type="button"
                 role="option"
+                data-testid={`inspector-state-opt-${s}`}
                 aria-selected={active}
                 onClick={() => {
                   setOpen(false);

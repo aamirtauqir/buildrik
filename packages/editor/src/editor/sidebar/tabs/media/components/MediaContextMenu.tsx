@@ -37,7 +37,11 @@ interface MediaContextMenuProps {
 }
 
 // Board 1163:13931 — the menu is 180 wide, one divider, 11px rows.
-const MENU_WIDTH = 180;
+/* 182, so the ROWS are the board's 180. 1163:13932 gives each item w-180 and
+   1163:13931 gives the surface a --color/border stroke; Figma strokes do not
+   consume layout and a CSS border does, so a 180 box with a border leaves 178
+   inside it. */
+const MENU_WIDTH = 182;
 
 /*
   Board 1163:13695, as `tw:` utilities rather than a companion stylesheet.
@@ -54,11 +58,15 @@ const MENU_WIDTH = 180;
   `font: inherit` does not survive the move, so the item spells its own type out:
   flowbite Button ships text-sm/font-medium and something has to displace them.
 */
+/* 1163:13932 — rows HUG on a 12/7 pad at 11px in ink-soft. The fixed
+   `--bk-size-row-dense` height is why the board's 7 had never been applied: a
+   set height and a padding are different properties, so nothing conflicted and
+   nothing won. */
 const ITEM_BASE =
-  "tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row-dense)] " +
+  "tw:flex tw:items-center tw:justify-start tw:w-full tw:min-h-0 tw:py-1.75 " +
   "tw:px-[var(--bk-space-12)] tw:border-0 tw:rounded-none tw:bg-transparent " +
-  "tw:text-left tw:cursor-pointer tw:text-[12px] tw:leading-[18px] " +
-  "tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]";
+  "tw:text-left tw:cursor-pointer tw:text-[11px] tw:leading-[18px] " +
+  "tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink-soft)]";
 
 /* Button rows: real <button>, so :enabled / :disabled are live. */
 const ITEM =
@@ -76,9 +84,13 @@ const ITEM_DANGER =
 const ITEM_SUBMENU =
   `${ITEM_BASE} tw:justify-between tw:relative tw:hover:bg-[var(--bk-bg-subtle)]`;
 
+/* 1163:13931 — bg-elevated on a --color/border edge, 8 radius, 6 top/bottom.
+   The edge was missing entirely, so the menu's only separation from what it
+   covers was its shadow. */
 const MENU_SURFACE =
-  "tw:bg-[var(--bk-bg-card)] tw:rounded-[var(--bk-radius-lg)] " +
-  "tw:shadow-[var(--bk-shadow-overlay)] tw:py-[var(--bk-space-4)]";
+  "tw:bg-[var(--bk-bg-elevated)] tw:rounded-[var(--bk-radius-lg)] " +
+  "tw:border tw:border-[var(--bk-border)] " +
+  "tw:shadow-[var(--bk-shadow-overlay)] tw:py-1.5";
 const MENU_ITEM_HEIGHT = 28;
 
 export function MediaContextMenu({
@@ -137,9 +149,10 @@ export function MediaContextMenu({
       <div className="tw:fixed tw:inset-0 tw:z-[199]" onClick={onClose} aria-hidden="true" />
       <div
         ref={menuRef}
-        className={`${MENU_SURFACE} tw:text-[12px] tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink)]`}
+        className={`${MENU_SURFACE} tw:text-[11px] tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] tw:text-[var(--bk-ink-soft)]`}
         role="menu"
         aria-label="Asset actions"
+        data-testid="media-ctx-menu"
         style={{ position: "fixed", left, top, width: MENU_WIDTH, zIndex: 200 }}
       >
         {/*
@@ -153,6 +166,7 @@ export function MediaContextMenu({
         <Button
           role="menuitem"
           className={ITEM}
+          data-testid="media-ctx-insert"
           onClick={act(() => onInsert(item))}
         >
           Insert to canvas

@@ -33,7 +33,11 @@ const strip: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   height: "var(--bk-size-row-dense)",
-  padding: "0 var(--bk-space-12)",
+  /* 6px top/bottom is the strip's own box on all four Insert boards
+     (1069:4704 · 4784 · 4867 · 5015): 28 - 6 - 6 = 16, the counter's line box
+     exactly, so this renders identically to centring it. No --bk-space-6
+     exists; the scale steps 4 -> 8. */
+  padding: "6px var(--bk-space-12)",
   background: "var(--bk-accent-tint)",
   color: "var(--bk-accent-text)",
   fontFamily: "var(--bk-font-ui)",
@@ -102,9 +106,9 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
     // Board 137:43 (and every Insert state board): the strip draws ONLY
     // "💡 Tip n/N" + ‹ › ✕ — no tip body text. The body rides on title so
     // hover still tells you what the tip says.
-    <div style={strip} role="note" aria-label="Tips" title={`${tip.bold}${tip.body}`}>
+    <div style={strip} data-testid="insert-tips" role="note" aria-label="Tips" title={`${tip.bold}${tip.body}`}>
       <span aria-hidden="true">💡</span>
-      <span style={counter}>
+      <span style={counter} data-testid="insert-tips-counter">
         Tip {tipIdx + 1}/{TIPS.length}
       </span>
       <span style={spacer} />
@@ -119,6 +123,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
           <Button
             type="button"
             style={arr}
+            data-testid="insert-tips-dismiss"
             onClick={onDismiss}
             onMouseEnter={hoverIn}
             onMouseLeave={hoverOut}

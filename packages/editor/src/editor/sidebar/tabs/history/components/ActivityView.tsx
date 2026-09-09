@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { Kbd, Button } from "@/editor/chrome-ui";
+import { Kbd, Button, ConfirmDialog } from "@/editor/chrome-ui";
 // react-window 1.8.x ships JS only; stub the minimal surface we use.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — module has no bundled .d.ts (see @types/react-window stub)
@@ -29,8 +29,10 @@ import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "../../../../../engine/historyTypes";
 const MAX_VISIBLE_CHANGES = 5;
 
-// Row sizing constants (see spec §2.5)
-const ROW_H_COLLAPSED = 48;
+// Row sizing constants (see spec §2.5). 44 is board 163:48's change row; the
+// rows are contiguous there, so the virtual slot IS the row and `.entry-row`
+// carries no vertical margin.
+const ROW_H_COLLAPSED = 44;
 const ROW_H_CHANGE = 24;
 const ROW_H_SHOW_ALL_BTN = 32;
 const ROW_H_DATE_HEADER = 28;
@@ -93,7 +95,9 @@ const STYLE_USER_CHIP: React.CSSProperties = {
 
 const STYLE_RELATIVE_TIME: React.CSSProperties = {
   fontSize: 11,
+  lineHeight: "16px",
   color: "var(--bk-ink-muted)",
+  whiteSpace: "nowrap",
 };
 
 const STYLE_DIFF_COUNT: React.CSSProperties = {
@@ -128,13 +132,14 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
   onClearHistory,
   canClear,
 }) => {
-  const { historyStack, isLoading } = useHistoryState(composer);
+  const { historyStack, isLoading, canRedo } = useHistoryState(composer);
   const reducedMotion = useReducedMotion();
 
   const [expandedGroupId, setExpandedGroupId] = React.useState<string | null>(null);
   const [showAllIds, setShowAllIds] = React.useState<Set<string>>(new Set());
   const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
   const [confirmingClear, setConfirmingClear] = React.useState(false);
+  const [pendingRestoreId, setPendingRestoreId] = React.useState<string | null>(null);
 
   const scrollHostRef = React.useRef<HTMLDivElement | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -272,6 +277,10 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
         return;
       }
 
+      // The restore confirm owns the keyboard while it is open — j/k must not
+      // move the selection behind it, and Enter belongs to its buttons.
+      if (pendingRestoreId) return;
+
       if (allEntries.length === 0) return;
 
       switch (e.key) {
@@ -313,7 +322,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [allEntries, focusedIndex, toggleExpand]);
+  }, [allEntries, focusedIndex, toggleExpand, pendingRestoreId]);
 
   // Scroll focused entry into view via react-window's scrollToItem.
   React.useEffect(() => {
@@ -357,7 +366,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
     }
   }, []);
 
-  const handleTimestampClick = React.useCallback(
+  const runRestore = React.useCallback(
     (entryId: string) => {
       if (!composer) return;
 
@@ -391,6 +400,72 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
     },
     [composer, reducedMotion, cancelPendingRestore, clearCanvasAnim]
   );
+
+  /* The timestamp is a RESTORE, not a jump: `history.restoreEntry` truncates
+     the undo stack at that point and empties the redo stack, so everything
+     after it is gone for good. It shipped labelled "Jump to 14:32" and fired
+     straight from the click — one stray click on a row header and the work
+     after it was unrecoverable. The click now only asks; the dialog names how
+     many steps go and whether any of them are unsaved. */
+  const requestRestore = React.useCallback((entryId: string) => {
+    setPendingRestoreId(entryId);
+  }, []);
+
+  /* Position in the newest-first stack IS the number of later steps discarded,
+     and it is read off the unfiltered stack so a search box cannot undercount
+     it. Derived rather than stored so a stack that moves under an open dialog
+     cannot leave a stale count on screen. */
+  const pendingRestore = React.useMemo(() => {
+    if (!pendingRestoreId) return null;
+    const discarded = historyStack.findIndex((e) => e.id === pendingRestoreId);
+    if (discarded < 0) return null;
+    const target = historyStack[discarded];
+    return {
+      id: target.id,
+      label: target.label,
+      time: formatTime(target.timestamp),
+      discarded,
+    };
+  }, [pendingRestoreId, historyStack]);
+
+  const renderRestoreConfirm = () => {
+    if (!pendingRestore) return null;
+    const { discarded } = pendingRestore;
+    const losses: string[] = [];
+    if (discarded > 0) {
+      losses.push(`${discarded} later change${discarded === 1 ? "" : "s"}`);
+    }
+    if (canRedo) losses.push("everything you can currently redo");
+    const unsaved = losses.length > 0 && composer?.isDirty() === true;
+
+    return (
+      <ConfirmDialog
+        open
+        tone="destructive"
+        title={`Restore to ${pendingRestore.time}?`}
+        message={
+          <>
+            This rewinds the project to <strong>{pendingRestore.label}</strong> at{" "}
+            {pendingRestore.time}.{" "}
+            {losses.length > 0
+              ? `It permanently discards ${losses.join(" and ")}.`
+              : "Nothing later is discarded."}
+            {unsaved ? " Some of that work has not been saved yet." : ""}
+          </>
+        }
+        confirmLabel={
+          discarded > 0
+            ? `Restore, discard ${discarded} change${discarded === 1 ? "" : "s"}`
+            : `Restore to ${pendingRestore.time}`
+        }
+        onClose={() => setPendingRestoreId(null)}
+        onConfirm={() => {
+          setPendingRestoreId(null);
+          runRestore(pendingRestore.id);
+        }}
+      />
+    );
+  };
 
   // Unmount cleanup: kill any pending restore timer + reset canvas styles.
   React.useEffect(() => {
@@ -515,6 +590,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
           <div
             className={rowClass}
             data-focused={isFocused}
+            data-testid={`history-change-${globalIndex}`}
             role="listitem"
             tabIndex={hasChanges ? 0 : -1}
             aria-expanded={hasChanges ? isExpanded : undefined}
@@ -524,20 +600,29 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
           >
             <div className="entry-row-main">
               <div>
-                <div className="entry-label">{entry.label}</div>
+                <div className="entry-label" data-testid={`history-change-label-${globalIndex}`}>
+                  {entry.label}
+                </div>
                 <div className="entry-meta">
                   <Button
                     type="button"
-                    className="entry-time-btn"
+                    /* flowbite's Button is 40 tall and a plain class cannot
+                       reach it — only a same-property `tw:` utility survives
+                       twMerge (CLAUDE.md §Chrome). Left at 40 it set the whole
+                       meta line's height and board 163:48's 44 row measured
+                       68. */
+                    className="entry-time-btn tw:h-4 tw:min-h-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleTimestampClick(entry.id);
+                      requestRestore(entry.id);
                     }}
-                    aria-label={`Jump to ${timeLabel}`}
-                    title={`Jump to ${timeLabel}`}
+                    aria-label={`Restore the project to ${timeLabel}`}
+                    title={`Restore the project to ${timeLabel} — discards every later change`}
                     style={STYLE_TIME_BTN}
                   >
-                    <span className="entry-time">{timeLabel}</span>
+                    <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
+                      {timeLabel}
+                    </span>
                   </Button>
                   <span style={STYLE_RELATIVE_TIME}>
                     {formatRelativeTime(entry.timestamp)}
@@ -636,7 +721,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
       collapsedByEntry,
       toggleExpand,
       toggleShowAll,
-      handleTimestampClick,
+      requestRestore,
     ]
   );
 
@@ -736,6 +821,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
         )}
       </div>
       {renderKeyboardHints()}
+      {renderRestoreConfirm()}
     </div>
   );
 };

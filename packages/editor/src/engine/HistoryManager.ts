@@ -767,6 +767,14 @@ export class HistoryManager {
     this.isRecording = true;
   }
 
+  /** The undo cap, so the panel can state it instead of hardcoding a number.
+   *  Mirrors `VersionTimelineManager.maxVersions`, which the Saves note reads
+   *  for exactly the same reason: board 163:2 prints the cap in its retention
+   *  sentence, and a literal there goes stale the day THRESHOLDS changes. */
+  get maxHistory(): number {
+    return this.config.maxHistory;
+  }
+
   setMaxHistory(max: number): void {
     this.config.maxHistory = max;
     this.trimHistory();

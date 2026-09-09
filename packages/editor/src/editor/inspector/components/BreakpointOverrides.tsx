@@ -83,7 +83,7 @@ export const BreakpointOverrides: React.FC<BreakpointOverridesProps> = ({
   return (
     <div className="tw:flex tw:flex-col" data-testid="breakpoint-overrides">
       {overrides.map(([property, value]) => (
-        <div key={property}>
+        <div key={property} data-testid={`breakpoint-override-${property}`}>
           {/* Board 160:305 uses the SAME 96px-label / 1fr-control grid every
               other property row uses (16 + 96 + 8 = 120, where its control
               starts) — the row used to run its own 72px label column and a
@@ -91,15 +91,21 @@ export const BreakpointOverrides: React.FC<BreakpointOverridesProps> = ({
               field, reading as a different, unrelated control type. The 2px
               accent bar is a `border-left`, which ADDS to box width, so the
               left inset is 14px, not 16 — 14 + the border's own 2 lands
-              content at the same x16 every other row uses. */}
+              content at the same x16 every other row uses. The label column
+              and the right inset are `.bdi-row-ctrl`'s own 95 and 20, for the
+              same reason it uses them: the board fixes the CONTROL at 120..280
+              and says nothing about the label's width, so the pixel the
+              panel's left rule spends comes out of the label column. At 96/16
+              this control measured 163. */}
           <div
-            className="tw:grid tw:items-center tw:gap-2 tw:border-l-2 tw:border-[var(--bk-accent)] tw:py-[3px] tw:pl-[14px] tw:pr-4"
-            style={{ gridTemplateColumns: "96px 1fr" }}
+            data-testid="breakpoint-override-row"
+            className="tw:grid tw:items-center tw:gap-2 tw:border-l-2 tw:border-[var(--bk-accent)] tw:py-[3px] tw:pl-[14px] tw:pr-5"
+            style={{ gridTemplateColumns: "95px 1fr" }}
           >
-            <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+            <span data-testid="breakpoint-override-label" className="tw:text-[12px]/[18px] tw:text-[var(--bk-ink-muted)]">
               {humanise(property)}
             </span>
-            <span className="tw:relative tw:flex tw:h-7 tw:items-center tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:pl-2 tw:pr-6 tw:text-[12px] tw:text-[var(--bk-ink)]">
+            <span data-testid="breakpoint-override-control" className="tw:relative tw:flex tw:h-7 tw:items-center tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:pl-2 tw:pr-6 tw:text-[12px]/[18px] tw:text-[var(--bk-ink)]">
               {value}
               <Button
                 color="light"
@@ -120,7 +126,7 @@ export const BreakpointOverrides: React.FC<BreakpointOverridesProps> = ({
               </Button>
             </span>
           </div>
-          <p className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px] tw:text-[var(--bk-accent)]">
+          <p data-testid="breakpoint-override-note" className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-2 tw:text-[11px]/[16px] tw:text-[var(--bk-accent)]">
             Overridden on {breakpointName} — Base is {base[property] || "not set"}
           </p>
         </div>

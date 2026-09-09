@@ -116,9 +116,16 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
         return fallback || "";
       }
 
-      // Get the content item
+      // Get the content item. Only published records may resolve: static
+      // resolution is the export default, so anything this returns ships to
+      // the live site, and status is what the author's Published switch sets.
+      // It is a three-value enum — "draft" and "archived" are both un-published,
+      // so this asks for what IS published rather than excluding drafts.
+      // A record that is not published takes the same exit as an unknown one
+      // below: the author's fallback.
       const items = await this.cmsManager.queryContent({
         collectionId,
+        status: "published",
         filter: {},
       });
 

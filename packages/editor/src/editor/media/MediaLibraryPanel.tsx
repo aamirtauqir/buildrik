@@ -22,6 +22,14 @@ const PAD = "tw:p-5";
 /** Both scroll containers cap at the same height as the panel body. */
 const GRID = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(140px,1fr))] tw:gap-3 tw:p-1 tw:max-h-100 tw:overflow-auto";
 const LIST = "tw:flex tw:flex-col tw:gap-2 tw:max-h-100 tw:overflow-auto";
+/* Board 1746:8390 — a 90-wide pair of 28-high chips on a 4 radius at 12px.
+   flowbite's own height and its rounded-lg were surviving because nothing set
+   either: `size="xs"` constrains neither. */
+const VIEW_BTN = "tw:h-7 tw:min-h-0 tw:px-2.5 tw:py-0 tw:rounded-sm tw:text-[12px] tw:font-normal";
+const VIEW_BTN_ON = "tw:bg-[var(--bk-accent)] tw:text-[var(--bk-accent-on)] tw:border-0";
+const VIEW_BTN_OFF =
+  "tw:bg-[var(--bk-bg-panel)] tw:border tw:border-[var(--bk-border-medium)] " +
+  "tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)]";
 // ============================================
 // Types
 // ============================================
@@ -178,10 +186,13 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="table">
-        <ModalTitle>
+        <ModalTitle data-testid="picker-title">
           {title}
           {forLabel ? (
-            <span className="tw:ml-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)]">
+            <span
+              className="tw:ml-2 tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]"
+              data-testid="picker-for-label"
+            >
               for {forLabel}
             </span>
           ) : null}
@@ -193,6 +204,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
         </ModalClose>
         <ModalBody>
     <Tabs
+      data-testid="picker-tabs"
       tabs={[
         { id: "library", label: "Library" },
         { id: "upload", label: "Upload" },
@@ -215,12 +227,13 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="tw:flex tw:gap-1">
+            <div className="tw:flex tw:gap-1" data-testid="picker-view-toggle">
               <Button
                 color={viewMode === "grid" ? undefined : "light"}
                 size="xs"
                 onClick={() => setViewMode("grid")}
-                className={viewMode === "grid" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"}
+                data-testid="picker-view-grid"
+                className={`${VIEW_BTN} ${viewMode === "grid" ? VIEW_BTN_ON : VIEW_BTN_OFF}`}
               >
                 Grid
               </Button>
@@ -228,7 +241,8 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 color={viewMode === "list" ? undefined : "light"}
                 size="xs"
                 onClick={() => setViewMode("list")}
-                className={viewMode === "list" ? undefined : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"}
+                data-testid="picker-view-list"
+                className={`${VIEW_BTN} ${viewMode === "list" ? VIEW_BTN_ON : VIEW_BTN_OFF}`}
               >
                 List
               </Button>

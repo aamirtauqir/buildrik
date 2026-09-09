@@ -207,15 +207,40 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     { id: "save", label: "Saving applied state" },
   ];
   const [applyStepIndex, setApplyStepIndex] = React.useState(0);
+  /* Board 642:2832 draws PER-SECTION phases. The names come from the
+     template's own markup — `importHTMLToActivePage` reports each top-level
+     landmark as it converts (`<nav>` → "Navigation") — so nothing here is
+     invented, which is the whole reason the board's six phases could not be
+     built before: `templatesData` exposed a section COUNT and never names.
+     Reporting happens inside the import's single transaction, so a template
+     apply is still one undo step.
+     Measured: the largest shipped template is 3,488 chars with 3 landmarks and
+     the loop is single-digit milliseconds, so this line is a RECORD of what
+     ran, not a countdown to watch — no delay is added to make it visible. */
+  const [importedSections, setImportedSections] = React.useState<string[]>([]);
   const applyCancelledRef = React.useRef(false);
   const applyRunningRef = React.useRef(false);
   /** Cancel is only honest before the import has landed. */
   const [applyCancellable, setApplyCancellable] = React.useState(true);
 
-  const applySteps: ApplyStep[] = APPLY_STEPS.map((s, i) => ({
-    ...s,
-    state: i < applyStepIndex ? "done" : i === applyStepIndex ? "active" : "queued",
-  }));
+  const applySteps: ApplyStep[] = APPLY_STEPS.flatMap((s, i) => {
+    const state: ApplyStep["state"] =
+      i < applyStepIndex ? "done" : i === applyStepIndex ? "active" : "queued";
+    const row = { ...s, state };
+    /* The import step carries the sections it actually converted, named by the
+       markup. They are reported after the fact, so each is `done` — a queued
+       section row would be a promise about work not yet begun, which is the
+       "theater" BLOCKERS B5 warned against. */
+    if (s.id !== "import" || importedSections.length === 0) return [row];
+    return [
+      row,
+      ...importedSections.map((label, n) => ({
+        id: `import-section-${n}`,
+        label,
+        state: "done" as const,
+      })),
+    ];
+  });
 
   /** Let React paint the step that just changed before the next one runs. */
   const paint = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
@@ -270,7 +295,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       }
       if (resetStyles) composer.styles.clear();
       setApplyCancellable(false);
-      composer.elements.importHTMLToActivePage(resolvedHtml);
+      setImportedSections([]);
+      composer.elements.importHTMLToActivePage(resolvedHtml, (label, done, total) => {
+        setImportedSections((prev) => [...prev, `${label} (${done}/${total})`]);
+      });
 
       // 3 — the canvas re-render the import triggers
       setApplyStepIndex(2);

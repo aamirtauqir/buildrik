@@ -20,6 +20,9 @@ export interface SearchBarProps {
   id?: string;
   /** Optional keyboard hint shown on the right of the input (e.g. "/"). Rendered only when input is empty. */
   kbdHint?: string;
+  /** Conformance anchor on the FIELD BOX (the bordered gray-50 container),
+   *  which is a different element from the band its consumer draws around it. */
+  testId?: string;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -30,6 +33,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   debounceMs = 300,
   id,
   kbdHint,
+  testId,
 }) => {
   // Internal state for instant visual feedback
   const [inputValue, setInputValue] = React.useState(value);
@@ -78,7 +82,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     // the bare mono kbd hint, which stays visible while typing (138:53 shows
     // "button" and ⌘F together). Clearing = Escape or the empty-state's
     // "Clear search" link.
-    <div style={containerStyles} role="search">
+    <div style={containerStyles} role="search" data-testid={testId}>
       <TextInput
         type="text"
         id={id}
@@ -107,6 +111,17 @@ const containerStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   margin: 0,
+  /* Board 1069:4712 declares the field box `flex-[1_0_0] min-w-px` — it FILLS
+     the band its consumer draws. Without this the box is sized by the bare
+     <input>'s UA `size=20` intrinsic width and lands at 215px inside a 256px
+     band, ending 41px short of every board that draws it (137:8, 138:59,
+     144:8 all state a 248 box in a 280 frame). The 2026-09-02 note on
+     boards.json 137:2 measured 247 here, so this is a regression, not a
+     never-built. `width` covers the block-parent case (StockSourceModal
+     wraps it in its own flex:1 div, where a flex-basis would not apply). */
+  flex: 1,
+  minWidth: 0,
+  width: "100%",
   /* Board 137:8 is asymmetric on purpose: the placeholder starts at 10 and
      the kbd hint ends 14 from the right (⌘F at x258+16 in a 288 box). It
      was 8 both sides, leaving the hint 9 short of the board. */

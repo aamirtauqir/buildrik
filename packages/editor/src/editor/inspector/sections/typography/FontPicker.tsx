@@ -16,6 +16,7 @@ import {
 } from "../../../../services/GoogleFontsService";
 import { FontSearchInput, CategoryTabs, FontList } from "./FontPickerDropdown";
 import { Button } from "@/editor/chrome-ui";
+import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -97,8 +98,15 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
     /* Board 807:8342 reads "Family  [Inter Tight]" — one row, label left, the
        same 88px column every other row uses. It used to stack a "Font Family"
        caption above a full-bleed button, the only row in the section that did. */
-    <div className="bdi-row-ctrl" style={{ marginBottom: 12, position: "relative" }}>
-      <label className="bdi-lb">Family</label>
+    /* `.bdi-ddn` — the SHARED control frame, not a fourth hand-rolled one.
+       807:8352 draws Family's box exactly like every other control on the
+       board: gray-50 on a gray-100 hairline, radius 4, 28 tall, 160 wide. This
+       one was white on `--bk-border-medium` at radius 6, and carried a 12px
+       bottom margin that broke the board's contiguous 34-row rhythm — the only
+       row in the panel that did either. The one style left inline is the
+       preview typeface, which is the field's value and cannot be a class. */
+    <div className="bdi-row-ctrl" data-testid={rowTestId("Family")} style={{ position: "relative" }}>
+      <label className="bdi-lb" data-testid={labelTestId("Family")}>Family</label>
       {/* Current Font Display / Toggle Button */}
       <Button
         onClick={() => setShowFontPicker(!showFontPicker)}
@@ -106,21 +114,9 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         aria-expanded={showFontPicker}
         aria-controls="font-picker-listbox"
         aria-label="Font family"
-        style={{
-          width: "100%",
-          padding: "4px 8px",
-          background: "var(--bk-bg-card)",
-          border: `1px solid ${"var(--bk-border-medium)"}`,
-          borderRadius: 6,
-          color: "var(--bk-ink)",
-          fontSize: 12,
-          textAlign: "left",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          fontFamily: value || "inherit",
-        }}
+        data-testid={fieldTestId("Family")}
+        className="bdi-ddn tw:justify-between tw:text-left"
+        style={{ fontFamily: value || "inherit" }}
       >
         <span>{currentFontName}</span>
         <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>

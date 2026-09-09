@@ -154,9 +154,15 @@ function RailZone({
               aria-selected={isVisibleActive}
               aria-label={tab.ariaLabel}
               data-tab={tab.id}
+              /* Conformance anchor, same reason as `data-testid="rail"` below:
+                 recipes address by testid so a class or aria-label rewrite
+                 cannot silently unhook a measurement. `data-tab` is read by
+                 CSS and by the drag code, so it is not free to double as one. */
+              data-testid={`rail-tab-${tab.id}`}
             >
               {isVisibleActive && (
                 <div
+                  data-testid="rail-active-bar"
                   /* Board 199:2: 3px, flush to the RAIL edge, the full
                      height of the item — measured at 1440x900 as x 0..2 over
                      y 114..157, the same 44px as the tinted pill. It was 2px,
@@ -165,7 +171,7 @@ function RailZone({
                      floating beside the pill rather than a rule down its edge.
                      The offset is the button's own centring inset, written
                      from the two tokens that create it. */
-                  className="ls-btn-bar tw:absolute tw:top-0 tw:bottom-0 tw:w-[3px] tw:rounded-r-[2px] tw:bg-[var(--bk-accent)] tw:left-[calc(-1*(var(--layout-rail-width,60px)-var(--bk-size-header))/2)]"
+                  className="ls-btn-bar tw:absolute tw:top-0 tw:bottom-0 tw:w-[3px] tw:rounded-[2px] tw:bg-[var(--bk-accent)] tw:left-[calc(-1*(var(--layout-rail-width,60px)-var(--bk-size-header))/2)]"
                 />
               )}
               {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}

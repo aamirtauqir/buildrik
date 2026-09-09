@@ -80,15 +80,25 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
      header carries as `✦ AI` — one answer to "I do not know what to do next",
      not three. */
   return (
-    <div role="status" aria-live="polite" aria-label="No element selected" className={CONTAINER}>
-      <p className={DESCRIPTION}>Select something on the canvas to edit it.</p>
+    <div role="status" aria-live="polite" aria-label="No element selected" className={CONTAINER} data-testid="inspector-empty">
+      <p className={DESCRIPTION} data-testid="inspector-empty-text">Select something on the canvas to edit it.</p>
       {composer && (
         <Button
           color="light"
           size="xs"
           data-testid="inspector-empty-ask-ai"
           onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
-          variant="link" className="tw:min-h-6 tw:mt-2 tw:self-center tw:font-normal"
+          /* Board 920:4717 draws this 12/16 across the full 268 content box,
+             not the `link` colour key's shared 13/20 at `min-h-6` — that key
+             is 48 call sites wide, so the two deltas are corrected here.
+             `min-h-4` is the same twMerge group as the theme's `min-h-6`,
+             which is why it wins; a different property (the old `min-h-6`
+             against `h-auto`) would not have. No `leading-*` here: measured,
+             that whole utility family is inert on a chrome Button — the root
+             computes `line-height: normal` with the theme's own `tw:leading-5`
+             on it — and the board's `leading-[0]` is a Figma auto-height
+             artifact, not a line box to match. `min-h-4` gives the 16. */
+          variant="link" className="tw:min-h-4 tw:mt-2 tw:text-[12px] tw:font-normal"
         >
           ✦ Ask AI ›
         </Button>
@@ -118,14 +128,20 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
    `pt-16` with `pt-4`. Applying one padding to both pushed the banner 63px
    down its own board. */
 const CONTAINER_BASE =
-  "tw:flex tw:flex-col tw:items-start tw:px-4 tw:pb-6 " +
-  "tw:text-left tw:text-[var(--bk-ink-soft)]";
+  "tw:flex tw:flex-col tw:px-4 tw:text-[var(--bk-ink-soft)]";
 /* Exactly ONE `pt-*` per state, never a base plus an override. Appending
    `tw:pt-4` to a string already carrying `tw:pt-16` changes nothing: both
    compile, neither is more specific, and the stylesheet's order decides —
    measured, the element carried both classes and computed 64px. */
-const CONTAINER = `${CONTAINER_BASE} tw:pt-16`;          // 159:99, sentence at y64
-const CONTAINER_APPLIED = `${CONTAINER_BASE} tw:pt-4`;   // 1175:4841, banner at y14
+/* 159:100 is a 160px block with `text-center`, and BOTH its text nodes are
+   268-wide boxes at `left-[150px] -translate-x-1/2` — i.e. the panel's full
+   content width, centred. The read this replaces ("box starts at x16, so the
+   sentence is flush left") came from the box's left EDGE and missed both the
+   centring transform and the `text-center` on their parent. `items-stretch`
+   gives each child that 268 box; the container's own `text-center` places the
+   glyphs inside it. */
+const CONTAINER = `${CONTAINER_BASE} tw:h-40 tw:items-stretch tw:text-center tw:pt-16`; // 159:99/159:100
+const CONTAINER_APPLIED = `${CONTAINER_BASE} tw:items-start tw:pb-6 tw:text-left tw:pt-4`; // 1175:4841, banner at y14
 /* Board 1175:4843/4844 — 12 semibold in the success ink and the template's own
    name at 11 under it. It was 14 over 13, both a step too loud for a banner
    the board draws 87 tall. */
@@ -133,7 +149,7 @@ const APPLIED_TITLE = "tw:m-0 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-
 const APPLIED_NAME = "tw:m-0 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-soft)]";
 /* No max-width: the board's sentence sits on one line inside the panel's
    own padding; capping it at 220px broke it across two. */
-const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]";
+const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* Board 1175:4847 sets the tip at 10; the DS type scale floors at 11 and
    `gate:design-debt-ratchet` locks off-scale sizes at zero, so 11 it is. */
 const TIP = "tw:mt-2.5 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";

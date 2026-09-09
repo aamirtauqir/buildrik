@@ -35,7 +35,12 @@ import { Presence, type PresenceProps } from "./Presence";
    the primary CTA at 32px with 13px medium text. The omission was the only
    reason it stood 8px taller than the design and than the bar's own rhythm.
    Stated once here so the two branches cannot drift apart again. */
-const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-5 tw:text-[13px] tw:font-medium";
+/* 680:22 on all three topbar frames (681:26, 682:4576, 682:4651): 32 tall,
+   16 horizontal, a 14/20 label. It shipped 20 horizontal and 13. The 10px
+   VERTICAL the boards also declare is nominal — 10 + a 20 line + 10 is 40 and
+   the same node fixes its height at 32 — so it is carried as a box-model value
+   the explicit height overrides, which is what Figma is doing too. */
+const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[14px] tw:leading-5 tw:font-medium";
 
 /* Exit geometry + colour (2026-08-03), from board 681:26 `btn/exit`: 28 tall,
    10 horizontal padding, 12px REGULAR, ink at gray-900. It rendered 32 / 12 /
@@ -198,13 +203,19 @@ export function Topbar({
         "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]"
       }
     >
-      <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS}>
+      <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS} data-testid="topbar-exit">
         {exitLabel}
       </Button>
 
+      {/* 680:11 on all three topbar frames — 681:26 (which shell-default
+          measures) and 682:4576 / 682:4651 on the S5 flow frames — is a FIXED
+          200 column at 14/20. It shipped 13px in a 120..200 elastic box, so
+          the site's own name read at the size of the controls around it and
+          the whole bar re-laid itself when the name changed length. */}
       <span
-        className="tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:max-w-[200px] tw:min-w-[120px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
+        className="tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)] tw:w-[200px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
         title={siteName}
+        data-testid="topbar-site-name"
       >
         {siteName}
       </span>
@@ -238,6 +249,7 @@ export function Topbar({
       {review ? (
         <ReviewBadge {...review} />
       ) : null}
+
 
       <span className="tw:flex-1" />
 
@@ -327,6 +339,7 @@ export function Topbar({
             size="xs"
             title={ctaHint}
             className={PUBLISH_BTN_CLASS}
+            data-testid="topbar-publish"
           >
             {ctaLabel ?? PUBLISH_LABEL[publish]}
           </Button>
@@ -365,8 +378,8 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
   const className = `${REVIEW_BASE_CLASS} ${REVIEW_TONE_CLASS[tone]}`;
   if (!onClick) {
     return (
-      <span className={className} title={title ?? label}>
-        <span className={REVIEW_LABEL_CLASS}>{label}</span>
+      <span className={className} title={title ?? label} data-testid="topbar-review-pill">
+        <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
       </span>
     );
   }
@@ -376,8 +389,9 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       className={`${className} tw:cursor-pointer tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
       title={title ?? label}
       onClick={onClick}
+      data-testid="topbar-review-pill"
     >
-      <span className={REVIEW_LABEL_CLASS}>{label}</span>
+      <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
     </button>
   );
 }

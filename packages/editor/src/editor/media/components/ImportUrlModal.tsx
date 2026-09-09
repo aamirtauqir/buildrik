@@ -51,7 +51,7 @@ export function ImportUrlModal({ open, onClose, onImport }: ImportUrlModalProps)
       title="Import from URL"
       subtitle="Paste a link to an image or video and it lands in this library."
       footer={
-        <div className="tw:flex tw:items-center tw:justify-end tw:gap-2">
+        <div className="tw:flex tw:items-center tw:justify-end tw:gap-2" data-testid="import-url-foot">
           <Button type="button" color="light" onClick={onClose} data-testid="import-url-cancel">
             Cancel
           </Button>
@@ -63,7 +63,10 @@ export function ImportUrlModal({ open, onClose, onImport }: ImportUrlModalProps)
     >
       {/* Board 1205:4804 labels the field, the way the family's other
           modals label their sections ("PAGES" on 1164:4738). */}
-      <p className="tw:mb-1 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+      <p
+        className="tw:mb-1 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
+        data-testid="import-url-label"
+      >
         Media URL
       </p>
       <TextField

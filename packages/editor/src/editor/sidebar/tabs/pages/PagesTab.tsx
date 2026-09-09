@@ -185,9 +185,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     if (deletable.length > 0) setBulkDeleteIds(deletable);
   }, [resolveBulkDeletable]);
 
+  /* The dialog is NOT closed here. Board 183:60 keeps it up long enough to
+     report what happened ("3 pages deleted." / "Closing…") and then closes
+     itself — the panel used to drop the modal on the same tick and leave the
+     result to whatever toast deletePage happened to raise, which is a report
+     from a different surface about a different unit of work. */
   const confirmBulkDelete = React.useCallback(() => {
     (bulkDeleteIds ?? []).forEach((id) => p.deletePage(id));
-    setBulkDeleteIds(null);
     bulk.clearSelection();
   }, [bulkDeleteIds, p.deletePage, bulk.clearSelection]);
 
@@ -347,6 +351,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           .join(", ")} are removed from this site. One undo (⌘Z) brings them all back.`}
         confirmLabel="Delete pages"
         tone="destructive"
+        testId="pages-bulk-delete"
+        success={{
+          title: "Deleted",
+          message: `${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"} deleted.`,
+        }}
       />
 
       {/* ⌘K command palette */}

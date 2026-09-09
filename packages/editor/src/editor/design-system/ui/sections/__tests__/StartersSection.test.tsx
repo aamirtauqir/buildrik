@@ -38,9 +38,16 @@ const wrap = (ui: React.ReactNode) => (
 beforeEach(() => localStorage.clear());
 
 describe("StartersSection", () => {
-  it("warns that applying overwrites tokens, before the grid", () => {
+  /* Board 152:145 writes this warning out in full and the panel now says it
+     verbatim, so the assertion moved from the one-line paraphrase to the two
+     clauses that carry the weight: what applying REPLACES, and that a confirm
+     stands between the click and the write. */
+  it("warns what applying replaces, and that a confirm stands in front of it", () => {
     const { getByRole } = render(wrap(<StartersSection projectId="p1" />));
-    expect(getByRole("note").textContent).toMatch(/overwrites your tokens/i);
+    const note = getByRole("note").textContent ?? "";
+    expect(note).toMatch(/replaces your colour, type and spacing tokens/i);
+    expect(note).toMatch(/the other eleven kinds keep their values/i);
+    expect(note).toMatch(/the confirm names every staged edit/i);
   });
 
   it("offers every starter in the registry", () => {

@@ -53,14 +53,23 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
   return (
     <div className="tw:flex tw:flex-col">
       {composer && composer.colorMode ? (
-        <div className="tw:px-3 tw:py-2">
+        /* 44 tall — 153:99. `py-2` around a 34px group measured 50, which is
+           six pixels of unboarded band above the first section header. */
+        <div className="tw:flex tw:h-11 tw:flex-none tw:items-center tw:px-3" data-testid="brand-colour-mode-preview">
           <ColorModeToggle composer={composer} />
         </div>
       ) : null}
 
       <div
-        className="tw:flex tw:items-center tw:justify-between tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)] tw:bg-[var(--bk-gray-100)]"
+        /* `--bk-ink-soft`, not the board's `--color/ink-muted`: this header's
+           own fill is `--bk-gray-100`, where ink-muted measures 4.39:1 and
+           fails AA at 11px. Same substitution as DesignTabFooter's status line.
+           28 tall on a 16 inset with an 8px gap — 220:835, the shared Section
+           header. It shipped 12-in on a `py-1.5` hug, so the one band that
+           groups this list sat 4px inside every row it grouped. */
+        className="tw:flex tw:h-7 tw:items-center tw:justify-between tw:gap-2 tw:px-4 tw:py-0 tw:text-[11px] tw:leading-4 tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-gray-100)]"
         data-no-dark-header
+        data-testid="brand-nodark-header"
       >
         <span>No dark value</span>
         <span className="tw:font-mono tw:tabular-nums tw:font-medium" data-no-dark-count>{missing.length}</span>
@@ -76,6 +85,7 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
             <li
               key={t.id}
               data-no-dark-row={t.id}
+              data-testid={`brand-nodark-row-${t.id}`}
               className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4 tw:py-0"
             >
               {/*
@@ -93,7 +103,8 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
                 reader still reads something human.
               */}
               <span
-                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[11px] tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
+                data-testid={`brand-nodark-name-${t.id}`}
+                className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[11px] tw:leading-4 tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
                 title={t.name}
               >
                 {t.id}
@@ -116,11 +127,15 @@ export const ColourModeSection: React.FC<ColourModeSectionProps> = ({ composer }
                   color="light"
                   size="xs"
                   data-set-dark={t.id}
+                  data-testid={`brand-nodark-set-${t.id}`}
                   onClick={() => {
                     setDraft(t.value);
                     setEditing(t.id);
                   }}
-                  variant="link" className="tw:font-normal"
+                  /* 12/18 in `--color/accent-text` — 153:110 and its three
+                     siblings. flowbite's `size="xs"` link is 12/16, so the one
+                     action on each row sat two pixels short of its own row. */
+                  variant="link" className="tw:font-normal tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
                 >
                   Set
                 </Button>

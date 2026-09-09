@@ -17,6 +17,11 @@ import * as React from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { ReplaceAcrossResult } from "../../../../../engine/media/MediaCommandLayer";
 import { Button, Checkbox } from "@/editor/chrome-ui";
+/* `.med-rx-*` lives in MediaTab.css, which only MediaTab imported — so this
+   dialog drew as unstyled block flow anywhere it was mounted without its
+   panel. Same defect board 1205:4829 found on FolderTree, same fix: the
+   component owns its own styles. */
+import "../MediaTab.css";
 
 interface ReplaceAcrossDialogProps {
   composer: Composer;
@@ -63,11 +68,15 @@ function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
   stylesheet — but a chrome-ui Button's geometry is exactly what the caller
   className is for, per chrome-ui/__tests__/className-precedence.test.tsx.
 */
+/* Boards 1164:4748 / 1164:4750 — the confirm buttons HUG on a 12/8 pad at 11px
+   rather than sitting on a fixed 32 row at 13px. The fixed height is the
+   reason the board's 8 vertical pad measured 0: a set height and a padding
+   are not the same property, so nothing conflicted and nothing won. */
 const RX_BTN =
-  "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-12)] tw:border " +
+  "tw:px-[var(--bk-space-12)] tw:py-2 tw:border " +
   "tw:border-[var(--bk-border)] tw:rounded-[var(--bk-radius-md)] " +
-  "tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:text-[13px] " +
-  "tw:leading-[18px] tw:font-normal tw:[font-family:var(--bk-font-ui)] " +
+  "tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] " +
+  "tw:font-normal tw:[font-family:var(--bk-font-ui)] " +
   "tw:cursor-pointer tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:cursor-not-allowed " +
   "tw:focus-visible:outline-none tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
@@ -76,6 +85,12 @@ const RX_BTN_PRIMARY =
   "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent)] " +
   "tw:text-[var(--bk-accent-on)] tw:font-medium " +
   "tw:enabled:hover:bg-[var(--bk-accent-hover)]";
+
+/* 1174:4861 / 1174:4862 — the RESULT footer is two text links, the same
+   treatment the clean state's "Done" already uses: the work is finished and
+   there is nothing left to weight. */
+const RX_LINK = "tw:min-h-5 tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-soft)]";
+const RX_LINK_GO = "tw:min-h-5 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)]";
 
 export function ReplaceAcrossDialog({
   composer,
@@ -163,8 +178,9 @@ export function ReplaceAcrossDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="med-rx-title"
+        data-testid="rx-dialog"
       >
-        <h2 id="med-rx-title" className="med-rx-title">
+        <h2 id="med-rx-title" className="med-rx-title" data-testid="rx-title">
           Replace across site
         </h2>
 
@@ -175,16 +191,16 @@ export function ReplaceAcrossDialog({
               {" "}— {totalUses} in total — will switch to the image you pick. This can be
               undone.
             </p>
-            <div className="med-rx-preview">
+            <div className="med-rx-preview" data-testid="rx-swap">
               <div className="med-rx-preview__before">
-                <img src={oldSrc} alt="" />
+                <img src={oldSrc} alt="" data-testid="rx-thumb-before" />
                 <span>Before</span>
               </div>
-              <div className="med-rx-preview__arrow" aria-hidden="true">
+              <div className="med-rx-preview__arrow" aria-hidden="true" data-testid="rx-swap-arrow">
                 →
               </div>
               <div className="med-rx-preview__after">
-                <img src={newSrc} alt="" />
+                <img src={newSrc} alt="" data-testid="rx-thumb-after" />
                 <span>After</span>
               </div>
             </div>
@@ -193,15 +209,22 @@ export function ReplaceAcrossDialog({
                 This asset is not used on any page.
               </p>
             ) : (
+              <>
+              {/* 1174:4833 — the list is captioned. Without it the checkbox
+                  column reads as a second confirmation rather than a scope
+                  picker. */}
+              <p className="med-rx-pages-label" id="med-rx-pages-label" data-testid="rx-pages-label">
+                PAGES
+              </p>
               <ul
                 className="med-rx-pages"
                 role="list"
-                aria-label="Pages to replace on"
+                aria-labelledby="med-rx-pages-label"
                 data-testid="rx-pages-list"
               >
                 {state.pages.map((p) => (
-                  <li key={p.id} className="med-rx-page-row">
-                    <label className="med-rx-page-label">
+                  <li key={p.id}>
+                    <label className="med-rx-page-label" data-testid={`rx-page-label-${p.id}`}>
                       <Checkbox
                         color="blue"
                         className="tw:bg-white"
@@ -218,14 +241,16 @@ export function ReplaceAcrossDialog({
                   </li>
                 ))}
               </ul>
+              </>
             )}
-            <footer className="med-rx-footer">
-              <Button type="button" className={RX_BTN} onClick={onClose}>
+            <footer className="med-rx-footer" data-testid="rx-foot">
+              <Button type="button" className={RX_BTN} data-testid="rx-cancel" onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 type="button"
                 className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
+                data-testid="rx-commit"
                 onClick={handleCommit}
                 disabled={selectedTotals.uses === 0}
               >
@@ -269,17 +294,18 @@ function ResultView({
   if (clean && replaced.length > 0) {
     return (
       <>
-        <p className="med-rx-body med-rx-body--success" role="status">
+        <p className="med-rx-body med-rx-body--success" role="status" data-testid="rx-result-clean">
           Replaced {replaced.length} use{replaced.length === 1 ? "" : "s"} ✓
         </p>
-        <footer className="med-rx-footer">
+        <footer className="med-rx-footer" data-testid="rx-foot">
           {/* Board 1174:4849's clean result closes on an 11/500 text link, not
               on the filled 32-tall button the confirm and partial phases use:
               there is nothing left to decide, so nothing to weight. */}
           <Button
             type="button"
             variant="link"
-            className="tw:text-[length:var(--bk-text-11)] tw:font-medium"
+            className={RX_LINK_GO}
+            data-testid="rx-done"
             onClick={onClose}
           >
             Done
@@ -318,11 +344,11 @@ function ResultView({
   // Partial failure: some replaced, some failed.
   return (
     <>
-      <p className="med-rx-body med-rx-body--warn" role="alert">
+      <p className="med-rx-body med-rx-body--warn" role="alert" data-testid="rx-result-partial">
         {replaced.length} replaced, {failed.length} failed.
       </p>
-      <details className="med-rx-failed" open>
-        <summary>Failed elements ({failed.length})</summary>
+      <details className="med-rx-failed" open data-testid="rx-failed-details">
+        <summary data-testid="rx-failed-summary">Failed elements ({failed.length})</summary>
         <ul>
           {failed.map((f) => (
             <li key={f.elementId}>
@@ -331,13 +357,15 @@ function ResultView({
           ))}
         </ul>
       </details>
-      <footer className="med-rx-footer">
-        <Button type="button" className={RX_BTN} onClick={onClose}>
+      <footer className="med-rx-footer" data-testid="rx-foot">
+        <Button type="button" variant="link" className={RX_LINK} data-testid="rx-close" onClick={onClose}>
           Close
         </Button>
         <Button
           type="button"
-          className={`${RX_BTN} ${RX_BTN_PRIMARY}`}
+          variant="link"
+          className={RX_LINK_GO}
+          data-testid="rx-retry"
           onClick={onRetryFailed}
         >
           Retry failed

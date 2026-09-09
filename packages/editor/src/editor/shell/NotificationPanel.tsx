@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { EmptyState, PanelHeader, ROW_META_CLASS, Row, SkeletonBlock, StatusDot, Button, type ToastInput } from "@/editor/chrome-ui";
+import { EmptyState, PanelHeader, ROW_META_CLASS, Row, SkeletonBlock, Button, type ToastInput } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import {
@@ -28,10 +28,15 @@ import {
 function relTime(iso: string | Date): string {
   const then = new Date(iso).getTime();
   if (Number.isNaN(then)) return "";
+  /* Board 165:12 / 165:33 draw the age as "2h" / "4h" / "1d" — no " ago".
+     The list is already banded by day above these rows ("TODAY", "YESTERDAY"),
+     so the word restates what the band just said, and it costs most of the
+     34px the board leaves for this column. Stripped here rather than in
+     `formatRelativeTime`, which other surfaces read. */
   return formatRelativeTime(Math.min(then, Date.now()), {
-    fallback: "days",
+    fallback: "daysShort",
     justNowLabel: "just now",
-  });
+  }).replace(/ ago$/, "");
 }
 
 /** Board 165:2 bands the list by day — TODAY, YESTERDAY, then the date. A
@@ -45,7 +50,7 @@ function relTime(iso: string | Date): string {
    165:51's note. It was 24.5h at a 12px inset with Tailwind's own `wide`
    tracking (0.275px at this size). */
 const DAY_BAND_CLASS =
-  "tw:flex tw:h-7 tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 " +
+  "tw:flex tw:h-7 tw:items-center tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:px-4 " +
   "tw:text-[11px] tw:font-medium tw:leading-4 tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]";
 
 function dayBand(iso: string | Date): string {
@@ -63,14 +68,6 @@ function dayBand(iso: string | Date): string {
 
 /** The dot carries the kind, the way the board colours it: a publish failure
  *  is not the same event as an approval. */
-function dotState(type: string): "live" | "review" | "changes" | "failed" {
-  const t = type.toLowerCase();
-  if (t.includes("fail") || t.includes("error")) return "failed";
-  if (t.includes("approve") || t.includes("publish")) return "live";
-  if (t.includes("change") || t.includes("request")) return "changes";
-  return "review";
-}
-
 /** Unread badge count, refreshable after a read lands. */
 export function useUnreadCount(): { count: number; refresh: () => void } {
   const [count, setCount] = React.useState(0);
@@ -173,7 +170,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
   });
 
   return (
-    <div ref={panelRef} tabIndex={-1} className="bk-notifications" role="dialog" aria-label="Notifications">
+    <div ref={panelRef} tabIndex={-1} className="bk-notifications" role="dialog" aria-label="Notifications" data-testid="notifications-panel">
       {/* Board 165:52 is the same 48-pixel bar Issues draws, down to the x=16
           title and the close glyph at x=332 — so it is PanelHeader's `panel`
           size, not a second hand-built header. The panel had neither the
@@ -259,40 +256,79 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose, o
           return (
             <React.Fragment key={n.id}>
             {showBand && (
-              <div className={DAY_BAND_CLASS}>{band}</div>
+              <div className={DAY_BAND_CLASS} data-testid={`notifications-day-band-${index}`}>{band}</div>
             )}
+            {/* 165:77 draws the row at 44, which is `stack`. It was
+                `comment` (min-h-16 = 64) — the same 44 the loading skeleton
+                already draws, so the two states disagreed by 20px per row. */}
             <Row
-              size="comment"
+              size="stack"
               interactive={jumpable}
               className={n.read ? "bk-notif-row" : "bk-notif-row bk-notif-row--unread"}
+              data-testid={`notifications-row-${index}`}
               data-jump-gone={jumpable ? undefined : "true"}
               onClick={jumpable ? () => void openRow(n) : undefined}
             >
+              {/* Boards 165:2 / 165:24 mark an unread row with 165:9 — a 2px
+                  full-height accent bar at the row's left EDGE — and an
+                  accent-tint ground, and give a read row neither. It shipped a
+                  coloured StatusDot whose colour was the only thing carrying
+                  the notification's TYPE (`dotState`: live / review / changes /
+                  failed), which is colour as sole encoding — design codex #6 —
+                  and 165:10 draws a PLAIN accent disc — one colour meaning
+                  "unread", not four meaning four types. (That ellipse is
+                  invisible to the extracted spec: Figma exports an ellipse as
+                  an <img> with no style props, so reading the spec alone says
+                  the boards draw no dot at all. It is in the raw capture.)
+                  The bar is painted by `.bk-notif-row--unread::before`, and the
+                  word survives for screen readers, which is what the dot's
+                  `label` was doing. */}
               {n.read ? (
-                <span className="bk-notif-row__spacer" />
+                <span className="bk-notif-row__spacer" aria-hidden="true" />
               ) : (
-                <StatusDot state={dotState(n.type)} label="unread" />
+                /* `role=img` + aria-label rather than a visually-hidden word:
+                   `bd-sr-only` clips text to a 1px box but does not hide it
+                   from a colour sweep, and ink-on-accent inside an 8px disc
+                   reported 2.87:1 — a contrast failure over text nobody can
+                   see. The accessible name is the same either way. */
+                <span className="bk-notif-row__dot" role="img" aria-label="Unread" />
               )}
               <span className="bk-notif-row__body">
-                <span className="bk-notif-row__text">
+                <span className="bk-notif-row__text" data-testid={`notifications-row-text-${index}`}>
                   {n.actorName ? `${n.actorName} ` : ""}
                   {n.message}
                 </span>
               </span>
               {/* Board 165:2 puts the age at the right of its own row, not on
                   a second line under the text with the type repeated. */}
-              <span className={ROW_META_CLASS}>{relTime(n.createdAt)}</span>
+              <span className={ROW_META_CLASS} data-testid={`notifications-row-meta-${index}`}>{relTime(n.createdAt)}</span>
             </Row>
             {/* Board 165:81 — a tinted marker of its own, indented to the row's
                 text column (dot 16 + 8 wide + 8 gap), not a quiet third line
                 inside the row. The row above stays a row you can read; this
-                says why it does not click. */}
+                says why it does not click.
+
+                MEASURED off 165:81/82/83 (2026-09-08): 64 tall, not 44, and
+                the two lines are TOP-anchored at y=6 and y=24 rather than
+                centred — 12/18 then 11/16, which stack to exactly 6+18=24.
+                The right inset is 16, which is what makes the body line 312
+                wide inside the 360 panel. It shipped 44 and centred. */}
             {jumpable ? null : (
-              <div className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-0.5 tw:bg-[var(--bk-warning-tint)] tw:pl-8" data-jump-gone-note>
-                <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]">
+              <div
+                className="tw:flex tw:h-16 tw:flex-col tw:bg-[var(--bk-warning-tint)] tw:pt-1.5 tw:pl-8 tw:pr-4"
+                data-jump-gone-note
+                data-testid="notifications-jump-gone"
+              >
+                <span
+                  className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]"
+                  data-testid="notifications-jump-gone-title"
+                >
                   What this points to was deleted
                 </span>
-                <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                <span
+                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                  data-testid="notifications-jump-gone-body"
+                >
                   The notification is kept, but there&rsquo;s nothing to jump to.
                 </span>
               </div>

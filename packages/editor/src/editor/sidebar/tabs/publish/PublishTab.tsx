@@ -426,11 +426,19 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
-      <div className={CONTENT}>
-        {/* Board 784:4480 — with no publish path there is nothing to say about
-            environments, changes or deploys: the panel states the one fact
-            that matters and offers the one action that changes it. */}
-        {noPublishPath ? (
+      {/* Board 781:4489 — the deploy service is unreachable, so the panel can
+          claim nothing about environments or deploys. Both halves of the
+          reassurance: nothing went out, and the work is not lost.
+
+          It sits OUTSIDE `CONTENT` because the board draws it at the panel's
+          own width (280) on 24px gutters — the same full-bleed state block
+          Layers, Insert and Pages all use. Nested inside CONTENT's px-4 it
+          measured 248 wide on 40px gutters. */}
+      {noPublishPath ? (
+        <div className={CONTENT}>
+          {/* Board 784:4480 — with no publish path there is nothing to say
+              about environments, changes or deploys: the panel states the one
+              fact that matters and offers the one action that changes it. */}
           <section className={SECTION}>
             <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]">
               Connect Vercel to publish.
@@ -439,29 +447,93 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               Buildrick deploys into your own Vercel account — we host nothing.
             </p>
           </section>
-        ) : (
+        </div>
+      ) : snapshot.error ? (
+        /* Frame 781:4545 verbatim: pt-36 pb-32 px-24, 6px gaps, three lines at
+           13 / 12 / 13. The headline was 16px semibold, which is the panel's
+           section-heading size, not the size the board gives an error block —
+           and not the 13px its own "Publishing to production…" sibling uses. */
+        <div
+          className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pt-9 tw:pb-8"
+          role="alert"
+          aria-label="Deploy service unreachable"
+          data-testid="publish-load-error"
+        >
+          <p
+            className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]"
+            data-testid="publish-load-error-title"
+          >
+            Couldn&apos;t reach the deploy service.
+          </p>
+          <p
+            className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+            data-testid="publish-load-error-desc"
+          >
+            Nothing was published. Your work is saved.
+          </p>
+          <Button
+            color="light"
+            size="xs"
+            variant="link"
+            onClick={() => snapshot.reload()}
+            data-testid="publish-load-error-retry"
+            className="tw:min-h-5 tw:self-start tw:p-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)]"
+          >
+            Try again
+          </Button>
+        </div>
+      ) : (
         <>
-        {/* Board 781:4489 — the deploy service is unreachable, so the panel
-            can claim nothing about environments or deploys. Both halves of the
-            reassurance: nothing went out, and the work is not lost. */}
-        {snapshot.error ? (
-          <section className={SECTION} aria-label="Deploy service unreachable">
-            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-error-text)]">
-              Couldn&apos;t reach the deploy service.
-            </h2>
-            <p className={META}>Nothing was published. Your work is saved.</p>
-            <div className="tw:mt-1">
-              <Button
-                color="light"
-                size="xs"
-                onClick={() => snapshot.reload()}
-                className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-accent)]"
-              >
-                Try again
-              </Button>
-            </div>
+        {/* Board 784:4250 — while a publish runs, the panel leads with the run
+            itself, at the panel's own width on the board's 24px gutters. Same
+            reason as the load-error block above: CONTENT's px-4 is the section
+            inset, not the state-block inset. */}
+        {isPublishing && (
+          <section
+            className="tw:flex tw:flex-col tw:gap-2 tw:px-6 tw:pt-8 tw:pb-7"
+            aria-label="Publish progress"
+            data-testid="publish-progress"
+          >
+            <h3
+              className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]"
+              data-testid="publish-progress-title"
+            >
+              Publishing to production…
+            </h3>
+            {/* The board's meta line reads "Building · step 2 of 4 · started
+                14s ago". It names the running step rather than the board's
+                generic "Building", because the worker knows which one it is
+                and "Optimizing images" answers "what is it doing" where a
+                phase word does not. Falls back to the percentage when a job
+                carries no steps. */}
+            <p className={META} data-testid="publish-progress-meta">
+              {runningStep
+                ? `${runningStep.name} · step ${runningStep.index} of ${runningStep.total}`
+                : publishJob && publishJob.progress > 0
+                  ? `${publishJob.progress}%`
+                  : "Starting"}
+              {startedAgo ? ` · started ${startedAgo} ago` : ""}
+            </p>
+            {/* Two questions about this control, with different answers.
+                GEOMETRY stays flowbite's: boards 784:4309/4310 draw a 4px track
+                on a 2px radius, this is chrome-ui's shared `Progress` (flowbite
+                `sm` = 6px, full radius), and re-theming a shared re-export off
+                one screen board is what this arc's own precedent forbids
+                (boards.json _note, BK_TEXT_INPUT_THEME, 2026-08-17).
+                COLOUR does not: flowbite fills the bar `bg-primary-600` =
+                #1C64F2 (blue-600), one step off the single accent #1A56DB, and
+                "one blue everywhere" is a DESIGN.md rule that holds whether or
+                not a board is being read. So the fill is corrected and the
+                geometry is left alone. `theme.color` and not `theme.bar`,
+                because the colour class is twMerged AFTER bar and would win.
+                A themed wrapper would be the SSOT fix, but the closed wrapper
+                set is [TextInput, Select] and `gate:chrome-ui-surface` requires
+                every flowbite export in the barrel to stay a pure re-export —
+                so the override belongs at the call site. */}
+            <Progress progress={publishJob?.progress ?? 0} size="sm" theme={{ color: { default: "tw:bg-[var(--bk-accent)]" } }} />
           </section>
-        ) : (
+        )}
+        <div className={CONTENT}>
         <>
 
         {/* Board 784:4403 — a failed publish leads with the failure AND with
@@ -505,35 +577,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         )}
 
-        {/* Board 784:4250 — while a publish runs, the panel leads with the run
-            itself and drops the "what would go out" sections: they describe a
-            publish the user has already started. ENVIRONMENT stays, because
-            where it is going is still the question being answered.
-
-            The board's meta line reads "Building · step 2 of 4 · started 14s
-            ago". This note used to say the job "exposes a percentage and a
-            start, not named steps" — true until `steps` was carried through
-            PublishService for board 784:4403's log. It names the running step
-            rather than the board's generic "Building", because the worker
-            knows which one it is and "Optimizing images" answers "what is it
-            doing" where a phase word does not. Falls back to the percentage
-            when a job carries no steps. */}
-        {isPublishing && (
-          <section className={SECTION} aria-label="Publish progress">
-            <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">
-              Publishing to production…
-            </h3>
-            <p className={META}>
-              {runningStep
-                ? `${runningStep.name} · step ${runningStep.index} of ${runningStep.total}`
-                : publishJob && publishJob.progress > 0
-                  ? `${publishJob.progress}%`
-                  : "Starting"}
-              {startedAgo ? ` · started ${startedAgo} ago` : ""}
-            </p>
-            <Progress progress={publishJob?.progress ?? 0} size="sm" />
-          </section>
-        )}
+        {/* The run itself is drawn ABOVE this scroll body — board 784:4250
+            puts it at the panel's own width, and it drops the "what would go
+            out" sections below because they describe a publish the user has
+            already started. ENVIRONMENT stays, because where it is going is
+            still the question being answered. */}
 
         {/* Board 641:2652 opens on WHERE it goes, not on a status chip.
             Production carries the live domain; Preview stays listed because an
@@ -674,17 +722,23 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             which is what this panel is for; "show me every version and roll
             one back" is the other surface's question. */}
         </>
-        )}
+        </div>
         </>
-        )}
-      </div>
+      )}
 
       {/* Board 641:2652 pins the CTA to the bottom of the panel, full width,
           and names the destination rather than the verb: "Publish to
           production", not "Publish Site". Inside the scroll body it drifted
           below the fold as the change list grew — exactly when it is most
           needed. */}
-      <div className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3">
+      {/* Boards 781:4525 / 784:4286 draw the foot as a bordered white band on
+          16px gutters with 10 above and below. It was py-3 (12) on a
+          transparent ground, which reads through whatever the body scrolled
+          under it. */}
+      <div
+        className="tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2.5"
+        data-testid="publish-footer"
+      >
         <div className="tw:flex tw:flex-col tw:gap-2">
           {noPublishPath ? (
             /* Board 784:4480 puts the CTA here too — the panel body above
@@ -737,7 +791,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                    board's grey already reads as disabled without the dimming,
                    but dropping it changes 207 buttons and belongs in its own
                    change. */
-                className="tw:h-7 tw:w-auto tw:self-start tw:px-3"
+                className="tw:h-7 tw:w-auto tw:self-start tw:px-3 tw:py-1.5"
+                data-testid="publish-cta"
               >
                 {/* One label, in every state. Board 641:2652 and 784:4326 both name the
                     destination and neither draws an "Update" variant — the

@@ -47,11 +47,18 @@ function readRecent(): string[] {
   }
 }
 
+/* 75:34 — a tile is 40 tall and fills its track (42.67 at this width), not a
+   fixed 40 square floated in the middle of one. */
 const TILE =
-  "tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded tw:border-0 tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded tw:border-0 tw:bg-[var(--bk-bg-subtle)] " +
   "tw:p-0 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-accent-subtle,#ebf5ff)]";
+/* 220:827 — 28 tall, 16 inset, 8 gap. The gap was absent because the label
+   grows with flex-1, which hides the difference until the count is short.
+   `shrink-0` is the load-bearing one: this band is a flex item in a column
+   whose content overflows, so `h-7` was being compressed to 16 — measured, not
+   theorised. The band ships squashed today on every screen that has recents. */
 const GROUP_HDR =
-  "tw:flex tw:h-7 tw:w-full tw:items-center tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] " +
+  "tw:flex tw:h-7 tw:w-full tw:shrink-0 tw:items-center tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:text-[11px] " +
   "tw:font-medium tw:leading-4 tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]";
 
 export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps) {
@@ -113,7 +120,11 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
 
   const grid = (list: IconDefinition[], testid: string) => (
     <div
-      className="tw:grid tw:grid-cols-5 tw:justify-items-center tw:gap-2 tw:px-4 tw:py-3"
+      /* Board 75:25 draws the picker SIX up on a 12 gutter (75:30's body is
+         px 12, pt 6, pb 12), which makes each track 42.67 wide. It shipped
+         five up at a 16 gutter — and this file's own docstring said "6-up
+         grid" the whole time, so the markup was the thing that drifted. */
+      className="tw:grid tw:grid-cols-6 tw:gap-2 tw:px-3 tw:pt-1.5 tw:pb-3"
       data-testid={testid}
     >
       {list.map((icon) => {
@@ -121,6 +132,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
         return (
           <Button
             key={icon.name}
+            data-testid={`icon-tile-${icon.name}`}
             className={TILE}
             title={icon.name}
             aria-label={`Insert ${icon.name} icon`}
@@ -136,7 +148,12 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
   return (
     <div
       ref={overlayRef}
-      className="tw:absolute tw:inset-0 tw:z-10 tw:flex tw:flex-col tw:items-stretch tw:overflow-y-auto tw:bg-[var(--bk-bg-panel,white)]"
+      /* Board 147:2 gives the drill-in frame the drawer's own
+         --flowbite/gray/100 edge. With no border set at all the computed
+         border-color reads #000000, the initial value — the identical defect
+         boards 144:2 and 146:2 already found on SlimLauncher and the asset
+         detail overlay. */
+      className="tw:absolute tw:inset-0 tw:z-10 tw:flex tw:flex-col tw:items-stretch tw:overflow-y-auto tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-panel,white)]"
       role="dialog"
       aria-modal="true"
       aria-label="Icon picker"
@@ -146,6 +163,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
 
       <Button
         variant="link" className="tw:flex tw:h-9 tw:shrink-0 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left"
+        data-testid="media-icon-back"
         onClick={onClose}
         aria-label="Back to media grid"
       >
@@ -165,7 +183,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
       </div>
 
       {/* Category row — All ▾ dropdown left, "N categories" mono right. */}
-      <div className="tw:flex tw:h-8 tw:shrink-0 tw:items-center tw:gap-2 tw:px-4">
+      <div className="tw:flex tw:h-8 tw:shrink-0 tw:items-center tw:gap-2 tw:px-4" data-testid="media-icon-categories">
         <Popover
           open={catMenuOpen}
           onClose={() => setCatMenuOpen(false)}
@@ -176,7 +194,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
               type="button"
               color="light"
               size="xs"
-              className="tw:min-h-6 tw:gap-1 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[13px] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
+              className="tw:min-h-6 tw:gap-1 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent"
               aria-expanded={catMenuOpen}
               data-testid="icon-category-scope"
               onClick={() => setCatMenuOpen((v) => !v)}
@@ -209,16 +227,22 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
           </Menu>
         </Popover>
         <span className="tw:flex-1" />
-        <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]">
+        <span
+          className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-muted)]"
+          data-testid="media-icon-category-count"
+        >
           {ICON_CATEGORIES.length} categories
         </span>
       </div>
 
       {showRecent ? (
         <>
-          <div className={GROUP_HDR}>
-            <span className="tw:flex-1">RECENT</span>
-            <span className="tw:[font-family:var(--bk-font-mono)] tw:tabular-nums">
+          <div className={GROUP_HDR} data-testid="media-icon-group-recent">
+            <span className="tw:flex-1" data-testid="media-icon-group-label">RECENT</span>
+            <span
+              className="tw:[font-family:var(--bk-font-mono)] tw:tabular-nums"
+              data-testid="media-icon-group-count"
+            >
               {recentIcons.length}
             </span>
           </div>

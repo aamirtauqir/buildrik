@@ -75,7 +75,7 @@ function MediaTabWithComposer({
   /*
     Boards 303:1997 / 303:2032 draw a status pill over the grid while a
     long-running media job is happening: "Image editor — crop · rotate ·
-    adjust" while the editor is open, "Optimising → WebP…" while an optimised
+    adjust" while the editor is open, "Optimizing → WebP…" while an optimised
     copy is being written. Both spans are owned here.
 
     The editor pill has no close signal to hang off: the modal's open state
@@ -154,7 +154,7 @@ function MediaTabWithComposer({
   const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
     const item = state.detailItem;
     if (!item) return;
-    setStatusPill("Optimising → WebP…");
+    setStatusPill("Optimizing → WebP…");
     try {
       const res = await fetch(optimizedSrc);
       const blob = await res.blob();
@@ -345,6 +345,7 @@ function MediaTabWithComposer({
         allFolders={state.allFolders}
         onFolderChange={state.setCurrentFolderId}
         selectionMode={state.selMode}
+        onToggleSelection={state.toggleSelMode}
         selectedKeys={state.selectedKeys}
         onEnterSelection={(key) => {
           if (!state.selMode) state.toggleSelMode();

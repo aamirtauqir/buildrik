@@ -264,7 +264,7 @@ describe("StudioHeader", () => {
 
     it("clean and saved", () => {
       save({ lastSavedAt: Date.now() });
-      expect(screen.getByText("Saved").textContent).toBe("Saved · just now");
+      expect(screen.getByText("Saved").textContent).toBe("Saved just now");
     });
 
     it("offline outranks a save error — queued is not lost", () => {

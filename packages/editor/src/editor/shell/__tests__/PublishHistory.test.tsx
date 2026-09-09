@@ -230,7 +230,11 @@ describe("rollback", () => {
     rerender(<PublishHistory siteId="s1" rollbackJob={{ state: "failed", progress: 60 }} />);
 
     expect(await screen.findByText(/Rollback failed/i)).toBeInTheDocument();
-    expect(screen.getByText(/did not finish/i)).toBeInTheDocument();
+    /* 453:4072's sentence, and it is now the ONLY one. This asserted "did not
+       finish", which was a second wording this path had to itself — same
+       screen, same failure, different text depending on whether the request
+       threw or the job failed, and only the throw path matched the board. */
+    expect(screen.getByText(/Nothing was overwritten\. Retry the rollback/i)).toBeInTheDocument();
   });
 });
 

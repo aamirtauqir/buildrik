@@ -37,34 +37,45 @@ export interface EmptyThreadProps {
 
 export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onDraft }) => (
   <div className="tw:flex tw:flex-col tw:pb-2">
-    <div className={BAND}>TRY</div>
-    {TRY_PROMPTS.map((p) => (
-      <Button
-        key={p}
-        color="light"
-        size="xs"
-        className="tw:justify-start tw:border-transparent tw:bg-transparent tw:px-4 tw:py-1 tw:text-[12px] tw:text-[var(--bk-accent)]"
-        onClick={() => onTry?.(p)}
-        disabled={!onTry}
-      >
-        {p}
-      </Button>
-    ))}
+    {/* Board 170:10 "Suggestions" is ONE block: the TRY label and the three
+        prompts under it, which is why they share an anchor. */}
+    <div className="tw:flex tw:flex-col" data-testid="ai-try">
+      <div className={BAND}>TRY</div>
+      {TRY_PROMPTS.map((p) => (
+        <Button
+          key={p}
+          color="light"
+          size="xs"
+          className="tw:justify-start tw:border-transparent tw:bg-transparent tw:px-4 tw:py-1 tw:text-[12px] tw:text-[var(--bk-accent)]"
+          onClick={() => onTry?.(p)}
+          disabled={!onTry}
+        >
+          {p}
+        </Button>
+      ))}
+    </div>
 
-    <p className="tw:mx-4 tw:mt-3 tw:mb-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+    <p
+      className="tw:mx-4 tw:mt-3 tw:mb-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+      data-testid="ai-note"
+    >
       AI proposes a diff and never writes directly. Each Apply lands as one undo step — a
       multi-step draft applies one step at a time.
     </p>
 
-    <div className={BAND}>DRAFT</div>
-    <Button
-      color="light"
-      className="tw:mx-4 tw:flex tw:h-10 tw:items-center tw:justify-between tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[12px] tw:text-[var(--bk-ink)]"
-      onClick={() => onDraft?.()}
-      disabled={!onDraft}
-    >
-      <span>✦ Draft a new section from a brief</span>
-      <span aria-hidden="true">›</span>
-    </Button>
+    {/* Board 921:4478 "Draft": the label and the one row under it. */}
+    <div className="tw:flex tw:flex-col" data-testid="ai-draft">
+      <div className={BAND}>DRAFT</div>
+      <Button
+        color="light"
+        className="tw:mx-4 tw:flex tw:h-10 tw:items-center tw:justify-between tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[12px] tw:text-[var(--bk-ink)]"
+        data-testid="ai-draft-brief"
+        onClick={() => onDraft?.()}
+        disabled={!onDraft}
+      >
+        <span>✦ Draft a new section from a brief</span>
+        <span aria-hidden="true">›</span>
+      </Button>
+    </div>
   </div>
 );

@@ -36,12 +36,17 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     // period), accent "Clear search" link. No icon, no button chrome.
     return (
       <div
-        className="tw:flex tw:flex-col tw:items-center tw:gap-[10px] tw:px-6 tw:pt-12"
+        /* Board 138:150 puts the block's type contract on the CONTAINER —
+           13 on a 20 line box — and lets both lines inherit it. The size was
+           only ever on the message paragraph, so the box itself measured the
+           inherited 16/normal. Nothing moves on screen; the container now
+           states what it draws. */
+        className="tw:flex tw:flex-col tw:items-center tw:gap-[10px] tw:px-6 tw:pt-12 tw:text-[13px] tw:leading-[20px]"
         role="status"
         aria-live="polite"
         data-testid="insert-no-results"
       >
-        <p className="tw:m-0 tw:text-center tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink-muted)]">
+        <p className="tw:m-0 tw:text-center tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink-muted)]" data-testid="insert-no-results-text">
           Nothing matches &lsquo;{query}&rsquo;.
         </p>
         <Button
@@ -80,10 +85,16 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             }
           }}
         >
-          <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]">
+          <span
+            className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)]"
+            data-testid={`insert-hit-label-${hit.key}`}
+          >
             {hit.label}
           </span>
-          <span className="tw:text-[11px] tw:leading-[16px] tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)]">
+          <span
+            className="tw:text-[11px] tw:leading-[16px] tw:tracking-[0.5px] tw:text-[var(--bk-ink-soft)]"
+            data-testid={`insert-hit-group-${hit.key}`}
+          >
             {hit.group}
           </span>
         </div>

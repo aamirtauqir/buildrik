@@ -33,8 +33,10 @@ export interface ReviewBarProps {
   onResend?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
 }
 
+/* 136:14 on board 130:201 (and 200:213, the bar's own board): 44 tall with a
+   20 gap. It shipped 48/16. */
 const BAR =
-  "tw:flex tw:items-center tw:gap-4 tw:h-12 tw:px-4 tw:bg-[var(--bk-accent-tint)] " +
+  "tw:flex tw:items-center tw:gap-5 tw:h-11 tw:px-4 tw:bg-[var(--bk-accent-tint)] " +
   "tw:[font-family:var(--bk-font-ui)] tw:text-[13px]";
 const LINK =
   "tw:h-7 tw:px-2 tw:rounded tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal " +
@@ -127,7 +129,7 @@ export const ReviewBar: React.FC<ReviewBarProps> = ({ composer, onCompare, onRes
           while a round is live, so `0 open` meant "your client has not replied
           yet" — and printed a number that says none of that. The count earns
           its place the moment there IS one. */}
-      <span className="tw:font-medium tw:text-[var(--bk-accent-text)]">
+      <span className="tw:font-medium tw:text-[var(--bk-accent-text)]" data-testid="review-bar-count">
         {count > 0
           ? `${count} open`
           : round.status === "CHANGES_REQUESTED"
@@ -139,13 +141,14 @@ export const ReviewBar: React.FC<ReviewBarProps> = ({ composer, onCompare, onRes
         size="xs"
         className={LINK}
         onClick={next}
+        data-testid="review-bar-next"
         disabled={!open.length}
         /* Disabled without a reason is a bug, not a state (wireframes §5.8). */
         title={open.length ? undefined : "No open comments to step through"}
       >
         Next ›
       </Button>
-      <Button color="light" size="xs" className={LINK} onClick={onCompare}>
+      <Button color="light" size="xs" className={LINK} onClick={onCompare} data-testid="review-bar-compare">
         Compare
       </Button>
       <span className="tw:flex-1" />
@@ -154,6 +157,7 @@ export const ReviewBar: React.FC<ReviewBarProps> = ({ composer, onCompare, onRes
           color="light"
           size="xs"
           className={ACCENT_LINK}
+          data-testid="review-bar-resend"
           onClick={resend}
           disabled={resending}
           aria-busy={resending || undefined}

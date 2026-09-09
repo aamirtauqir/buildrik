@@ -199,13 +199,21 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange,
   );
 };
 
+/* --bk-warning is the FILL colour of a warning, not its text colour: at 12px
+   over its own 8%-amber wash this measured 2.94:1, and the ⚠ line and the
+   `<script src>` inside it were the two worst-contrast strings on the screen.
+   The token system already carries the pair — --bk-warning-tint as the ground
+   and --bk-warning-text (#723B13) as the ink, which is 8.69:1 — and the two
+   hand-mixed rgba()s were the only reason the composite differed from it.
+   Same shape as SCREEN_ERROR / SCREEN_SUCCESS in shared.tsx. No board draws
+   this banner, so nothing on the Figma side constrains the colours. */
 const warningBannerStyles: React.CSSProperties = {
   padding: "10px 12px",
-  background: "rgba(217, 119, 6, 0.08)",
-  border: "1px solid rgba(217, 119, 6, 0.3)",
+  background: "var(--bk-warning-tint)",
+  border: "1px solid var(--bk-warning)",
   borderRadius: "var(--bk-radius-sm)",
   font: "500 12px var(--bk-font-ui)",
-  color: "var(--bk-warning)",
+  color: "var(--bk-warning-text)",
   lineHeight: 1.5,
 };
 

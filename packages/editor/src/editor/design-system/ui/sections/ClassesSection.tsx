@@ -65,15 +65,30 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
   return (
     <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0" data-testid="brand-classes">
       {rows.map(([name, count]) => (
+        /* 44 tall, 16 in, 11/16 both lines, and NO rule between rows —
+           153:9..153:27 draw five of these flush against each other. The
+           divider made a two-line row look like a table; the board separates
+           them by the 16px line rhythm alone. */
         <li
           key={name}
-          className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-0.5 tw:px-4 tw:border-b tw:border-[var(--bk-gray-100)]"
+          data-testid={`brand-class-${name}`}
+          className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:px-4 tw:text-[11px] tw:leading-4"
         >
-          <span className="tw:text-[11px] tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]">
-            .{name}
+          <span
+            data-testid={`brand-class-name-${name}`}
+            className="tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
+          >
+            {`.${name}`}
           </span>
-          <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-            used {count}&times;
+          <span
+            data-testid={`brand-class-usage-${name}`}
+            className="tw:text-[var(--bk-ink-muted)]"
+          >
+            {/* One text node, not three. `used {count}&times;` split into
+                "used" / "1" / "×", and check-board-copy.mjs compares TEXT
+                NODES — so the board's `used 12×` had nothing to match and read
+                as copy the product does not render. */}
+            {`used ${count}\u00d7`}
           </span>
         </li>
       ))}

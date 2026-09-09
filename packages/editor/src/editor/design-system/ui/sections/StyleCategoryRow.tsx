@@ -47,6 +47,7 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
       color="light"
       size="xs"
       data-category-row={category}
+      data-testid={`brand-preset-row-${category}`}
       data-active={isActive ? "true" : undefined}
       onClick={onClick}
       disabled={!enabled}
@@ -78,9 +79,20 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
           at the right, like every other list in this panel. It used to read
           "Button · 3 variants" as one run of text, so the counts did not line
           up and the eye could not scan them. */}
-      <span>{CATEGORY_LABELS[category]}</span>
-      <span className="tw:text-xs tw:font-normal tw:text-[var(--bk-ink-muted)]">
-        {variantCount} {variantCount === 1 ? "variant" : "variants"}
+      {/* 13/20 for the name, 11/16 for the count — 306:2166 / 306:2167 and
+          their five siblings. Both inherited flowbite's `size="xs"` 12/16, so
+          the name was a pixel small and its line four short. */}
+      <span
+        data-testid={`brand-preset-label-${category}`}
+        className="tw:text-[13px] tw:leading-5"
+      >{CATEGORY_LABELS[category]}</span>
+      <span
+        data-testid={`brand-preset-count-${category}`}
+        className="tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-muted)]"
+      >
+        {/* One text node: split, "3" and "variants" reach the copy check as
+            separate strings and the board's "3 variants" matches neither. */}
+        {`${variantCount} ${variantCount === 1 ? "variant" : "variants"}`}
       </span>
     </Button>
   );

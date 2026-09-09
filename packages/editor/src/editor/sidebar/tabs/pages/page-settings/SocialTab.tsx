@@ -37,13 +37,16 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
         </div>
       </div>
       {/* OG Title */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5">
+      <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-title">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <Label htmlFor="og-title" className={BK_LABEL_CLASS}>Open Graph Title</Label>
-          <span style={{ font: "500 11px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
+          <Label htmlFor="og-title" className={BK_LABEL_CLASS} data-testid="social-label-title">OG title</Label>
+          {/* Board 2838:12126 — 11/16 ink-muted. It had no line-height of its
+              own and inherited the stack's. */}
+          <span data-testid="social-count-title" style={{ font: "500 11px/16px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
         </div>
         <TextInput
           id="og-title"
+          data-testid="social-input-title"
           value={s.ogTitle}
           onChange={(e) => s.setOgTitle(e.target.value)}
           placeholder={s.seoTitle || page.name}
@@ -51,10 +54,10 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
         <HelperText className={BK_HELPER_CLASS}>Title shown when the page is shared on social networks. Defaults to SEO title.</HelperText>
       </div>
       {/* OG Description */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5">
+      <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-desc">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <Label htmlFor="og-desc" className={BK_LABEL_CLASS}>Open Graph Description</Label>
-          <span style={{ font: "500 11px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
+          <Label htmlFor="og-desc" className={BK_LABEL_CLASS} data-testid="social-label-desc">OG description</Label>
+          <span data-testid="social-count-desc" style={{ font: "500 11px/16px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
         </div>
         <Textarea
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
@@ -65,10 +68,11 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
         />
       </div>
       {/* OG Image URL */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5">
-        <Label htmlFor="og-image" className={BK_LABEL_CLASS}>Image URL</Label>
+      <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-image">
+        <Label htmlFor="og-image" className={BK_LABEL_CLASS} data-testid="social-label-image">OG image</Label>
         <TextInput
           id="og-image"
+          data-testid="social-input-image"
           value={s.ogImageUrl ?? ""}
           onChange={(e) => s.setOgImageUrl(e.target.value || null)}
           placeholder="https://…"

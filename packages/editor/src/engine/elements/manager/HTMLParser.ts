@@ -22,6 +22,29 @@ import type { ElementManagerContext } from "./types";
 /**
  * Manages HTML parsing and import operations
  */
+/** Reports one converted top-level node: (label, done, total). */
+export type SectionProgress = (label: string, done: number, total: number) => void;
+
+/*
+ * A human name for a top-level node, read from the markup rather than invented.
+ * `getSectionCount` already counts exactly these landmarks, so the two agree by
+ * construction. Anything else falls back to its own tag, which is still the
+ * template's word and not ours.
+ */
+const LANDMARK_LABELS: Record<string, string> = {
+  nav: "Navigation",
+  header: "Header",
+  main: "Main content",
+  section: "Section",
+  article: "Article",
+  footer: "Footer",
+  aside: "Sidebar",
+};
+function sectionLabel(el: HTMLElement): string {
+  const tag = (el.tagName || "div").toLowerCase();
+  return LANDMARK_LABELS[tag] ?? tag.charAt(0).toUpperCase() + tag.slice(1);
+}
+
 export class HTMLParser {
   private ctx: ElementManagerContext;
 
@@ -55,7 +78,19 @@ export class HTMLParser {
    * as the children of the active page's root element. Rebuilds the internal
    * element map so that Composer remains the single source of truth.
    */
-  importHTMLToActivePage(html: string): void {
+  /**
+   * @param onSection Called once per TOP-LEVEL node as it converts, with a
+   *   label read from the markup's own tag (`<nav>` → "Navigation") and the
+   *   1-based index. Reporting happens INSIDE the transaction, so a template
+   *   apply remains a single undo step — the engine invariant that ruled out
+   *   splitting the import into several transactions.
+   *   Board 642:2832 draws per-section phases; the labels come from the
+   *   template's HTML so they cannot drift from it, which is why nothing here
+   *   invents a name. Measured on the largest shipped template (3,488 chars,
+   *   3 landmarks) this whole loop is single-digit milliseconds — the caller,
+   *   not the engine, decides whether that is worth showing.
+   */
+  importHTMLToActivePage(html: string, onSection?: SectionProgress): void {
     this.ctx.composer.beginTransaction("import-html-to-active-page");
     try {
       const activePageId = this.ctx.getActivePageId();
@@ -82,7 +117,7 @@ export class HTMLParser {
         this.ctx.composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:created", page });
       }
 
-      const children = this.htmlToElementDataList(html);
+      const children = this.htmlToElementDataList(html, onSection);
 
       // Get the old root element
       const oldRoot = this.ctx.elements.get(page.root.id);
@@ -137,15 +172,19 @@ export class HTMLParser {
    * Convert an HTML string into a list of ElementData nodes
    * Sanitizes HTML before parsing to prevent XSS attacks
    */
-  private htmlToElementDataList(html: string): ElementData[] {
+  private htmlToElementDataList(html: string, onSection?: SectionProgress): ElementData[] {
     // Defense-in-depth: sanitize HTML to remove dangerous attributes (onclick, etc.)
     const safeHtml = sanitizeHTML(html || "");
     const fragment = parseHTML(safeHtml);
     const result: ElementData[] = [];
+    const total = [...fragment.childNodes].filter((n) => n.nodeType === Node.ELEMENT_NODE).length;
+    let done = 0;
 
     fragment.childNodes.forEach((node) => {
       if (node.nodeType === Node.ELEMENT_NODE) {
         result.push(this.domElementToElementData(node as HTMLElement));
+        done += 1;
+        onSection?.(sectionLabel(node as HTMLElement), done, total);
       } else if (
         node.nodeType === Node.TEXT_NODE &&
         node.textContent &&

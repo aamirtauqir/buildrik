@@ -15,7 +15,11 @@ const visualBtn = (active: boolean): React.CSSProperties => ({
     ? "1px solid var(--bk-alpha-accent-30)"
     : `1px solid ${"var(--bk-border)"}`,
   borderRadius: 6,
-  color: active ? "var(--bk-accent)" : "var(--bk-ink-muted)",
+  /* MEASURED on the FLEX profile run: --bk-ink-muted on --bk-bg-subtle is
+     4.39:1 at 12px, under the 4.5 floor — "Row", "Column", "Row-R" and
+     "Col-R" all failed. --bk-ink-soft on the same fill is 6.78:1. The same
+     pair, the same fix, as `.bdi-seg button` and `.bdi-adv-c`. */
+  color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",

@@ -206,7 +206,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
         title="X-Frame-Options"
         desc="Controls whether your site can be embedded in an iframe. DENY blocks all framing; SAMEORIGIN allows only your own site."
       >
-        <Field label="Policy">
+        <Field label="Policy" anchor="x-frame-policy">
           <Select
             value={xFrame}
             onChange={(e) => {
@@ -226,7 +226,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
         title="Referrer-Policy"
         desc="Controls how much information browsers send in the Referer header when visitors click off your site."
       >
-        <Field label="Policy">
+        <Field label="Policy" anchor="referrer-policy">
           <Select
             value={referrer}
             onChange={(e) => {

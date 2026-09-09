@@ -38,22 +38,18 @@ export function useLayerTree(
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set());
   const [currentPageId, setCurrentPageId] = React.useState<string | null>(null);
   const isHydrated = React.useRef(false);
-  const hasAutoExpandedRoot = React.useRef(false);
   const treeContainerRef = React.useRef<HTMLDivElement>(null);
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
   const previousPageIdRef = React.useRef<string | null>(null);
 
-  const hydrateExpandedFromStorage = React.useCallback(
-    (pageId: string, rootId: string | null) => {
-      const stored = loadSetFromStorage(pageId, "expanded");
-      if (stored.size > 0) {
-        setExpandedIds(stored);
-      } else {
-        setExpandedIds(rootId ? new Set([rootId]) : new Set());
-      }
-    },
-    []
-  );
+  /* With no stored state, nothing is expanded. This used to seed the ROOT id,
+     which was the same "make the top level visible" trick as the auto-expand
+     effect — and with the root excluded from the tree (B6) it seeded an id that
+     is no longer a row at all, so it expanded nothing while making the panel
+     look like it had state. The `rootId` argument went with it. */
+  const hydrateExpandedFromStorage = React.useCallback((pageId: string) => {
+    setExpandedIds(loadSetFromStorage(pageId, "expanded"));
+  }, []);
 
   const buildLayersFromEngine = React.useCallback(() => {
     if (!composer) {
@@ -94,7 +90,16 @@ export function useLayerTree(
       children: element.getChildren().map((child: Element) => buildTree(child, depth + 1)),
     });
 
-    setLayers([buildTree(rootElement, 0)]);
+    /* The page root is EXCLUDED from the tree (founder call 2026-09-08,
+       BLOCKERS.md B6, matching PRD 04:7 "Root excluded everywhere" over the
+       contradicting 05:12).
+       It used to be `[buildTree(rootElement, 0)]`, so the root was itself a row:
+       an empty page read "1 layer" and the Layers empty-state board (143:355)
+       was unreachable — there was no state in which `layers.length === 0`.
+       The root is a container the user never selects, names, hides or locks;
+       counting it leaked an implementation detail into a user-facing number.
+       Its children become the top level at depth 0. */
+    setLayers(rootElement.getChildren().map((child: Element) => buildTree(child, 0)));
   }, [composer]);
 
   // Initial hydration + page change listener
@@ -107,8 +112,7 @@ export function useLayerTree(
       if (pageId !== currentPageId) {
         setCurrentPageId(pageId);
         isHydrated.current = false;
-        hasAutoExpandedRoot.current = false;
-        hydrateExpandedFromStorage(pageId, page?.root?.id ?? null);
+        hydrateExpandedFromStorage(pageId);
         isHydrated.current = true;
       }
     };
@@ -155,13 +159,14 @@ export function useLayerTree(
     saveSetToStorage(currentPageId, "expanded", expandedIds);
   }, [expandedIds, currentPageId]);
 
-  // Auto-expand root on first load (only if not hydrated from storage)
-  React.useEffect(() => {
-    if (!hasAutoExpandedRoot.current && layers.length > 0 && !isHydrated.current) {
-      hasAutoExpandedRoot.current = true;
-      setExpandedIds(new Set([layers[0].id]));
-    }
-  }, [layers]);
+  /* There is no longer anything to auto-expand, and that is the correct port
+     rather than an omission.
+     This used to expand the root on arrival, whose ONLY effect was to make the
+     page's top-level elements visible — with the root excluded (B6) those
+     elements are the top level and are visible with nothing expanded at all.
+     Expanding `layers[0]` instead would open one level DEEPER than the old
+     behaviour ever did, which is a change nobody asked for; a rewritten test
+     caught exactly that. Storage-hydrated expansion is unaffected. */
 
   // Auto-expand ancestors when canvas hover changes
   React.useEffect(() => {
@@ -241,9 +246,13 @@ export function useLayerTree(
     setExpandedIds(allIds);
   }, [layers]);
 
+  /* Collapse to nothing. This kept `layers[0]` — the root — expanded, because
+     collapsing the root hid the entire page. With the root no longer a row,
+     every top-level layer is a real element and "collapse all" should collapse
+     all of them. */
   const collapseAll = React.useCallback(() => {
-    setExpandedIds(layers.length > 0 ? new Set([layers[0].id]) : new Set());
-  }, [layers]);
+    setExpandedIds(new Set());
+  }, []);
 
   const getVisibleLayerIds = React.useCallback((): string[] => {
     const result: string[] = [];

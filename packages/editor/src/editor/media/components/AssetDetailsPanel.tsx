@@ -113,9 +113,12 @@ export function AssetDetailsPanel({
 
   if (!selectedItem) {
     return (
-      <div className="mgr-details">
+      <div className="mgr-details" data-testid="mgr-details">
         <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:p-8">
-          <div className="tw:text-center tw:text-[var(--bk-ink-disabled)]">
+          {/* --bk-ink-disabled on white is 1.47:1 — the empty state that tells
+              you what to do next was very nearly invisible. Measured against
+              board 1159:4593, not eyeballed. */}
+          <div className="tw:text-center tw:text-[var(--bk-ink-soft)]">
             <FolderOpen size={32} className="tw:mb-3 tw:opacity-40" />
             {/* Board 1163:13947 — "see", and the sentence ends. */}
             <div className="tw:text-[13px]">Select an asset to see details.</div>
@@ -131,7 +134,7 @@ export function AssetDetailsPanel({
 
   return (
     <>
-      <div className="mgr-details">
+      <div className="mgr-details" data-testid="mgr-details">
         <div className="mgr-det-head">
           <div className="mgr-det-filename">{selectedItem.name}</div>
           <div className="mgr-det-sub">

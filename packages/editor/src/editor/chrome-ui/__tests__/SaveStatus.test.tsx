@@ -42,7 +42,7 @@ describe("SaveStatus", () => {
 
   it("formats the saved timestamp", () => {
     const { container } = render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
-    expect(container.textContent).toBe("Saved · 2m ago");
+    expect(container.textContent).toBe("Saved 2m ago");
   });
 
   // T8 compact tier 2: the timestamp is the bar's first concession, so it has to
@@ -51,7 +51,7 @@ describe("SaveStatus", () => {
     const { container } = render(<SaveStatus state="saved" savedAt={Date.now() - 120_000} />);
     const root = container.firstElementChild!;
     const stamp = root.lastElementChild!;
-    expect(stamp.textContent).toBe(" · 2m ago");
+    expect(stamp.textContent).toBe(" 2m ago");
     stamp.remove();
     expect(root.textContent).toBe("Saved");
   });

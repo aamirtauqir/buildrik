@@ -80,22 +80,57 @@ const LIVE_META = "tw:text-xs tw:text-[var(--bk-ink-soft)]";
 /* Board 949:4474 closes the list with the rule that makes rollback safe to
    try. It sits under the rows, not in a tooltip on each one. */
 const FOOTER_NOTE = "tw:mt-2 tw:text-xs tw:text-[var(--bk-ink-muted)]";
-/* Board 184:24's info block — the accent-tinted box under the sentence. */
-const INFO_BOX = "tw:mt-3 tw:rounded-lg tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5";
-const INFO_TITLE = "tw:m-0 tw:text-[12px] tw:text-[var(--bk-accent)]";
-const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+/* THE 24 GUTTER. Every modal in this family insets its content 24 from the
+   frame: 184:29 and 184:30 are 392 in a 440, 184:52/184:53 are 392, 453:4071/
+   453:4072 are 392, 184:42's progress track is 392, and 184:7's picker rows are
+   512 in a 560. `MODAL_BODY_CLASS` gives every modal body 16, which is the
+   chassis eight other boards are measured against and not something these five
+   get to move — so the extra 8 lives here, on the bodies that need it, and the
+   chassis is untouched. */
+const MODAL_INSET = "tw:px-2";
+/* 184:29 — the sentence is ink-MUTED and 13/20; the body's own face is
+   ink-soft, which is right for a paragraph and a shade too present for the
+   line that explains a consequence. */
+const CONFIRM_BODY = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+/* Board 184:24's info block — the accent-tinted box under the sentence. 52
+   tall: 8 of lead, a 12/18 line, 2, an 11/16 line, 8. */
+const INFO_BOX = "tw:mt-3 tw:rounded-lg tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2";
+const INFO_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
+const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* Boards 184:45 / 453:4064 both open on a 32px status disc, centred. */
 const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-2";
 const STATUS_DISC =
   "tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-full tw:text-white";
-/* Board 184:2's picker rows — a bordered, selectable band per version. */
+/* Board 184:2's picker rows — a bordered, selectable band per version.
+   `disabled:` is the load-bearing half. The row for the LIVE version is
+   deliberately unselectable (rolling back to what is already serving is a
+   deploy that changes nothing), and flowbite's disabled `light` button paints
+   gray-100 with a transparent edge — so the one row the user reads first, the
+   one that says what is live, was the only grey one on the board's white list.
+   184:7 draws it white and bordered like the rest; its `live` chip and its
+   tooltip are what say it cannot be picked. */
 const PICK_ROW =
-  "tw:flex tw:w-full tw:h-14 tw:items-center tw:justify-between tw:gap-3 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-white tw:px-3 tw:py-0 tw:text-left tw:disabled:opacity-100";
-const PICK_ROW_ON = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]";
-const PICK_TITLE = "tw:text-[13px] tw:text-[var(--bk-ink)]";
+  "tw:flex tw:w-full tw:h-14 tw:items-center tw:justify-between tw:gap-3 tw:rounded-lg tw:border tw:border-[var(--bk-border)] tw:bg-white tw:px-3 tw:py-0 tw:text-left " +
+  "tw:disabled:opacity-100 tw:disabled:bg-white tw:disabled:border-[var(--bk-border)]";
+/* 184:11 tints the chosen row and keeps the NEUTRAL edge — the fill is the
+   selection, the border is the row. It shipped with an accent edge as well,
+   which made the selected row read as focused rather than chosen. */
+const PICK_ROW_ON = "tw:bg-[var(--bk-accent-tint)]";
+const PICK_TITLE = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const PICK_META = "tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]";
 const PICK_LIVE = "tw:text-[11px] tw:font-medium tw:text-[var(--bk-success-text)]";
 const NOTICE = "tw:text-xs tw:text-[var(--bk-ink-muted)]";
+/* Board 184:44 — the caption under the rollback progress bar. */
+const PROGRESS_CAPTION = "tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
+/* Boards 184:52 / 453:4071 — the one sentence naming the outcome, 13/20, in
+   ink (success) or error-text (failure), REGULAR weight in both. 184:53 /
+   453:4072 are its footnote at 11/16, ink-muted and ink-soft respectively. */
+const OUTCOME_LEAD = "tw:text-center tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const OUTCOME_SUB = "tw:mt-1 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const OUTCOME_LEAD_ERROR =
+  "tw:text-center tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-error-text)]";
+const OUTCOME_REASON =
+  "tw:mt-2 tw:text-center tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 
 export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted, rollbackJob = null }) => {
@@ -196,7 +231,12 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       setFailed({
         target: rollingBack.target,
         live: rollingBack.live,
-        reason: "The re-publish did not finish. Nothing was overwritten — retry, or pick a different version.",
+        /* 453:4072's own sentence. This path had a second wording of its own
+           ("The re-publish did not finish…"), so the same failure read
+           differently depending on whether the request threw or the JOB
+           failed — and only the throw path matched the board. One sentence,
+           the board's. */
+        reason: "Nothing was overwritten. Retry the rollback, or pick a different version.",
       });
       setRollingBack(null);
       setNotice(null);
@@ -353,6 +393,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
               ? "There is only one published version"
               : undefined
         }
+        data-testid="publish-rollback-open"
         onClick={() => setPicking(rows.find((r) => r.rollbackable && r.version !== liveVersion) ?? null)}
       >
         Roll back to a published version…
@@ -363,19 +404,20 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
         open={pickerOpen}
         onClose={closePicker}
         kind="form"
+        testId="publish-rollback-picker"
         title="Roll back to a published version"
         footer={
           <div className="tw:flex tw:justify-end tw:gap-2">
             <Button color="light" size="xs" onClick={closePicker}>
               Cancel
             </Button>
-            <Button size="xs" disabled={!picking} onClick={() => { setConfirm(picking); closePicker(); }}>
+            <Button size="xs" disabled={!picking} data-testid="publish-rollback-continue" onClick={() => { setConfirm(picking); closePicker(); }}>
               Continue
             </Button>
           </div>
         }
       >
-        <div className="tw:flex tw:flex-col tw:gap-1" role="radiogroup" aria-label="Published versions">
+        <div className={`tw:flex tw:flex-col tw:gap-1 ${MODAL_INSET}`} role="radiogroup" aria-label="Published versions">
           {rows.map((r) => {
             const isLive = r.version === liveVersion;
             /* The live version is listed — the board shows it with its `live`
@@ -397,16 +439,17 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                 disabled={!selectable}
                 onClick={() => setPicking(r)}
                 title={isLive ? "This version is already live" : r.rollbackable ? undefined : "This version's snapshot is no longer stored"}
+                data-testid={`publish-pick-${r.version}`}
                 className={`${PICK_ROW} ${picking?.id === r.id ? PICK_ROW_ON : ""}`}
               >
                 <span className="tw:flex tw:flex-col tw:items-start">
-                  <span className={PICK_TITLE}>
+                  <span className={PICK_TITLE} data-testid={`publish-pick-title-${r.version}`}>
                     v{r.version}
                     {isLive ? " · current" : ""}
                   </span>
-                  <span className={PICK_META}>published {relTime(r.completedAt)}</span>
+                  <span className={PICK_META} data-testid={`publish-pick-meta-${r.version}`}>published {relTime(r.completedAt)}</span>
                 </span>
-                {isLive && <span className={PICK_LIVE}>live</span>}
+                {isLive && <span className={PICK_LIVE} data-testid={`publish-pick-live-${r.version}`}>live</span>}
               </Button>
             );
           })}
@@ -416,17 +459,39 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       {/* Board 184:37 — "Rolling back…", a determinate bar, and the caption
           naming both versions. Rendered only while the shell reports a job in
           flight; without a progress feed the panel keeps its notice line. */}
+      {/* `question`, not `form`: 184:39 is a modal/440 and `form` is the 560.
+          The width is the board's, and it was 120px wide of nobody's. */}
       <Modal
         open={rollingBack !== null && rollbackJob?.state === "publishing"}
         onClose={() => setRollingBack(null)}
-        kind="form"
+        kind="question"
+        testId="publish-rollback-progress"
         title="Rolling back…"
       >
-        <Progress progress={rollbackJob?.progress ?? 0} size="sm" />
-        <p className="tw:mt-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-          Publishing v{rollingBack?.target} as v
-          {rollingBack?.live !== undefined ? rollingBack.live + 1 : "…"}
-        </p>
+        <div className={MODAL_INSET}>
+          {/* 184:42 draws the track bg-subtle with a 4 radius and 184:43 fills it
+              --color/accent. flowbite's own defaults are gray-200, a full pill,
+              and `bg-primary-600` — which resolves to #1C64F2 (blue-600), one
+              step off the single accent #1A56DB this product allows. Measured,
+              not assumed: the fill read rgb(28,100,242) before this.
+              `className` lands on the TRACK and `data-testid` on the root — the
+              two reach different elements (Progress.js:41) — and `theme.color`
+              has to be overridden rather than `theme.bar`, because the color
+              class is twMerged AFTER bar and would win. */}
+          <Progress
+            progress={rollbackJob?.progress ?? 0}
+            size="sm"
+            data-testid="publish-rollback-bar"
+            className="tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)]"
+            theme={{ bar: "tw:rounded-[4px]", color: { default: "tw:bg-[var(--bk-accent)]" } }}
+          />
+          {/* 184:44 is 12/18 ink-muted — the modal body's own 13/ink-soft is the
+              paragraph face, and this is a caption under a bar. */}
+          <p className={PROGRESS_CAPTION} data-testid="publish-rollback-caption">
+            Publishing v{rollingBack?.target} as v
+            {rollingBack?.live !== undefined ? rollingBack.live + 1 : "…"}
+          </p>
+        </div>
       </Modal>
 
       {/* Board 184:45 — the green confirmation. It names what is live now AND
@@ -435,7 +500,8 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       <Modal
         open={rolledBack !== null}
         onClose={() => setRolledBack(null)}
-        kind="form"
+        kind="question"
+        testId="publish-rolledback"
         title="Rolled back"
         footer={
           <div className="tw:flex tw:justify-end">
@@ -451,14 +517,19 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             <CheckCircle2 size={16} />
           </span>
         </div>
-        <p className="tw:text-center">
+        <div className={MODAL_INSET}>
+        {/* 184:52 is 13/20 in INK — the modal body paints ink-soft, which is
+            right for a paragraph and wrong for the one sentence naming what is
+            live now. */}
+        <p className={OUTCOME_LEAD} data-testid="publish-rolledback-lead">
           v{rolledBack?.newLive} is live — a re-publish of v{rolledBack?.target}.
         </p>
         {rolledBack?.previous !== undefined && (
-          <p className="tw:mt-1 tw:text-center tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+          <p className={OUTCOME_SUB} data-testid="publish-rolledback-sub">
             v{rolledBack.previous} is still in your history and can be rolled forward the same way.
           </p>
         )}
+        </div>
       </Modal>
 
       {/* Board 453:4064 — the failure modal. "Try again" reopens the confirm
@@ -467,6 +538,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           are re-attempting. */}
       <ConfirmDialog
         open={failed !== null}
+        testId="publish-rollback-failed"
         onClose={() => setFailed(null)}
         onConfirm={() => {
           const again = rows.find((r) => r.version === failed?.target) ?? null;
@@ -483,11 +555,18 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                 <AlertCircle size={16} />
               </span>
             </div>
-            <p className="tw:font-medium tw:text-[var(--bk-error-text)] tw:text-center">
-              v{failed?.target} could not be re-published. Your live site is unchanged
-              {failed?.live !== undefined ? ` — still v${failed.live}` : ""}.
-            </p>
-            <p className="tw:mt-2 tw:text-center">{failed?.reason}</p>
+            {/* 453:4071 is 13/20 error-text at Inter REGULAR, and 453:4072
+                drops to 11/16 ink-soft. Both were the body's own type: the
+                lead was bolded and the reason was a second 13px line, so the
+                two sentences read as one weight-graded block instead of a
+                headline and its footnote. */}
+            <div className={MODAL_INSET}>
+              <p className={OUTCOME_LEAD_ERROR} data-testid="publish-rollback-failed-lead">
+                v{failed?.target} could not be re-published. Your live site is unchanged
+                {failed?.live !== undefined ? ` — still v${failed.live}` : ""}.
+              </p>
+              <p className={OUTCOME_REASON} data-testid="publish-rollback-failed-reason">{failed?.reason}</p>
+            </div>
           </>
         }
         confirmLabel="Try again"
@@ -505,12 +584,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
           number the re-publish will take. */}
       <ConfirmDialog
         open={confirm !== null}
+        testId="publish-rollback-confirm"
         onClose={() => setConfirm(null)}
         onConfirm={() => void doRollback()}
         title={confirm ? `Roll back to v${confirm.version}?` : "Roll back?"}
         message={
           <>
-            <p className="tw:m-0">
+            <div className={MODAL_INSET}>
+            <p className={CONFIRM_BODY} data-testid="publish-rollback-confirm-body">
               This publishes v{confirm?.version} again as v{nextVersion}.
               {liveVersion !== undefined
                 ? ` Your current v${liveVersion} stays in history`
@@ -522,11 +603,12 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                 one says what happens to the LIST — it only ever grows, and
                 the new entry carries its source. That is the fact that makes
                 a rollback safe to try. */}
-            <div className={INFO_BOX}>
-              <p className={INFO_TITLE}>The publish list only ever grows.</p>
-              <p className={INFO_META}>
+            <div className={INFO_BOX} data-testid="publish-rollback-info">
+              <p className={INFO_TITLE} data-testid="publish-rollback-info-title">The publish list only ever grows.</p>
+              <p className={INFO_META} data-testid="publish-rollback-info-meta">
                 v{nextVersion} will name v{confirm?.version} as its source.
               </p>
+            </div>
             </div>
           </>
         }

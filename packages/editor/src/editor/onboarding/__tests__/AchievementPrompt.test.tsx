@@ -31,9 +31,10 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+/* The bar is the FILL inside the board's track (430:2357/430:2358) — the
+   dialog's first child is now the track, which never moves. */
 function countdownBar(): HTMLElement {
-  const dialog = screen.getByRole("dialog");
-  return dialog.firstElementChild as HTMLElement;
+  return screen.getByTestId("achievement-countdown-fill");
 }
 
 describe("render content", () => {
@@ -68,8 +69,16 @@ describe("render content", () => {
       />
     );
 
-    expect(screen.getByText("All done!")).toBeInTheDocument();
-    expect(screen.getByText("You're all set!")).toBeInTheDocument();
+    /* Board 430:2375 draws "ALL DONE" and "You're all set" — no exclamation
+       marks. The apostrophe is the typographic one board 296:2030 uses for
+       the same words. */
+    expect(screen.getByText("All done")).toBeInTheDocument();
+    expect(screen.getByText("You\u2019re all set")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "You\u2019ve finished every getting-started step. Go build something great.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Next up")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Done" })).toBeInTheDocument();
   });
@@ -176,7 +185,7 @@ describe("dismiss interactions", () => {
 
     const overlay = Array.from(
       container.querySelectorAll('div[aria-hidden="true"]')
-    ).find((d) => (d as HTMLElement).style.cursor === "pointer") as HTMLElement;
+    ).find((d) => d.className.includes("tw:cursor-pointer")) as HTMLElement;
     expect(overlay).toBeDefined();
 
     fireEvent.click(overlay);

@@ -226,18 +226,21 @@ describe("useExportHandlers — publish failure error mapping", () => {
  * Board S5.4 · the three approval gates that have no over-ride path.
  *
  * These used to be one `needs-approval` toast reading "send it for review from
- * the top bar" — advice that is only right for the first of the three. Someone
- * whose reviewer had already replied asking for changes was told to go send a
- * review they had already sent.
+ * the top bar" — advice that is only right for the first of the three. They
+ * were then three toasts, which is what this block used to assert. As of the
+ * S5.4 conformance pass they are a MODAL (`PublishGateModal`, mounted by
+ * StudioPanels off this same `blockedReason`), because all three boards draw
+ * the way out as a button rather than describing it in prose.
+ *
+ * So what this hook owes them is the opposite of what it used to: raise
+ * nothing, and — the part that actually blocked the dialog — do NOT clear the
+ * reason. The old effect called `dismissBlock()` in the same tick it toasted,
+ * so no component could ever have rendered off `blockedReason`.
  */
-describe("useExportHandlers — approval gate toasts (board S5.4)", () => {
-  const CASES: Array<[string, string]> = [
-    ["no-review", "Approval needed"],
-    ["review-pending", "Waiting on review"],
-    ["changes-requested", "Changes requested"],
-  ];
+describe("useExportHandlers — approval gates are the modal's, not a toast (board S5.4)", () => {
+  const GATES = ["no-review", "review-pending", "changes-requested"];
 
-  it.each(CASES)("%s raises the %s toast and clears the block", async (reason, title) => {
+  it.each(GATES)("%s raises no toast and leaves the block standing", async (reason) => {
     const opts = makeOpts();
     const dismissBlock = vi.fn();
     resetPublishState();
@@ -246,24 +249,20 @@ describe("useExportHandlers — approval gate toasts (board S5.4)", () => {
     await act(async () => {
       await flushMicrotasks();
     });
-    const call = (opts.addToast.mock.calls[0]?.[0] ?? {}) as ToastCall;
-    expect(call.title).toBe(title);
-    expect(call.tone).toBe("warning");
-    expect(dismissBlock).toHaveBeenCalled();
+    expect(opts.addToast).not.toHaveBeenCalled();
+    expect(dismissBlock).not.toHaveBeenCalled();
   });
 
-  it("gives each gate its own next action, not one shared sentence", async () => {
-    const seen = new Set<string>();
-    for (const [reason] of CASES) {
-      const opts = makeOpts();
-      resetPublishState();
-      setPublishState({ blockedReason: reason, dismissBlock: vi.fn() });
-      renderHook(() => useExportHandlers(opts as unknown as UseExportHandlersOptions));
-      await act(async () => {
-        await flushMicrotasks();
-      });
-      seen.add(String((opts.addToast.mock.calls[0]?.[0] as { description: string }).description));
-    }
-    expect(seen.size).toBe(3);
+  it("still leaves stale-approval alone — that gate has its own dialog", async () => {
+    const opts = makeOpts();
+    const dismissBlock = vi.fn();
+    resetPublishState();
+    setPublishState({ blockedReason: "stale-approval", dismissBlock });
+    renderHook(() => useExportHandlers(opts as unknown as UseExportHandlersOptions));
+    await act(async () => {
+      await flushMicrotasks();
+    });
+    expect(opts.addToast).not.toHaveBeenCalled();
+    expect(dismissBlock).not.toHaveBeenCalled();
   });
 });

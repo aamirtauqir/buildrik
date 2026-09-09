@@ -59,15 +59,26 @@ function makeItem(overrides: Partial<CMSContentItem> = {}): CMSContentItem {
   };
 }
 
+/**
+ * A collection holding one PUBLISHED record.
+ *
+ * These items were left at createContentItem's default status of "draft"
+ * while the tests asserted their values resolved — which is exactly the bug
+ * resolveBinding had: it queried with no status and served drafts to the
+ * exporter, so a record the author marked Draft shipped to the live site.
+ * Resolution is published-only now, so the fixture standing for "content that
+ * renders" has to be content the author actually published.
+ */
 async function setupWithContent() {
   const cms = new CollectionManager();
   const collection = await cms.createCollection("Posts");
-  const item = (await cms.createContentItem(collection.id, {
+  const draft = (await cms.createContentItem(collection.id, {
     title: "Hello World",
     image: "https://x/a.jpg",
     views: 42,
     empty: null,
   }))!;
+  const item = (await cms.updateContentItem(draft.id, { status: "published" }))!;
   return { cms, collection, item };
 }
 
@@ -215,6 +226,39 @@ describe("CMSBindingManager — field bindings", () => {
         })
       ).resolves.toBe("");
     });
+
+    /* The Published switch has to govern what resolves — static resolution is
+       the export default, so whatever comes back here ships. A draft is the
+       fourth flavour of "no publishable value", so it leaves by the same door
+       as the three above: the author's fallback. */
+    it.each([
+      ["draft", "draft"],
+      ["archived", "archived"],
+    ] as const)("falls back for a %s record rather than resolving it", async (_label, status) => {
+      const { cms, collection } = await setupWithContent();
+      const unpublished = (await cms.createContentItem(collection.id, {
+        title: "Not ready to ship",
+      }))!;
+      if (status !== "draft") {
+        await cms.updateContentItem(unpublished.id, { status });
+      }
+      const manager = new CMSBindingManager(makeComposer().composer, cms);
+
+      await expect(
+        manager.resolveBinding({
+          binding: {
+            sourceId: `cms:${collection.id}`,
+            path: `${unpublished.id}.title`,
+            type: "variable",
+          },
+          collectionId: collection.id,
+          itemId: unpublished.id,
+          fieldSlug: "title",
+          property: "content",
+          fallback: "FB",
+        })
+      ).resolves.toBe("FB");
+    });
   });
 
   describe("resolveBindingWithContext", () => {
@@ -263,7 +307,15 @@ describe("CMSBindingManager — field bindings", () => {
     manager.bindToField("el-1", collection.id, item.id, "title", "content");
     await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("Hello World"));
 
-    await cms.updateContentItem(item.id, { data: { ...item.data, title: "Updated" } });
+    /* status restated on purpose. updateContentItem emits content:UNPUBLISHED
+       for any update to a published record that does not repeat the status
+       (CollectionManager.ts:317-323), and this manager subscribes only to
+       created/updated/deleted — so a data-only edit to a published record
+       silently stops re-applying. Separate defect; not this change's to fix. */
+    await cms.updateContentItem(item.id, {
+      data: { ...item.data, title: "Updated" },
+      status: "published",
+    });
     await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("Updated"));
   });
 });

@@ -59,7 +59,14 @@ export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip
       {typeof count === "number" ? (
         <span
           data-testid={countTestId}
-          className="tw:[font-family:var(--bk-font-mono)] tw:font-medium tw:tabular-nums tw:text-[var(--bk-ink-soft)]"
+          className={[
+            "tw:[font-family:var(--bk-font-mono)] tw:font-medium tw:tabular-nums",
+            // Board 145:14: a SELECTED chip sets accent on the pill and its
+            // label and count carry no colour of their own, so both take it.
+            // Pinning the count to ink-soft made the selected chip read as one
+            // word in accent and one number in grey.
+            selected ? "tw:text-inherit" : "tw:text-[var(--bk-ink-soft)]",
+          ].join(" ")}
         >
           {count}
         </span>

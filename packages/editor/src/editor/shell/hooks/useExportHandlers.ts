@@ -31,29 +31,6 @@ import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
 import { exportPublishPages } from "../exportPublishPages";
 import { captureAndUploadThumbnail } from "../captureThumbnail";
 
-/** Copy for each approval gate that has no over-ride path (board S5.4). */
-const APPROVAL_GATE_TOASTS: Record<string, { title: string; description: string }> = {
-  "no-review": {
-    title: "Approval needed",
-    /* This named client view until 2026-08-23, which was true when the control
-       rendered only there. That mode is a VIEW now (and is called view mode),
-       carrying no owner controls, so the sentence pointed at a shut door — on
-       the exact path a user hits when publish is blocked. The control lives in
-       the Review panel; `r` opens it whether or not a round exists. */
-    description:
-      "This site hasn't been sent for review yet. Open the Review panel (press R) and send it from there.",
-  },
-  "review-pending": {
-    title: "Waiting on review",
-    description: "This site is with its reviewer. You can publish once it's approved.",
-  },
-  "changes-requested": {
-    title: "Changes requested",
-    description:
-      "The reviewer asked for changes. Resolve the open comments, then re-send for review.",
-  },
-};
-
 export interface UseExportHandlersOptions {
   composer: Composer | null;
   addToast: (input: ToastInput) => string;
@@ -154,20 +131,15 @@ export function useExportHandlers({
     runPublishRef.current = runPublish;
   }, [runPublish]);
 
-  // The three no-acknowledge gates (board S5.4) have no path to over-ride —
-  // there is no approval yet — so each is an informational toast, not a dialog.
-  // They differ only in what the user should do next, which is the entire
-  // reason the board draws them apart: one sentence covering all three told
-  // someone already waiting on a reviewer to go send a review.
-  // (stale-approval is handled by the dialog in the shell.)
-  const dismissBlock = publishJob.dismissBlock;
-  React.useEffect(() => {
-    const copy = publishJob.blockedReason ? APPROVAL_GATE_TOASTS[publishJob.blockedReason] : undefined;
-    if (copy) {
-      addToast({ ...copy, tone: "warning", duration: 6000 });
-      dismissBlock();
-    }
-  }, [publishJob.blockedReason, dismissBlock, addToast]);
+  /* The three no-acknowledge gates (boards 307:2193 / 307:2203 / 307:2213) are
+     a MODAL now — `PublishGateModal`, rendered by StudioPanels off this same
+     `blockedReason`. They used to be raised here as a warning toast that
+     dismissed the block in the same breath, which had two consequences worth
+     naming: the way out was described in prose ("Open the Review panel (press
+     R)") rather than offered, and the reason was cleared before anything else
+     could read it, so no dialog could ever have been driven from it. All three
+     boards draw the door as a button. `stale-approval` keeps its own dialog —
+     it is the only gate with something to over-ride. */
 
   // Surface publish completion / failure as toasts. This effect is the ONE
   // owner of outcome UX (eng D10) — the topbar renders the transient

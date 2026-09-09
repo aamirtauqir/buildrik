@@ -8,7 +8,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import type { LibraryItem, MediaFolder } from "../../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaFolder } from "../../../sidebar/tabs/media/data/mediaTypes";
 import { FolderTree, type FolderTreeProps } from "../FolderTree";
 
 function makeFolder(over: Partial<MediaFolder> = {}): MediaFolder {
@@ -27,7 +27,6 @@ function mount(over: Partial<FolderTreeProps> = {}) {
     inUseCount: 0,
     unusedCount: 0,
     allTags: [],
-    libraryItems: [],
     setLibrarySearch: vi.fn(),
     createFolder: vi.fn(async () => {}),
     deleteFolder: vi.fn(async () => {}),
@@ -125,10 +124,15 @@ describe("FolderTree — user folders", () => {
   it("boards 1163:13695/1205:4829 — the trigger is a labelled row in the list, not a header icon, and the input replaces it while editing", () => {
     mount();
     // The label reads, unlike the old icon-only 18x18 button — and it sits
-    // in the tree body, not in the "Folders" header row.
+    // in the tree body, not in a group caption. The rail's single "Folders"
+    // HEAD is gone (board 1159:4593 gives the rail three named groups —
+    // Smart / Folders / Tags — and no head of its own), so the assertion is
+    // now against the caption that replaced it.
     const trigger = screen.getByTitle("New folder");
     expect(trigger.textContent).toContain("New folder");
-    expect(screen.getByText("Folders").closest(".mgr-left-head")?.contains(trigger)).toBe(false);
+    const foldersCaption = screen.getByTestId("mgr-section-folders");
+    expect(foldersCaption).toHaveClass("mgr-tree-section");
+    expect(foldersCaption.contains(trigger)).toBe(false);
 
     fireEvent.click(trigger);
     // Mutually exclusive with the input, same as the board's two states.
@@ -163,11 +167,9 @@ describe("FolderTree — user folders", () => {
 
 describe("FolderTree — tags", () => {
   it("renders a Tags section when tags exist and clicking one searches", () => {
-    const items = [
-      { key: "a", altText: "summer beach" } as LibraryItem,
-      { key: "b", altText: "summer city" } as LibraryItem,
-    ];
-    const { props } = mount({ allTags: ["summer"], libraryItems: items });
+    /* Board 1160:44 makes tags PILLS, not rows with counts, so the count that
+       `libraryItems` was passed in for is gone and so is the prop. */
+    const { props } = mount({ allTags: ["summer"] });
     expect(screen.getByText("Tags")).toBeInTheDocument();
     fireEvent.click(screen.getByText("summer"));
     expect(props.setLibrarySearch).toHaveBeenCalledWith("summer");

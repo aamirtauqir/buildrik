@@ -125,6 +125,7 @@ export const TokenRow: React.FC<TokenRowProps> = ({
       role="button"
       tabIndex={0}
       data-token-row={token.id}
+      data-testid={`brand-token-row-${token.id}`}
       data-lint-warn={hasLint ? "true" : undefined}
       onClick={onClick}
       onKeyDown={handleKeyDown}

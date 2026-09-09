@@ -103,8 +103,13 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
   return (
     <div className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0" data-testid="tpl-drawer-gallery">
       {/* Board 641:2498: the FORM Input (10:16), always visible — not the
-          Insert-style search band, and no toggle button. */}
-      <div className="tw:px-2 tw:py-1.5">
+          Insert-style search band, and no toggle button. Board 1138:13415
+          gives the band itself the panel fill and a 6px radius; it was
+          transparent, so whatever scrolled under it showed through. */}
+      <div
+        className="tw:rounded-md tw:bg-[var(--bk-bg-panel)] tw:px-2 tw:py-1.5"
+        data-testid="tpl-search-band"
+      >
         <TextInput
           type="text"
           value={searchQ}
@@ -198,27 +203,49 @@ export const DrawerGallery: React.FC<DrawerGalleryProps> = ({
         )}
 
         {/* Board 1138:13413 — the catalog itself is empty. Distinct from a
-            search that found nothing, and it says what to do instead. */}
+            search that found nothing, and it says what to do instead.
+
+            Frame 1138:13417 verbatim: pt-36 pb-32 px-24 on a 10px rhythm, the
+            same full-bleed state block Layers and Pages use. It was px-4 pt-5
+            with a 6px gap, which is the list's own inset, not a state
+            block's — so the one screen that says "there is nothing here" sat
+            tighter to the search box than the rows it replaced. */}
         {!q && pages.length === 0 && sections.length === 0 && (
-          <div className="tw:flex tw:flex-col tw:gap-1.5 tw:px-4 tw:pt-5">
-            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+          <div
+            className="tw:flex tw:flex-col tw:gap-2.5 tw:px-6 tw:pt-9 tw:pb-8 tw:text-[13px]"
+            data-testid="tpl-empty"
+          >
+            <p
+              className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+              data-testid="tpl-empty-title"
+            >
               No templates yet.
             </p>
-            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent)]">
+            <p
+              className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)]"
+              data-testid="tpl-empty-hint"
+            >
               Starter templates are coming — start blank for now.
             </p>
           </div>
         )}
       </div>
 
-      {/* Board 641:2543 panel footer: border-t, secondary bordered button. */}
+      {/* Board 641:2543 / 1138:13421 panel footer: a bordered white band,
+          16px gutters, 10 above and below, holding one secondary button. The
+          fill was missing, so the list scrolled through it. */}
       {onBrowseAll && (
-        <div className="tw:flex tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0">
+        <div
+          className="tw:flex tw:shrink-0 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2.5"
+          data-testid="tpl-footer"
+        >
           <Button
             type="button"
             color="light"
             size="xs"
-            className="tw:h-7 tw:rounded-lg tw:px-3 tw:text-[13px] tw:font-medium"
+            /* Board 1138:13422: --color/border, not flowbite `light`'s gray-300,
+               and 6px of vertical padding where flowbite xs gives 1. */
+            className="tw:h-7 tw:rounded-lg tw:border-[var(--bk-border)] tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium"
             data-testid="tpl-browse-all"
             onClick={onBrowseAll}
           >

@@ -74,11 +74,20 @@ const SOON_TAG =
   "tw:font-medium tw:text-[var(--bk-ink-muted)]";
 
 export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormatChange }) => (
-  <div role="radiogroup" aria-label="Export format" className="tw:flex tw:flex-wrap tw:gap-2">
+  <div
+    role="radiogroup"
+    aria-label="Export format"
+    className="tw:flex tw:flex-wrap tw:gap-2"
+    data-testid="export-format-grid"
+  >
     {AVAILABLE_FORMATS.map((fmt) => {
       const checked = selectedFormat === fmt;
       return (
-        <label key={fmt} className={[PILL_BASE, checked ? PILL_SELECTED : PILL_IDLE].join(" ")}>
+        <label
+          key={fmt}
+          className={[PILL_BASE, checked ? PILL_SELECTED : PILL_IDLE].join(" ")}
+          data-testid={`export-fmt-${fmt}`}
+        >
           <Radio
             className="tw:sr-only"
             color="blue"
@@ -96,7 +105,12 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
         radio would still answer to getByRole("radio") and still take an
         arrow-key stop in the group (FormatRow precedent). */}
     {COMING_SOON_FORMATS.map((fmt) => (
-      <label key={fmt} className={[PILL_BASE, PILL_IDLE].join(" ")} aria-disabled="true">
+      <label
+        key={fmt}
+        className={[PILL_BASE, PILL_IDLE].join(" ")}
+        aria-disabled="true"
+        data-testid={`export-fmt-${fmt}`}
+      >
         {FORMAT_LABELS[fmt]}
         <span className={SOON_TAG}>Soon</span>
       </label>

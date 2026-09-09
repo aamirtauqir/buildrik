@@ -68,12 +68,18 @@ export interface TokenDetailViewProps {
 const CONTAINER = "tw:flex tw:flex-col tw:gap-4 tw:px-1 tw:py-3";
 const FIELD_ROW = "tw:border-t tw:border-[var(--bk-gray-200)] tw:py-2";
 const MONO = "tw:[font-family:var(--bk-font-mono)]";
-const NAME = "tw:text-base tw:font-semibold tw:text-[var(--bk-ink)] tw:leading-tight";
-const ID_MONO = `tw:text-xs tw:text-[var(--bk-ink-muted)] ${MONO}`;
+/* 1700:6945 — 16px on `leading-[normal]`. `leading-tight` is 1.25, which at
+   16px is 20 and made the two-line header block taller than the board's 60. */
+const NAME = "tw:text-base tw:font-semibold tw:text-[var(--bk-ink)] tw:leading-[normal]";
+/* 11px, not `text-xs`'s 12 — 1700:6946. */
+const ID_MONO = `tw:text-[11px] tw:text-[var(--bk-ink-muted)] ${MONO}`;
 const CSS_VAR = `tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:mt-0.5 ${MONO}`;
 /** The quiet button look, previously six copies of the same class list. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 const LINK_BTN = `${GHOST} tw:p-0 tw:text-left tw:inline-flex tw:items-center tw:gap-1.5`;
+/** The three detail actions — 13px text, no plate (1700:6960..6962). */
+const ACTION_LINK =
+  "tw:h-auto tw:p-0 tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:leading-[normal] tw:hover:underline";
 
 // ─── Preview slot ─────────────────────────────────────────────────────────────
 
@@ -84,7 +90,7 @@ const SWATCH = "tw:inline-block tw:size-6 tw:rounded tw:border tw:border-[var(--
 
 const previewSlot = (token: DesignToken): React.ReactNode => {
   if (token.kind === "color" || token.category === "colors") {
-    return <span aria-hidden="true" className={SWATCH} style={{ background: token.value }} />;
+    return <span aria-hidden="true" data-testid="brand-token-detail-swatch" className={SWATCH} style={{ background: token.value }} />;
   }
   if (token.kind === "type" || token.category === "typography") {
     return (
@@ -301,7 +307,10 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const lintRow = (() => {
     if (lintIssues.length === 0) {
       return (
-        <div className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-xs tw:text-[var(--bk-success)]" data-lint-status="pass">
+        /* 11px in `--bk-success-text` (#057a55) — 1700:6958. `--bk-success` is
+           #0E9F6E, which measures 3.0:1 on white; the board names the darker
+           text tone and it is the one that passes AA. */
+        <div className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[11px] tw:text-[var(--bk-success-text)]" data-testid="brand-token-lint-value" data-lint-status="pass">
           <span aria-hidden="true">✓</span>
           <span>pass</span>
         </div>
@@ -309,7 +318,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     }
     const issue = lintIssues[0];
     return (
-      <div className="tw:flex tw:flex-col tw:gap-1.5 tw:text-xs tw:text-[var(--bk-warning-text)]" data-lint-status="fail">
+      <div className="tw:flex tw:flex-col tw:gap-1.5 tw:text-[11px] tw:text-[var(--bk-warning-text)]" data-testid="brand-token-lint-value" data-lint-status="fail">
         <span>
           <span aria-hidden="true">△ </span>
           {issue.message}
@@ -333,6 +342,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             size="xs"
             onClick={handleIgnore}
             aria-label="Ignore lint issue"
+            data-testid="brand-token-ignore"
             className={GHOST}
           >
             Ignore
@@ -358,11 +368,11 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       </Button>
 
       {/* Header — preview + name + id + cssVar(Pro) */}
-      <div className="tw:flex tw:items-center tw:gap-3">
+      <div className="tw:flex tw:items-center tw:gap-3" data-testid="brand-token-detail-header">
         {previewSlot(token)}
         <div className="tw:flex tw:flex-col tw:min-w-0">
-          <span className={NAME}>{token.friendlyName ?? token.name}</span>
-          {isPro && <span className={ID_MONO}>{token.id}</span>}
+          <span className={NAME} data-testid="brand-token-detail-name">{token.friendlyName ?? token.name}</span>
+          {isPro && <span className={ID_MONO} data-testid="brand-token-detail-id">{token.id}</span>}
           {isPro && <span className={CSS_VAR}>{cssVarName}</span>}
         </div>
       </div>
@@ -379,6 +389,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                   onChange={(e) => onValueChange?.(token.id, e.target.value)}
                   className={MONO}
                   aria-label="Light value"
+                  data-testid="brand-token-value-light"
                 />
               </div>
               {pickerOpen && (
@@ -446,11 +457,15 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               if (usageCount > 0) setUsageExpanded((v) => !v);
             }}
             size="xs"
-            className={LINK_BTN}
+            /* 11px in `--color/ink` — 1700:6955. The GHOST base paints
+               `--bk-ink-soft` at flowbite's 12, so the one line that states a
+               FACT about the token read quieter than the label naming it. */
+            className={`${LINK_BTN} tw:text-[11px] tw:text-[var(--bk-ink)]`}
             aria-expanded={usageExpanded}
             aria-disabled={usageCount === 0 || undefined}
             disabled={usageCount === 0}
             data-used-by-toggle
+            data-testid="brand-token-usedby-value"
           >
             <span aria-hidden="true" className="tw:inline-block tw:w-2.5 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">
               {usageCount === 0 ? "" : usageExpanded ? "▾" : "▸"}
@@ -511,12 +526,19 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       </FieldRow>
 
       {/* Action row */}
-      <div className="tw:flex tw:gap-2 tw:mt-2">
+      {/* 1700:6959 draws this row as three 13px TEXT actions — accent, accent,
+          `--bk-error-text` — not a filled primary next to a light next to a red
+          plate. Three bordered buttons on a 280 drawer wrapped, and the
+          destructive one was the loudest thing on a read-only detail screen. */}
+      <div className="tw:flex tw:gap-4 tw:mt-2" data-testid="brand-token-actions">
         <Button
           type="button"
+          color="light"
           size="xs"
           onClick={handleReplaceValue}
           aria-label="Replace value"
+          data-testid="brand-token-action-replace"
+          className={`${ACTION_LINK} tw:text-[var(--bk-accent-text)]`}
         >
           Replace value
         </Button>
@@ -528,20 +550,27 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           aria-label="Rename ID"
           aria-disabled={!onRename || undefined}
           disabled={!onRename}
+          data-testid="brand-token-action-rename"
           title={onRename ? "Rename token id" : "Rename API coming soon — edit value inline above"}
+          className={`${ACTION_LINK} tw:text-[var(--bk-accent-text)]`}
         >
           Rename ID
         </Button>
+        {/* "Delete token", not "Delete" — 1700:6962. Beside two actions that
+            both name their object, the bare verb was the only one that did
+            not, on the one control that cannot be undone. */}
         <Button
           type="button"
-          color="red"
+          color="light"
           size="xs"
           onClick={handleDelete}
           aria-label="Delete token"
           aria-disabled={!isPro || undefined}
           disabled={!isPro}
+          data-testid="brand-token-action-delete"
+          className={`${ACTION_LINK} tw:text-[var(--bk-error-text)]`}
         >
-          Delete
+          Delete token
         </Button>
       </div>
 

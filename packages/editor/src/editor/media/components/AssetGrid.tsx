@@ -174,11 +174,11 @@ export function AssetGrid({
   const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
 
   return (
-    <div className={`mgr-main${isDragOver ? " dragover" : ""}`}>
+    <div className={`mgr-main${isDragOver ? " dragover" : ""}`} data-testid="mgr-grid-col">
       {isDragOver && (
-        <div className="mgr-dropzone" aria-hidden="true">
-          <span className="mgr-dropzone-title">Drop files to upload</span>
-          <span className="mgr-dropzone-sub">
+        <div className="mgr-dropzone" aria-hidden="true" data-testid="mgr-dropzone">
+          <span className="mgr-dropzone-title" data-testid="mgr-dropzone-title">Drop files to upload</span>
+          <span className="mgr-dropzone-sub" data-testid="mgr-dropzone-sub">
             Images, video, audio, SVG and fonts — up to {formatBytes(state.storage.total)} total
           </span>
         </div>
@@ -192,18 +192,19 @@ export function AssetGrid({
         gets a visible, clearable chip — otherwise the manager would show a
         filtered library with no cause on screen.
       */}
-      <div className="mgr-subbar">
-        <span className="mgr-count">
+      <div className="mgr-subbar" data-testid="mgr-subbar">
+        <span className="mgr-count" data-testid="mgr-count">
           {state.counts.all} {state.counts.all === 1 ? "file" : "files"}
           {lastAddedLabel ? ` · Last added ${lastAddedLabel}` : ""}
         </span>
 
         {availableFormats.length > 0 && (
-          <div className="mgr-fmt-strip" role="group" aria-label="Filter by format">
+          <div className="mgr-fmt-strip" role="group" aria-label="Filter by format" data-testid="mgr-fmt-strip">
             {availableFormats.map((fmt) => (
               <Button
                 key={fmt}
                 className={`mgr-fmt${state.fmtFilter === fmt ? " active" : ""}`}
+                data-testid={`mgr-fmt-${fmt}`}
                 aria-pressed={state.fmtFilter === fmt}
                 onClick={() => state.setFmtFilter(state.fmtFilter === fmt ? "" : fmt)}
               >
@@ -228,6 +229,7 @@ export function AssetGrid({
         <div className="mgr-view-toggle">
           <Button
             className={viewMode === "grid" ? "active" : ""}
+            data-testid="mgr-view-grid"
             onClick={() => setViewMode("grid")}
             title="Grid view"
             /* Icon-only, so `title` was its whole accessible name — browsers do
@@ -240,6 +242,7 @@ export function AssetGrid({
           </Button>
           <Button
             className={viewMode === "list" ? "active" : ""}
+            data-testid="mgr-view-list"
             onClick={() => setViewMode("list")}
             title="List view"
             aria-label="List view"
@@ -250,11 +253,12 @@ export function AssetGrid({
         </div>
 
         {/* Board's 2 / 3 / 4 — columns per row, not a view mode. */}
-        <div className="mgr-gridn" role="group" aria-label="Columns">
+        <div className="mgr-gridn" role="group" aria-label="Columns" data-testid="mgr-gridn">
           {([2, 3, 4] as const).map((n) => (
             <Button
               key={n}
               className={`mgr-gridn-btn${state.gridN === n ? " active" : ""}`}
+              data-testid={`mgr-gridn-${n}`}
               aria-pressed={state.gridN === n}
               onClick={() => state.setGridN(n)}
             >
@@ -264,7 +268,7 @@ export function AssetGrid({
         </div>
 
         <div className="mgr-sort-wrap">
-          <Button className="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
+          <Button className="mgr-sort" data-testid="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
             {SORT_OPTIONS.find((o) => o.value === state.sort)?.label || "Recent"}
             <ChevronDown size={12} />
           </Button>
@@ -316,8 +320,8 @@ export function AssetGrid({
           place of it: what you are filtering by stays on screen while a
           selection is live. */}
       {state.selMode && state.selectedKeys.size > 0 && (
-        <div className="mgr-bulk-bar">
-          <span className="mgr-bulk-count">{state.selectedKeys.size} selected</span>
+        <div className="mgr-bulk-bar" data-testid="mgr-bulk-bar">
+          <span className="mgr-bulk-count" data-testid="mgr-bulk-count">{state.selectedKeys.size} selected</span>
           <div className="mgr-spacer" />
           {/* Bug #4 fix: Move → folder picker popover */}
           <div className="mgr-sort-wrap">
@@ -416,7 +420,7 @@ export function AssetGrid({
         in a tooltip on the folder row.
       */}
       {smartFolder === "unused" && visibleItems.length > 0 && (
-        <div className="mgr-scope-note" role="status">
+        <div className="mgr-scope-note" role="status" data-testid="mgr-scope-note">
           Showing {visibleItems.length} unused{" "}
           {visibleItems.length === 1 ? "asset" : "assets"} — safe to delete, nothing on
           the site references them.
@@ -453,7 +457,7 @@ export function AssetGrid({
       )}
 
       {visibleItems.length > 0 && viewMode === "list" && (
-        <div className="mgr-list-head" aria-hidden="true">
+        <div className="mgr-list-head" aria-hidden="true" data-testid="mgr-list-head">
           <span />
           <span>Name</span>
           <span>Type</span>
@@ -463,6 +467,13 @@ export function AssetGrid({
       )}
       {visibleItems.length > 0 ? (
         <div
+          /* One literal anchor, with the mode as data. A ternary of two
+             literals is invisible to check-anchors (lib.mjs `anchorForm`
+             matches an attribute or a template prefix, not a conditional), so
+             a recipe naming "mgr-grid" reported an anchor nobody renders while
+             the element resolved perfectly in the browser. */
+          data-testid="mgr-assets"
+          data-view={viewMode}
           className={viewMode === "grid" ? "mgr-grid" : "mgr-list"}
           /* Board 1174:4876 draws "3" active with 144px cards, five to a row —
              so the toggle sizes the CARD, it does not count columns. */
@@ -529,6 +540,7 @@ export function AssetGrid({
                 <div
                   key={item.key}
                   className={`mgr-list-row${isSelected || checked ? " selected" : ""}`}
+                  data-testid={`mgr-list-row-${item.key}`}
                   onClick={onClick}
                   onDoubleClick={() => state.insertToCanvas(item.key)}
                   onContextMenu={(e) => state.openCtxMenu(e, item)}
@@ -540,6 +552,7 @@ export function AssetGrid({
                       that decides a bulk action is usage, not pixels. */}
                   <span
                     className={`mgr-list-check${checked ? " on" : ""}`}
+                    data-testid={`mgr-list-check-${item.key}`}
                     role="checkbox"
                     aria-checked={checked}
                     aria-label={`Select ${item.name}`}
@@ -556,7 +569,7 @@ export function AssetGrid({
                     ) : null}
                   </span>
                   <div className="mgr-list-name">{item.displayName ?? item.name}</div>
-                  <div className="mgr-list-type">{item.type.toUpperCase()}</div>
+                  <div className="mgr-list-type" data-testid={`mgr-list-type-${item.key}`}>{item.type.toUpperCase()}</div>
                   <div className="mgr-list-size">{formatBytes(item.size)}</div>
                   <div className={`mgr-list-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}>
                     {(usageMap.get(item.key) ?? 0) > 0
@@ -571,13 +584,14 @@ export function AssetGrid({
               <div
                 key={item.key}
                 className={`mgr-asset${isSelected ? " selected" : ""}`}
+                data-testid={`mgr-asset-${item.key}`}
                 onClick={onClick}
                 onDoubleClick={() => state.insertToCanvas(item.key)}
                 onContextMenu={(e) => state.openCtxMenu(e, item)}
                 draggable
                 onDragStart={onDragStart}
               >
-                <div className="mgr-asset-thumb">
+                <div className="mgr-asset-thumb" data-testid={`mgr-thumb-${item.key}`}>
                   {thumbContent}
                   {/*
                     Board 1161:66/80/111 — the only badge on a card says what
@@ -599,15 +613,18 @@ export function AssetGrid({
                     </div>
                   )}
                 </div>
-                <div className="mgr-asset-meta">
-                  <div className="mgr-asset-name">{item.displayName ?? item.name}</div>
+                <div className="mgr-asset-meta" data-testid={`mgr-meta-${item.key}`}>
+                  <div className="mgr-asset-name" data-testid={`mgr-name-${item.key}`}>{item.displayName ?? item.name}</div>
                   {/*
                     Board 1161:55 — dot + "used ×3" / "unused". Dimensions and
                     bytes moved to the details rail, which is where you go when
                     you care; on the card the question is always "can I delete
                     this?".
                   */}
-                  <div className={`mgr-asset-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}>
+                  <div
+                    className={`mgr-asset-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}
+                    data-testid={`mgr-use-${item.key}`}
+                  >
                     <span className="mgr-use-dot" aria-hidden="true" />
                     {(usageMap.get(item.key) ?? 0) > 0
                       ? `used ×${usageMap.get(item.key)}`
@@ -619,27 +636,27 @@ export function AssetGrid({
           })}
         </div>
       ) : (
-        <div className="mgr-empty">
-          <div className="mgr-empty-hero">
-            <div className="mgr-empty-ring">
+        <div className="mgr-empty" data-testid="mgr-empty">
+          <div className="mgr-empty-hero" data-testid="mgr-empty-hero">
+            <div className="mgr-empty-ring" data-testid="mgr-empty-icon">
               <FolderOpen size={32} />
             </div>
             {/* Board 1162:4617 — the empty library says where uploads GO,
                 because the question at zero assets is "is this the right
                 place?", not "what can I do here?". */}
-            <h4>{state.librarySearch ? "No results" : "No images or files yet."}</h4>
-            <p>
+            <h4 data-testid="mgr-empty-title">{state.librarySearch ? "No results" : "No images or files yet."}</h4>
+            <p data-testid="mgr-empty-sub">
               {state.librarySearch
                 ? `No assets match "${state.librarySearch}"`
                 : "Everything you upload lives here, in one library for the whole site."}
             </p>
             {!state.librarySearch && (
-              <div className="mgr-empty-actions">
-                <Button className="mgr-btn-primary" onClick={onUploadClick}>
+              <div className="mgr-empty-actions" data-testid="mgr-empty-actions">
+                <Button className="mgr-btn-primary" data-testid="mgr-empty-upload" onClick={onUploadClick}>
                   <Upload size={14} />
                   Upload
                 </Button>
-                <Button className="mgr-btn" onClick={onOpenStockModal}>
+                <Button className="mgr-btn" data-testid="mgr-empty-stock" onClick={onOpenStockModal}>
                   <Search size={14} />
                   Browse stock
                 </Button>

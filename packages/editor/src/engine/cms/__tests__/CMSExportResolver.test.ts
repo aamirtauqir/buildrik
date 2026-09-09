@@ -11,9 +11,17 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CMSExportResolver } from "../CMSExportResolver";
+import { CMSBindingManager } from "../CMSBindingManager";
+import { CollectionManager } from "../CollectionManager";
+import * as Storage from "../CollectionStorage";
 import type { Composer } from "../../Composer";
+
+vi.mock("../CollectionStorage", async () => {
+  const { createInMemoryCollectionStorage } = await import("./inMemoryCollectionStorage");
+  return createInMemoryCollectionStorage();
+});
 
 const PAGE = `<!DOCTYPE html>
 <html lang="en"><head><title>Their Title</title>
@@ -85,5 +93,80 @@ describe("a site with no CMS exports unchanged", () => {
   it("leaves mode:none alone entirely", async () => {
     const resolver = new CMSExportResolver(composerWith(boundTo("Real")));
     expect(await resolver.resolve(PAGE, { mode: "none" })).toBe(PAGE);
+  });
+});
+
+/**
+ * The publication switch has to govern what ships.
+ *
+ * `resolveBinding` queried with `filter: {}` and no status, so it resolved
+ * whichever record carried the bound id — draft, published or archived alike —
+ * and static resolution is the export DEFAULT. A record the author had
+ * explicitly marked Draft was therefore embedded in the deployed page with no
+ * warning, and the Published switch changed a field nothing downstream read.
+ *
+ * These run the real CollectionManager and the real CMSBindingManager through
+ * the real resolver: a stub `resolveBinding` cannot show which records the
+ * query lets through, which is the entire defect.
+ */
+describe("only published records reach the exported page", () => {
+  const BOUND_PAGE = '<h1 data-buildrick-id="h1">Placeholder</h1>';
+  const DRAFT_COPY = "UNFINISHED DRAFT COPY";
+
+  type MockedStorage = typeof Storage & { __reset: () => void };
+
+  /** A composer real enough for BaseBindingManager, carrying its own bindings. */
+  async function setup() {
+    const cms = new CollectionManager();
+    const composer = {
+      data: { on: vi.fn(), off: vi.fn() },
+      markDirty: vi.fn(),
+      emit: vi.fn(),
+      // No live elements: applyBinding returns early and the export path is
+      // the only thing resolving here.
+      elements: { getElement: () => null },
+    } as unknown as Composer;
+    const bindings = new CMSBindingManager(composer, cms);
+    (composer as unknown as { cms: unknown }).cms = { bindings };
+
+    const collection = await cms.createCollection("Posts");
+    // createContentItem defaults to status "draft".
+    const record = (await cms.createContentItem(collection.id, { title: DRAFT_COPY }))!;
+    bindings.bindToField("h1", collection.id, record.id, "title", "content", "Fallback copy");
+
+    const exported = () => new CMSExportResolver(composer).resolve(BOUND_PAGE, { mode: "static" });
+    return { cms, collection, record, exported };
+  }
+
+  beforeEach(() => {
+    (Storage as MockedStorage).__reset();
+  });
+
+  it("does not ship a record the author left in Draft", async () => {
+    const { exported } = await setup();
+    expect(await exported()).not.toContain(DRAFT_COPY);
+  });
+
+  /* Draft is the fourth flavour of "this binding has no publishable value",
+     alongside no itemId, unknown item and a null field — so it takes the same
+     exit the other three already take: the author's fallback. */
+  it("renders the author's fallback in the draft record's place", async () => {
+    const { exported } = await setup();
+    expect(await exported()).toContain("Fallback copy");
+  });
+
+  it("ships the same record once it is published", async () => {
+    const { cms, record, exported } = await setup();
+    await cms.updateContentItem(record.id, { status: "published" });
+    expect(await exported()).toContain(DRAFT_COPY);
+  });
+
+  /* "not draft" would have been the wrong test: status is a three-value enum
+     and archived is equally un-published. */
+  it("does not ship an archived record either", async () => {
+    const { cms, record, exported } = await setup();
+    await cms.updateContentItem(record.id, { status: "published" });
+    await cms.updateContentItem(record.id, { status: "archived" });
+    expect(await exported()).not.toContain(DRAFT_COPY);
   });
 });

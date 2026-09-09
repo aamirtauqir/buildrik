@@ -7,6 +7,7 @@
 
 import { Info, X } from "lucide-react";
 import * as React from "react";
+import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Button, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 // ============================================================================
 // HELPERS
@@ -62,8 +63,8 @@ export const InputRow: React.FC<InputRowProps> = ({
      control it obviously belongs to. `htmlFor` costs one id. */
   const controlId = React.useId();
   return (
-  <div className="bdi-row-ctrl">
-    <label className="bdi-lb" htmlFor={controlId}>
+  <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
+    <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={controlId}>
       {label}
       {isOverridden && <OverrideDot />}
       {helperText && <HelperIcon text={helperText} />}
@@ -228,12 +229,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
        label, and leaving it standing squeezed paired fields (Size | line
        height, W | H) down to about 39px — enough to read "inhe". */
     <div
+      data-testid={label ? rowTestId(label) : undefined}
       className={`bdi-row-ctrl${disabled ? " disabled" : ""}`}
       style={label ? undefined : { gridTemplateColumns: "1fr" }}
       title={disabledReason}
     >
       {label ? (
-        <label className="bdi-lb">
+        <label className="bdi-lb" data-testid={labelTestId(label)}>
           {label}
           {isOverridden && <OverrideDot />}
           {helperText && <HelperIcon text={helperText} />}
@@ -241,6 +243,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       ) : null}
       <div className="bdi-row-content">
         <div
+          data-testid={label ? fieldTestId(label) : undefined}
           className={`bdi-fld${isInvalid ? " invalid" : ""}`}
           onMouseEnter={() => setIsRowHovered(true)}
           onMouseLeave={() => setIsRowHovered(false)}
@@ -354,14 +357,14 @@ export const SelectRow: React.FC<SelectRowProps> = ({
      read the option list and never what it was choosing. */
   const id = React.useId();
   return (
-    <div className="bdi-row-ctrl">
-      <label className="bdi-lb" htmlFor={id}>
+    <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
+      <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={id}>
         {label}
         {isOverridden && <OverrideDot />}
         {helperText && <HelperIcon text={helperText} />}
       </label>
       <div className="bdi-row-content">
-        <div className="bdi-ddn">
+        <div className="bdi-ddn" data-testid={fieldTestId(label)}>
           <Select
             id={id}
             className="bdi-v"

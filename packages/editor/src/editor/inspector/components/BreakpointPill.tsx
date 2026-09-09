@@ -57,6 +57,7 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
       <Button
         type="button"
         className="bdi-bpr-pill"
+        data-testid="inspector-breakpoint-pill"
         onClick={() => onChange && setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -110,6 +111,10 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
                 key={bp}
                 type="button"
                 role="option"
+                /* Prefix-first, because `check-anchors`'s template matcher
+                   only resolves a derived id through the literal text BEFORE
+                   the interpolation. */
+                data-testid={`inspector-bp-opt-${bp}`}
                 aria-selected={active}
                 onClick={() => {
                   setOpen(false);

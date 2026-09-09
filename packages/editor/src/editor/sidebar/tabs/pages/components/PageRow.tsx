@@ -183,6 +183,7 @@ export const PageRow = React.memo<Props>(
              is not allowed"), and it duplicated what this row already says:
              `aria-selected` carries the multi-select state below. */
           aria-selected={onToggleSelect ? isSelected : (page.isActive ?? false)}
+          data-testid={`page-row-${page.id}`}
           onClick={(e) => {
             if (onToggleSelect && (e.ctrlKey || e.metaKey || e.shiftKey)) {
               onToggleSelect(e);
@@ -207,6 +208,7 @@ export const PageRow = React.memo<Props>(
           {/* Bulk-select checkbox slot — visible when .bd-pg-panel.bulk-mode is active */}
           <div
             className="bd-pg-row-checkbox"
+            data-testid={`page-row-checkbox-${page.id}`}
             aria-hidden={!onToggleSelect}
             onClick={(e) => {
               if (!onToggleSelect) return;
@@ -276,6 +278,7 @@ export const PageRow = React.memo<Props>(
             <>
               <span
                 className="bd-pg-row-name"
+                data-testid={`page-row-name-${page.id}`}
                 title={page.name}
                 onDoubleClick={(e) => {
                   e.stopPropagation();
@@ -290,7 +293,11 @@ export const PageRow = React.memo<Props>(
           <span style={{ flex: 1 }} aria-hidden="true" />
 
           {searchContext && (
-            <span className="bd-pg-row-incontext" aria-label={`in ${searchContext}`}>
+            <span
+              className="bd-pg-row-incontext"
+              data-testid={`page-row-incontext-${page.id}`}
+              aria-label={`in ${searchContext}`}
+            >
               in {searchContext}
             </span>
           )}

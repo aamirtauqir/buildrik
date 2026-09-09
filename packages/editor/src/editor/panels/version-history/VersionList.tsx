@@ -85,15 +85,16 @@ export function EmptyState({
   message,
   hint,
 }: {
-  icon: React.ReactNode;
+  /** Optional: board 163:64 draws this block as two lines and no glyph. */
+  icon?: React.ReactNode;
   message: string;
   hint?: React.ReactNode;
 }) {
   return (
-    <div className="empty-state">
-      <div className="empty-icon">{icon}</div>
-      <p className="empty-title">{message}</p>
-      {hint && <p className="empty-hint">{hint}</p>}
+    <div className="empty-state" data-testid="saves-empty">
+      {icon ? <div className="empty-icon">{icon}</div> : null}
+      <p className="empty-title" data-testid="saves-empty-title">{message}</p>
+      {hint && <p className="empty-hint" data-testid="saves-empty-hint">{hint}</p>}
     </div>
   );
 }
@@ -360,20 +361,19 @@ export function VersionList({
   return (
     <div ref={listWrapperRef} className="version-list" role="list">
       {filteredVersions.length === 0 ? (
+        /* Board 163:64 draws the empty panel as two lines of copy and nothing
+           else — no glyph — with "+ Save a version" in the footer below as the
+           way out. Its second line names BOTH ways a version comes into
+           existence ("whenever you name one, or when a template is applied");
+           the old one named only the button, and a user whose history filled
+           up from template applies was told about a control they had never
+           pressed. */
         <EmptyState
-          icon={
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <rect x="8" y="6" width="16" height="20" rx="2" />
-              <path d="M12 12h8M12 16h8M12 20h4" />
-            </svg>
-          }
-          message={totalCount === 0 ? "No saved versions yet" : "No matching versions"}
+          message={totalCount === 0 ? "No saved versions yet." : "No matching versions"}
           hint={
-            totalCount === 0 ? (
-              <>Save Version creates a named milestone you can restore anytime.</>
-            ) : (
-              "Try a different search term."
-            )
+            totalCount === 0
+              ? "Versions are created whenever you name one, or when a template is applied."
+              : "Try a different search term."
           }
         />
       ) : listHeight > 0 ? (

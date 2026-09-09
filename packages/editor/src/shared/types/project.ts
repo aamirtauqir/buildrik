@@ -48,6 +48,23 @@ export interface ProjectData {
    * Migration runner reads this to decide whether to bump and seed.
    */
   dsSchemaVersion?: number;
+  /**
+   * CMS element bindings — which canvas element shows which collection field.
+   *
+   * These lived only in two in-memory Maps (BaseBindingManager.ts:72,
+   * CMSBindingManager.ts:68) and were absent from this type, so every reload
+   * silently unbound every element and the next publish shipped the
+   * pre-binding placeholder copy with nothing said. The managers' own
+   * export()/import() pair was written for exactly this and never called.
+   *
+   * Optional, so a project saved before this field loads unchanged.
+   */
+  cmsBindings?: {
+    /** element id -> field bindings (BaseBindingManager.export()) */
+    field?: Record<string, unknown[]>;
+    /** element id -> collection binding (CMSBindingManager) */
+    collection?: Record<string, unknown>;
+  };
 }
 
 export interface ProjectMetadata {

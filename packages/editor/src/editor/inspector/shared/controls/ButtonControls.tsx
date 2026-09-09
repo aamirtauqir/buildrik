@@ -7,6 +7,13 @@
 
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
+import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
+
+const slugifySeg = (label: string): string =>
+  label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/** One line, same reason as `rowTestId` — see ControlRow.tsx. */
+const segTestId = (label: string, value: string): string => `inspector-seg-${slugifySeg(label)}-${value}`;
 // ============================================================================
 // BUTTON GROUP (segmented, sits in a .bdi-row-ctrl row when labeled)
 // ============================================================================
@@ -22,6 +29,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
   const segment = (
     <div
       className="bdi-seg"
+      data-testid={label ? fieldTestId(label) : undefined}
       style={{
         gridAutoColumns: `repeat(${options.length}, 1fr)`,
       }}
@@ -30,6 +38,11 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
         <Button
           key={opt.value}
           type="button"
+          /* One anchor per segment, so a recipe can drive a real style write
+             (the breakpoint-override state has no other way in — it needs a
+             value CHANGED on a non-base breakpoint). Prefix-first for
+             `check-anchors`'s template matcher. */
+          data-testid={label ? segTestId(label, opt.value) : undefined}
           className={value === opt.value ? "on" : ""}
           onClick={() => onChange(opt.value)}
           title={opt.label}
@@ -51,8 +64,8 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
   if (!label) return segment;
 
   return (
-    <div className="bdi-row-ctrl">
-      <label className="bdi-lb">{label}</label>
+    <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
+      <label className="bdi-lb" data-testid={labelTestId(label)}>{label}</label>
       <div className="bdi-row-content">{segment}</div>
     </div>
   );
@@ -88,6 +101,11 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
         <Button
           key={opt.value}
           type="button"
+          /* One anchor per segment, so a recipe can drive a real style write
+             (the breakpoint-override state has no other way in — it needs a
+             value CHANGED on a non-base breakpoint). Prefix-first for
+             `check-anchors`'s template matcher. */
+          data-testid={label ? segTestId(label, opt.value) : undefined}
           className={value === opt.value ? "on" : ""}
           onClick={() => onChange(opt.value)}
           title={opt.label}

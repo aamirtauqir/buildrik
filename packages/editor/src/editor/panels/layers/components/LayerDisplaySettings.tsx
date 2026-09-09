@@ -27,11 +27,12 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
     <div
       ref={ref}
       className="bdc-popover bdc-layers-settings"
+      data-testid="layers-display-popover"
       role="dialog"
       aria-label="Layer display settings"
     >
       <div className="bdc-popover-h">
-        <span>Display Settings</span>
+        <span data-testid="layers-display-title">Display Settings</span>
         <Button className="bdc-icon-btn" onClick={onClose} aria-label="Close display settings">
           ×
         </Button>

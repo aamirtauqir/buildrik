@@ -239,6 +239,7 @@ const DropPositionLine: React.FC<DropPositionLineProps> = ({ position, targetRec
   return (
     <div
       className="bd-drop-position-line"
+      data-testid="drop-insertion-line"
       style={{
         position: "absolute",
         left: targetRect.left - 4,
@@ -252,8 +253,8 @@ const DropPositionLine: React.FC<DropPositionLineProps> = ({ position, targetRec
         zIndex: Z_LAYERS.dropPositionLine,
       }}
     >
-      <span className={DOT_CLASS + " tw:left-0 tw:-translate-x-1/2"} />
-      <span className={DOT_CLASS + " tw:right-0 tw:translate-x-1/2"} />
+      <span className={DOT_CLASS + " tw:left-0 tw:-translate-x-1/2"} data-testid="drop-insertion-dot-start" />
+      <span className={DOT_CLASS + " tw:right-0 tw:translate-x-1/2"} data-testid="drop-insertion-dot-end" />
     </div>
   );
 };
@@ -383,6 +384,7 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
   return (
     <div
       className="bd-drop-breadcrumb"
+      data-testid="drop-breadcrumb"
       style={{
         position: "absolute",
         left: targetRect.left,
@@ -391,7 +393,10 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
         alignItems: "center",
         gap: 2,
         backgroundColor: "var(--bk-ink)",
-        padding: "6px 8px",
+        /* Board 807:7517 draws the pill 28 tall with the label at x=8. 6/8
+           padding on an 11px line box measured 25. */
+        height: 28,
+        padding: "0 8px",
         borderRadius: 4,
         fontSize: 11,
         fontWeight: 500,

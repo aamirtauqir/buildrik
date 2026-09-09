@@ -23,10 +23,22 @@
   background: var(--bk-bg-card);
 }
 
+/* The field is the positioning context for the send/stop control, which the
+   boards leave out of the prompt block entirely (170:7 is 8 + 52 + 12 = 72,
+   with nothing but the input inside it). */
+.bd-ai-composer-field {
+  position: relative;
+}
+
 .bd-ai-composer-input {
   width: 100%;
-  min-height: 52px;
-  border: 1px solid var(--bk-border);
+  /* 52, not min-height 52: `rows={2}` at 18px line-height computed 54 and the
+     board's block height depends on this one. */
+  height: 52px;
+  /* --bk-border is the panel rule; an INPUT edge is its own token
+     (--color/border-input on 170:8), and at #E5E7EB the field was invisible
+     against the white panel it sits on. */
+  border: 1px solid var(--bk-border-input);
   border-radius: var(--bk-radius-lg);
   padding: var(--bk-space-8) var(--bk-space-12);
   background: var(--bk-bg-card);
@@ -105,16 +117,20 @@
 .bd-ai-model-item:hover { background: var(--bk-bg-subtle); }
 .bd-ai-model-item[aria-current="true"] { color: var(--bk-accent); }
 
-.bd-ai-composer-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-  margin-top: var(--bk-space-4);
+/* Two classes deep on purpose: flowbite's `px-3` is a `tw:` utility, and a
+   single-class rule ties it on specificity and then loses on source order —
+   which is how a 26px send button rendered 40 wide, its own width overrun by
+   padding it never asked for. */
+.bd-ai-composer-field .bd-ai-composer-send,
+.bd-ai-composer-field .bd-ai-composer-stop {
+  padding: 0;
 }
 
 .bd-ai-composer-send,
 .bd-ai-composer-stop {
-  margin-left: auto;
+  position: absolute;
+  right: var(--bk-space-4);
+  bottom: var(--bk-space-4);
   width: 26px;
   height: 22px;
   border-radius: var(--bk-radius-sm);
@@ -230,6 +246,17 @@
 .bd-ai-agent-planning {
   padding: var(--bk-space-12) var(--bk-space-16);
 }
+/* Boards 170:41 · 170:70 · 171:67 put the step glyph on the panel's own 16
+   gutter. Nothing reset this list: chrome-reset.css replaces Tailwind's
+   preflight and deliberately touches only the four form-control tags, so the
+   UA's own <ol> rules stood — 40px of inline padding and a decimal marker, i.e.
+   every step row sat 40px in, beside a second number nobody asked for. */
+.bd-ai-agent-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .bd-ai-agent-error {
   padding: var(--bk-space-8) var(--bk-space-16);
   color: var(--bk-error);

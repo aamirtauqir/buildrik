@@ -156,8 +156,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
           tracking pixel is loaded on every page — visitor interactions are reported to your
           Meta Events Manager.
         </p>
+        {/* Board 639:3781 labels this row "Pixel ID". The card above it already
+            says META PIXEL, so "Meta (Facebook) Pixel ID" repeated the vendor
+            twice in one card and pushed the label past the 180 column the
+            chassis gives it. The hint still names Events Manager. */}
         <Field
-          label="Meta (Facebook) Pixel ID"
+          label="Pixel ID"
           hint="15–16 digit number from your Meta Events Manager"
         >
           <Input
@@ -275,7 +279,9 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
         )}
       </Section>
 
-      <Section title="Cookie Consent">
+      {/* Board 1711:8414 heads this card CONSENT and names the row inside it
+          "Cookie Consent" — the card is the category, the row is the setting. */}
+      <Section title="Consent">
         <SwitchRow
           title="Show cookie banner (stored, not yet shown)"
           checked={cookieBanner}

@@ -83,23 +83,44 @@ export const PageContextMenu: React.FC<Props> = ({
        straight through them.
        `tw:!fixed` because the shared class is `absolute` and the position is
        computed from the click, not from an anchor. */
-    <div ref={menuRef} className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed`} style={style}>
+    <div
+      ref={menuRef}
+      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed`}
+      style={style}
+      data-testid="pages-context-menu"
+    >
       <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
         {/* Board 1171:4753 labels — sentence case, ellipsis on the two that
-            open something. It draws no shortcut hints; the shortcuts still
-            work from the row (F2 / ⌘D / ⌘,). */}
-        <MenuItem onClick={() => act(() => onRename(pageId))}>Rename…</MenuItem>
-        <MenuItem onClick={() => act(() => onDuplicate(pageId))}>Duplicate</MenuItem>
+            open something. Its 2026-09 revision ALSO draws the chord beside
+            the three items that have one (2838:12148/12149/12150), which is
+            what the row's own F2 / ⌘D / ⌫ already do; this comment used to
+            say the board drew none. MenuItem has carried a `kbd` slot the
+            whole time. ⌘, opens Page settings from the row but the board
+            leaves that item bare, so it stays bare. */}
+        <MenuItem kbd="F2" data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
+          Rename…
+        </MenuItem>
+        <MenuItem kbd="⌘D" data-testid="pages-menu-duplicate" onClick={() => act(() => onDuplicate(pageId))}>
+          Duplicate
+        </MenuItem>
         {!isHome && (
-          <MenuItem onClick={() => act(() => onSetHomepage(pageId))}>Set as homepage</MenuItem>
+          <MenuItem data-testid="pages-menu-homepage" onClick={() => act(() => onSetHomepage(pageId))}>
+            Set as homepage
+          </MenuItem>
         )}
-        <MenuItem onClick={() => act(() => onCopyLink(pageId))}>Copy link</MenuItem>
-        <MenuItem onClick={() => act(() => onSettings(pageId))}>Page settings…</MenuItem>
+        <MenuItem data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
+          Copy link
+        </MenuItem>
+        <MenuItem data-testid="pages-menu-settings" onClick={() => act(() => onSettings(pageId))}>
+          Page settings…
+        </MenuItem>
         <MenuSeparator />
         <MenuItem
           danger
           disabled={deleteDisabled}
           title={deleteTooltip}
+          kbd="⌫"
+          data-testid="pages-menu-delete"
           onClick={() => act(() => onDelete(pageId))}
         >
           Delete page

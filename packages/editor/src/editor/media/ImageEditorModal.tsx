@@ -166,15 +166,24 @@ const TAB =
   "tw:border-0 tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 tw:enabled:hover:bg-transparent";
 const TAB_ACTIVE = "tw:font-semibold tw:text-[var(--bk-blue-500)]";
 const TAB_RESTING = "tw:font-medium tw:text-[var(--bk-ink-muted)] tw:enabled:hover:text-[var(--bk-ink)]";
+/* `tw:h-6`, not `tw:min-h-6`. flowbite's Button ships `h-10` and className goes
+   through twMerge, so only a SAME-property utility beats it — a min-height
+   never could, and these chips rendered 40 tall against board 1124:4536's 24.
+   (CLAUDE.md §Chrome, "Overriding a flowbite default depends on WHERE the class
+   lands"; same trap, same day, as the Save button below.) */
 const CHIP =
-  "tw:min-h-6 tw:rounded-full tw:border-0 tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4";
-const CHIP_ACTIVE = "tw:bg-[var(--bk-accent-subtle,#ebf5ff)] tw:font-medium tw:text-[var(--bk-accent-text,#1a56db)]";
+  "tw:h-6 tw:min-h-0 tw:rounded-full tw:border-0 tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4";
+/* `--bk-accent-tint`, not `--bk-accent-subtle`. Board 1124:4536 says
+   `--color/bg-selected` #EBF5FF; the class already carried #EBF5FF as its
+   FALLBACK while naming the token that resolves to #E1EFFE, so the fallback was
+   right and the token was wrong, and the fallback never applies. */
+const CHIP_ACTIVE = "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent-text)]";
 const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]";
 const TOOL =
   "tw:flex tw:h-7 tw:w-9 tw:items-center tw:justify-center tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] " +
   "tw:bg-white tw:p-0 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-gray-50)]";
 const GHOST =
-  "tw:min-h-8 tw:border-0 tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] " +
+  "tw:h-8 tw:min-h-0 tw:border-0 tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink-soft)] " +
   "tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]";
 const SECTION_LABEL = "tw:mb-1 tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
 const MONO_VAL =
@@ -305,17 +314,19 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
     <div
       className="tw:fixed tw:inset-0 tw:z-[10000] tw:flex tw:items-center tw:justify-center tw:bg-[rgba(17,24,39,0.6)]"
       onClick={onClose}
+      data-testid="image-editor-scrim"
     >
       <div
         className="tw:flex tw:max-h-[90vh] tw:w-[720px] tw:max-w-[92vw] tw:flex-col tw:overflow-y-auto tw:rounded-2xl tw:bg-white tw:[box-shadow:var(--bk-shadow-overlay)]"
         role="dialog"
         aria-modal="true"
+        data-testid="image-editor-card"
         aria-label={imageName ? `Edit image — ${imageName}` : "Edit image"}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header — board: title + text-link tabs, no button chrome. */}
         <div className="tw:shrink-0 tw:px-6 tw:pt-5">
-          <h3 className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]">
+          <h3 data-testid="image-editor-title" className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]">
             Edit image{imageName ? ` — ${imageName}` : ""}
           </h3>
           <div className="tw:mt-3 tw:flex tw:gap-5" role="tablist" aria-label="Editor sections">
@@ -327,6 +338,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
               <Button
                 key={id}
                 role="tab"
+                data-testid={`image-editor-tab-${id}`}
                 aria-selected={tab === id}
                 className={`${TAB} ${tab === id ? TAB_ACTIVE : TAB_RESTING}`}
                 onClick={() => setTab(id)}
@@ -338,7 +350,10 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
         </div>
 
         {/* Canvas well — board 1124: full-width, rounded-8, mono dims. */}
-        <div className="tw:relative tw:mx-6 tw:mt-3 tw:h-[280px] tw:shrink-0 tw:overflow-hidden tw:rounded-lg tw:bg-[var(--bk-bg-subtle)]">
+        <div
+          data-testid="image-editor-well"
+          className="tw:relative tw:mx-6 tw:mt-3 tw:h-[280px] tw:shrink-0 tw:overflow-hidden tw:rounded-lg tw:bg-[var(--bk-bg-subtle)]"
+        >
           {!imageError && (
             <Cropper
               image={imageSrc}
@@ -372,7 +387,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
             </div>
           )}
           {!imageError && croppedArea.width > 0 ? (
-            <span className={`tw:absolute tw:bottom-2 tw:left-4 ${MONO_VAL}`}>
+            <span data-testid="image-editor-dims" className={`tw:absolute tw:bottom-2 tw:left-4 ${MONO_VAL}`}>
               {Math.round(croppedArea.width)}×{Math.round(croppedArea.height)}
             </span>
           ) : null}
@@ -410,9 +425,10 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
           {tab === "crop" && (
             <>
               <div className="tw:flex tw:items-center tw:gap-2">
-                {CROP_PRESETS.map((p) => (
+                {CROP_PRESETS.map((p, i) => (
                   <Button
                     key={p.label}
+                    data-testid={`image-editor-crop-${i}`}
                     className={`${CHIP} ${aspect === p.value ? CHIP_ACTIVE : CHIP_RESTING}`}
                     aria-pressed={aspect === p.value}
                     onClick={() => setAspect(p.value)}
@@ -432,6 +448,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   className={`${TOOL} ${flipH ? "tw:border-[var(--bk-accent)] tw:text-[var(--bk-accent)]" : ""}`}
                   onClick={() => setFlipH(!flipH)}
                   title="Flip horizontal"
+                  data-testid="image-editor-flip-h"
                   aria-label="Flip horizontal"
                   aria-pressed={flipH}
                 >
@@ -441,6 +458,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   className={`${TOOL} ${flipV ? "tw:border-[var(--bk-accent)] tw:text-[var(--bk-accent)]" : ""}`}
                   onClick={() => setFlipV(!flipV)}
                   title="Flip vertical"
+                  data-testid="image-editor-flip-v"
                   aria-label="Flip vertical"
                   aria-pressed={flipV}
                 >
@@ -450,7 +468,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
               <div className="tw:mt-4 tw:grid tw:grid-cols-2 tw:gap-x-9">
                 <div>
-                  <span className={SECTION_LABEL}>Zoom</span>
+                  <span data-testid="image-editor-zoom-label" className={SECTION_LABEL}>Zoom</span>
                   <div className="tw:flex tw:items-center tw:gap-2">
                     <div className="tw:flex-1">
                       <Slider value={zoom} onChange={setZoom} min={1} max={3} step={0.1} label="Zoom" withField={false} />
@@ -459,12 +477,12 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   </div>
                 </div>
                 <div>
-                  <span className={SECTION_LABEL}>Rotate</span>
+                  <span data-testid="image-editor-rotate-label" className={SECTION_LABEL}>Rotate</span>
                   <div className="tw:flex tw:items-center tw:gap-2">
                     <div className="tw:flex-1">
                       <Slider value={rotation} onChange={setRotation} min={-180} max={180} label="Rotate" withField={false} />
                     </div>
-                    <span className={MONO_VAL}>{rotation}°</span>
+                    <span data-testid="image-editor-rotate-value" className={MONO_VAL}>{rotation}°</span>
                   </div>
                 </div>
               </div>
@@ -561,17 +579,21 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
         {/* Foot — board: note left, actions right. Reset rides as a ghost. */}
         <div className="tw:mt-auto tw:flex tw:shrink-0 tw:items-center tw:gap-2 tw:px-6 tw:py-5">
-          <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+          <span
+            data-testid="image-editor-foot-note"
+            className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+          >
             Edits create a new version — original preserved.
           </span>
           <Button className={GHOST} onClick={handleReset}>
             Reset
           </Button>
-          <Button className={GHOST} onClick={onClose}>
+          <Button data-testid="image-editor-cancel" className={GHOST} onClick={onClose}>
             Cancel
           </Button>
           <Button
-            className="tw:min-h-8 tw:rounded tw:border-0 tw:bg-[var(--bk-accent)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]"
+            className="tw:h-8 tw:min-h-0 tw:rounded tw:border-0 tw:bg-[var(--bk-accent)] tw:px-3.5 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]"
+            data-testid="image-editor-save"
             onClick={handleSave}
             disabled={saving}
           >

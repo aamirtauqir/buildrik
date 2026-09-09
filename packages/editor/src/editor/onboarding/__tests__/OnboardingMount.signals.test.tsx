@@ -60,7 +60,13 @@ import { OnboardingMount } from "../OnboardingMount";
  *  over-credit. */
 function fakeComposer({ pages = 1, sectionTypes = [] as string[] } = {}) {
   const handlers = new Map<string, Set<(p?: unknown) => void>>();
+  /* Mutable, because `page:created` is now read against the page COUNT: the
+     editor bootstraps one page for you, so only a SECOND page is the user
+     adding one. A frozen count could not tell the two apart, which is exactly
+     how the phantom credit survived. */
+  let pageCount = pages;
   return {
+    setPages: (n: number) => { pageCount = n; },
     on: (e: string, h: (p?: unknown) => void) => {
       if (!handlers.has(e)) handlers.set(e, new Set());
       handlers.get(e)!.add(h);
@@ -69,7 +75,7 @@ function fakeComposer({ pages = 1, sectionTypes = [] as string[] } = {}) {
     emit: (e: string, p?: unknown) => handlers.get(e)?.forEach((h) => h(p)),
     listenerCount: (e: string) => handlers.get(e)?.size ?? 0,
     elements: {
-      getAllPages: () => Array.from({ length: pages }, (_, i) => ({ id: `p${i}` })),
+      getAllPages: () => Array.from({ length: pageCount }, (_, i) => ({ id: `p${i}` })),
       getAllElements: () =>
         sectionTypes.map((t, i) => ({ getId: () => `e${i}`, getType: () => t })),
     },
@@ -93,7 +99,8 @@ describe("OnboardingMount — outcomes, not intentions", () => {
     render(<OnboardingMount composer={c as never} />);
 
     act(() => c.emit(EVENTS.BRAND_APPLIED, undefined));
-    act(() => c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created", page: { id: "p2" } }));
+    // A page BEYOND the bootstrap one — the project now holds two.
+    act(() => { c.setPages(2); c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created", page: { id: "p2" } }); });
     act(() => c.emit(EVENTS.ELEMENT_INSERTED, { elementId: "e1", blockId: "hero" }));
     act(() => c.emit(EVENTS.UI_TOGGLE_PREVIEW, {}));
     act(() => c.emit(EVENTS.SITE_PUBLISHED, { jobId: "j1" }));
@@ -122,6 +129,19 @@ describe("OnboardingMount — outcomes, not intentions", () => {
     expect(ids()).toEqual(["insert-section"]);
   });
 
+  /* THE BOOTSTRAP PAGE IS NOT THE USER'S PAGE. `useComposerInit` creates one
+     when storage holds nothing, and it emits `page:created` outside any
+     import — so a brand-new project ticked "Add your first page" on first
+     paint, fired the achievement overlay for work nobody did, and left the
+     S1.1 rail coach (which needs completedCount === 0) unreachable. Measured
+     live at :5050 before the fix: 1/7 done four seconds after boot. */
+  it("the editor's own bootstrap page credits nothing", () => {
+    const c = fakeComposer({ pages: 1 });
+    render(<OnboardingMount composer={c as never} />);
+    act(() => c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created", page: { id: "p0" } }));
+    expect(completeStep).not.toHaveBeenCalled();
+  });
+
   it("a PROJECT_CHANGED that is not page:created credits nothing", () => {
     const c = fakeComposer();
     render(<OnboardingMount composer={c as never} />);
@@ -144,7 +164,7 @@ describe("OnboardingMount — outcomes, not intentions", () => {
     render(<OnboardingMount composer={c as never} />);
 
     act(() => c.emit(EVENTS.PROJECT_LOADED, { importing: true }));
-    act(() => c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created" }));
+    act(() => { c.setPages(9); c.emit(EVENTS.PROJECT_CHANGED, { type: "page:created" }); });
     act(() => c.emit(EVENTS.ELEMENT_INSERTED, { blockId: "hero" }));
     expect(completeStep).not.toHaveBeenCalled();
 

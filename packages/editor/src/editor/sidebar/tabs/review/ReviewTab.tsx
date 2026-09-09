@@ -43,6 +43,7 @@ import {
   Spinner,
   Textarea,
   Toolbar,
+  OverlayMount,
 } from "@/editor/chrome-ui";
 import { SendForReview } from "@/editor/shell/SendForReview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
@@ -88,15 +89,20 @@ type LoadState = "loading" | "ready" | "error";
 const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
 const META = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-/** The grey band over each page's comments, and over RESOLVED / DETACHED. */
+/** The grey band over each page's comments, and over RESOLVED / DETACHED.
+ *  Figma component 16:16 ("28h. The right-aligned count is mono so the numbers
+ *  do not jitter as a list filters"), drawn on 157:2 as 220:855. */
 const BAND =
   "tw:flex tw:items-center tw:gap-2 tw:w-full tw:px-4 tw:h-7 tw:bg-[var(--bk-bg-subtle)] " +
-  "tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-wide tw:text-[var(--bk-ink-muted)] " +
+  "tw:text-[11px] tw:leading-4 tw:font-medium tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)] " +
   "tw:border-0 tw:justify-between";
+/** The band's trailing count — data/11 · mono, not the band's own Inter. */
+const BAND_COUNT =
+  "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[11px] tw:leading-4 tw:font-medium";
 const FOOT = "tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-2";
 const ROUND_STRIP =
   "tw:flex tw:items-center tw:justify-center tw:h-8 tw:bg-[var(--bk-bg-subtle)] " +
-  "tw:text-[12px] tw:text-[var(--bk-ink-soft)]";
+  "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 /** Both confirms (revoke, re-send) are inline panels on the boards, not modals. */
 const CONFIRM =
   "tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-3 tw:bg-[var(--bk-warning-tint)] " +
@@ -156,6 +162,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   const [compareOpen, setCompareOpen] = React.useState(false);
+  /* Compare's mode is lifted here because it decides WHERE the view renders:
+     list in the 280 drawer, split and overlay at 1080 in an OverlayMount
+     (B1, founder call 2026-09-08). Defaults to "split", matching what
+     ApprovedCompareView opened with before the mode moved out. */
+  const [compareMode, setCompareMode] = React.useState<"split" | "overlay" | "list">("split");
   const [compareState, setCompareState] = React.useState<LoadState>("loading");
   const [approvedSnap, setApprovedSnap] = React.useState<PublishPage[] | null>(null);
   const [currentPages, setCurrentPages] = React.useState<PublishPage[] | null>(null);
@@ -382,39 +393,78 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      something to measure: "0 of 0" over an empty thread was a gauge with no
      quantity (designer walk 2026-08-28). The sent line stays either way. */
   const progress = (
-    <div className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-2">
+    <>
       {total > 0 && (
-      <div className="tw:flex tw:items-center tw:gap-3">
-        <span
-          className="tw:h-1.5 tw:flex-1 tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:overflow-hidden"
-          role="progressbar"
-          aria-valuenow={resolvedComments.length}
-          aria-valuemin={0}
-          aria-valuemax={total}
-          aria-label="Comments resolved"
+        /* Board 157:8 — a 44-tall block, the 140 track at x16 and the mono
+           count at x170. The track is FIXED, not flex-1: the count is mono and
+           tabular precisely so it does not move as the numbers change, which a
+           flexible track would undo. */
+        <div
+          className="tw:flex tw:h-11 tw:w-full tw:flex-none tw:items-center tw:gap-[14px] tw:px-4"
+          data-testid="review-progress"
         >
           <span
-            className="tw:block tw:h-full tw:rounded-full tw:bg-[var(--bk-success)]"
-            style={{ width: `${pct}%` }}
-          />
-        </span>
-        <span className="tw:font-mono tw:text-[12px] tw:tabular-nums tw:text-[var(--bk-ink)]">
-          {resolvedComments.length} of {total}
-        </span>
-      </div>
+            className="tw:h-1.5 tw:w-[140px] tw:flex-none tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:overflow-hidden"
+            role="progressbar"
+            aria-valuenow={resolvedComments.length}
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-label="Comments resolved"
+            data-testid="review-progress-track"
+          >
+            <span
+              className="tw:block tw:h-full tw:rounded-[4px] tw:bg-[var(--bk-success)]"
+              style={{ width: `${pct}%` }}
+              data-testid="review-progress-fill"
+            />
+          </span>
+          <span
+            className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink)]"
+            data-testid="review-progress-count"
+          >
+            {resolvedComments.length} of {total}
+          </span>
+        </div>
       )}
-      {round ? <span className={META}>{sentLine(round)}</span> : null}
-      {notice ? <span className={META}>{notice}</span> : null}
-    </div>
+      {/* Board 157:12 — a 28-tall block of its own, so the sent line keeps its
+          place whether or not there is a bar above it. */}
+      {round || notice ? (
+        <div
+          className="tw:flex tw:h-7 tw:w-full tw:flex-none tw:flex-col tw:justify-center tw:px-4"
+          data-testid="review-sent-meta"
+        >
+          {round ? (
+            <span className={META} data-testid="review-sent-line">
+              {sentLine(round)}
+            </span>
+          ) : null}
+          {notice ? <span className={META}>{notice}</span> : null}
+        </div>
+      ) : null}
+    </>
   );
 
   const compareButton = (
     <Button
       color="light"
+      size="xs"
       onClick={() => void openCompare()}
       disabled={!onExportCurrentPages}
       title={!onExportCurrentPages ? "Compare isn't available here" : undefined}
-      className="tw:w-full tw:justify-center"
+      /* Board 229:1090: `--size/row-dense` (28) with 12/6 padding and an 8
+         radius — the dense secondary, not the 40-tall default a bare
+         `<Button>` renders. `tw:h-7` and not `tw:min-h-7`: on a flowbite
+         component only a SAME-property utility survives twMerge. */
+      /* --color/border and gray-700, not flowbite `light`'s gray-300 border and
+         gray-900 label — the same call-site override DrawerGallery's
+         `tpl-browse-all` carries for board 1138:13422. See the report:
+         the secondary Button has now been corrected at the call site six
+         times, which is a theme's job, not a call site's. */
+      className={
+        "tw:h-7 tw:w-full tw:justify-center tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-[13px] tw:leading-[18px] " +
+        "tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]"
+      }
+      data-testid="review-compare"
     >
       Compare with approved
     </Button>
@@ -495,17 +545,49 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   }
 
   if (compareOpen) {
+    const compareView = (
+      <ApprovedCompareView
+        approvedPages={approvedSnap}
+        currentPages={currentPages}
+        mode={compareMode}
+        onModeChange={setCompareMode}
+        onBack={() => setCompareOpen(false)}
+        onRefreshCurrent={
+          onExportCurrentPages
+            ? () => {
+                setCurrentPages(null);
+                void onExportCurrentPages().then(setCurrentPages).catch(() => setCurrentPages([]));
+              }
+            : undefined
+        }
+      />
+    );
     return (
       <div className={BODY} data-review-state="compare">
-        <Toolbar>
-          <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
-            <ChevronLeft size={14} aria-hidden="true" /> Back
-          </Button>
-          <span className="tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]">Compare with approved</span>
-        </Toolbar>
+        {/* No strip of our own: every Compare board draws ONE 48-tall bar, and
+            the way back is a hotspot at its left end. ApprovedCompareView owns
+            that bar and takes `onBack`; this used to stack a second Toolbar
+            above it, so the panel showed two rules and two titles. The loading
+            and error states keep a bar because there is no compare view yet to
+            carry one. */}
         {compareState === "loading" ? (
+          <>
+          <Toolbar>
+            <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
+              <ChevronLeft size={14} aria-hidden="true" /> Back
+            </Button>
+            <span className="tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]">Compare with approved</span>
+          </Toolbar>
           <EmptyState className="tw:flex-1" icon={<Spinner size="lg" />} body="Loading approved snapshot…" />
+          </>
         ) : compareState === "error" ? (
+          <>
+          <Toolbar>
+            <Button color="light" size="xs" onClick={() => setCompareOpen(false)} className={GHOST}>
+              <ChevronLeft size={14} aria-hidden="true" /> Back
+            </Button>
+            <span className="tw:text-xs tw:font-semibold tw:text-[var(--bk-ink)]">Compare with approved</span>
+          </Toolbar>
           <EmptyState
             className="tw:flex-1"
             icon={<AlertCircle size={24} aria-hidden="true" />}
@@ -513,19 +595,31 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             body="The dashboard didn't answer. Try again."
             action={<Button color="light" size="xs" onClick={() => void openCompare()}>Retry</Button>}
           />
+          </>
+        ) : compareMode === "list" ? (
+          /* LIST stays in the drawer: one column reads fine at 280, and the
+             board draws it that way. */
+          compareView
         ) : (
-          <ApprovedCompareView
-            approvedPages={approvedSnap}
-            currentPages={currentPages}
-            onRefreshCurrent={
-              onExportCurrentPages
-                ? () => {
-                    setCurrentPages(null);
-                    void onExportCurrentPages().then(setCurrentPages).catch(() => setCurrentPages([]));
-                  }
-                : undefined
-            }
-          />
+          /* SPLIT and OVERLAY open at 1080 (boards 168:2 / 168:26 / 168:48,
+             founder call 2026-09-08 closing BLOCKERS.md B1). In the 280 drawer
+             each pane was ~140px, so "Side by side" was only side-by-side on
+             the board's own surface. `OverlayMount` is chrome-ui's overlay-root
+             primitive, which is what Gate 22 requires — no bare createPortal.
+             Closing the overlay drops back to list rather than leaving Compare
+             entirely: the user asked for a comparison, not to leave one. */
+          <>
+            {compareView === null ? null : (
+              <OverlayMount open onClose={() => setCompareMode("list")} labelledBy="compare-title">
+                <div
+                  className="tw:flex tw:h-[760px] tw:w-[1080px] tw:max-w-[95vw] tw:flex-col tw:overflow-hidden tw:rounded-lg tw:bg-[var(--bk-bg-panel)]"
+                  data-testid="compare-overlay"
+                >
+                  {compareView}
+                </div>
+              </OverlayMount>
+            )}
+          </>
         )}
       </div>
     );
@@ -533,6 +627,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
   const detached = openComments.filter((c) => detachedIds.has(c.id));
   const attached = openComments.filter((c) => !detachedIds.has(c.id));
+
+  /* One id per row across the WHOLE list, in render order (detached, then the
+     page groups, then resolved), so a probe or recipe can address the third row
+     without knowing which group it fell into. */
+  const rowIndex = new Map(
+    [...detached, ...attached, ...resolvedComments].map((c, i) => [c.id, i]),
+  );
 
   const groups: Group[] = [];
   for (const c of attached) {
@@ -561,9 +662,14 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     </Button>
   );
 
-  const row = (c: ReviewComment, extra?: { detachedNote?: string; actions?: React.ReactNode }) => (
+  const row = (
+    c: ReviewComment,
+    extra?: { detachedNote?: string; actions?: React.ReactNode },
+  ) => (
     <CommentRow
       key={c.id}
+      data-testid={`review-comment-row-${rowIndex.get(c.id)}`}
+      index={rowIndex.get(c.id)}
       author={c.authorKind === "client" ? (c.authorName ?? "Client") : "You"}
       authorKind={c.authorKind === "client" ? "client" : "internal"}
       body={c.body}
@@ -698,11 +804,12 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             <div
               className={BAND}
               style={{ background: "var(--bk-warning-tint)", color: "var(--bk-warning-text)" }}
+              data-testid="review-detached-band"
             >
               <span className="tw:flex tw:items-center tw:gap-1.5">
                 <AlertCircle size={12} aria-hidden="true" /> Detached
               </span>
-              <span>{detached.length}</span>
+              <span className={BAND_COUNT}>{detached.length}</span>
             </div>
             {detached.map((c) =>
               row(c, {
@@ -727,11 +834,15 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
         {groups.map((g, i) => (
           <div key={g.key}>
-            <div className={BAND}>
+            <div className={BAND} data-testid={`review-band-${i}`}>
               {/* Board 156:2 marks where the open thread starts, then names
                   each page after it. */}
-              <span>{i === 0 ? `Open · ${g.label}` : g.label}</span>
-              <span>{g.comments.length}</span>
+              <span data-testid={`review-band-label-${i}`}>
+                {i === 0 ? `Open · ${g.label}` : g.label}
+              </span>
+              <span className={BAND_COUNT} data-testid={`review-band-count-${i}`}>
+                {g.comments.length}
+              </span>
             </div>
             {g.comments.map((c) => row(c))}
           </div>
@@ -744,9 +855,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               className={BAND}
               aria-expanded={resolvedOpen}
               onClick={() => setResolvedOpen((v) => !v)}
+              data-testid="review-resolved-band"
             >
               <span>Resolved</span>
-              <span className="tw:flex tw:items-center tw:gap-1">
+              <span className={`${BAND_COUNT} tw:flex tw:items-center tw:gap-1`}>
                 {resolvedComments.length}
                 {resolvedOpen ? (
                   <ChevronDown size={12} aria-hidden="true" />
@@ -776,7 +888,19 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {round.totalRounds > 1 ? (roundsOpen ? " ▾" : " ▸") : ""}
       </Button>
       {roundsOpen && (
-        <div className="tw:px-4 tw:py-2 tw:bg-[var(--bk-bg-subtle)] tw:flex tw:flex-col tw:gap-1" data-testid="review-rounds-list">
+        <div className="tw:bg-[var(--bk-bg-subtle)] tw:flex tw:flex-col" data-testid="review-rounds-list">
+          {/* Board 1753:8422 — 12px lines on a 24 pitch, inset 12, which puts
+              each line at the board's 256. The rows are their own block so the
+              read-only note below can be the 32-tall block 157:219 draws. */}
+          <div
+            /* The colour is stated, not inherited. 1753:8422 says
+               `--color/ink-soft`; this block set only a size, so it took
+               whatever the host painted — #000000 in the probe, i.e. a black
+               that no board asks for and that nothing in the panel matches.
+               Same defect the Content panel's "Published" label carried. */
+            className="tw:flex tw:flex-col tw:px-3 tw:py-1 tw:text-[12px] tw:text-[color:var(--bk-ink-soft)]"
+            data-testid="review-rounds-rows"
+          >
           {roundsError ? (
             <span className={META}>
               Couldn't load the history.{" "}
@@ -792,23 +916,46 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             rounds
               .filter((r) => r.id !== round.id)
               .map((r) => (
-                <span key={r.id} className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]" data-testid={`review-round-${r.roundNumber}`}>
+                <span key={r.id} className="tw:flex tw:h-6 tw:items-center tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid={`review-round-${r.roundNumber}`}>
+                  {/* Board 1753:8423-8429: "Round 6 · approved 3d ago" — the
+                      outcome then a RELATIVE age, which is the scale the rest of
+                      this panel uses ("Sent 2d ago · Sara"). It printed
+                      `toLocaleDateString()` and the reviewer's name, so one
+                      panel spoke in both "2d ago" and "9/5/2026", and repeated
+                      a name already on the line above.
+                      Outcome first, and outcome over revocation: a revoked link
+                      does not undo an approval. Every previous round printed
+                      "Revoked" while the DB said APPROVED or CHANGES_REQUESTED
+                      (measured 2026-09-02), which is why the revocation is a
+                      suffix and not the verb. */}
                   Round {r.roundNumber} ·{" "}
-                  {/* Outcome first: a revoked link does not undo an approval. Every
-                      previous round printed "Revoked" while the DB said APPROVED
-                      or CHANGES_REQUESTED (measured 2026-09-02). */}
                   {r.status === "APPROVED"
-                    ? `Approved${r.reviewerName ? ` by ${r.reviewerName}` : ""}`
+                    ? "approved"
                     : r.status === "CHANGES_REQUESTED"
-                      ? "Changes requested"
+                      ? "changes requested"
                       : r.revoked
-                        ? "Revoked"
-                        : "Sent, no reply"}
-                  {r.revoked && (r.status === "APPROVED" || r.status === "CHANGES_REQUESTED") ? " · link revoked" : ""}
-                  {r.resolvedAt ? ` · ${new Date(r.resolvedAt).toLocaleDateString()}` : ""}
+                        ? "revoked"
+                        : "sent"}{" "}
+                  {shortAge(r.resolvedAt ?? r.createdAt)} ago
+                  {r.revoked && (r.status === "APPROVED" || r.status === "CHANGES_REQUESTED")
+                    ? " · link revoked"
+                    : ""}
                 </span>
               ))
           )}
+          </div>
+          {/* Board 157:219. The list is header lines and nothing else — no
+              endpoint returns an older round's comments (contracts §6.4:
+              comments carry no round id) — so saying so is the difference
+              between a deliberate limit and a list that looks broken. Only
+              once there IS an older round to be read-only about. */}
+          {rounds && rounds.length > 1 ? (
+            <div className="tw:flex tw:h-8 tw:flex-none tw:items-center tw:px-4" data-testid="review-rounds-note">
+              <span className={META} data-testid="review-rounds-note-text">
+                Older rounds are read-only.
+              </span>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -830,7 +977,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         </div>
       </div>
 
-      <div className="tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-3">{compareButton}</div>
+      {/* Board 157:48: 40 tall, the 28 button inset 16 — and no top rule; the
+          tinted round strip above it is the separation. */}
+      <div className="tw:flex tw:h-10 tw:w-full tw:flex-none tw:items-center tw:px-4" data-testid="review-compare-block">
+        {compareButton}
+      </div>
 
       {/* Board 158:2 — the confirm REPLACES the primary button rather than
           sitting above it. Two live re-send affordances at once is how you get
@@ -858,6 +1009,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         <div className="tw:px-3 tw:pb-3 tw:flex tw:flex-col tw:gap-2">
           <Button
             className="tw:w-full tw:justify-center"
+            data-testid="review-primary"
             disabled={resending || !onResend}
             title={!onResend ? "Re-send isn't available here" : undefined}
             aria-busy={resending || undefined}

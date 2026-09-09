@@ -156,16 +156,24 @@ export class MediaCommandLayer {
    * @param opts.x / opts.y        Page-space coordinates (image/video only).
    * @param opts.targetElementId   Replace this element's src instead of creating a new one.
    * @param opts.path              Telemetry tag: "click" or "drag".
+   * @param opts.alt               The asset's alt text, carried onto the element.
    */
   insertMediaAt(
     src: string,
     type: MediaInsertType,
-    opts?: { x?: number; y?: number; targetElementId?: string; path?: "click" | "drag" },
+    opts?: {
+      x?: number;
+      y?: number;
+      targetElementId?: string;
+      path?: "click" | "drag";
+      alt?: string;
+    },
   ): InsertResult | null {
     const result = this.composer.elements.insertMediaAt(src, type, {
       x: opts?.x,
       y: opts?.y,
       targetElementId: opts?.targetElementId,
+      alt: opts?.alt,
     });
 
     if (!result) {

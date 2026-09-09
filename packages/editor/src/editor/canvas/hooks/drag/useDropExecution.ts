@@ -89,6 +89,7 @@ export function useDropExecution({
       const src = e.dataTransfer.getData("application/x-aquibra-media-src");
       const rawType = e.dataTransfer.getData("application/x-aquibra-media-type");
       const name = e.dataTransfer.getData("application/x-aquibra-media-name");
+      const alt = e.dataTransfer.getData("application/x-aquibra-media-alt");
       if (!src || !composer) return;
 
       const { targetId } = calculateFreshDropTarget(
@@ -121,6 +122,7 @@ export function useDropExecution({
           y,
           targetElementId: targetId ?? undefined,
           path: "drag",
+          alt: alt || undefined,
         });
 
         if (result && src.startsWith("blob:")) {

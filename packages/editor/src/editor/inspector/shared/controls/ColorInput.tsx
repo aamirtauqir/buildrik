@@ -8,6 +8,7 @@ import { Popover, Button, TextField } from "@/editor/chrome-ui";
 
 import { Eye, EyeOff, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
+import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 import { TokenPickerPopover } from "../TokenPickerPopover";
@@ -140,6 +141,13 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     composer?.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
   }, [composer]);
 
+  /* ONLY when the value is bound. A chip carries the token's NAME, which the
+     field cannot show; the off-ds chip carried a warning mark next to a hex the
+     field already displays two centimetres to its left, and it cost the control
+     a fifth of its width — measured 127 against the 160 every profile board
+     fixes (807:8366 draws the swatch and the hex INSIDE one 160 frame and no
+     chip at all). Board 32:2 does draw a chip in this slot — 32:78, and it is
+     green, the bound state. Both boards agree once the chip means "bound". */
   const chip =
     isBound && tokenId ? (
       <DSBindingChip
@@ -147,17 +155,11 @@ export const ColorInput: React.FC<ColorInputProps> = ({
         label={tokenId}
         onClick={composer ? handleChipClick : undefined}
       />
-    ) : isValidHexColor(value) ? (
-      <DSBindingChip
-        state="off-ds"
-        label={value}
-        onClick={composer ? handleChipClick : undefined}
-      />
     ) : null;
 
   return (
-    <div className="bdi-row-ctrl">
-      <label className="bdi-lb">{label}</label>
+    <div className="bdi-row-ctrl" data-testid={rowTestId(label)}>
+      <label className="bdi-lb" data-testid={labelTestId(label)}>{label}</label>
       <div className="bdi-row-content">
         <Popover
           open={isOpen}
@@ -171,7 +173,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                — a button whose focusable children a screen reader cannot
                announce or reach cleanly. The SWATCH is the control that opens
                the picker, so it carries the button. */
-            <div className={`bdi-fill${isBound ? " bound" : ""}`}>
+            <div className={`bdi-fill${isBound ? " bound" : ""}`} data-testid={fieldTestId(label)}>
               <Button
                 type="button"
                 className="bdi-sw"

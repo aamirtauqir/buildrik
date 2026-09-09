@@ -266,7 +266,11 @@ html.bk-read-only-view { --layout-rail-width: 0px; }
   display: flex;
   flex-direction: column;
   background: var(--bk-bg-panel);
-  border-left: 1px solid var(--bk-border);
+  /* NO border-left. `.bdi-panel` already draws the inspector's own
+     `1px solid var(--bk-gray-100)` edge (inspector.css:27, boards 32:2 and
+     642:3249), so this was a SECOND hairline one step darker sitting outside
+     it — and, because the column is 300 border-box, it also stole a pixel:
+     the panel measured 299 against the 300 boards 301:2080 / 301:2287 draw. */
   overflow: hidden;
   z-index: var(--bk-z-drawer);
 

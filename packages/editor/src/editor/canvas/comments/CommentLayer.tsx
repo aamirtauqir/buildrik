@@ -508,11 +508,15 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
         </>
       )}
 
-      {/* Orphan-comment modal — board 184:56, measured: 560-wide (`form`, not
-          `lg`/720) with an 8px-radius note band, not the 4px this shipped
-          with. */}
+      {/* Orphan-comment modal — board 184:56, measured twice. First pass:
+          560-wide (`form`, not `lg`/720) with an 8px-radius note band, not the
+          4px this shipped with. Second pass (conformance, recipe
+          `orphan-comments-detected`): the body gutter is 24, not ModalBody's
+          16 — every row on this board is 512 inside a 560 dialog — and each
+          note is a 56-tall block whose two lines are 12/18 ink over 11/16
+          warning-text. They were both 12px on the paragraph's own leading. */}
       <ModalRoot open={orphanModal != null} onOpenChange={(o) => !o && setOrphanModal(null)}>
-        <ModalContent size="form" srTitle="Comments lost their element">
+        <ModalContent size="form" srTitle="Comments lost their element" data-testid="orphan-modal">
           <ModalTitle>
             {orphanModal?.length === 1
               ? "A comment lost its element"
@@ -520,26 +524,34 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
           </ModalTitle>
           {/* ModalBody carries the gutter — same missing-inset family as
               FINDING-008. */}
-          <ModalBody>
-          <p style={{ fontSize: 13, color: "var(--bk-ink-muted)", margin: "8px 0 12px" }}>
+          <ModalBody className="tw:px-6">
+          <p
+            className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+            style={{ margin: "8px 0 12px" }}
+            data-testid="orphan-intro"
+          >
             The elements these were pinned to were deleted. The comments are kept — never
             auto-deleted — and moved to the Detached group at the top of the Review panel.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {(orphanModal ?? []).map((c) => {
+            {(orphanModal ?? []).map((c, i) => {
               const label = deletedLabels.current.get(elementIdFromSelector(c.targetSelector) ?? "");
               return (
                 <div
                   key={c.id}
-                  style={{
-                    background: "var(--bk-warning-tint)",
-                    borderRadius: "var(--bk-radius-lg)",
-                    padding: "10px 12px",
-                    fontSize: 12,
-                  }}
+                  className="tw:flex tw:h-14 tw:w-full tw:flex-col tw:justify-center tw:gap-[2px] tw:rounded-[var(--bk-radius-lg)] tw:bg-[var(--bk-warning-tint)] tw:px-3"
+                  data-testid={`orphan-row-${i}`}
                 >
-                  <div style={{ color: "var(--bk-ink)" }}>&ldquo;{c.body.slice(0, 120)}&rdquo;</div>
-                  <div style={{ color: "var(--bk-warning-text)", marginTop: 2 }}>
+                  <div
+                    className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]"
+                    data-testid={`orphan-body-${i}`}
+                  >
+                    &ldquo;{c.body.slice(0, 120)}&rdquo;
+                  </div>
+                  <div
+                    className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-warning-text)]"
+                    data-testid={`orphan-was-${i}`}
+                  >
                     {label ? `was on: "${label}"` : "was pinned to a deleted element"}
                   </div>
                 </div>
@@ -550,6 +562,21 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
           <ModalFooter>
             <Button
               size="xs"
+              className="tw:text-[14px] tw:leading-5"
+              /* 229:1178 is `--size/row` (32) at a 16/10 inset — the modal foot
+                 caps its buttons at 28 with `[&_button]:h-7`, a descendant
+                 selector no class on the button can out-specify. `style` is the
+                 only thing that reaches past it, and it is the same escape
+                 hatch CommentRow uses for geometry that has to win. */
+              style={{
+                height: 32,
+                paddingLeft: 16,
+                paddingRight: 16,
+                paddingTop: 10,
+                paddingBottom: 10,
+                borderRadius: "var(--bk-radius-lg)",
+              }}
+              data-testid="orphan-open-review"
               onClick={() => {
                 setOrphanModal(null);
                 composer?.emit("ui:switch-tab", { tab: "review" });

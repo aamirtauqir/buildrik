@@ -56,8 +56,9 @@ interface ParsedState {
 const CARD = "tw:flex tw:flex-col";
 /* Board 220:839 · 28-tall caps header, matching EXPORT. */
 const TITLE =
-  "tw:flex tw:h-7 tw:items-center tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] " +
-  "tw:text-[var(--bk-ink-muted)]";
+  "tw:flex tw:h-7 tw:items-center tw:gap-2 tw:-mx-4 tw:px-4 tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:text-[11px] tw:leading-4 tw:font-semibold tw:tracking-[0.06em] " +
+  "tw:text-[var(--bk-ink-soft)]";
 /* base/active supply their own border-colour and background together — never
    two competing utilities for the same property (Row precedent). */
 /* Board 153:152 · a 56-tall dashed band with ONE centred line, not the 128
@@ -245,7 +246,7 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
 
   return (
     <div className={CARD}>
-      <div className={TITLE}>IMPORT</div>
+      <div className={TITLE} data-testid="brand-import-head">IMPORT</div>
 
       {!parsed && (
         <>

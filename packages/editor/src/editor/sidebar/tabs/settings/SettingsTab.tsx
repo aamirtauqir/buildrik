@@ -37,6 +37,7 @@ import {
   DomainsScreen,
   WebhooksScreen,
 } from "./index";
+import { Section } from "./shared";
 import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
@@ -725,18 +726,29 @@ export const SettingsTab: React.FC<
       // panel keeps its embedded copy on purpose; that one answers "did mine
       // land?" at the moment of publishing, which is a different question from
       // "what shipped, and can I go back?".
+      /* `Section`, not hand-rolled `.bd-set-section` markup. Every other S7
+         screen composes this card, which is what stamps `set-card-<stem>` and
+         `set-card-title-<stem>`; this one duplicated the three class names by
+         hand and therefore had NO anchor at all — the only settings screen a
+         conformance recipe could not address, and the one that would drift
+         silently the next time the chassis moves (as it did on 2026-09-08, when
+         cards, the 180 label column and the uppercase card titles all changed
+         under all thirteen screens at once). */
       case "export":
         return (
-          <div className="bd-set-section">
-            <h3 className="bd-set-section-h">Export</h3>
-            <div className="bd-set-section-d">
-              Download the whole site as clean HTML/CSS you can host anywhere. Opens the exporter
-              with format and scope options.
-            </div>
-            <Button color="light" size="xs" onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}>
+          <Section
+            title="Export"
+            desc="Download the whole site as clean HTML/CSS you can host anywhere. Opens the exporter with format and scope options."
+          >
+            <Button
+              color="light"
+              size="xs"
+              data-testid="set-export-open"
+              onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}
+            >
               Open exporter
             </Button>
-          </div>
+          </Section>
         );
       default:
         return null;

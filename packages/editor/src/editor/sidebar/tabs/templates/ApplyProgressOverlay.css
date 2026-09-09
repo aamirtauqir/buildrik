@@ -1,7 +1,12 @@
 /* Board 642:2832 (Templates · applying): a light card over a scrim, not a
    dark full-screen takeover. The old treatment was near-black with white text
    — legible over the dark sample template it was designed against and nowhere
-   near the rest of the editor's chrome, which is the canonical light theme. */
+   near the rest of the editor's chrome, which is the canonical light theme.
+
+   Every number below is board 642:3095's `modal/440` and its three regions
+   (642:3096 Title, 642:3099 Body, 642:3108 Footer), measured 2026-09-08. The
+   card used to be a single 20/24/16 box, so the title, the bar and the Cancel
+   all sat on one rhythm the board does not draw. */
 
 .tmpl-progress {
   position: fixed;
@@ -19,33 +24,88 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--bk-space-8);
   width: 100%;
   max-width: 440px;
-  padding: var(--bk-space-20) var(--bk-space-24) var(--bk-space-16);
-  background: var(--bk-bg-card);
+  overflow: hidden;
+  background: var(--bk-bg-elevated);
   border: 1px solid var(--bk-border);
   border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
 }
 
+/* 642:3096 — 18 over the title, 12 under the instruction, 4 between them. */
+.tmpl-progress__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  padding: 18px var(--bk-space-20) var(--bk-space-12);
+  background: var(--bk-bg-panel);
+}
+
 .tmpl-progress__title {
   margin: 0;
-  font-size: 15px;
-  font-weight: 600;
+  font: 600 16px/24px var(--bk-font-ui);
   color: var(--bk-ink);
-  letter-spacing: -0.01em;
 }
 
-.tmpl-progress__cancel {
-  align-self: flex-end;
-  margin-top: var(--bk-space-12);
-  font-size: 12px;
+.tmpl-progress__sub {
+  margin: 0;
+  font: 400 12px/18px var(--bk-font-ui);
   color: var(--bk-ink-muted);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
 }
 
-.tmpl-progress__cancel:hover { color: var(--bk-ink); }
+/* 642:3099 — the bar and the step rows share one 12px rhythm. */
+.tmpl-progress__body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--bk-space-12);
+  padding: var(--bk-space-4) var(--bk-space-20) var(--bk-space-16);
+  background: var(--bk-bg-panel);
+}
+
+.tmpl-progress__track {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-bg-subtle);
+}
+.tmpl-progress__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-accent);
+}
+
+/* 642:3102-3107 — the state is the suffix, and the only colour distinction the
+   board draws is "still queued" (ink-muted) against everything else. */
+.tmpl-progress__step {
+  margin: 0;
+  font: 400 12px/18px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+}
+.tmpl-progress__step[data-step-state="queued"] { color: var(--bk-ink-muted); }
+.tmpl-progress__step[data-step-state="active"] { font-weight: 500; }
+
+/* 642:3108 — a bordered foot, right-aligned, 14 over 20. */
+.tmpl-progress__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--bk-space-8);
+  padding: 14px var(--bk-space-20);
+  background: var(--bk-bg-panel);
+  border-top: 1px solid var(--bk-border);
+}
+
+/* 642:3110 — a 28-tall secondary chip, not the accent primary flowbite
+   defaults to. Two classes deep so a `tw:` utility cannot win on source
+   order (CLAUDE.md §Chrome — "Overriding a flowbite default"). */
+.tmpl-progress__foot .tmpl-progress__cancel {
+  height: 28px;
+  min-height: 28px;
+  padding: 6px var(--bk-space-12);
+  /* --color/border, not flowbite `light`'s gray-300 (board 642:3110). */
+  border-color: var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+}

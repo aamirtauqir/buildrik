@@ -361,8 +361,11 @@ describe("the previous-rounds history (board 157:169, the buildable half)", () =
     ]);
     renderTab();
     fireEvent.click(await screen.findByTestId("review-rounds-toggle"));
-    // The current round is not its own history.
-    expect(await screen.findByTestId("review-round-1")).toHaveTextContent("Approved by Sara Khan");
+    /* The current round is not its own history. The line is the board's
+       (1753:8423-8429): outcome then a RELATIVE age, not "Approved by <name>"
+       and a locale date — the name is already on the sent line above, and the
+       panel had been speaking in two time scales at once. */
+    expect(await screen.findByTestId("review-round-1")).toHaveTextContent(/approved \d+d ago/);
     expect(screen.queryByTestId("review-round-2")).not.toBeInTheDocument();
   });
 

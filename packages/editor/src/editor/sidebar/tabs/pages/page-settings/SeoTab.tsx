@@ -165,9 +165,9 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </>
       )}
       {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
-      <div className={FIELD}>
+      <div className={FIELD} data-testid="seo-field-title">
         <div className={FIELD_HEAD}>
-          <Label htmlFor="seo-title" className={BK_LABEL_CLASS}>Title</Label>
+          <Label htmlFor="seo-title" className={BK_LABEL_CLASS} data-testid="seo-label-title">Meta title</Label>
           <span
             className={`${COUNTER} ${
               range === "ok" || range === "ideal"
@@ -199,6 +199,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         )}
         <TextInput
           id="seo-title"
+          data-testid="seo-input-title"
           value={s.seoTitle}
           onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
           maxLength={60}
@@ -207,11 +208,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <HelperText className={BK_HELPER_CLASS}>Aim for 50–60 characters for best Google ranking</HelperText>
       </div>
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
-      <div className={FIELD}>
+      <div className={FIELD} data-testid="seo-field-desc">
         <div className={FIELD_HEAD}>
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
           <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-            <Label htmlFor="seo-desc" className={BK_LABEL_CLASS}>Meta Description</Label>
+            <Label htmlFor="seo-desc" className={BK_LABEL_CLASS} data-testid="seo-label-desc">Meta description</Label>
             <Tooltip
               content="A short summary of your page shown in Google search results (keep under 160 characters)"
               placement="bottom"
@@ -257,8 +258,8 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <HelperText className={BK_HELPER_CLASS}>Briefly describe this page (150–160 chars). Appears in Google results below your title.</HelperText>
       </div>
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
-      <div className={FIELD}>
-        <Label htmlFor="seo-slug" className={BK_LABEL_CLASS}>URL Slug</Label>
+      <div className={FIELD} data-testid="seo-field-slug">
+        <Label htmlFor="seo-slug" className={BK_LABEL_CLASS} data-testid="seo-label-slug">URL slug</Label>
         <div className="tw:flex tw:items-stretch">
           <span
             className={`tw:inline-flex tw:items-center tw:px-2 tw:border tw:border-r-0 tw:border-[var(--bk-gray-200)] tw:rounded-l tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)] tw:text-[11px] tw:font-medium ${MONO}`}

@@ -149,9 +149,16 @@ export function useHistoryFeedback(
       const action = formatLabel(data.entry.label);
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({
-        title: "↩ Undo",
-        description: action,
-        tone: "info",
+        /* ONE line, not two. Board 814:7032 draws the whole message on a
+           single 36-high bar — "Undo: Deleted 'Button'" — with the reverse
+           link beside it. A separate "↩ Undo" title above the sentence made
+           the bar two lines and said "Undo" twice. */
+        description: `Undo: ${action}`,
+        /* Board 814:7027 draws every undo/redo toast on --color/ink with the
+           message in gray-200 — a transient bar, not one of the five semantic
+           tints. It shipped as `info`, i.e. the same pale blue card a
+           "publish queued" notice uses. */
+        tone: "dark",
         duration: isDestructive ? 4000 : 2500,
         action: { label: "Redo", onClick: () => composer.history.redo() },
       });
@@ -161,9 +168,8 @@ export function useHistoryFeedback(
       const action = formatLabel(data.entry.label);
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({
-        title: "↪ Redo",
-        description: action,
-        tone: "info",
+        description: `Redo: ${action}`,
+        tone: "dark",
         duration: isDestructive ? 4000 : 2500,
         action: { label: "Undo", onClick: () => composer.history.undo() },
       });
@@ -183,7 +189,13 @@ export function useHistoryFeedback(
           : data.direction === "undo"
             ? "Nothing to undo"
             : "Nothing to redo",
-        tone: "neutral",
+        /* 814:7060's caption reads "Grey toast, no action", but the frame it
+           captions (814:7062) is filled --color/ink like the other five. The
+           DRAWING is the design and the caption describes it, so the
+           empty-stack toast is dark too; what actually distinguishes it is
+           what the caption's second half says — no reverse action, because
+           there is nothing to reverse. */
+        tone: "dark",
         duration: data.reason ? 4000 : 2000,
       });
     };

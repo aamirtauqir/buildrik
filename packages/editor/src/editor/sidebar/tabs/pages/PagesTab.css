@@ -85,7 +85,10 @@
   background: var(--bk-bg-subtle);
   cursor: pointer;
   font: 500 var(--bk-text-12) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
+  /* ink-soft, not ink-muted: measured 4.39:1 on this band's own bg-subtle
+     ground, under the 4.5 floor. No board draws this row — it is the code's
+     own affordance — so nothing was traded away by raising it. */
+  color: var(--bk-ink-soft);
 }
 .bd-pg-selectall:hover { background: rgba(15, 23, 42, 0.06); color: var(--bk-ink); }
 .bd-pg-selectall-checkbox {
@@ -153,6 +156,10 @@
 /* ─── ROW VARIANTS ────────────────────────────────────────────────────── */
 .bd-pg-row.nested { padding-left: 22px; }
 .bd-pg-row.folder-row .bd-pg-row-icon { color: var(--bk-ink-muted); }
+/* Board 141:78 tints every SELECTED row, not just its checkbox: the three
+   rows the bulk bar is counting all sit on accent-tint. Without it the only
+   evidence of a 3-page selection was three 16px ticks. */
+.bd-pg-row.selected { background: var(--bk-accent-tint); }
 .bd-pg-row.selected .bd-pg-row-checkbox { background: var(--bk-accent); border-color: var(--bk-accent); }
 /* .bd-pg-row.expanded-folder .bd-pg-row-disclosure descendant rule
    removed 2026-05-24 — .bd-pg-row-disclosure has no JSX consumer. */
@@ -240,7 +247,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font: 400 13px var(--bk-font-ui);
+  /* 13/20 — board 141:96 and 140:2's row label. The line-height was missing, so
+     the name sat on the font's own normal and every row's text box was 4px
+     shorter than the rhythm the 32px row is built on. */
+  font: 400 13px/20px var(--bk-font-ui);
 }
 .bd-pg-row-slug {
   font-family: var(--bk-font-mono);
@@ -422,11 +432,14 @@
   gap: var(--bk-space-8);
   height: 44px; padding: 0 var(--bk-space-16);
   background: var(--bk-ink);
+  /* Board 141:119 sets the type and the ink on the BAND, not on the count —
+     every label on it is 12/18 card-white, and the count was the only child
+     that said so. */
+  color: var(--bk-bg-card);
+  font: 400 12px/18px var(--bk-font-ui);
   z-index: 10;
 }
 .bd-pg-bulk-count {
-  color: var(--bk-bg-card);
-  font: 400 12px/18px var(--bk-font-ui);
   white-space: nowrap;
 }
 .bd-pg-bulk-count b { color: var(--bk-bg-card); font-weight: 500; }
@@ -585,7 +598,26 @@
   gap: 14px;
   padding: var(--bk-space-24) var(--bk-space-28) 0;
   flex-shrink: 0;
+  position: relative;
 }
+
+/* Board 2838:12107 — the header's ✕. Figma exports it as the third child of
+   the header's flex column; a close sits at the card's top-right corner, so
+   the header is the positioning context and the glyph is pinned to it. */
+.bd-pg-drawer-close {
+  position: absolute;
+  top: var(--bk-space-20);
+  right: var(--bk-space-20);
+  padding: var(--bk-space-4);
+  border: 0;
+  background: transparent;
+  font: 400 13px var(--bk-font-ui);
+  line-height: 1;
+  color: var(--bk-ink-muted);
+  cursor: pointer;
+  transition: color 100ms;
+}
+.bd-pg-drawer-close:hover { color: var(--bk-ink); }
 
 .bd-pg-drawer-title {
   font: 600 16px var(--bk-font-ui);
@@ -613,7 +645,13 @@
   gap: 6px;
   transition: color 100ms;
 }
-.bd-pg-drawer-tab:hover { color: var(--bk-ink); }
+/* :not() keeps this off the ACTIVE tab. A bare `:hover` is class+pseudo —
+   (0,2,0) — and beat `.bd-pg-drawer-tab--active` at (0,1,0), so the tab you
+   had just clicked went from board blue-500 to ink under the pointer that
+   clicked it. Measured, not read: the SEO board passed its active-tab colour
+   and the Social/Advanced boards failed it, because those two are reached by
+   a click and the cursor is still there. */
+.bd-pg-drawer-tab:not(.bd-pg-drawer-tab--active):hover { color: var(--bk-ink); }
 .bd-pg-drawer-tab--active { color: var(--bk-blue-500); font-weight: 600; }
 .bd-pg-drawer-tab-chip {
   font: 500 var(--bk-text-11) var(--bk-font-mono);
@@ -631,10 +669,23 @@
   flex-direction: column;
   gap: 14px;
 }
+/* Board field labels: 13/500 ink-muted on all three S3.7 boards (302:1988,
+   302:2014, 302:2036 and their siblings). BK_LABEL_CLASS ships 12px ink-soft
+   and is a chrome-wide primitive measured against many other boards, so it is
+   NOT moved — the override is scoped to this drawer. Two classes deep on
+   purpose: a single-class rule ties `tw:text-xs` on specificity and loses on
+   source order. */
+.bd-pg-drawer-body label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bk-ink-muted);
+}
 /* Board field rows: 42h inputs, radius 8, 14px text (drawn instances win
    over the Input component doc's 36h — founder precedent: drawn > description). */
-.bd-pg-drawer-body input[type="text"],
-.bd-pg-drawer-body input:not([type]) {
+/* Every text-ish input, not just [type=text]: the OG image field is
+   `type="url"` and missed all three rules, so it shipped 10px shorter than
+   the two fields above it with a different radius and type size. */
+.bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]) {
   min-height: 42px;
   border-radius: var(--bk-radius-lg);
   font-size: 14px;
@@ -692,10 +743,18 @@
 
 /* Board 141:165 — centered load error. */
 .bd-pg-error {
+  /* Board 141:203 is a 132-tall full-width band on 24px gutters — `min-height`
+     rather than `height` so the copy can never be clipped at a narrower
+     drawer, which the board's own `overflow-clip` would do. */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* stretch, not center: board 141:204-206 give all three lines the block's
+     full 232px column and centre the TEXT inside it. Centring the flex items
+     shrank each one to its own text, so the retry's hit area was the width of
+     the words "Try again". */
+  align-items: stretch;
   gap: var(--bk-space-8);
+  min-height: 132px;
   padding: var(--bk-space-32) var(--bk-space-24) 0;
   text-align: center;
 }
@@ -714,23 +773,46 @@
   box-shadow: none;
 }
 
-/* Board 782:4212 — no-results, left at 16. */
+/* Board 782:4257 — 36 / 24 / 32 on a 280 column, 10px gap, 13px type ON THE
+   BLOCK. It read "left at 16" and was 24/16/0 with an 8 gap, which is the
+   older draw; the 2026-09-08 export states all four insets.
+
+   The negative side margin is the same fix `.bd-pg-error` carries and for the
+   same reason: this block lives inside `.bd-pg-list`, whose 6px gutter it
+   inherited, so its 24px text column measured 220 against the board's 232.
+   Unlike the error block it cannot be hoisted to a sibling — it replaces the
+   list's CONTENT, not the list — so it reaches the panel edge from where it
+   is. `stretch`, not `flex-start`: 782:4258 and 782:4259 are both `w-full`,
+   and centring the flex items shrank "Clear search" to the width of its own
+   words. */
 .bd-pg-nores {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--bk-space-8);
-  padding: var(--bk-space-24) var(--bk-space-16) 0;
+  align-items: stretch;
+  gap: 10px;
+  margin: 0 -6px;
+  padding: var(--bk-space-36) var(--bk-space-24) var(--bk-space-32);
+  font: 400 13px var(--bk-font-ui);
 }
 .bd-pg-nores p { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-ink-muted); }
 
-/* Board 141:124 — the one-page note under the single row. */
+/* Board 141:162 — the one-page note under the single row: a 120-tall band,
+   13/20 type, its two lines at y32 and y60 on a 232px column (141:163 /
+   141:164 are both w-232 inside a 280 panel = 24px gutters).
+
+   Same negative margin as `.bd-pg-nores` above: nested in `.bd-pg-list` this
+   measured a 220 column. `stretch` gives the "+ Add page" link the full 232
+   the board draws instead of the width of its own words — the same hit-area
+   defect `.bd-pg-error` had. */
 .bd-pg-onepage {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: var(--bk-space-8);
-  padding: var(--bk-space-24) var(--bk-space-24) 0;
+  margin: 0 -6px;
+  min-height: 120px;
+  padding: var(--bk-space-32) var(--bk-space-24) 0;
+  font: 400 13px/20px var(--bk-font-ui);
   text-align: center;
 }
 .bd-pg-onepage p { margin: 0; font: 400 13px/20px var(--bk-font-ui); color: var(--bk-ink-muted); }
@@ -746,8 +828,15 @@
   margin-right: var(--bk-space-4);
 }
 
+/* Board 155:4 paints this `--color/ink-disabled` and the code used
+   `--bk-gray-300` — the SAME value, #D1D5DB, so the join passed while the line
+   measured 1.47:1 on white. Board and code had agreed on something a person
+   cannot read since it was built.
+   The folder a page lives in is real information, not a disabled control.
+   `ink-muted` (4.83:1) matches its secondary role and clears AA. Founder call
+   2026-09-08; size and line box unchanged. */
 .bd-pg-row-incontext {
   flex-shrink: 0;
   font: 400 11px/16px var(--bk-font-ui);
-  color: var(--bk-gray-300);
+  color: var(--bk-ink-muted);
 }

@@ -45,7 +45,11 @@ export const MoreSettingsToggle: React.FC<MoreSettingsToggleProps> = ({
         <span
           style={{
             font: "500 11px var(--bk-font-mono)",
-            color: "var(--bk-ink-muted)",
+            /* MEASURED 2026-09-08: --bk-ink-muted on --bk-bg-subtle is 4.39:1
+               at 11px, under the 4.5 floor. ink-soft on the same chip is
+               6.78:1. Same pair, same fix, as `.bdi-seg button` and
+               `.bdi-adv-c` in inspector.css. */
+            color: "var(--bk-ink-soft)",
             background: "var(--bk-bg-subtle)",
             padding: "0 4px",
             borderRadius: 3,

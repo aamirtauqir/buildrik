@@ -44,6 +44,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
         onClick={onAddBlank}
         aria-label="Add new page"
         variant="link"
+        data-testid="pages-add-page"
       >
         +&nbsp;&nbsp;Add page
       </Button>

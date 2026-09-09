@@ -173,18 +173,19 @@ export function UploadZone({
       */}
       {activeItems.length > 0 && (
         <ul className="tw:m-0 tw:list-none tw:p-0" role="list" aria-label="Uploads in progress" data-testid="media-upload-progress">
-          {activeItems.map((item) => (
-            <li key={item.fileName} className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-1.5 tw:px-4">
+          {activeItems.map((item, i) => (
+            <li key={item.fileName} className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:gap-1.5 tw:px-4" data-testid={`media-upload-row-${i}`}>
               <span className="tw:flex tw:items-baseline tw:gap-2">
-                <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid={`media-upload-name-${i}`}>
                   {item.fileName}
                 </span>
-                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]">
+                <span className="tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-muted)]" data-testid={`media-upload-pct-${i}`}>
                   {Math.round(item.progress)}%
                 </span>
               </span>
               <span
                 className="tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-[2px] tw:bg-[var(--bk-gray-100)]"
+                data-testid={`media-upload-track-${i}`}
                 role="progressbar"
                 aria-label={`Uploading ${item.fileName}`}
                 aria-valuenow={Math.round(item.progress)}
@@ -220,14 +221,19 @@ export function UploadZone({
           {failedItems.map((item) => (
             <li
               key={item.fileName}
-              className="med-upload-queue-item med-upload-queue-item--error tw:flex tw:min-h-11 tw:items-center tw:gap-2 tw:bg-yellow-50 tw:px-4 tw:py-1.5"
+              className="med-upload-queue-item med-upload-queue-item--error tw:flex tw:h-16 tw:items-center tw:gap-2 tw:bg-[var(--bk-warning-tint)] tw:px-4"
               data-testid="media-upload-error-row"
             >
               <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-                <span className="med-upload-queue-item__name tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+                <span className="med-upload-queue-item__name tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="media-upload-error-name">
                   {item.fileName}
                 </span>
-                <span className="med-upload-queue-item__reason tw:truncate tw:text-[11px] tw:leading-4 tw:text-amber-800">
+                {/* Board 145:197 — --color/warning-text, the token this system
+                    already ships as `--bk-warning-text`. It was `tw:text-amber-800`
+                    (#92400e), a ramp step from a different palette that happens
+                    to look close; the tint one line up was `tw:bg-yellow-50` for
+                    the same reason. Both now name the token the board names. */}
+                <span className="med-upload-queue-item__reason tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-warning-text)]" data-testid="media-upload-error-reason">
                   {item.error ?? "Upload failed"}
                 </span>
               </span>
@@ -236,7 +242,8 @@ export function UploadZone({
                   type="button"
                   color="light"
                   size="xs"
-                  variant="link" className="med-upload-queue-item__retry tw:shrink-0 tw:text-[12px]"
+                  variant="link" className="med-upload-queue-item__retry tw:shrink-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+                  data-testid="media-upload-error-retry"
                   onClick={() => onRetryUpload(item.fileName)}
                   aria-label={`Retry ${item.fileName}`}
                 >

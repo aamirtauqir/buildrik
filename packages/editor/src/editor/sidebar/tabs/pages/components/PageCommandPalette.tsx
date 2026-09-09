@@ -98,11 +98,12 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
       aria-label="Page search"
       onClick={handleBackdropClick}
     >
-      <div className="bd-pg-palette">
+      <div className="bd-pg-palette" data-testid="pages-palette">
         <TextField
           ref={inputRef}
           type="text"
           className="bd-pg-palette-input"
+          data-testid="pages-palette-input"
           placeholder="go to page…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -132,12 +133,19 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
                 role="option"
                 aria-selected={idx === activeIndex}
                 data-palette-index={idx}
+                data-testid={`pages-palette-item-${page.id}`}
                 onMouseEnter={() => setActiveIndex(idx)}
                 onClick={() => handleItemClick(page.id)}
               >
-                <span className="bd-pg-palette-item-name">{page.name}</span>
+                <span className="bd-pg-palette-item-name" data-testid={`pages-palette-name-${page.id}`}>
+                  {page.name}
+                </span>
                 {page.isHome && (
-                  <span className="bd-pg-palette-item-home" aria-label="Homepage">
+                  <span
+                    className="bd-pg-palette-item-home"
+                    aria-label="Homepage"
+                    data-testid={`pages-palette-home-${page.id}`}
+                  >
                     {"\u2302"}
                   </span>
                 )}

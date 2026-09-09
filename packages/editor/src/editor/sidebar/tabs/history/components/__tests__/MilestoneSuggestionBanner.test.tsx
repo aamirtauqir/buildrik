@@ -62,9 +62,11 @@ describe("MilestoneSuggestionBanner — accept + loading", () => {
     expect(onAccept).toHaveBeenCalledWith(null);
   });
 
+  /* Board 433:2385 writes the saving label as a single ellipsis glyph, not
+     three periods — this asserted "..." and so protected the drift. */
   it("disables Save and shows a spinner glyph while loading", () => {
     renderBanner({ isLoading: true });
-    const save = screen.getByRole("button", { name: "..." });
+    const save = screen.getByRole("button", { name: "…" });
     expect(save).toBeDisabled();
   });
 

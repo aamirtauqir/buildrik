@@ -198,10 +198,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           )}
         </div>
         {onCreateNew && (
-          <div className="tw:flex tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0">
+          <div
+            className="tw:flex tw:bg-[var(--bk-bg-panel)] tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0"
+            data-testid="comp-footer"
+          >
             <Button
               size="xs"
-              className="tw:h-7 tw:rounded-lg tw:px-3 tw:text-[13px] tw:font-medium"
+              className="tw:h-7 tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium"
               data-testid="comp-create"
               onClick={onCreateNew}
             >
@@ -216,7 +219,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   // ── Main list view ────────────────────────────────────────────────────────────
 
   return (
-    <PanelFrame>
+    <PanelFrame data-testid="comp-panel">
       {state.isStandaloneMode && (
         <>
           <PanelFrame.Header
@@ -229,7 +232,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </>
       )}
       {/* Board 641:2546 (Components · library): no search, no filter chips —
-          one "YOUR COMPONENTS" section of 32h rows (name · "N instances" · ›)
+          one "YOUR COMPONENTS" section of 32h rows (name · "N on this site" · ›)
           and a bordered footer with the one primary button. The FROM BRAND
           section ships when a brand-linked source exists; today's registry
           has none, so it would always be empty chrome. */}
@@ -244,7 +247,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
         <div aria-live="polite">
           <span className="bd-sr-only">{state.components.length} components found</span>
-          <div className="tw:flex tw:items-center tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]">
+          <div
+            className="tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
+            data-testid="comp-section-header"
+          >
             YOUR COMPONENTS
           </div>
           {state.components.map((component) => {
@@ -263,11 +269,20 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
                 }}
               >
-                <span className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                <span
+                  className="tw:flex-1 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  data-testid={`comp-row-name-${component.id}`}
+                >
                   {component.name}
                 </span>
-                <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                  {n} instance{n === 1 ? "" : "s"}
+                {/* Board 641:2564 writes the count as "6 on this site", not
+                    "6 instances". The number is sample data; the words are the
+                    label, and copy on screen is decided by the board. */}
+                <span
+                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                  data-testid={`comp-row-count-${component.id}`}
+                >
+                  {n} on this site
                 </span>
                 <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">›</span>
               </div>
@@ -277,10 +292,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       </div>
       {/* Board 641:2596 panel footer — the screen's ONE primary button. */}
       {onCreateNew && (
-        <div className="tw:flex tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0">
+        <div
+          className="tw:flex tw:bg-[var(--bk-bg-panel)] tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0"
+          data-testid="comp-footer"
+        >
           <Button
             size="xs"
-            className="tw:h-7 tw:rounded-lg tw:px-3 tw:text-[13px] tw:font-medium"
+            className="tw:h-7 tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium"
             data-testid="comp-create"
             onClick={onCreateNew}
           >

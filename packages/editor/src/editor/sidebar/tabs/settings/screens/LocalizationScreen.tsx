@@ -203,11 +203,14 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
 
   return (
     <Screen>
+      {/* Board 639:4107 heads this card DEFAULT and names the row inside it
+          "Default locale" — the card is the category, the row is the setting.
+          Live had the two the other way round. */}
       <Section
-        title="Default locale"
+        title="Default"
         desc="The fallback for content not translated into the visitor's locale. URL strategy: subdirectory (e.g. /fr/about). The default locale serves at the root path (/about) without a prefix."
       >
-        <Field label="Default">
+        <Field label="Default locale">
           <Select
             value={defaultLocale}
             onChange={(e) => {
@@ -227,6 +230,10 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
 
       <Section
         title={`Enabled locales (${enabledLocales.length})`}
+        /* Board 639:4119 heads this card LOCALES, flat. The count is the
+           product's own and is left standing; the ANCHOR is pinned so it does
+           not change with the rows. */
+        anchor="locales"
         /* Present tense here ("serves") contradicted the note at the bottom of
            the same screen, which says routing ships in Phase D. Two sentences
            on one screen disagreeing is how a reader ends up believing the

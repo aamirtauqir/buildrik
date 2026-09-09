@@ -80,7 +80,7 @@ export const LayersLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) 
 */
 export const LayersNoResults: React.FC<{ search: string; onClear: () => void }> = ({ search, onClear }) => (
   <div className="tw:flex tw:flex-col tw:gap-2.5 tw:px-6 tw:pb-8 tw:pt-9 tw:text-[13px]" data-testid="layers-no-results" role="status">
-    <p className="tw:leading-5 tw:text-[var(--bk-ink-muted)]">Nothing matches &lsquo;{search}&rsquo;.</p>
+    <p className="tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="layers-no-results-text">Nothing matches &lsquo;{search}&rsquo;.</p>
     <Button
       type="button"
       color="light"

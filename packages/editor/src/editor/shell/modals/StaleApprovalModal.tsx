@@ -135,14 +135,36 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
       {/* 560, which board 131:201 draws (131:401 is 560x352) and which the
           size map already carries — `form` is the only 560 in it. It shipped
           `lg` (720), a third wider than the only board that states a width. */}
-      <ModalContent size="form" srTitle="Publish un-approved changes?">
+      <ModalContent size="form" srTitle="Publish un-approved changes?" data-testid="stale-modal">
         {/* Board 1168:4713. The title states the FACT (the approval is stale),
             not a question about the client — the question is the buttons. */}
-        <ModalTitle>The approval is older than your latest edits</ModalTitle>
+        {/* `inset={false}` + our own padding: board 131:402 is 16/24 at the 24
+            gutter, and ModalTitle's own pl-5 cannot be beaten by a second
+            padding utility (two classes on one property resolve by stylesheet
+            order — the escape hatch the part itself documents). */}
+        <ModalTitle
+          inset={false}
+          className="tw:px-6 tw:pt-6 tw:pb-3 tw:leading-6"
+          /* Through `style`: MODAL_TITLE_CLASS already sets
+             `text-[length:var(--bk-text-14)]`, and two arbitrary font-size
+             utilities on a plain element resolve by stylesheet order rather
+             than by which one the caller wrote — measured, the part's 14 won. */
+          style={{ fontSize: "var(--bk-text-16)" }}
+          data-testid="stale-title"
+        >
+          The approval is older than your latest edits
+        </ModalTitle>
         {/* ModalBody carries the horizontal inset — same missing-gutter bug
             as PublishConfirmModal (FINDING-008). */}
-        <ModalBody>
-        <p className="tw:my-2 tw:mb-3 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
+        {/* 24, not the part's 16. Five boards in this file draw a dialog body at
+            the 24 gutter — 131:401 here, 184:56/70/87 on the orphan modals, and
+            914:4517, whose own recipe conformed the same inset at its call
+            site. Every 512-wide row on this board IS 560 less two 24s. */}
+        <ModalBody className="tw:px-6">
+        <p
+          className="tw:my-0 tw:mb-3 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
+          data-testid="stale-body"
+        >
           {/* The round is fetched separately from the block that opens this
               modal, so it can be absent — and the fallback used to render the
               placeholder into the prose: "Your client approved round — — the
@@ -166,15 +188,28 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
               Changed since approval
             </p>
             <div className="tw:mb-3 tw:flex tw:flex-col tw:gap-1.5">
-              {changed.slice(0, 6).map((c) => (
+              {/* Board 131:404/407: a 44-tall tinted row on a 6 radius, the page
+                  in 13/20 Medium INK (not warning-text — the tint already says
+                  "changed", and amber-on-amber was the quietest thing in the
+                  dialog) and the verb in 12/18 ink-muted at the far end. */}
+              {changed.slice(0, 6).map((c, i) => (
                 <div
                   key={`${c.kind}-${c.path}`}
-                  className="tw:flex tw:items-center tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-warning-tint)] tw:px-2.5 tw:py-2 tw:text-[12px]"
+                  className="tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-warning-tint)] tw:px-3"
+                  data-testid={`stale-change-${i}`}
                 >
-                  <span className="tw:font-medium tw:capitalize tw:text-[var(--bk-warning-text)]">
+                  <span
+                    className="tw:text-[13px] tw:font-medium tw:capitalize tw:leading-5 tw:text-[var(--bk-ink)]"
+                    data-testid={`stale-change-name-${i}`}
+                  >
                     {pageLabel(c.path)}
                   </span>
-                  <span className="tw:text-[var(--bk-ink-muted)]">{c.kind}</span>
+                  <span
+                    className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+                    data-testid={`stale-change-kind-${i}`}
+                  >
+                    {c.kind}
+                  </span>
                 </div>
               ))}
               {changed.length > 6 && (
@@ -189,7 +224,10 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
                 `acknowledgeStale` is false. Without it the modal states the
                 risk and leaves the user to guess whether pressing the amber
                 button also throws away the approval they already have. */}
-            <p className="tw:m-0 tw:mb-3 tw:text-[12px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
+            <p
+              className="tw:m-0 tw:mb-3 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
+              data-testid="stale-footnote"
+            >
               {round?.reviewerName ? `${round.reviewerName}’s` : "The"} approval still stands — publishing
               now just ships {changed.length === 1 ? "this change" : "these changes"} on top of it.
             </p>

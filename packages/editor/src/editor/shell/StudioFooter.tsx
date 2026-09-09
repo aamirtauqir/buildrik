@@ -53,6 +53,15 @@ const DEVICE_LABEL: Partial<Record<DeviceType, string>> = {
 };
 
 export interface StudioFooterProps {
+  /* A full-page tab (Settings, Templates, History) replaces the canvas, so the
+     selection readout and the zoom control describe something the person cannot
+     see. The footer itself stays — save state and the connection pill are still
+     true — but its canvas-specific halves are dropped. Without this the shell
+     printed "Section · Hero 680 × 250" and "Desktop · 100%" over full-page
+     Settings, which is audit finding F15, confirmed on six boards. The footer
+     renders as a flex sibling OUTSIDE LayoutShell's grid, so none of the
+     `.layout-shell--fullpage` rules can reach it — the mode has to be passed. */
+  fullPage?: boolean;
   composer: Composer | null;
   device: DeviceType;
   zoom: number;
@@ -90,16 +99,23 @@ function elementDims(id: string | undefined): string | null {
  *  `nowrap` is load-bearing — at the popover's default 180px "Zoom to
  *  selection" broke across two lines and the flyout stopped looking like the
  *  board's single-line list. */
+/* 13px in `--flowbite/gray/700` — 817:4727 and its ten siblings. The rows ran
+   at `text-xs` (12) in `--bk-ink-soft`, a size small and a shade light against
+   every label the flyout draws. */
 const ZOOM_ROW =
   "tw:flex tw:w-full tw:h-7 tw:min-h-0 tw:items-center tw:justify-between tw:gap-6 tw:rounded tw:border-0 " +
-  "tw:px-3 tw:py-0 tw:text-xs tw:font-medium tw:leading-5 tw:whitespace-nowrap tw:bg-transparent " +
-  "tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-100)]";
-const ZOOM_KEY = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]";
+  "tw:px-3 tw:py-0 tw:text-[13px] tw:font-medium tw:leading-[normal] tw:whitespace-nowrap tw:bg-transparent " +
+  "tw:text-[var(--bk-gray-700)] tw:hover:bg-[var(--bk-gray-100)]";
+/* 12px — 817:4728. The COLOUR stays `--bk-ink-muted`: the board names
+   `--color/ink-placeholder` #9ca3af, which measures 2.54:1 on the flyout's
+   white and is a contrast failure, and a chord is information, not decoration. */
+const ZOOM_KEY = "tw:text-[12px] tw:text-[var(--bk-ink-muted)]";
 
 export const StudioFooter: React.FC<StudioFooterProps> = ({
   composer,
   device,
   zoom,
+  fullPage = false,
   onZoomChange,
   selectedElement,
   onOpenStructure,
@@ -207,14 +223,16 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           Structure
         </Button>
       )}
-      <span
-        className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis"
-        title={label}
-        data-testid="footer-selection-label"
-      >
-        {label}
-      </span>
-      {dims && (
+      {!fullPage && (
+        <span
+          className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis"
+          title={label}
+          data-testid="footer-selection-label"
+        >
+          {label}
+        </span>
+      )}
+      {!fullPage && dims && (
         <span
           className="tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap"
           data-testid="footer-selection-dims"
@@ -223,6 +241,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
         </span>
       )}
       <span className="tw:flex-1 tw:min-w-px" />
+      {!fullPage && (
       <div className="tw:relative" ref={zoomRef}>
         <Button
           color="light"
@@ -230,7 +249,15 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           aria-haspopup="menu"
           aria-expanded={zoomOpen}
           aria-label={`Zoom: ${Math.round(zoom)} percent`}
-          className="tw:border-transparent tw:bg-transparent tw:px-[6px] tw:py-[2px] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:hover:text-[var(--bk-ink)]"
+          /* tw:h-5 is load-bearing, not cosmetic. flowbite's Button defaults to
+             h-10 (40px) and className goes through twMerge, so only a SAME
+             property overrides it: the padding utilities here never could.
+             A 40px control in this 32px status bar overflowed the 900px shell
+             to 905 and made the whole editor scroll — the conformance harness
+             caught it as every target shifting up 5px after an interaction.
+             (CLAUDE.md, "Overriding a flowbite default depends on WHERE the
+             class lands".) */
+          className="tw:h-5 tw:border-transparent tw:bg-transparent tw:px-[6px] tw:py-[2px] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap tw:hover:text-[var(--bk-ink)]"
           data-testid="footer-device-zoom"
         >
           {deviceLabel} · {Math.round(zoom)}%
@@ -242,45 +269,53 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             data-testid="footer-zoom-flyout"
             className={`${POPOVER_BASE_CLASS} tw:absolute tw:bottom-full tw:right-0 tw:mb-1 tw:min-w-[196px] tw:p-1`}
           >
-            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_FIT)}>
-              <span>Zoom to fit</span>
+            <Button color="light" data-testid="zoom-row-fit" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_FIT)}>
+              <span data-testid="zoom-label-fit">Zoom to fit</span>
               <span className={ZOOM_KEY}>⌘1</span>
             </Button>
-            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_SELECTION)}>
-              <span>Zoom to selection</span>
+            <Button color="light" data-testid="zoom-row-selection" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_SELECTION)}>
+              <span data-testid="zoom-label-selection">Zoom to selection</span>
               <span className={ZOOM_KEY}>⌘2</span>
             </Button>
-            <Button color="light" className={ZOOM_ROW} onClick={pick(100)}>
-              <span>Zoom to 100%</span>
+            <Button color="light" data-testid="zoom-row-100" className={ZOOM_ROW} onClick={pick(100)}>
+              <span data-testid="zoom-label-100">Zoom to 100%</span>
               <span className={ZOOM_KEY}>⌘0</span>
             </Button>
-            <div className="tw:my-1 tw:h-px tw:bg-[var(--bk-gray-200)]" />
+            {/* `--color/bg-subtle`, not gray-200 — 817:4731 / 4741. */}
+            <div data-testid="zoom-sep-top" className="tw:my-1 tw:h-px tw:bg-[var(--bk-bg-subtle)]" />
             {ZOOM_PRESETS.map((preset) => (
               <Button
                 key={preset}
                 color="light"
                 onClick={pick(preset)}
-                className={`${ZOOM_ROW} tw:justify-end ${
+                data-testid={`zoom-preset-${preset}`}
+                /* Left-aligned and pale-blue when current — 817:4737 / 4738.
+                   The presets were `justify-end`, which put seven numbers on
+                   the opposite edge from the eleven labels above and below
+                   them, and the current one was a grey plate that read as
+                   "hovered" rather than "this is where you are". */
+                className={`${ZOOM_ROW} tw:justify-start ${
                   Math.round(zoom) === preset
-                    ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)]"
+                    ? "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]"
                     : ""
                 }`}
               >
                 {preset}%
               </Button>
             ))}
-            <div className="tw:my-1 tw:h-px tw:bg-[var(--bk-gray-200)]" />
-            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_IN)}>
-              <span>Zoom in</span>
+            <div data-testid="zoom-sep-bottom" className="tw:my-1 tw:h-px tw:bg-[var(--bk-bg-subtle)]" />
+            <Button color="light" data-testid="zoom-row-in" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_IN)}>
+              <span data-testid="zoom-label-in">Zoom in</span>
               <span className={ZOOM_KEY}>⌘+</span>
             </Button>
-            <Button color="light" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_OUT)}>
-              <span>Zoom out</span>
+            <Button color="light" data-testid="zoom-row-out" className={ZOOM_ROW} onClick={emitZoom(EVENTS.ZOOM_OUT)}>
+              <span data-testid="zoom-label-out">Zoom out</span>
               <span className={ZOOM_KEY}>⌘−</span>
             </Button>
           </div>
         )}
       </div>
+      )}
     </>
   );
 };

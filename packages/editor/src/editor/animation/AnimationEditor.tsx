@@ -106,11 +106,16 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           {animations[activeTab as keyof typeof animations]?.map((anim) => (
             <Button
               key={anim.value}
+              data-testid={`anim-chip-${anim.value}`}
               onClick={() => updateAnimation({ type: anim.value })}
               style={{
                 // 11px label + 6px side padding: at 12px the longest presets
                 // ("Fade In Down", "Slide In Down", "Fade Out Down") wrapped to
                 // two lines inside a 1fr column (Figma board B9.1).
+                // Board 429:2362 fixes the chip at 40 tall; 12/6 on an 11px
+                // line box measured 37, so any chip whose label wrapped grew
+                // taller than the rest of its row.
+                height: 40,
                 padding: "12px 6px",
                 background:
                   animation.type === anim.value
@@ -134,10 +139,14 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       </div>
       {/* Timing */}
       <div style={{ marginTop: 24 }}>
+        {/* Board 429:2390 — 11 Semi Bold in ink-muted at 0.66 tracking. It
+            shipped 12px with no tracking at all. */}
         <div
+          data-testid="anim-timing-label"
           style={{
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 600,
+            letterSpacing: "0.66px",
             textTransform: "uppercase",
             color: "var(--bk-ink-muted)",
             marginBottom: 12,

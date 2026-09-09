@@ -51,6 +51,14 @@ const TAB = "tw:px-3 tw:py-1.5 tw:text-[13px] tw:rounded tw:border-b-2 tw:bg-tra
 const PANEL = "tw:px-6 tw:py-4 tw:max-h-90 tw:overflow-auto";
 const LIST = "tw:list-none tw:m-0 tw:p-0 tw:flex tw:flex-col tw:gap-1";
 const ROW = "tw:flex tw:items-center tw:gap-3 tw:w-full tw:px-2.5 tw:py-2 tw:rounded tw:text-[13px]";
+/* Board 1169:4766/4769 draws a "Used in" entry as a TINTED CHIP, not a bare
+   row: bg-subtle on a 6 radius, 10/7 insets, 8 gap, 11px, top-aligned. The
+   list shipped as transparent 13px rows at gap-3 on a 4 radius, which read as
+   a menu rather than as the two facts (page, when) the board pairs. Versions
+   keeps ROW — the board draws no versions list. */
+const USE_ROW =
+  "tw:flex tw:items-start tw:gap-2 tw:w-full tw:px-2.5 tw:py-[7px] tw:rounded-md " +
+  "tw:text-[11px] tw:bg-[var(--bk-bg-subtle)]";
 const VERSION_CHIP = "tw:text-[11px] tw:px-1.5 tw:py-0.5 tw:rounded-sm tw:bg-[var(--bk-gray-50)] tw:text-[var(--bk-ink-muted)]";
 const META = "tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 const CENTERED_EMPTY = "tw:text-[13px] tw:text-[var(--bk-ink-muted)] tw:py-8 tw:text-center";
@@ -76,7 +84,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
           {/* Board 1169:4764 asks the question in the title — "Where 'Bistro
               Menu' is used" — instead of naming the template and explaining
               underneath. */}
-          <ModalTitle id={`tpl-usage-title-${templateId}`} className="tw:text-base tw:font-semibold">
+          <ModalTitle id={`tpl-usage-title-${templateId}`} data-testid="tpl-usage-title" className="tw:text-base tw:font-semibold">
             Where &lsquo;{templateName}&rsquo; is used
           </ModalTitle>
         </div>
@@ -93,6 +101,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
               color="light"
               size="xs"
               role="tab"
+              data-testid={`tpl-usage-tab-${t}`}
               aria-selected={tab === t}
               onClick={() => setTab(t)}
               className={`${TAB} ${
@@ -152,11 +161,17 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                       type="button"
                       color="light"
                       size="xs"
+                      data-testid={`tpl-use-row-${entry.pageId}`}
                       onClick={() => onJumpToPage?.(entry.pageId)}
                       disabled={!onJumpToPage}
-                      className={`${ROW} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)]`}
+                      className={`${USE_ROW} tw:border-transparent tw:text-[var(--bk-ink)]`}
                     >
-                      <span className="tw:flex-1">{entry.pageName}</span>
+                      {/* 1169:4767 — the page name is Inter Medium in ink at
+                          the chip's own 11px; 1169:4768 pairs it with the
+                          when, 16-leading in ink-muted. */}
+                      <span className="tw:font-medium" data-testid={`tpl-use-name-${entry.pageId}`}>
+                        {entry.pageName}
+                      </span>
                       {entry.version && (
                         <span
                           className={VERSION_CHIP}
@@ -164,7 +179,10 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                           v{entry.version}
                         </span>
                       )}
-                      <span className={META}>
+                      <span
+                        className="tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                        data-testid={`tpl-use-meta-${entry.pageId}`}
+                      >
                         {formatRelative(entry.appliedAt)}
                       </span>
                     </Button>
@@ -186,7 +204,10 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             applying a template COPIES it, so editing the template later
             changes nothing that already exists. Without it, a list of pages
             reads like a set of live links. */}
-        <p className="tw:m-0 tw:px-6 tw:pb-3 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+        <p
+          className="tw:m-0 tw:px-6 tw:pb-3 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+          data-testid="tpl-usage-footnote"
+        >
           Changes to the template never touch pages already created from it.
         </p>
 

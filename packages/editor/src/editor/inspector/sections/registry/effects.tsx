@@ -126,8 +126,24 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   visibility: defineSection({
+    /* The THREE keys this section reads, and only those. It declared
+       `display`, `visibility`, `opacity` and `pointer-events` — none of which
+       VisibilitySection touches — and omitted the `--hide-<breakpoint>` custom
+       properties, which are all it touches. Both halves were live defects:
+
+       1. `styleKeys` is what `defineSection` slices `ctx.styles` down to, so
+          the component was handed a bag that could never contain
+          `--hide-desktop`. The three toggles therefore ALWAYS read "visible"
+          and the collapsed preview ("hidden on 2") could never appear — you
+          could hide an element on mobile and the panel would keep saying it
+          was shown.
+       2. `styleKeys` is also what `sectionApplies` counts, so declaring
+          `display` opened VISIBILITY for every element that has one. Measured
+          live: it was open on Flex, Grid, Container and Image, where all six
+          profile boards (807:8342/8412/8475/8521/8567/8614) draw it shut —
+          and on the FLEX board it displaced SIZE from the footer's count. */
     Component: VisibilitySection,
-    styleKeys: ["display", "visibility", "opacity", "pointer-events"],
+    styleKeys: ["--hide-desktop", "--hide-tablet", "--hide-mobile"],
     adaptProps: adaptBaseStyleProps,
   }),
 };

@@ -564,6 +564,14 @@ export class Composer extends EventEmitter {
       this.styles.importStyles(data.styles);
     }
 
+    // Restore CMS bindings before settings, so anything that reacts to a
+    // settings change already sees the element->field wiring.
+    if (data.cmsBindings) {
+      if (data.cmsBindings.field) this.cms.bindings.import(data.cmsBindings.field as never);
+      if (data.cmsBindings.collection)
+        this.cms.bindings.importCollectionBindings(data.cmsBindings.collection as never);
+    }
+
     // Import project settings
     this.applyProjectSettings(this.projectSettings, data.settings ?? {}, {
       emitProjectChanged: false,
@@ -611,6 +619,19 @@ export class Composer extends EventEmitter {
         updatedAt: new Date().toISOString(),
       },
       settings: this.projectSettings,
+      /* Without this the binding survives only the session that made it: the
+         maps are in memory, and a reload republished the placeholder text.
+         Guarded because HistoryManager snapshots from its own constructor
+         (:244), before `cms` exists (:272) — that snapshot is of an empty
+         project, so an absent field there is correct, not lossy. */
+      ...(this.cms
+        ? {
+            cmsBindings: {
+              field: this.cms.bindings.export(),
+              collection: this.cms.bindings.exportCollectionBindings(),
+            },
+          }
+        : {}),
     };
   }
 

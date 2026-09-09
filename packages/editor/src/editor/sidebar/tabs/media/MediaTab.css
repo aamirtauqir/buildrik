@@ -157,27 +157,34 @@
   background: rgba(17, 24, 39, 0.6);
 }
 
+/* Board 1164:4738 — 12 radius on --color/bg-elevated with a --color/border
+   edge, 16/14 inset, and a 12 gap between blocks. It shipped on 8 radius, a
+   flat 24 pad, no edge, and per-child margins doing the gap's job. */
 .med-rx-dialog {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 301;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-12);
   width: 520px;
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 96px);
   overflow-y: auto;
-  padding: var(--bk-space-24);
-  background: var(--bk-bg-card);
-  border-radius: var(--bk-radius-lg);
+  padding: 14px var(--bk-space-16);
+  background: var(--bk-bg-elevated);
+  border: 1px solid var(--bk-border);
+  border-radius: 12px;
   box-shadow: var(--bk-shadow-overlay);
   font: 400 13px/18px var(--bk-font-ui);
   color: var(--bk-ink);
 }
 
 .med-rx-title {
-  margin: 0 0 var(--bk-space-8);
-  font-size: 15px;
+  margin: 0;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bk-ink);
 }
@@ -188,12 +195,14 @@
   line-height: 20px;
 }
 
-/* Before → After. The board draws two square plates with the arrow between. */
+/* Before → After. Board 1164:4741 draws two 96x64 plates with the arrow
+   between them — landscape, not square, and the gap comes from the dialog's
+   own column rather than a margin of its own. */
 .med-rx-preview {
   display: flex;
   align-items: center;
   gap: var(--bk-space-12);
-  margin: var(--bk-space-16) 0;
+  margin: 0;
 }
 .med-rx-preview__before,
 .med-rx-preview__after {
@@ -207,31 +216,41 @@
 .med-rx-preview__before img,
 .med-rx-preview__after img {
   width: 96px;
-  height: 96px;
+  height: 64px;
   object-fit: cover;
-  border-radius: var(--bk-radius-md);
+  border-radius: var(--bk-radius-lg);
   border: 1px solid var(--bk-border);
-  background: var(--bk-bg-subtle);
+  background: var(--bk-gray-200);
 }
-/* The board rings the incoming asset in accent — it is the thing being chosen. */
+/* 1164:4744 — the board rings the incoming asset in accent AND tints its
+   plate: it is the thing being chosen. */
 .med-rx-preview__after img {
-  border: 2px solid var(--bk-accent);
+  border: 1px solid var(--bk-accent);
+  background: var(--bk-accent-tint);
 }
 .med-rx-preview__arrow {
   font-size: 16px;
   color: var(--bk-ink-muted);
 }
 
+/* 1174:4859 — the disclosure is a 10px ink-soft line, not error-red body
+   copy: it is a control for reading detail, and the outcome line above it
+   already carries the tone. */
 .med-rx-failed {
-  margin: var(--bk-space-8) 0 0;
-  color: var(--bk-error);
+  margin: 0;
+  font-size: 10px;
+  color: var(--bk-ink-soft);
 }
 
+/* 1164:4746 / 1174:4860 — 8 gap, 11px, and no margin of its own (the dialog
+   column owns the spacing). */
 .med-rx-footer {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--bk-space-8);
-  margin-top: var(--bk-space-16);
+  margin-top: 0;
+  font-size: 11px;
 }
 
 /* Result phases reuse the body copy slot, tinted by outcome. */
@@ -239,31 +258,37 @@
 .med-rx-body--warn { color: var(--bk-warning-text); font-size: var(--bk-text-12); font-weight: 600; }
 .med-rx-body--error { color: var(--bk-error-text); font-size: var(--bk-text-12); font-weight: 600; }
 
+/* Board 1174:4832 — a bare 4-gap list under a PAGES caption, not a bordered
+   scroll box. The box read as a second dialog inside the dialog. */
 .med-rx-pages {
   list-style: none;
-  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  margin: 0;
   padding: 0;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid var(--bk-border, var(--bk-border));
-  border-radius: var(--bk-radius-lg, var(--bk-radius-md));
 }
-.med-rx-page-row {
-  border-bottom: 1px solid var(--bk-border, var(--bk-border));
-}
-.med-rx-page-row:last-child {
-  border-bottom: none;
+.med-rx-pages-label {
+  margin: 0;
+  font-size: 11px;
+  color: var(--bk-ink-soft);
 }
 .med-rx-page-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 4px 0 4px 8px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
 }
+/* A single-class rule ties a `tw:` utility on specificity and loses on source
+   order — this one competes with nothing, but the hover fill was
+   --bk-ink-muted, i.e. a TEXT token used as a background, which painted the
+   row mid-grey under its own grey text. */
 .med-rx-page-label:hover {
-  background: var(--bk-ink-muted);
+  background: var(--bk-bg-subtle);
 }
 .med-rx-page-name {
   flex: 1;

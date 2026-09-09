@@ -182,8 +182,11 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
 
   return (
     <Screen>
+      {/* Board 640:4161 heads this card ENDPOINT. The screen is already called
+          Webhooks by the nav row and the pane header above it, so the card
+          repeated the word rather than naming what it holds. */}
       <Section
-        title="Webhooks"
+        title="Endpoint"
         desc="One endpoint per workspace. Buildrick POSTs JSON, signed with HMAC-SHA256 in the x-buildrick-signature header."
       >
         {loading && <div className="bd-set-section-d">Loading…</div>}

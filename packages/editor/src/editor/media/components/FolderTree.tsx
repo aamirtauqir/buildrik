@@ -24,8 +24,14 @@ import {
   ChevronRight,
 } from "lucide-react";
 import * as React from "react";
-import type { LibraryItem, MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
 import { Button, TextField } from "@/editor/chrome-ui";
+/* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
+   this rail drew as unstyled 16px rows anywhere it was mounted on its own (a
+   probe, a test, board 1205:4829's own measurement, which read every padding
+   and gap as 0). Same rule StorageQuotaBar's header states after the same
+   defect: a component that cannot be mounted alone cannot be measured alone. */
+import "../LibraryManager.css";
 // ─── Types ────────────────────────────────────────────────────────────────
 
 export type SmartFolder = null | "recent" | "in-use" | "unused";
@@ -41,6 +47,8 @@ export interface TypeCounts {
 interface TreeNodeProps {
   icon: React.ReactNode;
   label: string;
+  /** Conformance anchor — board 1205:4829 measures these rows individually. */
+  testId?: string;
   count?: number;
   active: boolean;
   expandable?: boolean;
@@ -68,7 +76,6 @@ export interface FolderTreeProps {
   inUseCount: number;
   unusedCount: number;
   allTags: string[];
-  libraryItems: LibraryItem[];
   setLibrarySearch(q: string): void;
   createFolder(name: string): Promise<void>;
   deleteFolder(id: string): Promise<void>;
@@ -88,6 +95,7 @@ export interface FolderTreeProps {
 function TreeNode({
   icon,
   label,
+  testId,
   count,
   active,
   expandable,
@@ -111,6 +119,7 @@ function TreeNode({
        stays a div and gets the semantics instead of becoming a <button>. */
     <div
       className={`mgr-node${active ? " active" : ""}${depthClass}${isDropTarget ? " dragover" : ""}`}
+      data-testid={testId}
       role="button"
       tabIndex={0}
       aria-current={active ? "true" : undefined}
@@ -175,7 +184,6 @@ export function FolderTree({
   inUseCount,
   unusedCount,
   allTags,
-  libraryItems,
   setLibrarySearch,
   createFolder,
   deleteFolder,
@@ -258,6 +266,7 @@ export function FolderTree({
                 />
               }
               label={folder.name}
+              testId={`mgr-row-folder-${folder.id}`}
               active={currentFolderId === folder.id}
               expandable={hasChildren}
               expanded={!isCollapsed}
@@ -281,14 +290,19 @@ export function FolderTree({
   );
 
   return (
-    <div className="mgr-left">
-      <div className="mgr-left-head">Folders</div>
-
+    /* Board 1160:16/27/43 — the rail is three NAMED groups (SMART, FOLDERS,
+       TAGS) separated by 10-high gaps, with Trash at the foot. It shipped as
+       one "Folders" head over four hairline-separated blocks, which named the
+       whole rail after one of its groups and gave the smart folders no name at
+       all. */
+    <div className="mgr-left" data-testid="mgr-folders">
       <div className="mgr-tree">
+        <div className="mgr-tree-section" data-testid="mgr-section-smart">Smart</div>
         {/* Smart folders (Bugs #6, #7 fix: actually filter) */}
         <TreeNode
           icon={<Clock size={14} style={{ color: /* @lint-hex-policy: "Recent" smart-folder sky-500 marker, off chrome palette */ "#0EA5E9" }} />}
           label="Recent"
+          testId="mgr-row-recent"
           count={recentCount}
           active={smartFolder === "recent"}
           onClick={() => {
@@ -299,6 +313,7 @@ export function FolderTree({
         <TreeNode
           icon={<CheckCircle size={14} style={{ color: "var(--bk-success)" }} />}
           label="In use"
+          testId="mgr-row-in-use"
           count={inUseCount}
           active={smartFolder === "in-use"}
           onClick={() => {
@@ -309,6 +324,7 @@ export function FolderTree({
         <TreeNode
           icon={<MinusCircle size={14} style={{ color: "var(--bk-ink-disabled)" }} />}
           label="Unused"
+          testId="mgr-row-unused"
           count={unusedCount}
           active={smartFolder === "unused"}
           onClick={() => {
@@ -317,12 +333,14 @@ export function FolderTree({
           }}
         />
 
-        <hr className="mgr-tree-sep" />
+        <div className="mgr-tree-gap" data-testid="mgr-tree-gap-1" />
+        <div className="mgr-tree-section" data-testid="mgr-section-folders">Folders</div>
 
         {/* All assets */}
         <TreeNode
           icon={<FolderOpen size={14} />}
           label="All assets"
+          testId="mgr-row-all-assets"
           count={counts.all}
           active={!currentFolderId && !smartFolder}
           onClick={() => {
@@ -334,11 +352,10 @@ export function FolderTree({
           {...dropProps}
         />
 
-        <hr className="mgr-tree-sep" />
-        <div className="mgr-tree-section">My folders</div>
-
         {/* User folders (nested tree) */}
-        {renderFolderTree(null, 0)}
+        {/* Board 1205:4849 / 1205:4853 draw user folders inset 16, one level
+            under `🏠 All assets` — they hang off it, they are not its peers. */}
+        {renderFolderTree(null, 1)}
 
         {/*
           Board 1205:4829 — the name is typed at the bottom of My folders,
@@ -356,6 +373,7 @@ export function FolderTree({
             className="mgr-node"
             title="New folder"
             aria-label="New folder"
+            data-testid="mgr-new-folder-open"
             onClick={() => setNewFolderName("")}
           >
             {"＋  New folder"}
@@ -363,7 +381,7 @@ export function FolderTree({
         ) : null}
 
         {newFolderName !== null ? (
-          <div className="mgr-tree-newfolder tw:px-2 tw:pb-1.5" data-testid="mgr-new-folder">
+          <div className="mgr-tree-newfolder tw:flex tw:flex-col tw:gap-1 tw:px-2 tw:py-1" data-testid="mgr-new-folder">
             <TextField
               autoFocus
               className="tw:h-[var(--bk-size-row-dense)] tw:rounded-md tw:px-[var(--bk-space-8)] tw:text-[length:var(--bk-text-12)]"
@@ -383,7 +401,7 @@ export function FolderTree({
                 }
               }}
             />
-            <p className="tw:mt-1 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+            <p className="tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="mgr-new-folder-hint">
               Enter to create · Esc to cancel
             </p>
           </div>
@@ -400,25 +418,31 @@ export function FolderTree({
         {/* Tags section */}
         {allTags.length > 0 && (
           <>
-            <hr className="mgr-tree-sep" />
-            <div className="mgr-tree-section">Tags</div>
-            {allTags.map((tag) => (
-              <TreeNode
-                key={`tag-${tag}`}
-                icon={<div className="mgr-node-dot" style={{ background: /* @lint-hex-policy: tag-node sky-500 dot, off chrome palette */ "#0EA5E9" }} />}
-                label={tag}
-                count={libraryItems.filter((i) => i.altText?.includes(tag)).length}
-                active={false}
-                onClick={() => setLibrarySearch(tag)}
-              />
-            ))}
+            <div className="mgr-tree-gap" data-testid="mgr-tree-gap-2" />
+            <div className="mgr-tree-section" data-testid="mgr-section-tags">Tags</div>
+            {/* 1160:44 — tags are PILLS on a 6 gap, not another column of
+                rows with counts. A tag is a filter you scan sideways; giving
+                it the same row shape as a folder said it was a place. */}
+            <div className="mgr-tags" role="group" aria-label="Filter by tag" data-testid="mgr-tags">
+              {allTags.map((tag) => (
+                <Button
+                  key={`tag-${tag}`}
+                  className="mgr-tag"
+                  data-testid={`mgr-tag-${tag}`}
+                  onClick={() => setLibrarySearch(tag)}
+                >
+                  {tag}
+                </Button>
+              ))}
+            </div>
           </>
         )}
 
-        <hr className="mgr-tree-sep" />
+        <div className="mgr-tree-gap" data-testid="mgr-tree-gap-3" />
         <TreeNode
           icon={<Trash2 size={14} />}
           label="Trash"
+          testId="mgr-row-trash"
           count={0}
           active={false}
           onClick={onTrashClick}

@@ -286,9 +286,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   };
 
   return (
-    <div className="mgr" {...fileDragProps}>
+    <div className="mgr" data-testid="mgr-root" {...fileDragProps}>
       {/* ═══ TOP BAR ═══ */}
-      <div className="mgr-top">
+      <div className="mgr-top" data-testid="mgr-top">
         <div className="mgr-title">
           <FolderOpen size={16} />
           Asset Library
@@ -315,15 +315,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
 
         <div className="mgr-right">
-          <Button className="mgr-btn" onClick={() => setImportUrlOpen(true)}>
+          <Button className="mgr-btn" data-testid="mgr-btn-import" onClick={() => setImportUrlOpen(true)}>
             <Download size={14} />
             Import URL
           </Button>
-          <Button className="mgr-btn" onClick={handleUploadClick}>
+          <Button className="mgr-btn" data-testid="mgr-btn-upload" onClick={handleUploadClick}>
             <Upload size={14} />
             Upload
           </Button>
-          <Button className="mgr-btn-primary" onClick={() => setStockModalOpen(true)}>
+          <Button className="mgr-btn-primary" data-testid="mgr-btn-stock" onClick={() => setStockModalOpen(true)}>
             <Plus size={14} />
             Add from stock
           </Button>
@@ -333,7 +333,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
       </div>
       {/* ═══ BODY ═══ */}
-      <div className="mgr-body">
+      <div className="mgr-body" data-testid="mgr-body">
         {/* ─── LEFT: Folder tree ─── */}
         {/* D5 Stage 1 (audit-remediation 2026-05-08): LEFT panel + collapsed
             state + recursive renderer + TreeNode all live in
@@ -349,7 +349,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           inUseCount={inUseCount}
           unusedCount={unusedCount}
           allTags={allTags}
-          libraryItems={state.libraryItems}
           setLibrarySearch={state.setLibrarySearch}
           createFolder={state.createFolder}
           deleteFolder={state.deleteFolder}
@@ -431,13 +430,13 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}
-      <div className="mgr-status">
+      <div className="mgr-status" data-testid="mgr-status">
         <span><strong style={{ color: "var(--bk-ink-soft)" }}>{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
         <span>{formatQuotaSize(state.storage.used)} / {formatQuotaSize(state.storage.total)}</span>
         <div className="mgr-status-right">
-          <div className="mgr-quota-bar">
-            <div className="mgr-quota-fill" style={{ width: `${storageUsedPct}%` }} />
+          <div className="mgr-quota-bar" data-testid="mgr-quota-bar">
+            <div className="mgr-quota-fill" data-testid="mgr-quota-fill" style={{ width: `${storageUsedPct}%` }} />
           </div>
           {/* This was a hardcoded string. It is the library's only persistent
               signal for whether assets reached the server, and it said "This
@@ -447,7 +446,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               persisted to IndexedDB, and `MediaManager` already rebuilds its
               retry queue by scanning for it. */}
           {localOnlyCount > 0 && (
-            <span className="mgr-sync-pill">
+            <span className="mgr-sync-pill" data-testid="mgr-sync-pill">
               <AlertCircle size={10} />
               {localOnlyCount} not on the server
             </span>

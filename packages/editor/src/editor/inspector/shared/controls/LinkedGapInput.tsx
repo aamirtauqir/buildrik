@@ -114,11 +114,17 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
           aria-pressed={linked}
           aria-label={linked ? "Unlink row and column gap" : "Link row and column gap"}
           disabled={disabled}
-          className="tw:px-0 bdi-mini"
+          /* `tw:bg-transparent`, because it did not have one: this is a
+             flowbite Button, whose default colour paints the brand blue, and
+             the linked state then drew an accent GLYPH on it — measured 1.00:1
+             on the FLEX profile run, i.e. an invisible icon. Every other icon
+             button in this panel (`.bdi-icon-btn`, `.bdi-eye`) declares a
+             transparent background for exactly this reason. */
+          className="tw:px-0 tw:bg-transparent tw:enabled:hover:bg-transparent bdi-mini"
           style={{
             width: 16,
             height: 16,
-            color: linked ? "var(--bk-accent)" : "var(--bk-ink-muted)",
+            color: linked ? "var(--bk-accent)" : "var(--bk-ink-soft)",
           }}
         >
           {linked ? <Link size={10} aria-hidden="true" /> : <Link2Off size={10} aria-hidden="true" />}

@@ -49,6 +49,7 @@ export function LayerContextMenu({
     <div
       ref={menuRef}
       className="bdc-menu"
+      data-testid="layer-context-menu"
       style={{ position: "fixed", left: x, top: y, zIndex: 9999 }}
       role="menu"
       aria-label={`Actions for ${nodeName}`}
@@ -58,10 +59,12 @@ export function LayerContextMenu({
           Hide/Lock live on the row's own 👁🔒; reordering is drag. Move to
           page… and Copy link wait for real backing — a dead item is worse
           than a missing one. */}
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("cut")}>
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-cut"
+        onClick={() => act("cut")}>
         Cut
       </Button>
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("copy")}>
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-copy"
+        onClick={() => act("copy")}>
         Copy
       </Button>
       <Button
@@ -69,25 +72,30 @@ export function LayerContextMenu({
         role="menuitem"
         disabled={!hasClipboard}
         title={hasClipboard ? undefined : "Copy or cut an element first"}
+        data-testid="layer-menu-paste"
         onClick={() => act("paste")}
       >
         Paste
       </Button>
-      <div className="bdc-menu-sep" />
+      <div className="bdc-menu-sep" data-testid="layer-menu-sep" />
       {/* Board 1082:4527 draws "Copy link" — a URL that reopens the editor with
           this element selected. The other of its two unbacked rows ("Move to
           page…") stays unbuilt; cut/paste already crosses pages. */}
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("copyLink")}>
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-copy-link"
+        onClick={() => act("copyLink")}>
         Copy link
       </Button>
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("duplicate")}>
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-duplicate"
+        onClick={() => act("duplicate")}>
         Duplicate
       </Button>
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("delete")}>
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-delete"
+        onClick={() => act("delete")}>
         Delete
       </Button>
       <div className="bdc-menu-sep" />
-      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("rename")}>
+      <Button className="bdc-menu-item" role="menuitem" data-testid="layer-menu-rename"
+        onClick={() => act("rename")}>
         Rename
       </Button>
       <Button
@@ -95,6 +103,7 @@ export function LayerContextMenu({
         role="menuitem"
         disabled={selectedCount < 2}
         title={selectedCount < 2 ? "Select 2 or more layers first" : undefined}
+        data-testid="layer-menu-group"
         onClick={() => act("group")}
       >
         Group selection

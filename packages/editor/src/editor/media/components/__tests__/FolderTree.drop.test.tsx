@@ -30,7 +30,6 @@ function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void) {
       inUseCount={2}
       unusedCount={1}
       allTags={[]}
-      libraryItems={[]}
       setLibrarySearch={vi.fn()}
       createFolder={vi.fn()}
       deleteFolder={vi.fn()}

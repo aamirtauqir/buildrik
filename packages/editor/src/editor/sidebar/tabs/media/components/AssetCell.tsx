@@ -163,10 +163,13 @@ export function AssetCell({
         )}
         {badge ? (
           <span
-            /* 40x14 at (6, 56) per `I218:686;218:6` — fixed, not padded: a
+            /* 52x14 at (6, 56) per `I218:686;218:6` — fixed, not padded: a
                badge that grows with its word would shift the thumb's focal
-               point between STOCK and AI. */
-            className="tw:absolute tw:left-1.5 tw:top-14 tw:flex tw:h-3.5 tw:w-10 tw:items-center tw:justify-center tw:rounded-md tw:bg-[var(--bk-gray-900)] tw:text-[11px] tw:leading-4 tw:text-white"
+               point between STOCK and AI. It was 40, which was true of the
+               node until the 2026-09-07 recapture widened it; three instances
+               now agree on 52 (media-drawer's two cards and the S3.6 flow
+               boards' `I303:2020;218:6`), and `media-card` went red on it. */
+            className="tw:absolute tw:left-1.5 tw:top-14 tw:flex tw:h-3.5 tw:w-13 tw:items-center tw:justify-center tw:rounded-md tw:bg-[var(--bk-gray-900)] tw:text-[11px] tw:leading-4 tw:text-white"
             data-testid="media-card-badge"
           >
             {badge}

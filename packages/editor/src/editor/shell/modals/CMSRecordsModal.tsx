@@ -35,9 +35,28 @@ function emptyForm(fields: CMSField[]): Record<string, unknown> {
    record form. The board's own sample (Title · Price · Photo) is three. */
 const MAX_FIELD_COLUMNS = 3;
 
-/** The quiet row-action treatment, previously repeated at each of the three
- *  call sites below. */
-const GHOST_BTN = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+/** The row-action treatment, repeated at each of the three call sites below.
+ *  Board 1744:8396/8398/8400 draws them as small BORDERED white buttons — 22
+ *  tall, radius 4, a --flowbite/gray/300 hairline, 11px label — not as the
+ *  borderless ghost this used to be: on a tinted row a transparent control with
+ *  no edge reads as text, and "Unpublish" beside "Delete" is not a sentence.
+ *  `h-*` and `text-*`, not `min-h-*`/nothing: flowbite's `size="xs"` ships its
+ *  own height and font-size and only a SAME-property utility displaces them. */
+const ROW_BTN =
+  "tw:h-[22px] tw:min-h-0 tw:px-2 tw:py-0 tw:rounded-[4px] tw:text-[11px] tw:font-normal " +
+  "tw:border tw:border-solid tw:border-[var(--bk-gray-300)] tw:bg-white tw:text-[var(--bk-ink-soft)] " +
+  "tw:enabled:hover:bg-[var(--bk-gray-100)] tw:enabled:hover:text-[var(--bk-ink)]";
+
+/* Board 1170:4751/4756 — the table's own scale, and it is smaller than a
+   panel's: 10px semibold column heads, 11px cells, 7px of vertical air per row
+   and a 10px left inset. It was 13px cells on 10px padding, which is the
+   PANEL's scale applied to a 640 modal holding four columns and three
+   buttons — the widest column wrapped before the table filled its frame.
+   `px-1.5` on every cell is the board's 12px column gap read as cell padding,
+   since a <tr> takes neither padding nor gap; `first:pl-2.5` is its row inset. */
+const CELL = "tw:px-1.5 tw:first:pl-2.5 tw:last:pr-2.5";
+const TH = `${CELL} tw:py-1 tw:text-left tw:text-[10px] tw:font-semibold tw:text-[var(--bk-ink-muted)]`;
+const TD = `${CELL} tw:py-[7px]`;
 
 /** "today" for same-day, else "MMM D" — the board's own two shapes. */
 function updatedLabel(iso: string): string {
@@ -59,7 +78,10 @@ function MediaCell({ filled, label }: { filled: boolean; label: string }) {
   return filled ? (
     <span className="tw:text-[var(--bk-ink-muted)]">✓ {label}</span>
   ) : (
-    <span style={{ color: "var(--bk-warning)" }}>— missing</span>
+    /* 1170:4769 names --color/warning-text (#723B13), not --color/warning
+       (#C27803, the DOT's amber). The amber measured 3.51:1 on white — under
+       AA for a cell whose whole job is to report a gap; warning-text is 9.9. */
+    <span className="tw:text-[var(--bk-warning-text)]">— missing</span>
   );
 }
 
@@ -251,11 +273,11 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
 
   return (
     <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
-      <ModalContent size="table">
+      <ModalContent size="table" data-testid="cms-records-modal">
         {/* Board 1170:4749 puts the collection and its record count IN the
             title — "Menu items — 12 records" — so the modal says what it is
             holding before you read a single row. */}
-        <ModalTitle>
+        <ModalTitle data-testid="cms-records-title">
           {collection ? `${collection.name} — ${items.length} record${items.length === 1 ? "" : "s"}` : "Records"}
         </ModalTitle>
         <ModalClose aria-label="Close modal" onClick={onClose}>
@@ -272,6 +294,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
             <>
               <div style={{ marginBottom: 12, maxWidth: 280 }}>
                 <Select
+                  data-testid="cms-records-collection"
                   value={collectionId}
                   onChange={(e) => {
                     setCollectionId(e.target.value);
@@ -336,26 +359,25 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       collection's own leading fields plus Updated. The list it
                       replaced showed only the display field, so every other
                       field was invisible until you opened the record. */}
-                  <table className="tw:w-full tw:text-[13px] tw:border-collapse">
+                  {/* `border-separate` with zero spacing, not `border-collapse`:
+                      1170:4756 rounds each row at 6 and a collapsed table
+                      cannot round a <tr> at all. */}
+                  <table className="tw:w-full tw:text-[11px] tw:border-separate tw:border-spacing-0">
                     <thead>
-                      <tr>
+                      <tr data-testid="cms-records-thead">
                         {columns.map((f) => (
-                          <th
-                            key={f.id}
-                            scope="col"
-                            className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-[var(--bk-ink-muted)]"
-                          >
+                          <th key={f.id} scope="col" className={TH}>
                             {f.name}
                           </th>
                         ))}
-                        <th scope="col" className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-normal tw:text-[var(--bk-ink-muted)]">
+                        <th scope="col" className={TH}>
                           Updated
                         </th>
                         {/* The board draws no row actions; the code has publish,
                             edit and delete, and rule 1 says a working capability
                             does not get dropped because a sample frame omits it. */}
-                        <th scope="col" className="tw:px-3 tw:py-2">
-                          <span className="tw:sr-only">Actions</span>
+                        <th scope="col" className={`${TH} tw:text-right`}>
+                          Actions
                         </th>
                       </tr>
                     </thead>
@@ -371,9 +393,22 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                         </tr>
                       ) : (
                         items.map((item) => [
-                          <tr key={item.id} className="tw:hover:bg-blue-50">
+                          <tr key={item.id} className="tw:rounded-md tw:hover:bg-blue-50" data-testid={`cms-records-row-${item.id}`}>
                             {columns.map((f, idx) => (
-                              <td key={f.id} className="tw:px-3 tw:py-2.5 tw:text-[var(--bk-ink)]">
+                              /* 1170:4757/58/59 — the display value is ink, the
+                                 next column ink-soft, and a media column drops
+                                 to 10px ink-muted: the row's own hierarchy,
+                                 which one flat --bk-ink erased. */
+                              <td
+                                key={f.id}
+                                className={`${TD} ${
+                                  f.type === "image"
+                                    ? "tw:text-[10px] tw:text-[var(--bk-ink-muted)]"
+                                    : idx === 0
+                                      ? "tw:text-[var(--bk-ink)]"
+                                      : "tw:text-[var(--bk-ink-soft)]"
+                                }`}
+                              >
                                 {f.type === "image" ? (
                                   <MediaCell
                                     filled={Boolean(item.data[f.slug])}
@@ -386,10 +421,10 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                 )}
                               </td>
                             ))}
-                            <td className="tw:px-3 tw:py-2.5 tw:text-[var(--bk-ink-muted)]">
+                            <td className={`${TD} tw:text-[10px] tw:text-[var(--bk-ink-muted)]`}>
                               {updatedLabel(item.updatedAt)}
                             </td>
-                            <td className="tw:px-3 tw:py-2.5">
+                            <td className={TD}>
                               <span className="tw:flex tw:justify-end tw:gap-1">
                                 <Button
                                   color="light"
@@ -398,14 +433,14 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                   onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
                                   aria-label={item.status === "published" ? "Unpublish record" : "Publish record"}
                                   aria-busy={busy || undefined}
-                                  className={GHOST_BTN}
+                                  className={ROW_BTN}
                                 >
                                   {item.status === "published" ? "Unpublish" : "Publish"}
                                 </Button>
-                                <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className={GHOST_BTN}>
+                                <Button color="light" size="xs" onClick={() => startEdit(item)} aria-label="Edit record" className={ROW_BTN}>
                                   <Pencil size={13} />
                                 </Button>
-                                <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className={GHOST_BTN}>
+                                <Button color="light" size="xs" disabled={busy} onClick={() => remove(item.id)} aria-label="Delete record" aria-busy={busy || undefined} className={ROW_BTN}>
                                   <Trash2 size={13} />
                                 </Button>
                               </span>
@@ -430,8 +465,21 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       button would have nothing to call. Parsing, validating and
                       fanning a file out over N creates is a feature, not this
                       modal's layout. */}
-                  <div className="tw:flex tw:justify-end tw:pt-3">
-                    <Button size="xs" onClick={startAdd} disabled={!collection}>
+                  {/* 1170:4775 — gap 8, because the board's foot holds TWO
+                      controls; the second (Import JSON) is not built and says
+                      so at the note below. */}
+                  <div className="tw:flex tw:justify-end tw:gap-2 tw:pt-3" data-testid="cms-records-foot">
+                    <Button
+                      size="xs"
+                      /* 1170:4773/4774 — 12/7 insets, radius 6, an 11px label.
+                         flowbite's `xs` gives 1px of vertical padding, radius 8
+                         and 12px, and each only yields to a same-property
+                         utility. */
+                      className="tw:px-3 tw:py-[7px] tw:rounded-md tw:text-[11px] tw:font-normal"
+                      onClick={startAdd}
+                      disabled={!collection}
+                      data-testid="cms-records-add"
+                    >
                       <Plus size={13} /> Add record
                     </Button>
                   </div>

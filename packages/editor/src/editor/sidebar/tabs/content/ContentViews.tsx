@@ -43,6 +43,18 @@ import type { ConditionRow } from "./useContentPanel";
 
 /** The panel column. Exported because ContentTab wraps these views in it. */
 export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
+/** Board 148:2 — the Content group header is 32-tall, not the shared List
+ *  section's 28. The arbitrary bracket sorts after the named `h-7` scale
+ *  utility in the compiled sheet and so wins regardless of class order (same
+ *  trick as AssetDetailOverlay's alt input) rather than trusting an
+ *  equal-specificity `h-8` to win. Exported because the loading skeleton draws
+ *  the same two bands and has to draw them at the same height.
+ *
+ *  `leading-4` for the same reason: 776:4095 draws the band's label at 11/16
+ *  and the shared SectionHeader sets no line-height at all, so the band's text
+ *  resolved off the face's own metrics. Content-only — nothing else imports
+ *  this constant, so the shared primitive keeps whatever its own boards say. */
+export const SECTION_H = "tw:h-[var(--bk-size-row)] tw:leading-4";
 
 const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
 /** A text button that reads as a link: breadcrumbs and every "+ New …".
@@ -63,34 +75,89 @@ const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
    twMerge drops flowbite's. */
 const LINK_BTN =
   "tw:inline-flex tw:items-center tw:gap-1.5 tw:bg-transparent tw:border-0 tw:p-0 tw:h-8 tw:min-h-0 " +
-  "tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] tw:enabled:hover:bg-transparent";
+  /* ui/13 · row label is 13/20 wherever a board draws it (149:114 the back
+     crumb, and every "+ New …" beside it); the line-height was left to the
+     browser, which resolves `normal` off the face's own metrics. */
+  "tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:text-[var(--bk-accent-hover)] tw:enabled:hover:bg-transparent";
 /** The quiet row-action button, previously copy-pasted at eleven call sites. */
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
-const FIELD_LABEL = "tw:text-xs tw:text-[var(--bk-ink-muted)] tw:mx-4 tw:mt-2.5 tw:mb-1";
+/* 149:116/120/124 — 12/18, not `text-xs`'s own 16. */
+const FIELD_LABEL = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)] tw:mx-4 tw:mt-2.5 tw:mb-1";
 /** Inputs sit in a padded wrapper rather than carrying their own margin, so
  *  the field keeps the TextInput/Select wrapper theme untouched. */
 const FIELD_WRAP = "tw:px-4";
 const TOGGLE_ROW = "tw:flex tw:h-8 tw:items-center tw:justify-between tw:px-4 tw:py-0";
+const TOGGLE_ROW_LABEL = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 /* Board 149:108 tints the save bar with the warning wash, not neutral grey —
    the bar exists to say something is unsaved, and grey says nothing. */
 const SAVEBAR =
   "tw:flex tw:h-11 tw:items-center tw:gap-2 tw:px-4 tw:py-0 " +
-  "tw:bg-[var(--bk-warning-tint)]";
+  "tw:text-[12px] tw:leading-[18px] tw:bg-[var(--bk-warning-tint)]";
 /* …and it draws Save as accent TEXT, not a filled button. The Button doc on the
    same Figma page is explicit that the one filled accent button belongs to the
    screen's primary action; a drawer's save bar is not where that is spent. */
 /* The recipe moved into Button's `link` variant (2026-08-29); what stays
    here is the one class this row adds on top. */
-const SAVE_LINK = "tw:min-h-6 tw:text-xs tw:font-normal";
-/** A note that belongs to the row above it, not to the panel's foot. */
-const INLINE_HINT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-normal tw:px-4 tw:pb-3";
-const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:text-[var(--bk-accent-text)]";
-const SUB = "tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
+/* Board 149:133/134/135 — all three of the bar's words are 12/18, and they
+   differ only in colour: the status is warning-text, Discard is ink-MUTED
+   (it was ink-soft, borrowed from the row-action GHOST which this row is not),
+   Save is accent-text. `leading-[18px]` because `text-xs` carries Tailwind's
+   own 16, and 2px per line across a 44 bar is the difference between the
+   words sitting on the board's baseline and 1px above it. */
+const SAVE_LINK = "tw:min-h-6 tw:text-[12px] tw:leading-[18px] tw:font-normal";
+const SAVEBAR_STATUS = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]";
+const SAVEBAR_DISCARD =
+  "tw:border-transparent tw:bg-transparent tw:text-[12px] tw:leading-[18px] " +
+  "tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]";
+/* 149:57 — the collection's meta strip. BOTH words are 12/18 there: the count
+   was 11px (SUB) and "+ Add" 13px (LINK_BTN), so a two-word row carried three
+   type sizes between it and the rows underneath. */
+const META_TEXT = "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
+const META_ADD = "tw:text-[12px] tw:leading-[18px]";
+/** A note that belongs to the row above it, not to the panel's foot.
+ *  151:61 — 11/16 on the panel's 16px gutters with 8 above and 8 below
+ *  (151:60's frame is the text's own box plus those two insets). It was
+ *  `leading-normal` (16.5 at this size) with no top inset and 12 below, so the
+ *  note sat tight under the link it explains and its two lines drifted half a
+ *  pixel per line off every other 11px line in the panel. */
+const INLINE_HINT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-4 tw:px-4 tw:py-2";
+/* 151:70 — the {{site.*}} key is 12/16, and `text-xs` carries Tailwind's own
+   16… which is right here, but only by accident: state it. */
+const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:leading-4 tw:text-[var(--bk-accent-text)]";
+/* 151:12 / 151:17 / 151:38 draw this 11/16 in `--color/ink-disabled`, and the
+   code followed them — so board and code AGREED on #D1D5DB, which is 1.47:1 on
+   white. Nothing failed, because agreement is what the diff checks; that is the
+   one case where agreement is not evidence.
+   A tag stating a field is MANDATORY is not decoration, and `ink-disabled` is
+   the token for a control you cannot use — WCAG exempts inactive controls
+   precisely so they can be dim. Wrong token for the job (founder call
+   2026-09-08): ink-soft, 7.56:1. Size and line box are unchanged, so the boards
+   still win everything they are right about. */
+const REQUIRED_TAG = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
+/* Boards 303:2067 and 303:2083 both draw the Sources status as the file's own
+   Badge (12:16): a bordered pill, 10/2 padding, 12/16 medium. The two states
+   differ only in ramp — grey for "nothing connected", green for "watching".
+   Live drew the first as a plain 11px sentence and the second as a borderless
+   green wash in --bk-success (#0E9F6E), which is the DOT's colour, not the
+   label's: on green-100 the board uses green-700. */
+const STATUS_PILL =
+  "tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-solid " +
+  "tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4 tw:font-medium";
+const STATUS_PILL_OK = "tw:bg-[var(--bk-green-100)] tw:border-[var(--bk-green-500)] tw:text-[var(--bk-green-700)]";
+const STATUS_PILL_IDLE = "tw:bg-[var(--bk-gray-200)] tw:border-[var(--bk-gray-400)] tw:text-[var(--bk-gray-700)]";
+/* The second line of every two-line row: 151:11 the field's type, 151:56 a
+   source's status, 151:71 a variable's value, 151:96 a condition's summary —
+   all four boards draw it 11/16, and the line-height was left to the face. */
+const SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-[var(--bk-gray-200)]";
 const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
 const SPACER = "tw:flex-1";
 /** Two stacked lines inside a row (name over type, key over value). */
 const ROW_STACK = "tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1";
+/** …and its FIRST line: 13/20 wherever a board draws one (151:10 a field name,
+ *  151:54 a source name, 151:95 a condition's element). `Row` supplies the 13
+ *  and nothing supplied the 20. */
+const ROW_TITLE = "tw:leading-5";
 const ROW_ACTIONS = "tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:flex-none";
 const ERROR_TEXT = "tw:text-xs tw:text-[var(--bk-error)]";
 
@@ -99,7 +166,7 @@ function Crumb({ label, onClick }: { label: string; onClick: () => void }) {
     /* self-start / justify-start: flowbite's Button centres its content and
        stretches to the column's width, so the board's left-aligned back link
        sat in the middle of the panel (149:50, 149:84). */
-    <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5 tw:self-start tw:justify-start`} onClick={onClick} aria-label={`Back to ${label}`}>
+    <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5 tw:self-start tw:justify-start`} onClick={onClick} aria-label={`Back to ${label}`} data-testid="content-crumb">
       ‹ {label}
     </Button>
   );
@@ -143,10 +210,14 @@ export function RootView({
         its two calls to action the same way.
       */
       <EmptyState
-        className="tw:flex-1"
+        /* 149:46 — a 160-tall block at the TOP of the panel, not a column that
+           fills it. `flex-1` centred the two lines in whatever height the
+           drawer had (~768 live), which put the invitation halfway down an
+           otherwise blank panel and ~300px below where the board draws it. */
+        className="tw:h-40"
         data-testid="content-empty"
       >
-        <EmptyStateDesc className="tw:max-w-[272px] tw:text-[13px] tw:leading-5">
+        <EmptyStateDesc className="tw:max-w-[272px] tw:text-[13px] tw:leading-5" data-testid="content-empty-desc">
           {/* One source literal, deliberately: gate:copy greps src/ for the exact
               string from the design doc, so wrapping it across two JSX lines
               reads to that gate as the line having been deleted. */}
@@ -175,7 +246,7 @@ export function RootView({
           the named `h-7` scale utility in the compiled sheet and so wins
           regardless of class order (same trick as AssetDetailOverlay's alt
           input) rather than trusting an equal-specificity `h-8` to win. */}
-      <SectionHeader tint className="tw:h-[var(--bk-size-row)]" count={collections.length}>Collections</SectionHeader>
+      <SectionHeader tint className={SECTION_H} count={collections.length} data-testid="content-section-collections">Collections</SectionHeader>
       {collections.map((c) => (
         <ListRow
           key={c.id}
@@ -183,6 +254,7 @@ export function RootView({
           label={c.name}
           count={recordCounts[c.id] ?? "—"}
           chevron
+          data-testid={`content-collection-${c.id}`}
           onClick={() => onOpenCollection(c.id)}
         />
       ))}
@@ -192,18 +264,18 @@ export function RootView({
           Button (mx-4, its own 48h before this fix) never matched that. */}
       {onCreateCollection && (
         <Row interactive onClick={onCreateCollection} data-testid="content-new-collection" aria-label="New collection">
-          <span className={`${ROW_ICON_CLASS} tw:text-[length:var(--bk-text-12)] tw:leading-[18px]`} aria-hidden="true">
+          <span className={`${ROW_ICON_CLASS} tw:text-[length:var(--bk-text-12)] tw:leading-[18px]`} aria-hidden="true" data-testid="content-new-collection-plus">
             +
           </span>
-          <span className={`${ROW_LABEL_CLASS} tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-accent-text)]`}>
+          <span className={`${ROW_LABEL_CLASS} tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-accent-text)]`} data-testid="content-new-collection-label">
             New collection
           </span>
         </Row>
       )}
-      <SectionHeader tint className="tw:h-[var(--bk-size-row)]">Data</SectionHeader>
-      <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron onClick={onOpenSources} />
-      <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron onClick={onOpenVariables} />
-      <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron onClick={onOpenConditions} />
+      <SectionHeader tint className={SECTION_H} data-testid="content-section-data">Data</SectionHeader>
+      <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
+      <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
+      <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
     </div>
   );
 }
@@ -235,11 +307,18 @@ export function CollectionView({
   return (
     <div className={CONTENT_BODY}>
       <Crumb label={collection.name} onClick={onBack} />
-      <div className="tw:flex tw:justify-between tw:items-center tw:px-3 tw:pt-1 tw:pb-2">
-        <span className={SUB}>
+      {/* 149:57 — a 32-tall meta strip on the panel's own 16px gutters, both
+          lines 12/18. It was 12px gutters, a 11px left word and a 13px right
+          one, so nothing in the row shared a baseline with the rows below.
+          The board states the 12/18 on the STRIP, not only on its two words,
+          and the strip itself was inheriting the document's 16 — invisible
+          while both children override it, and wrong the moment anything else
+          lands in the row. */}
+      <div className="tw:flex tw:h-8 tw:justify-between tw:items-center tw:px-4 tw:text-[12px] tw:leading-[18px]" data-testid="content-collection-meta">
+        <span className={META_TEXT} data-testid="content-collection-count">
           {records.length} record{records.length === 1 ? "" : "s"}
         </span>
-        <Button className={LINK_BTN} onClick={onAddRecord}>
+        <Button className={`${LINK_BTN} ${META_ADD}`} data-testid="content-collection-add" onClick={onAddRecord}>
           + Add
         </Button>
       </div>
@@ -248,6 +327,7 @@ export function CollectionView({
           <RecordRow
             key={r.id}
             data-record-row
+            data-testid={`content-record-${r.id}`}
             label={recordName(r)}
             published={r.status === "published"}
             chevron
@@ -257,8 +337,8 @@ export function CollectionView({
         {records.length === 0 && <div className={`${SUB} tw:p-3`}>No records yet — add the first one.</div>}
       </div>
       <div className="tw:border-t tw:border-[var(--bk-gray-200)]">
-        <ListRow label="Fields" count={collection.fields.length} chevron onClick={onOpenFields} />
-        {onOpenDynamicPages && <ListRow label="Dynamic pages" chevron onClick={onOpenDynamicPages} />}
+        <ListRow label="Fields" count={collection.fields.length} chevron data-testid="content-open-fields" onClick={onOpenFields} />
+        {onOpenDynamicPages && <ListRow label="Dynamic pages" chevron data-testid="content-open-dynamic" onClick={onOpenDynamicPages} />}
       </div>
     </div>
   );
@@ -338,14 +418,25 @@ export function RecordView({
               </div>
             ) : (
               <>
-                <div className={FIELD_LABEL}>{f.name}</div>
+                <div className={FIELD_LABEL} data-testid={`content-label-${f.slug}`}>{f.name}</div>
                 <div className={FIELD_WRAP}>
                   {f.type === "textarea" || f.type === "richtext" ? (
                     <Textarea
-                      className="tw:bg-white tw:min-h-16 tw:resize-y"
+                      /* Board 149:101 draws the textarea 56 tall, radius 6, on
+                         `--color/border-input`. `Textarea` is a SEPARATE
+                         flowbite component, so `BK_TEXT_INPUT_THEME` — which
+                         carries that geometry for every `TextInput` — does not
+                         reach it, and the size has to be stated here. `min-h-16`
+                         was 64. The `!` on the radius is the same reason it
+                         carries one in the input theme: flowbite's own
+                         `rounded-lg` is emitted unprefixed and a `tw:`-prefixed
+                         utility cannot be deduped against it, so source order
+                         decides without it. */
+                      className="tw:bg-white tw:min-h-14 tw:py-0 tw:rounded-md! tw:border-[var(--bk-border-input)] tw:resize-y"
                       value={String(data[f.slug] ?? "")}
                       onChange={(e) => setField(f.slug, e.target.value)}
                       aria-label={f.name}
+                      data-testid={`content-field-${f.slug}`}
                     />
                   ) : (
                     <TextInput
@@ -353,6 +444,7 @@ export function RecordView({
                       value={String(data[f.slug] ?? "")}
                       onChange={(e) => setField(f.slug, f.type === "number" ? Number(e.target.value) : e.target.value)}
                       aria-label={f.name}
+                      data-testid={`content-field-${f.slug}`}
                     />
                   )}
                 </div>
@@ -365,8 +457,11 @@ export function RecordView({
             )}
           </div>
         ))}
-        <div className={TOGGLE_ROW}>
-          <span className="tw:text-[13px]">Published</span>
+        <div className={TOGGLE_ROW} data-testid="content-row-published">
+          {/* 149:128 is 13/20 in --bk-ink. It was inheriting: the demo host paints
+              body #0F172A and the dashboard host paints its own, so this label
+              was whatever the page around it happened to be. */}
+          <span className={TOGGLE_ROW_LABEL} data-testid="content-row-published-label">Published</span>
           <ToggleSwitch checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
         </div>
         {record && onDelete && (
@@ -400,13 +495,14 @@ export function RecordView({
         tone="destructive"
       />
       {(dirty || !record) && (
-        <div className={SAVEBAR} role="region" aria-label="Unsaved changes">
-          <span className="tw:text-xs tw:text-[var(--bk-warning-text)]">Unsaved changes</span>
+        <div className={SAVEBAR} role="region" aria-label="Unsaved changes" data-testid="content-savebar">
+          <span className={SAVEBAR_STATUS} data-testid="content-savebar-status">Unsaved changes</span>
           <span className={SPACER} />
           <Button
             color="light"
             size="xs"
-            className={GHOST}
+            className={SAVEBAR_DISCARD}
+            data-testid="content-savebar-discard"
             onClick={() => { setData(initial); setPublished(record?.status === "published"); }}
           >
             Discard
@@ -415,6 +511,7 @@ export function RecordView({
             color="light"
             size="xs"
             variant="link" className={SAVE_LINK}
+            data-testid="content-savebar-save"
             disabled={saving}
             aria-busy={saving || undefined}
             onClick={() => {
@@ -478,13 +575,16 @@ export function FieldsView({
       <Crumb label={`${collection.name} · fields`} onClick={onBack} />
       <div className={SCROLL}>
         {collection.fields.map((f) => (
-          <Row key={f.id} size="stack" data-field-row>
+          <Row key={f.id} size="stack" data-field-row data-testid={`content-fieldrow-${f.id}`}>
             <span className={ROW_STACK}>
-              <span>{f.name}</span>
-              <span className={SUB}>{FIELD_TYPE_LABEL[f.type] ?? f.type}</span>
+              <span className={ROW_TITLE} data-testid={`content-fieldrow-name-${f.id}`}>{f.name}</span>
+              <span className={SUB} data-testid={`content-fieldrow-type-${f.id}`}>{FIELD_TYPE_LABEL[f.type] ?? f.type}</span>
             </span>
             <span className={ROW_ACTIONS}>
-              {f.validation?.required && <span className={SUB}>required</span>}
+              {/* 151:12 — the `required` tag is ink-DISABLED, a step quieter
+                  than the type line beside it. It was ink-muted, which read as
+                  a second piece of content rather than a tag. */}
+              {f.validation?.required && <span className={REQUIRED_TAG} data-testid={`content-fieldrow-req-${f.id}`}>required</span>}
               {/* Board 151:2 draws `⋯`, not a bare ✕: delete is not the only
                   thing a field row will ever offer, and a destructive glyph
                   sitting permanently on every row invites the mis-click.
@@ -561,7 +661,7 @@ export function FieldsView({
             </div>
           </div>
         ) : (
-          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={() => setAdding(true)}>
+          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-field" onClick={() => setAdding(true)}>
             + Add field
           </Button>
         )}
@@ -774,11 +874,8 @@ export function SourcesView({
           because ContentTab now subscribes to DataManager's own events — the
           panel states this because it is true, not as decoration. */}
       {sources.length > 0 && (
-        <div className="tw:px-3 tw:pb-1" data-testid="sources-watching">
-          <span
-            className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2 tw:py-0.5 tw:text-xs"
-            style={{ background: "var(--bk-success-tint)", color: "var(--bk-success)" }}
-          >
+        <div className="tw:px-4 tw:pb-1">
+          <span className={`${STATUS_PILL} ${STATUS_PILL_OK}`} data-testid="sources-watching">
             Watching for changes
           </span>
         </div>
@@ -787,10 +884,10 @@ export function SourcesView({
         {sources.map((s) => {
           const status = sourceStatus(s);
           return (
-            <Row key={s.id} size="comment" data-source-row>
+            <Row key={s.id} size="comment" data-source-row data-testid={`content-source-${s.id}`}>
               <span className={ROW_STACK}>
-                <span>{s.name}</span>
-                <span className={`${SUB} tw:inline-flex tw:items-center tw:gap-1.5`}>
+                <span className={ROW_TITLE} data-testid={`content-source-name-${s.id}`}>{s.name}</span>
+                <span className={`${SUB} tw:inline-flex tw:items-center tw:gap-1.5`} data-testid={`content-source-status-${s.id}`}>
                   <span
                     aria-hidden="true"
                     className="tw:size-[7px] tw:flex-none tw:rounded-full"
@@ -830,7 +927,13 @@ export function SourcesView({
         })}
         {/* Board 303:2067's pill words, which are the state's real name — the
             panel is not missing a list, there is nothing connected yet. */}
-        {sources.length === 0 && !adding && <div className={`${SUB} tw:p-3`}>No data source connected</div>}
+        {sources.length === 0 && !adding && (
+          <div className="tw:px-4 tw:py-2">
+            <span className={`${STATUS_PILL} ${STATUS_PILL_IDLE}`} data-testid="content-no-source">
+              No data source connected
+            </span>
+          </div>
+        )}
         {adding ? (
           <div className={INLINE_FORM}>
             <Textarea
@@ -864,13 +967,13 @@ export function SourcesView({
           </div>
         ) : (
           <>
-            <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={() => setAdding(true)}>
+            <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-source" onClick={() => setAdding(true)}>
               + Connect a source
             </Button>
             {/* Board 151:46 prints this under the link, in flow. Pinned to the
                 panel's foot with a rule above it, it read as a footer note on
                 a different subject — 600px below the thing it explains. */}
-            <div className={INLINE_HINT}>
+            <div className={INLINE_HINT} data-testid="content-source-note">
               A source feeds a collection. Edits sync one way — from the source in.
             </div>
           </>
@@ -924,9 +1027,9 @@ export function VariablesView({
           </div>
         )}
         {variables.map((v) => (
-          <Row key={v.key} size="stack" data-variable-row>
+          <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`}>
             <span className={ROW_STACK}>
-              <span className={MONO}>{`{{site.${v.key}}}`}</span>
+              <span className={MONO} data-testid={`content-var-key-${v.key}`}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
                 <TextInput
                   className="tw:mt-1"
@@ -943,7 +1046,7 @@ export function VariablesView({
                   }}
                 />
               ) : (
-                <span className={SUB}>{v.value || "—"}</span>
+                <span className={SUB} data-testid={`content-var-value-${v.key}`}>{v.value || "—"}</span>
               )}
             </span>
             <span className={ROW_ACTIONS}>
@@ -1028,7 +1131,7 @@ export function VariablesView({
             </div>
           </div>
         ) : (
-          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={() => setAdding(true)}>
+          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-variable" onClick={() => setAdding(true)}>
             + New variable
           </Button>
         )}
@@ -1071,10 +1174,10 @@ export function ConditionsView({
       <Crumb label="Conditions" onClick={onBack} />
       <div className={SCROLL}>
         {conditions.map((c) => (
-          <Row key={`${c.elementId}`} size="tall" data-condition-row>
+          <Row key={`${c.elementId}`} size="tall" data-condition-row data-testid={`content-cond-${c.elementId}`}>
             <span className={ROW_STACK}>
-              <span className="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap">{c.label}</span>
-              <span className={SUB}>{conditionSummary(c.binding)}</span>
+              <span className={`${ROW_TITLE} tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap`} data-testid={`content-cond-label-${c.elementId}`}>{c.label}</span>
+              <span className={SUB} data-testid={`content-cond-summary-${c.elementId}`}>{conditionSummary(c.binding)}</span>
             </span>
             <span className={ROW_ACTIONS}>
               {/* Board 151:87 draws `⋯`. */}
@@ -1161,7 +1264,7 @@ export function ConditionsView({
             </div>
           </div>
         ) : (
-          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} onClick={onStartPick}>
+          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-condition" onClick={onStartPick}>
             + New condition
           </Button>
         )}

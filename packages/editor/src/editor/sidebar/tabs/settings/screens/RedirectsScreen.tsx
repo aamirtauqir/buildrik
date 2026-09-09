@@ -19,7 +19,7 @@ import {
 } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog } from "@/editor/chrome-ui";
 
 interface Redirect {
   id: string;
@@ -56,6 +56,9 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
   registerSaveHandler,
 }) => {
   const [rows, setRows] = React.useState<Redirect[]>([]);
+  // Deleting is a server mutation with no undo, so the row button opens this
+  // instead of firing it — same ConfirmDialog the tab's own discard guard uses.
+  const [pendingDelete, setPendingDelete] = React.useState<Redirect | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [loadError, setLoadError] = React.useState<string | null>(null);
 
@@ -227,7 +230,13 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
         </form>
       </Section>
 
-      <Section title={`Active redirects${rows.length ? ` (${rows.length})` : ""}`}>
+      {/* Board 640:2752 heads this card REDIRECTS, flat. The count is the
+          product's own and is left standing; the ANCHOR is pinned so it does
+          not change with the rows. */}
+      <Section
+        title={`Active redirects${rows.length ? ` (${rows.length})` : ""}`}
+        anchor="redirects"
+      >
         {loading && <div className={SCREEN_EMPTY}>Loading…</div>}
         {!loading && loadError && (
           <div role="alert" className={SCREEN_ERROR}>{loadError}</div>
@@ -250,7 +259,7 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
                     color="light"
                     size="xs"
                     type="button"
-                    onClick={() => handleDelete(r.id)}
+                    onClick={() => setPendingDelete(r)}
                     aria-label={`Delete redirect from ${r.fromPath}`}
                     className="tw:px-2 tw:py-1 tw:rounded tw:border tw:border-[var(--bk-border-medium)] tw:bg-transparent tw:text-[11px] tw:font-medium tw:text-[var(--bk-error)]"
                   >
@@ -262,15 +271,38 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
           </ul>
         )}
       </Section>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => {
+          const target = pendingDelete;
+          setPendingDelete(null);
+          if (target) void handleDelete(target.id);
+        }}
+        title="Delete this redirect?"
+        message={
+          pendingDelete
+            ? `${pendingDelete.fromPath} → ${pendingDelete.toUrl} is removed for good. Nothing will forward ${pendingDelete.fromPath} once redirects go live — anyone following that URL lands on a 404. This can't be undone.`
+            : ""
+        }
+        confirmLabel="Delete redirect"
+        tone="destructive"
+      />
     </Screen>
   );
 };
 
 const ADD_BTN = "tw:mt-2 tw:px-3.5 tw:py-2 tw:rounded-md tw:text-xs tw:font-semibold";
 const LIST = "tw:flex tw:flex-col tw:gap-1.5 tw:list-none tw:m-0 tw:p-0";
-const ROW =
-  "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-2.5 tw:py-2 tw:rounded-md " +
-  "tw:border tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-subtle)]";
+/* Board 640:2759 draws each row on the CARD'S OWN WHITE (--color/bg-panel),
+   12px gap, 6px above and below, with no fill and no border of its own — the
+   rows are a table under a thead, not a stack of tiles. Live drew every row as
+   a bordered bg-subtle tile inside the white card, i.e. a card inside a card,
+   and that wash is what dropped the two 11px strings each row carries under
+   AA: the "→" (--bk-ink-muted) measured 4.39:1 and "Delete" (--bk-error)
+   4.29:1. Both clear on the white the board asked for. */
+const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-1.5";
 const PATH_COL = "tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:min-w-0";
 const MONO_CELL =
   "tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis tw:text-[11px] " +

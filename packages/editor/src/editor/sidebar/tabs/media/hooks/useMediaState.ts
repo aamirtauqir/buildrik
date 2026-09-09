@@ -177,7 +177,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const insertToCanvas = useCallback(
     async (key: string) => {
       let asset:
-        | { src: string; type: string; name: string; localOnly?: boolean }
+        | { src: string; type: string; name: string; localOnly?: boolean; altText?: string }
         | undefined = composer.media.getAsset(key);
       let isStock = false;
 
@@ -189,7 +189,10 @@ export function useMediaState(composer: Composer): MediaStateResult {
         } else {
           const photo = discovery.stockPhotos.find(p => p.id === key);
           if (photo) {
-            asset = { src: photo.url, type: "img", name: photo.alt };
+            /* The provider already wrote alt text for this photo; carrying it
+               is the difference between a published image with a description
+               and one with none. */
+            asset = { src: photo.url, type: "img", name: photo.alt, altText: photo.alt };
             isStock = true;
           } else {
             const font = discovery.discFonts.find((f) => f.id === key);
@@ -255,6 +258,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
           const mediaType = typeMap[asset.type] || "image";
           const result = composer.mediaOps.insertMediaAt(asset.src, mediaType, {
             path: "click",
+            alt: asset.altText,
           });
           if (result) {
             const insertedEl = composer.elements.getElement(result.elementId);

@@ -177,6 +177,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         aria-level={layer.depth + 1}
         title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
         style={rowStyle}
+        data-testid={`layer-row-${layer.id}`}
         data-drop={dropPosition ?? undefined}
         onMouseEnter={() => onMouseEnter(layer.id)}
         onMouseLeave={onMouseLeave}
@@ -239,6 +240,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
                any kind — axe: label, critical. It is the layer's name that is
                being edited, so say which layer. */
             aria-label={`Rename ${displayName}`}
+            data-testid={`layer-name-edit-${layer.id}`}
             className="bdc-lr-edit"
             value={editingName}
             onChange={(e) => onEditingNameChange(e.target.value)}
@@ -252,12 +254,13 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           />
         ) : (
           <>
-            <span className="bdc-lr-nm">{displayName}</span>
+            <span className="bdc-lr-nm" data-testid={`layer-name-${layer.id}`}>{displayName}</span>
             {isInstance && (
               <span
                 className="bdc-lr-comp"
                 title="Component instance"
                 aria-label="Component instance"
+                data-testid={`layer-instance-badge-${layer.id}`}
               >
                 {"\u25C7"}
               </span>
@@ -298,6 +301,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         <Button
           type="button"
           className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
+          data-testid={`layer-eye-${layer.id}`}
           title={
             isHidden
               ? "Show in editor — this element publishes either way"
@@ -325,6 +329,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         <Button
           type="button"
           className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
+          data-testid={`layer-lock-${layer.id}`}
           title={isLocked ? "Unlock element" : "Lock element"}
           aria-label={isLocked ? "Unlock element" : "Lock element"}
           onClick={(e) => onToggleLock(layer.id, e)}

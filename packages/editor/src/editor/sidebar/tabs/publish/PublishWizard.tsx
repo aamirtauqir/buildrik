@@ -48,7 +48,12 @@ export interface PublishWizardProps {
   rollbackTo: number | null;
 }
 
-const STEP_PILL = "tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[12px] tw:leading-4";
+/* Board 914:4510/4512/4514: a 28-high pill on a 14 radius, 10 either side,
+   12px SEMIBOLD in both states — and the inactive fill is --color/bg-selected
+   (#EBF5FF), not the grey the pills shipped with. `rounded-full` measured
+   9999 against the board's 14, and `py-1` on a 16 line box made them 24. */
+const STEP_PILL =
+  "tw:inline-flex tw:h-7 tw:items-center tw:rounded-[14px] tw:px-2.5 tw:text-[12px] tw:font-semibold";
 /* `min-h-9`, not `h-9`. The board draws every check on one line at 520 wide,
    but board sample data is not the contract — with this site's real strings
    ("SEO configured" and "Domain connected", both warnings) the label wraps to
@@ -130,10 +135,11 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
       {(["review", "confirm"] as const).map((s, i) => (
         <span
           key={s}
+          data-testid={`publish-step-${s}`}
           className={`${STEP_PILL} ${
             step === s
-              ? "tw:bg-[var(--bk-accent)] tw:font-medium tw:text-white"
-              : "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]"
+              ? "tw:bg-[var(--bk-accent)] tw:text-white"
+              : "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-ink-muted)]"
           }`}
         >
           {i + 1}. {s === "review" ? "Review" : "Confirm"}
@@ -150,7 +156,14 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
           read "form (560) is the closest size in the shared scale" until the
           520 was added to ModalParts for board 1172:4840. */}
       <ModalContent size="md" srTitle="Publish" className="tw:px-0 tw:py-0">
-        <div className="tw:border-b tw:border-[var(--bk-border)] tw:px-6 tw:py-4">{stepper}</div>
+        {/* Board 914:4508 — a 56-high gray-50 band, with 914:4516's 1px rule
+            under it in bg-subtle (the modal's default border is gray-200). */}
+        <div
+          className="tw:flex tw:h-14 tw:items-center tw:justify-center tw:border-b tw:border-[var(--bk-bg-subtle)] tw:bg-[var(--bk-gray-50)] tw:px-6"
+          data-testid="publish-stepper-band"
+        >
+          {stepper}
+        </div>
       {step === "review" ? (
         <>
           <h2 className="tw:m-0 tw:px-6 tw:pt-1 tw:pb-3 tw:text-[16px] tw:font-semibold tw:text-[var(--bk-ink)]">
@@ -225,7 +238,7 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
             {blockedOnVercel ? (
               <Button onClick={onConnectVercel}>Connect Vercel</Button>
             ) : (
-              <Button onClick={() => setStep("confirm")} disabled={blocked}>
+              <Button onClick={() => setStep("confirm")} disabled={blocked} data-testid="publish-continue">
                 Continue to Confirm →
               </Button>
             )}
@@ -233,7 +246,12 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
         </>
       ) : (
         <>
-          <h2 className="tw:m-0 tw:px-6 tw:pt-1 tw:pb-3 tw:text-[16px] tw:font-semibold tw:text-[var(--bk-ink)]">
+          {/* Board 914:4517/4518 — a 48-high row at the 24 gutter, not a
+              heading with asymmetric top/bottom padding. */}
+          <h2
+            className="tw:m-0 tw:flex tw:h-12 tw:items-center tw:px-6 tw:text-[16px] tw:font-semibold tw:text-[var(--bk-ink)]"
+            data-testid="publish-confirm-title"
+          >
             Confirm publish
           </h2>
 
@@ -254,13 +272,21 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
 
           {/* Board 914:4507. The consequence, stated before the irreversible
               button and not after it. */}
-          <p className={BAND}>⚠ This replaces the live site immediately for all visitors.</p>
+          <p className={BAND} data-testid="publish-confirm-band">
+            ⚠ This replaces the live site immediately for all visitors.
+          </p>
 
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-3">
+          {/* Board 914:4544: a 60-high foot at the 24 gutter, gap 12, with
+              914:4543's rule above it in bg-subtle. */}
+          <div
+            className="tw:flex tw:h-15 tw:items-center tw:justify-between tw:gap-3 tw:border-t tw:border-[var(--bk-bg-subtle)] tw:px-6"
+            data-testid="publish-confirm-foot"
+          >
             <Button
               color="light"
               onClick={() => setStep("review")}
-              className="tw:border-transparent tw:bg-transparent"
+              className="tw:border-transparent tw:bg-transparent tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink-muted)]"
+              data-testid="publish-confirm-back"
             >
               ← Back
             </Button>
@@ -269,6 +295,8 @@ export const PublishWizard: React.FC<PublishWizardProps> = ({
                 onClose();
                 onPublish();
               }}
+              className="tw:h-10 tw:rounded-lg tw:px-[18px] tw:text-[14px] tw:font-semibold"
+              data-testid="publish-confirm-now"
             >
               Publish now
             </Button>

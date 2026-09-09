@@ -29,9 +29,15 @@ export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
   onRetry?: () => void;
 }
 
-/** U1: one relative-time SSOT — seconds granularity preserved for saves. */
+/** U1: one relative-time SSOT — seconds granularity preserved for saves.
+ *
+ *  No " · " separator. Board 813:4836 draws all five states and its saved
+ *  labels are "Saved just now" / "Saved 2m ago"; board 297:1972's topbar
+ *  draws "Saved 2m ago" too. Two boards, same answer, and the middot bought
+ *  nothing — the whole point of the suffix being its own element is that it
+ *  can be dropped, and "Saved" alone reads the same either way. */
 function ago(ts: number): string {
-  return ` · ${formatRelativeTime(ts, {
+  return ` ${formatRelativeTime(ts, {
     fallback: "days",
     showSeconds: true,
     justNowLabel: "just now",
@@ -51,30 +57,48 @@ const COPY: Record<Exclude<SaveState, "saved">, string> = {
   error: "Save failed — retry",
 };
 
+/* `leading-[normal]` is the board's value (all five label nodes on 813:4836)
+   and it has to be said out loud: `text-xs` carries a 16px line-height of its
+   own. The pill is `h-6` with `items-center`, so nothing moves. */
 const BASE_CLASS =
   "tw:inline-flex tw:items-center tw:gap-2 tw:h-6 tw:px-2 tw:rounded-full " +
-  "tw:[font-family:var(--bk-font-ui)] tw:text-xs tw:whitespace-nowrap";
+  "tw:[font-family:var(--bk-font-ui)] tw:text-xs tw:leading-[normal] tw:whitespace-nowrap";
 
-/* T8/D7 rule 4 — text-first: saved · saving · unsaved are plain muted text on
-   no surface; the coloured dot carries the state. Only `offline`, `error`
-   (and `conflict`) earn a tinted pill, because they are the only ones that
-   mean "your work is not where you think it is". */
+/* SUPERSEDES "T8/D7 rule 4 — text-first" (founder call, 2026-09-08).
+   That rule read: saved · saving · unsaved are plain muted text and the dot
+   carries the state. Measured, it meant all three painted the SAME grey, so the
+   one control whose whole job is telling you your save state said nothing by
+   colour except through a 6px dot.
+   Board 813:4836 reached for the same fix and chose four hues that exist as NO
+   token and, three of four, FAIL AA on white — #998026 3.84, #268c40 4.28,
+   #b2661a 4.37 against a 4.5 floor. So the board is right about the problem and
+   wrong about the fix, and the accessible per-state tokens the system already
+   carries are used instead: success-text 5.36, warning-text 8.93, error-text
+   5.74, with ink-soft 7.56 for the neutral in-progress state.
+   `saving` is deliberately NOT a warning — it is in progress and nothing is
+   wrong — so it takes the neutral tone one step darker than muted, which keeps
+   it distinct from `saved` without implying a problem.
+   The board is pending a redraw to these tokens; until then the four colours
+   stay refused in `s1-2f-save-indicator`'s skipProps with this reasoning. */
 const STATE_CLASS: Record<SaveState, string> = {
-  saved: "tw:bg-transparent tw:text-[var(--bk-ink-muted)]",
-  saving: "tw:bg-transparent tw:text-[var(--bk-ink-muted)]",
-  unsaved: "tw:bg-transparent tw:text-[var(--bk-ink-muted)]",
-  conflict: "tw:bg-yellow-50 tw:text-yellow-800",
-  offline: "tw:bg-yellow-50 tw:text-yellow-800",
-  error: "tw:bg-red-100 tw:text-red-700",
+  saved: "tw:bg-transparent tw:text-[var(--bk-success-text)]",
+  saving: "tw:bg-transparent tw:text-[var(--bk-ink-soft)]",
+  unsaved: "tw:bg-transparent tw:text-[var(--bk-warning-text)]",
+  conflict: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
+  offline: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
+  error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
 };
 
+/* Dots follow the text, and off-ramp Tailwind literals (green-500, yellow-500,
+   red-600) become the tokens that already express these states — the same
+   substitution the Media surfaces made for bg-yellow-50/text-amber-800. */
 const DOT_CLASS: Record<SaveState, string> = {
-  saved: "tw:bg-green-500",
+  saved: "tw:bg-[var(--bk-success)]",
   saving: "tw:bg-[var(--bk-gray-500)]",
-  unsaved: "tw:bg-yellow-500",
-  conflict: "tw:bg-yellow-500",
-  offline: "tw:bg-yellow-500",
-  error: "tw:bg-red-600",
+  unsaved: "tw:bg-[var(--bk-warning)]",
+  conflict: "tw:bg-[var(--bk-warning)]",
+  offline: "tw:bg-[var(--bk-warning)]",
+  error: "tw:bg-[var(--bk-error)]",
 };
 
 export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: SaveStatusProps) {
@@ -101,9 +125,23 @@ export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: Save
       <span className="tw:@max-[1200px]:hidden">{ago(savedAt)}</span>
     ) : null;
 
+  /* `save-status-${state}` is the anchor board 813:4836 is measured through —
+     five drawn states, five ids, derived from the one prop that decides which
+     is on screen. Note `saved` covers the board's states 2 AND 3: they are the
+     same branch at two clock positions, which the board's own caption says
+     ("The same saved state as 2 — only savedAt is older").
+
+     Written inline at BOTH call sites rather than hoisted to a `const`:
+     `check-anchors` finds a derived id by grepping for the literal text
+     before the interpolation inside the attribute, so a hoisted template is
+     invisible to it and every `save-status-*` in a recipe reads as an anchor
+     nobody renders (measured — it failed exactly that way). */
+  /* `...rest` reached the span branch and not the button one, so every prop a
+     caller passed — id, aria-describedby, a test hook — was silently dropped
+     for exactly the two states that are actionable. */
   if (actionable) {
     return (
-      <button type="button" className={classes} onClick={onRetry}>
+      <button type="button" className={classes} onClick={onRetry} data-testid={`save-status-${state}`} {...rest}>
         {dot}
         {label}
         {stamp}
@@ -111,7 +149,7 @@ export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: Save
     );
   }
   return (
-    <span className={classes} {...rest}>
+    <span className={classes} data-testid={`save-status-${state}`} {...rest}>
       {dot}
       {label}
       {stamp}

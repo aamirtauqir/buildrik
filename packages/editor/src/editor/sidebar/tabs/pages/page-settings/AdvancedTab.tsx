@@ -16,8 +16,8 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
   return (
     <div className="tw:flex tw:flex-col tw:gap-[18px]">
       {/* Visibility */}
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+      <div className="tw:flex tw:flex-col tw:gap-2" data-testid="adv-field-visibility">
+        <div data-testid="adv-label-visibility" style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Visibility
         </div>
         <div style={{ display: "inline-flex", padding: 2, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4 }} role="radiogroup" aria-label="Page visibility">
@@ -108,6 +108,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           Custom &lt;head&gt; code
         </div>
         <Textarea
+          data-testid="adv-input-head"
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={s.customHead}
           onChange={(e) => s.setCustomHead(e.target.value)}

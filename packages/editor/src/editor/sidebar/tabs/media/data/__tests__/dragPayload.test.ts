@@ -54,14 +54,21 @@ describe("libraryTypeToInsertType", () => {
 });
 
 describe("setMediaDragData / readMediaDragData round-trip", () => {
-  it("writes the three canonical keys + text/plain fallback", () => {
+  it("writes the four canonical keys + text/plain fallback", () => {
     const dt = makeDT();
-    setMediaDragData(dt, makeItem());
+    setMediaDragData(dt, makeItem({ altText: "The company logo" }));
 
     expect(dt.getData("application/x-aquibra-media-src")).toBe("blob:https://app/abc");
     expect(dt.getData("application/x-aquibra-media-type")).toBe("image");
     expect(dt.getData("application/x-aquibra-media-name")).toBe("logo");
+    expect(dt.getData("application/x-aquibra-media-alt")).toBe("The company logo");
     expect(dt.getData("text/plain")).toBe("blob:https://app/abc");
+  });
+
+  it("writes an empty alt key when the asset has none, rather than omitting it", () => {
+    const dt = makeDT();
+    setMediaDragData(dt, makeItem());
+    expect(dt.getData("application/x-aquibra-media-alt")).toBe("");
   });
 
   it("sets effectAllowed = copy so the drop handler shows the copy cursor", () => {
@@ -82,10 +89,14 @@ describe("setMediaDragData / readMediaDragData round-trip", () => {
 
   it("readMediaDragData returns the same payload the source wrote", () => {
     const dt = makeDT();
-    setMediaDragData(dt, makeItem({ name: "hero-bg", type: "vid", src: "blob:xyz" }));
+    setMediaDragData(dt, makeItem({
+      name: "hero-bg", type: "vid", src: "blob:xyz", altText: "Rooftop at dusk",
+    }));
 
     const read = readMediaDragData(dt);
-    expect(read).toEqual({ src: "blob:xyz", type: "video", name: "hero-bg" });
+    expect(read).toEqual({
+      src: "blob:xyz", type: "video", name: "hero-bg", alt: "Rooftop at dusk",
+    });
   });
 
   it("readMediaDragData returns null when the drag is not a media drag", () => {

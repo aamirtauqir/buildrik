@@ -76,7 +76,7 @@ describe("TokenDetailView beginner-block", () => {
         "beginner",
       ),
     );
-    const deleteBtn = getByText("Delete").closest("button") as HTMLButtonElement;
+    const deleteBtn = getByText("Delete token").closest("button") as HTMLButtonElement;
     expect(deleteBtn.getAttribute("aria-disabled")).toBe("true");
     expect(deleteBtn.disabled).toBe(true);
   });
@@ -111,7 +111,7 @@ describe("TokenDetailView beginner-block", () => {
         "beginner",
       ),
     );
-    const deleteBtn = getByText("Delete").closest("button") as HTMLButtonElement;
+    const deleteBtn = getByText("Delete token").closest("button") as HTMLButtonElement;
     fireEvent.click(deleteBtn);
     expect(onDelete).not.toHaveBeenCalled();
     expect(onBack).not.toHaveBeenCalled();
@@ -128,7 +128,7 @@ describe("TokenDetailView beginner-block", () => {
         "pro",
       ),
     );
-    const deleteBtn = getByText("Delete").closest("button") as HTMLButtonElement;
+    const deleteBtn = getByText("Delete token").closest("button") as HTMLButtonElement;
     expect(deleteBtn.disabled).toBe(false);
     expect(deleteBtn.getAttribute("aria-disabled")).toBeNull();
     expect(container.querySelector("[data-beginner-notice]")).toBeNull();
@@ -151,7 +151,7 @@ describe("TokenDetailView beginner-block", () => {
         "pro",
       ),
     );
-    fireEvent.click(getByText("Delete"));
+    fireEvent.click(getByText("Delete token"));
     // Modal opens; nothing deleted yet, no back navigation.
     expect(onDelete).not.toHaveBeenCalled();
     expect(onBack).not.toHaveBeenCalled();

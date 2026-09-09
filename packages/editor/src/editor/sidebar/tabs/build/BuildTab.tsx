@@ -154,6 +154,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       <div className="bld-content">
         <div
           className="bld-search-wrap"
+          data-testid="insert-search-wrap"
           onKeyDown={(e) => {
             if (e.key === "Escape" && tab.searchQuery.length > 0) {
               e.stopPropagation();
@@ -168,6 +169,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             placeholder="Search elements"
             debounceMs={150}
             kbdHint="⌘F"
+            testId="insert-search-box"
           />
         </div>
 

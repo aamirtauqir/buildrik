@@ -20,6 +20,10 @@
 import * as React from "react";
 import "./settings.css";
 import { Button, type CustomFlowbiteTheme, Select as FlowbiteSelect, Textarea as FlowbiteTextarea, TextInput as FlowbiteTextInput } from "@/editor/chrome-ui";
+/** Conformance anchor stem: a card/field is identified by its own title. */
+const slug = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Section
 // ─────────────────────────────────────────────────────────────────────────────
@@ -27,16 +31,38 @@ import { Button, type CustomFlowbiteTheme, Select as FlowbiteSelect, Textarea as
 interface SectionProps {
   title: string;
   desc?: string;
+  /**
+   * Anchor stem, when the TITLE carries data. Three screens head a table card
+   * with a live count — "Active redirects (2)", "Enabled locales (2)",
+   * "Submissions (14)" — and the title-derived id then changed with the rows,
+   * so `set-card-enabled-locales-2` was an anchor that only existed for one
+   * fixture. Defaults to the title, so every other card is unchanged.
+   */
+  anchor?: string;
   children: React.ReactNode;
 }
 
-export const Section: React.FC<SectionProps> = ({ title, desc, children }) => (
-  <div className="bd-set-section">
-    <h3 className="bd-set-section-h">{title}</h3>
-    {desc ? <div className="bd-set-section-d">{desc}</div> : null}
-    {children}
-  </div>
-);
+export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children }) => {
+  const stem = slug(anchor ?? title);
+  /* An EMPTY title is a real case — Headers and Localization both end with a
+     bare `<Section title="">` holding the save row. It used to render an empty
+     <h3> (an unlabelled heading in the a11y tree) and derive `set-card-` /
+     `set-card-title-` from it, which is a junk anchor that two screens both
+     claim. No stem, no heading and no anchor. */
+  const cardId = stem ? `set-card-${stem}` : undefined;
+  const cardTitleId = `set-card-title-${stem}`;
+  return (
+    <div className="bd-set-section" data-testid={cardId}>
+      {title ? (
+        <h3 className="bd-set-section-h" data-testid={cardTitleId}>
+          {title}
+        </h3>
+      ) : null}
+      {desc ? <div className="bd-set-section-d">{desc}</div> : null}
+      {children}
+    </div>
+  );
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Field
@@ -46,18 +72,34 @@ interface FieldProps {
   label: React.ReactNode;
   hint?: React.ReactNode;
   htmlFor?: string;
+  /**
+   * Anchor stem, when the LABEL is not unique on the screen. Headers draws two
+   * fields called "Policy" — X-Frame-Options' and Referrer-Policy's, both named
+   * that way by the board (640:3109 / 640:3117) — and the label-derived id made
+   * `set-field-policy` resolve to two elements, so the second card's field was
+   * unaddressable by any test or probe. Defaults to the label, so the other
+   * twelve screens are unchanged.
+   */
+  anchor?: string;
   children: React.ReactNode;
 }
 
-export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) => (
-  <div className="bd-set-field">
-    <label className="bd-set-field-lbl" htmlFor={htmlFor}>
+export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, children }) => {
+  const stem = slug(anchor ?? String(label));
+  return (
+  <div className="bd-set-field" data-testid={`set-field-${stem}`}>
+    <label
+      className="bd-set-field-lbl"
+      htmlFor={htmlFor}
+      data-testid={`set-field-label-${stem}`}
+    >
       <span>{label}</span>
       {hint ? <span className="bd-set-field-hint">{hint}</span> : null}
     </label>
     {children}
   </div>
-);
+  );
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Input / Textarea / Select

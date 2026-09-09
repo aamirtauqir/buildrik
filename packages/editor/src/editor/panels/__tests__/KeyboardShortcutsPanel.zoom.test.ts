@@ -33,7 +33,9 @@ describe("keyboard shortcuts panel — zoom rows", () => {
   });
 
   it("advertises fit under the chord that fits", () => {
-    expect(descFor("Ctrl+1")).toBe("Fit to view");
+    /* Board 815:4518, the zoom flyout and the canvas cheat sheet all say
+       "Zoom to fit"; this sheet was the only "Fit to view". */
+    expect(descFor("Ctrl+1")).toBe("Zoom to fit");
     expect(toolbar).toMatch(/key === "1" && onFitToScreen/);
   });
 

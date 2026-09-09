@@ -49,18 +49,27 @@ describe("BrandPreview", () => {
     expect(within(strip).getByText("+4")).toBeTruthy();
   });
 
+  /* The `brand-preview-type` wrapper this used to reach through is gone:
+     board 1691:7341 makes Heading and Body peers of the swatch row inside the
+     band's own 8px gap, so each specimen is now addressed by its own id. */
   it("renders both type slots as specimens, in their own faces", () => {
     render(<BrandPreview colors={[]} />);
-    const type = screen.getByTestId("brand-preview-type");
-    expect(within(type).getByText("Heading")).toBeTruthy();
-    expect(within(type).getByText("Body")).toBeTruthy();
-    const [heading] = within(type).getAllByText("Aa");
-    expect(heading.getAttribute("style")).toContain("--buildrick-design-font-heading");
+    const heading = screen.getByTestId("brand-specimen-heading");
+    const body = screen.getByTestId("brand-specimen-body");
+    expect(within(heading).getByText("Heading")).toBeTruthy();
+    expect(within(body).getByText("Body")).toBeTruthy();
+    expect(
+      screen.getByTestId("brand-specimen-aa-heading").getAttribute("style"),
+    ).toContain("--buildrick-design-font-heading");
+    expect(
+      screen.getByTestId("brand-specimen-aa-body").getAttribute("style"),
+    ).toContain("--buildrick-design-font-body");
   });
 
   it("with no colour tokens it shows type only, not an empty strip", () => {
     render(<BrandPreview colors={[]} />);
     expect(screen.queryByTestId("brand-preview-swatches")).toBeNull();
-    expect(screen.getByTestId("brand-preview-type")).toBeTruthy();
+    expect(screen.getByTestId("brand-specimen-heading")).toBeTruthy();
+    expect(screen.getByTestId("brand-specimen-body")).toBeTruthy();
   });
 });

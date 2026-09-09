@@ -11,19 +11,20 @@
  * assets the user had not found yet. Search leads now, and Stock moved to the
  * footer beside Upload, where the two ways of getting media in sit together.
  *
- * WHAT THE FOOTER KEPT. The board draws two text links. `UploadZone` is still
- * mounted under them because it owns the file input, the drag-and-drop target,
- * the quota bar and the persistent failed-upload list with retry — none of
- * which the board's mock shows and all of which are real behaviour. Deleting
- * the component to match a static frame would have removed working surfaces;
- * the links drive it instead.
+ * WHAT THE FOOTER KEPT. The board draws text links, the accept list and a
+ * pointer to the full library — 182px of it. `UploadZone` is still mounted
+ * above them because it owns the file input, the drag-and-drop target, the
+ * quota bar and the persistent failed-upload list with retry — none of which
+ * the board's mock shows and all of which are real behaviour. Deleting the
+ * component to match a static frame would have removed working surfaces; the
+ * links drive it instead.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { PanelFrame, Button, IconButton, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
-import { Upload, Cloud, Shapes, Folder, ChevronDown, LayoutGrid, Rows3, ArrowUpDown } from "lucide-react";
+import { PanelFrame, Button, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
+import { Upload, Cloud, Shapes, Folder, ChevronDown, CheckSquare } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { flattenFolderTree } from "../utils/folderTree";
@@ -50,7 +51,7 @@ interface SlimLauncherProps {
   onExpand?(): void;
   /**
    * Boards 303:1997 / 303:2032 — a pill over the grid naming the media job
-   * currently running ("Image editor — …", "Optimising → WebP…").
+   * currently running ("Image editor — …", "Optimizing → WebP…").
    */
   statusPill?: string | null;
   /** Any interaction with the drawer clears a pill left by a closed modal. */
@@ -64,11 +65,14 @@ interface SlimLauncherProps {
 
   // ── Bulk select (board `145:300`) ─────────────────────────────────────────
   /**
-   * The board draws the SELECTED state but no way into it — there is no
-   * "Select" control anywhere on `144:2`. Right-click on a card is the entry
-   * point here: it is the gesture the fullpage manager already uses for its
-   * per-asset menu, it costs the bar no chrome the board does not have, and
-   * the way out (Done) is visible the whole time selection is on.
+   * Two ways in. `☑ Select` in the folder row is the board's own (144:12, and
+   * the hotspot on it names `bulk-select` as the destination); right-click on
+   * a card is the gesture the fullpage manager already uses for its per-asset
+   * menu and pre-selects the card it landed on. The way out — Done — is
+   * visible the whole time selection is on.
+   *
+   * This comment used to read "the board draws the SELECTED state but no way
+   * into it". True of the 2026-09-02 capture, not of the board.
    */
   /**
    * Open the asset drill-in (board `146:2`, and its Versions / Used-in tabs at
@@ -87,6 +91,8 @@ interface SlimLauncherProps {
   onFolderChange?(folderId: string | null): void;
 
   selectionMode?: boolean;
+  /** Board 144:12's `☑ Select` — enter (or leave) bulk-select from the folder row. */
+  onToggleSelection?(): void;
   selectedKeys?: Set<string>;
   onEnterSelection?(key: string): void;
   onToggleSelect?(key: string): void;
@@ -155,7 +161,12 @@ export function SlimLauncher(props: SlimLauncherProps) {
 
   return (
     <PanelFrame
-      className="sl-launcher"
+      /* Board 144:2 gives the panel a --flowbite/gray/100 (#f3f4f6) edge, which
+         the shipped panel did not draw at all — measured border-color came back
+         #000000, the initial value. Set here rather than via PanelFrame's
+         `bordered` prop: that prop paints gray-200, and a single screen board
+         must not redefine a chrome-ui-wide primitive (CLAUDE.md). */
+      className="sl-launcher tw:border tw:border-[var(--bk-gray-100)]"
       data-testid="media-panel"
       onPointerDownCapture={props.statusPill ? props.onDismissStatusPill : undefined}
     >
@@ -177,17 +188,35 @@ export function SlimLauncher(props: SlimLauncherProps) {
           aria-live="polite"
           data-testid="media-status-pill"
         >
-          <span className="tw:pointer-events-none tw:absolute tw:left-4 tw:top-1.5 tw:z-10 tw:inline-flex tw:items-center tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:[box-shadow:var(--bk-shadow-raised)]">
+          {/* Boards 333:2340 / 333:2342 — the chrome-ui Badge treatment, not a
+              bare tint: gray-200 fill, a gray-400 rule, 10/2 padding, and the
+              label 12/16 Medium gray-700. It shipped as bg-subtle with no
+              border and ink text, which read as part of the grid rather than
+              as something laid over it. The raised shadow stays: it is what
+              makes a floating status legible over cards, and no board can draw
+              a shadow this small. */}
+          <span
+            data-testid="media-status-pill-badge"
+            className="tw:pointer-events-none tw:absolute tw:left-4 tw:top-1.5 tw:z-10 tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-gray-400)] tw:bg-[var(--bk-gray-200)] tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:font-medium tw:leading-4 tw:text-[var(--bk-gray-700)] tw:[box-shadow:var(--bk-shadow-raised)]"
+          >
             {props.statusPill}
           </span>
         </div>
       ) : null}
 
       {/* Board 144:7/144:8 — bare 28h box, no magnifier, no inline clear. */}
-      <div className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4" data-testid="media-search">
+      {/* Board 144:7 draws ONE box: 36 high, border --color/border (#e5e7eb),
+          radius 6. The code had the 36 on this wrapper and the border+radius on
+          the input inside it, so the measured wrapper reported no border and
+          radius 0 while the height passed — three failures for one structural
+          mismatch. The edge belongs on the box the board describes. */}
+      <div
+        className="sl-search tw:flex tw:h-9 tw:items-center tw:px-4 tw:rounded-md tw:border tw:border-[var(--bk-border)]"
+        data-testid="media-search"
+      >
         <TextField
           type="text"
-          className="sl-search__input tw:h-[28px] tw:w-full tw:rounded-md tw:border tw:border-[var(--bk-gray-100)] tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
+          className="sl-search__input tw:h-[28px] tw:w-full tw:border-0 tw:bg-[var(--bk-bg-subtle)] tw:px-[var(--bk-space-8)] tw:text-[13px] tw:text-[var(--bk-ink)] tw:placeholder:text-[var(--bk-gray-500)]"
           placeholder="Search"
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
@@ -203,7 +232,13 @@ export function SlimLauncher(props: SlimLauncherProps) {
           "Nothing matches" about a file that exists. */}
       {props.serverPage && searchQuery.trim().length >= 2 && props.serverPage.total > props.serverPage.loaded ? (
         <div
-          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:font-medium tw:leading-4 ${props.searchState === "failed" ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`}
+          /* Boards 1313:11 (filtered) and 1314:20 (no-results) draw this band.
+             They disagree about its size — 11/16 there, 13/20 here — and about
+             its height, 43 against 51, so neither settles it and it keeps the
+             11/16 caption scale the rest of the drawer's small text uses. They
+             AGREE on two things the code had wrong: it is Inter, not mono, and
+             the informative state is accent, not ink-muted. */
+          className={`tw:flex tw:min-h-[22px] tw:items-center tw:px-4 tw:text-[11px] tw:font-medium tw:leading-4 ${props.searchState === "failed" ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-accent-text)]"}`}
           data-testid="media-search-scope"
           role="status"
         >
@@ -223,11 +258,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       ) : null}
 
       {/*
-        Folder row — board `144:10`. Scope on the left, view + sort on the
-        right. The controls are rendered disabled rather than omitted: the
-        board draws them, the drawer has one flat folder today, and a control
-        that is present-but-disabled says "not here yet" where a missing one
-        says nothing at all. They light up with the folder work (T12).
+        Folder row — board `144:10`. Scope on the left, Select on the right.
       */}
       <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4" data-testid="media-folder-row">
         <Popover
@@ -279,19 +310,32 @@ export function SlimLauncher(props: SlimLauncherProps) {
           </Menu>
         </Popover>
         <span className="tw:flex-1" />
-        {/* Board 144:12 draws a bare glyph cluster — no button boxes. Still
-            disabled controls, not decoration (T12 lights them up). */}
-        <span className="tw:flex tw:items-center tw:gap-2 tw:text-[var(--bk-ink-soft)]" data-testid="media-view-controls">
-          <IconButton label="Grid view" size="sm" pressed disabled className="tw:border-0 tw:bg-transparent tw:aria-pressed:bg-transparent tw:aria-pressed:text-[var(--bk-ink)]">
-            <LayoutGrid size={13} />
-          </IconButton>
-          <IconButton label="List view" size="sm" disabled className="tw:border-0 tw:bg-transparent">
-            <Rows3 size={13} />
-          </IconButton>
-          <IconButton label="Sort" size="sm" disabled className="tw:border-0 tw:bg-transparent">
-            <ArrowUpDown size={13} />
-          </IconButton>
-        </span>
+        {/*
+          Board 144:12, redrawn. This slot held three DISABLED glyphs — grid,
+          list, sort — on the reading that a present-but-disabled control says
+          "not here yet". The board now spends the slot on `☑ Select` (11/18
+          ink-soft, with a 76×30 hotspot wired to the bulk-select state) and
+          says where the other three live in the footer instead. That is one
+          edit, not two: keeping the greyed glyphs beside a footer line that
+          sends you elsewhere for them states the opposite of what it means.
+
+          It also closes the hole this file used to record — "the board draws
+          the SELECTED state but no way into it". Right-click still enters
+          selection on a card; this is the entry a first-time user can see.
+        */}
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          variant="link"
+          className="tw:min-h-6 tw:gap-1 tw:font-normal tw:text-[11px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]"
+          data-testid="media-select-mode"
+          aria-pressed={Boolean(props.selectionMode)}
+          onClick={props.onToggleSelection}
+        >
+          <CheckSquare size={13} aria-hidden="true" />
+          Select
+        </Button>
       </div>
 
       <TypePills
@@ -310,8 +354,14 @@ export function SlimLauncher(props: SlimLauncherProps) {
             browser, and only one of them is worth a retry.
           */
           <div className="tw:h-35 tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-load-error" role="alert">
-            <p className="tw:text-[var(--bk-error-text)]">Couldn&apos;t load your media.</p>
-            <p className="tw:mt-2 tw:flex tw:justify-center tw:gap-10">
+            {/* `tw:m-0` is load-bearing, not tidiness: chrome-reset.css resets
+                form controls only, so the UA's 1em <p> margin pushed both rows
+                13px down the band. The board puts the message at 44 and the
+                links at 74; the shipped block had them at 57 and 90, and the
+                harness could not see it — only the band's own height was
+                joined. Measured 2026-09-08. */}
+            <p className="tw:m-0 tw:text-[var(--bk-error-text)]">Couldn&apos;t load your media.</p>
+            <p className="tw:mx-0 tw:mb-0 tw:mt-2.5 tw:flex tw:justify-center tw:gap-10">
               <Button
                 type="button"
                 color="light"
@@ -329,7 +379,9 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 variant="link" className="tw:min-h-6 tw:font-normal"
                 onClick={onOpenStock}
               >
-                Stock
+                {/* Board 453:3955 — "Browse stock", the same words the footer
+                    and the empty state use for the same destination. */}
+                Browse stock
               </Button>
             </p>
           </div>
@@ -350,9 +402,9 @@ export function SlimLauncher(props: SlimLauncherProps) {
                 classes rather than an inline width — these are six fixed
                 values from the design, not a computed one. */}
             {["tw:w-24", "tw:w-18", "tw:w-[110px]", "tw:w-21", "tw:w-25", "tw:w-[66px]"].map((w, i) => (
-              <span key={i} className="tw:flex tw:h-26 tw:w-full tw:flex-col tw:gap-1">
-                <SkeletonBlock className="tw:h-19 tw:w-full tw:rounded-md" />
-                <SkeletonBlock className={`tw:h-2.5 ${w}`} />
+              <span key={i} className="tw:flex tw:h-26 tw:w-full tw:flex-col tw:gap-1" data-testid={`media-skeleton-cell-${i}`}>
+                <SkeletonBlock className="tw:h-19 tw:w-full tw:rounded-md" data-testid={`media-skeleton-thumb-${i}`} />
+                <SkeletonBlock className={`tw:h-2.5 ${w}`} data-testid={`media-skeleton-bar-${i}`} />
               </span>
             ))}
           </div>
@@ -378,9 +430,9 @@ export function SlimLauncher(props: SlimLauncherProps) {
 
                Stock stays, because it is the one action the drop zone cannot
                perform — and it is worded the way the footer words it. */
-            <div className="sl-empty tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-empty">
-              <p className="tw:text-[var(--bk-ink-muted)]">No images or files yet.</p>
-              <p className="tw:mt-2.5 tw:flex tw:justify-center tw:gap-10">
+            <div className="sl-empty tw:h-35 tw:px-4 tw:pt-11 tw:text-center tw:text-[13px] tw:leading-5" data-testid="media-empty">
+              <p className="tw:m-0 tw:text-[var(--bk-ink-muted)]">No images or files yet.</p>
+              <p className="tw:mx-0 tw:mb-0 tw:mt-2.5 tw:flex tw:justify-center tw:gap-10">
                 <Button
                   type="button"
                   color="light"
@@ -395,15 +447,20 @@ export function SlimLauncher(props: SlimLauncherProps) {
             </div>
           ) : (
             searchQuery.trim() ? (
-              <div className="tw:px-4 tw:pt-8 tw:text-left tw:text-[13px] tw:leading-5" data-testid="media-no-results" role="status">
-                <p className="tw:text-[var(--bk-ink-muted)]">
+              /* Board 782:4399 — a left-aligned state block on its own inset
+                 (px-24, pt-36, pb-32, gap-10), not a list row on the grid's
+                 px-16. `leading-[normal]` is the one thing NOT taken from it:
+                 that is Figma's AUTO line height, and every other 13px line on
+                 every Media board is 13/20. */
+              <div className="tw:flex tw:flex-col tw:items-start tw:gap-2.5 tw:px-6 tw:pt-9 tw:pb-8 tw:text-left tw:text-[13px] tw:leading-5" data-testid="media-no-results" role="status">
+                <p className="tw:m-0 tw:text-[var(--bk-ink-muted)]" data-testid="media-no-results-message">
                   Nothing matches {"\u2018"}{searchQuery.trim()}{"\u2019"}.
                 </p>
                 <Button
                   type="button"
                   color="light"
                   size="xs"
-                  variant="link" className="tw:min-h-6 tw:mt-1.5 tw:font-normal"
+                  variant="link" className="tw:min-h-6 tw:font-normal"
                   data-testid="media-clear-search"
                   onClick={() => onSearchChange("")}
                 >
@@ -606,10 +663,34 @@ export function SlimLauncher(props: SlimLauncherProps) {
           uploadQueue={props.uploadQueue}
           disabled={props.storage.used >= props.storage.total}
         />
-        {/* Board `144:46` — two accent text links, 44h row. */}
+        {/*
+          Board `144:46` — and it is 182 tall, not 44. The footer grew between
+          the 2026-09-02 and 2026-09-07 captures of the same node: under the
+          links row it now carries the accept list and the line that explains
+          why Sort and List view sit disabled in the folder row. Both are facts
+          the drawer already owned and never said out loud — `UploadZone`'s
+          `ACCEPT_TYPES` + `MAX_FILE_BYTES`, and the two controls at 144:12 —
+          so the board is asking for copy, not for behaviour.
+
+          The board paints both lines accent blue with `cursor-pointer`, which
+          is the link node they were duplicated from, not a decision: neither
+          line goes anywhere. The one board that colours them as text rather
+          than as links — 145:250, quota-full — uses --color/ink-muted, and
+          that board also turns this whole foot to --color/bg-subtle, where
+          ink-muted computes 4.39:1 and fails AA. So they take ink-soft: 7.4 on
+          the panel, 7.0 on the tint, and no board asserts a colour for them
+          that the harness can hold either of us to.
+        */}
+        {/* Board 145:294 — when storage is full the whole foot goes to
+            --color/bg-subtle: Upload cannot run, and a footer that still looks
+            live is the part of a disabled control users argue with. */}
         <div
-          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:px-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-accent-text)]"
+          className={`tw:pb-7.5 tw:text-[13px] tw:leading-5 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
           data-testid="media-footer"
+        >
+        <div
+          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:px-4 tw:text-[var(--bk-accent-text)]"
+          data-testid="media-footer-links"
         >
           <Button
             type="button"
@@ -651,6 +732,19 @@ export function SlimLauncher(props: SlimLauncherProps) {
               Icons
             </Button>
           ) : null}
+        </div>
+          {/* Board 2838:12022. The list is `UploadZone`'s own accept string and
+              its own 50 MB ceiling, spelled for a person. */}
+          <p className="tw:m-0 tw:px-4 tw:text-[var(--bk-ink-soft)]" data-testid="media-footer-accepts">
+            Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file
+          </p>
+          {/* Board 2838:12023 — why the view and sort controls at 144:12 are
+              disabled. They were present-but-disabled and said nothing; a
+              disabled control that names its destination is the difference
+              between "broken" and "not here". */}
+          <p className="tw:m-0 tw:px-4 tw:pt-7 tw:text-[var(--bk-ink-soft)]" data-testid="media-footer-hint">
+            Sort and list view live in the full library
+          </p>
         </div>
       </div>
     </PanelFrame>

@@ -156,9 +156,9 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         onClose={onClose}
       />
       {/* Board 142:7 Toolbar — search box + ⊞ ⊟ ⚙ on one 36-tall band. */}
-      <div className="bdc-ltoolbar">
+      <div className="bdc-ltoolbar" data-testid="layers-toolbar">
         {/* Board 142:8: bare box — no magnifier glyph. */}
-        <label className="bdc-psearch">
+        <label className="bdc-psearch" data-testid="layers-search">
           {/* The CONTAINER (.bdc-psearch) is the box — board 142:8. The
               flowbite input's own border/ring inside it reads as a second
               box; inline style outranks the theme utilities. */}
@@ -173,13 +173,13 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         </label>
         {/* Board 142:10 draws these as TEXT glyphs — "⊞ ⊟ ⚙", 13px
             ink-soft — not stroked SVG icons. */}
-        <Button className="bdc-icon-btn" title="Expand all" aria-label="Expand all layers" onClick={handleExpandAll}>
+        <Button className="bdc-icon-btn" data-testid="layers-expand-all" title="Expand all" aria-label="Expand all layers" onClick={handleExpandAll}>
           <span aria-hidden="true">⊞</span>
         </Button>
-        <Button className="bdc-icon-btn" title="Collapse all" aria-label="Collapse all layers" onClick={handleCollapseAll}>
+        <Button className="bdc-icon-btn" data-testid="layers-collapse-all" title="Collapse all" aria-label="Collapse all layers" onClick={handleCollapseAll}>
           <span aria-hidden="true">⊟</span>
         </Button>
-        <Button className="bdc-icon-btn" title="Display settings" aria-label="Layer display settings" aria-expanded={displaySettingsOpen} onClick={() => setDisplaySettingsOpen((v) => !v)}>
+        <Button className="bdc-icon-btn" data-testid="layers-display-settings-toggle" title="Display settings" aria-label="Layer display settings" aria-expanded={displaySettingsOpen} onClick={() => setDisplaySettingsOpen((v) => !v)}>
           <span aria-hidden="true">⚙</span>
         </Button>
       </div>
@@ -214,10 +214,14 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           failed (781:4217), because a count of a list that did not load is
           not a fact. */}
       {!treeFailed && (
-        <div className="bdc-lcount" aria-live="polite">
-          {stats.selected >= 2
-            ? `${stats.selected} selected of ${stats.total}`
-            : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+        <div className="bdc-lcount" data-testid="layers-count" aria-live="polite">
+          {/* The span is the board's own second node (142:59 inside 142:58):
+              the band carries the height, the run carries the type. */}
+          <span data-testid="layers-count-text">
+            {stats.selected >= 2
+              ? `${stats.selected} selected of ${stats.total}`
+              : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+          </span>
         </div>
       )}
     </PanelFrame>

@@ -1,7 +1,20 @@
 /**
  * Board 163:269 (History · Saves · pruned-notice) draws a banner above the
- * list: "Older auto-saves were removed / Past 50. Named versions and the
- * approved one were kept."
+ * list: "Older auto-saves were removed / Past 50. Named versions were kept."
+ *
+ * The second sentence used to read "Named versions AND THE APPROVED ONE were
+ * kept", here and in the panel. That is a protection the engine does not have:
+ * `pruneVersions` (engine/storage/VersionHistoryStorage.ts) filters on
+ * `isAutoCheckpoint` and knows nothing about approval, so an approved
+ * auto-checkpoint prunes like any other — the notice was promising a guarantee
+ * in the same breath as announcing a deletion. Board and code agree without it.
+ *
+ * WHAT THIS FILE DOES NOT PROVE: the fixture below re-implements the notice,
+ * so it tests the subscription contract (nothing until VERSION_PRUNED, and the
+ * kept count comes from the payload rather than a hardcoded 50) and NOT the
+ * shipped markup. The real block is measured against 163:315/316/317 by
+ * `scripts/conformance/surfaces/history-saves-pruned-notice.json`, which mounts
+ * VersionHistoryPanel itself.
  *
  * VersionTimelineManager has always pruned past maxVersions and said nothing —
  * older auto-saves simply stopped being there. It now emits VERSION_PRUNED and
@@ -29,7 +42,7 @@ function PrunedNotice({ composer }: { composer: { on: Function; off: Function } 
   return (
     <div className="saves-pruned-notice" role="status">
       <strong>Older auto-saves were removed</strong>
-      <span>Past {pruned.kept}. Named versions and the approved one were kept.</span>
+      <span>Past {pruned.kept}. Named versions were kept.</span>
     </div>
   );
 }

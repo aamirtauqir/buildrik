@@ -32,6 +32,7 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
+import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 // ============================================================================
@@ -193,6 +194,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // carry these next to its own second implementation of those shortcuts; the
   // implementations are gone and the feedback follows the commands' events.
   useClipboardToasts(composer, addToast);
+  /* Narrowed once, here, so the JSX below reads as one fact rather than a
+     type-guard expression: `stale-approval` is the fourth block reason and
+     keeps StaleApprovalModal. */
+  const blockedReason = publishJob?.blockedReason ?? null;
+  const publishGate = isPublishGateReason(blockedReason) ? blockedReason : null;
   const { handleBlockClick } = useBlockInsertion(composer);
   useAltTextAutoTrigger(composer);
 
@@ -536,6 +542,17 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           />
         </LayoutShell.FullPage>
       </LayoutShell>
+
+      {/* S5.4's three approval gates (307:2193 · 307:2203 · 307:2213). They are
+          driven from `publishJob`, which arrives here already for the Publish
+          panel, and their one action is "open the Review panel" — this
+          component's own `ui:switch-tab` contract. The gate belongs where the
+          door it offers is answered. */}
+      <PublishGateModal
+        reason={publishGate}
+        composer={composer}
+        onClose={() => publishJob?.dismissBlock()}
+      />
     </StylePresetRegistryProvider>
     </TokenRegistryProvider>
     </DSModeProvider>

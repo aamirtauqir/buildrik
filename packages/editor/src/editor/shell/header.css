@@ -40,7 +40,9 @@
   max-height: 60vh;
   overflow-y: auto;
   background: var(--bk-bg-panel);
-  border: 1px solid var(--bk-border);
+  /* Board 165:71 names --flowbite/gray/100 for this panel's edge, not the
+     general --bk-border (gray-200). Panel-local, so nothing else moves. */
+  border: 1px solid var(--bk-gray-100);
   border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
 }
@@ -54,30 +56,65 @@
   z-index: 1;
 }
 
-.bk-notif-row {
+/* Two classes deep on purpose: `stack` carries `tw:items-center`, and a
+   single-class rule only ties a utility on specificity — source order would
+   decide. Board 165:77 top-anchors the row's text at y=8 in a 44 box. */
+.bk-notifications .bk-notif-row {
   align-items: flex-start;
   gap: var(--bk-space-8);
   border-bottom: 1px solid var(--bk-border);
 }
 
-.bk-notif-row--unread { background: var(--bk-accent-subtle); }
-
-.bk-notif-row__spacer {
-  flex: none;
-  width: var(--bk-space-8);
+/* Board 165:8 — accent-TINT (#EBF5FF), not accent-subtle (#E1EFFE), plus
+   165:9: a 2px full-height accent bar at the row's left edge. Row's own
+   selected-state bar is 3px and hangs off aria-selected, which this is not —
+   an unread notification is not a selection — so the bar is panel-local.
+   `--unread` is one class, so ::before is written two deep to clear Row's own
+   `tw:relative` utilities on source order. */
+.bk-notifications .bk-notif-row--unread { background: var(--bk-accent-tint); }
+.bk-notifications .bk-notif-row--unread::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--bk-accent);
 }
 
+/* 165:10 — an 8px accent disc at x=16, on unread rows only. A read row keeps
+   the same 8px of column and puts nothing in it, which is what makes both
+   boards' text columns start at 32. */
+.bk-notif-row__spacer,
+.bk-notif-row__dot {
+  flex: none;
+  width: var(--bk-space-8);
+  height: var(--bk-space-8);
+  align-self: center;
+}
+.bk-notif-row__dot {
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-accent);
+}
+
+/* 268 is the board's own text column: 165:11 sits at x=32 and runs to 300 in a
+   360 panel, with the age left-anchored at 312. A FIXED column, not a hug —
+   the row hugged its text, so the age slid left against the message and landed
+   in a different place on every row. */
 .bk-notif-row__body {
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-2);
+  flex: 0 0 268px;
   min-width: 0;
 }
 
+/* Board 165:11 / 165:32 — 12/18 ink. It shipped 13 at leading-normal (1.5 =
+   19.5), which is a different type ramp from the 11/16 age beside it. */
 .bk-notif-row__text {
   color: var(--bk-ink);
-  font-size: var(--bk-text-13);
-  line-height: var(--bk-leading-normal);
+  font-size: var(--bk-text-12);
+  line-height: 18px;
 }
 
 /* ── Send for review ─────────────────────────────────────────────────────── */

@@ -207,7 +207,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
   }, [messages, submit]);
 
   return (
-    <PanelFrame className="bd-ai-tab">
+    <PanelFrame className="bd-ai-tab" data-testid="ai-panel">
       {/* Every AI board opens with "‹ Inspector" and a plain "AI" title — the
           panel lives in the inspector column, not beside it. The old header
           carried a subtitle ("Chat with AI to edit your page") no board has. */}
@@ -219,18 +219,25 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
               tall) and leave the title row (44) open below it. It was the
               other way round, which read as a header with a stray link
               floating above it. */}
-          <div className="tw:flex tw:h-9 tw:items-center tw:border-b tw:border-[var(--bk-gray-100)]">
+          <div
+            className="tw:flex tw:h-9 tw:items-center tw:border-b tw:border-[var(--bk-gray-100)]"
+            data-testid="ai-back-row"
+          >
             <Button
               color="light"
               size="xs"
               className="tw:h-full tw:border-transparent tw:bg-transparent tw:px-4 tw:py-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
               onClick={onBack}
               aria-label="Back to Inspector"
+              data-testid="ai-back-label"
             >
               ‹ Inspector
             </Button>
           </div>
-          <div className="tw:flex tw:h-11 tw:items-center tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]">
+          <div
+            className="tw:flex tw:h-11 tw:items-center tw:px-4 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)]"
+            data-testid="ai-header"
+          >
             AI
           </div>
         </div>
