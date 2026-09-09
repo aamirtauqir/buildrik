@@ -40,6 +40,10 @@ async function seedPublished() {
   const collection = await manager.createCollection("Dishes", "dishes");
   await manager.addField(collection.id, { name: "Name", slug: "name", type: "text", order: 0 });
   const item = await manager.createContentItem(collection.id, { name: "Margherita" });
+  // createContentItem returns null when the collection is missing or full; the
+  // seed cannot continue without a record, and a null here means the fixture
+  // broke, not the behaviour under test.
+  if (!item) throw new Error("seed: createContentItem returned null");
   await manager.updateContentItem(item.id, { status: "published" });
   return { manager, collection, item };
 }
