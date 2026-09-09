@@ -114,6 +114,20 @@ export async function POST(
       },
     });
 
+    /* DEPLOYING is written HERE, and until 2026-09-09 nothing ever wrote it.
+       The enum carried the state and `publish.service.ts:206,227` FILTERED on
+       it — a read with no writer — so four boards drew a phase the product
+       could never enter (BLOCKERS E1, confirmed 2026-09-03, taken 2026-09-08).
+       The transition belongs at exactly this line: everything above is page
+       generation, everything below is the deploy the provider is running. The
+       stale-job sweeps that already look for BUILDING/DEPLOYING past a cutoff
+       now see a state that actually occurs, which is what they were written
+       for. Step 2 is "Deploying to CDN", so the progress row moves with it. */
+    await prisma.publishBuildJob.update({
+      where: { id: jobId },
+      data: { status: "DEPLOYING", progress: stepProgress(2), steps: buildSteps(2) },
+    });
+
     const publicUrl = useVercel
       ? await runVercelDeployJob(jobId, job.siteId, job.workspaceId, pages)
       : await runSimulation(jobId, job.siteId);
