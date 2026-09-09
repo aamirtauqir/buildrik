@@ -1,0 +1,91 @@
+{
+ "surface": "layers-hidden",
+ "board": "Layers · hidden (Figma 143:179)",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-tree",
+ "viewport": {
+  "width": 280,
+  "height": 812
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "layer-row-lx-section"
+  },
+  {
+   "action": "click",
+   "testId": "layers-expand-all"
+  },
+  {
+   "action": "waitFor",
+   "testId": "layer-row-lx-gallery"
+  },
+  {
+   "action": "click",
+   "testId": "layer-eye-lx-gallery"
+  },
+  {
+   "action": "waitFor",
+   "testId": "layer-row-lx-gallery"
+  },
+  {
+   "action": "hover",
+   "testId": "layers-count"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "panel-header",
+   "testId": "panel-header",
+   "spec": "layers-hidden",
+   "nodeId": "208:231"
+  },
+  {
+   "name": "panel-header-title",
+   "testId": "panel-header-title",
+   "spec": "layers-hidden",
+   "nodeId": "I208:231;16:7"
+  },
+  {
+   "name": "toolbar-glyphs",
+   "testId": "layers-expand-all",
+   "spec": "layers-hidden",
+   "nodeId": "143:187"
+  },
+  {
+   "name": "count-footer",
+   "testId": "layers-count",
+   "spec": "layers-hidden",
+   "nodeId": "143:235"
+  },
+  {
+   "name": "hidden-row-name",
+   "testId": "layer-name-lx-gallery",
+   "spec": "layers-hidden",
+   "nodeId": "I245:1837;243:12"
+  },
+  {
+   "name": "sibling-row-name",
+   "testId": "layer-name-lx-section",
+   "spec": "layers-hidden",
+   "nodeId": "I245:1801;243:12"
+  },
+  {
+   "name": "hidden-row",
+   "testId": "layer-row-lx-gallery"
+  },
+  {
+   "name": "hidden-row-eye",
+   "testId": "layer-eye-lx-gallery"
+  },
+  {
+   "name": "hidden-row-lock",
+   "testId": "layer-lock-lx-gallery"
+  },
+  {
+   "name": "sibling-row",
+   "testId": "layer-row-lx-section"
+  }
+ ],
+ "_note": "['PROBE, not the running editor: the board is the 280 drawer and LayersTab is', '`w-full`. Case `layers-tree` mounts the REAL tab over a REAL Composer with', \"the board's own eight-row seed (Section / Container / Heading / Button /\", 'Gallery / Grid / a-very-long-… / Footer), so this recipe reaches the hidden', 'state through the SHIPPED control: it clicks the eye on the Gallery row,', 'which is the row 245:1837 dims on the board.', '', 'The eye and the lock had no anchor of any kind before this pass — they', 'were addressable only by aria-label, which a recipe may not use. They now', 'carry `layer-eye-<id>` / `layer-lock-<id>` (prefix-first, per the', 'check-anchors template rule).', '', 'CONFORMED to the board in this pass:', '  `.bdc-lr-eye.bdc-off` opacity 0.6 DROPPED. The board dims a hidden row', '  ONCE, on the row (245:1837 carries `opacity-45` and none of its five', '  children carries any opacity of its own). The code dimmed the row to', '  .45 AND the eye a further .6 on top of it, so the one control that', '  undoes the state rendered at an effective .27 — the least visible thing', '  in the row it belongs to. The slashed-eye glyph already says the state.', '', 'WHAT THE PROPERTY DIFF CANNOT SEE HERE, stated rather than implied: the', 'board expresses `hidden` as `opacity-45`, and `opacity` is not in any', 'TOLERANCE class — `propsFrom` only reads bracketed arbitrary values, so a', 'bare `opacity-45` produces no spec property and nothing compares it. The', 'value is right (`.bdc-lr.bdc-hidden { opacity: 0.45 }`, layers-v2.css:71,', \"exactly the board's 45) and it is pinned by LayerTreeItem.hidden.test.tsx\", 'rather than by this recipe. What this recipe proves is that the row still', 'measures 28 tall with its name on the 20px line box AFTER the eye is', 'clicked — the state does not reflow the tree.', '', 'NOT JOINED, with reasons:', '', '  the panel ROOT (143:179) — the 142/143 pair draws a 1px gray-100 border', '  on all four sides, the 1082/1171 pair a radius-8 card with none. Both are', '  the floating-frame dressing Figma gives a panel drawn on a canvas; the', '  shipped drawer is docked and `.ls-panel` carries a single right border.', '  Two board families disagree and neither describes a docked drawer.', '', '  the tree ROWS (245:1801 and its 56 instances) — gap 6 and padding-right', \"  16 are both already adjudicated against 642:3112's `--spacing/8` token\", \"  and against 1082:4748/4610's 8, by `layers-component-instance` and\", \"  `layers-tree`. padding-left 12 is the board's depth-0 value and the\", \"  product's ladder is 12 + depth×16 (board 1082:4640) — this board has no\", '  depth axis at all, which its own component name says. Their NAME nodes', \"  are joined, which is where the row's visible contract lives.\", '', \"  the Toolbar (143:184) — 54 tall here against 142:7's 36, one board\", '  against three; `layers-filtered` records the same one-against-three for', '  143:7.', '', '  the search box (143:185) — states width 208 on a 280 panel with a 12px', '  inset and a glyph run to its right; that is a frame artifact, and the', '  field ships flex. Its placeholder (143:186) is #9CA3AF = 2.54:1 on the', '  field fill; conforming would introduce a contrast failure.', '', \"  the count TEXT (143:236) — 11px here against 142:59's 12. 142:2 is the\", \"  family's root board (boards.json authority=board:142-2) and settles the\", '  size; the footer BOX is joined.', '', '  the crumb strip (1750:8390-8393) — drawn on this board and on 142:2 as a', '  32px breadcrumb above the tree. It renders only when a selection has', '  ancestors, and nothing on this board is selected except Heading, whose', '  row this recipe does not touch. Measured on `layers-tree`, not here.', '', 'ROW GEOMETRY RE-VERIFIED in this pass, on this mount, after the testids and', 'the opacity change: 9/9 rows 280x28, eye and lock 15x20 each, and', \"`elementFromPoint` at every row's bottom-3, on the eye's own x, returns that\", \"row's OWN element — never a neighbour's button. The flowbite `tw:h-10`\", 'defect that put 40px controls in 28px rows is not reintroduced.', '', '`.bdc-layers-tree-compact` IS NOW COMPLETELY INERT — measured, not inferred.', 'It is the SHIPPED DEFAULT (useLayersState.ts:43 `treeDensity: \"compact\"`)', \"and the Layers display popover offers 'Compact rows' as a toggle. Read on\", 'the same first row with the class added and removed:', '    with     h 28  pitch 28  padding 2px 8px 2px 12px', '    without  h 28  pitch 28  padding 0px 8px 0px 12px', 'Nothing but vertical padding on a fixed-height, centre-aligned row, which', \"moves no pixel. The 2026-09-08 record on 1171:4829 says it 'only altered\", \"the row's right inset and adds vertical padding'; the right-inset half is\", 'no longer true either — the same pass that wrote that note conformed', \"compact's inset 6 -> 8, so both states now measure 8 and the class changes\", \"NOTHING AT ALL. A user toggling 'Compact rows' sees no difference in either\", 'direction.', 'It is left standing rather than fixed here because no Layers board draws a', 'second density: 142:2, 143:2, 143:179, 143:237, 782:4260, 1082:* and', '1171:4829 all draw the 28px row, which is what the DEFAULT (compact)', \"renders. A 'comfortable' height would have to be invented, and inventing a\", 'number no board states is the move this brief forbids. Reported under', \"'Found, not fixed' so the option's fate is decided where it can be — as a\", 'product call, not inside a conformance recipe.'] ROOT ROW REMOVED 2026-09-08 (founder call, BLOCKERS.md B6): the page root is no longer a layer, so `layer-row-lx-root` does not exist and the first row is the first seeded element. ROOT ROW REMOVED 2026-09-08 (founder call, BLOCKERS.md B6). The page root is no longer a layer. Its targets are DELETED rather than re-pointed — there is no row to measure — and the gating `waitFor` now names `lx-section`, the first TOP-LEVEL row, which is visible before any expansion exactly as the root row was."
+}

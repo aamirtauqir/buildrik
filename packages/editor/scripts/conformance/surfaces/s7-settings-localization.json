@@ -1,0 +1,105 @@
+{
+  "surface": "s7-settings-localization",
+  "board": "S7 · Settings · Localization (Figma 639:3795)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-localization",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-default"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card-default",
+      "testId": "set-card-default",
+      "spec": "s7-settings-localization",
+      "nodeId": "639:4107"
+    },
+    {
+      "name": "card-default-title",
+      "testId": "set-card-title-default",
+      "spec": "s7-settings-localization",
+      "nodeId": "639:4108"
+    },
+    {
+      "name": "field-default-locale",
+      "testId": "set-field-default-locale",
+      "spec": "s7-settings-localization",
+      "nodeId": "639:4109"
+    },
+    {
+      "name": "field-default-locale-label",
+      "testId": "set-field-label-default-locale",
+      "spec": "s7-settings-localization",
+      "nodeId": "639:4110"
+    },
+    {
+      "name": "card-locales-title",
+      "testId": "set-card-title-locales",
+      "spec": "s7-settings-localization",
+      "nodeId": "639:4120"
+    },
+    {
+      "name": "card-locales",
+      "testId": "set-card-locales"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE, in the board's own pane — `.bd-set-pane-body` at 824,",
+    "which is 760 (the card) plus its two 32 insets. Host and arithmetic settled",
+    "by s7-settings-general (638:2378); the ten S7 screens share one probe host",
+    "rather than ten.",
+    "The screen reads `siteDetail.settings.get` — the same row the Headers board",
+    "reads — so the fixture is a default locale plus one more.",
+    "",
+    "BOARD WON — the card and its first row were NAMED THE WRONG WAY ROUND.",
+    "639:4107 heads the card DEFAULT and 639:4110 names the row inside it",
+    "'Default locale': the card is the category, the row is the setting. Live had",
+    "the card titled 'Default locale' and the row inside it labelled 'Default',",
+    "which reads as a card about defaults containing a setting called Default.",
+    "Swapped to the board. Anchors moved with it (set-card-default,",
+    "set-field-default-locale).",
+    "",
+    "ANCHOR PINNED, copy left alone: the second card is 'Enabled locales (2)' live",
+    "and 'LOCALES' on the board. The count is product data rather than board copy,",
+    "and fourteen assertions in LocalizationScreen.test.tsx use it to tell one",
+    "state from the next after an add or a remove — stripping it would take the",
+    "tests' only handle on that. `Section` took an optional `anchor` instead, so",
+    "`set-card-locales` no longer changes with the row count. Its TITLE is joined",
+    "to 639:4120 and passes; the COPY difference is reported, not hidden.",
+    "",
+    "CONFORMANT: 17 properties, 0 contrast failures.",
+    "",
+    "NOT JOINED, and why:",
+    "  639:4115 Field · Auto-redirect by browser — a toggle the product does not",
+    "  have. Nothing in LocalizationScreen or in the settings row corresponds.",
+    "  A feature. REPORTED.",
+    "  639:4119 the LOCALES card BOX — 940 wide against the 760 above it. Live",
+    "  cards stretch inside `.bd-set-pane-body`, so one screen cannot hold both;",
+    "  the family's settled probe host is 824, fixed by s7-settings-general.",
+    "  639:4121 the thead — LOCALE / PATH / PAGES TRANSLATED / STATUS. Live lists",
+    "  locale codes with no header row and, more to the point, no PAGES",
+    "  TRANSLATED column: the board answers 'how much of the site is actually",
+    "  in Urdu?' and the product cannot. REPORTED.",
+    "  639:4111 the Select — 220 wide, 36 high, 10px gutters, radius 8 on a",
+    "  --flowbite/gray/300 edge, against SETTINGS_SELECT_THEME's 5px radius,",
+    "  --bk-gray-200 and 7/9 padding. SHARED primitive behind all thirteen S7",
+    "  screens, and the reading is NOT isolated — 638:2702 (General) and",
+    "  640:3111/3119/3131 (Headers) draw the identical box, so six instances",
+    "  across three boards agree and nothing contradicts them. FLAGGED FOR THE",
+    "  ORCHESTRATOR as a family-wide move, not taken off one screen mid-pass.",
+    "",
+    "FOUND, NOT FIXED: live carries a third card, ADD LOCALE, that the board does",
+    "not draw; the board's LOCALES table presumably owns that affordance. And the",
+    "screen's own copy says locale routing has not shipped ('Once locale routing",
+    "ships, each enabled non-default locale will serve under its own path",
+    "prefix'), while the board draws a PATH column with '/'-prefixed values as if",
+    "it had. Fourth board in this family drawing a feature whose product version",
+    "ships with a disclaimer."
+  ]
+}

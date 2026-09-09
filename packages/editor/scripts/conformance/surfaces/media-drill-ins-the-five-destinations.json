@@ -1,0 +1,124 @@
+{
+  "surface": "media-drill-ins-the-five-destinations",
+  "board": "Media drill-ins \u2014 the five destinations (Figma 75:2)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drill-ins",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-version-current"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "version-current",
+      "testId": "media-version-current",
+      "spec": "media-drill-ins-the-five-destinations",
+      "nodeId": "75:65"
+    },
+    {
+      "name": "used-row-1",
+      "testId": "media-used-row-e1",
+      "spec": "media-drill-ins-the-five-destinations",
+      "nodeId": "75:96"
+    },
+    {
+      "name": "used-row-2",
+      "testId": "media-used-row-e2",
+      "spec": "media-drill-ins-the-five-destinations",
+      "nodeId": "75:106"
+    },
+    {
+      "name": "used-row-3",
+      "testId": "media-used-row-e3"
+    },
+    {
+      "name": "icon-tile",
+      "testId": "icon-tile-zap"
+    },
+    {
+      "name": "stock-thumb",
+      "testId": "stock-thumb-p0"
+    }
+  ],
+  "_note": [
+    "FIVE DESTINATIONS, and the board names them in its own title: stock",
+    "browser \u00b7 icon picker \u00b7 versions \u00b7 used-in \u00b7 image editor. They are joined",
+    "SEPARATELY below, and the two that are not joined are named with the reason,",
+    "not folded into the others.",
+    "",
+    "REACHED VIA PROBE: four of the five mount side by side, each in the",
+    "positioned drawer-width host they are `absolute inset-0` inside \u2014 mounting",
+    "one bare stretches it to the probe root and every width reads wrong. These",
+    "are the shipping overlays; nothing is re-implemented.",
+    "",
+    "BOARD WON, five times:",
+    "  75:65   the CURRENT version is a 44-high accent-tint chip on a 6 radius at",
+    "          a 10 inset \u2014 the same box the older rows wear in bg-subtle. It",
+    "          shipped 56 tall, full-bleed and square.",
+    "  75:90   the used-in list is one CHIP PER HIT \u2014 page name over the",
+    "          element's own name, with a 'Go \u203a' link \u2014 and NO page-group header.",
+    "          It shipped a 28-high bg-subtle header per page over bare rows,",
+    "          which put the page name in two places and left the row with no",
+    "          shape at all. Flattening it also removed three contrast failures",
+    "          (the headers' own ink-muted-on-bg-subtle).",
+    "  75:100  the link says 'Go \u203a'. It said 'Jump \u203a'.",
+    "  75:25   the icon picker is SIX up on a 12 gutter, and its tiles fill their",
+    "          track rather than floating a fixed 40 square in the middle of one.",
+    "          It shipped five up at a 16 gutter \u2014 and IconBrowserOverlay's own",
+    "          docstring has said '6-up grid' the whole time, so the markup was",
+    "          the half that drifted.",
+    "  75:6    the stock results are THREE up on a 12 gutter with an 8 gap and a",
+    "          66-tall thumb. It shipped two up at a 16 gutter with 76-tall",
+    "          thumbs \u2014 two big cards where the board draws a contact sheet.",
+    "",
+    "NOT JOINED, and why:",
+    "  75:15/16 (stock thumbs) and 75:34/35 (icon tiles) \u2014 every one carries a",
+    "  track width derived from a 320 drawer (93.333 and 42.667). The drawer is",
+    "  280 today; PageCommandPalette's own comment records the same supersession",
+    "  ('256 is the drawer's 280 less a 12 gutter \u2026 the 296 this carried was the",
+    "  same arithmetic against the old 320 drawer'). Their fill, height and",
+    "  radius ARE conformed and are in `measured/`; hosting the probe at 320 to",
+    "  make the number match would be measuring a width no user has.",
+    "  75:101 (the 'Menu' used-in chip) \u2014 the board gives THAT one row a raw",
+    "  `rounded-[8px]` while its two siblings use --radius/md (6). Board noise:",
+    "  one row of three. The other two are joined and the code follows the token.",
+    "  75:113 THE IMAGE EDITOR, the fifth destination \u2014 a 1000-wide full-bleed",
+    "  takeover: a 48-high bg-subtle bar, four 28-high outlined tools (Crop /",
+    "  Rotate / Adjust / Replace) on --color/border-input, an accent 'Save as v5',",
+    "  and an ink stage. That is ImageEditorModal, a separate component reached",
+    "  through `onEditImage`, and it is a build rather than a restyle. Its",
+    "  numbers are recorded here so whoever takes it does not have to re-read the",
+    "  board.",
+    "",
+    "CONTRAST, REPORTED NOT HIDDEN \u2014 three failures at 4.39:1 that conforming",
+    "PRODUCED, and they are the board's own pairing: 75:99 puts the element's",
+    "name in --color/ink-muted #6B7280 on 75:96's --color/bg-subtle #F3F4F6",
+    "ground, which measures 4.39 against a 4.5 floor. The board draws it that",
+    "way; the code now does too. Net for this surface the count went DOWN (the",
+    "page-group headers this replaced carried the same pair three times over),",
+    "but it is not zero and should not be read as zero. The fix is one step",
+    "darker on the sub-line (--bk-ink-soft #4B5563 is 7.0 there), which is a",
+    "founder call because it deviates from the board. The fourth failure,",
+    "'current' on the accent-tint version chip, is pre-existing.",
+    "",
+    "FOUND AND FIXED \u2014 a probe fixture that had been measuring nothing.",
+    "`USAGE_COMPOSER` answered only `elements.getAllPages`, but",
+    "`collectUsageByPage` calls `composer.mediaOps.getUsagesByPage`",
+    "(mediaUtils.ts:162). So the existing `media-detail-used-in` case had been",
+    "rendering the EMPTY state \u2014 'Not used on any page' \u2014 for as long as it has",
+    "existed, and nothing noticed because no recipe measured it. The fixture now",
+    "answers the call the code makes.",
+    "",
+    "FOUND, NOT FIXED: 75:111, a warning-tint 'delete guard' \u2014 'Deleting this",
+    "breaks 3 pages. Replace it instead.' \u2014 sits under the used-in list on the",
+    "board. The product has the empty-state counterpart ('Deleting this file",
+    "won't change anything on your site') but nothing for the NON-empty case,",
+    "which is the one where deleting is dangerous. That is a missing block, not",
+    "drift."
+  ]
+}

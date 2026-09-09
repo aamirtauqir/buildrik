@@ -1,0 +1,110 @@
+{
+ "surface": "compare-side-by-side",
+ "board": "Compare · side-by-side (Figma 168:2)",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=compare-side-by-side",
+ "viewport": {
+  "width": 1080,
+  "height": 812
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "compare-mode-strip"
+  },
+  {
+   "action": "waitFor",
+   "testId": "compare-pane-approved"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "title",
+   "testId": "compare-title",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:4"
+  },
+  {
+   "name": "mode-strip",
+   "testId": "compare-mode-strip",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:5"
+  },
+  {
+   "name": "seg-split",
+   "testId": "compare-mode-split",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:6"
+  },
+  {
+   "name": "seg-split-label",
+   "testId": "compare-mode-split",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:7"
+  },
+  {
+   "name": "seg-overlay",
+   "testId": "compare-mode-overlay",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:8"
+  },
+  {
+   "name": "seg-overlay-label",
+   "testId": "compare-mode-overlay",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:9"
+  },
+  {
+   "name": "seg-list",
+   "testId": "compare-mode-list",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:10"
+  },
+  {
+   "name": "seg-list-label",
+   "testId": "compare-mode-list",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:11"
+  },
+  {
+   "name": "count",
+   "testId": "compare-count",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:13"
+  },
+  {
+   "name": "close",
+   "testId": "compare-close",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:14"
+  },
+  {
+   "name": "bar",
+   "testId": "compare-bar",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:3",
+   "skipProps": {
+    "height": "Figma strokes do not consume layout; CSS borders do. The board's 48 is the frame, and the shipped bar is 48 plus its 1px bottom rule — the same export artifact recorded across this arc (see media's w-[280px] family). The bar's fill, border COLOUR and inset are all joined and pass; only the stroke's pixel is refused."
+   }
+  },
+  {
+   "name": "pane-approved",
+   "testId": "compare-pane-approved",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:16",
+   "skipProps": {
+    "height": "The board draws no LEGEND and the product ships one, deliberately: LEDGER J-168:48 records that the board encodes change kind by colour dot alone and design codex #6 forbids colour as the sole encoding. The legend is 27px, which is exactly the pane shortfall (660 board, 633 live). Conforming the height would mean deleting an accessibility affordance to match a board that predates it. Width (516), fill, radius and every other pane property ARE joined and pass — B1's resolution is what made them measurable."
+   }
+  },
+  {
+   "name": "pane-current",
+   "testId": "compare-pane-current",
+   "spec": "compare-side-by-side",
+   "nodeId": "168:20",
+   "skipProps": {
+    "height": "The board draws no LEGEND and the product ships one, deliberately: LEDGER J-168:48 records that the board encodes change kind by colour dot alone and design codex #6 forbids colour as the sole encoding. The legend is 27px, which is exactly the pane shortfall (660 board, 633 live). Conforming the height would mean deleting an accessibility affordance to match a board that predates it. Width (516), fill, radius and every other pane property ARE joined and pass — B1's resolution is what made them measurable."
+   }
+  }
+ ],
+ "_note": "['Compare only has states when the dashboard returns an approved snapshot for a', 'review round, so no click in the standalone editor reaches it — the probe', 'mounts `ApprovedCompareView` with two one-page fixtures that differ by a', 'headline. Without a real difference board 168:82 (no-changes) takes the whole', 'body and none of the three modes render at all.', '', 'THE HOST IS 280 — the review drawer this view actually ships inside', '(ReviewTab.tsx mounts it there). Boards 168:2 / 168:26 / 168:48 are drawn at', '1080 with a 12px radius and a 25/50 drop shadow, i.e. an overlay surface, and', 'at 280 a side-by-side diptych of two 1440-wide pages gets ~128px a side. That', 'placement is an OPEN FOUNDER CALL, not something a conformance pass may', 'settle: BLOCKERS.md B1 (`owner: founder`, stops J-168:2 and J-168:48) and', \"LEDGER J-168:2 2026-09-03 (`verdict: decide` — 'BLOCKED on a founder\", \"placement call'). So every board property that depends on the 1080 surface is\", 'left out of this recipe rather than measured against a surface the product', 'does not have:', '', '  Body / panes / change rows — 168:15 (700), 168:16+168:20 (660 x 516),', '  168:39/168:40 (656 / 640 x 1048), 168:61 (700), 168:62.. (44 x 1048).', '  Every one of those numbers is the 1080 frame. Anchors exist for all three', '  modes (compare-pane-approved / compare-overlay-pane / compare-list) and are', '  driven as waitFor steps, so a recipe cannot silently measure the wrong mode.', '', '  compare-bar 168:3 — height 48 and the bg-card fill both match already, but', \"  the board's rule is gray-100 and the shared chrome-ui `Toolbar` draws\", '  gray-200 for every control strip in the editor (Toolbar.tsx BASE). Two', '  reasons not to force it: one Compare board cannot restyle a chrome-ui-wide', '  primitive (the same ruling boards.json records for BK_TEXT_INPUT_THEME,', \"  2026-08-17 — 'Two boards that disagree cannot settle a chrome-ui-wide\", \"  primitive'), and this bar's rule is a `border-b` while measure.mjs reads\", '  `border-color` off border-TOP-color, so even the visually correct fix would', '  not register here.', '', \"WHAT WAS CONFORMED: the compare bar's contents, which are identical on all\", 'three boards and depend on no surface width — the title (168:4, 14/20 ink;', \"it read 'Compare with approved' at 12px semibold, in a SECOND toolbar stacked\", \"above this one, which no board draws), the segmented mode strip (the board's\", 'tinted container with the active segment lifted out of it in white; live it', 'was three loose buttons with the active one painted accent), and the change', \"count (168:12 is 12/18 ink — it was 11px mono muted, which is 168:13's\", 'treatment, the version label, applied to the wrong node).', '', 'TWO DRIFTS DELIBERATELY NOT TOUCHED, both already adjudicated to the CODE:', '  168:26 overlay — the board replaces the working opacity slider with change', '  highlights. LEDGER J-168:26, 2026-09-03: `skipped-code-ahead`, because', '  `CompareChange` carries no geometry and 2 of 5 change kinds cannot produce', '  a tint at all.', \"  168:48 list — the board's rows encode kind by colour dot alone. LEDGER\", '  J-168:48, same day: `skipped-code-ahead`, because that would remove the', \"  non-colour encoding (icon + label + detail) the code's own header ties to\", '  design codex #6.', '', \"NODE IDENTITY, read from the board's own text and not from document order:\", \"the bar's three trailing text nodes are the PAGE dropdown ('Home ▾', Inter\", \"12/18 ink), the CHANGE COUNT ('12 changes · 3 of 12', Geist Mono 11/16\", \"ink-muted) and the CLOSE control ('✕', 13/20 ink-muted) — in that order.\", \"A first pass through this recipe joined `count` to the dropdown's node and\", 're-typed the shipped count to match it; ApprovedCompareView.test.tsx caught', 'it. The dropdown itself is not anchored: it only renders with two or more', 'pages, and this fixture is one page.', '', '2026-09-08 — B1 RE-TESTED, NOT ASSUMED. Two standoffs in this arc turned out', 'to be stale boards rather than deadlocks, so the 1080 placement was checked', 'against the CURRENT capture (raw-figma fetchedAt 2026-09-07T20:57-20:58Z),', 'not against the note above. It still holds:', '    168:16 / 168:20  pane   516 x 660      (side-by-side)', '    168:40           pane  1048 x 640      (overlay)', '    168:62..168:78   rows  1048 x  44      (list)', 'Those are the 1080 frame, unchanged. BLOCKERS.md B1 (owner: founder) stands', 'and every body/pane/row number stays uncompared.', '', 'The LEGEND stays too, and deliberately: it is code-ahead of every Compare', 'board, per LEDGER J-168:48 — the board encodes change kind by colour dot', 'alone and design codex #6 forbids colour as sole encoding, so the icon +', 'label + detail the code adds is the reason, not an oversight. Nobody should', \"'fix' conformance by deleting it.\"] COMPARE NOW OPENS AT 1080 (founder call 2026-09-08, BLOCKERS.md B1): split and overlay mount through chrome-ui's OverlayMount at the width boards 168:2 / 168:26 / 168:48 draw, and LIST stays in the 280 drawer where a single column is genuinely fine. The probe and viewport follow the mode, or they would measure a layout no user sees. B1 UNBLOCKED: the bar (168:3) and both panes (168:16 / 168:20) are JOINED now that the surface opens at 1080. They were skipped because at 280 a 516-wide pane could not exist — the geometry, not the code, was what made them unmeasurable."
+}

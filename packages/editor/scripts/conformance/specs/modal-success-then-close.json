@@ -1,0 +1,168 @@
+{
+  "surface": "modal-success-then-close",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "183:60",
+  "boardName": "modal-success-then-close",
+  "figmaHash": "9912a8a7a6cb9d2b4cffee08da899cdaa82f65b0292179499c74faf5f2b527fa",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:01:18.095Z",
+  "copy": [
+    "Deleted",
+    "3 pages deleted.",
+    "Closing…"
+  ],
+  "targets": [
+    {
+      "nodeId": "183:60",
+      "name": "Modal · success-then-close",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "183:61",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[900px] left-0 top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "900px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:62",
+      "name": "modal/440",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[240px] left-[500px] overflow-clip rounded-[12px] shadow-[0px_12px_32px_0px_rgba(15,23,41,0.16)] top-[330px] w-[440px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "240px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:63",
+      "name": "Title",
+      "className": "[word-break:break-word] absolute h-[56px] left-0 not-italic overflow-clip text-left top-0 w-[440px] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "56px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:64",
+      "name": null,
+      "className": "absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[24px] text-[16px] text-[color:var(--color\\/ink,#111827)] top-[18px] tracking-[-0.16px]",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "183:65",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[20px] left-[404px] text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[18px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "183:67",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[213px] not-italic text-[16px] text-[color:var(--color\\/bg-card,white)] text-left top-[82px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "183:68",
+      "name": null,
+      "className": "-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[220px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] text-center top-[128px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:69",
+      "name": null,
+      "className": "-translate-x-1/2 [word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[220px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-center top-[152px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    }
+  ]
+}

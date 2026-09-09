@@ -1,0 +1,40 @@
+{
+  "surface": "pages-bulk-select",
+  "board": "Pages · bulk-select (Figma 141:78)",
+  "_note": [
+    "Three pages selected, the bulk band up in place of the Add-page foot. The",
+    "selection is per-row state a probe can hand over directly; driving it by",
+    "clicking would need three real page ids from a real Composer.",
+    "",
+    "The 2026-08-31 walk reported this surface as 'band-colour/order drift with the",
+    "✕ 25px outside the panel' and could not reproduce it. Measured here: the band",
+    "is ink #111827, 44 tall, 12/18 card-white, and the ✕ is inside. What WAS wrong",
+    "is the thing that walk could not see — the board tints all three SELECTED rows",
+    "accent-tint and the code tinted only their checkboxes, so a 3-page selection",
+    "showed as three 16px ticks.",
+    "",
+    "MEASURED but NOT joined, and why:",
+    "  141:83 / 141:84 (search band + box) — see pages-load-error's note; the box's",
+    "  width is `flex: 1` leftovers, not a spec.",
+    "  141:87 / 141:104 (folder rows) — folders are a different component",
+    "  (PageFolder); this fixture has none, and the two page-row heights the board",
+    "  gives are joined below.",
+    "  141:119's own `color`/`font-size` ARE joined: the board puts the type on the",
+    "  band, which is why the band now carries it instead of the count span."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-bulk-select",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [{ "action": "waitFor", "testId": "pages-bulk-bar" }],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel-header", "testId": "panel-header", "spec": "pages-bulk-select", "nodeId": "208:151" },
+    { "name": "panel-header-title", "testId": "panel-header-title", "spec": "pages-bulk-select", "nodeId": "I208:151;16:7" },
+    { "name": "row-selected", "testId": "page-row-home", "spec": "pages-bulk-select", "nodeId": "141:93" },
+    { "name": "row-selected-name", "testId": "page-row-name-home", "spec": "pages-bulk-select", "nodeId": "141:96" },
+    { "name": "row-selected-2", "testId": "page-row-menu", "spec": "pages-bulk-select", "nodeId": "141:98" },
+    { "name": "row-selected-3", "testId": "page-row-contact", "spec": "pages-bulk-select", "nodeId": "141:101" },
+    { "name": "row-plain", "testId": "page-row-about", "spec": "pages-bulk-select", "nodeId": "141:110" },
+    { "name": "row-plain-checkbox", "testId": "page-row-checkbox-about", "spec": "pages-bulk-select", "nodeId": "227:936" },
+    { "name": "bulk-bar", "testId": "pages-bulk-bar", "spec": "pages-bulk-select", "nodeId": "141:119" }
+  ]
+}

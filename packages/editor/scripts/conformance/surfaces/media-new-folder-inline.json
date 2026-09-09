@@ -1,0 +1,71 @@
+{
+  "surface": "media-new-folder-inline",
+  "board": "Media · fullpage · folders · new-folder (inline) (Figma 1205:4829)",
+  "_note": "Probe at the board's own 240×330. The inline field is opened by the recipe's own CLICK on `＋ New folder`, not by a prop: `newFolderName` is FolderTree's internal state and nothing forces it from outside, so a fixture that faked it would be measuring a component the product never renders. The waitFor is on the field that click produces.\n\nCONFORMED: `.mgr-node` gap 6 → 8 (board 1205:4831 and every other row on this rail), `.mgr-node.depth-1` padding-left 20 → 16 (1205:4849 / 1205:4853), and the editing row from px-2/pb-1.5 to the board's gap-4 / py-4 with its hint no longer carrying its own top margin.\n\nNOT joined: 1205:4829 the rail itself. It reports one `border-color`, and `.mgr-left` draws a divider on ONE edge — the computed shorthand is four values and cannot be compared as a colour. 1205:4858, the folder-name field: chrome-ui TextInput, boards.json authority=open:input-fill, and the board's accent border is its focus ring. 1205:4860, the `Enter to create · Esc to cancel` hint at 10px: the rail's other captions ship at --bk-text-11 and this board's own section labels (1205:4830 / 1205:4844) are 10px against a `.mgr-tree-section` that is 11 everywhere, so adopting 10 for one line would split the rail's caption step in two.\n\nNOT CONFORMED — the rail's structure, and this is the subject boundary. The board groups its rows under SMART and FOLDERS headings and the shipped rail has one `Folders` head and no groups. That is the fullpage library's own information architecture, drawn identically on 1162:4617 and the other fullpage boards, none of which has a recipe or an owner yet. This frame's subject is the inline editing row; rebuilding the rail around it would be conforming context, and would hand the next agent on those boards a surface someone else had already moved.\n\nTWO DEFECTS THIS BOARD FOUND, both invisible until it was measured: (1) `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported, so the rail drew as unstyled 16px rows anywhere it was mounted alone — the first measurement read EVERY padding, gap and radius as 0. FolderTree now imports its own styles, the rule StorageQuotaBar's header already states after the same defect. (2) With the styles loading, seven live WCAG failures surfaced at once: the rail head, the section label, four row counts and the inline hint, all --bk-ink-muted on the rail's --bk-bg-subtle at 4.39:1. No board pins those colours and the Media family gives an 11px caption --color/ink-soft (144:12, 145:369), so they are ink-soft now: 7.0:1, and the surface measures 0 contrast failures.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-new-folder-inline",
+  "viewport": {
+    "width": 240,
+    "height": 330
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "mgr-new-folder-open"
+    },
+    {
+      "action": "waitFor",
+      "testId": "mgr-new-folder-input"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "row-recent",
+      "testId": "mgr-row-recent",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4831"
+    },
+    {
+      "name": "row-in-use",
+      "testId": "mgr-row-in-use",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4835"
+    },
+    {
+      "name": "row-unused",
+      "testId": "mgr-row-unused",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4839"
+    },
+    {
+      "name": "row-all-assets",
+      "testId": "mgr-row-all-assets",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4845"
+    },
+    {
+      "name": "row-products",
+      "testId": "mgr-row-folder-f1",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4849"
+    },
+    {
+      "name": "row-hero-shots",
+      "testId": "mgr-row-folder-f2",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4853"
+    },
+    {
+      "name": "editing-row",
+      "testId": "mgr-new-folder",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4857"
+    },
+    {
+      "name": "row-trash",
+      "testId": "mgr-row-trash",
+      "spec": "media-new-folder-inline",
+      "nodeId": "1205:4862"
+    }
+  ]
+}

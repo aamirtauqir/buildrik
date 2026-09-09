@@ -1,0 +1,99 @@
+{
+  "surface": "s7-settings-domains",
+  "board": "S7 · Settings · Domains (Figma 639:3092)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-domains",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "domain-add"
+    },
+    {
+      "action": "click",
+      "testId": "domain-add"
+    },
+    {
+      "action": "waitFor",
+      "testId": "set-field-domain"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "set-card-custom-domain",
+      "spec": "s7-settings-domains",
+      "nodeId": "639:3404"
+    },
+    {
+      "name": "card-title",
+      "testId": "set-card-title-custom-domain",
+      "spec": "s7-settings-domains",
+      "nodeId": "639:3405"
+    },
+    {
+      "name": "field-domain",
+      "testId": "set-field-domain",
+      "spec": "s7-settings-domains",
+      "nodeId": "639:3406"
+    },
+    {
+      "name": "field-domain-label",
+      "testId": "set-field-label-domain",
+      "spec": "s7-settings-domains",
+      "nodeId": "639:3407"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: DomainsScreen reads `siteDetail.domains.list` over tRPC",
+    "and nothing else on first paint, so the probe answers that one procedure and",
+    "lets the real screen, the real client and the real 30s recheck loop run.",
+    "Hosted in the board's own pane — `.bd-set-pane-body` at 824, which is 760",
+    "(the card) plus its two 32 insets, the same host s7-settings-general settled.",
+    "This is NOT the DNS drill-in: board 807:8756 and recipe",
+    "s6-2-custom-domain-dns-verification measure that, one screen deeper.",
+    "",
+    "AN EMPTY LIST, deliberately, and a click. Board 639:3092 draws the CUSTOM",
+    "DOMAIN card with a Domain FIELD inside it, and live only renders that field",
+    "in the ADD state — a connected row renders a status card in its place. So",
+    "the fixture returns no domains and the recipe clicks 'Add domain'.",
+    "",
+    "CODE CHANGED — one anchor. The 'Add domain' button had no `data-testid`, and",
+    "it is the only door to the one field this board draws on this card, so the",
+    "field was unreachable by any probe or test. `domain-add` added; no visual",
+    "change.",
+    "",
+    "CONFORMANT where the two agree: 14 properties on the card, its title, the",
+    "Domain field and its 180 label column. The chassis arrived with",
+    "s7-settings-general's family-wide move to settings/shared.tsx.",
+    "",
+    "NOT JOINED, and why:",
+    "  639:3410 Field · Status — the board lays status out as a FIELD (180 label",
+    "  column, then a green flowbite Badge at radius 9999). Live renders a",
+    "  free-standing status line inside the domain card with no label column and",
+    "  no badge. Different control, not a drifted one.",
+    "  639:3414 Field · Force HTTPS — a toggle the product does not have at all.",
+    "  Nothing in DomainsScreen or in the domains tRPC row corresponds; SSL is",
+    "  reported (sslStatus) but never chosen. A feature, not drift. REPORTED.",
+    "  639:3418 Card · DNS RECORDS — drawn at 940 wide, against 760 for the card",
+    "  above it. Live cards are flex children of `.bd-set-pane-body` and STRETCH,",
+    "  so one screen cannot hold a 760 card and a 940 card at once; the family's",
+    "  settled probe host is 824 (760 + two 32s), fixed by s7-settings-general.",
+    "  The two board widths are a pane-layout decision — fixed-width cards",
+    "  left-aligned in a wider pane — that no single screen can adopt on its own.",
+    "  FLAGGED. The DNS table's own rows are measured by",
+    "  s6-2-custom-domain-dns-verification against 807:8756 either way.",
+    "  639:3408 the Input — 42 high, 320 wide, radius 8 on a --color/ink",
+    "  near-black border. Same shared SETTINGS_TEXT_INPUT_THEME and the same",
+    "  adjudication s7-settings-general recorded. Left for the founder.",
+    "",
+    "FOUND, NOT FIXED: the card's empty state says 'No custom domain. Using the",
+    "free buildrick.app address until you connect one', and the board draws no",
+    "empty state at all — it opens straight on a connected domain. So the state a",
+    "new site actually sees is undrawn on this board, and the state the board",
+    "draws needs a domain to exist first. Worth a frame."
+  ]
+}

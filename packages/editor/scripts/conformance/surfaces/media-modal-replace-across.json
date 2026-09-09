@@ -1,0 +1,129 @@
+{
+  "surface": "media-modal-replace-across",
+  "board": "Media · modal · replace-across-site (Figma 1164:4738)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-replace-across",
+  "viewport": {
+    "width": 520,
+    "height": 520
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rx-pages-list"
+    }
+  ],
+  "contrastScope": "body",
+  "_note": [
+    "CONTRAST SCOPE IS `body`. The dialog is `position: fixed` at z-301 with its",
+    "own scrim and is not inside `[data-probe]`'s box in any useful sense; a",
+    "probe-scoped sweep is exactly the empty-subtree zero measure.mjs now",
+    "refuses. The wait names the PAGE LIST rather than the dialog, because the",
+    "dialog renders in all four of its phases and only the preview has one.",
+    "",
+    "BOARD WON, and this is a restyle rather than a nudge:",
+    "  1164:4738  12 radius on --color/bg-elevated with a --color/border edge,",
+    "             16/14 inset and a 12 gap between blocks. It shipped on 8",
+    "             radius, a flat 24 pad, no edge at all, and per-child margins",
+    "             doing the column gap's job.",
+    "  1164:4739  the title is 14, not 15.",
+    "  1164:4742/4744  the swap plates are 96x64 on an 8 radius — landscape,",
+    "             the shape of the thing being replaced. They shipped 96x96 on",
+    "             a 6 radius. The incoming plate is accent-TINTED as well as",
+    "             accent-ringed; only the ring had shipped, and at 2px.",
+    "  1174:4832  the page list is a bare 4-gap column under a PAGES caption.",
+    "             It shipped as a bordered, rounded scroll box — a second",
+    "             dialog inside the dialog — with no caption, so the checkbox",
+    "             column read as a second confirmation rather than a scope",
+    "             picker.",
+    "  1174:4834  the rows are 4/0/4/8 padded, not 8/12, and 11px not 12.",
+    "  1164:4748/4750  the buttons HUG on a 12/8 pad at 11px. They shipped on a",
+    "             fixed 32 row at 13px — and the fixed height is why the",
+    "             board's 8 vertical pad measured 0 rather than failing: a set",
+    "             height and a padding are different properties, so nothing",
+    "             conflicted and nothing won. Same class as the tw:min-h-6 /",
+    "             h-10 trap already recorded in this repo's chrome rules.",
+    "",
+    "FOUND AND FIXED WHILE HERE, not board-driven: `.med-rx-page-label:hover`",
+    "painted `background: var(--bk-ink-muted)` — a TEXT token used as a fill,",
+    "so hovering a page row turned it mid-grey under its own grey text. And",
+    "`.med-rx-*` lived in MediaTab.css, which only MediaTab imported, so this",
+    "dialog drew as unstyled block flow anywhere it was mounted without its",
+    "panel — the identical defect board 1205:4829 found on FolderTree, and the",
+    "first measurement here read every padding and radius as 0 until the",
+    "component imported its own styles.",
+    "",
+    "NOT JOINED, and why: 1164:4740, the 11px asset-name subtitle — the product",
+    "puts a full sentence there instead ('Every place that uses X — N in total",
+    "— will switch to the image you pick. This can be undone.'), which is the",
+    "blast radius the board's own caption is about; a filename is not a",
+    "warning, and the node's width is `min-content` besides. 1174:4835 /",
+    "1174:4840 / 1174:4845, the row ticks — those are the flowbite Checkbox,",
+    "and its fill is the control's, not this frame's. Every text node on this",
+    "board carries Figma AUTO line-height, which is the absence of a decision",
+    "rather than a value (the media-import-url-invalid note records the same",
+    "call), so the joined text nodes are the ones where the COLOUR is the",
+    "point."
+  ],
+  "targets": [
+    {
+      "name": "dialog",
+      "testId": "rx-dialog",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1164:4738"
+    },
+    {
+      "name": "swap",
+      "testId": "rx-swap",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1164:4741"
+    },
+    {
+      "name": "thumb-before",
+      "testId": "rx-thumb-before",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1164:4742"
+    },
+    {
+      "name": "thumb-after",
+      "testId": "rx-thumb-after",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1164:4744"
+    },
+    {
+      "name": "pages-list",
+      "testId": "rx-pages-list",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1174:4832"
+    },
+    {
+      "name": "page-row-home",
+      "testId": "rx-page-label-home",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1174:4834"
+    },
+    {
+      "name": "page-row-menu",
+      "testId": "rx-page-label-menu",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1174:4839"
+    },
+    {
+      "name": "foot",
+      "testId": "rx-foot",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1164:4746"
+    },
+    {
+      "name": "btn-cancel",
+      "testId": "rx-cancel",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1164:4748"
+    },
+    {
+      "name": "btn-replace",
+      "testId": "rx-commit",
+      "spec": "media-modal-replace-across",
+      "nodeId": "1164:4750"
+    }
+  ]
+}

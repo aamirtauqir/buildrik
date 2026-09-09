@@ -1,0 +1,318 @@
+{
+  "surface": "client-sign-off-a0-identify",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1339:7162",
+  "boardName": "client-sign-off-a0-identify",
+  "figmaHash": "9c1d5a64e70699848d3032902f950d9f75ac03c56764377415280c42dbb4cb63",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T05:32:21.758Z",
+  "copy": [
+    "Ali's Studio",
+    "is asking for your feedback",
+    "Bella Cucina is ready for you to look at",
+    "Look at Bella Cucina",
+    "Your name",
+    "The email this link was sent to"
+  ],
+  "targets": [
+    {
+      "nodeId": "1339:7162",
+      "name": "Client sign-off · A0 · identify · 1280 — echo of 1:6 at the 1280×720 minimum fold; the canonical A0 family on 1:6 (23:2 / 112:2 / 112:21 / 113:3) is 1280×900. Kept because Figma rejects cross-page NAVIGATE and the editor prototype must reach this state.",
+      "className": "bg-[#f9fafb] relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7163",
+      "name": "Agency header",
+      "className": "[word-break:break-word] absolute bg-white border-[#e5e7eb] border-b border-solid h-[56px] leading-[normal] left-0 not-italic overflow-clip top-0 w-[1280px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "56px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "width": {
+          "value": "1280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7164",
+      "name": null,
+      "className": "absolute font-['Inter:Semi_Bold'] font-semibold left-[24px] text-[#111827] text-[13px] top-[20px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7165",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[120px] text-[#4b5563] text-[12px] top-[21px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7166",
+      "name": "Card",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[583px] left-[420px] overflow-clip rounded-[8px] top-[176px] w-[440px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "583px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7167",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[23px] not-italic text-[#111827] text-[20px] top-[23px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "20px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7168",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[23px] not-italic text-[#4b5563] text-[13px] top-[55px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7169",
+      "name": "CTA",
+      "className": "absolute bg-[#1a56db] h-[40px] left-[23px] overflow-clip rounded-[6px] top-[315px] w-[392px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1339:7170",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[24px] not-italic text-[13px] text-white top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "2563:11972",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[23px] not-italic text-[#4b5563] text-[12px] top-[127px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "2563:11973",
+      "name": "a0/input",
+      "className": "absolute bg-white border border-[#d1d5db] border-solid h-[42px] left-[23px] rounded-[8px] top-[147px] w-[392px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#d1d5db"
+        },
+        "height": {
+          "value": "42px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "2563:11974",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[23px] not-italic text-[#4b5563] text-[12px] top-[205px] w-[392px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "2563:11975",
+      "name": "a0/input",
+      "className": "absolute bg-white border border-[#d1d5db] border-solid h-[42px] left-[23px] rounded-[8px] top-[225px] w-[392px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#d1d5db"
+        },
+        "height": {
+          "value": "42px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1671:7307",
+      "name": "hotspot/state · Client · A viewing (identify)",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-0 opacity-0 top-[762px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1672:7195",
+      "name": "hotspot/state · Client · F expired",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-0 opacity-0 top-[564px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "1672:7197",
+      "name": "hotspot/state · Client · F revoked",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-[200px] opacity-0 top-[602px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    },
+    {
+      "nodeId": "1672:7199",
+      "name": "hotspot/state · Client · F not-found",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-[400px] opacity-0 top-[640px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    }
+  ]
+}

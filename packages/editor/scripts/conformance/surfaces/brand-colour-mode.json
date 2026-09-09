@@ -1,0 +1,233 @@
+{
+  "surface": "brand-colour-mode",
+  "board": "Brand · colour-mode (Figma 153:92)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-colour-mode"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-nodark-header"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "brand-panel"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-colour-mode",
+      "nodeId": "208:581"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-colour-mode",
+      "nodeId": "I208:581;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:97"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:98"
+    },
+    {
+      "name": "preview-toggle",
+      "testId": "brand-colour-mode-preview",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:99"
+    },
+    {
+      "name": "segmented",
+      "testId": "brand-colour-mode-seg",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:100"
+    },
+    {
+      "name": "seg-light",
+      "testId": "brand-colour-mode-seg-light",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:101"
+    },
+    {
+      "name": "seg-dark",
+      "testId": "brand-colour-mode-seg-dark",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:103"
+    },
+    {
+      "name": "section-header",
+      "testId": "brand-nodark-header",
+      "spec": "brand-colour-mode",
+      "nodeId": "220:835"
+    },
+    {
+      "name": "section-header-fill",
+      "testId": "brand-nodark-header",
+      "spec": "brand-colour-mode",
+      "nodeId": "I220:835;220:6"
+    },
+    {
+      "name": "row-color-primary",
+      "testId": "brand-nodark-row-color-primary",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:108"
+    },
+    {
+      "name": "row-color-primary-name",
+      "testId": "brand-nodark-name-color-primary",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:109"
+    },
+    {
+      "name": "row-color-primary-set",
+      "testId": "brand-nodark-set-color-primary",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:110"
+    },
+    {
+      "name": "row-color-secondary",
+      "testId": "brand-nodark-row-color-secondary",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:111"
+    },
+    {
+      "name": "row-color-secondary-name",
+      "testId": "brand-nodark-name-color-secondary",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:112"
+    },
+    {
+      "name": "row-color-secondary-set",
+      "testId": "brand-nodark-set-color-secondary",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:113"
+    },
+    {
+      "name": "row-color-accent",
+      "testId": "brand-nodark-row-color-accent",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:114"
+    },
+    {
+      "name": "row-color-accent-name",
+      "testId": "brand-nodark-name-color-accent",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:115"
+    },
+    {
+      "name": "row-color-accent-set",
+      "testId": "brand-nodark-set-color-accent",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:116"
+    },
+    {
+      "name": "row-color-background",
+      "testId": "brand-nodark-row-color-background",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:117"
+    },
+    {
+      "name": "row-color-background-name",
+      "testId": "brand-nodark-name-color-background",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:118"
+    },
+    {
+      "name": "row-color-background-set",
+      "testId": "brand-nodark-set-color-background",
+      "spec": "brand-colour-mode",
+      "nodeId": "153:119"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: rail -> `b` -> Colour mode. 60/60, 0 contrast failures.",
+    "",
+    "boards.json's finding — \"row pitch 48 vs board 32 — half as many rows per",
+    "screen\" — no longer reproduces: the rows are `tw:h-8` and measured 32.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  preview row     44 tall (153:99). `py-2` around a 34px group measured 50 —",
+    "                  six pixels of unboarded band above the first section header.",
+    "  segmented track radius 6 (153:100), not `--bk-radius-full`. A pill track",
+    "                  around two radius-6 segments left a 12px crescent of",
+    "                  `--bk-bg-subtle` at each end belonging to neither segment.",
+    "  segments        5/20 padding and an 18px line (153:101 / 153:102). A flat",
+    "                  `0 12px` gave 24 of inset against the board's 40.",
+    "  section header  28 tall, 16 in, 8px gap (220:835 — the SHARED Section header",
+    "                  component, so this is the component's own contract, not this",
+    "                  board's opinion). It shipped 12-in on a `py-1.5` hug, so the",
+    "                  band that groups the list sat inside every row it grouped.",
+    "  Set             12/18 in `--color/accent-text` (153:110 and three siblings).",
+    "                  flowbite's `size=\"xs\"` link is 12/16.",
+    "",
+    "CONTRAST — THE BOARD ASKED FOR THREE FAILURES AND DID NOT GET THEM. Measured",
+    "before the fix: `Dark` (153:104), the `No dark value` header and its count all",
+    "painted `--color/ink-muted` #6b7280 on a `--color/bg-subtle` #f3f4f6 fill,",
+    "which computes to 4.39:1 against a 4.5 floor. All three are what the board",
+    "specifies. All three now use `--bk-ink-soft` (6.5:1) — the substitution",
+    "DesignTabFooter and the Beginner note already document for this exact pair on",
+    "this exact fill, and the systemic defect recorded in",
+    "docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md. A board cannot",
+    "authorise a contrast failure. None of the three colours is a joined node, so",
+    "the substitution costs no coverage.",
+    "",
+    "TWO TARGETS SHARE ONE ANCHOR, deliberately: `section-header` (220:835 — gap,",
+    "height, inset) and `section-header-fill` (I220:835;220:6 — the",
+    "`--color/bg-subtle` fill and the same 28) both point at",
+    "`brand-nodark-header`. Figma nests a fill layer inside the header frame; the",
+    "DOM has no obligation to mirror that nesting and paints the fill on the header",
+    "itself. Two nodes, one element, both compared.",
+    "",
+    "NOT CONFORMED — DESIGN-AHEAD, the whole colours toolbar. 1751:8392 (a 60px",
+    "`toolbar · colours` row), 1751:8394 / 8396 / 8398 (`Group by` / `Sort` /",
+    "`Filter` — white, `--bk-gray-300` edge, 26 tall, radius 4, 11px labels),",
+    "1751:8399 and 1751:8400 (`group-heads`, 44 tall) with the BRAND / STATE /",
+    "SURFACE headings they produce. None of it exists in code: ColourModeSection",
+    "renders one unconditional query (colour tokens with no `darkValue`) under one",
+    "section header. Grouping, sorting and filtering a token list is a feature, not",
+    "a style, and building it from a board is out of a conformance pass's scope.",
+    "This is the largest gap on any board in my set and warrants its own row.",
+    "",
+    "SAMPLE DATA: the board's four token ids (`brand/accent-soft`,",
+    "`surface/raised`, `ink/quiet`, `border/hairline`) are a different naming",
+    "convention from the project's (`color-primary`, `color-secondary`, ...), and",
+    "the board draws four rows where the demo project has 17. The four board rows",
+    "are joined to the first four live rows; all four state identical properties."
+  ]
+}

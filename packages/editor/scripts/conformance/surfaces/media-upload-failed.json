@@ -1,0 +1,27 @@
+{
+  "surface": "media-upload-failed",
+  "board": "Media · upload-failed (Figma 145:148)",
+  "_note": "Probe: a queue entry that ended in `status:\"error\"`. The waitFor is on `media-upload-error-row`, which nothing else in the drawer renders. The row was on a Tailwind ramp rather than this system's tokens — `bg-yellow-50` / `text-amber-800` against the board's --color/warning-tint (#FDFDEA) and --color/warning-text (#723B13), both of which ship as --bk-* already — and it was min-h-11+py against the board's flat 64. Board won on all four. NOT joined: 145:197's w-184, a text-frame auto-width; 145:154 (inner search field, authority=open:input-fill); 145:157 (the folder row's Select). The board's ✕ dismiss (2838:12068) is NOT built — nothing in the upload queue can drop a row without retrying it, and a control that only hides a failure is worse than the failure staying visible.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-upload-failed",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [
+    { "action": "waitFor", "testId": "media-upload-error-row" }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel",        "testId": "media-panel",                "spec": "media-upload-failed", "nodeId": "145:148" },
+    { "name": "panel-header", "testId": "panel-header",               "spec": "media-upload-failed", "nodeId": "208:311" },
+    { "name": "search",       "testId": "media-search",               "spec": "media-upload-failed", "nodeId": "145:153" },
+    { "name": "folder-row",   "testId": "media-folder-row",           "spec": "media-upload-failed", "nodeId": "145:156" },
+    { "name": "type-chips",   "testId": "media-type-chips",           "spec": "media-upload-failed", "nodeId": "145:159" },
+    { "name": "chip-image",   "testId": "media-type-chip-img",        "spec": "media-upload-failed", "nodeId": "145:160" },
+    { "name": "chip-video",   "testId": "media-type-chip-vid",        "spec": "media-upload-failed", "nodeId": "145:163" },
+    { "name": "chip-svg",     "testId": "media-type-chip-ico",        "spec": "media-upload-failed", "nodeId": "145:166" },
+    { "name": "chip-icon",    "testId": "media-type-chip-fnt",        "spec": "media-upload-failed", "nodeId": "145:169" },
+    { "name": "asset-grid",   "testId": "media-grid",                 "spec": "media-upload-failed", "nodeId": "145:172" },
+    { "name": "failed-row",   "testId": "media-upload-error-row",     "spec": "media-upload-failed", "nodeId": "145:195" },
+    { "name": "failed-name",  "testId": "media-upload-error-name",    "spec": "media-upload-failed", "nodeId": "145:196" },
+    { "name": "failed-retry", "testId": "media-upload-error-retry",   "spec": "media-upload-failed", "nodeId": "145:198" },
+    { "name": "footer",       "testId": "media-footer",               "spec": "media-upload-failed", "nodeId": "145:192" }
+  ]
+}

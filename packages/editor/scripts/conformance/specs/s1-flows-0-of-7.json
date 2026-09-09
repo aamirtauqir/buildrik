@@ -1,0 +1,438 @@
+{
+  "surface": "s1-flows-0-of-7",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "296:1972",
+  "boardName": "s1-flows-0-of-7",
+  "figmaHash": "42b2cebd9dbb60e5f8685abbe2833142a0198fee1217a6a5d5162b678bf8a82d",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:50:40.951Z",
+  "copy": [
+    "Get started",
+    "0/7",
+    "Set your brand",
+    "Add your first page",
+    "Insert a section",
+    "Connect first client",
+    "Send for review",
+    "Preview your site",
+    "Publish"
+  ],
+  "targets": [
+    {
+      "nodeId": "296:1972",
+      "name": "S1.4 · 0 of 7",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1974",
+      "name": "checklist",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex flex-col gap-[12px] items-start left-[1068px] overflow-clip px-[20px] py-[18px] rounded-[12px] top-[604px] w-[340px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "gap": {
+          "value": "12px"
+        },
+        "padding-left": {
+          "value": "20px"
+        },
+        "padding-right": {
+          "value": "20px"
+        },
+        "padding-top": {
+          "value": "18px"
+        },
+        "padding-bottom": {
+          "value": "18px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "340px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1975",
+      "name": "Frame",
+      "className": "[word-break:break-word] content-stretch flex items-center justify-between leading-[normal] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1976",
+      "name": null,
+      "className": "font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1977",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium relative shrink-0 text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1978",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "343:3654",
+      "name": "Checkbox",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[1.5px] border-[var(--color\\/border-medium,#d1d5db)] border-solid relative rounded-[4px] shrink-0 size-[18px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1980",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1981",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "343:3655",
+      "name": "Checkbox",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[1.5px] border-[var(--color\\/border-medium,#d1d5db)] border-solid relative rounded-[4px] shrink-0 size-[18px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1983",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1984",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "343:3656",
+      "name": "Checkbox",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[1.5px] border-[var(--color\\/border-medium,#d1d5db)] border-solid relative rounded-[4px] shrink-0 size-[18px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1986",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1987",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "343:3657",
+      "name": "Checkbox",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[1.5px] border-[var(--color\\/border-medium,#d1d5db)] border-solid relative rounded-[4px] shrink-0 size-[18px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1989",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1990",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "343:3658",
+      "name": "Checkbox",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[1.5px] border-[var(--color\\/border-medium,#d1d5db)] border-solid relative rounded-[4px] shrink-0 size-[18px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1992",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1993",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "343:3659",
+      "name": "Checkbox",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[1.5px] border-[var(--color\\/border-medium,#d1d5db)] border-solid relative rounded-[4px] shrink-0 size-[18px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1995",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1996",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "343:3660",
+      "name": "Checkbox",
+      "className": "bg-[var(--color\\/bg-panel,white)] border-[1.5px] border-[var(--color\\/border-medium,#d1d5db)] border-solid relative rounded-[4px] shrink-0 size-[18px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "296:1998",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1682:7209",
+      "name": "hotspot/state · S1.4 · setup-chip",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-0 opacity-0 top-[706px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

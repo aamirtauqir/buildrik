@@ -1,0 +1,147 @@
+{
+  "surface": "brand-classes",
+  "board": "Brand \u00b7 classes (Figma 153:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-classes"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-classes"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-classes",
+      "nodeId": "208:551"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-classes",
+      "nodeId": "I208:551;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-classes",
+      "nodeId": "153:7"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-classes",
+      "nodeId": "153:8"
+    },
+    {
+      "name": "class-row",
+      "testId": "brand-class-buildrick-page-root",
+      "spec": "brand-classes",
+      "nodeId": "153:9"
+    },
+    {
+      "name": "class-name",
+      "testId": "brand-class-name-buildrick-page-root",
+      "spec": "brand-classes",
+      "nodeId": "153:10"
+    },
+    {
+      "name": "class-usage",
+      "testId": "brand-class-usage-buildrick-page-root",
+      "spec": "brand-classes",
+      "nodeId": "153:11"
+    },
+    {
+      "name": "class-list",
+      "testId": "brand-classes"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: Brand -> Classes. The screen is one click from the root and it",
+    "is NOT empty in the demo \u2014 the page root carries `.buildrick-page-root`, so",
+    "`ClassesSection` renders one real row read off the live element tree. That row",
+    "is joined to the board's first (153:9).",
+    "",
+    "ONE ROW, not five, and that is the honest coverage number. The board draws",
+    "five \u2014 `.btn-primary` used 12x, `.card` used 8x, `.section`, `.nav-link`,",
+    "`.badge` \u2014 and every one of those is sample data: a class list is whatever the",
+    "customer's own elements carry, and the founder rule says the SHAPE is the",
+    "contract. All five board rows are the same 44px / 11-over-11 block, so the",
+    "shape is measured once against the one row that really exists, rather than",
+    "five times against a fixture that would have invented four of them. Stated",
+    "plainly so nobody reads `17 compared` as five rows checked.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  row line-height  16 (153:9). Both lines inherited flowbite's `text-sm` 20px",
+    "                   from the panel, so the block was 40 tall inside a 44 row.",
+    "  no divider       the rows carried `border-b var(--bk-gray-100)`; 153:9..27",
+    "                   draw five rows flush against each other with the 16px line",
+    "                   rhythm doing the separating. A rule under a two-line row",
+    "                   made a list read as a table.",
+    "  no inner gap     `gap-0.5` -> none. The board's two lines are 16px apart",
+    "                   (top 10 and top 26), which is exactly one line-height.",
+    "  back row 36/16/no fill (153:7), crumb 13/20 accent (153:8) \u2014 the family's",
+    "  shared back row, changed once in DesignSystemTab.",
+    "",
+    "NOT JOINED:",
+    "  153:13, the `.card` row \u2014 it carries `border-radius: 8px` and its four",
+    "  identical siblings carry none. A radius on one row of five is an artifact;",
+    "  306:2168 does the same thing on the Presets board.",
+    "  153:2 itself \u2014 the drawer's edge, see brand-lint-warnings.json.",
+    "",
+    "FRAGILE BY CONSTRUCTION: the row anchor is `brand-class-buildrick-page-root`,",
+    "derived from the demo project's own data. If the seed stops putting that class",
+    "on the page root the recipe fails LOUDLY (step timeout, exit 3), which is the",
+    "right failure \u2014 measuring a class list means measuring real classes.",
+    "",
+    "CHECK-BOARD-COPY, triaged: `.btn-primary`, `.card`, `.section`, `.nav-link`,",
+    "`.badge` are the board's five sample classes. A class list is whatever the",
+    "customer's elements carry, and the demo carries one. Sample data by the",
+    "founder's rule.",
+    "Two leads DID come out of this check and were fixed in code rather than",
+    "explained away: `.{name}` and `used {count}&times;` each rendered as several",
+    "text nodes, so the board's `.btn-primary` and `used 12\u00d7` had nothing to",
+    "compare against. They are single template literals now \u2014 the panel looks",
+    "identical and the check can see it.",
+    "",
+    "HEADER TITLE REVERSED TO THE BOARD: the panel header now reads `Brand` at",
+    "every depth, not `Brand \u203a <Section>`. Six destination frames state the title",
+    "text and all six say `Brand`; check-board-copy.mjs reported it on all six at",
+    "once. This undoes a deliberate 2026-09-04 change whose argument is kept in",
+    "DesignSystemTab.tsx \u2014 the boards answer `where am I` one row lower, in the",
+    "36px Back row they all draw."
+  ]
+}

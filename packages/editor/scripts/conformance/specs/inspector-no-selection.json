@@ -1,0 +1,92 @@
+{
+  "surface": "inspector-no-selection",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "159:99",
+  "boardName": "inspector-no-selection",
+  "figmaHash": "a0922db543768b5aa0593177c417a5abb63b431496e3dfdc08175a37c067db84",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:23:18.108Z",
+  "copy": [
+    "Select something on the canvas to edit it.",
+    "✦ Ask AI ›"
+  ],
+  "targets": [
+    {
+      "nodeId": "159:99",
+      "name": "Inspector · no-selection",
+      "className": "bg-[var(--color\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "159:100",
+      "name": "Empty state",
+      "className": "[word-break:break-word] h-[160px] not-italic overflow-clip relative shrink-0 text-center w-full",
+      "props": {
+        "height": {
+          "value": "160px"
+        }
+      }
+    },
+    {
+      "nodeId": "159:101",
+      "name": null,
+      "className": "-translate-x-1/2 absolute font-['Inter:Regular'] font-normal leading-[20px] left-[150px] text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[64px] w-[268px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "268px"
+        }
+      }
+    },
+    {
+      "nodeId": "920:4717",
+      "name": null,
+      "className": "-translate-x-1/2 absolute cursor-pointer font-['Inter:Medium'] font-medium h-[16px] leading-[0] left-[150px] text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[92px] w-[268px]",
+      "props": {
+        "height": {
+          "value": "16px"
+        },
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "268px"
+        }
+      }
+    },
+    {
+      "nodeId": "1175:4868",
+      "name": "hotspot/state · template-applied",
+      "className": "absolute h-[34px] left-0 top-[168px] w-[300px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "300px"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "surface": "s7-0-navigation-model-drill-in-new-2026-08-2",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1344:7162",
+  "boardName": "s7-0-navigation-model-drill-in-new-2026-08-2",
+  "figmaHash": "904b967e902bc0a1ee4d12c43b86585c6093ed14e7601ae540531753bb09b6d7",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:50:56.540Z",
+  "copy": [
+    "Settings navigate by DRILL-IN, not master-detail",
+    "Founder-locked preference (drill-in stack nav, recorded pre-08-28; reconfirmed for Settings 2026-08-28)."
+  ],
+  "targets": [
+    {
+      "nodeId": "1344:7162",
+      "name": "S7.0 · navigation-model · drill-in — NEW 2026-08-28 — RETIRED 2026-09-02, not a screen (1440x400, two text nodes documenting the drill-in model SettingsTab.tsx:403-421 already implements)",
+      "className": "[word-break:break-word] bg-[#f9fafb] not-italic relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7163",
+      "name": null,
+      "className": "absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[24px] text-[#111928] text-[18px] top-[24px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "18px"
+        }
+      }
+    },
+    {
+      "nodeId": "1344:7164",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal h-[300px] leading-[0] left-[24px] text-[#4b5563] text-[13px] top-[64px] w-[1300px] whitespace-pre-wrap",
+      "props": {
+        "height": {
+          "value": "300px"
+        },
+        "line-height": {
+          "value": "0"
+        },
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "1300px"
+        }
+      }
+    }
+  ]
+}

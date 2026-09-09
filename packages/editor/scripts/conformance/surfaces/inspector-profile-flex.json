@@ -1,0 +1,262 @@
+{
+  "surface": "inspector-profile-flex",
+  "board": "Inspector · profile · FLEX (Figma 807:8412)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Flex"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-profile-flex",
+      "nodeId": "807:8412"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-profile-flex",
+      "nodeId": "920:4699"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-profile-flex",
+      "nodeId": "956:6844"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-profile-flex",
+      "nodeId": "956:6846"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-profile-flex",
+      "nodeId": "956:6848"
+    },
+    {
+      "name": "sechead-layout",
+      "testId": "inspector-sechead-layout",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20320"
+    },
+    {
+      "name": "secname-layout",
+      "testId": "inspector-secname-layout",
+      "spec": "inspector-profile-flex",
+      "nodeId": "807:8419"
+    },
+    {
+      "name": "sechead-flexbox",
+      "testId": "inspector-sechead-flexbox",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20323"
+    },
+    {
+      "name": "secname-flexbox",
+      "testId": "inspector-secname-flexbox",
+      "spec": "inspector-profile-flex",
+      "nodeId": "807:8427"
+    },
+    {
+      "name": "row-gap",
+      "testId": "inspector-row-gap"
+    },
+    {
+      "name": "field-gap",
+      "testId": "inspector-field-gap",
+      "spec": "inspector-profile-flex",
+      "nodeId": "807:8439"
+    },
+    {
+      "name": "label-gap",
+      "testId": "inspector-label-gap",
+      "spec": "inspector-profile-flex",
+      "nodeId": "807:8438"
+    },
+    {
+      "name": "sechead-spacing",
+      "testId": "inspector-sechead-spacing",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20331"
+    },
+    {
+      "name": "secname-spacing",
+      "testId": "inspector-secname-spacing",
+      "spec": "inspector-profile-flex",
+      "nodeId": "807:8449"
+    },
+    {
+      "name": "sechead-background",
+      "testId": "inspector-sechead-background",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20333"
+    },
+    {
+      "name": "sechead-border",
+      "testId": "inspector-sechead-border",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20334"
+    },
+    {
+      "name": "sechead-corner-radius",
+      "testId": "inspector-sechead-corner-radius",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20335"
+    },
+    {
+      "name": "sechead-effects",
+      "testId": "inspector-sechead-effects",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20336"
+    },
+    {
+      "name": "sechead-interactions",
+      "testId": "inspector-sechead-interactions",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20337"
+    },
+    {
+      "name": "sechead-animation",
+      "testId": "inspector-sechead-animation",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20338"
+    },
+    {
+      "name": "sechead-visibility",
+      "testId": "inspector-sechead-visibility",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20339"
+    },
+    {
+      "name": "sechead-element-properties",
+      "testId": "inspector-sechead-element-properties",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20340"
+    },
+    {
+      "name": "sechead-css-classes",
+      "testId": "inspector-sechead-css-classes",
+      "spec": "inspector-profile-flex",
+      "nodeId": "2069:20341"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row"
+    },
+    {
+      "name": "sechead-size",
+      "testId": "inspector-sechead-size"
+    },
+    {
+      "name": "sections-apply",
+      "testId": "inspector-sections-apply"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900: Insert's Flex row (Layout group) creates a flex",
+    "container and selects it, which is the production path into the FLEX",
+    "profile.",
+    "",
+    "THREE REAL CONTRAST FAILURES WERE FOUND ON THIS PANEL AND FIXED, not",
+    "baselined — nothing had ever measured the flexbox section before:",
+    "",
+    "  the four direction tiles ('Row', 'Column', 'Row-R', 'Col-R') painted",
+    "  --bk-ink-muted on --bk-bg-subtle = 4.39:1 at 12px, the same pair and the",
+    "  same fix as `.bdi-seg button` — --bk-ink-soft, 6.78:1.",
+    "",
+    "  the MARGIN tag on the spacing box, --bk-warning #C27803 on card white =",
+    "  3.51:1 at 11px. --bk-warning-text #723B13 is the token the system ships",
+    "  for warning INK on a light fill (8.0:1); --bk-warning stays a fill.",
+    "",
+    "  the linked-gap toggle measured 1.00:1 — an accent glyph on an accent",
+    "  background, i.e. invisible. It is a flowbite Button and had no",
+    "  `bg-transparent`, so flowbite's own primary fill painted under it. Every",
+    "  other icon button in this panel declares one.",
+    "",
+    "SHARED CHASSIS. This board is one of six that draw the same section",
+    "chassis (807:8342 TEXT, :8412 FLEX, :8475 GRID, :8521 MEDIA, :8567 BUTTON,",
+    ":8614 INPUT). It was conformed once, on inspector-profile-text, and that",
+    "recipe's _note carries the full account: 20-tall open / 28-tall shut section",
+    "headers, ink-muted on the header ROW, 0.08em tracking, section-body padding",
+    "0/8, the Family row moved onto the shared control frame, the colour row's",
+    "duplicate chip removed so the field keeps its 160, segmented tracks at 28,",
+    "and the three-anchor row (`inspector-row-`/`-label-`/`-field-<slug>`).",
+    "",
+    "NOT JOINED on every board in this family, censused across all committed",
+    "specs rather than counted board-to-board:",
+    "",
+    "  the header's `--flowbite/gray/50` fill — 37 boards draw this 48h row with",
+    "  NO fill, 6 draw it gray-50 (these six), 1 draws it accent-tinted. White",
+    "  ships; a header that changed colour with the selection would be a defect.",
+    "",
+    "  the context strip at 40 tall — 38 boards draw it 32, these 6 draw it 40.",
+    "  32 ships. One strip, not a per-profile one.",
+    "",
+    "  the accent-tint chip carrying the PROFILE name. 32:2 and 642:3112 put the",
+    "  ELEMENT's own name there and so does live.",
+    "",
+    "  the footer's `--color/ink-placeholder` #9CA3AF, which is 2.54:1 on white",
+    "  at 11px against a 4.5 floor. It ships --bk-ink-muted (4.83:1). Said loudly",
+    "  because it is a contrast refusal, not a taste call.",
+    "",
+    "  every `hotspot/…` node — prototype wiring, not chrome.",
+    "",
+    "NOT JOINED on THIS board specifically:",
+    "",
+    "  SIZE (2069:20328) is drawn OPEN with Width/Height where live has it shut —",
+    "  the flex container the Insert row creates sets no width or height, so the",
+    "  section carries nothing. Both sides count four sections in the footer; the",
+    "  board's four are LAYOUT/FLEXBOX/SIZE/SPACING and live's were",
+    "  LAYOUT/FLEXBOX/SPACING/VISIBILITY. VISIBILITY was a bug and is fixed (see",
+    "  below), so live now reads 3 of 13 honestly.",
+    "",
+    "  VISIBILITY was open here and on GRID, CONTAINER and MEDIA while all six",
+    "  profile boards draw it shut. That was a real defect, fixed in this change:",
+    "  the section declared `styleKeys: [display, visibility, opacity,",
+    "  pointer-events]` — four properties VisibilitySection never reads — and",
+    "  omitted the three `--hide-<breakpoint>` custom properties that are all it",
+    "  reads. `styleKeys` does two jobs: it is what `sectionApplies` counts (so",
+    "  `display` opened the section for every element that has one) AND what",
+    "  `defineSection` slices `ctx.styles` down to (so the toggles were handed a",
+    "  bag that could not contain `--hide-desktop`, always read 'visible', and",
+    "  could never show the 'hidden on N' preview).",
+    "",
+    "  2069:20321 / :20322 (Display, Direction) and :20324..:20326 (Justify,",
+    "  Align, Wrap): the board draws each as a 160 value frame; the shipped Layout",
+    "  and Flexbox sections use icon tiles and segmented groups, which is a",
+    "  control-type difference rather than a geometry one and is not addressable",
+    "  as a labelled row. Their SECTION headers are joined and match.",
+    "",
+    "  2069:20327, the Gap row, at 42 — the last-row-in-section form again. Its",
+    "  CONTROL and LABEL are joined and match at 160x28 and 12/ink-soft. Worth",
+    "  saying plainly: the board files Gap under FLEXBOX and the product files it",
+    "  under SPACING. The join measures the row's two boxes, not its heading."
+  ]
+}

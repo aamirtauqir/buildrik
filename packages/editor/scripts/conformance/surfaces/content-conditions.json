@@ -1,0 +1,109 @@
+{
+  "surface": "content-conditions",
+  "board": "Content · conditions (Figma 151:87)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "content-open-conditions"
+    },
+    {
+      "action": "waitFor",
+      "testId": "content-add-condition"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-conditions",
+      "nodeId": "208:491"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-conditions",
+      "nodeId": "I208:491;16:7"
+    },
+    {
+      "name": "crumb",
+      "testId": "content-crumb",
+      "spec": "content-conditions",
+      "nodeId": "151:93"
+    },
+    {
+      "name": "cond-happy",
+      "testId": "content-cond-el-happy-hour"
+    },
+    {
+      "name": "cond-happy-label",
+      "testId": "content-cond-label-el-happy-hour",
+      "spec": "content-conditions",
+      "nodeId": "151:95"
+    },
+    {
+      "name": "cond-happy-summary",
+      "testId": "content-cond-summary-el-happy-hour",
+      "spec": "content-conditions",
+      "nodeId": "151:96"
+    },
+    {
+      "name": "cond-sold",
+      "testId": "content-cond-el-sold-out",
+      "spec": "content-conditions",
+      "nodeId": "151:98"
+    },
+    {
+      "name": "cond-sold-label",
+      "testId": "content-cond-label-el-sold-out",
+      "spec": "content-conditions",
+      "nodeId": "151:99"
+    },
+    {
+      "name": "cond-sold-summary",
+      "testId": "content-cond-summary-el-sold-out",
+      "spec": "content-conditions",
+      "nodeId": "151:100"
+    },
+    {
+      "name": "add-condition",
+      "testId": "content-add-condition",
+      "spec": "content-conditions",
+      "nodeId": "151:103"
+    }
+  ],
+  "_note": [
+    "Board 151:87, reached with the panel's own Conditions row. The two rows are",
+    "real: `scanConditions` walks the engine's elements looking for a `condition`",
+    "data-binding, so the fixture's elements carry one and the summary line",
+    "(\"when time is 17:00–19:00\") is `conditionSummary` reading it, not a string.",
+    "",
+    "BOARD won on copy: the row was labelled `${type} · ${content}` — \"badge ·",
+    "Sold out\" — where the board names the element itself. The tag is the one word",
+    "the reader already knows least about the thing being hidden, and it pushed the",
+    "identifying words toward the truncation. `elementLabel` now returns the",
+    "element's own text, falling back to the type when it has none, which is the",
+    "case the prefix existed for. ContentTab.test.tsx:304 asserted the old label",
+    "and was rewritten in the same change.",
+    "",
+    "NOT anchored, and why:",
+    "  151:94, the FIRST row's frame. It carries `rounded-[8px]`; its twin 151:98",
+    "  on the same board, same component, does not — two instances disagreeing",
+    "  settle nothing, and where a Content row does carry a radius its own",
+    "  component boards (232:6 List row, 240:14 Record row) say 4. The 56 height",
+    "  the frame also states IS compared, on 151:98.",
+    "  151:97 / 151:101 the `⋯` glyphs — chrome-ui IconButton at 32x32 against a",
+    "  bare 13/20 glyph; sized by its own board 697:440.",
+    "  151:92 / 151:102 the two 36-tall frames (margin + an h-8 control; both",
+    "  controls are anchored, at 151:93 and 151:103). One hotspot/*.",
+    "",
+    "The board's `[not-implemented]` header stands and is not this recipe's",
+    "subject: evaluating a condition writes data-condition-hidden='true' and",
+    "nothing reads it, so the element stays visible on canvas and in the export."
+  ]
+}

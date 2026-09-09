@@ -1,0 +1,106 @@
+{
+  "surface": "s5-flows-approved",
+  "board": "S5.2 · approved (Figma 130:798)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=s5-approved&siteId=probe-site",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar-review-pill"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "topbar",
+      "testId": "topbar",
+      "spec": "s5-flows-approved",
+      "nodeId": "682:4651"
+    },
+    {
+      "name": "site-name",
+      "testId": "topbar-site-name",
+      "spec": "s5-flows-approved",
+      "nodeId": "I682:4651;680:11"
+    },
+    {
+      "name": "publish",
+      "testId": "topbar-publish",
+      "spec": "s5-flows-approved",
+      "nodeId": "I682:4651;680:22"
+    },
+    {
+      "name": "publish-label",
+      "testId": "topbar-publish",
+      "spec": "s5-flows-approved",
+      "nodeId": "I682:4651;680:22;9:19"
+    },
+    {
+      "name": "review-pill",
+      "testId": "topbar-review-pill"
+    },
+    {
+      "name": "review-label",
+      "testId": "topbar-review-label"
+    }
+  ],
+  "_note": [
+    "Board 130:798 — the shell with an APPROVED round. Everything on the frame",
+    "except the topbar's review pill is the standard shell, already measured",
+    "against its own family boards, so this recipe measures the topbar (which",
+    "this board draws as its own instance, 682:4651) and holds the pill.",
+    "",
+    "The probe mounts the real chrome-ui Topbar with the props StudioHeader",
+    "builds for the approved state — including the 'Approved by <name> · <ago>'",
+    "label it interpolates at StudioHeader.tsx:718-724 — rather than the whole",
+    "shell, because reaching an approved round live needs a dashboard that has",
+    "one.",
+    "",
+    "WHAT MOVED, and it moved in chrome-ui because THREE boards agree — 681:26",
+    "(the topbar board shell-default measures) and both S5 frames, which are",
+    "instances of the same component:",
+    "  · The site name was 13px at the bar's inherited leading. 680:11 is 14/20",
+    "    on all three, so the site's own name had been rendering at the same size",
+    "    as the controls around it.",
+    "",
+    "NOT MOVED, and named so the next agent does not re-open it:",
+    "  · `btn/exit` — the boards say 12px horizontal padding, a 13/18 label and",
+    "    --flowbite/gray/700; the code ships 10 / 12 / --bk-ink, with a comment",
+    "    dated 2026-08-03 citing 681:26 for '10 horizontal padding, 12px REGULAR,",
+    "    ink at gray-900'. The 2026-09-07 capture of that same node says",
+    "    otherwise, so either the board moved or the earlier read did. Flagged",
+    "    rather than flipped: the same comment records a deliberate colour",
+    "    decision (rest at ink, hover on surface) that a straight swap would",
+    "    undo, and the exit button belongs to the topbar board's own recipe.",
+    "  · Everything else on this 1440 frame — rail, drawer, Layers tree, canvas,",
+    "    inspector, status bar. Each has its own family board and its own recipe;",
+    "    re-measuring them here would put two recipes on one control.",
+    "",
+    "THE REVIEW PILL IS ANCHORED AND SKIPPED — the one thing on this board that",
+    "is uniquely its own, and the one thing a conformance pass may not settle.",
+    "The two boards in this pair paint it two different ways for two states that",
+    "both mean 'nothing is blocking you':",
+    "    130:798 approved  --color/success-tint #DEF7EC ground, success-text",
+    "                      #057A55 label",
+    "    130:201 pending   --color/warning-tint #FDFDEA ground, ink-soft label",
+    "    681:26  topbar    warning-tint again, for 'In review · 3 open'",
+    "Live, both are gray-100 / ink-soft. That is not drift, it is a written rule:",
+    "Topbar.tsx's REVIEW_TONE_CLASS says 'neutral-unless-blocking — info and",
+    "success are visually identical by design; only warning gets its own look',",
+    "because the bar's colour budget belongs to the two signals that GATE a",
+    "publish (the Issues chip and save trouble), and D7 rule 6 caps the bar at two",
+    "ambers at once. Painting 'In review' amber spends the third.",
+    "So: three boards, two of them mine, disagree with a chrome-ui primitive that",
+    "the twelve Shell-state boards already hold at authority=code:topbar. One",
+    "screen board does not move that, and neither do two that contradict each",
+    "other. Numbers are in measured/<surface>.json; the call is the founder's.",
+    "",
+    "The pill's DOT (680:16 / 680:14) is not anchored either: Figma exports an",
+    "ellipse as an <img> with no style props, so the spec carries nothing to",
+    "compare, and a 6px status dot whose only content is its colour is the same",
+    "design-codex-#6 question the notification rows just answered the other way."
+  ]
+}

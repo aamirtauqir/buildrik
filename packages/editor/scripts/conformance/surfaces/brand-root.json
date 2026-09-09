@@ -1,0 +1,433 @@
+{
+  "surface": "brand-root",
+  "board": "Brand · root — NEW 2026-08-27 (CURRENT) (Figma 1333:7162)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-row-tokens"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "brand-panel",
+      "spec": "brand-root",
+      "nodeId": "1333:7162"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-root",
+      "nodeId": "1627:7162"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-root",
+      "nodeId": "I1627:7162;16:7"
+    },
+    {
+      "name": "mode-row",
+      "testId": "ds-mode-row"
+    },
+    {
+      "name": "mode-seg-beginner",
+      "testId": "ds-mode-seg-beginner"
+    },
+    {
+      "name": "mode-seg-pro",
+      "testId": "ds-mode-seg-pro"
+    },
+    {
+      "name": "mode-hint",
+      "testId": "ds-mode-hint"
+    },
+    {
+      "name": "preview",
+      "testId": "brand-preview"
+    },
+    {
+      "name": "preview-swatches",
+      "testId": "brand-preview-swatches",
+      "spec": "brand-root",
+      "nodeId": "1334:7165"
+    },
+    {
+      "name": "specimen-heading",
+      "testId": "brand-specimen-heading",
+      "spec": "brand-root",
+      "nodeId": "1334:7170"
+    },
+    {
+      "name": "specimen-heading-aa",
+      "testId": "brand-specimen-aa-heading",
+      "spec": "brand-root",
+      "nodeId": "1334:7171"
+    },
+    {
+      "name": "specimen-heading-label",
+      "testId": "brand-specimen-label-heading",
+      "spec": "brand-root",
+      "nodeId": "1334:7172"
+    },
+    {
+      "name": "specimen-body",
+      "testId": "brand-specimen-body",
+      "spec": "brand-root",
+      "nodeId": "1334:7173"
+    },
+    {
+      "name": "specimen-body-aa",
+      "testId": "brand-specimen-aa-body",
+      "spec": "brand-root",
+      "nodeId": "1334:7174"
+    },
+    {
+      "name": "specimen-body-label",
+      "testId": "brand-specimen-label-body",
+      "spec": "brand-root",
+      "nodeId": "1334:7175"
+    },
+    {
+      "name": "row-tokens",
+      "testId": "brand-row-tokens",
+      "spec": "brand-root",
+      "nodeId": "1334:7176"
+    },
+    {
+      "name": "row-tokens-label",
+      "testId": "brand-row-label-tokens",
+      "spec": "brand-root",
+      "nodeId": "1334:7178"
+    },
+    {
+      "name": "row-tokens-hint",
+      "testId": "brand-row-hint-tokens",
+      "spec": "brand-root",
+      "nodeId": "1334:7179"
+    },
+    {
+      "name": "row-tokens-count",
+      "testId": "brand-row-count-tokens",
+      "spec": "brand-root",
+      "nodeId": "1334:7180"
+    },
+    {
+      "name": "row-tokens-chevron",
+      "testId": "brand-row-chevron-tokens",
+      "spec": "brand-root",
+      "nodeId": "1334:7181"
+    },
+    {
+      "name": "row-styles",
+      "testId": "brand-row-styles",
+      "spec": "brand-root",
+      "nodeId": "1334:7182"
+    },
+    {
+      "name": "row-styles-label",
+      "testId": "brand-row-label-styles",
+      "spec": "brand-root",
+      "nodeId": "1334:7184"
+    },
+    {
+      "name": "row-styles-hint",
+      "testId": "brand-row-hint-styles",
+      "spec": "brand-root",
+      "nodeId": "1334:7185"
+    },
+    {
+      "name": "row-styles-count",
+      "testId": "brand-row-count-styles",
+      "spec": "brand-root",
+      "nodeId": "1334:7186"
+    },
+    {
+      "name": "row-styles-chevron",
+      "testId": "brand-row-chevron-styles",
+      "spec": "brand-root",
+      "nodeId": "1334:7187"
+    },
+    {
+      "name": "row-starters",
+      "testId": "brand-row-starters",
+      "spec": "brand-root",
+      "nodeId": "1334:7188"
+    },
+    {
+      "name": "row-starters-label",
+      "testId": "brand-row-label-starters",
+      "spec": "brand-root",
+      "nodeId": "1334:7190"
+    },
+    {
+      "name": "row-starters-hint",
+      "testId": "brand-row-hint-starters",
+      "spec": "brand-root",
+      "nodeId": "1334:7191"
+    },
+    {
+      "name": "row-starters-count",
+      "testId": "brand-row-count-starters",
+      "spec": "brand-root",
+      "nodeId": "1334:7192"
+    },
+    {
+      "name": "row-starters-chevron",
+      "testId": "brand-row-chevron-starters",
+      "spec": "brand-root",
+      "nodeId": "1334:7193"
+    },
+    {
+      "name": "row-classes",
+      "testId": "brand-row-classes",
+      "spec": "brand-root",
+      "nodeId": "1334:7194"
+    },
+    {
+      "name": "row-classes-label",
+      "testId": "brand-row-label-classes",
+      "spec": "brand-root",
+      "nodeId": "1334:7196"
+    },
+    {
+      "name": "row-classes-hint",
+      "testId": "brand-row-hint-classes",
+      "spec": "brand-root",
+      "nodeId": "1334:7197"
+    },
+    {
+      "name": "row-classes-chevron",
+      "testId": "brand-row-chevron-classes",
+      "spec": "brand-root",
+      "nodeId": "1334:7198"
+    },
+    {
+      "name": "row-components",
+      "testId": "brand-row-components",
+      "spec": "brand-root",
+      "nodeId": "1334:7199"
+    },
+    {
+      "name": "row-components-label",
+      "testId": "brand-row-label-components",
+      "spec": "brand-root",
+      "nodeId": "1334:7201"
+    },
+    {
+      "name": "row-components-hint",
+      "testId": "brand-row-hint-components",
+      "spec": "brand-root",
+      "nodeId": "1334:7202"
+    },
+    {
+      "name": "row-components-chevron",
+      "testId": "brand-row-chevron-components",
+      "spec": "brand-root",
+      "nodeId": "1334:7203"
+    },
+    {
+      "name": "row-typography",
+      "testId": "brand-row-typography",
+      "spec": "brand-root",
+      "nodeId": "1334:7204"
+    },
+    {
+      "name": "row-typography-label",
+      "testId": "brand-row-label-typography",
+      "spec": "brand-root",
+      "nodeId": "1334:7206"
+    },
+    {
+      "name": "row-typography-hint",
+      "testId": "brand-row-hint-typography",
+      "spec": "brand-root",
+      "nodeId": "1334:7207"
+    },
+    {
+      "name": "row-typography-chevron",
+      "testId": "brand-row-chevron-typography",
+      "spec": "brand-root",
+      "nodeId": "1334:7208"
+    },
+    {
+      "name": "row-colour-mode",
+      "testId": "brand-row-colour-mode",
+      "spec": "brand-root",
+      "nodeId": "1334:7209"
+    },
+    {
+      "name": "row-colour-mode-label",
+      "testId": "brand-row-label-colour-mode",
+      "spec": "brand-root",
+      "nodeId": "1334:7211"
+    },
+    {
+      "name": "row-colour-mode-hint",
+      "testId": "brand-row-hint-colour-mode",
+      "spec": "brand-root",
+      "nodeId": "1334:7212"
+    },
+    {
+      "name": "row-colour-mode-chevron",
+      "testId": "brand-row-chevron-colour-mode",
+      "spec": "brand-root",
+      "nodeId": "1334:7213"
+    },
+    {
+      "name": "row-lint",
+      "testId": "brand-row-lint",
+      "spec": "brand-root",
+      "nodeId": "1334:7214"
+    },
+    {
+      "name": "row-lint-label",
+      "testId": "brand-row-label-lint",
+      "spec": "brand-root",
+      "nodeId": "1334:7216"
+    },
+    {
+      "name": "row-lint-hint",
+      "testId": "brand-row-hint-lint",
+      "spec": "brand-root",
+      "nodeId": "1334:7217"
+    },
+    {
+      "name": "row-lint-chevron",
+      "testId": "brand-row-chevron-lint",
+      "spec": "brand-root",
+      "nodeId": "1334:7219"
+    },
+    {
+      "name": "row-export",
+      "testId": "brand-row-export",
+      "spec": "brand-root",
+      "nodeId": "1334:7220"
+    },
+    {
+      "name": "row-export-label",
+      "testId": "brand-row-label-export",
+      "spec": "brand-root",
+      "nodeId": "1334:7222"
+    },
+    {
+      "name": "row-export-hint",
+      "testId": "brand-row-hint-export",
+      "spec": "brand-root",
+      "nodeId": "1334:7223"
+    },
+    {
+      "name": "row-export-chevron",
+      "testId": "brand-row-chevron-export",
+      "spec": "brand-root",
+      "nodeId": "1334:7224"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE at 1440x900: rail -> `b` -> the Brand panel's own root. Nothing",
+    "here is probed.",
+    "",
+    "THE SHARED-THEME STRIP (1747:8390..8394) IS NOT CONFORMED, AND THE BOARD SAYS",
+    "SO ITSELF: this board's Figma name ends `[not-implemented] the shared-theme",
+    "strip: capture/push moves projectStyles CSS rules, not designTokens",
+    "(theme.service.ts:79,184), so no brand syncs`. A 56px band above the fold",
+    "linking OUT of the editor to a sync that does not move tokens is the one",
+    "thing on this board its own author flagged. DesignSystemTab removed it on",
+    "2026-09-06 for the same reason and that decision stands.",
+    "",
+    "WHAT THE BOARD WON, on the mode row (1747:8395 and its four children) — this",
+    "is the change this recipe made:",
+    "  the band       a `--bk-bg-subtle` STRIP supplied by DesignSystemTab ->",
+    "                 40px on the panel's own white with one `--bk-gray-200` rule",
+    "                 (1747:8395 has no fill). Two grey bars used to stack",
+    "                 directly under the 44px header, which read as a second",
+    "                 header rather than a control.",
+    "  segments       24 tall, radius 4, 11px labels (1747:8396..8399). They took",
+    "                 flowbite's size=\"xs\" box and `text-xs` (12px), inside a",
+    "                 2px-padded tinted track the board does not draw.",
+    "  Beginner       filled `--color/accent` with NO stroke (1747:8397). It",
+    "                 carried a same-colour border, which is 2px of width no one",
+    "                 can see.",
+    "  Pro            white on a `--bk-gray-300` edge (1747:8399). It was",
+    "                 transparent-on-transparent and only read as a control",
+    "                 because the track behind it was tinted; with the track gone",
+    "                 there would have been nothing there.",
+    "  the hint       1747:8400 draws `Friendly · hides token IDs and empty",
+    "                 foundations` at 11px `--color/ink-muted` beside the",
+    "                 segments. In code it was a `title` attribute — a tooltip on",
+    "                 the one control whose job is to say what the panel will",
+    "                 show you, invisible unless you hovered the thing you were",
+    "                 trying to understand. 4.83:1 on white, computed.",
+    "",
+    "NOT JOINED — four nodes whose only failing property is a Figma frame artifact.",
+    "Every other property of each IS conformed in code and was measured passing",
+    "before the join was dropped; the numbers are in measured/brand-root.json.",
+    "  1747:8395 mode-row    `width: 280` is the DRAWER's outer edge. `.ls-panel`",
+    "            spends 1px of `--bk-size-drawer` on `border-right`, so every",
+    "            full-width child of this panel measures 279 and no code change",
+    "            inside the panel can alter that. Same ground on which",
+    "            brand-starters left 152:145 unjoined. Its `height: 40` matches.",
+    "  1747:8397 / 1747:8399  the two segments hug their labels, and Figma's Inter",
+    "            and the browser's disagree by under 2px on a 5-letter word:",
+    "            `Beginner` measures 47.23 here against the board's 48, `Pro`",
+    "            17.75 against 18. Fill, height, radius and the Pro stroke all",
+    "            match exactly and are the properties worth locking; pinning a",
+    "            literal `w-[68px]` on a text button to win 0.77px would be",
+    "            measuring the exporter's font metrics.",
+    "  1747:8400 mode-hint   `w-[134px]` is a FIXED-width text frame holding a",
+    "            ~230px string — the board clips its own hint. Live it is the",
+    "            flex remainder (130) and truncates. Colour, 11px size and",
+    "            leading-normal all match.",
+    "",
+    "NOT CONFORMED — 1334:7164, the preview band's `height: 82`, and this is a",
+    "board that contradicts itself rather than a code defect. The band's own",
+    "children are a 20px swatch row and two specimen rows, in a flex-col with",
+    "`gap-[8px]` inside `py-[12px]`: 12 + 20 + 8 + 19 + 8 + 19 + 12 = 98, which is",
+    "exactly what the live band measures. 82 would clip the `Aa Body` specimen —",
+    "the frame carries `overflow-clip`, so the board clips it too. The band's",
+    "16/12 inset and 8px gap ARE the board's and pass; only the typed height is",
+    "dropped.",
+    "",
+    "SAMPLE DATA, not conformed: the four swatch fills (1334:7166..7169) and the",
+    "row counts. The board paints #1a56db / #ffffff / #1f2937 / #ef4444 and prints",
+    "Tokens 4 · Presets 18 · Starters 6 · Lint 2; the live panel answers from the",
+    "registries. `row-lint-count` is not even a target — the demo project lints",
+    "clean, so no count renders, and a count that only exists when there are",
+    "issues is the behaviour the code contract specifies.",
+    "",
+    "FOUND, NOT FIXED — 1748:8390 `footer · clean`: a 32px `#f9fafb` strip whose",
+    "only content is `Tokens not saved` at 11/12-in. Live the same footer is",
+    "`DesignTabFooter`, 44 tall on `--bk-warning-tint`/`--bk-bg-subtle` at 12/18,",
+    "reading `Brand is up to date` when clean — and it is built to board 154:78,",
+    "which boards.json already verified (recipe brand-dirty). Two boards disagree",
+    "about one bar, so neither re-settles it (brief §When you may NOT conform) and",
+    "it is measured on 154:78. The board also contradicts itself here: a frame",
+    "NAMED `footer · clean` whose text says the tokens are not saved."
+  ]
+}

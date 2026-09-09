@@ -1,0 +1,208 @@
+{
+  "surface": "cmdk-recent",
+  "board": "S3.14 · cmdk · recent (Figma 303:1978)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "Control+k"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-input"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "press",
+      "key": "r"
+    },
+    {
+      "action": "press",
+      "key": "e"
+    },
+    {
+      "action": "press",
+      "key": "v"
+    },
+    {
+      "action": "press",
+      "key": "i"
+    },
+    {
+      "action": "press",
+      "key": "e"
+    },
+    {
+      "action": "press",
+      "key": "w"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-band-go-to"
+    }
+  ],
+  "contrastScope": "[data-testid=\"cmdk-palette\"]",
+  "targets": [
+    {
+      "name": "palette",
+      "testId": "cmdk-palette",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1978"
+    },
+    {
+      "name": "query-row",
+      "testId": "cmdk-query",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1979"
+    },
+    {
+      "name": "query-text",
+      "testId": "cmdk-input",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1980"
+    },
+    {
+      "name": "band-actions",
+      "testId": "cmdk-band-actions",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1981"
+    },
+    {
+      "name": "band-actions-tint",
+      "testId": "cmdk-band-actions",
+      "spec": "cmdk-recent",
+      "nodeId": "I303:1981;220:6"
+    },
+    {
+      "name": "row-action",
+      "testId": "cmdk-row-view-preview",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1982"
+    },
+    {
+      "name": "row-action-label",
+      "testId": "cmdk-label-view-preview",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1983"
+    },
+    {
+      "name": "row-action-kbd",
+      "testId": "cmdk-kbd-view-preview",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1984"
+    },
+    {
+      "name": "band-go-to",
+      "testId": "cmdk-band-go-to",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1987"
+    },
+    {
+      "name": "band-go-to-tint",
+      "testId": "cmdk-band-go-to",
+      "spec": "cmdk-recent",
+      "nodeId": "I303:1987;220:6"
+    },
+    {
+      "name": "row-nav",
+      "testId": "cmdk-row-nav-review",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1988"
+    },
+    {
+      "name": "row-nav-label",
+      "testId": "cmdk-label-nav-review",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1989"
+    },
+    {
+      "name": "row-nav-kbd",
+      "testId": "cmdk-kbd-nav-review",
+      "spec": "cmdk-recent",
+      "nodeId": "303:1990"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at :5050 — CmdK, then the board's own query, 'review'. The",
+    "`wait 400` before the keys is load-bearing: the input focuses on a 30ms",
+    "timeout, and keys pressed before it land on the document, which reads as an",
+    "unfiltered palette rather than a failed step.",
+    "",
+    "WHAT THIS BOARD ACTUALLY DRAWS, and why the recipe drives 'review' rather",
+    "than an empty query: 303:1978 is named 'recent', but the frame draws the",
+    "RESULTS state — a typed query, an ACTIONS strip and a GO TO strip. The word",
+    "'recent' appears only in 333:2338, an ANNOTATION badge: absolutely",
+    "positioned at left 16 / top 16, i.e. ON TOP of the query row's own text at",
+    "left 20 / top 17, in a gray-200 pill with a gray-400 border. Two strings",
+    "cannot occupy one line; it is a sticky note on the board, not a control, and",
+    "is not joined. The RECENT strip itself is drawn by 166:2 and is measured",
+    "there (cmdk-band-recent, 220:927).",
+    "",
+    "THIS BOARD IS THE ADJUDICATOR FOR STRIP ORDER, and the code moved to it.",
+    "166:27 draws the identical query, rows and strips but labels BOTH strips",
+    "'GO TO', which no grouped list can mean, so that frame cannot settle its own",
+    "order. This one labels them ACTIONS then GO TO and files the actions under",
+    "ACTIONS. Live banded in buildCommands' emission order, which put GO TO first",
+    "only because the navigation commands are pushed first;",
+    "shell/modals/CommandPalette.tsx now renders a fixed Recent · Suggested ·",
+    "Actions · Go to. The arrow keys walk the flattened banded list now too — a",
+    "render-only reorder would have left ArrowDown stepping between strips.",
+    "BOARD WON. It moves 166:27 and 166:2 as well as this one.",
+    "",
+    "SAMPLE DATA, not conformed literally: the board's four rows are review-",
+    "workflow commands ('Send for review', 'Versions'), which the command",
+    "registry does not carry. Live 'review' returns one row per strip —",
+    "'Preview' (view-preview, ⌘+P) under ACTIONS and 'Open Review panel'",
+    "(nav-review, chord R, the board's own row and chord) under GO TO. Two",
+    "strips, each heading a chorded row, is the shape.",
+    "",
+    "ALSO CHANGED, same file, same five boards: the rows were chrome-ui <Button>",
+    "with no variant, i.e. flowbite PRIMARY, so `enabled:hover:bg-primary-800`",
+    "survived the `tw:bg-*` override and the row under the pointer painted",
+    "#1E429F beneath a 13px --bk-ink label — 1.97:1, measured. Now",
+    "`variant=\"ghost\"`. Full account in cmdk-empty's recipe.",
+    "",
+    "NOT JOINED — I303:1981;16:17 and I303:1987;16:17, the strip LABELS. The",
+    "board colours them --color/ink-muted; live is --bk-ink-soft deliberately,",
+    "because 11px ink-muted on bg-subtle measures 4.39:1 (axe flagged 6 nodes)",
+    "and the component's own comment records it as open decision #1 in",
+    "FIGMA-TO-CODE/OPEN-DECISIONS.md — a Figma-side fix, not a call-site one.",
+    "Size and leading already match; only the colour is held open. The strip BOX",
+    "(28 tall, 16 gutters, 8 gap, bg-subtle tint) IS joined and passes.",
+    "",
+    "ALSO NOT JOINED — 303:1984 and 303:1990's left-[580px] and every other",
+    "absolute horizontal number on a CmdK frame. 166:2's frame name records the",
+    "founder's own reading: '640x420 is chrome-ui/CommandPalette.tsx, which has",
+    "no importer; the shipping palette is 560 wide",
+    "(shell/modals/CommandPalette.tsx:388, tw:w-140).' The boards are drawn in",
+    "640-space against a component nothing imports, so their x-coordinates do not",
+    "transfer and the palette is NOT to be widened. Heights, type and fills all do",
+    "transfer, and those are what this recipe joins.",
+    "",
+    "CONTRAST, REPORTED NOT HIDDEN — 4.38:1 on '⌘+P': --bk-ink-muted #6B7280 on",
+    "the selected row's --bk-accent-tint #EBF5FF at 11px. Same pair as cmdk-empty,",
+    "cmdk-typing, cmdk-results and pages-command-palette-k. The chord colour is",
+    "303:1984's own and diff compares it; the tint under it belongs to no board —",
+    "no CmdK frame draws a selected row at all. Recorded as a named pair so a NEW",
+    "failing pair still fails the run."
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "surface": "s5-flows-pending",
+  "board": "S5.2 · pending (Figma 130:201)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=s5-pending&siteId=probe-site",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "review-bar"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "topbar",
+      "testId": "topbar",
+      "spec": "s5-flows-pending",
+      "nodeId": "682:4576"
+    },
+    {
+      "name": "site-name",
+      "testId": "topbar-site-name",
+      "spec": "s5-flows-pending",
+      "nodeId": "I682:4576;680:11"
+    },
+    {
+      "name": "publish",
+      "testId": "topbar-publish",
+      "spec": "s5-flows-pending",
+      "nodeId": "I682:4576;680:22"
+    },
+    {
+      "name": "publish-label",
+      "testId": "topbar-publish",
+      "spec": "s5-flows-pending",
+      "nodeId": "I682:4576;680:22;9:19"
+    },
+    {
+      "name": "review-bar",
+      "testId": "review-bar",
+      "spec": "s5-flows-pending",
+      "nodeId": "136:14"
+    },
+    {
+      "name": "review-count",
+      "testId": "review-bar-count",
+      "spec": "s5-flows-pending",
+      "nodeId": "136:15"
+    },
+    {
+      "name": "review-next",
+      "testId": "review-bar-next",
+      "spec": "s5-flows-pending",
+      "nodeId": "136:16"
+    },
+    {
+      "name": "review-compare",
+      "testId": "review-bar-compare",
+      "spec": "s5-flows-pending",
+      "nodeId": "136:17"
+    },
+    {
+      "name": "review-resend",
+      "testId": "review-bar-resend",
+      "spec": "s5-flows-pending",
+      "nodeId": "136:19"
+    },
+    {
+      "name": "review-pill",
+      "testId": "topbar-review-pill"
+    },
+    {
+      "name": "review-label",
+      "testId": "topbar-review-label"
+    }
+  ],
+  "_note": [
+    "Board 130:201 — the shell with a PENDING round, which is the one S5.2",
+    "frame that adds a control rather than a colour: the Review bar (136:14)",
+    "under the topbar, with the open count, Next ›, Compare and Re-send.",
+    "",
+    "The bar's own board is 200:213 (Shell state 8), where it was built in the",
+    "2026-08-17 walk; this frame draws the same component, agrees with it, and",
+    "had no recipe of its own.",
+    "",
+    "COPY, and why the board's '0 open' is not adopted: the bar renders only",
+    "while a round is live, so a literal zero prints a number where a sentence",
+    "belongs — ReviewBar.tsx says so at the call site and prints 'Sent —",
+    "waiting on your client' instead, or 'Changes requested — nothing left",
+    "open'. Board sample data, and the SHAPE is the contract. The fixture runs",
+    "a round with 3 open comments so the count branch is what gets measured.",
+    "",
+    "The pill's '· 3 open' is the same shape of question and is already held at",
+    "authority=open:pill-count (boards.json, 2026-08-17): the count needs",
+    "`reviews.status` to return it — a tRPC + shared-schema change — and the",
+    "bar below the pill carries it meanwhile.",
+    "",
+    "WHAT MOVED, and it moved in chrome-ui because THREE boards agree — 681:26",
+    "(the topbar board shell-default measures) and both S5 frames, which are",
+    "instances of the same component:",
+    "  · The site name was 13px at the bar's inherited leading. 680:11 is 14/20",
+    "    on all three, so the site's own name had been rendering at the same size",
+    "    as the controls around it.",
+    "",
+    "NOT MOVED, and named so the next agent does not re-open it:",
+    "  · `btn/exit` — the boards say 12px horizontal padding, a 13/18 label and",
+    "    --flowbite/gray/700; the code ships 10 / 12 / --bk-ink, with a comment",
+    "    dated 2026-08-03 citing 681:26 for '10 horizontal padding, 12px REGULAR,",
+    "    ink at gray-900'. The 2026-09-07 capture of that same node says",
+    "    otherwise, so either the board moved or the earlier read did. Flagged",
+    "    rather than flipped: the same comment records a deliberate colour",
+    "    decision (rest at ink, hover on surface) that a straight swap would",
+    "    undo, and the exit button belongs to the topbar board's own recipe.",
+    "  · Everything else on this 1440 frame — rail, drawer, Layers tree, canvas,",
+    "    inspector, status bar. Each has its own family board and its own recipe;",
+    "    re-measuring them here would put two recipes on one control.",
+    "",
+    "THE REVIEW PILL IS ANCHORED AND SKIPPED — the one thing on this board that",
+    "is uniquely its own, and the one thing a conformance pass may not settle.",
+    "The two boards in this pair paint it two different ways for two states that",
+    "both mean 'nothing is blocking you':",
+    "    130:798 approved  --color/success-tint #DEF7EC ground, success-text",
+    "                      #057A55 label",
+    "    130:201 pending   --color/warning-tint #FDFDEA ground, ink-soft label",
+    "    681:26  topbar    warning-tint again, for 'In review · 3 open'",
+    "Live, both are gray-100 / ink-soft. That is not drift, it is a written rule:",
+    "Topbar.tsx's REVIEW_TONE_CLASS says 'neutral-unless-blocking — info and",
+    "success are visually identical by design; only warning gets its own look',",
+    "because the bar's colour budget belongs to the two signals that GATE a",
+    "publish (the Issues chip and save trouble), and D7 rule 6 caps the bar at two",
+    "ambers at once. Painting 'In review' amber spends the third.",
+    "So: three boards, two of them mine, disagree with a chrome-ui primitive that",
+    "the twelve Shell-state boards already hold at authority=code:topbar. One",
+    "screen board does not move that, and neither do two that contradict each",
+    "other. Numbers are in measured/<surface>.json; the call is the founder's.",
+    "",
+    "The pill's DOT (680:16 / 680:14) is not anchored either: Figma exports an",
+    "ellipse as an <img> with no style props, so the spec carries nothing to",
+    "compare, and a 6px status dot whose only content is its colour is the same",
+    "design-codex-#6 question the notification rows just answered the other way."
+  ]
+}

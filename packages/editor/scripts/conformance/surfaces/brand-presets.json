@@ -1,0 +1,213 @@
+{
+  "surface": "brand-presets",
+  "board": "Brand · presets (Figma 152:112)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-styles"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-preset-row-button"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "brand-panel"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-presets",
+      "nodeId": "208:531"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-presets",
+      "nodeId": "I208:531;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-presets",
+      "nodeId": "152:117"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-presets",
+      "nodeId": "152:118"
+    },
+    {
+      "name": "row-button",
+      "testId": "brand-preset-row-button",
+      "spec": "brand-presets",
+      "nodeId": "152:119"
+    },
+    {
+      "name": "row-button-label",
+      "testId": "brand-preset-label-button",
+      "spec": "brand-presets",
+      "nodeId": "152:120"
+    },
+    {
+      "name": "row-button-count",
+      "testId": "brand-preset-count-button",
+      "spec": "brand-presets",
+      "nodeId": "152:121"
+    },
+    {
+      "name": "row-card",
+      "testId": "brand-preset-row-card"
+    },
+    {
+      "name": "row-card-label",
+      "testId": "brand-preset-label-card",
+      "spec": "brand-presets",
+      "nodeId": "152:123"
+    },
+    {
+      "name": "row-card-count",
+      "testId": "brand-preset-count-card",
+      "spec": "brand-presets",
+      "nodeId": "152:124"
+    },
+    {
+      "name": "row-form",
+      "testId": "brand-preset-row-form",
+      "spec": "brand-presets",
+      "nodeId": "152:125"
+    },
+    {
+      "name": "row-form-label",
+      "testId": "brand-preset-label-form",
+      "spec": "brand-presets",
+      "nodeId": "152:126"
+    },
+    {
+      "name": "row-form-count",
+      "testId": "brand-preset-count-form",
+      "spec": "brand-presets",
+      "nodeId": "152:127"
+    },
+    {
+      "name": "row-link",
+      "testId": "brand-preset-row-link",
+      "spec": "brand-presets",
+      "nodeId": "152:128"
+    },
+    {
+      "name": "row-link-label",
+      "testId": "brand-preset-label-link",
+      "spec": "brand-presets",
+      "nodeId": "152:129"
+    },
+    {
+      "name": "row-link-count",
+      "testId": "brand-preset-count-link",
+      "spec": "brand-presets",
+      "nodeId": "152:130"
+    },
+    {
+      "name": "row-badge",
+      "testId": "brand-preset-row-badge",
+      "spec": "brand-presets",
+      "nodeId": "152:131"
+    },
+    {
+      "name": "row-badge-label",
+      "testId": "brand-preset-label-badge",
+      "spec": "brand-presets",
+      "nodeId": "152:132"
+    },
+    {
+      "name": "row-badge-count",
+      "testId": "brand-preset-count-badge",
+      "spec": "brand-presets",
+      "nodeId": "152:133"
+    },
+    {
+      "name": "row-alert",
+      "testId": "brand-preset-row-alert",
+      "spec": "brand-presets",
+      "nodeId": "152:134"
+    },
+    {
+      "name": "row-alert-label",
+      "testId": "brand-preset-label-alert",
+      "spec": "brand-presets",
+      "nodeId": "152:135"
+    },
+    {
+      "name": "row-alert-count",
+      "testId": "brand-preset-count-alert",
+      "spec": "brand-presets",
+      "nodeId": "152:136"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: rail -> `b` -> Presets. 53/53, no code change needed — the row",
+    "was already conformed by brand-presets-draft (44 tall, 13/20 name, 11/16",
+    "count), and this board states it identically.",
+    "",
+    "boards.json's row is now STALE on both counts: \"row pitch 34 vs board 44\" is",
+    "44 live and measured; \"variant count right-aligned to x295 vs board x232\" is",
+    "the disagreement brand-presets-draft already recorded between 306:2167 (x=192)",
+    "and this board (x=232) — two boards, so neither settles it, and x is not a",
+    "compared property in any case.",
+    "",
+    "THE SIX ROWS ARE JOINED BY SHAPE, NOT BY NAME. The board draws Buttons /",
+    "Cards / Sections / Forms / Nav / Footers; the code ships eleven categories",
+    "named Button / Card / Form input / Link / Badge / Alert / Tooltip / Modal /",
+    "Nav / Table / Layout. Two of the board's six (Sections, Footers) are not",
+    "preset categories in the engine at all, and five of the code's are not on the",
+    "board. Sample data is never conformed to literally (founder, 2026-08-06) and a",
+    "category taxonomy is data; all six board rows state the SAME properties, so",
+    "each is joined to the live row in the same position.",
+    "",
+    "NOT JOINED — 152:122, the `Cards` row's `border-radius: 8`. Its five siblings",
+    "state no radius at all and every live row is 4. One row in six carrying a",
+    "radius the others do not is a highlight state left on in the export, not a",
+    "design: the same board's neighbour 153:29 does exactly the same thing to its",
+    "own second row (153:39, `Menu card`). Its label and count ARE joined and pass.",
+    "",
+    "NOT JOINED — 152:112 itself: `border-color --flowbite/gray/100` on a frame the",
+    "live panel draws at 279 because `.ls-panel` spends 1px of `--bk-size-drawer`",
+    "on `border-right`. Same skip as every other Brand destination here.",
+    "",
+    "BOARD TITLE, worth carrying forward: 152:112's own Figma name begins",
+    "`[not-implemented] Brand · presets — read-only: updatePreset/addPreset/",
+    "deletePreset have zero UI callers, so Draft and the dirty dot are",
+    "unreachable`. That is the board agreeing with brand-presets-draft's finding",
+    "that the Draft badge cannot be reached, and it is the board's own author",
+    "saying so."
+  ]
+}

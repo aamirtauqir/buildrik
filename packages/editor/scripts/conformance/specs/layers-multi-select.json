@@ -1,0 +1,1020 @@
+{
+  "surface": "layers-multi-select",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "143:295",
+  "boardName": "layers-multi-select",
+  "figmaHash": "c60b770f9fb33dab1ad30003fb609e4f194bab4a919b32933976d052416199f4",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:10:20.441Z",
+  "copy": [
+    "Layers",
+    "Search",
+    "⊞ ⊟ ⚙",
+    "Section",
+    "👁",
+    "🔒",
+    "Container",
+    "👁",
+    "🔒",
+    "Heading",
+    "👁",
+    "🔒",
+    "Button",
+    "👁",
+    "🔒",
+    "Gallery",
+    "👁",
+    "🔒",
+    "Grid",
+    "👁",
+    "🔒",
+    "a-very-long-layer-name-that-truncates",
+    "👁",
+    "🔒",
+    "Footer",
+    "👁",
+    "🔒",
+    "3 selected of 12"
+  ],
+  "targets": [
+    {
+      "nodeId": "143:295",
+      "name": "Layers · multi-select",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:251",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:251;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "143:300",
+      "name": "Toolbar",
+      "className": "h-[54px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "54px"
+        }
+      }
+    },
+    {
+      "nodeId": "143:301",
+      "name": "search box",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[12px] overflow-clip rounded-[6px] top-[4px] w-[208px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "208px"
+        }
+      }
+    },
+    {
+      "nodeId": "143:302",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[20px] not-italic text-[#9ca3af] text-[12px] text-left top-[5px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "143:303",
+      "name": null,
+      "className": "-translate-x-full [word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[268px] not-italic text-[#6b7280] text-[13px] text-right top-[10px] tracking-[0.5px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:1945",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1945;243:10",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1945;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1945;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1945;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1945;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:1954",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1954;243:10",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1954;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1954;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1954;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1954;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:1963",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1963;243:7",
+      "name": "tint-bg",
+      "className": "absolute bg-[var(--color\\/accent-tint,#ebf5ff)] inset-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1963;243:8",
+      "name": "active bar",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] bottom-0 left-0 top-0 w-[2px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1963;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1963;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1963;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1963;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:1972",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1972;243:7",
+      "name": "tint-bg",
+      "className": "absolute bg-[var(--color\\/accent-tint,#ebf5ff)] inset-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1972;243:8",
+      "name": "active bar",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] bottom-0 left-0 top-0 w-[2px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1972;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1972;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1972;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1972;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:1981",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1981;243:7",
+      "name": "tint-bg",
+      "className": "absolute bg-[var(--color\\/accent-tint,#ebf5ff)] inset-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1981;243:8",
+      "name": "active bar",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] bottom-0 left-0 top-0 w-[2px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1981;243:10",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1981;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1981;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1981;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1981;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:1990",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1990;243:10",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1990;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1990;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1990;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1990;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:1999",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1999;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1999;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1999;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:1999;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "245:2008",
+      "name": "Layers tree row — chevron · icon · name · eye · lock. All 57 instances are Layers boards. Has NO depth axis, while the product indents at 12 + depth×16 (LayerTreeItem.tsx) — that axis is the one thing it is missing.",
+      "className": "content-stretch flex gap-[6px] h-[28px] items-center pl-[12px] pr-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:2008;243:10",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:2008;243:11",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[12px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:2008;243:12",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic overflow-hidden relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-ellipsis text-left whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:2008;243:13",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "I245:2008;243:14",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[16px] not-italic relative shrink-0 text-[#6b7280] text-[10px] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "10px"
+        }
+      }
+    },
+    {
+      "nodeId": "143:351",
+      "name": "Count footer",
+      "className": "h-[28px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "28px"
+        }
+      }
+    },
+    {
+      "nodeId": "143:352",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[12px] not-italic text-[#9ca3af] text-[11px] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1668:7201",
+      "name": "hotspot/back · Layers · tree",
+      "className": "absolute bg-[rgba(0,0,0,0)] left-[-1px] opacity-0 size-[36px] top-[775px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        }
+      }
+    }
+  ]
+}

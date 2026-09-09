@@ -1,0 +1,84 @@
+{
+  "surface": "media-replace-across-results",
+  "board": "Media · modal · replace-across · result-states (Figma 1174:4849)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-replace-across-result",
+  "viewport": {
+    "width": 520,
+    "height": 520
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rx-result-partial"
+    }
+  ],
+  "contrastScope": "body",
+  "_note": [
+    "THIS BOARD IS A CATALOGUE OF THREE STATES OF ONE DIALOG, and the product",
+    "has one dialog. `position: fixed` and singular, so exactly one of the",
+    "three can be on screen — the recipe holds the PARTIAL state, which is the",
+    "one the board draws the most of (outcome line, disclosure, and a two-link",
+    "footer). The state is reached by clicking the dialog's own commit button,",
+    "not by handing the component a `result` prop: the phase is internal state",
+    "and a fixture that forced it would be measuring the fixture. The wait",
+    "names the outcome line, so the preview phase cannot pass as this one.",
+    "",
+    "1174:4850, THE COMMITTING PHASE, HAS NO PRODUCER — and the spec node's own",
+    "name says so, from the capture: replace-across is synchronous, five",
+    "samples at 400ms all read 'Replaced 3 uses ✓'. The phase exists in the",
+    "component (`phase: 'committing'`) and renders for less than a frame. Its",
+    "progress bar (1174:4852 / 1174:4853) is drawing a determinate proportion",
+    "of an operation that has no steps to report. Not joined, not built.",
+    "",
+    "BOARD WON — 1174:4859 and the footer. The disclosure ('▸ Failed elements",
+    "(1)') shipped as error-red body copy at the dialog's 13px; the board makes",
+    "it a 10px ink-soft line, which is right: it is a control for reading",
+    "detail, and the outcome line above it already carries the tone. And",
+    "1174:4860/4861/4862 draw the result footer as two TEXT LINKS — 'Close' in",
+    "ink-soft, 'Retry failed' in ink-link — where the code had a bordered",
+    "button and a filled accent button. The clean state's 'Done' was already a",
+    "link, citing this same board; the partial state had not followed.",
+    "",
+    "NOT JOINED, and why: the three CARD nodes (1174:4850 / 1174:4854 /",
+    "1174:4857) each carry `width: 300px` and a 14/12 inset. That is the",
+    "catalogue's own scale — board 1164:4738 draws the SAME dialog at 520 with",
+    "a 16/14 inset, and boards.json points 1164:4738's recipe at it. Two boards",
+    "disagree about the container; the one whose subject IS the container wins,",
+    "and this frame's subject is the three states inside it. 1174:4855 /",
+    "1174:4856 are the CLEAN state's outcome line and Done link — the same two",
+    "slots as the partial ones joined here, in a different tone, and",
+    "unreachable while the partial state is on screen. 1174:4864 is a hotspot."
+  ],
+  "targets": [
+    {
+      "name": "result-line",
+      "testId": "rx-result-partial",
+      "spec": "media-replace-across-results",
+      "nodeId": "1174:4858"
+    },
+    {
+      "name": "failed-summary",
+      "testId": "rx-failed-summary",
+      "spec": "media-replace-across-results",
+      "nodeId": "1174:4859"
+    },
+    {
+      "name": "foot",
+      "testId": "rx-foot",
+      "spec": "media-replace-across-results",
+      "nodeId": "1174:4860"
+    },
+    {
+      "name": "btn-close",
+      "testId": "rx-close",
+      "spec": "media-replace-across-results",
+      "nodeId": "1174:4861"
+    },
+    {
+      "name": "btn-retry",
+      "testId": "rx-retry",
+      "spec": "media-replace-across-results",
+      "nodeId": "1174:4862"
+    }
+  ]
+}

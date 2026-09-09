@@ -1,0 +1,26 @@
+{
+  "surface": "media-no-results",
+  "board": "Media · no-results (Figma 782:4353)",
+  "_note": "Probe: a whole-library search that comes back empty needs a server, and the board draws the FAILED scope band over it, which needs a server that half-answers. The fixture sets `serverPage` + `searchState:\"failed\"` so the band renders — `searchState` alone does not, and a case that only set the query would have been measured as this board while showing a different screen.\n\nWIDTH IS NOT JOINABLE ANYWHERE ON THIS PANEL, and it costs this recipe three targets. Figma strokes do not consume layout; CSS borders do. Board 144:2 gives the panel a 1px --bk-gray-100 edge (joined, and passing), so every w-full child of it measures 278 against a board that writes `w-[280px]` on the same child. Skipped on that ground: 782:4399, the No results block itself — its gap-10 / pt-36 / pb-32 / px-24 ARE built, they simply cannot be asserted without its 280; and 1314:20 / 1314:21, the scope band, which is unjoinable twice over (280 again, and a 190 text-frame auto-width). The band's two text children 782:4400 / 782:4401 carry colour and no width, so they are what anchors the state.\n\nThe scope band's own type is authority=open: board 1313:12 says 11/16 accent, this board's 1314:21 says 13/20, and 43 vs 51 for the band height. Two boards disagree, so the code keeps 11/16. Both boards DO agree it is Inter and not mono, and that the informative state is accent — both conformed.\n\nAlso on screen and drawn by no board: the Load more row. It is gated on the server having more than is loaded, which is exactly true here and is the honest way out of a search that matched nothing locally.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-no-results",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [
+    { "action": "waitFor", "testId": "media-no-results" },
+    { "action": "waitFor", "testId": "media-search-scope" }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel",        "testId": "media-panel",              "spec": "media-no-results", "nodeId": "782:4353" },
+    { "name": "panel-header", "testId": "panel-header",             "spec": "media-no-results", "nodeId": "782:4354" },
+    { "name": "search",       "testId": "media-search",             "spec": "media-no-results", "nodeId": "782:4355" },
+    { "name": "folder-row",   "testId": "media-folder-row",         "spec": "media-no-results", "nodeId": "782:4358" },
+    { "name": "type-chips",   "testId": "media-type-chips",         "spec": "media-no-results", "nodeId": "782:4361" },
+    { "name": "chip-image",   "testId": "media-type-chip-img",      "spec": "media-no-results", "nodeId": "782:4362" },
+    { "name": "chip-video",   "testId": "media-type-chip-vid",      "spec": "media-no-results", "nodeId": "782:4365" },
+    { "name": "chip-svg",     "testId": "media-type-chip-ico",      "spec": "media-no-results", "nodeId": "782:4368" },
+    { "name": "chip-icon",    "testId": "media-type-chip-fnt",      "spec": "media-no-results", "nodeId": "782:4371" },
+    { "name": "message",      "testId": "media-no-results-message", "spec": "media-no-results", "nodeId": "782:4400" },
+    { "name": "clear-search", "testId": "media-clear-search",       "spec": "media-no-results", "nodeId": "782:4401" },
+    { "name": "footer",       "testId": "media-footer",             "spec": "media-no-results", "nodeId": "782:4382" }
+  ]
+}

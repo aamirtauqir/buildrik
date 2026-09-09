@@ -1,0 +1,118 @@
+{
+  "surface": "history-published-restore-confirm",
+  "board": "History \u00b7 Published \u00b7 restore-confirm (Figma 184:24)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=history-published-restore-confirm",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "publish-rollback-open"
+    },
+    {
+      "action": "click",
+      "testId": "publish-rollback-open"
+    },
+    {
+      "action": "waitFor",
+      "testId": "publish-rollback-picker"
+    },
+    {
+      "action": "click",
+      "testId": "publish-rollback-continue"
+    },
+    {
+      "action": "waitFor",
+      "testId": "publish-rollback-confirm"
+    }
+  ],
+  "contrastScope": "#bk-overlay-root",
+  "targets": [
+    {
+      "name": "confirm-body",
+      "testId": "publish-rollback-confirm-body",
+      "spec": "history-published-restore-confirm",
+      "nodeId": "184:29"
+    },
+    {
+      "name": "info-box",
+      "testId": "publish-rollback-info",
+      "spec": "history-published-restore-confirm",
+      "nodeId": "184:30"
+    },
+    {
+      "name": "info-title",
+      "testId": "publish-rollback-info-title",
+      "spec": "history-published-restore-confirm",
+      "nodeId": "184:31"
+    },
+    {
+      "name": "info-meta",
+      "testId": "publish-rollback-info-meta",
+      "spec": "history-published-restore-confirm",
+      "nodeId": "184:32"
+    }
+  ],
+  "_note": [
+    "Five boards, one panel, and every one of them sits behind a real site:",
+    "PublishHistory reads `sites.publishHistory` for the rows and `sites.get` for",
+    "whether anything is serving before it renders a single row, so none of these",
+    "states is reachable without a server. The probe answers those two procedures",
+    "over the transport the client actually uses (httpBatchLink + superjson) and",
+    "the recipe CLICKS its way to the state \u2014 open the picker, Continue, confirm \u2014",
+    "so the panel takes its own branches rather than being handed a prop.",
+    "",
+    "1440x900, the board's own frame, with the modal in `#bk-overlay-root` (the",
+    "contrast sweep is scoped there, because the panel behind the scrim is not",
+    "what these boards are about).",
+    "",
+    "THE 24 GUTTER, which is what most of the drift here was. Every modal in this",
+    "family insets its body 24 from the frame: 184:29 and 184:30 are 392 in a 440,",
+    "184:52/184:53 and 453:4071/453:4072 are 392, 184:42's track is 392, and",
+    "184:7's picker rows are 512 in a 560. `MODAL_BODY_CLASS` gives every modal",
+    "body 16. Five boards agreeing is not one board disagreeing \u2014 but the chassis",
+    "is measured against eight other boards, so the extra 8 went on these bodies",
+    "(`MODAL_INSET`) and the chassis was left alone.",
+    "",
+    "WHAT DRIFTED: the info block and the sentence above it.",
+    "  \u00b7 184:29 is ink-MUTED at 13/20; the modal body paints ink-soft, which is",
+    "    right for a paragraph and a shade too present for the line that explains",
+    "    a consequence.",
+    "  \u00b7 184:30 is 52 tall \u2014 8 of lead, a 12/18 line, 2, an 11/16 line, 8. It was",
+    "    56, from 10 of block padding.",
+    "  \u00b7 184:32 is ink-muted; it was ink-soft, the same colour as the title above",
+    "    it minus the accent, so the two lines carried equal weight.",
+    "",
+    "NOT anchored, and why:",
+    "  The modal FRAME (184:4/184:26/184:39/184:47/453:4066) \u2014 each carries a",
+    "  fixed Figma height (400/300/260/280/264) and the shipped modals are content",
+    "  -sized, so the number is the frame's, not the design's. Their width and",
+    "  radius WERE measured and match (2026-09-08: 560 for the picker via",
+    "  kind=\"form\", 440 for the rest via kind=\"question\" \u2014 two of which were",
+    "  `form`, i.e. 560 wide against a board that draws 440, and that is fixed",
+    "  here).",
+    "  The modal TITLE (16/24, and error-text on 453:4067) and the FOOTER buttons",
+    "  (32 tall, 16/10 inset, radius 8 on 229:1170/1172/1174/1176 and 184:35) \u2014",
+    "  both are the Modal chassis. MODAL_TITLE_CLASS is 14 and MODAL_FOOT_CLASS",
+    "  caps its buttons at 28 with a comment naming the boards it was measured",
+    "  against, one of which is 184:24 itself. Two readings of one primitive; a",
+    "  screen board does not re-settle it (cf. BK_TEXT_INPUT_THEME).",
+    "  184:35 btn/Roll back \u2014 124x32 in --color/warning. The tone IS the board's",
+    "  (`tone=\"warning\"`, #C27803, already recorded in ConfirmDialog's own doc)",
+    "  but the geometry is the shared footer's.",
+    "",
+    "CONTRAST \u2014 READ THIS ONE. Two failures, and the second is the board's own",
+    "primary action: white on #C27803 is 3.51 against a 4.5 floor, at 12/500.",
+    "184:35 draws exactly that pair. It is NOT introduced here \u2014 `tone=\"warning\"`",
+    "predates this pass \u2014 but it is a real AA failure on a confirm button, and it",
+    "is the board's colour, so nothing in the code can fix it without leaving the",
+    "board. Raised in the report. The other, 4.38, is 184:32's ink-muted on",
+    "184:30's accent tint.",
+    "",
+    "BOARD-COPY (2026-09-08): every lead is one sentence folding apart on the live",
+    "side because the version numbers are interpolated. Both sentences match the",
+    "board word for word once the numbers are folded."
+  ]
+}

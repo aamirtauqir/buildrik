@@ -1,0 +1,456 @@
+{
+  "surface": "brand-dirty",
+  "board": "Brand \u00b7 dirty (Figma 154:78)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-tokens"
+    },
+    {
+      "action": "click",
+      "testId": "brand-kind-color"
+    },
+    {
+      "action": "click",
+      "testId": "brand-token-row-color-action"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-token-value-light"
+    },
+    {
+      "action": "click",
+      "testId": "brand-token-value-light"
+    },
+    {
+      "action": "press",
+      "key": "End"
+    },
+    {
+      "action": "press",
+      "key": "Backspace"
+    },
+    {
+      "action": "press",
+      "key": "1"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-save-bar-save"
+    },
+    {
+      "action": "click",
+      "testId": "brand-back-link"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "click",
+      "testId": "brand-back-link"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-row-count-lint"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-save-bar-save"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-dirty",
+      "nodeId": "208:621"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-dirty",
+      "nodeId": "I208:621;16:7"
+    },
+    {
+      "name": "preview-swatches",
+      "testId": "brand-preview-swatches",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7281"
+    },
+    {
+      "name": "specimen-heading",
+      "testId": "brand-specimen-heading",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7286"
+    },
+    {
+      "name": "specimen-heading-aa",
+      "testId": "brand-specimen-aa-heading",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7287"
+    },
+    {
+      "name": "specimen-heading-label",
+      "testId": "brand-specimen-label-heading",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7288"
+    },
+    {
+      "name": "specimen-body",
+      "testId": "brand-specimen-body",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7289"
+    },
+    {
+      "name": "specimen-body-aa",
+      "testId": "brand-specimen-aa-body",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7290"
+    },
+    {
+      "name": "specimen-body-label",
+      "testId": "brand-specimen-label-body",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7291"
+    },
+    {
+      "name": "row-tokens",
+      "testId": "brand-row-tokens",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7292"
+    },
+    {
+      "name": "row-tokens-label",
+      "testId": "brand-row-label-tokens",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7294"
+    },
+    {
+      "name": "row-tokens-hint",
+      "testId": "brand-row-hint-tokens",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7295"
+    },
+    {
+      "name": "row-tokens-count",
+      "testId": "brand-row-count-tokens",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7296"
+    },
+    {
+      "name": "row-tokens-chevron",
+      "testId": "brand-row-chevron-tokens",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7297"
+    },
+    {
+      "name": "row-styles",
+      "testId": "brand-row-styles",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7298"
+    },
+    {
+      "name": "row-styles-label",
+      "testId": "brand-row-label-styles",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7300"
+    },
+    {
+      "name": "row-styles-hint",
+      "testId": "brand-row-hint-styles",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7301"
+    },
+    {
+      "name": "row-styles-count",
+      "testId": "brand-row-count-styles",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7302"
+    },
+    {
+      "name": "row-styles-chevron",
+      "testId": "brand-row-chevron-styles",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7303"
+    },
+    {
+      "name": "row-starters",
+      "testId": "brand-row-starters",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7304"
+    },
+    {
+      "name": "row-starters-label",
+      "testId": "brand-row-label-starters",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7306"
+    },
+    {
+      "name": "row-starters-hint",
+      "testId": "brand-row-hint-starters",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7307"
+    },
+    {
+      "name": "row-starters-count",
+      "testId": "brand-row-count-starters",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7308"
+    },
+    {
+      "name": "row-starters-chevron",
+      "testId": "brand-row-chevron-starters",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7309"
+    },
+    {
+      "name": "row-classes",
+      "testId": "brand-row-classes",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7310"
+    },
+    {
+      "name": "row-classes-label",
+      "testId": "brand-row-label-classes",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7312"
+    },
+    {
+      "name": "row-classes-hint",
+      "testId": "brand-row-hint-classes",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7313"
+    },
+    {
+      "name": "row-classes-chevron",
+      "testId": "brand-row-chevron-classes",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7314"
+    },
+    {
+      "name": "row-components",
+      "testId": "brand-row-components",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7315"
+    },
+    {
+      "name": "row-components-label",
+      "testId": "brand-row-label-components",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7317"
+    },
+    {
+      "name": "row-components-hint",
+      "testId": "brand-row-hint-components",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7318"
+    },
+    {
+      "name": "row-components-chevron",
+      "testId": "brand-row-chevron-components",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7319"
+    },
+    {
+      "name": "row-typography",
+      "testId": "brand-row-typography",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7320"
+    },
+    {
+      "name": "row-typography-label",
+      "testId": "brand-row-label-typography",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7322"
+    },
+    {
+      "name": "row-typography-hint",
+      "testId": "brand-row-hint-typography",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7323"
+    },
+    {
+      "name": "row-typography-chevron",
+      "testId": "brand-row-chevron-typography",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7324"
+    },
+    {
+      "name": "row-colour-mode",
+      "testId": "brand-row-colour-mode",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7325"
+    },
+    {
+      "name": "row-colour-mode-label",
+      "testId": "brand-row-label-colour-mode",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7327"
+    },
+    {
+      "name": "row-colour-mode-hint",
+      "testId": "brand-row-hint-colour-mode",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7328"
+    },
+    {
+      "name": "row-colour-mode-chevron",
+      "testId": "brand-row-chevron-colour-mode",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7329"
+    },
+    {
+      "name": "row-lint",
+      "testId": "brand-row-lint",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7330"
+    },
+    {
+      "name": "row-lint-label",
+      "testId": "brand-row-label-lint",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7332"
+    },
+    {
+      "name": "row-lint-hint",
+      "testId": "brand-row-hint-lint",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7333"
+    },
+    {
+      "name": "row-lint-count",
+      "testId": "brand-row-count-lint",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7334"
+    },
+    {
+      "name": "row-lint-chevron",
+      "testId": "brand-row-chevron-lint",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7335"
+    },
+    {
+      "name": "row-export",
+      "testId": "brand-row-export",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7336"
+    },
+    {
+      "name": "row-export-label",
+      "testId": "brand-row-label-export",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7338"
+    },
+    {
+      "name": "row-export-hint",
+      "testId": "brand-row-hint-export",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7339"
+    },
+    {
+      "name": "row-export-chevron",
+      "testId": "brand-row-chevron-export",
+      "spec": "brand-dirty",
+      "nodeId": "1691:7340"
+    },
+    {
+      "name": "save-bar",
+      "testId": "brand-save-bar",
+      "spec": "brand-dirty",
+      "nodeId": "154:128"
+    },
+    {
+      "name": "save-bar-status",
+      "testId": "brand-save-bar-status",
+      "spec": "brand-dirty",
+      "nodeId": "154:129"
+    },
+    {
+      "name": "save-bar-discard",
+      "testId": "brand-save-bar-discard",
+      "spec": "brand-dirty",
+      "nodeId": "154:130"
+    },
+    {
+      "name": "save-bar-save",
+      "testId": "brand-save-bar-save",
+      "spec": "brand-dirty",
+      "nodeId": "154:131"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE, and the dirty state is reached by actually editing a token:",
+    "Brand -> Tokens -> color -> `color-action` -> put a different hex in the Light",
+    "value field. The panel is dirty because a token really changed, not because a",
+    "fixture said so, and the root then shows what 154:78 draws \u2014 the amber dot on",
+    "the Tokens row and the Save bar at the foot.",
+    "",
+    "NOT reached by applying a starter, and that is a FINDING, not a preference.",
+    "152:137's own prototype hotspot (1670:7235) says a starter click lands here,",
+    "and it does raise the dirty flag \u2014 but in Beginner mode, which is the panel's",
+    "default, it also EMPTIES the screen this board draws. `stageTokens` REPLACES",
+    "the colour registry with the starter's nine tokens, not one of which carries",
+    "`semanticKind` (grep the six files under design-system/starters \u2014 zero hits),",
+    "and `filterTokensByMode(..., \"beginner\")` keeps only tokens that do. So after",
+    "applying Stripe Blue the Brand preview renders no swatches at all and the",
+    "Tokens row loses its count, against a board that draws four swatches and",
+    "`Tokens 4`. Measured: both `brand-preview-swatches` and",
+    "`brand-row-count-tokens` resolved to 0 elements on that path.",
+    "Not fixed here: the repair is metadata on 54 starter tokens across six files,",
+    "and adding `semanticKind` also feeds the linter's `semantic-needs-alias` rule",
+    "(those tokens carry no `aliasOf`), so it is a product change with a lint",
+    "consequence rather than a conformance edit. Reported for the founder.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  save bar type    154:128 sets 12/18 for the whole bar; the status line and",
+    "                   both actions shipped at 11 with the line inherited, a size",
+    "                   below every other label in the panel.",
+    "  Save weight      `font-medium` -> `font-normal`. 154:131 is Inter Regular",
+    "                   like its two neighbours; the medium weight made `Save` the",
+    "                   only bold word on a bar the board draws in one voice.",
+    "  Plus the whole root chassis \u2014 see surfaces/brand-lint-warnings.json.",
+    "",
+    "FIXED ALONG THE WAY, found by the contrast sweep rather than by eye: hovering",
+    "the SELECTED segment of the Beginner/Pro toggle repainted it `gray-100` under",
+    "`text-white` \u2014 flowbite's `color=\"light\"` theme carries `hover:bg-gray-100`,",
+    "and a hover variant beats a plain `bg-*` utility. The label measured 1.1:1 and",
+    "vanished. This recipe's click path happens to park the pointer there, which is",
+    "the only reason anything ever looked.",
+    "",
+    "NOT JOINED: 154:78 itself (the drawer's edge) and 1691:7280 (the preview",
+    "band's 82px Figma text-metric height) \u2014 see brand-lint-warnings.json.",
+    "",
+    "The last step re-waits for `brand-save-bar-save` after the walk back. One run in four reached the root CLEAN, and the cause is worth writing down: `Composer.markDirty()` emits `project:changed` on every logical project modification, and `TokensSection`'s handler for it calls `resetAll(...)` -> `resetFromSaved`, which moves savedTokens too and therefore DISCARDS staged brand edits. DesignSystemTab's own handlers for the neighbouring events (`settings:change`, `history:undo/redo`) guard on `isDirtyRef` and warn instead, for exactly this reason; TokensSection's does not. Without this step the flake reads as a MISSING target instead of a failed step.",
+    "",
+    "CHECK-BOARD-COPY: the same four leads as brand-lint-warnings.json, triaged",
+    "there \u2014 `components` (two boards disagree), `beginner`/`pro` (the documented",
+    "toggle), and 154:132's Beginner footnote."
+  ]
+}

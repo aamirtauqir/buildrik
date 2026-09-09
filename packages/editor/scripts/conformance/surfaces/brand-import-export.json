@@ -1,0 +1,250 @@
+{
+  "surface": "brand-import-export",
+  "board": "Brand · import-export (Figma 153:120)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-export"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-import-head"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "brand-panel"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-import-export",
+      "nodeId": "208:591"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-import-export",
+      "nodeId": "I208:591;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-import-export",
+      "nodeId": "153:125"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-import-export",
+      "nodeId": "153:126"
+    },
+    {
+      "name": "dark-row",
+      "testId": "brand-export-dark-row",
+      "spec": "brand-import-export",
+      "nodeId": "153:127"
+    },
+    {
+      "name": "dark-label",
+      "testId": "brand-export-dark-label",
+      "spec": "brand-import-export",
+      "nodeId": "153:128"
+    },
+    {
+      "name": "export-head",
+      "testId": "brand-export-head",
+      "spec": "brand-import-export",
+      "nodeId": "220:839"
+    },
+    {
+      "name": "export-head-fill",
+      "testId": "brand-export-head",
+      "spec": "brand-import-export",
+      "nodeId": "I220:839;220:6"
+    },
+    {
+      "name": "format-css",
+      "testId": "format-row-css",
+      "spec": "brand-import-export",
+      "nodeId": "153:132"
+    },
+    {
+      "name": "format-css-title",
+      "testId": "brand-format-title-css",
+      "spec": "brand-import-export",
+      "nodeId": "153:133"
+    },
+    {
+      "name": "format-css-desc",
+      "testId": "brand-format-desc-css",
+      "spec": "brand-import-export",
+      "nodeId": "153:134"
+    },
+    {
+      "name": "format-css-download",
+      "testId": "brand-format-download-css",
+      "spec": "brand-import-export",
+      "nodeId": "153:136"
+    },
+    {
+      "name": "format-json",
+      "testId": "format-row-json",
+      "spec": "brand-import-export",
+      "nodeId": "153:137"
+    },
+    {
+      "name": "format-json-title",
+      "testId": "brand-format-title-json",
+      "spec": "brand-import-export",
+      "nodeId": "153:138"
+    },
+    {
+      "name": "format-json-desc",
+      "testId": "brand-format-desc-json",
+      "spec": "brand-import-export",
+      "nodeId": "153:139"
+    },
+    {
+      "name": "format-json-download",
+      "testId": "brand-format-download-json",
+      "spec": "brand-import-export",
+      "nodeId": "153:141"
+    },
+    {
+      "name": "format-tailwind",
+      "testId": "format-row-tailwind"
+    },
+    {
+      "name": "format-tailwind-title",
+      "testId": "brand-format-title-tailwind",
+      "spec": "brand-import-export",
+      "nodeId": "153:143"
+    },
+    {
+      "name": "format-tailwind-desc",
+      "testId": "brand-format-desc-tailwind",
+      "spec": "brand-import-export",
+      "nodeId": "153:144"
+    },
+    {
+      "name": "format-tailwind-download",
+      "testId": "brand-format-download-tailwind",
+      "spec": "brand-import-export",
+      "nodeId": "153:146"
+    },
+    {
+      "name": "format-figma",
+      "testId": "format-row-figma"
+    },
+    {
+      "name": "format-figma-title",
+      "testId": "brand-format-title-figma",
+      "spec": "brand-import-export",
+      "nodeId": "153:148"
+    },
+    {
+      "name": "import-head",
+      "testId": "brand-import-head",
+      "spec": "brand-import-export",
+      "nodeId": "220:843"
+    },
+    {
+      "name": "import-head-fill",
+      "testId": "brand-import-head",
+      "spec": "brand-import-export",
+      "nodeId": "I220:843;220:6"
+    },
+    {
+      "name": "drop-zone",
+      "testId": "import-drop-zone"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: rail -> `b` -> Import / export.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  section headers  EXPORT and IMPORT are the SHARED `Section header`",
+    "                   component (220:839 / 220:843 with their `tint-bg` child):",
+    "                   a 28-tall band of `--color/bg-subtle` reaching the panel",
+    "                   edge, 16 in. They shipped as bare caps text on white, so",
+    "                   the two halves of this screen had no visible division at",
+    "                   all. `-mx-4 px-4` breaks out of the column's own inset and",
+    "                   puts it back.",
+    "  `Dark strategy`  12/18 (153:128). It ran at 13 — the LIST row size — while",
+    "                   this is a field label above a value.",
+    "  `Download`       11/16 in `--color/accent-text` (153:136 and siblings).",
+    "  format desc      11/16 (153:134), not `leading-snug`.",
+    "",
+    "CONTRAST, INTRODUCED BY CODE AND REMOVED: the unavailable Figma row carried",
+    "`tw:opacity-60`, which multiplied its `--bk-ink-muted` description down to",
+    "2.32:1 — measured, not eyeballed, by the ancestor-opacity folding in",
+    "measure.mjs. The board does not dim that row at all: 153:148 is `--color/ink`",
+    "and 153:149 is `--color/ink-muted`, the same as the three live rows. What",
+    "marks it unavailable on the board is that it carries no Copy and no Download,",
+    "which the code already does. The opacity is gone.",
+    "",
+    "boards.json's finding — \"row pitch 66 vs 48, and TWO nested scrollers (725px",
+    "hidden inside 470px hidden)\" — is half fixed: CSS and JSON rows measure 48.",
+    "The nested-scroller half was not re-checked here and should stay open.",
+    "",
+    "NOT JOINED:",
+    "  153:142 (Tailwind row, 48)  measures 64 live because its description takes a",
+    "            SECOND line — the ` · N dropped` suffix the row appends when the",
+    "            Tailwind emitter drops dark variants. That is data (this project",
+    "            drops some, the board's sample drops none), and a row that grows",
+    "            to fit its own reason is the right behaviour. Its title, desc and",
+    "            Download ARE joined and pass.",
+    "  153:147 (Figma row, 60)  the board does not fit its own contents: 12 of",
+    "            padding + a 20 title + a 61-character description that takes two",
+    "            16px lines at the 248 it states is 64, not 60. Live measures",
+    "            exactly 64.",
+    "  153:153 / 153:154 / 153:152  the drop zone. Its dashed `--color/border`",
+    "            edge, 56 height and radius 8 all match and are visible in",
+    "            measured/; only `width: 248` keeps it out, and that is the drawer",
+    "            edge — `.ls-panel` spends 1px of `--bk-size-drawer` on",
+    "            `border-right`, so a 16/16 inset leaves 247.",
+    "  153:149  the Figma description, `width: 248`, same cause.",
+    "  153:120 itself — the frame, same cause.",
+    "",
+    "FOUND, NOT FIXED — copy. The board's drop zone reads `Drop tokens.json — JSON",
+    "only`; the code reads `Drop .json or .ts` and its handler genuinely accepts a",
+    "`tailwind.config.ts`. The board's words would be false about the code, and",
+    "copy that describes behaviour has to be true before the board gets to win it.",
+    "Either the board or the parser should move; that is a product call.",
+    "",
+    "NOT CONFORMED — the whole IMPORT PREVIEW column the board adds at 1749:8390..",
+    "8403: a 96px preview card with a `Preview format` select, a `RECENT · parsed`",
+    "strip and an `Apply valid only` primary. None of it exists; ImportCard shows a",
+    "drop zone and, once parsed, its own detail block. That is a feature, not a",
+    "style. Same for `18 kinds · 77 tokens · 4 alias edges · 9 dark variants` — the",
+    "live stats line says something shorter."
+  ]
+}

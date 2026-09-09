@@ -1,0 +1,91 @@
+{
+  "surface": "s7-settings-webhooks",
+  "board": "S7 · Settings · Webhooks (Figma 640:3849)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-webhooks",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-endpoint"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card-endpoint",
+      "testId": "set-card-endpoint",
+      "spec": "s7-settings-webhooks",
+      "nodeId": "640:4161"
+    },
+    {
+      "name": "card-endpoint-title",
+      "testId": "set-card-title-endpoint",
+      "spec": "s7-settings-webhooks",
+      "nodeId": "640:4162"
+    },
+    {
+      "name": "field-secret",
+      "testId": "set-field-signing-secret",
+      "spec": "s7-settings-webhooks",
+      "nodeId": "640:4173"
+    },
+    {
+      "name": "field-secret-label",
+      "testId": "set-field-label-signing-secret",
+      "spec": "s7-settings-webhooks",
+      "nodeId": "640:4174"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE, in the board's own pane — `.bd-set-pane-body` at 824,",
+    "which is 760 (the card) plus its two 32 insets. Host and arithmetic settled",
+    "by s7-settings-general (638:2378); the ten S7 screens share one probe host",
+    "rather than ten.",
+    "The screen reads one tRPC procedure (webhooks.status), so the fixture is a",
+    "CONNECTED endpoint — which is the state the board draws (a URL, its events,",
+    "a masked secret), not the empty 'Connect endpoint' one.",
+    "",
+    "BOARD WON, twice, and the second one fixed three contrast failures:",
+    "  640:4161  the card is headed ENDPOINT. Live headed it 'Webhooks', which",
+    "            the nav row and the pane header above it already say — the card",
+    "            repeated the screen's name instead of naming what it holds.",
+    "  640:4161  the endpoint's rows sit DIRECTLY IN the white card. Live wrapped",
+    "            them in `.bd-set-webhook-card`: a bg-subtle wash on a",
+    "            border-medium edge at 10px — a card inside a card, which the",
+    "            board does not draw and which the whole family's chassis move was",
+    "            meant to end. It also made `field-secret` the one FAILING target",
+    "            on this surface (background-color #f3f4f6 against the board's",
+    "            #ffffff) and dropped every 11px --bk-ink-muted string inside it",
+    "            to 4.39:1 — the delivery line and the Signing secret's hint both",
+    "            measured it. Flattening to a plain flex column fixed the diff",
+    "            failure and all three contrast failures at once. Grouping is what",
+    "            the card around it is for.",
+    "",
+    "CONFORMANT after that: 14 properties, 0 contrast failures.",
+    "",
+    "NOT JOINED, and why:",
+    "  640:4163 Field · Endpoint URL and 640:4167 Field · Events — both exist,",
+    "  but only in the EDIT state, behind a 'Connect endpoint' / 'Edit' button",
+    "  with no anchor of its own. The board draws them as the settled view, so",
+    "  reaching them needs a click the recipe cannot express; unlike the Domains",
+    "  board (where one `data-testid` opened the only field on the card) two of",
+    "  the three fields here are already measurable in a nearby state and the",
+    "  third, Signing secret, IS joined. Left rather than adding anchors to a",
+    "  state this board does not draw.",
+    "  640:4177 Card · RECENT DELIVERIES — drawn 940 wide and holding a delivery",
+    "  table. The product has no delivery log: `recentFailures` lists FAILURES",
+    "  only, and only inside the endpoint card. A feature, not drift. REPORTED.",
+    "  Also: live cards are flex children of `.bd-set-pane-body` and STRETCH, so",
+    "  one screen cannot hold a 760 card and a 940 card at once — the two board",
+    "  widths are a pane-layout decision no single screen can adopt.",
+    "",
+    "FOUND, NOT FIXED: the board offers a webhook for `form.submit`, and the",
+    "product's own event list says next to it 'ready, but nothing sends it yet",
+    "(form capture is unbuilt)' — a caveat the board does not carry, and one a",
+    "test (WebhooksScreen.eventCopy.test.ts) exists to keep. Third board in this",
+    "family drawing a feature whose product version ships with a disclaimer."
+  ]
+}

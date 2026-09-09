@@ -78,6 +78,9 @@
       "name": null,
       "className": "bg-white border-[#f3f4f6] border-b border-solid content-stretch flex gap-[12px] h-[56px] items-center overflow-clip px-[12px] relative shadow-[0px_1px_1px_0px_rgba(0,0,0,0.04)] w-[1440px]",
       "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
         "border-color": {
           "value": "#f3f4f6"
         },
@@ -131,6 +134,9 @@
         "line-height": {
           "value": "18px"
         },
+        "color": {
+          "value": "#374151"
+        },
         "font-size": {
           "value": "13px"
         }
@@ -143,6 +149,9 @@
       "props": {
         "line-height": {
           "value": "20px"
+        },
+        "color": {
+          "value": "#111827"
         },
         "font-size": {
           "value": "14px"
@@ -257,6 +266,9 @@
         },
         "font-size": {
           "value": "14px"
+        },
+        "color": {
+          "value": "#ffffff"
         }
       }
     },

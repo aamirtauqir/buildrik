@@ -1,0 +1,120 @@
+{
+  "surface": "ai-done",
+  "board": "AI · done (Figma 171:67)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=ai-done",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "ai-run-step-3"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "run-band",
+      "testId": "ai-run-band",
+      "spec": "ai-done",
+      "nodeId": "220:967"
+    },
+    {
+      "name": "run-band-tint",
+      "testId": "ai-run-band",
+      "spec": "ai-done",
+      "nodeId": "I220:967;220:6"
+    },
+    {
+      "name": "run-band-label",
+      "testId": "ai-run-band",
+      "spec": "ai-done",
+      "nodeId": "I220:967;16:17"
+    },
+    {
+      "name": "step-1",
+      "testId": "ai-run-step-1",
+      "spec": "ai-done",
+      "nodeId": "171:79"
+    },
+    {
+      "name": "step-1-glyph",
+      "testId": "ai-run-glyph-1",
+      "spec": "ai-done",
+      "nodeId": "171:80"
+    },
+    {
+      "name": "step-1-index",
+      "testId": "ai-run-index-1",
+      "spec": "ai-done",
+      "nodeId": "171:81"
+    },
+    {
+      "name": "step-2",
+      "testId": "ai-run-step-2",
+      "spec": "ai-done",
+      "nodeId": "171:83"
+    },
+    {
+      "name": "step-2-glyph",
+      "testId": "ai-run-glyph-2",
+      "spec": "ai-done",
+      "nodeId": "171:84"
+    },
+    {
+      "name": "step-2-index",
+      "testId": "ai-run-index-2",
+      "spec": "ai-done",
+      "nodeId": "171:85"
+    },
+    {
+      "name": "step-3",
+      "testId": "ai-run-step-3",
+      "spec": "ai-done",
+      "nodeId": "171:87"
+    },
+    {
+      "name": "step-3-glyph",
+      "testId": "ai-run-glyph-3",
+      "spec": "ai-done",
+      "nodeId": "171:88"
+    },
+    {
+      "name": "step-3-index",
+      "testId": "ai-run-index-3",
+      "spec": "ai-done",
+      "nodeId": "171:89"
+    },
+    {
+      "name": "step-1-title",
+      "testId": "ai-run-title-1"
+    }
+  ],
+  "_note": [
+    "A finished run needs three answers from the dashboard's AI endpoint, so the",
+    "probe mounts `AgentPlan` at `phase: \"done\"` with three applied steps — a",
+    "state the runner really produces (`advance()` past the last step sets",
+    "\"done\" and leaves each approved step marked `applied`).",
+    "",
+    "WHAT THE BOARD DRAWS THAT THE CODE DOES NOT, and why the code wins:",
+    "171:91 `Actions` (a Stop under a finished run), 171:94 the success-tint",
+    "`Diff` block, and 171:99/171:101 `Discard` / `Apply`. That pair is the",
+    "census note `drift-applied-not-proposed-no-discard`, and it was ruled on",
+    "before this pass: LEDGER J-171:67, wave F, 2026-09-04 — 'each approved step",
+    "applies in its own transaction, so at \"done\" there is nothing left to",
+    "discard. The board's batch Discard+Apply is deliberately not built.' The",
+    "agent path proposes per step (board 170:97, built) and offers Undo all; a",
+    "batch Apply at the end would have to hold three edits unapplied, which is a",
+    "different runner. Nothing here re-opens that.",
+    "",
+    "171:103/171:104 `note` is a designer annotation, not UI — the 2026-09-03",
+    "founder ruling on note blocks (LEDGER J-164:22) covers this one by name.",
+    "",
+    "step-1-title carries no spec: 171:82 fixes the label at 208 wide, which is",
+    "the board's 280 frame less its 56 left offset and 16 right gutter. Its type",
+    "(12/18, ink) does match; the width is the same 280-vs-299 board/inspector",
+    "conflict `ai-idle` records in full. Its glyph and index ARE compared, and",
+    "the row's own 40 height is compared three times over."
+  ]
+}

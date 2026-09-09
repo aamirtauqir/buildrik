@@ -1,0 +1,165 @@
+{
+ "surface": "pages-searching",
+ "board": "Pages · searching (Figma 141:40)",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-panel",
+ "viewport": {
+  "width": 280,
+  "height": 812
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "pages-search-box"
+  },
+  {
+   "action": "click",
+   "testId": "pages-search-box"
+  },
+  {
+   "action": "press",
+   "key": "m"
+  },
+  {
+   "action": "press",
+   "key": "e"
+  },
+  {
+   "action": "press",
+   "key": "n"
+  },
+  {
+   "action": "press",
+   "key": "u"
+  },
+  {
+   "action": "wait",
+   "ms": 400
+  },
+  {
+   "action": "waitFor",
+   "testId": "page-row-menu"
+  },
+  {
+   "action": "hover",
+   "testId": "panel-header-title"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "panel-header",
+   "testId": "panel-header",
+   "spec": "pages-searching",
+   "nodeId": "208:141"
+  },
+  {
+   "name": "panel-header-title",
+   "testId": "panel-header-title",
+   "spec": "pages-searching",
+   "nodeId": "I208:141;16:7"
+  },
+  {
+   "name": "result-row",
+   "testId": "page-row-menu",
+   "spec": "pages-searching",
+   "nodeId": "141:60"
+  },
+  {
+   "name": "result-row-name",
+   "testId": "page-row-name-menu",
+   "spec": "pages-searching",
+   "nodeId": "141:62"
+  },
+  {
+   "name": "result-row-checkbox",
+   "testId": "page-row-checkbox-menu",
+   "spec": "pages-searching",
+   "nodeId": "227:924"
+  },
+  {
+   "name": "result-row-incontext",
+   "testId": "page-row-incontext-menu",
+   "spec": "pages-searching",
+   "nodeId": "155:4",
+   "skipProps": {
+    "color": "BOARD IS WRONG AND THE CODE DEVIATES ON PURPOSE (founder call 2026-09-08). Board 155:4 names --color/ink-disabled #D1D5DB for the 'in <folder>' line and .bd-pg-row-incontext used --bk-gray-300 — THE SAME VALUE — so the join passed while the line measured 1.47:1 on white. Board and code had agreed on something a person cannot read since it was built. The folder a page lives in is real information, not a disabled control; now --bk-ink-muted, 4.83:1, which matches its secondary role. Size and line box still joined. Same pair and same ruling as content-fields' 'required'."
+   }
+  },
+  {
+   "name": "add-page",
+   "testId": "pages-add-page",
+   "spec": "pages-searching",
+   "nodeId": "141:77"
+  },
+  {
+   "name": "footer",
+   "testId": "pages-footer"
+  },
+  {
+   "name": "search-band",
+   "testId": "pages-search-band"
+  },
+  {
+   "name": "search-box",
+   "testId": "pages-search-box"
+  }
+ ],
+ "_note": [
+  "PROBE, not the running editor: `search` is PageList's OWN state with no prop",
+  "behind it, so the recipe reaches this board the way a person does — it",
+  "types m-e-n-u into the shipped field, the tree flattens, and the one match",
+  "renders with the name of the folder it came from. Case `pages-panel` mounts",
+  "the same composition PagesTab renders (PanelFrame > Header > Body(noScroll)",
+  "> PageList), which is the composition `pages-load-error` and",
+  "`pages-bulk-select` already measure.",
+  "",
+  "THE FOLDER IS PART OF THE STATE, not decoration. The board draws 'Menu' with",
+  "'in Marketing' beside it, and `searchContext` is derived inside PageList",
+  "from `folders` + `pageToFolder` — with the empty folder list the other two",
+  "Pages cases use, a search result CANNOT carry that line, and the one thing",
+  "this board says that no other Pages board says would go unmeasured. So this",
+  "case seeds one folder holding Menu. The context span gained",
+  "`page-row-incontext-<id>` in this pass; it had no anchor at all.",
+  "",
+  "CONFORMED to the board in this pass: nothing had to move on this screen.",
+  "The result row is 32 tall, its name 13 on a 20 line box in --color/ink, the",
+  "checkbox is white on --color/border-medium at radius 4, and the Add-page",
+  "label is 13/20 --color/accent-text — all as drawn.",
+  "",
+  "A CONTRAST FAILURE THE BOARD ITSELF SPECIFIES, recorded loudly rather than",
+  "quietly baselined: 155:4 paints 'in Marketing' --color/ink-disabled,",
+  "#D1D5DB, which is 1.47:1 on the panel fill against a 4.5 floor for 11px",
+  "text. `.bd-pg-row-incontext` uses --bk-gray-300, the same value, so the code",
+  "matches the board exactly and the join PASSES — which is precisely why this",
+  "sentence exists. Conforming did not introduce it; the board and the code",
+  "have agreed on an illegible value since the line was built. It is the same",
+  "#D1D5DB / 1.47:1 pair `content-fields` already carries for its 'required'",
+  "tag, so this is a TOKEN-level decision (ink-disabled is not a text colour",
+  "on white), not a call site to patch under one board. Left matching the",
+  "board and reported.",
+  "",
+  "NOT JOINED, with reasons:",
+  "",
+  "  the search BAND (141:45) and BOX (141:46) — `pages-load-error` records the",
+  "  adjudication and this board repeats its numbers exactly: the band's own",
+  "  1px border and 6px radius would draw a second box around the box, and the",
+  "  field's 166 width is `flex: 1` leftovers from the board's own '⊞ Listings'",
+  "  label, not a spec — pinning it would freeze the box at the 280 drawer and",
+  "  break the 700 expand. Measured unjoined: band 280x40, box 168x28 on",
+  "  --flowbite/gray/50 at radius 6.",
+  "",
+  "  the Add-page FOOT (141:76) — 36 on the board, 54 shipped, because the",
+  "  shipped foot also carries 'From template' and the ⋮ that holds 'New",
+  "  folder' (founder call 2026-08-28). Same reading `pages-load-error`",
+  "  recorded. The LABEL inside it (141:77) matches exactly and IS joined.",
+  "",
+  "  the panel ROOT (141:40) — 6/8 padding and a radius-6 stroke, the",
+  "  floating-frame dressing Figma gives a panel drawn on a canvas.",
+  "",
+  "  the query text (141:47) and '⊞ Listings' (141:48) — the first is the text",
+  "  INSIDE the input and the only anchor on that control is its wrapper; the",
+  "  second is joined by `pages-load-error` against 141:172.",
+  "",
+  "  the back hotspot (1668:7225) — a prototype hitbox."
+ ]
+}

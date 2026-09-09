@@ -1,0 +1,850 @@
+{
+  "surface": "insert-default",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "137:2",
+  "boardName": "insert-default",
+  "figmaHash": "f1ca80ebb8fbe6ccc59154886fc4d0f7b3d450ccede346b43a9693c20419e028",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:46:14.452Z",
+  "copy": [
+    "Insert",
+    "Search elements",
+    "⌘F",
+    "ELEMENTS",
+    "53",
+    "Heading",
+    "Text",
+    "Link",
+    "BLOCKS",
+    "50",
+    "COMPONENTS",
+    "14",
+    "MINE",
+    "⌥ Paste HTML…",
+    "💡 Tip 2/4",
+    "‹ › ✕"
+  ],
+  "targets": [
+    {
+      "nodeId": "137:2",
+      "name": "Insert · default",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "207:2",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I207:2;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "137:7",
+      "name": "Search",
+      "className": "border border-[var(--color\\/border,#e5e7eb)] border-solid h-[36px] overflow-clip relative rounded-[6px] shrink-0 w-full",
+      "props": {
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:8",
+      "name": "search box",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid cursor-pointer h-[28px] left-[15px] overflow-clip rounded-[6px] top-[3px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:9",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[9px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[4px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:10",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[217px] text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left top-[6px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "2865:21886",
+      "name": "hotspot/state · Insert · searching",
+      "className": "absolute h-[36px] left-px opacity-0 top-[-4px] w-[119px]",
+      "props": {
+        "height": {
+          "value": "36px"
+        },
+        "width": {
+          "value": "119px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:11",
+      "name": "Group header · ELEMENTS",
+      "className": "h-[32px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:12",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:13",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[0] left-[32px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] tracking-[0.88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:14",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[244px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "2865:21884",
+      "name": "hotspot/state · Insert · elements-expanded",
+      "className": "absolute h-[32px] left-[24px] opacity-0 top-0 w-[81px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "81px"
+        }
+      }
+    },
+    {
+      "nodeId": "233:1108",
+      "name": "List row",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center px-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I233:1108;232:7",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[16px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I233:1108;232:8",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-left",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "233:1113",
+      "name": "List row",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center px-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I233:1113;232:7",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[16px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I233:1113;232:8",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-left",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "233:1118",
+      "name": "List row",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center px-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I233:1118;232:7",
+      "name": "icon",
+      "className": "relative rounded-[2px] shrink-0 size-[16px]",
+      "props": {
+        "border-radius": {
+          "value": "2px"
+        }
+      }
+    },
+    {
+      "nodeId": "I233:1118;232:8",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-left",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "137:24",
+      "name": "Group header · BLOCKS",
+      "className": "h-[32px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:25",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:26",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[0] left-[32px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] tracking-[0.88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "0"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:27",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[244px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "2865:21880",
+      "name": "hotspot/state · Insert · blocks-expanded (picture grid, design-ahead)",
+      "className": "absolute h-[32px] left-[24px] opacity-0 top-0 w-[65px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "65px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:28",
+      "name": "Group header · COMPONENTS",
+      "className": "h-[32px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:29",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:30",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[16px] left-[32px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] tracking-[0.88px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:31",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[244px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "2865:21882",
+      "name": "hotspot/state · Insert · components-expanded",
+      "className": "absolute h-[32px] left-[24px] opacity-0 top-0 w-[104px]",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "104px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:36",
+      "name": "Group header · MINE",
+      "className": "[word-break:break-word] h-[32px] overflow-clip relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)] text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "137:37",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] top-[8px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:38",
+      "name": null,
+      "className": "absolute font-['Inter:Medium'] font-medium leading-[16px] left-[32px] not-italic text-[11px] top-[8px] tracking-[0.88px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:39",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[244px] text-[11px] top-[8px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "233:1123",
+      "name": "List row",
+      "className": "content-stretch flex gap-[8px] h-[32px] items-center px-[16px] relative rounded-[4px] shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I233:1123;232:8",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Regular'] font-normal h-[20px] leading-[20px] min-w-px not-italic relative text-[13px] text-[color:var(--flowbite\\/gray\\/900,#111827)] text-left whitespace-pre-wrap",
+      "props": {
+        "height": {
+          "value": "20px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "137:43",
+      "name": "TipsFooter",
+      "className": "[word-break:break-word] bg-[var(--color\\/accent-tint,#ebf5ff)] font-['Inter:Regular'] font-normal h-[40px] leading-[18px] not-italic overflow-clip relative shrink-0 text-[color:var(--color\\/accent-text,#1a56db)] text-left w-full whitespace-pre",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "40px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "137:44",
+      "name": null,
+      "className": "absolute left-[16px] text-[12px] top-[12px]",
+      "props": {
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "137:45",
+      "name": null,
+      "className": "absolute left-[212px] text-[11px] top-[12px] tracking-[0.5px]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "787:4299",
+      "name": "hotspot/state · Insert · loading — the 2026-09-02 'CUT (RETIRED, no producer)' was withdrawn: InsertStateBlocks.tsx:55 InsertLoadingSkeleton is built and unit-tested and simply has zero mounts (BuildTab.tsx never imports InsertStateBlocks). Edge kept (QA-B-22).",
+      "className": "absolute h-[34px] left-[-1px] top-[741px] w-[160px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "160px"
+        }
+      }
+    },
+    {
+      "nodeId": "787:4303",
+      "name": "hotspot/state · Insert · load-error — the 2026-09-02 'CUT (RETIRED, no producer)' was withdrawn: InsertStateBlocks.tsx:79 InsertLoadError is built and unit-tested with zero mounts. Edge kept (QA-B-22).",
+      "className": "absolute h-[34px] left-[119px] top-[777px] w-[160px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "160px"
+        }
+      }
+    },
+    {
+      "nodeId": "873:4519",
+      "name": "hotspot/back · to editor",
+      "className": "bg-[rgba(0,0,0,0)] opacity-0 relative shrink-0 size-[36px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        }
+      }
+    },
+    {
+      "nodeId": "1668:7245",
+      "name": "hotspot/state · Insert · tip-dismissed",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[129px] opacity-0 top-[741px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17216",
+      "name": "hotspot/state · Components · empty",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[-1px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17220",
+      "name": "hotspot/state · Templates · empty",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17224",
+      "name": "hotspot/state · Templates · replace-confirm (modal",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17228",
+      "name": "hotspot/state · success · error",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17232",
+      "name": "hotspot/state · Templates · save-as-template (moda",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17236",
+      "name": "hotspot/state · Templates · usage-drawer",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17541",
+      "name": "hotspot/state · Ecommerce · collection-setup (moda",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[129px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

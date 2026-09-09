@@ -1,0 +1,135 @@
+{
+  "surface": "cmdk-no-results",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "166:45",
+  "boardName": "cmdk-no-results",
+  "figmaHash": "87ad595fe4d0488a724e7e5603981d3246107111f67b586372f08a7bde74c7de",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:15:41.623Z",
+  "copy": [
+    "qqp",
+    "Nothing matches ‘qqp’.",
+    "Ask AI instead ›"
+  ],
+  "targets": [
+    {
+      "nodeId": "166:45",
+      "name": "CmdK · no-results — the SHELL palette (Cmd+K, shell/modals/CommandPalette.tsx, which cites these boards by id). Ships today.",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch cursor-pointer flex flex-col items-start overflow-clip relative rounded-[12px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:46",
+      "name": "Query",
+      "className": "border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-b border-solid h-[56px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "56px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:47",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[20px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[17px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "166:48",
+      "name": "Empty",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[120px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-center w-full",
+      "props": {
+        "height": {
+          "value": "120px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:49",
+      "name": null,
+      "className": "-translate-x-1/2 absolute left-[320px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[36px] w-[600px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:50",
+      "name": null,
+      "className": "-translate-x-1/2 absolute left-[320px] text-[color:var(--color\\/accent-text,#1a56db)] top-[64px] w-[600px]",
+      "props": {
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "1668:7237",
+      "name": "hotspot/back · to editor",
+      "className": "absolute bg-[rgba(0,0,0,0)] left-[-1px] opacity-0 size-[36px] top-[383px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        }
+      }
+    },
+    {
+      "nodeId": "1668:7362",
+      "name": "hotspot/state · CmdK · ai-offer",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[219px] opacity-0 top-[339px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    }
+  ]
+}

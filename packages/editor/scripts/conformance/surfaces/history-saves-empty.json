@@ -1,0 +1,193 @@
+{
+ "surface": "history-saves-empty",
+ "board": "History · Saves · empty (Figma 163:64)",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=history-saves-empty",
+ "viewport": {
+  "width": 280,
+  "height": 812
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "saves-empty"
+  }
+ ],
+ "contrastScope": "[data-probe]",
+ "targets": [
+  {
+   "name": "panel-header",
+   "testId": "panel-header",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7141"
+  },
+  {
+   "name": "panel-header-title",
+   "testId": "panel-header-title",
+   "spec": "history-saves-empty",
+   "nodeId": "I1657:7141;16:7"
+  },
+  {
+   "name": "view-switcher",
+   "testId": "history-view-switcher",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7151"
+  },
+  {
+   "name": "view-tab-saves",
+   "testId": "history-view-tab-saves",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7152"
+  },
+  {
+   "name": "view-helper-saves",
+   "testId": "history-view-helper-saves",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7153",
+   "skipProps": {
+    "color": "Board names --color/ink-placeholder #9CA3AF, which is 2.54:1 on white at 11px — barely half the 4.5 floor. The code ships --bk-ink-muted (4.83:1). THIS EXACT REFUSAL WAS ALREADY MADE on boards 1657:7153/7156: an agent adopted #9CA3AF for the tab helper, the contrast gate lit immediately, and it was backed out with 'the board is wrong'. Same colour, same surface family, same answer. The size and line box are joined and match; only the colour is refused. The fix belongs in Figma."
+   }
+  },
+  {
+   "name": "view-tab-published",
+   "testId": "history-view-tab-published",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7155"
+  },
+  {
+   "name": "view-helper-published",
+   "testId": "history-view-helper-published",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7156",
+   "skipProps": {
+    "color": "Board names --color/ink-placeholder #9CA3AF, which is 2.54:1 on white at 11px — barely half the 4.5 floor. The code ships --bk-ink-muted (4.83:1). THIS EXACT REFUSAL WAS ALREADY MADE on boards 1657:7153/7156: an agent adopted #9CA3AF for the tab helper, the contrast gate lit immediately, and it was backed out with 'the board is wrong'. Same colour, same surface family, same answer. The size and line box are joined and match; only the colour is refused. The fix belongs in Figma."
+   }
+  },
+  {
+   "name": "filter-row",
+   "testId": "history-filter-row",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7157"
+  },
+  {
+   "name": "filter-chip-on",
+   "testId": "history-filter-milestones"
+  },
+  {
+   "name": "filter-chip-off",
+   "testId": "history-filter-changes"
+  },
+  {
+   "name": "search-bar",
+   "testId": "history-search-bar",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7162"
+  },
+  {
+   "name": "search-box",
+   "testId": "history-search-input",
+   "spec": "history-saves-empty",
+   "nodeId": "1657:7163"
+  },
+  {
+   "name": "empty-block",
+   "testId": "saves-empty",
+   "spec": "history-saves-empty",
+   "nodeId": "163:110"
+  },
+  {
+   "name": "empty-title",
+   "testId": "saves-empty-title",
+   "spec": "history-saves-empty",
+   "nodeId": "163:111"
+  },
+  {
+   "name": "empty-hint",
+   "testId": "saves-empty-hint",
+   "spec": "history-saves-empty",
+   "nodeId": "163:112"
+  },
+  {
+   "name": "prune-note",
+   "testId": "history-prune-note"
+  },
+  {
+   "name": "prune-note-text",
+   "testId": "history-prune-note-text",
+   "spec": "history-saves-empty",
+   "nodeId": "163:107"
+  },
+  {
+   "name": "footer",
+   "testId": "saves-footer",
+   "spec": "history-saves-empty",
+   "nodeId": "163:108"
+  },
+  {
+   "name": "footer-link",
+   "testId": "saves-save-version",
+   "spec": "history-saves-empty",
+   "nodeId": "163:109"
+  }
+ ],
+ "_note": [
+  "The panel with the read SETTLED and nothing saved. That pair is what",
+  "separates it from 1138:4573: an empty list and a list still loading answer",
+  "different questions, and only one of them is what a fresh project shows.",
+  "",
+  "280 — see history-saves-changes for why the family's 360 frame is not the",
+  "drawer. Every width here confirms it: the switcher, the filter row and the",
+  "search bar are all w-[280] on the board.",
+  "",
+  "TWO THINGS THIS BOARD SETTLES THAT EARLIER ONES LEFT OPEN.",
+  "",
+  "1. The View-toggle conflict (history-saves-changes / -time-travel `_note`,",
+  "   'Live conflict, left open'). 163:2 and 163:113 drew the filter as two bare",
+  "   text labels reading 'Changes' / 'Saves', which the code refused because",
+  "   'Saves' is already the view TAB one row above. 1657:7157 — redrawn",
+  "   2026-09-05 — keeps the code's CHIPS and renames them 'Saved versions' /",
+  "   'This session'. Board wins on the words, code wins on the control, nothing",
+  "   collides. Adopted; HistoryTabShell.test.tsx updated in the same change.",
+  "",
+  "2. The Panel header conflict (same two notes: '48h/14px on the board, 44h/11px",
+  "   caps in the code … screen board loses to component board'). 1657:7141 is an",
+  "   instance of component board 2100:11651, whose own description says it was",
+  "   'widened 2026-09-05 so the eight local copies could be adopted', and it now",
+  "   draws 44h / 11 / ink-soft / pl-16 / pr-12 / gap-8 — the shipped PanelHeader",
+  "   exactly. Anchored here, and it passes. The conflict is closed by the file,",
+  "   not by this recipe.",
+  "",
+  "NOT anchored, and why:",
+  "  1657:7159 / 1657:7161 the two chips — their FRAMES are stale. 1657:7159 is",
+  "  79 wide with its 12px label inset 8 either side, i.e. Figma measured the",
+  "  text at 63px; 'Saved versions' is ~90 at 12/500 and 63 is almost exactly",
+  "  'Milestones', the label these chips carried before the 09-05 redraw. The",
+  "  text was retyped and the fixed-width frame was not resized, so the label now",
+  "  overflows its own chip on the board. Frame artifact, not design — same class",
+  "  as the 46px Restore button on 163:113. Their other four properties WERE",
+  "  measured against the board before the targets were skipped and all matched",
+  "  (2026-09-08: height 24/24, radius 12/12, active fill #1a56db, inactive",
+  "  border #e5e7eb); the row that contains them, 1657:7157, is anchored and",
+  "  carries the 32 height the chips sit in.",
+  "  1657:7154 active underline — a `border-bottom` on the tab, not an element.",
+  "  163:106 Prune note BLOCK — 40 here, 64 on 163:2, for the same component and",
+  "  the same two-line sentence. Its height is not a contract (the call",
+  "  history-saves-changes already recorded); 163:107, the text, is anchored.",
+  "  163:105 spacer (403) — the leftover of a fixed 812 frame, not a box the",
+  "  code draws.",
+  "  453:4047 hotspot — a prototype trigger.",
+  "",
+  "CONTRAST: one failure, 4.39 — the prune note's ink-muted on bg-subtle, which",
+  "is exactly the token pair 163:107-on-163:106 names. Pre-existing and already",
+  "baselined on history-saves-time-travel; not introduced here.",
+  "A SECOND one WAS introduced and then backed out: 1657:7153/7156 paint the",
+  "tab helper #9CA3AF, which is 2.54:1 on the panel's white. Adopting it lit the",
+  "gate immediately. The helper keeps --bk-ink-muted (4.83) and the board is",
+  "wrong; see the report.",
+  "",
+  "BOARD-COPY (check-board-copy.mjs, 2026-09-08): one lead, 'search saves...'",
+  "reported as drawn-but-not-rendered. It IS rendered — as the search field's",
+  "`placeholder`, which is an attribute and not a text node, so the sweep cannot",
+  "see it. The board draws it inside the box for the same reason. Instrument",
+  "limit, not drift; the field's `aria-label` carries the same string."
+ ]
+}

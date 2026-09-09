@@ -1,0 +1,119 @@
+{
+  "surface": "inspector-pseudo-state",
+  "board": "Inspector · pseudo-state (Figma 160:313)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-state-pill"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-state-opt-hover"
+    },
+    {
+      "action": "waitFor",
+      "testId": "pseudo-state-banner"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "160:313"
+    },
+    {
+      "name": "element-name",
+      "testId": "inspector-element-name",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "160:315"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "920:4681"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "160:318"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "160:319"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "160:321"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "160:323"
+    },
+    {
+      "name": "pseudo-note",
+      "testId": "pseudo-state-banner",
+      "spec": "inspector-pseudo-state",
+      "nodeId": "160:410"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900 through the production path: Insert a Section, open",
+    "the state pill in the context strip, choose :hover. Every write from the",
+    "panel then lands on the hover layer, and 160:410's note says so.",
+    "",
+    "MATCHES AS DRAWN, 31 properties, no drift: the element name at 14/20 in ink,",
+    "the `btn/ai` chip (22h, px7, radius 6, bg-selected), the 32h bg-subtle strip",
+    "with its three 22h radius-4 pills — the state pill reading ':hover' — and the",
+    "pseudo note itself: a full-width 32-tall `--color/accent-tint` band with its",
+    "line at 11/16 in `--color/accent-text`, x16.",
+    "",
+    "NOT JOINED:",
+    "",
+    "  160:314, the HEADER. This is the ONE board in the whole file that fills the",
+    "  inspector header — `--color/accent-tint`, to tint the entire chrome while a",
+    "  pseudo-state is active. Censused across every committed spec: 37 boards",
+    "  draw this 48h row with no fill, 6 (the profile family) draw it gray-50, and",
+    "  this one draws it accent-tint. Three readings, one row, so no single board",
+    "  re-settles it; the state is already announced twice on screen, by the pill",
+    "  and by the band directly under the header. Its geometry (48h, x16, gap 8)",
+    "  is what the other 37 assert and is measured on the recipes that own them.",
+    "",
+    "  92:8 / 92:11 / 92:13 — the opacity slider molecule the frame carries as",
+    "  context. It belongs to the Effects section, not to this state."
+  ]
+}

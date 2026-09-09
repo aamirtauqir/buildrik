@@ -1,0 +1,124 @@
+{
+  "surface": "inspector-single-selection",
+  "board": "Inspector · single-selection (Figma 159:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Section"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    },
+    {
+      "action": "hover",
+      "testId": "inspector-panel"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-single-selection",
+      "nodeId": "159:2"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header",
+      "spec": "inspector-single-selection",
+      "nodeId": "159:3"
+    },
+    {
+      "name": "element-name",
+      "testId": "inspector-element-name",
+      "spec": "inspector-single-selection",
+      "nodeId": "159:4"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-single-selection",
+      "nodeId": "920:4669"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row",
+      "spec": "inspector-single-selection",
+      "nodeId": "159:7"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-single-selection",
+      "nodeId": "159:8"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-single-selection",
+      "nodeId": "159:10"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-single-selection",
+      "nodeId": "159:12"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE, same production path inspector-profile-media uses: Insert's",
+    "Section row creates a section and selects it. Measured at the shell's",
+    "1440x900 rather than the board's 300 frame — the app has no view that",
+    "shows the inspector alone.",
+    "",
+    "READ THE BOARD'S OWN NAME FIRST. `get_design_context` returns this frame",
+    "titled: 'Inspector · single-selection — RETIRED 2026-09-02, superseded by",
+    "32:2 (founder call in-session: 807 geometry, 32:2 master, retire 159:2)'.",
+    "That is a founder decision recorded in the artefact itself, so this board",
+    "does not get to move anything the boards that replaced it draw",
+    "differently. What it CAN still assert is the chrome its successors did not",
+    "change, and that is exactly what is joined here: the 48h header with its",
+    "16 insets and 8 gap, the element name at 14/20 in ink, the `btn/ai` chip",
+    "(920:4669 — the same component instance inspector-profile-media joins as",
+    "920:4705), the 32h context strip on --color/bg-subtle, and the three 22h",
+    "radius-4 pills with the active one filled white. All eight match.",
+    "",
+    "NOT JOINED, and this is most of the board:",
+    "",
+    "  the whole SECTION BODY — LAYOUT, SPACING, TYPOGRAPHY, BACKGROUND,",
+    "  BORDER, EFFECTS, and the 88px-label / 172px-control row geometry under",
+    "  them (159:14 through 159:92). The panel that ships renders the eleven",
+    "  sections the profile boards specify — SIZE, SPACING, BACKGROUND, BORDER,",
+    "  CORNER RADIUS, EFFECTS, INTERACTIONS, ANIMATION, VISIBILITY, ELEMENT",
+    "  PROPERTIES, CSS CLASSES — closing on 'N of 11 sections apply', which is",
+    "  what inspector-profile-media measured against 807:8521 and what 32:2",
+    "  masters. Conforming a retired board's six-section body would break the",
+    "  seven profile boards that superseded it.",
+    "",
+    "  every text INPUT on it (159:33, :37, :45, :47, :52, :60, :65, :67, :76,",
+    "  :86) — stroked --color/border-input #9CA3AF on --color/bg-card. That is",
+    "  the chrome-ui TextInput primitive, measured against six other boards, and",
+    "  boards.json already carries authority=open:input-fill for exactly this",
+    "  disagreement (1172:4867 fills #F3F4F6, 1205:4804 fills #F9FAFB,",
+    "  textInputTheme.ts ships white on purpose). One screen board does not",
+    "  re-settle a chrome-ui primitive.",
+    "",
+    "  the pills' TEXT nodes (159:9 / :11 / :13) — 11px --color/ink-soft. The",
+    "  live pills paint their label in --bk-ink; the text is not separately",
+    "  addressable (no anchor inside the pill) and the pill BOXES, which are,",
+    "  are joined and pass. Recorded rather than silently dropped.",
+    "",
+    "  159:6 — a 13/20 ink-soft run the board places after the AI chip with no",
+    "  copy in the extracted list. Nothing on screen corresponds to it."
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "surface": "content-empty",
+  "board": "Content · empty (Figma 149:7)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-empty",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "content-empty"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-empty",
+      "nodeId": "208:421"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-empty",
+      "nodeId": "I208:421;16:7"
+    },
+    {
+      "name": "empty",
+      "testId": "content-empty",
+      "spec": "content-empty",
+      "nodeId": "149:46"
+    },
+    {
+      "name": "empty-desc",
+      "testId": "content-empty-desc",
+      "spec": "content-empty",
+      "nodeId": "149:47"
+    },
+    {
+      "name": "empty-cta",
+      "testId": "content-empty-cta"
+    }
+  ],
+  "_note": [
+    "Board 149:7. PROBE: the empty root is only reachable with hydration SETTLED —",
+    "a composer-less tab with an unsettled status renders the loading skeleton",
+    "instead, which is exactly what the injected `hydrationStatus` exists to",
+    "separate. The probe host is given the board's own 812 height, because",
+    "CONTENT_BODY is `h-full` and an auto-height host measures the panel's CONTENT",
+    "rather than the column it fills in the shipped drawer.",
+    "",
+    "BOARD won, and this was the largest visual miss in the tranche after the",
+    "input height: the block carried `tw:flex-1`, so in the drawer it filled ~768px",
+    "and `justify-center` parked the invitation halfway down an otherwise blank",
+    "panel. 149:46 draws a 160-tall block at the TOP. Now `tw:h-40`. The 24px",
+    "gutters and the 232 text column were already right (EmptyState md's px-6).",
+    "",
+    "NOT anchored: 149:48, the 'Create a collection' line. Figma exports it as an",
+    "absolutely-positioned text frame — `leading-[0]`, `w-[232px]`, `top-[116px]`,",
+    "`left-[140px] -translate-x-1/2` — and a line-height of 0 is an export artifact,",
+    "not a design. The two properties that ARE design were read off the same run:",
+    "the live control is 13/20 in #1a56db, the same size and colour as its sibling",
+    "149:47 which IS anchored. Precedent: inspector-no-selection anchors its own",
+    "leading-[0] node (920:4717) and carries a standing FAIL for it.",
+    "  453:4027 hotspot/state — prototype wiring, not design."
+  ]
+}

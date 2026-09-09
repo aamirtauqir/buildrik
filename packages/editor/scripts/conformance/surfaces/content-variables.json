@@ -1,0 +1,140 @@
+{
+  "surface": "content-variables",
+  "board": "Content · variables (Figma 151:62)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=content-panel",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "content-open-variables"
+    },
+    {
+      "action": "waitFor",
+      "testId": "content-add-variable"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-variables",
+      "nodeId": "208:481"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-variables",
+      "nodeId": "I208:481;16:7"
+    },
+    {
+      "name": "crumb",
+      "testId": "content-crumb",
+      "spec": "content-variables",
+      "nodeId": "151:68"
+    },
+    {
+      "name": "var-name",
+      "testId": "content-var-name",
+      "spec": "content-variables",
+      "nodeId": "151:69"
+    },
+    {
+      "name": "var-name-key",
+      "testId": "content-var-key-name",
+      "spec": "content-variables",
+      "nodeId": "151:70"
+    },
+    {
+      "name": "var-name-value",
+      "testId": "content-var-value-name"
+    },
+    {
+      "name": "var-phone",
+      "testId": "content-var-phone",
+      "spec": "content-variables",
+      "nodeId": "151:73"
+    },
+    {
+      "name": "var-phone-key",
+      "testId": "content-var-key-phone",
+      "spec": "content-variables",
+      "nodeId": "151:74"
+    },
+    {
+      "name": "var-phone-value",
+      "testId": "content-var-value-phone"
+    },
+    {
+      "name": "var-address",
+      "testId": "content-var-address",
+      "spec": "content-variables",
+      "nodeId": "151:77"
+    },
+    {
+      "name": "var-address-key",
+      "testId": "content-var-key-address",
+      "spec": "content-variables",
+      "nodeId": "151:78"
+    },
+    {
+      "name": "var-address-value",
+      "testId": "content-var-value-address"
+    },
+    {
+      "name": "var-hours",
+      "testId": "content-var-hours",
+      "spec": "content-variables",
+      "nodeId": "151:81"
+    },
+    {
+      "name": "var-hours-key",
+      "testId": "content-var-key-hours",
+      "spec": "content-variables",
+      "nodeId": "151:82"
+    },
+    {
+      "name": "var-hours-value",
+      "testId": "content-var-value-hours"
+    },
+    {
+      "name": "add-variable",
+      "testId": "content-add-variable",
+      "spec": "content-variables",
+      "nodeId": "151:86"
+    }
+  ],
+  "_note": [
+    "Board 151:62, reached with the panel's own Variables row. The four variables",
+    "are seeded through `saveSiteVariables` — the shipped writer — during the",
+    "probe host's RENDER, not an effect: child effects run first, so an effect",
+    "would write them after useContentPanel had already read and the board would",
+    "mount on its empty state.",
+    "",
+    "Nothing drifted here beyond what content-fields already fixed: the key line is",
+    "12/16 accent (MONO, given its line-height in that pass) and the value line is",
+    "11/16 ink-muted (SUB, same pass). The 44 row height is Row size=\"stack\".",
+    "",
+    "NOT anchored, and why:",
+    "  151:71 / 75 / 79 / 83 the four VALUE lines. Type and colour match; the",
+    "  board's `w-[200px]` does not — live is 208. The whole row is absolutely",
+    "  positioned Figma art (`left-[16px] top-[25px] w-[200px]`, with the `⋯` at",
+    "  `left-[256px]`), so the 200 is a drawn truncation frame, and the 8px is",
+    "  entirely the `⋯`: the board draws a bare 13/20 glyph, live it is chrome-ui",
+    "  IconButton at 32x32, sized by its own board 697:440 (\"32x32 so it clears",
+    "  the 24px touch minimum\"). A shared control with its own board is not",
+    "  re-settled by one screen, and the same 11/16 ink-muted style IS compared on",
+    "  content-fields (151:11) and content-data-sources (151:56).",
+    "  151:72 / 76 / 80 / 84 the `⋯` glyphs — same control, same reason.",
+    "  151:67 the 36 Back-row frame and 151:85 the Add-var frame (margin + an h-8",
+    "  control; both controls are anchored, at 151:68 and 151:86). Three hotspot/*.",
+    "",
+    "The board's `[not-implemented]` header is not this recipe's subject but is",
+    "true and worth repeating: these values live in localStorage under a key built",
+    "from the project NAME, and the screen's own empty state says pages do not read",
+    "them."
+  ]
+}

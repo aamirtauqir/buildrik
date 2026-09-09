@@ -1,0 +1,172 @@
+{
+  "surface": "canvas-zoom-levels",
+  "board": "Canvas · zoom levels (Figma 817:4723)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "waitFor",
+      "testId": "footer-device-zoom"
+    },
+    {
+      "action": "click",
+      "testId": "footer-device-zoom"
+    },
+    {
+      "action": "waitFor",
+      "testId": "footer-zoom-flyout"
+    }
+  ],
+  "contrastScope": "[data-testid=\"footer-zoom-flyout\"]",
+  "targets": [
+    {
+      "name": "flyout",
+      "testId": "footer-zoom-flyout"
+    },
+    {
+      "name": "row-fit",
+      "testId": "zoom-label-fit",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4727"
+    },
+    {
+      "name": "row-selection",
+      "testId": "zoom-label-selection",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4729"
+    },
+    {
+      "name": "row-100",
+      "testId": "zoom-label-100",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4732"
+    },
+    {
+      "name": "row-in",
+      "testId": "zoom-label-in",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4743"
+    },
+    {
+      "name": "row-out",
+      "testId": "zoom-label-out",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4745"
+    },
+    {
+      "name": "preset-25",
+      "testId": "zoom-preset-25",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4734"
+    },
+    {
+      "name": "preset-50",
+      "testId": "zoom-preset-50",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4735"
+    },
+    {
+      "name": "preset-75",
+      "testId": "zoom-preset-75",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4736"
+    },
+    {
+      "name": "preset-100",
+      "testId": "zoom-preset-100",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4738"
+    },
+    {
+      "name": "preset-150",
+      "testId": "zoom-preset-150",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4739"
+    },
+    {
+      "name": "preset-200",
+      "testId": "zoom-preset-200",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4740"
+    },
+    {
+      "name": "preset-400",
+      "testId": "zoom-preset-400",
+      "spec": "canvas-zoom-levels",
+      "nodeId": "817:4742"
+    },
+    {
+      "name": "sep-top",
+      "testId": "zoom-sep-top"
+    },
+    {
+      "name": "sep-bottom",
+      "testId": "zoom-sep-bottom"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE: click the footer's `Desktop · 100%` readout, which is what the",
+    "board says opens the flyout. 36/36, 0 contrast failures.",
+    "",
+    "817:4723 IS A DOCUMENTATION BOARD, not a screen: a 900x480 sheet with a title,",
+    "a sentence, one mock of the flyout (817:4726) and five 580x68 explainer cards",
+    "for 10 / 50 / 100 / 200 / 400 percent. Only the flyout mock describes a thing",
+    "the product renders, so that is what this recipe joins; the cards are prose.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  row type      13px in `--flowbite/gray/700` (817:4727 and its ten siblings).",
+    "                The rows ran at `text-xs` (12) in `--bk-ink-soft` — a size",
+    "                small and a shade light on every label in the flyout.",
+    "  chord size    12px (817:4728). It was 11.",
+    "  preset align  LEFT (817:4734..4742). The seven presets were `justify-end`,",
+    "                putting the numbers on the opposite edge from the eleven",
+    "                labels above and below them — boards.json's",
+    "                \"presets right-aligned where the board left-aligns\".",
+    "  current preset  `--color/accent-tint` with an `--color/accent-text` label",
+    "                (817:4737 / 4738). It was a grey `--bk-bg-subtle` plate, which",
+    "                on a list whose rows also grey on hover read as \"hovered\",",
+    "                not as \"this is where you are\" — boards.json's \"active preset",
+    "                grey vs board pale-blue\". 6.5:1, computed.",
+    "  separators    `--color/bg-subtle` (817:4731 / 4741), not `--bk-gray-200`.",
+    "",
+    "NOT CONFORMED — the chord COLOUR. 817:4728 / 4730 / 4733 / 4744 / 4746 all",
+    "name `--color/ink-placeholder` #9ca3af, which measures 2.54:1 on the flyout's",
+    "white. A keyboard chord is information, not decoration, and a board cannot",
+    "authorise a contrast failure. The SIZE is the board's; the colour stays",
+    "`--bk-ink-muted` (4.83:1). Because size and colour live on one node, those",
+    "five nodes are not joined at all.",
+    "",
+    "NOT JOINED:",
+    "  817:4726  the flyout frame — `w-[220px]` and `h-[344px]` are the MOCK's,",
+    "            not the control's. Live it is `min-w-[196px]` and its height is",
+    "            twelve rows plus two rules; the board's 344 does not match its own",
+    "            twelve rows at 26 either. Its white fill, `--color/border` edge",
+    "            and radius 8 come from POPOVER_BASE_CLASS, a shared primitive",
+    "            measured on other boards.",
+    "  817:4737  the current-preset highlight is a 26-tall RECTANGLE behind a row",
+    "            that is 28 live and on the board. Figma draws the highlight as its",
+    "            own layer; the DOM paints it on the row. The fill and the label",
+    "            colour ARE joined through 817:4738.",
+    "  817:4731 / 4741  the separators' `w-[196px]`. Their fill is conformed; the",
+    "            width is the mock's inner measure.",
+    "",
+    "boards.json's \"all 5 chords correct\" re-confirmed: the flyout prints ⌘1, ⌘2,",
+    "⌘0, ⌘+, ⌘− and CanvasFooterToolbar binds all five.",
+    "",
+    "SAMPLE DATA: the board draws seven presets (25..400); the code ships eight —",
+    "10% as well, which the board's own description (\"Range: 10%-400%\") and its",
+    "`10% · Min zoom` explainer card both require. The seven the board draws are",
+    "joined; 10% is left uncovered rather than called drift."
+  ]
+}

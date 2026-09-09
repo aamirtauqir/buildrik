@@ -1,0 +1,821 @@
+{
+  "surface": "s3-flows-media-optimizing",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "303:2032",
+  "boardName": "s3-flows-media-optimizing",
+  "figmaHash": "8cd3d53a73aaa3e00962119a50abb24a3b9b9ca6dc012d6d9d20d060422f1a2b",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:51:19.668Z",
+  "copy": [
+    "Media",
+    "Search",
+    "📁 All ▾",
+    "⊞ ⊟ ↑",
+    "image",
+    "128",
+    "video",
+    "svg",
+    "24",
+    "icon",
+    "370",
+    "hero-dark.jpg",
+    "STOCK",
+    "menu-01.jpg",
+    "pasta.jpg",
+    "AI",
+    "team.jpg",
+    "↑ Upload",
+    "☁ Stock",
+    "Optimizing → WebP…"
+  ],
+  "targets": [
+    {
+      "nodeId": "303:2032",
+      "name": "S3.6 · media · optimizing",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2033",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2033;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2034",
+      "name": "Search",
+      "className": "border border-[var(--color\\/border,#e5e7eb)] border-solid h-[36px] overflow-clip relative rounded-[6px] shrink-0 w-full",
+      "props": {
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2035",
+      "name": "search box",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/50,#f9fafb)] border border-[var(--color\\/border,#e5e7eb)] border-solid h-[28px] left-[15px] overflow-clip rounded-[6px] top-[3px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/50",
+          "value": "#f9fafb"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2036",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[9px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[4px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2037",
+      "name": "Folder row",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[32px] not-italic overflow-clip relative shrink-0 text-left w-full whitespace-pre",
+      "props": {
+        "height": {
+          "value": "32px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2038",
+      "name": null,
+      "className": "absolute leading-[20px] left-[16px] text-[13px] text-[color:var(--color\\/ink,#111827)] top-[7px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2039",
+      "name": null,
+      "className": "absolute leading-[18px] left-[196px] text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] top-[8px] tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2040",
+      "name": "Type pills",
+      "className": "[word-break:break-word] content-start flex flex-wrap gap-[8px] items-start leading-[16px] overflow-clip px-[16px] py-[4px] relative shrink-0 text-[11px] text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2041",
+      "name": "pill/image",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2042",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2043",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2044",
+      "name": "pill/video",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2045",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2046",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2047",
+      "name": "pill/svg",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2048",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2049",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2050",
+      "name": "pill/icon",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[4px] items-start overflow-clip px-[8px] py-[3px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "4px"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "3px"
+        },
+        "padding-bottom": {
+          "value": "3px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2051",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal not-italic relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2052",
+      "name": null,
+      "className": "font-['Geist_Mono:Medium'] font-medium relative shrink-0 text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2053",
+      "name": "Asset grid",
+      "className": "content-stretch flex flex-col gap-[16px] items-start overflow-clip px-[16px] py-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2054",
+      "name": "grid row",
+      "className": "content-stretch flex gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2055",
+      "name": "Card / media",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[4px] h-[104px] items-start min-w-px relative",
+      "props": {
+        "gap": {
+          "value": "4px"
+        },
+        "height": {
+          "value": "104px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2055;17:7",
+      "name": "thumb/site-preview (empty until first publish)",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[var(--radius\\/sm,4px)] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "token": "--radius/sm",
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2055;17:8",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[18px] leading-[18px] min-w-full not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-ellipsis text-left w-[min-content] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "18px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "min-content"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2055;218:6",
+      "name": "badge",
+      "className": "absolute bg-[var(--color\\/ink,#111827)] h-[14px] left-[6px] overflow-clip rounded-[6px] top-[56px] w-[52px]",
+      "props": {
+        "background-color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "14px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "52px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2055;218:7",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[5px] not-italic text-[11px] text-[color:var(--color\\/bg-card,white)] text-left top-0 tracking-[0.5px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2056",
+      "name": "Card / media",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[4px] h-[104px] items-start min-w-px relative",
+      "props": {
+        "gap": {
+          "value": "4px"
+        },
+        "height": {
+          "value": "104px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2056;17:7",
+      "name": "thumb/site-preview (empty until first publish)",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[var(--radius\\/sm,4px)] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "token": "--radius/sm",
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2056;17:8",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[18px] leading-[18px] min-w-full not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-ellipsis text-left w-[min-content] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "18px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "min-content"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2057",
+      "name": "grid row",
+      "className": "content-stretch flex gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2058",
+      "name": "Card / media",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[4px] h-[104px] items-start min-w-px relative",
+      "props": {
+        "gap": {
+          "value": "4px"
+        },
+        "height": {
+          "value": "104px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2058;17:7",
+      "name": "thumb/site-preview (empty until first publish)",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[var(--radius\\/sm,4px)] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "token": "--radius/sm",
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2058;17:8",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[18px] leading-[18px] min-w-full not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-ellipsis text-left w-[min-content] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "18px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "min-content"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2058;218:6",
+      "name": "badge",
+      "className": "absolute bg-[var(--color\\/ink,#111827)] h-[14px] left-[6px] overflow-clip rounded-[6px] top-[56px] w-[52px]",
+      "props": {
+        "background-color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "14px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "52px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2058;218:7",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[5px] not-italic text-[11px] text-[color:var(--color\\/bg-card,white)] text-left top-0 tracking-[0.5px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2059",
+      "name": "Card / media",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[4px] h-[104px] items-start min-w-px relative",
+      "props": {
+        "gap": {
+          "value": "4px"
+        },
+        "height": {
+          "value": "104px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2059;17:7",
+      "name": "thumb/site-preview (empty until first publish)",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[var(--radius\\/sm,4px)] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "token": "--radius/sm",
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "I303:2059;17:8",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[18px] leading-[18px] min-w-full not-italic overflow-hidden relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] text-ellipsis text-left w-[min-content] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "18px"
+        },
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "min-content"
+        }
+      }
+    },
+    {
+      "nodeId": "303:2061",
+      "name": "Footer",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left w-full whitespace-pre",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "333:2342",
+      "name": "Badge",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/200,#e5e7eb)] border border-[var(--flowbite\\/gray\\/400,#9ca3af)] border-solid content-stretch flex items-center left-[15px] px-[10px] py-[2px] rounded-[9999px] top-[63px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/200",
+          "value": "#e5e7eb"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/400",
+          "value": "#9ca3af"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "2px"
+        },
+        "padding-bottom": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "I333:2342;12:7",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[16px] not-italic relative shrink-0 text-[12px] text-[color:var(--flowbite\\/gray\\/700,#374151)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    }
+  ]
+}

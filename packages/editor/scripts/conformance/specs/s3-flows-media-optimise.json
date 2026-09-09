@@ -1,0 +1,503 @@
+{
+  "surface": "s3-flows-media-optimise",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1124:4562",
+  "boardName": "s3-flows-media-optimise",
+  "figmaHash": "16d166b4a7d832db04c923dc97a627d6596394515fadefad042d6e6d4999a41f",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T05:29:28.211Z",
+  "copy": [
+    "Media",
+    "‹ hero-dark.jpg · optimise",
+    "2400×1600 · 840 KB",
+    "Format",
+    "WebP",
+    "JPEG",
+    "PNG",
+    "Quality",
+    "85",
+    "Original",
+    "840 KB",
+    "Optimised",
+    "312 KB · −63%",
+    "Optimise",
+    "Optimised copy saves as a new version."
+  ],
+  "targets": [
+    {
+      "nodeId": "1124:4562",
+      "name": "S3.6 · media · optimise (drill-in)",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4563",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[15px] not-italic text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] top-[13px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4564",
+      "name": "Rectangle",
+      "className": "absolute border border-[var(--flowbite\\/gray\\/500,#6b7280)] border-solid left-[231px] size-[16px] top-[13px]",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/gray/500",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4565",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[255px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4566",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] top-[51px] w-[119px] whitespace-pre-wrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        },
+        "width": {
+          "value": "119px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4567",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[160px] left-[-1px] top-[79px] w-[280px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "160px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4568",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[normal] left-[15px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[215px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4569",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[253px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4570",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/bg-selected,#ebf5ff)] h-[24px] left-[15px] rounded-[9999px] top-[273px] w-[52px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-selected",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        },
+        "width": {
+          "value": "52px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4571",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[27px] not-italic text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] top-[277px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4572",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[24px] left-[75px] rounded-[9999px] top-[273px] w-[52px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        },
+        "width": {
+          "value": "52px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4573",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[87px] not-italic text-[12px] text-[color:var(--color\\/ink,#111827)] top-[277px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4574",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[24px] left-[135px] rounded-[9999px] top-[273px] w-[5px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "24px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        },
+        "width": {
+          "value": "5px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4575",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[147px] not-italic text-[12px] text-[color:var(--color\\/ink,#111827)] top-[277px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4576",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[313px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4577",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[normal] left-[247px] text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] top-[313px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4578",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[4px] left-[15px] rounded-[2px] top-[335px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4579",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] h-[4px] left-[15px] rounded-[2px] top-[335px] w-[204px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "4px"
+        },
+        "border-radius": {
+          "value": "2px"
+        },
+        "width": {
+          "value": "204px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4580",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border-strong,#9ca3af)] border-solid left-[213px] rounded-[9999px] size-[14px] top-[329px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-strong",
+          "value": "#9ca3af"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4581",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] top-[367px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4582",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[normal] left-[203px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[367px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4583",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] top-[395px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4584",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[normal] left-[159px] text-[11px] text-[color:var(--color\\/success-text,#057a55)] top-[395px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/success-text",
+          "value": "#057a55"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4585",
+      "name": "Rectangle",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] h-[36px] left-[15px] rounded-[4px] top-[431px] w-[248px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "36px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4586",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[133px] not-italic text-[13px] text-[color:var(--color\\/ink-inverse,white)] top-[441px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "1124:4587",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[15px] not-italic text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[481px] w-[187px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "187px"
+        }
+      }
+    },
+    {
+      "nodeId": "1682:7221",
+      "name": "hotspot/back · Media · drill-in (‹ back)",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-[-1px] opacity-0 top-[773px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

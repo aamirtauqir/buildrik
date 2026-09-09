@@ -1,0 +1,71 @@
+{
+ "surface": "modal-success-then-close",
+ "board": "Modal · success-then-close (Figma 183:60)",
+ "_note": [
+  "boards.json recorded `partial-save-closes-modal-success-toast`: the state",
+  "did not exist. PagesTab's bulk confirm dropped the dialog on the same tick",
+  "it deleted, and the only report left was whatever toast `deletePage`",
+  "happened to raise per page — a message from another surface about a",
+  "different unit of work (three toasts for one decision). ConfirmDialog now",
+  "takes `success`, holds the dialog for 1.4s on this card, and closes itself.",
+  "",
+  "Measured against the PROBE. 1.4s is by design too short to click into and",
+  "far too short to drive a measurement through; the probe passes a no-op",
+  "onClose so the dialog's own timer fires into nothing and the card holds",
+  "still. Everything up to that point is the real component on the real",
+  "branch — the recipe clicks the confirm button rather than a fixture",
+  "pre-setting the state.",
+  "",
+  "NOT anchored, and why:",
+  "  183:62 modal/440 — width 440, radius 12 and the white fill all come from",
+  "  `kind=\"question\"` and DO match. Its 240 height does not, and is not",
+  "  adopted: the board's own last element ends at y168, so 72 of that is",
+  "  empty frame, and Modal sizes to content by contract (KIND_WIDTH_CLASS",
+  "  sets width only). Pinning 240 would clip the card the day a delete count",
+  "  wraps the message line.",
+  "  183:63/183:64 Title — 56 tall at 16/24 on the board; the shared modal",
+  "  head is 45 at 14px, measured across six boards (Modal.tsx's own note:",
+  "  1164:4713, 1175:4827, 1205:4804, 1170:4713/4749, 1172:4840, 184:24).",
+  "  A screen board does not move a primitive six boards agree on.",
+  "  183:65 the ✕ — the question Modal has no close glyph at all (its exits",
+  "  are Cancel, Escape and the scrim). Adding one to the SUCCESS state alone",
+  "  would be a control that appears only after the decision is made.",
+  "  183:61 scrim — the board exports it as opaque gray-900 because Figma",
+  "  bakes layer opacity out of the generated class. The real scrim is",
+  "  `--bk-alpha-ink-40` over the app, which is what every other overlay in",
+  "  the editor uses.",
+  "CONTRAST SCOPE CORRECTED 2026-09-08: was \"[data-testid=\\\"modal-success\\\"]\", which resolved to a subtree holding none of the text under test — ModalRoot PORTALS to the overlay root, so a probe-, scrim- or panel-scoped selector contains no part of the dialog. It reported 0 contrast failures from an empty sweep, which is indistinguishable from a clean screen. `body` is the honest scope for a portalled subject: it covers the dialog and the shell behind it, which is what a person sees. measure.mjs now exits 3 on an empty sweep rather than banking the zero."
+ ],
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=modal-success-then-close",
+ "viewport": {
+  "width": 1440,
+  "height": 900
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "confirm-success-closing"
+  }
+ ],
+ "contrastScope": "body",
+ "targets": [
+  {
+   "name": "success-mark",
+   "testId": "confirm-success-mark",
+   "spec": "modal-success-then-close",
+   "nodeId": "183:67"
+  },
+  {
+   "name": "success-message",
+   "testId": "confirm-success-message",
+   "spec": "modal-success-then-close",
+   "nodeId": "183:68"
+  },
+  {
+   "name": "success-closing",
+   "testId": "confirm-success-closing",
+   "spec": "modal-success-then-close",
+   "nodeId": "183:69"
+  }
+ ]
+}

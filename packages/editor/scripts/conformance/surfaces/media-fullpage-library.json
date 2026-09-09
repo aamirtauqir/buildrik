@@ -1,0 +1,304 @@
+{
+  "surface": "media-fullpage-library",
+  "board": "Media · fullpage · library (Figma 1159:4593)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-fullpage-library",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "mgr-asset-mg0"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "PROBE, AND THE REASON IS NOT CONVENIENCE. The fullpage manager reads a",
+    "library out of IndexedDB; a fresh demo project has none, so every one of",
+    "the five fullpage boards measured in the running app would be measured",
+    "against the EMPTY state — which is 1162:4617, a different board. The host",
+    "is 1380 x 844, the board's own middle band (1440 less the 60 rail, 900",
+    "less the 56 topbar); measuring at the raw viewport would compare a",
+    "1440-wide manager against a board that draws 1380. LibraryManager mounts",
+    "exactly as it ships — useMediaState and all four sub-hooks run, FolderTree",
+    "/ AssetGrid / AssetDetailsPanel are the real components — and the fixture",
+    "answers only the composer.media calls those hooks make. The wait names an",
+    "ASSET CARD, so an empty library cannot pass as this board.",
+    "",
+    "BOARD WON — the chassis first, and it was wrong by construction:",
+    "  1159:4641  the middle band is 760, and 52 + 760 + 32 is the board's 844.",
+    "             `.mgr`'s grid template said 56 / 1fr / 36 while `.mgr-top`",
+    "             and `.mgr-status` set 52 and 32 on THEMSELVES, so the body",
+    "             was 752 and eight pixels went to two rows taller than their",
+    "             own contents. Nothing could see it: each row looked right.",
+    "  1159:4642  the folder rail is inset 12 on three sides with a 2 gap. Its",
+    "             horizontal inset was 0 and `.mgr-tree` carried an 8 of its",
+    "             own, so the rows ran nearly to the rail's edge.",
+    "  1159:4643  the grid column is inset 16 with a 12 top and a 12 between",
+    "             blocks; the toolbar and the grid each carried a 20 of their",
+    "             own instead, and the toolbar drew a rule the board does not.",
+    "  1159:4645  the status bar sits on --color/bg-subtle with an 8 gap. It",
+    "             was white with 16, so the band that separates the manager",
+    "             from the page read as more panel.",
+    "",
+    "BOARD WON — the rail's INFORMATION ARCHITECTURE, which the",
+    "media-new-folder-inline note deferred to 'whoever owns the fullpage",
+    "boards'. 1160:16 / 1160:27 / 1160:43 name three groups — SMART, FOLDERS,",
+    "TAGS — separated by 10-high gaps (1160:26 / 1160:42), with Trash at the",
+    "foot. It shipped as a single 'Folders' head over four hairline-separated",
+    "blocks: the rail was named after one of its own groups and the smart",
+    "folders had no name at all. And 1160:44 draws tags as a wrapped row of",
+    "full-radius PILLS, not as a fourth column of rows with counts — a tag is a",
+    "filter you scan sideways, and giving it a folder's row shape said it was a",
+    "place. `libraryItems` was FolderTree's only remaining use for the tag",
+    "counts and is gone from its props with them.",
+    "",
+    "BOARD WON — the card grid. 1161:51 draws five 144-wide cards on a 12",
+    "gutter and leaves the slack; the grid's tracks were `minmax(144px, 1fr)`,",
+    "which stretched every card to 148, so no card in the product has ever been",
+    "the width the board specifies. 1161:52 makes the card a borderless 8-radius",
+    "stack on a 6 gap and 1161:53 puts the SELECTION RING on the thumb — the",
+    "card's own 1px border was also what made every thumb 142 inside a 144",
+    "track. Thumb 120 -> 100 (1161:53), name 11 -> 10 (1161:54), usage line 11",
+    "-> 9 (1161:57), format chips and column chips 8/11 -> 6/9 and 6/10",
+    "(1174:4868 / 1174:4877), sort radius 4 -> 6 and 12 -> 11 (1161:49).",
+    "",
+    "A BORDER COLOUR THAT COULD NOT BE COMPARED, now it can. `.mgr-top`,",
+    "`.mgr-left` and `.mgr-status` each drew ONE edge, which leaves the other",
+    "three `border-color`s at `currentColor` — so the computed shorthand is",
+    "four different values and the board's single colour cannot be matched",
+    "against it at all (the media-new-folder-inline note records giving up on",
+    "exactly this). Declaring `border: 0 solid var(--bk-border)` and then one",
+    "edge's width renders identically and makes the fact measurable.",
+    "",
+    "CONTRAST — one fixed, three declined. FIXED: the status bar's",
+    "'N not on the server' pill was --bk-warning on --bk-warning-tint at",
+    "3.51:1; it is --bk-warning-text now (9.9:1), the same swap board 807:8521",
+    "forced on the inspector's MARGIN tag. DECLINED: 1160:16 / 1160:27 /",
+    "1160:43 name --color/ink-muted for the three rail captions, which measures",
+    "4.39:1 on this rail's own --color/bg-subtle ground. Seven instances of",
+    "that exact pair were fixed here on 2026-09-08 against board 1205:4829;",
+    "re-introducing three would be conforming a defect. The captions keep",
+    "--bk-ink-soft (7.0:1) and their nodes are NOT joined, so the deviation is",
+    "declared rather than hidden.",
+    "",
+    "NOT JOINED — 1159:4644, the details rail. The board draws a flat 14-inset",
+    "column: 160 preview, filename, dimensions, an alt-text box, two version",
+    "rows, a used-in line and five action buttons. AssetDetailsPanel is a",
+    "bordered head over a preview over a Details/Versions/Used-in TAB BAR. That",
+    "is a rebuild of a 450-line component, not a restyle, and its own 320 width",
+    "and 760 height ARE right; joining the node would only report a padding",
+    "difference that is downstream of a structure this pass is not changing.",
+    "1161:123-155 (its children) go with it.",
+    "",
+    "ALSO NOT JOINED: the topbar (1159:4594) and the rail (2034:8392) — other",
+    "surfaces own those, and this probe does not mount them. 2865:21954 /",
+    "2865:21966 / 2865:21888 / 1165:4719 are hotspots. 1160:6 (the manager's",
+    "search) is a chrome-ui TextInput, boards.json authority=open:input-fill.",
+    "",
+    "NOT JOINED, three more and each for its own reason:",
+    "  1160:26  the rail's group gap, w-216. The rail is 240 with a 1px right",
+    "           edge, so its content box is 215: Figma strokes do not consume",
+    "           layout and CSS borders do, which the media-no-results note",
+    "           records as the same arithmetic. Its HEIGHT (10) is what the gap",
+    "           is for and is built.",
+    "  1160:44  the tags row, whose only fills are gap 6 and a #ffffff",
+    "           background. The row sits on the rail's --color/bg-subtle in the",
+    "           board's own render; a white strip behind three pills on a grey",
+    "           rail is Figma's default frame fill, not a design. Its gap and",
+    "           its pills (1160:45) are conformed; 1160:45 IS joined.",
+    "  1161:53  the FIRST card's thumb, which the board draws selected (accent",
+    "           border). Nothing is selected in this state, so the second card's",
+    "           thumb (1161:59) is joined instead — identical but for the ring.",
+    "",
+    "TWO HARNESS CHANGES CAME OUT OF THIS SURFACE, both widenings rather than",
+    "loosenings. (1) `parse()` in measure.mjs read only rgb()/rgba(), so every",
+    "Tailwind opacity-modifier fill — which v4 emits as `oklab(... / 0.6)` — was",
+    "read as NO FILL and composited past; it fabricated eight white-on-white",
+    "failures on the media picker and would have hidden a real one anywhere",
+    "else. It rasterises through a 1x1 canvas now. (2) `PILL` in lib.mjs folded",
+    "at 9999, and boards in this file author the same intent as 999 — 1160:58's",
+    "quota track is 5px tall on a 999 radius, which is a pill by any reading —",
+    "so a pixel-identical shape reported a 9000px difference. The fold starts at",
+    "999; nothing in this system asks for a literal radius in between.",
+    "",
+    "CONTRAST STILL OPEN AND DECLARED — `.mgr-kind`, the ▶/◆/Aa file-kind badge",
+    "on a thumb, at 3.99:1. Board 1161:66 pins it: white on --color/bg-overlay",
+    "rgba(17,24,39,0.5). The ratio is a function of what is BEHIND the scrim, and",
+    "the fixture's thumb is a light grey placeholder — over a dark photograph the",
+    "same badge passes comfortably. Fixing it means a scrim darker than the token",
+    "the board names, which is a founder call, so it is baselined with the pair",
+    "recorded rather than silently."
+  ],
+  "targets": [
+    {
+      "name": "mgr",
+      "testId": "mgr-root",
+      "spec": "media-fullpage-library",
+      "nodeId": "1159:4639"
+    },
+    {
+      "name": "mgr-top",
+      "testId": "mgr-top",
+      "spec": "media-fullpage-library",
+      "nodeId": "1159:4640"
+    },
+    {
+      "name": "mgr-body",
+      "testId": "mgr-body",
+      "spec": "media-fullpage-library",
+      "nodeId": "1159:4641"
+    },
+    {
+      "name": "col-folders",
+      "testId": "mgr-folders",
+      "spec": "media-fullpage-library",
+      "nodeId": "1159:4642"
+    },
+    {
+      "name": "col-grid",
+      "testId": "mgr-grid-col",
+      "spec": "media-fullpage-library",
+      "nodeId": "1159:4643"
+    },
+    {
+      "name": "status",
+      "testId": "mgr-status",
+      "spec": "media-fullpage-library",
+      "nodeId": "1159:4645"
+    },
+    {
+      "name": "row-recent",
+      "testId": "mgr-row-recent",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:17"
+    },
+    {
+      "name": "row-all-assets",
+      "testId": "mgr-row-all-assets",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:28"
+    },
+    {
+      "name": "row-folder-1",
+      "testId": "mgr-row-folder-f1",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:31"
+    },
+    {
+      "name": "row-new-folder",
+      "testId": "mgr-new-folder-open",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:40"
+    },
+    {
+      "name": "tag-menu",
+      "testId": "mgr-tag-menu",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:45"
+    },
+    {
+      "name": "row-trash",
+      "testId": "mgr-row-trash",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:52"
+    },
+    {
+      "name": "toolbar",
+      "testId": "mgr-subbar",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:35"
+    },
+    {
+      "name": "count",
+      "testId": "mgr-count",
+      "spec": "media-fullpage-library",
+      "nodeId": "1174:4866"
+    },
+    {
+      "name": "fmt-strip",
+      "testId": "mgr-fmt-strip",
+      "spec": "media-fullpage-library",
+      "nodeId": "1174:4867"
+    },
+    {
+      "name": "fmt-jpg",
+      "testId": "mgr-fmt-jpg",
+      "spec": "media-fullpage-library",
+      "nodeId": "1174:4868"
+    },
+    {
+      "name": "gridn",
+      "testId": "mgr-gridn",
+      "spec": "media-fullpage-library",
+      "nodeId": "1174:4876"
+    },
+    {
+      "name": "gridn-2",
+      "testId": "mgr-gridn-2",
+      "spec": "media-fullpage-library",
+      "nodeId": "1174:4877"
+    },
+    {
+      "name": "gridn-3",
+      "testId": "mgr-gridn-3",
+      "spec": "media-fullpage-library",
+      "nodeId": "1174:4879"
+    },
+    {
+      "name": "sort",
+      "testId": "mgr-sort",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:49"
+    },
+    {
+      "name": "grid",
+      "testId": "mgr-assets",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:51"
+    },
+    {
+      "name": "card",
+      "testId": "mgr-asset-mg1",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:58"
+    },
+    {
+      "name": "card-thumb",
+      "testId": "mgr-thumb-mg1",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:59"
+    },
+    {
+      "name": "card-name",
+      "testId": "mgr-name-mg1",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:60"
+    },
+    {
+      "name": "card-meta",
+      "testId": "mgr-meta-mg1",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:61"
+    },
+    {
+      "name": "card-use",
+      "testId": "mgr-use-mg1",
+      "spec": "media-fullpage-library",
+      "nodeId": "1161:63"
+    },
+    {
+      "name": "quota-bar",
+      "testId": "mgr-quota-bar",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:58"
+    },
+    {
+      "name": "quota-fill",
+      "testId": "mgr-quota-fill",
+      "spec": "media-fullpage-library",
+      "nodeId": "1160:59"
+    }
+  ]
+}

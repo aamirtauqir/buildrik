@@ -1,0 +1,218 @@
+{
+  "surface": "brand-review-changes",
+  "board": "Brand · review-changes (modal) (Figma 1172:4840)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-starters"
+    },
+    {
+      "action": "waitFor",
+      "testId": "starter-grid"
+    },
+    {
+      "action": "click",
+      "testId": "starter-card-stripe-blue"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-save-bar-save"
+    },
+    {
+      "action": "click",
+      "testId": "brand-save-bar-save"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-review-modal"
+    }
+  ],
+  "contrastScope": "body",
+  "targets": [
+    {
+      "name": "modal",
+      "testId": "brand-review-modal"
+    },
+    {
+      "name": "body",
+      "testId": "brand-review-body"
+    },
+    {
+      "name": "title",
+      "testId": "brand-review-title"
+    },
+    {
+      "name": "row-primary",
+      "testId": "brand-review-row-color-primary",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4842"
+    },
+    {
+      "name": "row-primary-name",
+      "testId": "brand-review-name-color-primary",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4843"
+    },
+    {
+      "name": "row-primary-was",
+      "testId": "brand-review-was-color-primary"
+    },
+    {
+      "name": "row-secondary",
+      "testId": "brand-review-row-color-secondary",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4846"
+    },
+    {
+      "name": "row-secondary-name",
+      "testId": "brand-review-name-color-secondary",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4847"
+    },
+    {
+      "name": "row-secondary-was",
+      "testId": "brand-review-was-color-secondary"
+    },
+    {
+      "name": "row-accent",
+      "testId": "brand-review-row-color-accent",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4850"
+    },
+    {
+      "name": "row-accent-name",
+      "testId": "brand-review-name-color-accent",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4851"
+    },
+    {
+      "name": "row-accent-was",
+      "testId": "brand-review-was-color-accent"
+    },
+    {
+      "name": "consequence",
+      "testId": "brand-review-consequence",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4858"
+    },
+    {
+      "name": "foot",
+      "testId": "brand-review-foot",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4865"
+    },
+    {
+      "name": "btn-discard",
+      "testId": "brand-review-discard",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4859"
+    },
+    {
+      "name": "btn-keep",
+      "testId": "brand-review-keep",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4861"
+    },
+    {
+      "name": "btn-apply",
+      "testId": "brand-review-apply",
+      "spec": "brand-review-changes",
+      "nodeId": "1172:4863"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE, and the modal is REACHED the way a user reaches it: rail ->",
+    "`b` -> Starters -> apply `Stripe Blue` -> the footer's own Save. Nothing is",
+    "probed and no state is faked; the nine diff rows are the starter's nine colour",
+    "tokens as the registry staged them.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  title        16px (1172:4841). It shipped at 13 — the same size as the row",
+    "               labels under it — so the dialog had no heading, only a first",
+    "               line. See the finding below about WHY 13 never even applied.",
+    "  diff row     `--color/bg-subtle` on a 10px gap and a 10/6 inset, radius 6",
+    "               (1172:4842). It sat on `--bk-gray-50`, a step lighter, which on",
+    "               a white dialog left the rows with almost no plate; and the",
+    "               colour rows added `py-2` on top of the shared row class, so the",
+    "               three colour rows were 4px taller than the type and spacing",
+    "               rows they sit above.",
+    "  row name     11/16 (1172:4843).",
+    "  consequence  11/16 (1172:4858).",
+    "  all three buttons  12/7 inset, radius 6, 13px labels (1172:4859..4864);",
+    "               `Discard all` white on a `--color/error` edge, `Keep editing`",
+    "               white on `--color/border`, `Apply N changes` filled",
+    "               `--color/accent`. All three were pinned to `h-7` with 11px",
+    "               labels — the PANEL's row size applied to a dialog's actions,",
+    "               which is where boards.json's \"buttons 32h vs 27\" came from.",
+    "               boards.json's other half, \"360w vs board 520\", is already",
+    "               fixed: ModalContent's `md` is `w-[520px]` and cites this board.",
+    "",
+    "CONTRAST — CONFORMING THE FILL INTRODUCED EIGHTEEN FAILURES AND THEY WERE NOT",
+    "BASELINED. Moving the row from `--bk-gray-50` to the board's",
+    "`--color/bg-subtle` dropped `--bk-ink-muted` from 4.66:1 to 4.39:1, under the",
+    "AA floor, on both the struck-through old value and the `->` between the two —",
+    "nine rows x two nodes = 18, every one of them reported by measure.mjs the",
+    "moment the fill landed. The fill is the board's and stays; the TEXT moves to",
+    "`--bk-ink-soft` (6.5:1), which is the substitution DesignTabFooter and the",
+    "Beginner note already document for this exact pair, and the systemic defect",
+    "recorded in docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md. That means",
+    "1172:4845 / 4849 / 4853 are NOT joined: the board names ink-muted there and a",
+    "board cannot authorise a contrast failure.",
+    "",
+    "FOUND AND FIXED, worth carrying to whoever owns chrome-ui: a caller CANNOT set",
+    "a ModalTitle's font size through `className`. `MODAL_TITLE_CLASS` is",
+    "`text-[length:var(--bk-text-14)]`, the caller's is a second arbitrary",
+    "font-size utility on a plain <h2>, and two classes on one property resolve by",
+    "STYLESHEET order — so this file's `tw:text-[13px]` had no effect and the",
+    "heading measured 14 the whole time it claimed 13. The size now lives on a span",
+    "inside the heading, which is also what the recipe anchors. ModalTitle already",
+    "carries an `inset` escape hatch for the identical problem on padding; a `size`",
+    "prop would close the other half.",
+    "",
+    "NOT JOINED:",
+    "  1172:4840  the dialog frame. Its `--color/bg-elevated` fill,",
+    "             `--color/border` edge and radius 12 belong to `ModalContent`, a",
+    "             shared primitive measured against a dozen other boards, and its",
+    "             `px-16 / py-14 / gap-10` describe the padded BODY, which is a",
+    "             different element in the DOM. The body's inset is conformed to",
+    "             16/14 anyway; only the join is dropped.",
+    "  1172:4841  `width: 340` — a fixed-width Figma text frame over a ~180px",
+    "             heading in a 520 dialog. Export noise (brief, §Figma frame",
+    "             artifacts). Its 16px size and normal leading ARE conformed.",
+    "",
+    "NOT CONFORMED — 1172:4854..4857, the `shadow/raised · removed` row, and the",
+    "board says why itself: its Figma name is `[not-implemented] shadow/raised ·",
+    "removed — ReviewModal's two filters iterate the CURRENT tokens",
+    "(ReviewModal.tsx:84-92), so a DELETED token can never appear in the review`.",
+    "The title's `· 1 not supported` suffix belongs to the same unbuilt state.",
+    "The board's own frame name also records the wider limit: only colour, type and",
+    "spacing of fourteen token kinds reach this review at all.",
+    "",
+    "FOUND, NOT FIXED — the board draws no section headings, and the code renders",
+    "`COLOR CHANGES` / `TYPOGRAPHY CHANGES` / `SPACING CHANGES` caps rows between",
+    "the groups. With nine colour rows staged they are the only thing telling the",
+    "three groups apart, so deleting them on a board that only ever shows three",
+    "rows would cost more than it conforms."
+  ]
+}

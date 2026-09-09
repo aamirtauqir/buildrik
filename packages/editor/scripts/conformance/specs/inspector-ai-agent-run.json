@@ -1,0 +1,170 @@
+{
+  "surface": "inspector-ai-agent-run",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "160:512",
+  "boardName": "inspector-ai-agent-run",
+  "figmaHash": "38ca7f48017e3051f8758faabe2d380a7ac33976c6e5da898b83fa84853b32f4",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:24:30.833Z",
+  "copy": [
+    "‹ Inspector",
+    "AI",
+    "Rewriting 3 headings…",
+    "Your selection is kept and restored when you go back."
+  ],
+  "targets": [
+    {
+      "nodeId": "160:512",
+      "name": "[unreachable] Inspector · ai-agent-run — entering the AI tab clears the selection, so the takeover (ProInspector.tsx:510-517) is never reached with an element selected",
+      "className": "bg-[var(--color\\/bg-card,white)] content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "160:513",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "160:514",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "160:515",
+      "name": "AI header",
+      "className": "h-[44px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "160:516",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[20px] left-[16px] not-italic text-[14px] text-[color:var(--color\\/ink,#111827)] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "160:517",
+      "name": "Run",
+      "className": "bg-[var(--color\\/accent-tint,#ebf5ff)] h-[80px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "80px"
+        }
+      }
+    },
+    {
+      "nodeId": "160:518",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[18px] left-[16px] not-italic text-[12px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[12px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "160:519",
+      "name": "track",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[6px] left-[16px] overflow-clip rounded-[4px] top-[38px] w-[268px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "268px"
+        }
+      }
+    },
+    {
+      "nodeId": "160:520",
+      "name": "fill",
+      "className": "absolute bg-[var(--color\\/accent,#1a56db)] h-[6px] left-0 rounded-[4px] top-0 w-[160px]",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "6px"
+        },
+        "border-radius": {
+          "value": "4px"
+        },
+        "width": {
+          "value": "160px"
+        }
+      }
+    },
+    {
+      "nodeId": "160:521",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[16px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[54px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    }
+  ]
+}

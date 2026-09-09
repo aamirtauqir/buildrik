@@ -1,0 +1,115 @@
+{
+  "surface": "media-loading",
+  "board": "Media · loading (Figma 777:4093)",
+  "_note": "Probe: the drawer reads storage once at mount, so the skeleton is on screen for a few frames in the live app and cannot be driven to. The waitFor is on `media-grid-skeleton`, which is the state itself — waiting on the panel would pass over an empty grid. NOT joined, and why: (1) 777:4139, the skeleton frame. It is 372 = 12 top + three 104 rows + two 16 gaps + 16 BOTTOM, where the asset grid it stands in for (144:26, and this board's own siblings) is 12/12 — 368. Two boards disagree about the same container, so neither settles it, and the shipped skeleton keeps the REAL grid's geometry, which is the only reason a skeleton is worth drawing: the layout must not jump when the assets land. (2) every full-bleed width on this board, including the sk/cell and sk/thumb at 116. Figma strokes do not consume layout space and CSS borders do, so the 1px --bk-gray-100 edge board 144:2 requires leaves every w-full child of this panel measuring 278 against the board's 280, and every fractional grid cell 115 against 116. That is the export model, not drift. The six label bars ARE joined: their widths are literal in both the board and the code (96, 72, 110, 84, 100, 66), so they measure the design rather than the frame.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-loading",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-grid-skeleton"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "media-panel",
+      "spec": "media-loading",
+      "nodeId": "777:4093"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-loading",
+      "nodeId": "777:4094"
+    },
+    {
+      "name": "search",
+      "testId": "media-search",
+      "spec": "media-loading",
+      "nodeId": "777:4095"
+    },
+    {
+      "name": "folder-row",
+      "testId": "media-folder-row",
+      "spec": "media-loading",
+      "nodeId": "777:4098"
+    },
+    {
+      "name": "type-chips",
+      "testId": "media-type-chips",
+      "spec": "media-loading",
+      "nodeId": "777:4101"
+    },
+    {
+      "name": "chip-image",
+      "testId": "media-type-chip-img",
+      "spec": "media-loading",
+      "nodeId": "777:4102"
+    },
+    {
+      "name": "chip-video",
+      "testId": "media-type-chip-vid",
+      "spec": "media-loading",
+      "nodeId": "777:4105"
+    },
+    {
+      "name": "chip-svg",
+      "testId": "media-type-chip-ico",
+      "spec": "media-loading",
+      "nodeId": "777:4108"
+    },
+    {
+      "name": "chip-icon",
+      "testId": "media-type-chip-fnt",
+      "spec": "media-loading",
+      "nodeId": "777:4111"
+    },
+    {
+      "name": "footer",
+      "testId": "media-footer",
+      "spec": "media-loading",
+      "nodeId": "777:4122"
+    },
+    {
+      "name": "skeleton-bar-0",
+      "testId": "media-skeleton-bar-0",
+      "spec": "media-loading",
+      "nodeId": "777:4142"
+    },
+    {
+      "name": "skeleton-bar-1",
+      "testId": "media-skeleton-bar-1",
+      "spec": "media-loading",
+      "nodeId": "777:4145"
+    },
+    {
+      "name": "skeleton-bar-2",
+      "testId": "media-skeleton-bar-2",
+      "spec": "media-loading",
+      "nodeId": "777:4148"
+    },
+    {
+      "name": "skeleton-bar-3",
+      "testId": "media-skeleton-bar-3",
+      "spec": "media-loading",
+      "nodeId": "777:4151"
+    },
+    {
+      "name": "skeleton-bar-4",
+      "testId": "media-skeleton-bar-4",
+      "spec": "media-loading",
+      "nodeId": "777:4154"
+    },
+    {
+      "name": "skeleton-bar-5",
+      "testId": "media-skeleton-bar-5",
+      "spec": "media-loading",
+      "nodeId": "777:4157"
+    }
+  ]
+}

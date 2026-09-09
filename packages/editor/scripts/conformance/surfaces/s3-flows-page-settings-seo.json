@@ -1,0 +1,166 @@
+{
+  "surface": "s3-flows-page-settings-seo",
+  "board": "S3.7 · page-settings · SEO (Figma 302:1978)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-settings-seo",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "pg-drawer-body"
+    }
+  ],
+  "contrastScope": "[data-testid=\"pg-drawer\"]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "pg-drawer",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1979"
+    },
+    {
+      "name": "hdr",
+      "testId": "pg-drawer-hdr",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1980"
+    },
+    {
+      "name": "title",
+      "testId": "pg-drawer-title",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1981"
+    },
+    {
+      "name": "tab-seo",
+      "testId": "pg-drawer-tabbtn-seo",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1983"
+    },
+    {
+      "name": "tab-social",
+      "testId": "pg-drawer-tabbtn-social",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1984"
+    },
+    {
+      "name": "tab-advanced",
+      "testId": "pg-drawer-tabbtn-advanced",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1985"
+    },
+    {
+      "name": "close",
+      "testId": "pg-drawer-close",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "2838:12107"
+    },
+    {
+      "name": "body",
+      "testId": "pg-drawer-body",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1986"
+    },
+    {
+      "name": "field-title",
+      "testId": "seo-field-title",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1991"
+    },
+    {
+      "name": "label-title",
+      "testId": "seo-label-title",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1992"
+    },
+    {
+      "name": "input-title",
+      "testId": "seo-input-title"
+    },
+    {
+      "name": "field-desc",
+      "testId": "seo-field-desc",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1995"
+    },
+    {
+      "name": "label-desc",
+      "testId": "seo-label-desc",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1996"
+    },
+    {
+      "name": "field-slug",
+      "testId": "seo-field-slug",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1987"
+    },
+    {
+      "name": "label-slug",
+      "testId": "seo-label-slug",
+      "spec": "s3-flows-page-settings-seo",
+      "nodeId": "302:1988"
+    }
+  ],
+  "_note": [
+    "Board 302:1978 — the 580x520 S3.7 card on a gray-900 ground. Three boards",
+    "(SEO 302:1978, Social 302:2004, Advanced 302:2026) draw the SAME chassis, so",
+    "every chassis number here is agreed by three frames, not one.",
+    "",
+    "WHAT MOVED:",
+    "  · The header ✕ (2838:12107, 13px ink-muted) did not exist. The drawer's",
+    "    own docblock said 'There is no ✕', which was true of an older capture;",
+    "    all three 2026-09-07 boards draw one inside header frame 302:1980. Until",
+    "    now a modal dialog's only exits were ESC and a scrim click, neither of",
+    "    which is on screen. Placed at the card's top-right: Figma exports the",
+    "    header as a flex COLUMN, so the generated code puts the glyph under the",
+    "    tab row, which is an auto-layout artifact and not where a close lives.",
+    "  · Field labels were BK_LABEL_CLASS (12px ink-soft); 302:1988 / 302:1992 /",
+    "    302:1996 and their Social and Advanced siblings are 13/500 ink-muted.",
+    "    BK_LABEL_CLASS is NOT moved — it is a chrome-wide primitive measured",
+    "    against many other boards. The override is scoped to `.bd-pg-drawer-body",
+    "    label`, two classes deep so it beats `tw:text-xs` on specificity rather",
+    "    than on source order.",
+    "  · Field COPY: 'Title' -> 'Meta title', 'Meta Description' -> 'Meta",
+    "    description', 'URL Slug' -> 'URL slug' (302:1992 / 302:1996 / 302:1988).",
+    "    Sentence case, and 'Meta title' is what the field actually is.",
+    "",
+    "NEW EVIDENCE ON authority=open:input-fill (OPEN-DECISIONS §3). These three",
+    "boards draw the text input 42 TALL, radius 8, fill --color/bg-panel white,",
+    "padding 12/10 — which is BK_TEXT_INPUT_THEME exactly, on every number that",
+    "149:108 disputes. Recorded here because the dispute has been running on two",
+    "boards and now has three more on the theme's side. What is still NOT",
+    "measured is `border-color`: all four inputs on all three boards carry",
+    "--color/ink #111827 while the theme ships flowbite gray-300, and four",
+    "simultaneously-black borders cannot be a focus state. That is the same",
+    "chrome-wide control the open authority covers, so it is skipped, not passed.",
+    "",
+    "NOT CONFORMED, and why:",
+    "  · STRUCTURE. The board's SEO tab is four plain fields (URL slug / Meta",
+    "    title / Meta description / Search indexing). The shipped tab is a Google",
+    "    preview card, a score block with a four-check grid, a 'Reach 80+' banner",
+    "    and three fields. Conforming literally would DELETE the score system —",
+    "    behaviour, not visuals — and 'Search indexing' lives on the Advanced tab",
+    "    (allowIndex). Fields are joined by IDENTITY here, not by position.",
+    "  · The 2838:121xx layer. 'btn/Done' is drawn white-on-white with an",
+    "    --color/error BORDER and --color/error-text label; on the Advanced board",
+    "    the same batch draws seg/will-publish in that treatment and seg/draft,",
+    "    seg/hidden, seg/password in solid accent — three simultaneously-active",
+    "    segments. No shipped control combines those tokens and no segmented",
+    "    control has three active segments, so this reads as a designer's markup",
+    "    layer (red = gap, filled = proposal) rather than as UI. The same batch",
+    "    carries the UX-B-10 / UX-B-19 / UX-B-22 annotation paragraphs, which",
+    "    LEDGER J-164:22 already ruled are annotations. Reported, not built.",
+    "",
+    "THE TEXT INPUTS ARE SKIPPED, NOT PASSED. They are joined to no board node",
+    "because border-color is board-vs-board: 149:108 draws --color/border-input,",
+    "these three draw --color/ink #111827 on all four instances, and two boards",
+    "that disagree do not re-settle a chrome-wide primitive",
+    "(authority=open:input-fill, OPEN-DECISIONS §3). Measured anyway, from",
+    "measured/<surface>.json, because the numbers are the useful part: the",
+    "shipped control is 42 tall on a radius-8 white fill — which is what these",
+    "boards draw and what 149:108 disputes. Padding is the one real difference",
+    "(theme 10, board 12) and it belongs to the same open call."
+  ]
+}

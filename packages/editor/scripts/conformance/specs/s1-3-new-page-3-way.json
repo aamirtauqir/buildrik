@@ -1,0 +1,254 @@
+{
+  "surface": "s1-3-new-page-3-way",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "295:1972",
+  "boardName": "s1-3-new-page-3-way",
+  "figmaHash": "b69a619cf368c4f540760edeb0c7e658a17e075a7b6ab3a2b7e9f8ab6e96ee90",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:44:18.436Z",
+  "copy": [
+    "New page",
+    "Start blank",
+    "Empty canvas",
+    "From template",
+    "10 layouts"
+  ],
+  "targets": [
+    {
+      "nodeId": "295:1972",
+      "name": "S1.3 · new-page · 3-way",
+      "className": "bg-[var(--flowbite\\/gray\\/900,#111827)] relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1973",
+      "name": "modal",
+      "className": "[word-break:break-word] absolute bg-[var(--color\\/bg-card,white)] content-stretch flex flex-col gap-[20px] h-[320px] items-start leading-[normal] left-[420px] not-italic overflow-clip px-[28px] py-[26px] rounded-[16px] top-[290px] w-[600px] whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "gap": {
+          "value": "20px"
+        },
+        "height": {
+          "value": "320px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "28px"
+        },
+        "padding-right": {
+          "value": "28px"
+        },
+        "padding-top": {
+          "value": "26px"
+        },
+        "padding-bottom": {
+          "value": "26px"
+        },
+        "border-radius": {
+          "value": "16px"
+        },
+        "width": {
+          "value": "600px"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1974",
+      "name": null,
+      "className": "font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[20px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "20px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1975",
+      "name": "Frame",
+      "className": "content-stretch flex gap-[14px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "14px"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1976",
+      "name": "Frame",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border-medium,#d1d5db)] border-solid content-stretch flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px overflow-clip px-[18px] py-[20px] relative rounded-[12px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "padding-left": {
+          "value": "18px"
+        },
+        "padding-right": {
+          "value": "18px"
+        },
+        "padding-top": {
+          "value": "20px"
+        },
+        "padding-bottom": {
+          "value": "20px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1977",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[26px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "26px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1978",
+      "name": null,
+      "className": "font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1979",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1980",
+      "name": "Frame",
+      "className": "bg-[var(--color\\/bg-card,white)] border border-[var(--color\\/border-medium,#d1d5db)] border-solid content-stretch cursor-pointer flex flex-[1_0_0] flex-col gap-[8px] items-start min-w-px overflow-clip px-[18px] py-[20px] relative rounded-[12px] text-left",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border-medium",
+          "value": "#d1d5db"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "padding-left": {
+          "value": "18px"
+        },
+        "padding-right": {
+          "value": "18px"
+        },
+        "padding-top": {
+          "value": "20px"
+        },
+        "padding-bottom": {
+          "value": "20px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1981",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[26px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "26px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1982",
+      "name": null,
+      "className": "font-['Inter:Semi_Bold'] font-semibold relative shrink-0 text-[14px] text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "295:1983",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[12px] text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "444:2400",
+      "name": "hotspot/state · S1.3 · new-page · error — CUT 2026-09-02 (new-page · error RETIRED)",
+      "className": "absolute h-[34px] left-[1274px] top-[850px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,362 @@
+{
+  "surface": "s1-flows-session-expired-unsaved-warning",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1347:7162",
+  "boardName": "s1-flows-session-expired-unsaved-warning",
+  "figmaHash": "d3f79eec4bec490aafc661464932161acaeaebe8d1f5995df374efc5201ca619",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-08T12:10:33.562Z",
+  "copy": [
+    "Your session expired",
+    "You have unsaved changes — they live in this tab. Keep it open, sign in again, then save.",
+    "3 CHANGES AT RISK",
+    "Changed padding on Hero",
+    "Added element",
+    "and 4 more",
+    "Keep editing",
+    "Try saving again",
+    "Sign in"
+  ],
+  "targets": [
+    {
+      "nodeId": "1347:7162",
+      "name": "S1.5b · session-expired · unsaved-warning — NEW 2026-08-28",
+      "className": "bg-[#f9fafb] relative size-full",
+      "props": {
+        "background-color": {
+          "value": "#f9fafb"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7163",
+      "name": "dialog",
+      "className": "absolute bg-white border border-[#e5e7eb] border-solid h-[340px] left-[140px] overflow-clip rounded-[12px] top-[60px] w-[440px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "value": "340px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7164",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[23px] not-italic text-[#111928] text-[16px] top-[23px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7165",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[36px] leading-[normal] left-[23px] not-italic text-[#6b7280] text-[13px] top-[55px] w-[392px]",
+      "props": {
+        "height": {
+          "value": "36px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7166",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[23px] not-italic text-[#6b7280] text-[11px] top-[103px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7167",
+      "name": "risk row",
+      "className": "absolute bg-[#fdf6b2] h-[28px] left-[23px] overflow-clip rounded-[6px] top-[125px] w-[392px]",
+      "props": {
+        "background-color": {
+          "value": "#fdf6b2"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7168",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[10px] not-italic text-[#8e4b10] text-[12px] top-[7px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#8e4b10"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7169",
+      "name": "risk row",
+      "className": "absolute bg-[#fdf6b2] h-[28px] left-[23px] overflow-clip rounded-[6px] top-[159px] w-[392px]",
+      "props": {
+        "background-color": {
+          "value": "#fdf6b2"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7170",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[10px] not-italic text-[#8e4b10] text-[12px] top-[7px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#8e4b10"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7171",
+      "name": "risk row",
+      "className": "absolute bg-white h-[28px] left-[23px] overflow-clip rounded-[6px] top-[193px] w-[392px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7172",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[normal] left-[10px] not-italic text-[#9ca3af] text-[12px] top-[7px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#9ca3af"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7173",
+      "name": "button/Keep editing",
+      "className": "absolute bg-white border border-[#d1d5db] border-solid h-[34px] left-[23px] overflow-clip rounded-[8px] top-[275px] w-[100px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#d1d5db"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "100px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7174",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[11px] not-italic text-[#111928] text-[12px] top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7175",
+      "name": "button/Try saving again",
+      "className": "absolute bg-white border border-[#d1d5db] border-solid h-[34px] left-[163px] overflow-clip rounded-[8px] top-[275px] w-[128px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#d1d5db"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "128px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7176",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[11px] not-italic text-[#111928] text-[12px] top-[8px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111928"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7177",
+      "name": "button/Sign in",
+      "className": "absolute bg-[#1a56db] h-[34px] left-[303px] overflow-clip rounded-[8px] top-[275px] w-[100px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "100px"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7178",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Medium'] font-medium leading-[normal] left-[12px] not-italic text-[12px] text-white top-[9px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "value": "#ffffff"
+        }
+      }
+    },
+    {
+      "nodeId": "1347:7179",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[90px] leading-[normal] left-[24px] not-italic text-[#6b7280] text-[11px] top-[416px] w-[672px]",
+      "props": {
+        "height": {
+          "value": "90px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "width": {
+          "value": "672px"
+        }
+      }
+    },
+    {
+      "nodeId": "1682:7213",
+      "name": "hotspot/back · S1 · Editor (Keep editing)",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer h-[34px] left-0 opacity-0 top-[482px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

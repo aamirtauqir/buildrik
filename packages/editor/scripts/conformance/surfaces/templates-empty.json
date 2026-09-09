@@ -1,0 +1,40 @@
+{
+  "surface": "templates-empty",
+  "board": "Templates · empty (Figma 1138:13413)",
+  "_note": [
+    "The built-in catalog is a static module array, so DrawerGallery's empty branch",
+    "cannot be reached by any prop — the catalog itself has to be empty. The probe",
+    "empties it, which is the state the board draws and the state a site whose only",
+    "templates are server-side sees when that pull comes back with nothing.",
+    "",
+    "The board's search box carries 'pricing' while the message reads 'No templates",
+    "yet.' — the two cannot both be true, and per the arc's rule the board's sample",
+    "data is never conformed to literally. The SHAPE (band, message pair, bordered",
+    "foot) is what is measured.",
+    "",
+    "NOT joined, and why:",
+    "  1138:13416 (the Input) — the board gives it a #111827 border and a 42px",
+    "  height. That is chrome-ui's `TextInput`, whose default theme is set against",
+    "  the whole board set, and two boards already disagree about this control's",
+    "  fill (1172:4867 #F3F4F6 vs 1205:4804 #F9FAFB — boards.json _note,",
+    "  authority=open:input-fill). One screen board does not re-settle a chrome-wide",
+    "  primitive; that stays the standing decision.",
+    "  I1138:13422;9:31 (the foot button's label) — flowbite renders it as the",
+    "  button's own text node, so it has no element to anchor. The button is",
+    "  measured instead."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=templates-empty",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [{ "action": "waitFor", "testId": "tpl-empty" }],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel-header", "testId": "panel-header", "spec": "templates-empty", "nodeId": "1138:13414" },
+    { "name": "panel-header-title", "testId": "panel-header-title", "spec": "templates-empty", "nodeId": "I1138:13414;16:7" },
+    { "name": "search-band", "testId": "tpl-search-band", "spec": "templates-empty", "nodeId": "1138:13415" },
+    { "name": "empty-block", "testId": "tpl-empty", "spec": "templates-empty", "nodeId": "1138:13417" },
+    { "name": "empty-title", "testId": "tpl-empty-title", "spec": "templates-empty", "nodeId": "1138:13418" },
+    { "name": "empty-hint", "testId": "tpl-empty-hint", "spec": "templates-empty", "nodeId": "1138:13419" },
+    { "name": "footer", "testId": "tpl-footer", "spec": "templates-empty", "nodeId": "1138:13421" },
+    { "name": "browse-all", "testId": "tpl-browse-all", "spec": "templates-empty", "nodeId": "1138:13422" }
+  ]
+}

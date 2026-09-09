@@ -1,0 +1,134 @@
+{
+  "surface": "cmdk-no-results",
+  "board": "CmdK · no-results (Figma 166:45)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "Control+k"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-input"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "press",
+      "key": "q"
+    },
+    {
+      "action": "press",
+      "key": "q"
+    },
+    {
+      "action": "press",
+      "key": "p"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-no-results"
+    }
+  ],
+  "contrastScope": "[data-testid=\"cmdk-palette\"]",
+  "targets": [
+    {
+      "name": "palette",
+      "testId": "cmdk-palette",
+      "spec": "cmdk-no-results",
+      "nodeId": "166:45"
+    },
+    {
+      "name": "query-row",
+      "testId": "cmdk-query",
+      "spec": "cmdk-no-results",
+      "nodeId": "166:46"
+    },
+    {
+      "name": "query-text",
+      "testId": "cmdk-input",
+      "spec": "cmdk-no-results",
+      "nodeId": "166:47"
+    },
+    {
+      "name": "empty",
+      "testId": "cmdk-no-results",
+      "spec": "cmdk-no-results",
+      "nodeId": "166:48"
+    },
+    {
+      "name": "empty-line",
+      "testId": "cmdk-no-results-line"
+    },
+    {
+      "name": "empty-ai",
+      "testId": "cmdk-no-results-ai"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at :5050 — ⌘K then the board's own query, 'qqp'. Single-word,",
+    "which matters: the component routes a MULTI-word miss to 166:51 (ai-offer,",
+    "another agent's board) and a single-word one here. The `wait 400` before the",
+    "keys is load-bearing — the input focuses on a 30ms timeout and keys pressed",
+    "before it land on the document, which reads as an unfiltered palette.",
+    "",
+    "CONFORMANT where it can be compared: the miss is a 120-tall centred block,",
+    "13/20, the line in --color/ink-muted and the offer under it as an",
+    "accent-text link. All four of those match (the colours are measured on the",
+    "two skipped targets below even though they are not diffed — #6b7280 and",
+    "#1a56db, both exact).",
+    "",
+    "NOT JOINED — 166:49 and 166:50, and the reason governs the whole family, not",
+    "just this board. THIS BOARD IS DRAWN IN 640-SPACE. 166:2's frame name says",
+    "so in the founder's own words: '640x420 is chrome-ui/CommandPalette.tsx,",
+    "which has no importer; the shipping palette is 560 wide",
+    "(shell/modals/CommandPalette.tsx:388, tw:w-140).' So every ABSOLUTE",
+    "horizontal number on a CmdK frame is measured against a component nothing",
+    "imports: the chords at left-[580px], the centres at left-[320px], and these",
+    "two w-[600px] text frames, which are 640 minus the 20px gutters. In the",
+    "shipping 560 palette the same construction is 520, and no edit can make a",
+    "centred text frame 600 wide inside 560. They are also frame artifacts in the",
+    "plain sense — a 600-wide centring box around a 140px line of text, which is",
+    "what `-translate-x-1/2 left-[320px] text-center` means; live centres the same",
+    "text with a flex column, so the text lands in the same place and only the box",
+    "hugs it. Skipped rather than conformed, and NOT by widening the palette:",
+    "166:2's name is an explicit founder instruction not to.",
+    "",
+    "CODE CHANGED, and it moves all five CmdK boards (full account in",
+    "cmdk-empty's recipe): row hover was flowbite primary's #1E429F under 13px",
+    "--bk-ink at 1.97:1, now `variant=\"ghost\"`; and the strips render in a fixed",
+    "Recent · Suggested · Actions · Go to order, adjudicated on 303:1978. Neither",
+    "reaches this state, which has no rows and no strips.",
+    "",
+    "CONTRAST: zero failures on this surface. --bk-ink-muted #6B7280 on the",
+    "palette's white is 4.83 and --bk-accent-text #1A56DB is 6.4; the 4.38 pair",
+    "the other four CmdK recipes carry needs a selected ROW, and there is none",
+    "here.",
+    "",
+    "FOUND, NOT FIXED — the 'Ask AI instead >' link is a real Button with a real",
+    "handler, and the handler has been dead since it shipped: askAI() emits",
+    "`ui:switch-tab` with tab 'ai'. The component's own comment records it",
+    "('UI_PANEL_OPEN is allow-listed to real LEFT tabs and \"ai\" is not one'),",
+    "so it is known; it is behaviour, not visual, so the CODE contract governs and",
+    "this recipe does not touch it. But the one affordance this state offers a",
+    "stuck user does nothing, and the board draws it as the only way out."
+  ]
+}

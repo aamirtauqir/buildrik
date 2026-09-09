@@ -1,0 +1,96 @@
+{
+  "surface": "s3-flows-page-settings-advanced",
+  "board": "S3.7 · page-settings · Advanced (Figma 302:2026)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-settings-advanced",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "pg-drawer-tabbtn-advanced"
+    },
+    {
+      "action": "waitFor",
+      "testId": "adv-field-visibility"
+    }
+  ],
+  "contrastScope": "[data-testid=\"pg-drawer\"]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "pg-drawer",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "302:2027"
+    },
+    {
+      "name": "hdr",
+      "testId": "pg-drawer-hdr",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "302:2028"
+    },
+    {
+      "name": "title",
+      "testId": "pg-drawer-title",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "302:2029"
+    },
+    {
+      "name": "tab-seo",
+      "testId": "pg-drawer-tabbtn-seo",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "302:2031"
+    },
+    {
+      "name": "tab-social",
+      "testId": "pg-drawer-tabbtn-social",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "302:2032"
+    },
+    {
+      "name": "tab-advanced",
+      "testId": "pg-drawer-tabbtn-advanced",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "302:2033"
+    },
+    {
+      "name": "close",
+      "testId": "pg-drawer-close",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "2838:12113"
+    },
+    {
+      "name": "body",
+      "testId": "pg-drawer-body",
+      "spec": "s3-flows-page-settings-advanced",
+      "nodeId": "302:2034"
+    }
+  ],
+  "_note": [
+    "Board 302:2026 — the same chassis, Advanced tab active.",
+    "",
+    "NOT CONFORMED, and this tab diverges most:",
+    "  · The board's three fields are 'Custom <head> code', 'Password protect'",
+    "    and 'Canonical URL'. The shipped tab is a Visibility segmented control,",
+    "    a password field shown only at visibility=password, two indexing",
+    "    toggles and the head-code textarea. There is no canonical-URL field at",
+    "    all and no 'Password protect' switch (the password field IS the",
+    "    control). Joining those by position would measure unrelated rows.",
+    "  · The section headings ('VISIBILITY', 'CUSTOM <HEAD> CODE') ship as 11/600",
+    "    ink uppercase; the board draws them as ordinary 13/ink-muted field",
+    "    labels (2838:12129). That is a structural claim — heading vs label —",
+    "    rather than a property one, and it is the same two-class question the",
+    "    Settings pane already answers the other way (uppercase 11px card",
+    "    titles, S7 shared.tsx). Left for the family, not settled from one tab.",
+    "  · seg/will-publish (2838:12130) proposes a FOURTH visibility state for an",
+    "    unset value, with the line 'Will publish — this page ships with the next",
+    "    deploy. Nothing is stored until you choose otherwise.' Commit 9fd45cde2",
+    "    settled the same question the other way five days ago: unset visibility",
+    "    IS live, because PageManager never writes the field and treating unset",
+    "    as draft would drop every non-home page from every existing site's next",
+    "    deploy. Adopting the board's fourth segment means a schema change and a",
+    "    migration, not a re-label. Reported to the founder, not built.",
+    "  · TextInput border-color — authority=open:input-fill, see the SEO recipe."
+  ]
+}

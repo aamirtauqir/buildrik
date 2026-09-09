@@ -1,0 +1,110 @@
+{
+  "surface": "shell-state-11-saving-conflict",
+  "board": "Shell state 11 · Saving → conflict (Figma 66:640)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=shell-state-11-saving-conflict",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "conflict-modal"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "modal",
+      "testId": "conflict-modal",
+      "spec": "shell-state-11-saving-conflict",
+      "nodeId": "66:840"
+    },
+    {
+      "name": "title",
+      "testId": "conflict-title",
+      "spec": "shell-state-11-saving-conflict",
+      "nodeId": "66:842"
+    },
+    {
+      "name": "body",
+      "testId": "conflict-body",
+      "spec": "shell-state-11-saving-conflict",
+      "nodeId": "66:844"
+    },
+    {
+      "name": "actions",
+      "testId": "conflict-actions"
+    },
+    {
+      "name": "scrim",
+      "testId": "conflict-scrim"
+    }
+  ],
+  "_note": [
+    "PROBE, not the running editor, and not the shell either. The overlay opens",
+    "only when the server rejects a save because the site moved underneath this",
+    "editor; AquibraStudio sets `conflict` from a save response, and no click in",
+    "the standalone demo reaches it. The probe mounts the REAL ConflictModal",
+    "with the four callbacks it takes — its whole API — at the board's 1440x900",
+    "so the 440 card lands where the board draws it.",
+    "",
+    "THE REST OF THIS BOARD IS THE SHELL BEHIND THE SCRIM, and it is skipped",
+    "for the reasons the other three Shell-state recipes record: the topbar is",
+    "authority=code:topbar across all twelve of these frames, the rail is",
+    "chassis, the canvas toolbar belongs to the canvas family, and the",
+    "inspector body redraws the RETIRED 159:2. Its Layers drawer is measured at",
+    "the panel's own width by the five Layers recipes in this same run.",
+    "",
+    "CONFORMED in this pass — the card's own drawing, which the founder gate",
+    "below does not touch:",
+    "  radius 12 -> 8 (66:840 / --radius/lg). 12 is no step on this file's",
+    "    scale.",
+    "  title 16 -> 16/24 in #111827 (66:842). It carried no line-height at all,",
+    "    so it sat on Inter's ~19, and its fill was #111 — near --color/ink but",
+    "    not it.",
+    "  body 14/1.5 on #555 -> 13/20 on #4b5563 (66:844).",
+    "  actions gap 8 -> 12 (66:845).",
+    "  shadow 0 10px 40px rgba(0,0,0,.25) -> 0 12px 32px rgba(15,23,41,.16),",
+    "    the board's own. Not compared by diff.mjs (box-shadow is read but not",
+    "    in the property set), so it is recorded here rather than asserted.",
+    "The colours stay LITERAL HEX rather than becoming var(--bk-*): this overlay",
+    "is deliberately self-contained because the editor is dynamically imported",
+    "into the dashboard and it must render with no external stylesheet — the",
+    "@lint-hex-policy exception in the file says so. The literals are now the",
+    "board's own values, which is the best of both.",
+    "",
+    "NOT CONFORMED — FOUNDER GATE, recorded in boards.json 2026-08-17 and",
+    "re-read here rather than inherited:",
+    "",
+    "  the board offers TWO ways out, 'Review both' and 'Keep mine'. The",
+    "  shipped modal offers THREE: Reload latest, Save a backup, Overwrite (with",
+    "  its own confirm step). Conforming literally would DELETE two data-safety",
+    "  exits in exchange for a compare surface that does not exist.",
+    "",
+    "  its copy names the other writer and the elapsed time — 'Sara saved a",
+    "  change to this page 40 seconds ago'. The conflict path's props are four",
+    "  callbacks; the save response carries neither a who nor a when, so the",
+    "  sentence cannot be adopted honestly until it does. The shipped body says",
+    "  what IS known: the copy is behind, it cannot be auto-merged, and nothing",
+    "  is lost without a choice.",
+    "",
+    "  the three footer BUTTONS (66:847 / 1625:7164 / 66:849) follow from that:",
+    "  they are drawn 32 tall, 14 across, radius 4, with two of the three",
+    "  filled --color/accent. The shipped controls are chrome-ui Buttons and",
+    "  there are three different ones; a board that names two buttons cannot",
+    "  size three. Same call the first-run CTA buttons got against 338:2326.",
+    "",
+    "  the header/body/footer BANDS (66:841 h56 pl24 pr20 · 66:843 pb20 px24 ·",
+    "  66:845 h64 px24) — the shipped card is one 24-padded block, which is why",
+    "  the title and body join and the bands do not. Restructuring the card into",
+    "  three bands is a change inside the gated area and is not this pass's.",
+    "",
+    "  the SCRIM (66:839) — extracted as an opaque --flowbite/gray/900 fill,",
+    "  which is Figma baking out layer opacity; the layer's own NAME says",
+    "  'scrim rgba(15,23,42,.4)'. The shipped scrim is rgba(0,0,0,0.5). Neither",
+    "  the export nor the name can settle it against the other, so the scrim is",
+    "  measured and screenshotted but not joined. (A 0.4 slate scrim vs a 0.5",
+    "  black one is a real difference and worth a decision — see the report.)"
+  ]
+}

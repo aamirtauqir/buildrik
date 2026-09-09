@@ -1,0 +1,230 @@
+{
+  "surface": "inspector-profile-button",
+  "board": "Inspector · profile · BUTTON (Figma 807:8567)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Button"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8567"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-profile-button",
+      "nodeId": "920:4708"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-profile-button",
+      "nodeId": "956:6868"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-profile-button",
+      "nodeId": "956:6870"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-profile-button",
+      "nodeId": "956:6872"
+    },
+    {
+      "name": "sechead-typography",
+      "testId": "inspector-sechead-typography",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20295"
+    },
+    {
+      "name": "secname-typography",
+      "testId": "inspector-secname-typography",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8574"
+    },
+    {
+      "name": "row-family",
+      "testId": "inspector-row-family",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20296"
+    },
+    {
+      "name": "field-family",
+      "testId": "inspector-field-family",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8577"
+    },
+    {
+      "name": "label-family",
+      "testId": "inspector-label-family",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8576"
+    },
+    {
+      "name": "label-size",
+      "testId": "inspector-label-size",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8579"
+    },
+    {
+      "name": "sechead-background",
+      "testId": "inspector-sechead-background",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20298"
+    },
+    {
+      "name": "secname-background",
+      "testId": "inspector-secname-background",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8582"
+    },
+    {
+      "name": "row-fill",
+      "testId": "inspector-row-fill",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20299"
+    },
+    {
+      "name": "field-fill",
+      "testId": "inspector-field-fill",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8585"
+    },
+    {
+      "name": "label-fill",
+      "testId": "inspector-label-fill",
+      "spec": "inspector-profile-button",
+      "nodeId": "807:8584"
+    },
+    {
+      "name": "sechead-interactions",
+      "testId": "inspector-sechead-interactions",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20306"
+    },
+    {
+      "name": "sechead-animation",
+      "testId": "inspector-sechead-animation",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20307"
+    },
+    {
+      "name": "sechead-link",
+      "testId": "inspector-sechead-link",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20308"
+    },
+    {
+      "name": "sechead-visibility",
+      "testId": "inspector-sechead-visibility",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20309"
+    },
+    {
+      "name": "sechead-element-properties",
+      "testId": "inspector-sechead-element-properties",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20310"
+    },
+    {
+      "name": "sechead-css-classes",
+      "testId": "inspector-sechead-css-classes",
+      "spec": "inspector-profile-button",
+      "nodeId": "2067:20311"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row"
+    },
+    {
+      "name": "sections-apply",
+      "testId": "inspector-sections-apply"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900: Insert's Button row creates a button and selects",
+    "it, which is the production path into the BUTTON profile.",
+    "",
+    "SHARED CHASSIS. This board is one of six that draw the same section",
+    "chassis (807:8342 TEXT, :8412 FLEX, :8475 GRID, :8521 MEDIA, :8567 BUTTON,",
+    ":8614 INPUT). It was conformed once, on inspector-profile-text, and that",
+    "recipe's _note carries the full account: 20-tall open / 28-tall shut section",
+    "headers, ink-muted on the header ROW, 0.08em tracking, section-body padding",
+    "0/8, the Family row moved onto the shared control frame, the colour row's",
+    "duplicate chip removed so the field keeps its 160, segmented tracks at 28,",
+    "and the three-anchor row (`inspector-row-`/`-label-`/`-field-<slug>`).",
+    "",
+    "NOT JOINED on every board in this family, censused across all committed",
+    "specs rather than counted board-to-board:",
+    "",
+    "  the header's `--flowbite/gray/50` fill — 37 boards draw this 48h row with",
+    "  NO fill, 6 draw it gray-50 (these six), 1 draws it accent-tinted. White",
+    "  ships; a header that changed colour with the selection would be a defect.",
+    "",
+    "  the context strip at 40 tall — 38 boards draw it 32, these 6 draw it 40.",
+    "  32 ships. One strip, not a per-profile one.",
+    "",
+    "  the accent-tint chip carrying the PROFILE name. 32:2 and 642:3112 put the",
+    "  ELEMENT's own name there and so does live.",
+    "",
+    "  the footer's `--color/ink-placeholder` #9CA3AF, which is 2.54:1 on white",
+    "  at 11px against a 4.5 floor. It ships --bk-ink-muted (4.83:1). Said loudly",
+    "  because it is a contrast refusal, not a taste call.",
+    "",
+    "  every `hotspot/…` node — prototype wiring, not chrome.",
+    "",
+    "NOT JOINED on THIS board specifically — which sections arrive OPEN:",
+    "",
+    "  BORDER, CORNER RADIUS, SPACING, SIZE and EFFECTS (2067:20301..20305) are",
+    "  drawn shut at 28 and arrive open at 20. That is not chrome drift: a",
+    "  section opens when the element carries a value for it",
+    "  (`sectionApplies`, the rule this board's own footer counts), and the",
+    "  default button the Insert row creates carries a border, a radius, padding,",
+    "  a size and a shadow where the board's sample button carries two things —",
+    "  'of 13' is the same, '2' is sample data. The eight headers whose state DOES",
+    "  agree are joined: TYPOGRAPHY and BACKGROUND open at 20, INTERACTIONS,",
+    "  ANIMATION, LINK, VISIBILITY, ELEMENT PROPERTIES and CSS CLASSES shut at 28.",
+    "",
+    "  2067:20297, the 42-tall Size row. 42 is the board's LAST-row-in-section",
+    "  form (34 plus 8 of trailing air); in the DOM that 8 is the section body's",
+    "  padding-bottom. Its LABEL is joined and matches. Its control is not: this",
+    "  board draws one 160 frame where 807:8342 draws the same row as 80 | 72,",
+    "  the size and its line height — the boards disagree and the TEXT board's",
+    "  split is what ships, because a line height is read against the size it",
+    "  belongs to.",
+    "",
+    "  2067:20300, the Image row. The shipped Background section chooses between",
+    "  colour / gradient / image with a segmented control and shows the chosen",
+    "  one, rather than standing an always-empty Image row under Fill."
+  ]
+}

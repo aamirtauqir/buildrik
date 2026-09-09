@@ -1,0 +1,109 @@
+{
+  "surface": "components-library",
+  "board": "Components · library (Figma 641:2546)",
+  "_note": [
+    "Probe, not the live app, and the reason is not convenience: components are",
+    "persisted per project by ComponentStorage, a fresh demo project has none,",
+    "and pressing ⇧A in the running editor opens the EMPTY panel (verified",
+    "2026-09-08). The four-row list this board draws has therefore never been",
+    "measurable in the app. The probe mounts the real ComponentsTab against a",
+    "fixture composer answering only the calls useComponentsState makes.",
+    "",
+    "THE 'FROM BRAND' GROUP IS GONE FROM THE BOARD AND MUST NOT COME BACK.",
+    "The board used to draw a second section, 'FROM BRAND · NOT IMPLEMENTED',",
+    "with linked rows; it was hidden on the board 2026-09-07 and this spec's",
+    "copy[] now contains one group heading, YOUR COMPONENTS. That agrees with",
+    "the code, which ships exactly that one group and says at ComponentsTab",
+    "why: no brand→component link exists in the registry, so the section would",
+    "always be empty chrome.",
+    "",
+    "WHAT THE BOARD WON (changed in code):",
+    "  row count label  '6 instances' -> '6 on this site' (641:2564). The",
+    "    number is sample data; the words are the label, and on-screen copy is",
+    "    decided by the board (copy.json _note, founder precedence 2026-08-06).",
+    "  footer fill      the row had no background of its own, so the board's",
+    "    --color/bg-panel was coming from whatever was behind it (641:2596).",
+    "  footer button    padding-y 1px -> 6px (641:2597). The height was already",
+    "    pinned at 28 by tw:h-7, so this is the inset the board states rather",
+    "    than a size change.",
+    "  section header   gained the board's 8px gap (641:2557); it had none, and",
+    "    an absent gap measures as `normal`, which is unreadable, not equal.",
+    "",
+    "verifiedNote said 'drift-extra-header-add-button'. Measured 2026-09-08 in",
+    "both the live panel and the probe: the header renders expand + close and",
+    "nothing else — two 16px controls, which is exactly what 641:2547 draws",
+    "(I641:2547;16:8 and ;16:13). onHelpClick is undefined on this panel so no",
+    "third button exists to remove. Nothing to fix; the note is stale.",
+    "",
+    "NOT JOINED: the panel root (641:2546). Its border is the DRAWER's edge —",
+    "board 642:3152 draws that hairline on 'Drawer (pinned)', and in the app it",
+    "is `.ls-panel`, not PanelFrame. Giving the panel body its own border would",
+    "double it in the shell to make a probe number match."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=components-library",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "comp-section-header"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "components-library",
+      "nodeId": "641:2547"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "components-library",
+      "nodeId": "I641:2547;16:7"
+    },
+    {
+      "name": "section-header",
+      "testId": "comp-section-header",
+      "spec": "components-library",
+      "nodeId": "641:2557"
+    },
+    {
+      "name": "row",
+      "testId": "comp-row-c1",
+      "spec": "components-library",
+      "nodeId": "641:2561"
+    },
+    {
+      "name": "row-name",
+      "testId": "comp-row-name-c1",
+      "spec": "components-library",
+      "nodeId": "641:2562"
+    },
+    {
+      "name": "row-count",
+      "testId": "comp-row-count-c1",
+      "spec": "components-library",
+      "nodeId": "641:2564"
+    },
+    {
+      "name": "footer",
+      "testId": "comp-footer",
+      "spec": "components-library",
+      "nodeId": "641:2596"
+    },
+    {
+      "name": "create-button",
+      "testId": "comp-create",
+      "spec": "components-library",
+      "nodeId": "641:2597"
+    },
+    {
+      "name": "panel",
+      "testId": "comp-panel"
+    }
+  ]
+}

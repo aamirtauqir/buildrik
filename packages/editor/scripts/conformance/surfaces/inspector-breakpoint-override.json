@@ -1,0 +1,159 @@
+{
+  "surface": "inspector-breakpoint-override",
+  "board": "Inspector · breakpoint-override (Figma 160:208)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Text"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-breakpoint-pill"
+    },
+    {
+      "action": "click",
+      "testId": "inspector-bp-opt-tablet"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "click",
+      "testId": "inspector-seg-align-center"
+    },
+    {
+      "action": "waitFor",
+      "testId": "breakpoint-override-row"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:208"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:209"
+    },
+    {
+      "name": "element-name",
+      "testId": "inspector-element-name",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:210"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "920:4678"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:213"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:214"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:216"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:218"
+    },
+    {
+      "name": "override-row",
+      "testId": "breakpoint-override-row",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:305"
+    },
+    {
+      "name": "override-label",
+      "testId": "breakpoint-override-label",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:306"
+    },
+    {
+      "name": "override-control",
+      "testId": "breakpoint-override-control",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:307"
+    },
+    {
+      "name": "override-note",
+      "testId": "breakpoint-override-note",
+      "spec": "inspector-breakpoint-override",
+      "nodeId": "160:311"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900 through the production path, no fixture: Insert a",
+    "Text element, switch the breakpoint pill to Tablet, then centre it. That",
+    "last click is a real style write on a non-base layer, which is the only way",
+    "into this state — and it needed two new anchors to be drivable at all:",
+    "`inspector-bp-opt-<breakpoint>` on the pill's listbox rows and",
+    "`inspector-seg-<label>-<value>` on every segmented option. Both prefix-first,",
+    "for `check-anchors`'s template matcher.",
+    "",
+    "MATCHES AS DRAWN, 44 properties, no drift: the header, the strip with its",
+    "three pills (the breakpoint one reading Tablet), and the whole override",
+    "molecule — the 34-tall row with its 2px accent bar, the 12/18 ink-muted",
+    "label, the 160x28 white control on a `--color/border` hairline at radius 6,",
+    "and the 32-tall accent-tint note reading 'Overridden on Tablet — Base is …'.",
+    "",
+    "ONE THING CHANGED: the override row ran its own 96px label column and a 16px",
+    "right inset, which put the control at 163 against the board's 160. It now",
+    "uses `.bdi-row-ctrl`'s 95 and 20 for the reason that rule states — the board",
+    "fixes the CONTROL at 120..280 and says nothing about the label's width, so",
+    "the pixel the panel's left rule spends comes out of the label column.",
+    "",
+    "AND ONE REAL DEFECT WAS FOUND HERE, fixed rather than baselined: the",
+    "type-token chain button measured 1.97:1 on HOVER — `--bk-ink` on #1E429F,",
+    "against a 3.0 floor for a 12px icon. It is a flowbite Button and carried a",
+    "bare `tw:bg-transparent`, which cannot contest flowbite's own",
+    "`enabled:hover:bg-primary-800` — a hover variant beats a base utility. The",
+    "button is only VISIBLE on hover, so the unreadable state was the only state",
+    "anyone ever saw it in. `tw:enabled:hover:bg-transparent` now.",
+    "",
+    "NOT JOINED:",
+    "",
+    "  160:220 onward — the section body under the note. Shared chassis, joined",
+    "  on the six profile recipes against the boards that own it.",
+    "",
+    "  92:8 / 92:11 / 92:13, the opacity slider molecule the frame carries as",
+    "  context for the Effects section."
+  ]
+}

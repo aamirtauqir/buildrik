@@ -1,0 +1,64 @@
+{
+  "surface": "ai-planning",
+  "board": "AI · planning (Figma 170:41)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=ai-planning",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "ai-run-band"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "run-band",
+      "testId": "ai-run-band",
+      "spec": "ai-planning",
+      "nodeId": "220:947"
+    },
+    {
+      "name": "run-band-tint",
+      "testId": "ai-run-band",
+      "spec": "ai-planning",
+      "nodeId": "I220:947;220:6"
+    },
+    {
+      "name": "run-band-label",
+      "testId": "ai-run-band",
+      "spec": "ai-planning",
+      "nodeId": "I220:947;16:17"
+    }
+  ],
+  "_note": [
+    "ONE TARGET, THREE BOARD NODES. 170:41's band is an instance of the shared",
+    "`Section header` component: a group (220:947 — 28 tall, 16 gutters, an 8",
+    "gap), an absolutely-positioned tint child (bg-subtle) and a label child",
+    "(11/16 ink-muted). The code draws that as one flex row, so all three join",
+    "to the same anchor.",
+    "",
+    "THE BAND IS ALL THIS STATE HAS, and that is the finding, not a shortcut.",
+    "`useAgentRunner.start()` clears `steps`, awaits the plan, then sets the",
+    "steps and flips to phase \"running\" in the same breath — so `phase ===",
+    "\"planning\"` NEVER renders a step row. The board draws three pending rows",
+    "under the band and an `Edit plan` / `Run 3 steps` action row beneath them,",
+    "i.e. a plan-level review gate.",
+    "",
+    "THAT GATE IS NOT BUILT HERE, on purpose. It is a new FSM state, and the",
+    "record already says so: LEDGER J-170:41 (2026-09-02) — the PRD documents",
+    "per-step approval only (11-flows.md:111-112, and board 170:97 draws that",
+    "shape), no chapter defines a plan-level gate, and the proposal is `add it",
+    "to 02:48 first, then code; otherwise redraw 170:41`. It was then routed to",
+    "the designer/founder lane as a structural redraw (LEDGER `designer-redraws`,",
+    "D9). Building it from a conformance pass would put a new approval step in",
+    "front of every agent run on the strength of a picture. So: band conformed,",
+    "gate left to the founder, and the three step rows measured on `ai-done`,",
+    "where the product does render them.",
+    "",
+    "Also not built: `Edit plan` implies an editable plan, and there is no plan",
+    "editor, no state for one and no endpoint behind it."
+  ]
+}

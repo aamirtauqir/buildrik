@@ -1,0 +1,211 @@
+{
+  "surface": "s3-flows-media-image-editor",
+  "board": "S3.6 · media · image-editor (modal) (Figma 1124:4527)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-image-editor",
+  "viewport": {
+    "width": 1000,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "image-editor-card"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "scrim",
+      "testId": "image-editor-scrim",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4527"
+    },
+    {
+      "name": "card",
+      "testId": "image-editor-card"
+    },
+    {
+      "name": "title",
+      "testId": "image-editor-title",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4529"
+    },
+    {
+      "name": "tab-crop",
+      "testId": "image-editor-tab-crop",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4530"
+    },
+    {
+      "name": "tab-adjust",
+      "testId": "image-editor-tab-adjust",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4531"
+    },
+    {
+      "name": "tab-resize",
+      "testId": "image-editor-tab-resize",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4532"
+    },
+    {
+      "name": "well",
+      "testId": "image-editor-well",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4533"
+    },
+    {
+      "name": "dims",
+      "testId": "image-editor-dims",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4535"
+    },
+    {
+      "name": "crop-free",
+      "testId": "image-editor-crop-0"
+    },
+    {
+      "name": "crop-free-label",
+      "testId": "image-editor-crop-0",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4537"
+    },
+    {
+      "name": "crop-11-label",
+      "testId": "image-editor-crop-1",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4539"
+    },
+    {
+      "name": "flip-h",
+      "testId": "image-editor-flip-h",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4544"
+    },
+    {
+      "name": "flip-v",
+      "testId": "image-editor-flip-v",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4546"
+    },
+    {
+      "name": "zoom-label",
+      "testId": "image-editor-zoom-label",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4548"
+    },
+    {
+      "name": "rotate-label",
+      "testId": "image-editor-rotate-label",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4552"
+    },
+    {
+      "name": "rotate-value",
+      "testId": "image-editor-rotate-value",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4556"
+    },
+    {
+      "name": "foot-note",
+      "testId": "image-editor-foot-note",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4557"
+    },
+    {
+      "name": "cancel",
+      "testId": "image-editor-cancel",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4558"
+    },
+    {
+      "name": "save",
+      "testId": "image-editor-save"
+    },
+    {
+      "name": "save-label",
+      "testId": "image-editor-save",
+      "spec": "s3-flows-media-image-editor",
+      "nodeId": "1124:4560"
+    }
+  ],
+  "_note": [
+    "Board 1124:4527 is the image editor as a 720 CARD on an ink scrim. It is NOT",
+    "the surface `media-drill-ins-the-five-destinations` declined: that recipe read",
+    "the FIFTH destination off board 75:113 — 'a 1000-wide full-bleed takeover … a",
+    "build rather than a restyle' — and recorded its numbers for whoever took it.",
+    "Someone did. ImageEditorModal.tsx's docstring cites 1124:4527 by number and",
+    "was built to it; what it lacked was an anchor, a probe case and a recipe, so",
+    "nothing had ever measured it. 54 of 66 properties matched on the first run.",
+    "",
+    "REACHED VIA PROBE (`case=media-image-editor`), because the modal opens from",
+    "MediaTab's `onOpenImageEditor` and mounts in AquibraStudio, which this arc may",
+    "not stage. The probe mounts the SHIPPING component, nothing re-implemented.",
+    "Its source is a 2400x1600 SVG data URI: react-easy-crop reports a cropped area",
+    "only once the media loads, and the mono dimension readout is gated on that.",
+    "",
+    "WHAT MOVED — both are the same flowbite/twMerge trap CLAUDE.md documents, and",
+    "both shipped controls two-thirds too tall:",
+    "  1124:4536  the crop chips are 24 tall. `CHIP` said `tw:min-h-6`, and a",
+    "             min-height cannot beat flowbite's `h-10` through twMerge, so every",
+    "             aspect chip rendered 40. `tw:h-6 tw:min-h-0` fixes it.",
+    "  1124:4559  Save version is 32. `tw:min-h-8`, same trap, same 40. The GHOST",
+    "             class beside it (Reset / Cancel) had it too and moved with it.",
+    "  1124:4536  the active chip's fill is `--color/bg-selected` #EBF5FF. The class",
+    "             read `var(--bk-accent-subtle,#ebf5ff)` — the FALLBACK was the",
+    "             board's colour and the TOKEN it named resolves to #E1EFFE, so the",
+    "             chip painted the wrong blue and the right one sat in a fallback",
+    "             that never applies. Now `--bk-accent-tint`.",
+    "Those three moved the card from 596 tall to 588 against a board drawing 560.",
+    "",
+    "NOT JOINED, and why:",
+    "  1124:4528 the CARD's own height — 560 is the CROP tab's content. The card is",
+    "  a flex column with `max-h-[90vh]` and a `min-h-[128px]` control well that",
+    "  exists so the three tabs do not make it jump; Adjust draws four sliders and",
+    "  six filter chips and is genuinely taller. Fixing 560 would either freeze one",
+    "  tab's height onto all three or delete the anti-jump floor. Its fill, radius",
+    "  and the headline 720 width are measured and in `measured/`; only the height",
+    "  is unjoinable, and the three fixes above closed 36px of the 48 it had.",
+    "  1124:4536 / 1124:4559 as BOXES — both are hug-content and the board's widths",
+    "  are FIGMA's text metrics, not the browser's: 'Free' hugs to 45.28 in Chrome",
+    "  against the board's 50, 'Save version' to 107.75 against 100, and the board's",
+    "  own sibling chips disagree with each other about the inset that implies (Free",
+    "  50 and 1:1 43 for a 10px difference in label). Their heights, fills and radii",
+    "  ARE conformed in the code above; the LABELS are joined, which is where the",
+    "  type contract lives.",
+    "  1124:4534 the crop frame, 1124:4549-4551 / 4553-4555 the two slider tracks",
+    "  and thumbs — `Slider` is a shared chrome-ui primitive with its own boards and",
+    "  its own recipes; one screen board does not re-settle a control six others are",
+    "  measured against. Their values are in `measured/`.",
+    "  1124:4538 / 4540 / 4542 the three resting chips — same component as the two",
+    "  that ARE joined, same hug-width problem, and measuring the same control four",
+    "  times proves nothing the first two did not.",
+    "  1124:4561 the annotation paragraph ('Adjust tab: … Resize tab: W x H fields')",
+    "  and 1682:7219 the prototype hotspot — Figma authoring furniture.",
+    "",
+    "NINE UNKNOWNS, all one cause: Figma exports auto line-height as `leading-",
+    "[normal]` and the code sets explicit leading (20 on the tabs, 24 on the title,",
+    "16/18 on the labels). `normal` against a pixel value is not comparable, so",
+    "diff reports UNKNOWN rather than inventing an answer. Deleting the explicit",
+    "leading to make the comparison possible would be conforming to the",
+    "INSTRUMENT, not the board.",
+    "",
+    "CONTRAST — TWO FAILURES, REPORTED NOT HIDDEN, and one of them is the board's",
+    "own pairing:",
+    "  3.61:1  the ACTIVE tab, 'Crop', at `--flowbite/blue/500` #3F83F8 on white,",
+    "          14px/600. Board 1124:4530 names that blue itself. Every other",
+    "          selected-state in this editor uses `--color/accent-text` #1A56DB,",
+    "          which measures 5.6 on white; blue/500 is the DS's hover/decorative",
+    "          step. The board is wrong here and a founder call is needed, because",
+    "          the fix (accent-text) deviates from the drawing.",
+    "  4.39:1  the mono dimension readout, `--bk-ink-muted` on the well's",
+    "          `--bk-bg-subtle`. That is the systemic pair documented in",
+    "          docs/design-jobs/FIGMA-TO-CODE/CONTRAST-INK-MUTED.md — a token-value",
+    "          defect the boards specify, not something this call site can fix.",
+    "Both pre-date this pass; neither was introduced by it.",
+    "",
+    "Board sample data not conformed to: 'hero-dark.jpg' and '2400x1600' (the probe",
+    "renders 2133x1600, which is the crop area react-easy-crop reports for that",
+    "source at zoom 1)."
+  ]
+}

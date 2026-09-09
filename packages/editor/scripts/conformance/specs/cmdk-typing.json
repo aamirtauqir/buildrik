@@ -1,0 +1,179 @@
+{
+  "surface": "cmdk-typing",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "166:18",
+  "boardName": "cmdk-typing",
+  "figmaHash": "da36e476a2460060cf7a2d1a29ab5868dcb224066f893a6305db73fddaf64d72",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:16:00.844Z",
+  "copy": [
+    "revi",
+    "Open Review panel",
+    "Review panel"
+  ],
+  "targets": [
+    {
+      "nodeId": "166:18",
+      "name": "CmdK · typing — the SHELL palette (Cmd+K, shell/modals/CommandPalette.tsx, which cites these boards by id). Ships today.",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch cursor-pointer flex flex-col items-start overflow-clip relative rounded-[12px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:19",
+      "name": "Query",
+      "className": "border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-b border-solid h-[56px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "56px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:20",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[20px] not-italic text-[16px] text-[color:var(--color\\/ink,#111827)] text-left top-[17px] tracking-[-0.16px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "166:21",
+      "name": "Cmd · Open Review panel",
+      "className": "[word-break:break-word] h-[40px] overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "40px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:22",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[20px] left-[20px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] top-[10px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "166:23",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[580px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "166:24",
+      "name": "Cmd · Review panel",
+      "className": "[word-break:break-word] h-[40px] overflow-clip relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "40px"
+        }
+      }
+    },
+    {
+      "nodeId": "166:25",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[20px] left-[20px] not-italic text-[13px] text-[color:var(--color\\/ink,#111827)] top-[10px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "166:26",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Medium'] font-medium leading-[16px] left-[580px] text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1668:7233",
+      "name": "hotspot/back · to editor",
+      "className": "absolute bg-[rgba(0,0,0,0)] left-[-1px] opacity-0 size-[36px] top-[383px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        }
+      }
+    },
+    {
+      "nodeId": "1668:7360",
+      "name": "hotspot/state · CmdK · results",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[219px] opacity-0 top-[339px] w-[200px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "200px"
+        }
+      }
+    }
+  ]
+}

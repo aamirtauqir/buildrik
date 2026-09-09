@@ -1,0 +1,124 @@
+{
+  "surface": "history-milestone-suggestion-banner-code-mil",
+  "board": "History \u00b7 milestone suggestion banner (Figma 433:2348)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=history-milestone-banner",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "milestone-banner"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "banner",
+      "testId": "milestone-banner"
+    },
+    {
+      "name": "content",
+      "testId": "milestone-content",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2352"
+    },
+    {
+      "name": "trigger",
+      "testId": "milestone-trigger",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2353"
+    },
+    {
+      "name": "name",
+      "testId": "milestone-name",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2354"
+    },
+    {
+      "name": "reasoning",
+      "testId": "milestone-reasoning",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2355"
+    },
+    {
+      "name": "actions",
+      "testId": "milestone-actions",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2356"
+    },
+    {
+      "name": "btn-primary",
+      "testId": "milestone-save",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2357"
+    },
+    {
+      "name": "btn-secondary",
+      "testId": "milestone-edit",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2359"
+    },
+    {
+      "name": "btn-ghost",
+      "testId": "milestone-dismiss",
+      "spec": "history-milestone-suggestion-banner-code-mil",
+      "nodeId": "433:2361"
+    }
+  ],
+  "_note": [
+    "A COMPONENT board \u2014 its own layer name says so ('code:",
+    "MilestoneSuggestionBanner.tsx') \u2014 drawing all three states of one banner in a",
+    "600-wide gallery frame. `useAutoMilestone` only produces a suggestion after",
+    "the engine has watched a real editing session cross a trigger threshold, so",
+    "the component is mounted directly, inside the 280 drawer it actually ships",
+    "in.",
+    "",
+    "WHAT DRIFTED \u2014 the three buttons, and it was the whole action row:",
+    "  \u00b7 433:2359 draws Edit as btn/SECONDARY (white chip, --bk-border edge) and",
+    "    only 433:2361 Dismiss as the ghost. BOTH shipped ghost, so 'keep this",
+    "    suggestion and rename it' and 'throw it away' were the same control.",
+    "  \u00b7 the labels are 11/500; they shipped 12.",
+    "  \u00b7 the ghost's label is ink-SOFT (433:2362); it shipped ink-muted.",
+    "  \u00b7 every button is 10 across and 5 DOWN. `.milestone-btn` set a fixed 24",
+    "    height and `padding: 0 10px` \u2014 zero block padding, an invented height.",
+    "    The rules moved one class deeper (`.milestone-banner .milestone-btn`) so",
+    "    they cannot lose to flowbite's own h-10/px-5 on source order; that trap",
+    "    is what a single-class rule beside a `tw:` utility hits.",
+    "  \u00b7 433:2352 is a flex column with a 2px gap; the three lines carried their",
+    "    own margins, so the spacing belonged to the children rather than to the",
+    "    stack and changed when the name became an input.",
+    "",
+    "NOT anchored, and why:",
+    "  433:2350 the banner FRAME \u2014 600 wide, which is the gallery's width, not a",
+    "  surface. The banner ships full-bleed inside a 280 drawer (`margin: 0 12px`).",
+    "  Its other eight properties were measured against the board before the",
+    "  target was skipped and every one matched (2026-09-08: fill #ebf5ff, border",
+    "  --bk-alpha-accent-30, gap 8, padding 8/12, radius 8).",
+    "  433:2351 icon/clock \u2014 a 16px ring the board draws as a bordered circle and",
+    "  the code draws as an SVG stroke; there is no border-color pair to compare.",
+    "  433:2365 editing / 433:2377 saving \u2014 the same three properties per element",
+    "  as the suggested state, on the same components. The states themselves ARE",
+    "  built (the input opens on Edit; the primary disables and shows '\u2026' while",
+    "  saving \u2014 the ellipsis is now the board's single glyph, it was '...'), but",
+    "  measuring them here would re-measure the same CSS through a second click",
+    "  path.",
+    "  ACTION-ROW WRAP, seen and left: the board keeps the three buttons inline",
+    "  beside the content. At 280 they cannot be \u2014 'Save \u00b7 Edit \u00b7 Dismiss' at 11px",
+    "  with their insets is ~162 of a 230 inner width, which leaves 36 for the",
+    "  version name. The code wraps them onto their own row (`flexBasis: 100%`).",
+    "  A 600 gallery frame does not adjudicate a 280 drawer; this is the same",
+    "  class of question BLOCKERS B1 holds for Compare.",
+    "",
+    "CONTRAST: two failures at 4.38 \u2014 the trigger line and the reasoning line,",
+    "ink-muted on the accent tint, which is exactly what 433:2353/433:2355 paint",
+    "on 433:2350. Not introduced here (both colours predate this pass) and the",
+    "same pair history-saves-changes already baselines for the entry time.",
+    "",
+    "BOARD-COPY (2026-09-08): three leads, all of them the gallery's own state",
+    "captions \u2014 'SUGGESTED' (433:2349), 'EDITING' (433:2364), 'SAVING' (433:2376).",
+    "They label the three specimens on the sheet; nothing renders them and nothing",
+    "should."
+  ]
+}

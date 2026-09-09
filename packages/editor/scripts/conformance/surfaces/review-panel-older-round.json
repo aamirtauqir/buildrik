@@ -1,0 +1,173 @@
+{
+  "surface": "review-panel-older-round",
+  "board": "Review panel · older-round (Figma 157:169)",
+  "_note": [
+    "The second half of the chassis pair. 157:169 repeats 157:2's frame exactly",
+    "— same header, same 44 progress block, same 28 sent line, same 40 Compare",
+    "block, same dense secondary — so where the two agree they settle the panel.",
+    "This recipe re-measures those and adds what only this board draws: the",
+    "expanded rounds list and the read-only note.",
+    "",
+    "The board's own annotation node (1753:8430) says it: 'Rounds list only —",
+    "comments carry no round id (contracts §6.4), so a per-round comment view is",
+    "not buildable without a schema change. This board drew one; the code",
+    "renders these seven lines at 12/400.' A designer annotation is not",
+    "conformed (the 164:22 ledger ruling), but it IS the adjudication, and it",
+    "adjudicates to the code.",
+    "",
+    "WHAT MOVED:",
+    "  · The rounds list was `px-4 py-2 gap-1` over auto-height lines. 1753:8422",
+    "    is a 24px pitch inset 12 (which is what puts 1753:8423 at 256 in a 280",
+    "    panel), so the rows are their own 24-tall block inside the strip.",
+    "  · `Older rounds are read-only.` (157:219/157:220) was not built at all.",
+    "    It is the sentence that turns a list you cannot click into a deliberate",
+    "    limit, and the code's constraint is exactly what it states.",
+    "",
+    "  · The round LINES. 1753:8423-8429 read \"Round 6 · approved 3d ago\": the",
+    "    outcome, then a relative age — the scale the rest of this panel already",
+    "    uses (\"Sent 2d ago · Sara\"). They shipped as \"Round 6 · Approved by Sara",
+    "    · 9/5/2026\", so one panel spoke in both \"2d ago\" and a locale date, and",
+    "    repeated a name that is on the line above. Found by `check-board-copy`,",
+    "    not by `diff` — no property class covers text. The revocation suffix",
+    "    stays: outcome over revocation is a code contract (a revoked link does",
+    "    not undo an approval), and the board has no round that is both.",
+    "    NOTE the checker still lists these lines as leads after the fix — the",
+    "    live line is four text nodes (\"Round\", \"approved\", \"3d\", \"ago\") and it",
+    "    compares whole nodes. Read `measured/*.json` `rendered` to settle it.",
+    "",
+    "NOT anchored, and why:",
+    "  157:169 root — transparent panel root, the 164:22 ruling (see the",
+    "    detached-present recipe).",
+    "  1753:8422 POSITION — the board draws the expanded list directly under the",
+    "    progress bar, ABOVE the sent line, while the strip that toggles it sits",
+    "    at the foot. The code opens it under its own toggle. A disclosure that",
+    "    opens 600px away from its control is not a layout this measures.",
+    "  1753:8422 height 176 IS anchored, and it is 7 rows × 24 + 8: the pitch is",
+    "    the only way the spec expresses row height, since 1753:8423 carries",
+    "    nothing but its width. The probe renders the board's seven rounds.",
+    "  157:207 Round history (h70) and 157:214 Re-send (h44) — see the",
+    "    detached-present recipe; 70 is unexplained on both boards and the",
+    "    re-send block also carries `Revoke link`, which 158:105/158:162 require.",
+    "  229:1104 Re-send fill — `--flowbite/blue/600`, against the product's one",
+    "    accent #1A56DB. Label only. Same call as 157:2.",
+    "  1753:8430 — the designer annotation itself."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=review-panel-older-round&siteId=probe-site",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "review-rounds-toggle"
+    },
+    {
+      "action": "click",
+      "testId": "review-rounds-toggle"
+    },
+    {
+      "action": "waitFor",
+      "testId": "review-rounds-note"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "review-panel-older-round",
+      "nodeId": "208:681"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "review-panel-older-round",
+      "nodeId": "I208:681;16:7"
+    },
+    {
+      "name": "progress-block",
+      "testId": "review-progress",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:175"
+    },
+    {
+      "name": "progress-track",
+      "testId": "review-progress-track",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:176"
+    },
+    {
+      "name": "progress-count",
+      "testId": "review-progress-count",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:178"
+    },
+    {
+      "name": "sent-meta-block",
+      "testId": "review-sent-meta",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:179"
+    },
+    {
+      "name": "sent-line",
+      "testId": "review-sent-line",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:180"
+    },
+    {
+      "name": "rounds-rows",
+      "testId": "review-rounds-rows",
+      "spec": "review-panel-older-round",
+      "nodeId": "1753:8422"
+    },
+    {
+      "name": "rounds-row",
+      "testId": "review-round-6",
+      "spec": "review-panel-older-round",
+      "nodeId": "1753:8423"
+    },
+    {
+      "name": "rounds-note-block",
+      "testId": "review-rounds-note",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:219"
+    },
+    {
+      "name": "rounds-note-text",
+      "testId": "review-rounds-note-text",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:220"
+    },
+    {
+      "name": "round-strip-label",
+      "testId": "review-rounds-toggle",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:209"
+    },
+    {
+      "name": "compare-block",
+      "testId": "review-compare-block",
+      "spec": "review-panel-older-round",
+      "nodeId": "157:211"
+    },
+    {
+      "name": "compare-button",
+      "testId": "review-compare",
+      "spec": "review-panel-older-round",
+      "nodeId": "229:1102"
+    },
+    {
+      "name": "compare-label",
+      "testId": "review-compare",
+      "spec": "review-panel-older-round",
+      "nodeId": "I229:1102;9:31"
+    },
+    {
+      "name": "primary-label",
+      "testId": "review-primary",
+      "spec": "review-panel-older-round",
+      "nodeId": "I229:1104;9:19"
+    }
+  ]
+}

@@ -1,0 +1,452 @@
+{
+  "surface": "brand-components",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "153:29",
+  "boardName": "brand-components",
+  "figmaHash": "9370c8d3adf354b9d000111535263193180ce759b56d6eb762bc49b91c331b15",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:44:27.204Z",
+  "copy": [
+    "Brand",
+    "‹ Components",
+    "Hero",
+    "Menu card",
+    "Booking form",
+    "Footer",
+    "Gallery",
+    "Testimonial",
+    "✨ Generate with AI",
+    "Your saved components · 0",
+    "No saved components yet — save a selection from the canvas to start.",
+    "2 variants"
+  ],
+  "targets": [
+    {
+      "nodeId": "153:29",
+      "name": "Brand · components",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:561",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:561;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "153:34",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:35",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "153:36",
+      "name": "Comp · Hero",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:37",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "153:38",
+      "name": null,
+      "className": "absolute left-[256px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "153:39",
+      "name": "Comp · Menu card",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative rounded-[8px] shrink-0 text-[13px] text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:40",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "153:41",
+      "name": null,
+      "className": "absolute left-[256px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "153:42",
+      "name": "Comp · Booking form",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:43",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "153:44",
+      "name": null,
+      "className": "absolute left-[256px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "153:45",
+      "name": "Comp · Footer",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:46",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "153:47",
+      "name": null,
+      "className": "absolute left-[256px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "153:48",
+      "name": "Comp · Gallery",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:49",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "153:50",
+      "name": null,
+      "className": "absolute left-[256px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "153:51",
+      "name": "Comp · Testimonial",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[20px] not-italic overflow-clip relative shrink-0 text-[13px] text-left w-full whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:52",
+      "name": null,
+      "className": "absolute left-[16px] text-[color:var(--color\\/ink,#111827)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "153:53",
+      "name": null,
+      "className": "absolute left-[256px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[12px]",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "153:55",
+      "name": "Generate with AI",
+      "className": "bg-[var(--color\\/accent-tint,#ebf5ff)] h-[44px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/accent-tint",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "44px"
+        }
+      }
+    },
+    {
+      "nodeId": "153:56",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[14px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1670:7217",
+      "name": "hotspot/back · Brand · root",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[-1px] opacity-0 top-[773px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1720:17387",
+      "name": "hotspot/state · components · saved-empty",
+      "className": "absolute bg-[#f3f4f6] h-[28px] left-[-1px] top-[783px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1748:8393",
+      "name": "saved-components",
+      "className": "[word-break:break-word] h-[46px] leading-[normal] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left w-[280px]",
+      "props": {
+        "height": {
+          "value": "46px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1748:8395",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[12px] top-[22px] w-[256px]",
+      "props": {
+        "width": {
+          "value": "256px"
+        }
+      }
+    },
+    {
+      "nodeId": "1748:8396",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[#6b7280] text-[11px] text-left w-[51px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "width": {
+          "value": "51px"
+        }
+      }
+    }
+  ]
+}

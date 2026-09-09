@@ -1,0 +1,209 @@
+{
+  "surface": "templates-usage-drawer",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1169:4764",
+  "boardName": "templates-usage-drawer",
+  "figmaHash": "3b24282f137ffed7d0d1e116d9b0756c5a4c8d76787ee70b0ebe49a23df743f6",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:50:04.314Z",
+  "copy": [
+    "Where 'Bistro Menu' is used",
+    "Menu",
+    "applied Aug 2",
+    "Menu 2",
+    "created today",
+    "The Versions tab flags pages applied from an older version of this template."
+  ],
+  "targets": [
+    {
+      "nodeId": "1169:4764",
+      "name": "Templates · usage-drawer",
+      "className": "[word-break:break-word] bg-[var(--color\\/bg-elevated,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch cursor-pointer flex flex-col gap-[10px] items-start not-italic overflow-clip px-[16px] py-[14px] relative rounded-[12px] shadow-[0px_8px_24px_0px_rgba(18,23,38,0.18)] size-full text-left",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-elevated",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "gap": {
+          "value": "10px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "14px"
+        },
+        "padding-bottom": {
+          "value": "14px"
+        },
+        "border-radius": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4765",
+      "name": null,
+      "className": "font-['Inter:Semi_Bold'] font-semibold leading-[normal] relative shrink-0 text-[12px] text-[color:var(--color\\/ink,#111827)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4766",
+      "name": "use/Menu",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[8px] items-start overflow-clip px-[10px] py-[7px] relative rounded-[6px] shrink-0 text-[11px] w-full whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4767",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium leading-[normal] relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4768",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal leading-[16px] relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4769",
+      "name": "use/Menu 2",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex gap-[8px] items-start overflow-clip px-[10px] py-[7px] relative rounded-[6px] shrink-0 text-[11px] w-full whitespace-nowrap",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "7px"
+        },
+        "padding-bottom": {
+          "value": "7px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4770",
+      "name": null,
+      "className": "font-['Inter:Medium'] font-medium leading-[normal] relative shrink-0 text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4771",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal leading-[16px] relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1169:4772",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal leading-[16px] relative shrink-0 text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] w-[348px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "348px"
+        }
+      }
+    }
+  ]
+}

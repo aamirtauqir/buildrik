@@ -1,0 +1,105 @@
+{
+  "surface": "media-modal-picker",
+  "board": "Media · modal · picker (choose for element) (Figma 1164:4713)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-picker-modal",
+  "viewport": {
+    "width": 640,
+    "height": 640
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "picker-view-toggle"
+    }
+  ],
+  "contrastScope": "body",
+  "_note": [
+    "CONTRAST SCOPE IS `body`. ModalRoot PORTALS to the overlay root, so",
+    "`[data-probe]` contains none of this dialog and a probe-scoped sweep",
+    "reports 0 failures from an empty subtree — the silence measure.mjs now",
+    "exits 3 on. The wait names the LIBRARY tab's toolbar rather than the modal",
+    "frame, because all four tabs render inside the same frame.",
+    "",
+    "BOARD WON: 1164:4716 puts the 'for <element>' subtitle at 11 where it",
+    "shipped 12, and 1746:8390/8392/8394 make the Grid/List pair two 28-high",
+    "chips on a 4 radius at 12px — accent-filled for the active one, white on a",
+    "--color/border-medium edge for the other. They shipped at flowbite's own",
+    "height and its rounded-lg, because `size=\"xs\"` constrains neither: a",
+    "default that nothing contradicts is not overridden, it is simply kept.",
+    "",
+    "THE MODAL FRAME AND ITS HEAD ARE NOT JOINED, on the shared-primitive rule.",
+    "1164:4713 gives the frame a 16/14 inset and a 12 gap; in the product those",
+    "live on MODAL_HEAD_CLASS / MODAL_BODY_CLASS rather than the frame, and",
+    "Modal.tsx's own comment records that the 16/14 was MEASURED on this board",
+    "plus five others (1175:4827, 1205:4804, 1170:4713/4749, 1172:4840,",
+    "184:24). One frame does not re-settle a control six frames agree on, and",
+    "the frame's own padding is 0 by construction. Same for the tab PILLS:",
+    "1173:4805-4812 draw them 11px on a 5 vertical pad, and chrome-ui Tabs is",
+    "measured against 1172:4867 and 1172:4825 as well — its docstring names all",
+    "three. The tab ROW (1173:4804) is joined, because gap and fill are this",
+    "frame's own arithmetic and agree.",
+    "",
+    "NOT JOINED — THE RESULT GRID, and it is a structural difference rather",
+    "than drift. 1164:4721-4730 draw eight bare 140x96 thumbs on a 10 gutter.",
+    "The product's AssetCard is a bordered card: thumb, then the file NAME and",
+    "SIZE under it. Joining the board's node would compare a 96-tall thumb",
+    "against a card that is 96 plus two lines of metadata — and the metadata is",
+    "information the board omits, not chrome the product invented. A picker",
+    "that shows eight identical grey rectangles and no filenames is not a",
+    "target worth conforming to. diff.mjs cannot see structure anyway (README",
+    "§What this harness cannot see); this is recorded so the next reader knows",
+    "it was looked at.",
+    "",
+    "ALSO NOT JOINED: 1164:4719/4720, the search field — chrome-ui TextInput,",
+    "boards.json authority=open:input-fill. 1173:4814, the accepts/limit",
+    "footnote — a text frame at w-434 inside a 608 column, which is the frame's",
+    "own wrap point rather than a width the product should hold; its copy IS",
+    "conformed and carries the board's own limits.",
+    "",
+    "1746:8392 / 1746:8394 (the Grid and List chips themselves) ARE conformed —",
+    "accent fill, --color/border-medium edge, 28 high, 4 radius, 12px — but not",
+    "JOINED, because each node's only remaining property is a text-hug width (45",
+    "and 41) and the browser measures the same labels at 43.84 and 41.95. A",
+    "1.16px disagreement between Figma's advance width for 'Grid' at 12px Inter",
+    "and Chrome's is export noise, not design, and holding it would need a",
+    "literal `w-[45px]` — which Gate 14's layout-literal ratchet bans. The pair's",
+    "box IS measured, through 1746:8390 (28 x 90 = 45 + 41 + a 4 gap).",
+    "",
+    "A HARNESS DEFECT WAS FOUND HERE, and it was manufacturing failures rather",
+    "than hiding them. The contrast sweep's `parse()` read only `rgb()`/`rgba()`;",
+    "Tailwind v4 emits `oklab(0 0 0 / 0.6)` for every `bg-*/NN` opacity modifier.",
+    "An unreadable colour returned null, `effectiveBg` treats null as no fill and",
+    "composites past it, so AssetCard's eight white-on-black-scrim delete buttons",
+    "measured white-on-WHITE at 1.00:1 — eight fabricated WCAG failures on a",
+    "control that is perfectly legible. The same silence would hide a REAL",
+    "failure on any element whose fill is an oklab/oklch/color() value, which is",
+    "every `/NN` opacity in this codebase. measure.mjs now rasterises what the",
+    "regex cannot read through a 1x1 canvas, in the browser's own colour engine."
+  ],
+  "targets": [
+    {
+      "name": "title",
+      "testId": "picker-title",
+      "spec": "media-modal-picker",
+      "nodeId": "1164:4715"
+    },
+    {
+      "name": "for-label",
+      "testId": "picker-for-label",
+      "spec": "media-modal-picker",
+      "nodeId": "1164:4716"
+    },
+    {
+      "name": "tabs",
+      "testId": "picker-tabs",
+      "spec": "media-modal-picker",
+      "nodeId": "1173:4804"
+    },
+    {
+      "name": "view-toggle",
+      "testId": "picker-view-toggle",
+      "spec": "media-modal-picker",
+      "nodeId": "1746:8390"
+    }
+  ]
+}

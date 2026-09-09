@@ -1,0 +1,207 @@
+{
+  "surface": "cmdk-empty",
+  "board": "CmdK · empty (Figma 166:2)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "Control+k"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-palette"
+    },
+    {
+      "action": "click",
+      "testId": "cmdk-row-nav-add"
+    },
+    {
+      "action": "press",
+      "key": "Control+k"
+    },
+    {
+      "action": "waitFor",
+      "testId": "cmdk-band-recent"
+    }
+  ],
+  "contrastScope": "[data-testid=\"cmdk-palette\"]",
+  "targets": [
+    {
+      "name": "palette",
+      "testId": "cmdk-palette",
+      "spec": "cmdk-empty",
+      "nodeId": "166:2"
+    },
+    {
+      "name": "query-row",
+      "testId": "cmdk-query",
+      "spec": "cmdk-empty",
+      "nodeId": "166:3"
+    },
+    {
+      "name": "query-placeholder",
+      "testId": "cmdk-input"
+    },
+    {
+      "name": "band-recent",
+      "testId": "cmdk-band-recent",
+      "spec": "cmdk-empty",
+      "nodeId": "220:927"
+    },
+    {
+      "name": "band-recent-tint",
+      "testId": "cmdk-band-recent",
+      "spec": "cmdk-empty",
+      "nodeId": "I220:927;220:6"
+    },
+    {
+      "name": "band-recent-label",
+      "testId": "cmdk-band-recent"
+    },
+    {
+      "name": "row-recent",
+      "testId": "cmdk-row-nav-add",
+      "spec": "cmdk-empty",
+      "nodeId": "166:7"
+    },
+    {
+      "name": "row-recent-label",
+      "testId": "cmdk-label-nav-add",
+      "spec": "cmdk-empty",
+      "nodeId": "166:8"
+    },
+    {
+      "name": "row-recent-kbd",
+      "testId": "cmdk-kbd-nav-add",
+      "spec": "cmdk-empty",
+      "nodeId": "166:9"
+    },
+    {
+      "name": "band-suggested",
+      "testId": "cmdk-band-suggested",
+      "spec": "cmdk-empty",
+      "nodeId": "220:931"
+    },
+    {
+      "name": "band-suggested-tint",
+      "testId": "cmdk-band-suggested",
+      "spec": "cmdk-empty",
+      "nodeId": "I220:931;220:6"
+    },
+    {
+      "name": "band-suggested-label",
+      "testId": "cmdk-band-suggested"
+    },
+    {
+      "name": "row-ai",
+      "testId": "cmdk-row-nav-ai",
+      "spec": "cmdk-empty",
+      "nodeId": "166:12"
+    },
+    {
+      "name": "row-ai-label",
+      "testId": "cmdk-label-nav-ai",
+      "spec": "cmdk-empty",
+      "nodeId": "166:13"
+    },
+    {
+      "name": "row-ai-kbd",
+      "testId": "cmdk-kbd-nav-ai",
+      "spec": "cmdk-empty",
+      "nodeId": "166:14"
+    },
+    {
+      "name": "row-templates",
+      "testId": "cmdk-row-nav-templates",
+      "spec": "cmdk-empty",
+      "nodeId": "166:15"
+    },
+    {
+      "name": "row-templates-label",
+      "testId": "cmdk-label-nav-templates",
+      "spec": "cmdk-empty",
+      "nodeId": "166:16"
+    },
+    {
+      "name": "row-templates-kbd",
+      "testId": "cmdk-kbd-nav-templates",
+      "spec": "cmdk-empty",
+      "nodeId": "166:17"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at :5050 — the shell palette is a real ⌘K away, so no probe.",
+    "The steps open it once, RUN a row (cmdk-row-nav-add) so `commandRecents`",
+    "has something to put under RECENT, then reopen: board 166:2 draws a RECENT",
+    "strip, and an untouched session has no recents to draw one from.",
+    "",
+    "THE BOARD SETTLES ITS OWN WIDTH, against boards.json. 166:2's frame name",
+    "reads: \"640×420 is chrome-ui/CommandPalette.tsx, which has no importer; the",
+    "shipping palette is 560 wide (shell/modals/CommandPalette.tsx:388,",
+    "tw:w-140).\" So the row note \"modal 560x450 vs 640x420\" is stale — the 640",
+    "frame is a DIFFERENT component's, the founder wrote that into the board, and",
+    "the shipping 560 is not drift. Nothing changed here. Same for the height:",
+    "the root exports `size-full` in a flex-col of `shrink-0` children, so 420 is",
+    "frame slack, not a declared box; neither width nor height reaches the spec.",
+    "",
+    "CODE CHANGED, and the reason is measured, not stylistic — see the two",
+    "entries under \"the palette moved\" in the sibling recipes. Both changes are",
+    "in shell/modals/CommandPalette.tsx and both move ALL FIVE CmdK boards plus",
+    "166:51 / 166:58, so anyone holding one should re-measure:",
+    "  1. ROW HOVER WAS 1.97:1. The rows are chrome-ui <Button> with no variant,",
+    "     which is flowbite's PRIMARY: the `tw:bg-*` on the row overrode the",
+    "     resting fill through twMerge, but nothing overrode",
+    "     `enabled:hover:bg-primary-800`, so the row under the pointer painted",
+    "     #1E429F beneath a 13px --bk-ink label. measure.mjs read 1.97 and 1.86",
+    "     on this very surface. Now `variant=\"ghost\"`, with the selected row",
+    "     holding its accent tint on hover too (mouseEnter is what selects it).",
+    "     No CmdK board draws a hover state, so the board constrains nothing here.",
+    "  2. BAND ORDER is now fixed (Recent · Suggested · Actions · Go to) rather",
+    "     than buildCommands' emission order. Adjudicated on 303:1978, not here —",
+    "     this board's own two strips are RECENT then SUGGESTED either way, and",
+    "     they still are.",
+    "",
+    "NOT JOINED, three targets, each because the live element's own colour is a",
+    "settled disagreement rather than drift:",
+    "  166:4 the query PLACEHOLDER — the board colours the placeholder string",
+    "  ink-disabled, and the live placeholder IS ink-disabled",
+    "  (`placeholder:text-[var(--bk-ink-disabled)]`). But `cmdk-input` is the real",
+    "  <input>, whose computed `color` is the TYPED colour (--bk-ink); a probe",
+    "  reads the element, not its ::placeholder. Joining it would compare the",
+    "  wrong two colours and fail a field that is right. The four sibling boards",
+    "  draw a TYPED query at --color/ink and those ARE joined to cmdk-input.",
+    "  I220:927;16:17 / I220:931;16:17 the band LABELS — board says 11/16",
+    "  ink-muted; live is ink-soft, deliberately: 11px --bk-ink-muted on",
+    "  --bk-bg-subtle is 4.39:1 (axe flagged 6 nodes), which the component's own",
+    "  comment records as open decision #1 in FIGMA-TO-CODE/OPEN-DECISIONS.md and",
+    "  a Figma-side fix. Conforming the colour would re-introduce a known AA",
+    "  failure. Size and leading match; only the colour is held open.",
+    "",
+    "CONTRAST, REPORTED NOT HIDDEN — 4.38:1 on the SELECTED row's chord glyph:",
+    "--bk-ink-muted #6B7280 on --bk-accent-tint #EBF5FF at 11px (\"A\", the Insert",
+    "chord under RECENT, which is row 0 and therefore selected on open). The pair",
+    "is recorded in the measured baseline so a NEW failing pair still fails the",
+    "run; it is not silenced. It cannot be conformed away from either side: the",
+    "chord colour is 166:9's own (--color/ink-muted, and diff compares it), while",
+    "the tint under it is the PRODUCT's — no CmdK board draws a selected row at",
+    "all. Fixing it means either a lighter selection fill or ink-soft chords on",
+    "the selected row only, and both are decisions above this recipe. Identical",
+    "pair, identical number, already flagged on pages-command-palette-k."
+  ]
+}

@@ -1,0 +1,1514 @@
+{
+  "surface": "insert-blocks-expanded",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "1069:4707",
+  "boardName": "insert-blocks-expanded",
+  "figmaHash": "2c06c1e7648c0f53a42f5115dfe3e79b9f10f9c4b4e494b6720f3c3c903e8928",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:49:21.389Z",
+  "copy": [
+    "Insert",
+    "Search elements",
+    "⌘F",
+    "ELEMENTS",
+    "53",
+    "BLOCKS",
+    "50",
+    "Hero",
+    "Feature row",
+    "Feature grid",
+    "CTA banner",
+    "Pricing table",
+    "Pricing card",
+    "FAQ",
+    "Testimonial",
+    "Team grid",
+    "Team row",
+    "Stats row",
+    "Stats grid",
+    "Logo cloud",
+    "Gallery grid",
+    "Gallery masonry",
+    "Gallery carousel",
+    "COMPONENTS",
+    "14",
+    "TEMPLATES",
+    "10",
+    "MINE",
+    "⌥ Paste HTML…",
+    "💡 Tip 2/4",
+    "‹ › ✕"
+  ],
+  "targets": [
+    {
+      "nodeId": "2100:10963",
+      "name": null,
+      "className": "[word-break:break-word] content-stretch flex h-[44px] items-center leading-[normal] not-italic overflow-clip pl-[16px] pr-[12px] py-[12px] relative text-[14px] w-[280px]",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "2100:10961",
+      "name": null,
+      "className": "flex-[1_0_0] font-['Inter:Semi_Bold'] font-semibold min-w-px relative text-[color:var(--color\\/ink,#111827)]",
+      "props": {
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "2100:10962",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4707",
+      "name": "Insert · blocks-expanded — [not-implemented] the thumbnails. shared/types/block.ts:25 declares preview?: string and nothing sets it: grep -rn preview packages/editor/src/blocks/ returns zero, so all 50 cards fall through to an empty 136x80 grey rectangle under an 11px label (GroupSection.tsx:234-262, UX-A-05). DESIGN-AHEAD: the picture grid is kept here as the target for when previews exist; the shipping drawing is the sibling Insert · blocks-expanded · rows. BLOCKS cards are also not draggable — only ELEMENTS passes draggable (UX-A-06). UX-A-28: three of these 50 — Product Card, Product Grid, Product Detail — start a data-modelling flow on insert and nothing on the card says so. useComposerInit.ts:735-763 listens for ELEMENT_INSERTED and opens the CMS collection-setup modal over the editor; hasPromptedForCollectionRef is set BEFORE the async collection lookup (:744-746), so one dismissal is permanent and the block is left bound to no collection with no route back to the offer.",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex flex-col items-start overflow-clip relative rounded-[8px] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.08)] size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4711",
+      "name": "Search",
+      "className": "content-stretch flex h-[40px] items-start overflow-clip px-[12px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "40px"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4712",
+      "name": "search box",
+      "className": "[word-break:break-word] bg-[var(--color\\/bg-subtle,#f3f4f6)] content-stretch flex flex-[1_0_0] font-['Inter:Regular'] font-normal h-[28px] items-center leading-[normal] min-w-px not-italic overflow-clip px-[8px] py-[5px] relative rounded-[6px] text-[color:var(--color\\/ink-placeholder,#9ca3af)]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "8px"
+        },
+        "padding-right": {
+          "value": "8px"
+        },
+        "padding-top": {
+          "value": "5px"
+        },
+        "padding-bottom": {
+          "value": "5px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4713",
+      "name": null,
+      "className": "flex-[1_0_0] min-w-px relative text-[12px]",
+      "props": {
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4714",
+      "name": null,
+      "className": "relative shrink-0 text-[11px] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4716",
+      "name": "Group header · ELEMENTS",
+      "className": "[word-break:break-word] content-stretch flex gap-[6px] h-[28px] items-center leading-[normal] not-italic overflow-clip pl-[12px] pr-[16px] py-[6px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4717",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4718",
+      "name": null,
+      "className": "flex-[1_0_0] font-['Inter:Semi_Bold'] font-semibold min-w-px relative text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4719",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4720",
+      "name": "Group header · BLOCKS",
+      "className": "[word-break:break-word] content-stretch flex gap-[6px] h-[28px] items-center leading-[normal] not-italic overflow-clip pl-[12px] pr-[16px] py-[6px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4721",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4722",
+      "name": null,
+      "className": "flex-[1_0_0] font-['Inter:Semi_Bold'] font-semibold min-w-px relative text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4723",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4724",
+      "name": "Blocks grid",
+      "className": "content-start flex flex-wrap gap-[8px] h-[100px] items-start overflow-clip px-[16px] py-[4px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "100px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "4px"
+        },
+        "padding-bottom": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4725",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4726",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4727",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4728",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4729",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4730",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4731",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4732",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4733",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4734",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4735",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4736",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4737",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4738",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4739",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4740",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4741",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4742",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4743",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4744",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4745",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4746",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4747",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4748",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4749",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4750",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4751",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4752",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4753",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4754",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4755",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4756",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4757",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4758",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4759",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4760",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4761",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4762",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4763",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4764",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4765",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4766",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4767",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4768",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4769",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4770",
+      "name": "Card",
+      "className": "content-stretch flex flex-col gap-[6px] h-[108px] items-start overflow-clip relative shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "108px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4771",
+      "name": "Rectangle",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[80px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "80px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4772",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4773",
+      "name": "Group header · COMPONENTS",
+      "className": "[word-break:break-word] content-stretch flex gap-[6px] h-[28px] items-center leading-[normal] not-italic overflow-clip pl-[12px] pr-[16px] py-[6px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4774",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4775",
+      "name": null,
+      "className": "flex-[1_0_0] font-['Inter:Semi_Bold'] font-semibold min-w-px relative text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4776",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4777",
+      "name": "[not-implemented] Group header · TEMPLATES — removed from Insert on 2026-08-07; the panel builds four groups (catalog/groups.ts:1-6)",
+      "className": "[word-break:break-word] content-stretch flex gap-[6px] h-[28px] items-center leading-[normal] not-italic overflow-clip pl-[12px] pr-[16px] py-[6px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4778",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4779",
+      "name": null,
+      "className": "flex-[1_0_0] font-['Inter:Semi_Bold'] font-semibold min-w-px relative text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4780",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4781",
+      "name": "Group header · MINE",
+      "className": "[word-break:break-word] content-stretch flex gap-[6px] h-[28px] items-center leading-[normal] not-italic overflow-clip pl-[12px] pr-[16px] py-[6px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4782",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[10px] text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "10px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4783",
+      "name": null,
+      "className": "flex-[1_0_0] font-['Inter:Semi_Bold'] font-semibold min-w-px relative text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] tracking-[0.5px]",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4784",
+      "name": null,
+      "className": "font-['Inter:Regular'] font-normal relative shrink-0 text-[11px] text-[color:var(--color\\/ink-placeholder,#9ca3af)] whitespace-nowrap",
+      "props": {
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-placeholder",
+          "value": "#9ca3af"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4785",
+      "name": "Paste HTML",
+      "className": "content-stretch flex h-[32px] items-center overflow-clip px-[16px] py-[8px] relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "8px"
+        },
+        "padding-bottom": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4786",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4787",
+      "name": "TipsFooter",
+      "className": "[word-break:break-word] bg-[var(--color\\/bg-selected,#ebf5ff)] content-stretch flex font-['Inter:Regular'] font-normal h-[28px] items-center leading-[normal] not-italic overflow-clip px-[12px] py-[6px] relative shrink-0 text-[11px] w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-selected",
+          "value": "#ebf5ff"
+        },
+        "height": {
+          "value": "28px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "12px"
+        },
+        "padding-right": {
+          "value": "12px"
+        },
+        "padding-top": {
+          "value": "6px"
+        },
+        "padding-bottom": {
+          "value": "6px"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4788",
+      "name": null,
+      "className": "flex-[1_0_0] min-w-px relative text-[#4270d9] whitespace-pre-wrap",
+      "props": {
+        "color": {
+          "value": "#4270d9"
+        }
+      }
+    },
+    {
+      "nodeId": "1069:4789",
+      "name": null,
+      "className": "relative shrink-0 text-[color:var(--color\\/ink-muted,#6b7280)] whitespace-pre",
+      "props": {
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "1668:7219",
+      "name": "hotspot/back · Insert · default",
+      "className": "absolute bg-[rgba(0,0,0,0)] block cursor-pointer left-0 opacity-0 size-[36px] top-[776px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "surface": "pages-empty",
+  "board": "Pages \u00b7 one-page (Figma 141:124)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=pages-onepage",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "pages-onepage"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "pages-empty",
+      "nodeId": "208:161"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "pages-empty",
+      "nodeId": "I208:161;16:7"
+    },
+    {
+      "name": "home-row",
+      "testId": "page-row-home",
+      "spec": "pages-empty",
+      "nodeId": "141:139"
+    },
+    {
+      "name": "home-row-checkbox",
+      "testId": "page-row-checkbox-home",
+      "spec": "pages-empty",
+      "nodeId": "227:937"
+    },
+    {
+      "name": "home-row-name",
+      "testId": "page-row-name-home",
+      "spec": "pages-empty",
+      "nodeId": "141:142"
+    },
+    {
+      "name": "onepage-note",
+      "testId": "pages-onepage",
+      "spec": "pages-empty",
+      "nodeId": "141:162"
+    },
+    {
+      "name": "onepage-text",
+      "testId": "pages-onepage-text",
+      "spec": "pages-empty",
+      "nodeId": "141:163"
+    },
+    {
+      "name": "onepage-add",
+      "testId": "pages-onepage-add",
+      "spec": "pages-empty",
+      "nodeId": "141:164"
+    },
+    {
+      "name": "add-page",
+      "testId": "pages-add-page",
+      "spec": "pages-empty",
+      "nodeId": "141:161"
+    },
+    {
+      "name": "footer",
+      "testId": "pages-footer"
+    },
+    {
+      "name": "search-band",
+      "testId": "pages-search-band"
+    }
+  ],
+  "_note": [
+    "The board is named 'Pages \u00b7 empty' in the manifest and 'Pages \u00b7 one-page' in",
+    "Figma, and the Figma name is the accurate one: the branch is",
+    "`!search && pages.length === 1` (PageList.tsx:351). It is not an empty list \u2014",
+    "the single row is drawn, and the note sits UNDER it. The probe case hands",
+    "PageList a one-page array, which is the shape `usePages` computes for a new",
+    "site; the composition is the one PagesTab renders and the one",
+    "`pages-load-error` and `pages-bulk-select` already measure.",
+    "",
+    "CONFORMED to the board in this pass \u2014 two real defects, one of them the",
+    "same one `pages-load-error` found in its own block:",
+    "",
+    "  `.bd-pg-onepage` lives inside `.bd-pg-list`, whose 6px side gutter it",
+    "  inherited, so the block measured 268 wide and its 24px text column 220 \u2014",
+    "  against the board's 280 and 232 (141:163 and 141:164 are both w-232 in a",
+    "  280 panel). It now carries `margin: 0 -6px`, the same reach-to-the-edge",
+    "  fix the error block got, because unlike that block it CANNOT be hoisted to",
+    "  a sibling: it belongs under the row, inside the list.",
+    "",
+    "  the note's own box: `align-items` center -> stretch, padding-top 24 -> 32,",
+    "  min-height 0 -> 120, and 13/20 stated on the block. 141:162 is a 120-tall",
+    "  band with its two lines at y32 and y60; centring the flex items had shrunk",
+    "  each to the width of its own words, so '+ Add page' \u2014 the only control in",
+    "  the state \u2014 had a hit area 72px wide instead of the 232 the board draws.",
+    "  Same defect, same shape, as the retry button in 141:203.",
+    "  Measured after: block 280x120, both lines 232 wide, at y+32 and y+60.",
+    "",
+    "NOT JOINED, with reasons:",
+    "",
+    "  the home GLYPH (141:141) \u2014 the board draws '\u2302' as 12/18 text; the code",
+    "  draws a stroked SVG roof (PageRow.tsx:233-255, board 140:19). A font-size",
+    "  join between a text glyph and an SVG compares nothing. Same call the",
+    "  Layers eye/lock records for 1082:4758.",
+    "",
+    "  the search BAND (141:129) and BOX (141:130) \u2014 `pages-load-error` settled",
+    "  both: the band's own border and radius would draw a second box around the",
+    "  box, and 166 is `flex: 1` leftovers rather than a spec.",
+    "",
+    "  the Add-page FOOT (141:160) \u2014 36 on the board, 54 shipped, because the",
+    "  shipped foot also carries 'From template' and the \u22ee holding 'New folder'",
+    "  (founder call 2026-08-28). Its LABEL (141:161) matches and IS joined.",
+    "",
+    "  the dirty dot (141:143) \u2014 the board draws one on Home; `isDirty` is a",
+    "  per-page unsaved flag, not part of this state, and the fixture has none.",
+    "",
+    "  the panel ROOT (141:124) and the back hotspot (1668:7229).",
+    "",
+    "FOUND, NOT FIXED \u2014 and the BOARD found it first. 2838:12165 is a sticky on",
+    "this frame, not UI: 'UX-B-27 \u2014 this is the state for a site that genuinely",
+    "HAS one page. When the project fails to load the shell falls back to browser",
+    "storage and, failing that, invents a page called Home",
+    "(useComposerInit.ts:280-381), and this copy then ships over a site with ten",
+    "pages on the server.' Verified still live this pass: nothing between",
+    "useComposerInit's invented-Home fallback and PageList's `pages.length === 1`",
+    "distinguishes the two, so a failed load renders 'This site has one page.'",
+    "over a site that has ten. Figma already names the board that should own it",
+    "('Pages \u00b7 local-only \u00b7 project load failed'); it is not in boards.json and",
+    "the state has no flag to render from, so this is a build, not a conform."
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "surface": "s1-5-session-expired",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "294:1976",
+  "boardName": "s1-5-session-expired",
+  "figmaHash": "5e042ac004c021caeaab8ee2e41196032cced378efb19e7fade35cfccf43e3b2",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:45:11.514Z",
+  "copy": [
+    "Your session expired",
+    "Sign in again to pick up where you left off. Your work is saved.",
+    "Sign in"
+  ],
+  "targets": [
+    {
+      "nodeId": "294:1976",
+      "name": "S1.5 · session-expired",
+      "className": "bg-[var(--color\\/bg-app,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-app",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "294:1977",
+      "name": "Frame",
+      "className": "absolute content-stretch flex flex-col gap-[16px] items-center left-[480px] overflow-clip top-[361px]",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "294:1979",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Semi_Bold'] font-semibold leading-[normal] not-italic relative shrink-0 text-[24px] text-[color:var(--color\\/ink,#111827)] text-center w-[480px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "24px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        },
+        "width": {
+          "value": "480px"
+        }
+      }
+    },
+    {
+      "nodeId": "294:1980",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[normal] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-muted,#6b7280)] text-center w-[480px]",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "480px"
+        }
+      }
+    },
+    {
+      "nodeId": "334:2218",
+      "name": "Button",
+      "className": "bg-[var(--color\\/accent,#1a56db)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[32px] items-center justify-center px-[16px] py-[10px] relative rounded-[8px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--color/accent",
+          "value": "#1a56db"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I334:2218;9:19",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "444:2396",
+      "name": "hotspot/back · S1.5 · retrying",
+      "className": "absolute h-[34px] left-[16px] top-[850px] w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,424 @@
+{
+  "surface": "brand-lint-suppressed",
+  "board": "Brand \u00b7 lint \u00b7 suppressed (Figma 306:2217)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-tokens"
+    },
+    {
+      "action": "click",
+      "testId": "brand-kind-color"
+    },
+    {
+      "action": "click",
+      "testId": "brand-token-row-color-action"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-token-ignore"
+    },
+    {
+      "action": "click",
+      "testId": "brand-token-ignore"
+    },
+    {
+      "action": "click",
+      "testId": "brand-back-link"
+    },
+    {
+      "action": "wait",
+      "ms": 400
+    },
+    {
+      "action": "click",
+      "testId": "brand-back-link"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-section-status-warnings-suppressed"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-row-count-lint"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "306:2218"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "I306:2218;16:7"
+    },
+    {
+      "name": "preview-swatches",
+      "testId": "brand-preview-swatches",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7403"
+    },
+    {
+      "name": "specimen-heading",
+      "testId": "brand-specimen-heading",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7408"
+    },
+    {
+      "name": "specimen-heading-aa",
+      "testId": "brand-specimen-aa-heading",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7409"
+    },
+    {
+      "name": "specimen-heading-label",
+      "testId": "brand-specimen-label-heading",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7410"
+    },
+    {
+      "name": "specimen-body",
+      "testId": "brand-specimen-body",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7411"
+    },
+    {
+      "name": "specimen-body-aa",
+      "testId": "brand-specimen-aa-body",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7412"
+    },
+    {
+      "name": "specimen-body-label",
+      "testId": "brand-specimen-label-body",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7413"
+    },
+    {
+      "name": "row-tokens",
+      "testId": "brand-row-tokens",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7414"
+    },
+    {
+      "name": "row-tokens-label",
+      "testId": "brand-row-label-tokens",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7416"
+    },
+    {
+      "name": "row-tokens-hint",
+      "testId": "brand-row-hint-tokens",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7417"
+    },
+    {
+      "name": "row-tokens-count",
+      "testId": "brand-row-count-tokens",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7418"
+    },
+    {
+      "name": "row-tokens-chevron",
+      "testId": "brand-row-chevron-tokens",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7419"
+    },
+    {
+      "name": "row-styles",
+      "testId": "brand-row-styles",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7420"
+    },
+    {
+      "name": "row-styles-label",
+      "testId": "brand-row-label-styles",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7422"
+    },
+    {
+      "name": "row-styles-hint",
+      "testId": "brand-row-hint-styles",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7423"
+    },
+    {
+      "name": "row-styles-count",
+      "testId": "brand-row-count-styles",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7424"
+    },
+    {
+      "name": "row-styles-chevron",
+      "testId": "brand-row-chevron-styles",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7425"
+    },
+    {
+      "name": "row-starters",
+      "testId": "brand-row-starters",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7426"
+    },
+    {
+      "name": "row-starters-label",
+      "testId": "brand-row-label-starters",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7428"
+    },
+    {
+      "name": "row-starters-hint",
+      "testId": "brand-row-hint-starters",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7429"
+    },
+    {
+      "name": "row-starters-count",
+      "testId": "brand-row-count-starters",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7430"
+    },
+    {
+      "name": "row-starters-chevron",
+      "testId": "brand-row-chevron-starters",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7431"
+    },
+    {
+      "name": "row-classes",
+      "testId": "brand-row-classes",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7432"
+    },
+    {
+      "name": "row-classes-label",
+      "testId": "brand-row-label-classes",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7434"
+    },
+    {
+      "name": "row-classes-hint",
+      "testId": "brand-row-hint-classes",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7435"
+    },
+    {
+      "name": "row-classes-chevron",
+      "testId": "brand-row-chevron-classes",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7436"
+    },
+    {
+      "name": "row-components",
+      "testId": "brand-row-components",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7437"
+    },
+    {
+      "name": "row-components-label",
+      "testId": "brand-row-label-components",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7439"
+    },
+    {
+      "name": "row-components-hint",
+      "testId": "brand-row-hint-components",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7440"
+    },
+    {
+      "name": "row-components-chevron",
+      "testId": "brand-row-chevron-components",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7441"
+    },
+    {
+      "name": "row-typography",
+      "testId": "brand-row-typography",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7442"
+    },
+    {
+      "name": "row-typography-label",
+      "testId": "brand-row-label-typography",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7444"
+    },
+    {
+      "name": "row-typography-hint",
+      "testId": "brand-row-hint-typography",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7445"
+    },
+    {
+      "name": "row-typography-chevron",
+      "testId": "brand-row-chevron-typography",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7446"
+    },
+    {
+      "name": "row-colour-mode",
+      "testId": "brand-row-colour-mode",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7447"
+    },
+    {
+      "name": "row-colour-mode-label",
+      "testId": "brand-row-label-colour-mode",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7449"
+    },
+    {
+      "name": "row-colour-mode-hint",
+      "testId": "brand-row-hint-colour-mode",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7450"
+    },
+    {
+      "name": "row-colour-mode-chevron",
+      "testId": "brand-row-chevron-colour-mode",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7451"
+    },
+    {
+      "name": "row-lint",
+      "testId": "brand-row-lint",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7452"
+    },
+    {
+      "name": "row-lint-label",
+      "testId": "brand-row-label-lint",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7454"
+    },
+    {
+      "name": "row-lint-hint",
+      "testId": "brand-row-hint-lint",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7455"
+    },
+    {
+      "name": "row-lint-count",
+      "testId": "brand-row-count-lint",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7456"
+    },
+    {
+      "name": "row-lint-chevron",
+      "testId": "brand-row-chevron-lint",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7457"
+    },
+    {
+      "name": "row-export",
+      "testId": "brand-row-export",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7458"
+    },
+    {
+      "name": "row-export-label",
+      "testId": "brand-row-label-export",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7460"
+    },
+    {
+      "name": "row-export-hint",
+      "testId": "brand-row-hint-export",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7461"
+    },
+    {
+      "name": "row-export-chevron",
+      "testId": "brand-row-chevron-export",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "1691:7462"
+    },
+    {
+      "name": "suppressed-badge",
+      "testId": "brand-section-status-warnings-suppressed",
+      "spec": "brand-lint-suppressed",
+      "nodeId": "I333:2360;12:11"
+    },
+    {
+      "name": "suppressed-badge-pill-unjoined",
+      "testId": "brand-section-status"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE, and the suppression is real: Brand -> Tokens -> color ->",
+    "`color-action` -> Ignore. `LintState.suppress()` puts the token id in the",
+    "suppressed set, `suppressedCount()` answers 1, and the root then renders the",
+    "pill 306:2217 draws. No probe and no planted flag \u2014 the only reason this state",
+    "looked unreachable is that the control lives two screens down, in",
+    "TokenDetailView, not on the Lint screen.",
+    "",
+    "WHAT THE BOARD WON:",
+    "  the pill is the family's Badge instance (333:2360), not a second pill built",
+    "  beside it. The root rendered its own span at `px-2` with `leading-none`",
+    "  while `SectionStatusBadge` \u2014 the same component on the board, already",
+    "  rendering the Presets and Import/export states \u2014 sat one import away. It is",
+    "  now one component with a per-status label, colour and leading, so the four",
+    "  Badge instances in this family cannot drift apart again.",
+    "  10px inset (was 8) and a 16px line (was `leading-none`, i.e. 12) on every",
+    "  instance; 18px on this one, which is the only one the boards lead at 18.",
+    "",
+    "NOT JOINED \u2014 a Figma frame artifact:",
+    "  333:2360 itself. Its properties are right (`yellow/100` fill = --bk-yellow-100,",
+    "  `yellow/500` edge = --bk-warning, 10/2 inset, radius full) but the frame",
+    "  carries `width: 105px`, and its OWN label does not fit in it: `Warnings",
+    "  suppressed` at 12/500 Inter measures 146.9 including the board's own 20px of",
+    "  padding. The board clips its own text by 42px. Measured rather than assumed",
+    "  \u2014 the pill was joined once and failed exactly there.",
+    "  The pill's fill, edge, radius and inset ARE checked, on the two sibling",
+    "  instances whose frames carry no width: 333:2356 (brand-presets-draft) and",
+    "  333:2358 (brand-starters-applied). One component, so one measurement covers",
+    "  all four.",
+    "  I333:2360;12:11, the label, IS joined \u2014 12/18 in --color/warning-text.",
+    "",
+    "  Also not joined: 306:2217 itself (the drawer's edge) and 1691:7402 (the",
+    "  preview band's 82px text-metric height). See brand-lint-warnings.json.",
+    "",
+    "The final `hover` step parks the pointer on the panel title. Without it the",
+    "pointer stays where the last click left it \u2014 over the Beginner/Pro toggle \u2014",
+    "and the contrast sweep reads a hover state instead of the resting screen.",
+    "",
+    "CHECK-BOARD-COPY: one lead, `components`, triaged in",
+    "brand-lint-warnings.json \u2014 two boards of this chassis disagree about that",
+    "label and the code keeps `Component styles`."
+  ]
+}

@@ -1,0 +1,905 @@
+{
+  "surface": "brand-pro-locked",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "154:132",
+  "boardName": "brand-pro-locked",
+  "figmaHash": "39bc51ff9c82debd3e2fdbb97ccffac2ba644e2e55675e2a284a0612c57e5bb2",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:07:40.837Z",
+  "copy": [
+    "Brand",
+    "Aa",
+    "Heading",
+    "Aa",
+    "Body",
+    "Tokens",
+    "Colours, type, spacing",
+    "Presets",
+    "Component style presets",
+    "18",
+    "Starters",
+    "Whole-brand starting points",
+    "Classes",
+    "Names shared across elements",
+    "Component styles",
+    "What the brand ships",
+    "Typography",
+    "The fonts this site uses",
+    "Colour mode",
+    "Light and dark values",
+    "Lint",
+    "What breaks the brand",
+    "Import / export",
+    "Move the brand in and out",
+    "Beginner hides token IDs and empty foundations. Switch to Pro to show them."
+  ],
+  "targets": [
+    {
+      "nodeId": "154:132",
+      "name": "Brand · root · Beginner mode",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:631",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:631;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7219",
+      "name": "Brand preview (NEW)",
+      "className": "content-stretch flex flex-col gap-[8px] h-[82px] items-start overflow-clip px-[16px] py-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "82px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7220",
+      "name": "Swatches",
+      "className": "content-stretch flex gap-[6px] items-start overflow-clip relative shrink-0",
+      "props": {
+        "gap": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7221",
+      "name": "swatch",
+      "className": "bg-[#1a56db] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7222",
+      "name": "swatch",
+      "className": "bg-white border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#ffffff"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7223",
+      "name": "swatch",
+      "className": "bg-[#1f2937] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#1f2937"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7224",
+      "name": "swatch",
+      "className": "bg-[#ef4444] border border-[#e5e7eb] border-solid relative rounded-[4px] shrink-0 size-[20px]",
+      "props": {
+        "background-color": {
+          "value": "#ef4444"
+        },
+        "border-color": {
+          "value": "#e5e7eb"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7225",
+      "name": "Specimen · Heading",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] items-center leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7226",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[15px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "15px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7227",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7228",
+      "name": "Specimen · Body",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] items-center leading-[normal] not-italic overflow-clip relative shrink-0 text-left whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "line-height": {
+          "value": "normal"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7229",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[15px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "15px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7230",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7231",
+      "name": "List row · Tokens",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7233",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7234",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7235",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7236",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7237",
+      "name": "List row · Presets",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7239",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7240",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7241",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7242",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7243",
+      "name": "List row · Starters",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7245",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7246",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7247",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7248",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7249",
+      "name": "List row · Classes",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7251",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7252",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7253",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7254",
+      "name": "List row · Components",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7256",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7257",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7258",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7259",
+      "name": "List row · Typography",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7261",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7262",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7263",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7264",
+      "name": "List row · Colour mode",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7266",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7267",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7268",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7269",
+      "name": "List row · Lint",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7271",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7272",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7273",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7274",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7275",
+      "name": "List row · Import / export",
+      "className": "[word-break:break-word] content-stretch flex font-['Inter:Regular'] font-normal gap-[8px] h-[52px] items-center leading-[normal] not-italic overflow-clip px-[16px] relative shrink-0 text-left w-full whitespace-nowrap",
+      "props": {
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "52px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7277",
+      "name": null,
+      "className": "relative shrink-0 text-[#111827] text-[13px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7278",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[11px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1691:7279",
+      "name": null,
+      "className": "relative shrink-0 text-[#4b5563] text-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "154:185",
+      "name": "note",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[40px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "40px"
+        }
+      }
+    },
+    {
+      "nodeId": "154:186",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[16px] not-italic text-[11px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[6px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    }
+  ]
+}

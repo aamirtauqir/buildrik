@@ -1,0 +1,205 @@
+{
+  "surface": "inspector-profile-media",
+  "board": "Inspector · profile · MEDIA (Figma 807:8521)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "insert-el-Image"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Image"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-profile-media",
+      "nodeId": "807:8521"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-profile-media",
+      "nodeId": "920:4705"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-profile-media",
+      "nodeId": "956:6860"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-profile-media",
+      "nodeId": "956:6862"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-profile-media",
+      "nodeId": "956:6864"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row"
+    },
+    {
+      "name": "sechead-size",
+      "testId": "inspector-sechead-size",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20363"
+    },
+    {
+      "name": "secname-size",
+      "testId": "inspector-secname-size",
+      "spec": "inspector-profile-media",
+      "nodeId": "807:8528"
+    },
+    {
+      "name": "sechead-background",
+      "testId": "inspector-sechead-background",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20369"
+    },
+    {
+      "name": "sechead-border",
+      "testId": "inspector-sechead-border",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20370"
+    },
+    {
+      "name": "sechead-effects",
+      "testId": "inspector-sechead-effects",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20372"
+    },
+    {
+      "name": "sechead-interactions",
+      "testId": "inspector-sechead-interactions",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20374"
+    },
+    {
+      "name": "sechead-animation",
+      "testId": "inspector-sechead-animation",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20375"
+    },
+    {
+      "name": "sechead-visibility",
+      "testId": "inspector-sechead-visibility",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20376"
+    },
+    {
+      "name": "sechead-element-properties",
+      "testId": "inspector-sechead-element-properties",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20377"
+    },
+    {
+      "name": "sechead-css-classes",
+      "testId": "inspector-sechead-css-classes",
+      "spec": "inspector-profile-media",
+      "nodeId": "2069:20378"
+    },
+    {
+      "name": "sections-apply",
+      "testId": "inspector-sections-apply"
+    },
+    {
+      "name": "sechead-spacing",
+      "testId": "inspector-sechead-spacing"
+    },
+    {
+      "name": "sechead-corner-radius",
+      "testId": "inspector-sechead-corner-radius"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE: Insert's Image row creates an image element and selects it,",
+    "which is the production path into the MEDIA profile. Measured at the",
+    "shell's 1440x900 rather than the board's 300-wide frame, because the app",
+    "has no view that shows the inspector alone.",
+    "",
+    "SECTION LIST ALREADY MATCHES. The board's copy runs SIZE, SPACING,",
+    "BACKGROUND, BORDER, CORNER RADIUS, EFFECTS, INTERACTIONS, ANIMATION,",
+    "VISIBILITY, ELEMENT PROPERTIES, CSS CLASSES and closes with",
+    "'N of 11 sections apply'; the live panel renders those eleven in that",
+    "order and closes with the same line. The count differs (2 on the board, 3",
+    "live) because the board's is sample data.",
+    "",
+    "TWO TARGETS ARE MEASURED BUT NOT JOINED, and this is the whole",
+    "adjudication for this surface. Three boards draw this same header and",
+    "strip and they do not agree:",
+    "",
+    "  header background   32:3 and 642:3251 draw NO fill (the panel shows",
+    "                      through, white). 807:8522 fills --flowbite/gray/50.",
+    "                      2-1 for white, which is what ships.",
+    "  strip height        32:7 and 642:3255 draw 32. 956:6859 draws 40.",
+    "                      2-1 for 32, which is what ships.",
+    "",
+    "Both are one chrome element, not a per-profile one -- an inspector whose",
+    "header changed colour depending on what you selected would be a defect,",
+    "not conformance. Joining them here would encode the minority reading and",
+    "make inspector-profile-container-fallback fail instead. Recorded rather",
+    "than silently dropped; if the MEDIA board is the intended direction, all",
+    "three boards move together and both joins come back.",
+    "",
+    "ALSO NOT CONFORMED: the board's header shows a 48x22 accent-tint pill",
+    "reading 'Media' -- the PROFILE name -- where 32:2 and 642:3112 show the",
+    "element's own name beside a glyph, and where live shows 'Image'. The",
+    "element name is what the other two boards and the shipped panel agree on,",
+    "and it is the more useful fact: a person selects an image, not a profile.",
+    "",
+    "boards.json carried 'match-partial-link-section-absent-for-icon' against",
+    "this board. That is not a drift against THIS frame: 807:8521 draws no LINK",
+    "section either, and LinkSection.tsx:78 gates the section to",
+    "link/button/a/cta, so an icon correctly has none. Nothing to fix.",
+    "",
+    "2026-09-08 — EXTENDED from 5 joined targets to 15, once the shared section",
+    "chassis was conformed on inspector-profile-text. Added: the SIZE section",
+    "header open at 20 with its 11/16 label, and eight shut headers at 28",
+    "(BACKGROUND, BORDER, EFFECTS, INTERACTIONS, ANIMATION, VISIBILITY, ELEMENT",
+    "PROPERTIES, CSS CLASSES). 22 properties -> 42.",
+    "",
+    "The header-fill and strip-height adjudications above were made from a 2-1",
+    "count. The full census across every committed spec, run 2026-09-08, is",
+    "stronger and points the same way: 37 boards draw the 48h header with no",
+    "fill against these six at gray-50 and one (160:314, pseudo-state) at",
+    "accent-tint; 38 draw the strip 32 against these six at 40.",
+    "",
+    "STILL NOT JOINED, added to the list above:",
+    "",
+    "  2069:20364 / :20365 (Width, Height) and 2069:20367 / :20368 (Padding,",
+    "  Gap). The board draws each as a 34-tall labelled row with one 160x28",
+    "  control reading 'Fill' / 'Hug'. SizeSection ships a stacked caption over a",
+    "  Fixed | Fill | Hug cluster plus its own unit field, so there is no",
+    "  `inspector-row-width` to join — a control-type difference, not a geometry",
+    "  one, and the same shape on the FLEX board's SIZE section. Recorded rather",
+    "  than papered over; it is the largest remaining structural gap in this",
+    "  family.",
+    "",
+    "  SPACING (2069:20366, drawn open) and CORNER RADIUS (2069:20371, drawn",
+    "  shut). The image the Insert row creates carries a radius and no padding,",
+    "  so live opens the opposite pair — `sectionApplies` doing exactly what the",
+    "  board's own footer counts, on different sample data."
+  ]
+}

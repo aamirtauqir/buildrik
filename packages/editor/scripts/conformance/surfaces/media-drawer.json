@@ -1,7 +1,7 @@
 {
   "surface": "media-drawer",
-  "board": "Media · grid @320 (Figma 144:2)",
-  "_note": "Measured against the PROBE, not the running editor (plan D3). The states this board draws — a populated library, an empty one, a failed upload — are not reachable by clicking the live app, and a demo library that happens to be empty would measure the wrong screen. measure.mjs honours a per-recipe `url`, so this recipe points at the probe case that mounts the real component with fixtures.",
+  "board": "Media · grid @280 (Figma 144:2)",
+  "_note": "Measured against the PROBE, not the running editor (plan D3). The states this board draws — a populated library, an empty one, a failed upload — are not reachable by clicking the live app, and a demo library that happens to be empty would measure the wrong screen. measure.mjs honours a per-recipe `url`, so this recipe points at the probe case that mounts the real component with fixtures. FOOTER: the board node 144:46 grew from 44 to 182 between the 2026-09-02 and 2026-09-07 captures — it gained the accept list and the 'Sort and list view live in the full library' line under the links row. Board won; both lines were added to the code. The board paints them accent blue with cursor-pointer, which is the link node they were duplicated from — they are not links, so they render muted and no colour is joined on them. The board's 4th link 'Aa Fonts' is NOT built: there is no fonts destination in the drawer (onOpenStock / onOpenIconPicker are the only two), and a link to nothing is worse than an absent one. SEARCH BOX: the inner 28h field (144:8) is not joined — boards.json holds chrome-ui TextInput at authority=open:input-fill. FOLDER ROW: board 144:12 redrew the right-hand slot as `☑ Select` (11/18 ink-soft, hotspot → bulk-select) where the code held three DISABLED glyphs (grid / list / sort). Board won — the glyphs are gone and Select is wired to toggleSelMode, which is the same edit as the footer line that now says where sort and list view live. The node itself is NOT joined: its only geometric prop is w-64, the auto-width of a text frame whose ☑ is a stand-in for an icon, so it measures the mock's glyph rather than the design.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-grid",
   "viewport": {
     "width": 280,
@@ -44,6 +44,30 @@
       "testId": "media-type-chips",
       "spec": "media-drawer",
       "nodeId": "144:13"
+    },
+    {
+      "name": "chip-image",
+      "testId": "media-type-chip-img",
+      "spec": "media-drawer",
+      "nodeId": "144:14"
+    },
+    {
+      "name": "chip-video",
+      "testId": "media-type-chip-vid",
+      "spec": "media-drawer",
+      "nodeId": "144:17"
+    },
+    {
+      "name": "chip-svg",
+      "testId": "media-type-chip-ico",
+      "spec": "media-drawer",
+      "nodeId": "144:20"
+    },
+    {
+      "name": "chip-icon",
+      "testId": "media-type-chip-fnt",
+      "spec": "media-drawer",
+      "nodeId": "144:23"
     },
     {
       "name": "asset-grid",

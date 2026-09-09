@@ -2,8 +2,10 @@
   "shell-default": {
     "skipped": 4,
     "compared": 7,
-    "contrastFailures": 3,
-    "nonTextFailures": 0
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
   },
   "content-load-error": {
     "contrastFailures": 0,
@@ -11,7 +13,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 0,
-    "compared": 5
+    "compared": 22
   },
   "layers-load-error": {
     "contrastFailures": 0,
@@ -27,15 +29,15 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 0,
-    "compared": 8
+    "compared": 18
   },
   "layers-no-results": {
     "contrastFailures": 0,
     "nonTextFailures": 0,
     "contrastPairs": {},
     "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 8
+    "skipped": 2,
+    "compared": 19
   },
   "media-drawer": {
     "contrastFailures": 0,
@@ -43,7 +45,7 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 0,
-    "compared": 25
+    "compared": 52
   },
   "media-bulk-bar": {
     "contrastFailures": 0,
@@ -67,6 +69,1608 @@
     "contrastPairs": {},
     "nonTextPairs": {},
     "skipped": 0,
+    "compared": 46
+  },
+  "inspector-profile-container-fallback": {
+    "skipped": 2,
+    "compared": 34
+  },
+  "inspector-profile-media": {
+    "skipped": 5,
+    "compared": 42
+  },
+  "components-library": {
+    "skipped": 1,
+    "compared": 38
+  },
+  "history-saves-loading": {
+    "skipped": 0,
+    "compared": 35
+  },
+  "history-saves-changes": {
+    "contrastFailures": 7,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.entry-time | 04:20 PM | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "span | 04:20 PM | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "span.entry-badge.checkpoint | Checkpoint | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.kbd-hint | jknavigate | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.kbd-hint | Enterexpand | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.kbd-hint | gGstart/end | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "p.tw:m-0.tw:text-[11px] | This session only — the last 100 steps,  | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 32
+  },
+  "publish-load-error": {
+    "skipped": 0,
+    "compared": 34
+  },
+  "publish-publishing": {
+    "skipped": 1,
+    "compared": 26
+  },
+  "history-saves-time-travel": {
+    "contrastFailures": 4,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "p.tw:m-0.tw:text-[11px] | 50 versions kept. Auto-saves prune oldes | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | 04:20 PM | rgb(107, 114, 128) | rgb(27, 27, 38)": 3.53,
+      "span.tt-time-current | 04:05 PM | rgb(26, 86, 219) | rgb(27, 27, 38)": 2.76,
+      "span | 03:58 PM | rgb(107, 114, 128) | rgb(27, 27, 38)": 3.53
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 21
+  },
+  "pages-load-error": {
+    "skipped": 2,
+    "compared": 24
+  },
+  "components-create-modal-canvas-save-as": {
+    "skipped": 8,
+    "compared": 8
+  },
+  "pages-bulk-select": {
+    "skipped": 0,
+    "compared": 26
+  },
+  "templates-empty": {
+    "skipped": 0,
+    "compared": 38
+  },
+  "components-create": {
+    "skipped": 3,
+    "compared": 22
+  },
+  "templates-applying": {
+    "skipped": 0,
+    "compared": 46
+  },
+  "templates-create-page-confirm-success-error": {
+    "skipped": 3,
     "compared": 3
+  },
+  "issues-filtered": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 15
+  },
+  "components-variant-picker-detach-confirm": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span | / | rgb(209, 213, 219) | rgb(243, 244, 246)": 1.34,
+      "span.tw:text-[12px].tw:text-[var(--bk-ink-muted)] | No Preview | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 1
+  },
+  "ai-idle": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 6
+  },
+  "ai-thinking": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 5
+  },
+  "ai-planning": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.tw:flex.tw:h-7 | Planning | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 9
+  },
+  "ai-done": {
+    "contrastFailures": 5,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.tw:flex.tw:h-7 | Done · 3 of 3 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:w-3.tw:flex-none | ✓ | rgb(14, 159, 110) | rgb(255, 255, 255)": 3.39,
+      "p.tw:m-0.tw:text-[12px] | Each step is its own undo step — ⌘Z take | rgb(107, 114, 128) | rgb(222, 247, 236)": 4.29
+    },
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 30
+  },
+  "compare-side-by-side": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | Overlay | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "button.tw:relative.tw:flex | List | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 36
+  },
+  "compare-overlay": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | Side by side | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "button.tw:relative.tw:flex | List | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 36
+  },
+  "compare-list": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | Side by side | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "button.tw:relative.tw:flex | Overlay | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 36
+  },
+  "pages-page-tab-bar-code-pagetabbar-tsx": {
+    "skipped": 0,
+    "compared": 23
+  },
+  "layers-component-instance": {
+    "skipped": 3,
+    "compared": 6,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "modal-success-then-close": {
+    "skipped": 0,
+    "compared": 11,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "export-html-modal": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 71
+  },
+  "notifications-jump-target-deleted": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.tw:flex.tw:h-7 | SEP 5 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 12
+  },
+  "content-unsaved-record": {
+    "skipped": 0,
+    "compared": 23
+  },
+  "onboarding-achievement-step-complete": {
+    "skipped": 5,
+    "compared": 34,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "templates-usage-drawer": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 24
+  },
+  "compare-loading-render": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | Overlay | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "button.tw:relative.tw:flex | List | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 30
+  },
+  "compare-no-changes": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | Overlay | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "button.tw:relative.tw:flex | List | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 18
+  },
+  "insert-elements-expanded": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 55
+  },
+  "insert-blocks-expanded": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 41
+  },
+  "insert-components-expanded": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 48
+  },
+  "insert-mine-expanded": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 57
+  },
+  "review-panel-detached-present": {
+    "contrastFailures": 6,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span | Open · Home | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:[font-family:var(--bk-font-mono)].tw:tabular-nums | 2 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | Menu | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:[font-family:var(--bk-font-mono)].tw:tabular-nums | 1 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | Resolved | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:[font-family:var(--bk-font-mono)].tw:tabular-nums | 7 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 63
+  },
+  "onboarding-achievement-final-step": {
+    "skipped": 5,
+    "compared": 19,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "publish-confirm": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 60
+  },
+  "review-panel-older-round": {
+    "contrastFailures": 7,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span | Open · Home | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:[font-family:var(--bk-font-mono)].tw:tabular-nums | 4 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | Menu | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:[font-family:var(--bk-font-mono)].tw:tabular-nums | 1 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | Resolved | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:[font-family:var(--bk-font-mono)].tw:tabular-nums | 7 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:text-[11px].tw:leading-4 | Older rounds are read-only. | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 46
+  },
+  "brand-lint-warnings": {
+    "skipped": 0,
+    "compared": 93,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "brand-pro-locked": {
+    "skipped": 1,
+    "compared": 95,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "pages-context-menu": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 19
+  },
+  "history-saves-empty": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "p.tw:m-0.tw:text-[11px] | 50 versions kept. Auto-saves prune oldes | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 48
+  },
+  "s1-4-4-of-7": {
+    "skipped": 1,
+    "compared": 50,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s1-4-7-of-7": {
+    "skipped": 1,
+    "compared": 47,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "history-saves-pruned-notice": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "p.tw:m-0.tw:text-[11px] | 50 versions kept. Auto-saves prune oldes | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 14
+  },
+  "history-saves-restoring": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:text-[11px].tw:leading-4 | Saving your current work as v4 first. | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "p.tw:m-0.tw:text-[11px] | 50 versions kept. Auto-saves prune oldes | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 12
+  },
+  "pages-command-palette-k": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.bd-pg-palette-item-home | ⌂ | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 32
+  },
+  "history-milestone-suggestion-banner-code-mil": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div | New page added | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "div | 3 sections added, hero copy changed | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 27
+  },
+  "brand-dirty": {
+    "skipped": 0,
+    "compared": 100,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s3-11-smart-guides-snap-indicators": {
+    "contrastFailures": 4,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span | 60 | rgb(224, 36, 36) | rgb(243, 244, 246)": 4.29,
+      "span | 32 | rgb(224, 36, 36) | rgb(243, 244, 246)": 4.29,
+      "span | 30 | rgb(224, 36, 36) | rgb(243, 244, 246)": 4.29
+    },
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 14
+  },
+  "s1-2f-save-indicator": {
+    "skipped": 0,
+    "compared": 8,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s1-2f-save-indicator-saved-stale": {
+    "skipped": 0,
+    "compared": 3,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s3-2-drop-target-insertion-indicators": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 7
+  },
+  "layers-tree": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 38
+  },
+  "layers-multi-select": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 35
+  },
+  "layers-filtered": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 16
+  },
+  "layers-renaming": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 35
+  },
+  "layers-display-settings": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 31
+  },
+  "brand-lint-suppressed": {
+    "skipped": 1,
+    "compared": 96,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "brand-starters": {
+    "skipped": 7,
+    "compared": 62,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-single-selection": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 33
+  },
+  "history-published-roll-back-confirm": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:text-[11px].tw:font-normal | published 7w ago | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 47
+  },
+  "history-published-restore-confirm": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "p.tw:m-0.tw:mt-0.5 | v7 will name v5 as its source. | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "button.tw:relative.tw:flex | Roll back to v5 | rgb(255, 255, 255) | rgb(194, 120, 3)": 3.51
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 15
+  },
+  "history-published-redeploying": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 3
+  },
+  "history-published-restored": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 4
+  },
+  "history-published-failed": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 8
+  },
+  "brand-starters-applied": {
+    "skipped": 4,
+    "compared": 59,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s3-1-pick-mode": {
+    "contrastFailures": 4,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:shrink-0.tw:text-[length:var(--bk-text-11)] | › | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
+      "span | ← Parent | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
+      "span | → Child | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34
+    },
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 9
+  },
+  "s5-4-gate-pending": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 30
+  },
+  "s5-4-gate-changes-requested": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 30
+  },
+  "s5-4-gate-no-review-sent": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 30
+  },
+  "s3-1-dragging": {
+    "contrastFailures": 4,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:shrink-0.tw:text-[length:var(--bk-text-11)] | › | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
+      "span | ← Parent | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34,
+      "span | → Child | rgb(156, 163, 175) | rgb(136, 140, 147)": 1.34
+    },
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 9
+  },
+  "shell-state-1-first-run": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 17
+  },
+  "s1-1-coach-dismissed": {
+    "skipped": 2,
+    "compared": 25,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "brand-tokens-add": {
+    "skipped": 0,
+    "compared": 72,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "brand-tokens-replace": {
+    "skipped": 0,
+    "compared": 72,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s3-10-keyboard-shortcuts-overlay": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 24
+  },
+  "brand-presets-draft": {
+    "skipped": 2,
+    "compared": 53,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s1-2-load-error": {
+    "skipped": 0,
+    "compared": 18,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "b9-1-animation-editor-entrance-attention-exi": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 30
+  },
+  "s5-6-approved-edited-since": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | Publish anyway | rgb(255, 255, 255) | rgb(194, 120, 3)": 3.51
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 7
+  },
+  "brand-load-error": {
+    "skipped": 1,
+    "compared": 21,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "brand-classes": {
+    "skipped": 1,
+    "compared": 17,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "shell-state-4-multi-select": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 12
+  },
+  "s3-4-responsive-viewport-breakpoint-bar": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 6
+  },
+  "orphan-comments-detected": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 30
+  },
+  "shell-state-6-comment-mode": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 41
+  },
+  "shell-state-11-saving-conflict": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 9
+  },
+  "s3-9-undo-redo-toast-6-variants": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 6
+  },
+  "s7-settings-general": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 14
+  },
+  "s6-2-custom-domain-dns-verification": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 9
+  },
+  "media-drill-ins-the-five-destinations": {
+    "contrastFailures": 4,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:block.tw:truncate | hero | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:block.tw:truncate | gallery | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:block.tw:truncate | header | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:mt-2.5.tw:mr-4 | current | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 18
+  },
+  "content-loading": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span | Collections | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | Data | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 63
+  },
+  "content-empty": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 13
+  },
+  "inspector-no-selection": {
+    "skipped": 0,
+    "compared": 10
+  },
+  "media-empty": {
+    "skipped": 0,
+    "compared": 50
+  },
+  "content-root": {
+    "contrastFailures": 3,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span | Collections | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:ml-auto.tw:[font-family:var(--bk-font-mono)] | 2 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | Data | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 97
+  },
+  "content-collection": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 85
+  },
+  "media-loading": {
+    "skipped": 0,
+    "compared": 69
+  },
+  "content-fields": {
+    "contrastFailures": 3,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:text-[11px].tw:leading-4 | required | rgb(209, 213, 219) | rgb(255, 255, 255)": 1.47
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 79
+  },
+  "content-record": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 24
+  },
+  "inspector-multi-select": {
+    "skipped": 8,
+    "compared": 34
+  },
+  "content-variables": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 30
+  },
+  "content-conditions": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 27
+  },
+  "media-no-results": {
+    "skipped": 0,
+    "compared": 49
+  },
+  "media-filtered": {
+    "skipped": 0,
+    "compared": 53
+  },
+  "content-data-sources": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 15
+  },
+  "content-data-watching": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 24
+  },
+  "content-data-no-source": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 24
+  },
+  "media-quota-full": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "p.tw:m-0.tw:tabular-nums | 524 MB of 524 MB used — upload is off un | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "p.tw:m-0.tw:mt-5 | Nothing already on your sites is affecte | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 59
+  },
+  "content-records": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 6,
+    "compared": 11
+  },
+  "inspector-profile-text": {
+    "skipped": 6,
+    "compared": 94
+  },
+  "media-folder-scoped": {
+    "skipped": 0,
+    "compared": 52
+  },
+  "media-bulk-select": {
+    "skipped": 0,
+    "compared": 56
+  },
+  "media-uploading": {
+    "skipped": 0,
+    "compared": 59
+  },
+  "media-upload-failed": {
+    "skipped": 0,
+    "compared": 60
+  },
+  "media-quota-warn": {
+    "skipped": 0,
+    "compared": 57
+  },
+  "inspector-profile-button": {
+    "skipped": 3,
+    "compared": 63
+  },
+  "content-collection-setup": {
+    "contrastFailures": 4,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:flex-none.tw:cursor-grab | ⠿ | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 49
+  },
+  "inspector-profile-input": {
+    "skipped": 3,
+    "compared": 63
+  },
+  "inspector-profile-flex": {
+    "skipped": 5,
+    "compared": 60,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "inspector-profile-grid": {
+    "skipped": 4,
+    "compared": 67
+  },
+  "media-bulk-delete-confirm": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 18
+  },
+  "media-import-url": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 4
+  },
+  "media-import-url-invalid": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 4
+  },
+  "media-new-folder-inline": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 45
+  },
+  "inspector-reach-whole-site": {
+    "skipped": 4,
+    "compared": 35
+  },
+  "inspector-reach-all-like-this": {
+    "skipped": 0,
+    "compared": 35
+  },
+  "inspector-pseudo-state": {
+    "skipped": 1,
+    "compared": 31
+  },
+  "inspector-breakpoint-override": {
+    "skipped": 0,
+    "compared": 44,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "media-drill-in-asset-detail": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:absolute.tw:bottom-2 | 2400×1600 · 840 KB | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {}
+  },
+  "layers-hidden": {
+    "contrastFailures": 1,
+    "nonTextFailures": 3,
+    "contrastPairs": {
+      "span.bdc-lr-nm | Container | rgb(17, 24, 39) | rgb(255, 255, 255)": 2.92
+    },
+    "nonTextPairs": {
+      "button.tw:relative.tw:flex | Collapse children | rgb(107, 114, 128) | rgb(255, 255, 255)": 1.83,
+      "button.tw:relative.tw:flex | Show in editor | rgb(107, 114, 128) | rgb(255, 255, 255)": 1.83,
+      "button.tw:relative.tw:flex | Lock element | rgb(107, 114, 128) | rgb(255, 255, 255)": 1.83
+    },
+    "skipped": 4,
+    "compared": 20
+  },
+  "media-drill-in-used-in": {
+    "skipped": 0,
+    "compared": 24,
+    "contrastFailures": 3,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:block.tw:truncate | hero | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:block.tw:truncate | gallery | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:block.tw:truncate | header | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {}
+  },
+  "s3-flows-page-settings-seo": {
+    "contrastFailures": 9,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | SEO75 | rgb(63, 131, 248) | rgb(255, 255, 255)": 3.61,
+      "span.bd-pg-drawer-tab-chip | 75 | rgb(194, 120, 3) | rgb(253, 253, 234)": 3.41,
+      "span.tw:ml-auto.tw:text-[length:var(--bk-text-11)] | +30 pts | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span | Meta description | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:ml-auto.tw:text-[length:var(--bk-text-11)] | +40 pts | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:ml-auto.tw:text-[length:var(--bk-text-11)] | Required | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "div.tw:px-2.5.tw:py-2 | Reach 80+ before publishing — add a meta | rgb(194, 120, 3) | rgb(253, 253, 234)": 3.41,
+      "span.tw:text-[length:var(--bk-text-11)].tw:font-medium | 31/60 | rgb(14, 159, 110) | rgb(255, 255, 255)": 3.39
+    },
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 32
+  },
+  "s3-flows-page-settings-social": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.bd-pg-drawer-tab-chip | 75 | rgb(194, 120, 3) | rgb(253, 253, 234)": 3.41,
+      "button.tw:relative.tw:flex | Social | rgb(63, 131, 248) | rgb(255, 255, 255)": 3.61
+    },
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 38
+  },
+  "s3-flows-page-settings-advanced": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.bd-pg-drawer-tab-chip | 75 | rgb(194, 120, 3) | rgb(253, 253, 234)": 3.41,
+      "button.tw:relative.tw:flex | Advanced | rgb(63, 131, 248) | rgb(255, 255, 255)": 3.61
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 20
+  },
+  "media-drill-in-icon-picker": {
+    "skipped": 0,
+    "compared": 25,
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:flex-1 | RECENT | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:[font-family:var(--bk-font-mono)].tw:tabular-nums | 12 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {}
+  },
+  "media-drill-in-stock-browser": {
+    "skipped": 0,
+    "compared": 28,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s3-flows-media-editing": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 33
+  },
+  "s3-flows-media-optimizing": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 40
+  },
+  "media-drill-in-versions": {
+    "skipped": 0,
+    "compared": 31,
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:[font-family:var(--bk-font-mono)].tw:text-[11px] | current | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "button.tw:relative.tw:flex | Cancel | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {}
+  },
+  "insert-searching": {
+    "skipped": 4,
+    "compared": 31
+  },
+  "insert-no-results": {
+    "skipped": 4,
+    "compared": 21
+  },
+  "insert-tip-dismissed": {
+    "skipped": 4,
+    "compared": 25
+  },
+  "media-modal-replace-across": {
+    "skipped": 0,
+    "compared": 46,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "media-replace-across-results": {
+    "skipped": 0,
+    "compared": 9,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "insert-dragging": {
+    "skipped": 4,
+    "compared": 25
+  },
+  "notifications-unread": {
+    "contrastFailures": 4,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.tw:flex.tw:h-7 | TODAY | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "span.tw:text-[var(--bk-ink-muted)].tw:[font-family:var(--bk-font-mono)] | 2h | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "span.tw:text-[var(--bk-ink-muted)].tw:[font-family:var(--bk-font-mono)] | 4h | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "div.tw:flex.tw:h-7 | YESTERDAY | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 42
+  },
+  "notifications-all-read": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.tw:flex.tw:h-7 | TODAY | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39,
+      "div.tw:flex.tw:h-7 | YESTERDAY | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 40
+  },
+  "pages-searching": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.bd-pg-row-incontext | in Marketing | rgb(209, 213, 219) | rgb(255, 255, 255)": 1.47
+    },
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 22
+  },
+  "pages-empty": {
+    "skipped": 2,
+    "compared": 25
+  },
+  "pages-no-results": {
+    "skipped": 3,
+    "compared": 21
+  },
+  "ai-scoped": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 12
+  },
+  "media-modal-picker": {
+    "skipped": 0,
+    "compared": 10,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s5-flows-approved": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 20
+  },
+  "s5-flows-pending": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 37
+  },
+  "media-fullpage-library": {
+    "skipped": 0,
+    "compared": 130,
+    "contrastFailures": 5,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.mgr-kind | ▶ | rgb(255, 255, 255) | rgb(123, 128, 137)": 3.99,
+      "div.mgr-kind | ◆ | rgb(255, 255, 255) | rgb(123, 128, 137)": 3.99,
+      "div.mgr-kind | Aa | rgb(255, 255, 255) | rgb(123, 128, 137)": 3.99
+    },
+    "nonTextPairs": {}
+  },
+  "layers-locked": {
+    "skipped": 4,
+    "compared": 20,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "media-fullpage-empty": {
+    "skipped": 0,
+    "compared": 110,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s1-1b-first-run-browse-templates-templates-d": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 4
+  },
+  "media-fullpage-drag-over": {
+    "skipped": 0,
+    "compared": 24,
+    "contrastFailures": 5,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.mgr-kind | ▶ | rgb(255, 255, 255) | rgb(123, 128, 137)": 3.99,
+      "div.mgr-kind | ◆ | rgb(255, 255, 255) | rgb(123, 128, 137)": 3.99,
+      "div.mgr-kind | Aa | rgb(255, 255, 255) | rgb(123, 128, 137)": 3.99
+    },
+    "nonTextPairs": {}
+  },
+  "cmdk-empty": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:flex-none.tw:whitespace-nowrap | A | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 38
+  },
+  "cmdk-typing": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:flex-none.tw:whitespace-nowrap | ⌘+P | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 22
+  },
+  "cmdk-results": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:flex-none.tw:whitespace-nowrap | ⌘+P | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 34
+  },
+  "cmdk-no-results": {
+    "skipped": 2,
+    "compared": 11
+  },
+  "cmdk-recent": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:flex-none.tw:whitespace-nowrap | ⌘+P | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 32
+  },
+  "s7-settings-headers": {
+    "skipped": 0,
+    "compared": 56,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-analytics": {
+    "skipped": 0,
+    "compared": 64,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-custom-code": {
+    "skipped": 0,
+    "compared": 24,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-seo": {
+    "skipped": 2,
+    "compared": 20,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-domains": {
+    "skipped": 0,
+    "compared": 14,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-webhooks": {
+    "skipped": 0,
+    "compared": 14,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-redirects": {
+    "skipped": 2,
+    "compared": 9,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-localization": {
+    "skipped": 1,
+    "compared": 17,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "s7-settings-forms": {
+    "skipped": 1,
+    "compared": 17,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
+  },
+  "brand-colour-mode": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 60
+  },
+  "brand-components": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 44
+  },
+  "brand-export-exported": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 70
+  },
+  "brand-import-export": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 4,
+    "compared": 60
+  },
+  "brand-presets": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 2,
+    "compared": 53
+  },
+  "brand-review-changes": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 6,
+    "compared": 55
+  },
+  "brand-root": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 5,
+    "compared": 127
+  },
+  "brand-token-detail": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 5,
+    "compared": 23
+  },
+  "brand-tokens": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 5,
+    "compared": 72
+  },
+  "canvas-breadcrumb": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 23
+  },
+  "canvas-zoom-levels": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 36
+  },
+  "layers-context-menu": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 80
+  },
+  "media-fullpage-list-view-bulk": {
+    "contrastFailures": 7,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | ✕ Clear | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "div.mgr-list-type | IMG | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "div.mgr-list-size | 18.77 MB | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "div.mgr-list-use | used ×2 | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38,
+      "div.mgr-list-type | VID | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 54
+  },
+  "media-fullpage-unused-ctx-menu": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "div.mgr-kind | ▶ | rgb(255, 255, 255) | rgb(123, 128, 137)": 3.99
+    },
+    "nonTextPairs": {},
+    "skipped": 0,
+    "compared": 26
+  },
+  "pages-unsaved-warning": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 1,
+    "compared": 28
+  },
+  "shell-site-menu": {
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {},
+    "skipped": 9,
+    "compared": 21
+  },
+  "s1-flows-setup-chip-footer-band": {
+    "skipped": 0,
+    "compared": 7
+  },
+  "s3-flows-media-image-editor": {
+    "contrastFailures": 2,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "button.tw:relative.tw:flex | Crop | rgb(63, 131, 248) | rgb(255, 255, 255)": 3.61,
+      "span.tw:absolute.tw:bottom-2 | 2133×1600 | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 3,
+    "compared": 54
+  },
+  "s3-flows-media-optimise": {
+    "contrastFailures": 1,
+    "nonTextFailures": 0,
+    "contrastPairs": {
+      "span.tw:absolute.tw:bottom-2 | 2400×1600 · 46.28 KB | rgb(107, 114, 128) | rgb(243, 244, 246)": 4.39
+    },
+    "nonTextPairs": {},
+    "skipped": 7,
+    "compared": 35
+  },
+  "s1-editor-assembled-1440-drawer-pinned": {
+    "skipped": 4,
+    "compared": 21,
+    "contrastFailures": 0,
+    "nonTextFailures": 0,
+    "contrastPairs": {},
+    "nonTextPairs": {}
   }
 }

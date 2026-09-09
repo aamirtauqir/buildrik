@@ -1,0 +1,584 @@
+{
+  "surface": "brand-starters-applied",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "306:2186",
+  "boardName": "brand-starters-applied",
+  "figmaHash": "1326ffbee8bc6343bcf6869a5557636eb4af09927577dba42fb894d00549b2e8",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T21:07:58.098Z",
+  "copy": [
+    "Brand",
+    "‹ Starters",
+    "Starter applied",
+    "Buildrik Default",
+    "Stripe Blue",
+    "Notion Warm",
+    "Apple Minimal",
+    "Linear Dark",
+    "Vercel Mono"
+  ],
+  "targets": [
+    {
+      "nodeId": "306:2186",
+      "name": "Brand · starters · applied",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2187",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I306:2187;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2188",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2189",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "2173:11816",
+      "name": "Badge row",
+      "className": "content-stretch flex items-start overflow-clip px-[16px] relative shrink-0 w-full",
+      "props": {
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "333:2358",
+      "name": "Badge",
+      "className": "bg-[var(--flowbite\\/green\\/100,#def7ec)] border border-[var(--flowbite\\/green\\/500,#0e9f6e)] border-solid content-stretch flex items-center px-[10px] py-[2px] relative rounded-[9999px] shrink-0",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/green/100",
+          "value": "#def7ec"
+        },
+        "border-color": {
+          "token": "--flowbite/green/500",
+          "value": "#0e9f6e"
+        },
+        "padding-left": {
+          "value": "10px"
+        },
+        "padding-right": {
+          "value": "10px"
+        },
+        "padding-top": {
+          "value": "2px"
+        },
+        "padding-bottom": {
+          "value": "2px"
+        },
+        "border-radius": {
+          "value": "9999px"
+        }
+      }
+    },
+    {
+      "nodeId": "I333:2358;12:9",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[16px] not-italic relative shrink-0 text-[12px] text-[color:var(--flowbite\\/green\\/700,#046c4e)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--flowbite/green/700",
+          "value": "#046c4e"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2190",
+      "name": "Warning",
+      "className": "bg-[var(--color\\/warning-tint,#fdfdea)] h-[150px] overflow-clip relative rounded-[8px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/warning-tint",
+          "value": "#fdfdea"
+        },
+        "height": {
+          "value": "150px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2191",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-[16px] not-italic text-[11px] text-[color:var(--color\\/warning-text,#723b13)] top-[14px] w-[248px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/warning-text",
+          "value": "#723b13"
+        },
+        "width": {
+          "value": "248px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2192",
+      "name": "Gallery",
+      "className": "content-stretch flex flex-col gap-[16px] items-start overflow-clip px-[16px] py-[12px] relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "12px"
+        },
+        "padding-bottom": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2193",
+      "name": "row",
+      "className": "content-stretch flex gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2194",
+      "name": "Card / starter",
+      "className": "content-stretch flex flex-col gap-[6px] h-[104px] items-start overflow-clip relative rounded-[8px] shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "104px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2195",
+      "name": "thumb",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2196",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2197",
+      "name": "Card / starter",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[6px] h-[104px] items-start min-w-px overflow-clip relative rounded-[8px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "104px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2198",
+      "name": "thumb",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[6px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2199",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2200",
+      "name": "row",
+      "className": "content-stretch flex gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2201",
+      "name": "Card / starter",
+      "className": "content-stretch flex flex-col gap-[6px] h-[104px] items-start overflow-clip relative rounded-[8px] shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "104px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2202",
+      "name": "thumb",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2203",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2204",
+      "name": "Card / starter",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[6px] h-[104px] items-start min-w-px overflow-clip relative rounded-[8px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "104px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2205",
+      "name": "thumb",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[6px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2206",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2207",
+      "name": "row",
+      "className": "content-stretch flex gap-[16px] items-start overflow-clip relative shrink-0 w-full",
+      "props": {
+        "gap": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2208",
+      "name": "Card / starter",
+      "className": "content-stretch flex flex-col gap-[6px] h-[104px] items-start overflow-clip relative rounded-[8px] shrink-0 w-[136px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "104px"
+        },
+        "border-radius": {
+          "value": "8px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2209",
+      "name": "thumb",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[6px] shrink-0 w-[136px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "value": "6px"
+        },
+        "width": {
+          "value": "136px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2210",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2211",
+      "name": "Card / starter",
+      "className": "content-stretch flex flex-[1_0_0] flex-col gap-[6px] h-[104px] items-start min-w-px overflow-clip relative rounded-[8px]",
+      "props": {
+        "gap": {
+          "value": "6px"
+        },
+        "height": {
+          "value": "104px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2212",
+      "name": "thumb",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] h-[76px] relative rounded-[6px] shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        },
+        "height": {
+          "value": "76px"
+        },
+        "border-radius": {
+          "value": "6px"
+        }
+      }
+    },
+    {
+      "nodeId": "306:2213",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal leading-[18px] not-italic relative shrink-0 text-[12px] text-[color:var(--color\\/ink-soft,#4b5563)] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "18px"
+        },
+        "font-size": {
+          "value": "12px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "444:2440",
+      "name": "hotspot/back · S1 · Editor — ASSEMBLED (1440, dra",
+      "className": "block cursor-pointer h-[34px] relative shrink-0 w-[150px]",
+      "props": {
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    }
+  ]
+}

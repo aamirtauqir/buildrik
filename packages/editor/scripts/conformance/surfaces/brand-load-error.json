@@ -1,0 +1,94 @@
+{
+  "surface": "brand-load-error",
+  "board": "Brand \u00b7 load-error (Figma 781:4311)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=brand-load-error",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "panel-load-error-retry"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-load-error",
+      "nodeId": "781:4312"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-load-error",
+      "nodeId": "I781:4312;16:7"
+    },
+    {
+      "name": "error-block",
+      "testId": "panel-load-error",
+      "spec": "brand-load-error",
+      "nodeId": "781:4368"
+    },
+    {
+      "name": "error-title",
+      "testId": "panel-load-error-title",
+      "spec": "brand-load-error",
+      "nodeId": "781:4369"
+    },
+    {
+      "name": "error-desc",
+      "testId": "panel-load-error-desc",
+      "spec": "brand-load-error",
+      "nodeId": "781:4370"
+    },
+    {
+      "name": "error-retry",
+      "testId": "panel-load-error-retry",
+      "spec": "brand-load-error",
+      "nodeId": "781:4371"
+    },
+    {
+      "name": "panel",
+      "testId": "brand-panel"
+    }
+  ],
+  "_note": [
+    "PROBE, and the reason is that no click reaches this state: `DesignSystemTab`",
+    "sets `error` only when `loadFromComposer` CATCHES \u2014 i.e. when reading the",
+    "project's own settings throws. So the probe's composer throws from",
+    "`getProjectSettings`, which is the single call that branch depends on, and",
+    "everything else is production: the real DesignSystemTab under the same three",
+    "providers `StudioPanels.tsx:405-407` wraps it in, the real PanelHeader, the",
+    "real PanelErrorState. Nothing about the error block is redrawn in the fixture.",
+    "",
+    "WHAT THE BOARD WON \u2014 PanelErrorState was rebuilt to 781:4368:",
+    "  it composed chrome-ui's `EmptyState` inside a CENTRED 16px box with a",
+    "  bordered Button. The board draws a left-aligned column at the panel's full",
+    "  width on 24px gutters, 36 above and 32 below, three lines 6px apart, and",
+    "  `Try again` as a LINK. Every one of those was wrong: centred text under a",
+    "  headline about a failure, and a filled control where the board has a link.",
+    "  title  13px `--color/error-text`   (781:4369)",
+    "  desc   12px `--color/ink-muted`    (781:4370)",
+    "  retry  13px `--color/accent-text`  (781:4371)",
+    "  `PublishTab.tsx:456` already rendered this exact block for its own sibling",
+    "  board (781:4545, the same node run), which is where the shape came from.",
+    "",
+    "  The change reaches ComponentsTab too \u2014 it is the only other caller \u2014 and",
+    "  that is deliberate: the boards draw one load-error block for the whole",
+    "  drawer, and two panels rendering two different ones is the drift this",
+    "  harness exists to catch. No recipe measures ComponentsTab's error state, so",
+    "  nothing else moves under anyone's feet.",
+    "",
+    "ONE NUMBER THE PROBE FLATTERS: `781:4368` carries `width: 280px` and passes",
+    "here because the probe host IS 280 wide. In the shell it would read 279 \u2014",
+    "`.ls-panel` spends 1px of `--bk-size-drawer` on `border-right`. Same 1px that",
+    "makes surfaces/brand-starters.json skip 152:145. The block is `w-full`; it is",
+    "its parent that differs, and the parent here is the board's own frame.",
+    "",
+    "NOT JOINED: 781:4311 itself \u2014 the drawer's edge, see brand-lint-warnings.json.",
+    "`brand-panel` stays anchored so the coverage line names it."
+  ]
+}

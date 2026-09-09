@@ -1,0 +1,107 @@
+{
+  "surface": "s7-settings-seo",
+  "board": "S7 · Settings · SEO (Figma 638:3070)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-seo",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-site-seo"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "set-card-site-seo",
+      "spec": "s7-settings-seo",
+      "nodeId": "638:3382"
+    },
+    {
+      "name": "card-title",
+      "testId": "set-card-title-site-seo",
+      "spec": "s7-settings-seo",
+      "nodeId": "638:3383"
+    },
+    {
+      "name": "field-twitter",
+      "testId": "set-field-twitter-handle",
+      "spec": "s7-settings-seo",
+      "nodeId": "638:3392"
+    },
+    {
+      "name": "field-twitter-label",
+      "testId": "set-field-label-twitter-handle",
+      "spec": "s7-settings-seo",
+      "nodeId": "638:3393"
+    },
+    {
+      "name": "field-og",
+      "testId": "set-field-default-og-image-url",
+      "spec": "s7-settings-seo",
+      "nodeId": "638:3396"
+    },
+    {
+      "name": "field-og-label",
+      "testId": "set-field-label-default-og-image-url",
+      "spec": "s7-settings-seo",
+      "nodeId": "638:3397"
+    },
+    {
+      "name": "field-title-template",
+      "testId": "set-field-title-template"
+    },
+    {
+      "name": "field-title-template-label",
+      "testId": "set-field-label-title-template"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: SeoScreen reads and writes through",
+    "`composer.getProjectSettings()/setProjectSettings()`, so a four-method stub",
+    "is the whole dependency. Hosted in the board's own pane —",
+    "`.bd-set-pane-body` at 824, which is 760 (the card) plus its two 32 insets.",
+    "Same host and arithmetic as s7-settings-general.",
+    "",
+    "ALREADY CONFORMANT where the two agree: 20 properties on the SITE SEO card,",
+    "its title and the two fields both sides have. The chassis arrived with",
+    "s7-settings-general's family-wide move to settings/shared.tsx.",
+    "",
+    "NOT CONFORMED — 638:3384 'Meta title' and 638:3388 'Meta description', and",
+    "THE BOARD'S OWN ANNOTATION IS WHY. 2876:12473 sits at the top of this frame",
+    "and reads: 'This screen sets the site-level title template, Twitter handle",
+    "and default OG image (SeoScreen.tsx:76-141); each page's own meta title,",
+    "description and social image live in Pages > page settings > SEO... ",
+    "[design-ahead] The resolution is drawn nowhere.' So the frame draws two rows",
+    "the same frame's note says belong to a different screen — the card is an",
+    "earlier draft and the annotation supersedes it. Live's first row is 'Title",
+    "template', which is what the note describes and what the product does; it is",
+    "measured here (field-title-template) but not joined to a board node, because",
+    "no board node names it. The annotation itself is not conformed either: it is",
+    "a founder's sticky note about an unresolved UX problem, not a card.",
+    "",
+    "NOT CONFORMED — 638:3400, the whole INDEXING card ('Allow search indexing'",
+    "toggle + a robots.txt code block). Nothing in the product corresponds: there",
+    "is no indexing flag in project settings and no robots.txt generator to read",
+    "one. That is a feature, not drift, and the board is the first place it has",
+    "been drawn. REPORTED for the orchestrator — it is the largest single gap on",
+    "this board.",
+    "",
+    "ALSO NOT JOINED — the Inputs (638:3386 / 3390 / 3394 / 3398): 42 high, 320",
+    "wide, radius 8 on a --color/ink near-black border. Same node and the same",
+    "adjudication s7-settings-general already recorded for the shared",
+    "SETTINGS_TEXT_INPUT_THEME; an ink-black border on every settings input is a",
+    "reading no other board supports. Left for the founder.",
+    "",
+    "FOUND, NOT FIXED: live ends with a note — 'Per-page SEO (meta title,",
+    "description, robots) is set in each page's settings via the Pages tab' —",
+    "which is the product's own answer to the problem 2876:12473 describes, and",
+    "it is doing more work than the board credits. It is also the one place the",
+    "two screens are linked, and it is prose, not a link: it names the Pages tab",
+    "but does not go there. The board's note asks for exactly that ('this screen",
+    "does not say how many pages override the default'), and neither side has it."
+  ]
+}

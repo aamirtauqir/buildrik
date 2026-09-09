@@ -1,0 +1,175 @@
+{
+  "surface": "s7-settings-analytics",
+  "board": "S7 · Settings · Analytics (Figma 639:3443)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=settings-analytics",
+  "viewport": {
+    "width": 900,
+    "height": 700
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "set-card-google-analytics"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card-ga",
+      "testId": "set-card-google-analytics",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3755"
+    },
+    {
+      "name": "card-ga-title",
+      "testId": "set-card-title-google-analytics",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3756"
+    },
+    {
+      "name": "field-ga-id",
+      "testId": "set-field-google-analytics-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3761"
+    },
+    {
+      "name": "field-ga-id-label",
+      "testId": "set-field-label-google-analytics-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3762"
+    },
+    {
+      "name": "card-gtm",
+      "testId": "set-card-google-tag-manager",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3765"
+    },
+    {
+      "name": "card-gtm-title",
+      "testId": "set-card-title-google-tag-manager",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3766"
+    },
+    {
+      "name": "field-gtm-id",
+      "testId": "set-field-gtm-container-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3771"
+    },
+    {
+      "name": "field-gtm-id-label",
+      "testId": "set-field-label-gtm-container-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3772"
+    },
+    {
+      "name": "card-pixel",
+      "testId": "set-card-meta-pixel",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3775"
+    },
+    {
+      "name": "card-pixel-title",
+      "testId": "set-card-title-meta-pixel",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3776"
+    },
+    {
+      "name": "field-pixel-id",
+      "testId": "set-field-pixel-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3781"
+    },
+    {
+      "name": "field-pixel-id-label",
+      "testId": "set-field-label-pixel-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3782"
+    },
+    {
+      "name": "card-clarity",
+      "testId": "set-card-microsoft-clarity",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3785"
+    },
+    {
+      "name": "card-clarity-title",
+      "testId": "set-card-title-microsoft-clarity",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3786"
+    },
+    {
+      "name": "field-clarity-id",
+      "testId": "set-field-clarity-project-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3791"
+    },
+    {
+      "name": "field-clarity-id-label",
+      "testId": "set-field-label-clarity-project-id",
+      "spec": "s7-settings-analytics",
+      "nodeId": "639:3792"
+    },
+    {
+      "name": "card-consent",
+      "testId": "set-card-consent",
+      "spec": "s7-settings-analytics",
+      "nodeId": "1711:8414"
+    },
+    {
+      "name": "card-consent-title",
+      "testId": "set-card-title-consent",
+      "spec": "s7-settings-analytics",
+      "nodeId": "1711:8415"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE: AnalyticsScreen reads and writes through",
+    "`composer.getProjectSettings()/setProjectSettings()` and subscribes to two",
+    "events, so a four-method stub is the whole dependency. Hosted in the board's",
+    "own pane — `.bd-set-pane-body` at 824, which is 760 (the card) plus its two",
+    "32 insets. Same host and same arithmetic as s7-settings-general.",
+    "",
+    "CONFORMANT ON THE CHASSIS, 64 properties across five cards and four fields.",
+    "The cards, the 180 label column, the uppercase 11px card titles and the",
+    "bg-app ground all arrived with s7-settings-general's family-wide move to",
+    "settings/shared.tsx; this recipe is what proves they landed here too.",
+    "",
+    "BOARD WON — COPY, twice, and both are renames of things the product already",
+    "had:",
+    "  1711:8414  the card is CONSENT, and the row inside it is 'Cookie Consent'.",
+    "             Live headed the CARD 'Cookie Consent', which put the same two",
+    "             words at both levels. Now Section title=\"Consent\".",
+    "  639:3781   the field is 'Pixel ID'. Live said 'Meta (Facebook) Pixel ID'",
+    "             inside a card already headed META PIXEL — the vendor named",
+    "             twice in one card, in a label column that is now 180 wide. The",
+    "             hint under it still names Meta Events Manager, so nothing is",
+    "             lost. Anchors moved with it: set-field-pixel-id.",
+    "",
+    "NOT JOINED — the five 'Enable X' fields (639:3757, 639:3767, 639:3777,",
+    "639:3787 and 1711:8416). The board lays a toggle out as a FIELD: the 180",
+    "label column, 16 gap, switch to the right of it, exactly like an input row.",
+    "Live renders `SwitchRow` — a full-width title-and-description block with the",
+    "switch pushed to the far right, and no 180 column at all. That is not drift",
+    "in a control; it is a different control, `SwitchRow` in shared.tsx, standing",
+    "behind every S7 screen that has a toggle and behind boards this agent does",
+    "not hold. Folding SwitchRow into Field is a FAMILY-WIDE move of the same size",
+    "as the one s7-settings-general made, and it is the single largest remaining",
+    "gap on this board (five rows on five cards). FLAGGED FOR THE ORCHESTRATOR",
+    "rather than taken off one screen mid-pass.",
+    "",
+    "ALSO NOT JOINED — the Inputs (639:3763 / 3773 / 3783 / 3793): 42 high, 320",
+    "wide, radius 8 on a --color/ink (near-black) border. Same node and the same",
+    "adjudication s7-settings-general already recorded — the shared",
+    "SETTINGS_TEXT_INPUT_THEME, and an ink-black border on every settings input",
+    "is a reading no other board supports. Left for the founder.",
+    "",
+    "FOUND, NOT FIXED: the CONSENT card's own copy says the preference is recorded",
+    "and nothing renders a banner — 'the analytics above load as soon as the page",
+    "does — they do not wait for consent'. The board draws the toggle with no such",
+    "caveat, so the board describes a consent control and the product ships a",
+    "stored boolean. Same shape as the Headers board's missing 'Not yet enforced'",
+    "banner. Behaviour, so the CODE contract governs and the caveat stays; but the",
+    "board is drawing a feature that does not exist."
+  ]
+}

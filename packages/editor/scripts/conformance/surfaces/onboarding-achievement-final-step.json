@@ -1,0 +1,118 @@
+{
+  "surface": "onboarding-achievement-final-step",
+  "board": "Onboarding · achievement prompt · final step (Figma 430:2375)",
+  "_note": [
+    "The sibling of onboarding-achievement-step-complete — same component, the",
+    "`isLastStep` branch. Read that recipe's note for the probe rationale and",
+    "the blue-500 refusal; what is specific to this board:",
+    "",
+    "COPY, board wins: \"All done!\" -> \"All done\", \"You're all set!\" ->",
+    "\"You're all set\" (no exclamation marks on either), and the sentence under",
+    "the title is the board's — \"You've finished every getting-started step. Go",
+    "build something great.\" The apostrophe is the typographic one: THIS board",
+    "types it ASCII, board 296:2030 types the same words with U+2019, and the",
+    "rest of the editor's copy is typographic. Two boards disagree about a",
+    "character, so neither settles it and the house style holds.",
+    "",
+    "GLYPH: the board draws a white ★ on the disc. The code drew 🎉, and a",
+    "colour emoji ignores `color` — it painted multicoloured confetti on a",
+    "green disc, at 20px where the board says 18. Board wins on both.",
+    "",
+    "NOT JOINED, and why:",
+    "  430:2385 countdown-fill, 430:2388 badge, 430:2394 btn/primary — all",
+    "  `--color/success` (#0E9F6E). REFUSED ON CONTRAST, and unlike the blue-500",
+    "  case this one was already shipping: white 14px on #0E9F6E is 3.39:1",
+    "  (AA wants 4.5) and the 3px fill on its #E5E7EB track is 2.73:1 (1.4.11",
+    "  wants 3). The fill is now `--bk-success-text` (#057A55) — 5.36:1 and",
+    "  4.33:1 — which is the token set's own readable green, not a new colour.",
+    "  The board and the code were BOTH wrong here; the board copied the code.",
+    "  430:2384 countdown-track — the 380-vs-378 border-box trap, same as the",
+    "  sibling board.",
+    "  430:2393 all-done desc — `leading-[1.5]` states a ratio, the browser",
+    "  reports 19.5px, and the harness's length normaliser reads bare `1.5` as",
+    "  1.5px. Unjoinable by construction, not undone: `tw:leading-[1.5]` is in",
+    "  the code.",
+    "",
+    "countdown-FILL (430:2385) is not a target at all, joined or measured: its width is wall-clock (100%->0 over 4s), so any number read from it says when the browser looked, not what the code renders. Measured it once anyway and it cost a run — playwright's locator.screenshot on the 0-width frame aborted the whole screenshot pass. The TRACK is static and stays.",
+    "",
+    "badge-glyph (430:2389) is measured, not joined: the board sizes it 18, and the DS type scale has no 18 (11/12/13/14/16/20/24) with `gate:design-debt-ratchet` locked at zero off-scale sizes. Snapped to 16 — the same call InspectorEmptyState.tsx made when board 1175:4847 asked for 10 against the scale's 11 floor — which still moves in the board's direction, since 20 is what shipped. The glyph's white fill and `normal` leading are unchanged and were passing; only the size is unjoinable.",
+    "",
+    "HARNESS NOTE, worth passing on: this board's spec `copy[]` held only [\"ALL DONE\", \"Done\"] until the title and the sentence were read straight out of raw-figma. extract.mjs's copy scraper misses a text node written as a JSX expression container — `<p>{`You're all set`}</p>` — which is how Figma exports any string containing an apostrophe. So check-board-copy reported the two most important lines on this board as \"product renders, no board draws\". They are on the board; the extractor could not see them."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=onboarding-achievement-final-step",
+  "viewport": {
+    "width": 1440,
+    "height": 852
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "achievement-card"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "achievement-card",
+      "spec": "onboarding-achievement-prompt-final-step-cod",
+      "nodeId": "430:2383"
+    },
+    {
+      "name": "countdown-track",
+      "testId": "achievement-countdown-track"
+    },
+    {
+      "name": "body",
+      "testId": "achievement-body",
+      "spec": "onboarding-achievement-prompt-final-step-cod",
+      "nodeId": "430:2386"
+    },
+    {
+      "name": "head",
+      "testId": "achievement-head",
+      "spec": "onboarding-achievement-prompt-final-step-cod",
+      "nodeId": "430:2387"
+    },
+    {
+      "name": "badge",
+      "testId": "achievement-badge"
+    },
+    {
+      "name": "badge-glyph",
+      "testId": "achievement-badge-glyph"
+    },
+    {
+      "name": "head-text",
+      "testId": "achievement-head-text",
+      "spec": "onboarding-achievement-prompt-final-step-cod",
+      "nodeId": "430:2390"
+    },
+    {
+      "name": "kicker",
+      "testId": "achievement-kicker",
+      "spec": "onboarding-achievement-prompt-final-step-cod",
+      "nodeId": "430:2391"
+    },
+    {
+      "name": "title",
+      "testId": "achievement-title",
+      "spec": "onboarding-achievement-prompt-final-step-cod",
+      "nodeId": "430:2392"
+    },
+    {
+      "name": "done-desc",
+      "testId": "achievement-done-desc"
+    },
+    {
+      "name": "cta",
+      "testId": "achievement-cta"
+    },
+    {
+      "name": "cta-label",
+      "testId": "achievement-cta-label",
+      "spec": "onboarding-achievement-prompt-final-step-cod",
+      "nodeId": "430:2395"
+    }
+  ]
+}

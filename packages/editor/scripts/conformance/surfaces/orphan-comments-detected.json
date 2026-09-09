@@ -1,0 +1,113 @@
+{
+  "surface": "orphan-comments-detected",
+  "board": "Orphan comments · detected (Figma 184:56)",
+  "_note": [
+    "boards.json had this `drift-open · partial-copy+action-confirmed-",
+    "geometry-not-measured`. This is the geometry.",
+    "",
+    "Probe, and the scan is REAL: the modal opens when CommentLayer's own",
+    "orphan scan finds a pinned comment whose element has left the canvas DOM.",
+    "The probe supplies the three inputs that scan reads — a canvas root with",
+    "two rendered elements, an active page, and two open comments anchored to",
+    "ids that are not among them — and lets the shipped detector decide. It",
+    "also replays `ELEMENT_DELETED` so the modal can quote what each pin was",
+    "on; that label is captured client-side from the live instance and is never",
+    "stored, so nothing else can produce it.",
+    "",
+    "WHAT MOVED:",
+    "  · The body gutter, 16 -> 24 at this call site. Every row on this board is",
+    "    512 inside a 560 dialog. Five boards in the file draw the dialog body",
+    "    at 24 (184:56/70/87, 131:401, 914:4517).",
+    "  · Each orphan note was a 12px block on the paragraph's own leading with",
+    "    a 10/12 pad. 184:62 is a 56-tall row whose two lines are 12/18 ink over",
+    "    11/16 warning-text.",
+    "  · The intro was an inline-styled 13px on default leading; 184:61 is 13/20.",
+    "  · The primary is `--size/row` (32) at a 16/10 inset and 14/20 — it",
+    "    shipped as the modal foot's capped 28 with 12px text. The foot's cap is",
+    "    `[&_button]:h-7`, a DESCENDANT selector, so no class on the button can",
+    "    out-specify it; the geometry goes through `style`, the same escape",
+    "    hatch CommentRow uses.",
+    "",
+    "NOT anchored, and why:",
+    "  184:58 the dialog frame — MODAL_FRAME_BASE_CLASS is shared by every",
+    "    dialog (the 914:4507 call). Its 560 width and 12 radius already agree;",
+    "    its 340 height is content, and this dialog's content is a list.",
+    "  184:57 the scrim — exported as opaque `--flowbite/gray/900`; Figma bakes",
+    "    layer opacity out of the export.",
+    "  184:59 the title — 16/24. MODAL_TITLE_CLASS is 14 and cites no board, and",
+    "    the same 16 appears on 131:402, 307:2195 and 914:4518. That is four",
+    "    boards against an uncited default and it deserves settling in the",
+    "    component, not four call-site overrides. Reported, not patched here.",
+    "  184:60 the ✕ — ModalClose is the shared control at top-3/right-3.",
+    "  1682:7245 — a prototype hotspot.",
+    "  184:61 the intro paragraph — its type is right (13/20 ink-muted at 512,",
+    "    all four measured PASS before it was dropped) but the node also carries",
+    "    `h-[60px]`, and the SAME string at the SAME size in the SAME 512 box",
+    "    wraps to two lines in the browser and three in Figma. A line-breaking",
+    "    difference is not a design property, and a target's properties cannot be",
+    "    joined one at a time — so the node goes rather than the height being",
+    "    faked with a min-height."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=orphan-comments-detected&siteId=probe-site",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "orphan-row-0"
+    }
+  ],
+  "contrastScope": "[data-testid=\"orphan-modal\"]",
+  "targets": [
+    {
+      "name": "orphan-row",
+      "testId": "orphan-row-0",
+      "spec": "orphan-comments-detected",
+      "nodeId": "184:62"
+    },
+    {
+      "name": "orphan-body",
+      "testId": "orphan-body-0",
+      "spec": "orphan-comments-detected",
+      "nodeId": "184:63"
+    },
+    {
+      "name": "orphan-was",
+      "testId": "orphan-was-0",
+      "spec": "orphan-comments-detected",
+      "nodeId": "184:64"
+    },
+    {
+      "name": "orphan-row-2",
+      "testId": "orphan-row-1",
+      "spec": "orphan-comments-detected",
+      "nodeId": "184:65"
+    },
+    {
+      "name": "orphan-body-2",
+      "testId": "orphan-body-1",
+      "spec": "orphan-comments-detected",
+      "nodeId": "184:66"
+    },
+    {
+      "name": "orphan-was-2",
+      "testId": "orphan-was-1",
+      "spec": "orphan-comments-detected",
+      "nodeId": "184:67"
+    },
+    {
+      "name": "orphan-primary",
+      "testId": "orphan-open-review",
+      "spec": "orphan-comments-detected",
+      "nodeId": "229:1178"
+    },
+    {
+      "name": "orphan-primary-label",
+      "testId": "orphan-open-review",
+      "spec": "orphan-comments-detected",
+      "nodeId": "I229:1178;9:19"
+    }
+  ]
+}

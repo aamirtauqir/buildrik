@@ -1,0 +1,240 @@
+{
+  "surface": "inspector-profile-grid",
+  "board": "Inspector · profile · GRID (Figma 807:8475)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "click",
+      "testId": "insert-el-Grid"
+    },
+    {
+      "action": "waitFor",
+      "testId": "inspector-context-row"
+    }
+  ],
+  "contrastScope": "[data-testid=\"inspector-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "inspector-panel",
+      "spec": "inspector-profile-grid",
+      "nodeId": "807:8475"
+    },
+    {
+      "name": "ai-chip",
+      "testId": "inspector-ai-chip",
+      "spec": "inspector-profile-grid",
+      "nodeId": "920:4702"
+    },
+    {
+      "name": "scope-pill",
+      "testId": "inspector-scope-pill",
+      "spec": "inspector-profile-grid",
+      "nodeId": "956:6852"
+    },
+    {
+      "name": "breakpoint-pill",
+      "testId": "inspector-breakpoint-pill",
+      "spec": "inspector-profile-grid",
+      "nodeId": "956:6854"
+    },
+    {
+      "name": "state-pill",
+      "testId": "inspector-state-pill",
+      "spec": "inspector-profile-grid",
+      "nodeId": "956:6856"
+    },
+    {
+      "name": "sechead-layout",
+      "testId": "inspector-sechead-layout",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20344"
+    },
+    {
+      "name": "secname-layout",
+      "testId": "inspector-secname-layout",
+      "spec": "inspector-profile-grid",
+      "nodeId": "807:8482"
+    },
+    {
+      "name": "sechead-grid",
+      "testId": "inspector-sechead-grid",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20346"
+    },
+    {
+      "name": "secname-grid",
+      "testId": "inspector-secname-grid",
+      "spec": "inspector-profile-grid",
+      "nodeId": "807:8487"
+    },
+    {
+      "name": "row-row-gap",
+      "testId": "inspector-row-row-gap",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20348"
+    },
+    {
+      "name": "field-row-gap",
+      "testId": "inspector-field-row-gap",
+      "spec": "inspector-profile-grid",
+      "nodeId": "807:8493"
+    },
+    {
+      "name": "label-row-gap",
+      "testId": "inspector-label-row-gap",
+      "spec": "inspector-profile-grid",
+      "nodeId": "807:8492"
+    },
+    {
+      "name": "field-column-gap",
+      "testId": "inspector-field-column-gap",
+      "spec": "inspector-profile-grid",
+      "nodeId": "807:8496"
+    },
+    {
+      "name": "label-column-gap",
+      "testId": "inspector-label-column-gap",
+      "spec": "inspector-profile-grid",
+      "nodeId": "807:8495"
+    },
+    {
+      "name": "sechead-size",
+      "testId": "inspector-sechead-size",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20350"
+    },
+    {
+      "name": "sechead-background",
+      "testId": "inspector-sechead-background",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20352"
+    },
+    {
+      "name": "sechead-border",
+      "testId": "inspector-sechead-border",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20353"
+    },
+    {
+      "name": "sechead-corner-radius",
+      "testId": "inspector-sechead-corner-radius",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20354"
+    },
+    {
+      "name": "sechead-effects",
+      "testId": "inspector-sechead-effects",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20355"
+    },
+    {
+      "name": "sechead-interactions",
+      "testId": "inspector-sechead-interactions",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20356"
+    },
+    {
+      "name": "sechead-animation",
+      "testId": "inspector-sechead-animation",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20357"
+    },
+    {
+      "name": "sechead-visibility",
+      "testId": "inspector-sechead-visibility",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20358"
+    },
+    {
+      "name": "sechead-element-properties",
+      "testId": "inspector-sechead-element-properties",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20359"
+    },
+    {
+      "name": "sechead-css-classes",
+      "testId": "inspector-sechead-css-classes",
+      "spec": "inspector-profile-grid",
+      "nodeId": "2069:20360"
+    },
+    {
+      "name": "header",
+      "testId": "inspector-header"
+    },
+    {
+      "name": "context-row",
+      "testId": "inspector-context-row"
+    },
+    {
+      "name": "sechead-spacing",
+      "testId": "inspector-sechead-spacing"
+    },
+    {
+      "name": "sections-apply",
+      "testId": "inspector-sections-apply"
+    }
+  ],
+  "_note": [
+    "REACHED LIVE at 1440x900: Insert's Grid row (Layout group) creates a grid",
+    "container and selects it, which is the production path into the GRID",
+    "profile.",
+    "",
+    "SHARED CHASSIS. This board is one of six that draw the same section",
+    "chassis (807:8342 TEXT, :8412 FLEX, :8475 GRID, :8521 MEDIA, :8567 BUTTON,",
+    ":8614 INPUT). It was conformed once, on inspector-profile-text, and that",
+    "recipe's _note carries the full account: 20-tall open / 28-tall shut section",
+    "headers, ink-muted on the header ROW, 0.08em tracking, section-body padding",
+    "0/8, the Family row moved onto the shared control frame, the colour row's",
+    "duplicate chip removed so the field keeps its 160, segmented tracks at 28,",
+    "and the three-anchor row (`inspector-row-`/`-label-`/`-field-<slug>`).",
+    "",
+    "NOT JOINED on every board in this family, censused across all committed",
+    "specs rather than counted board-to-board:",
+    "",
+    "  the header's `--flowbite/gray/50` fill — 37 boards draw this 48h row with",
+    "  NO fill, 6 draw it gray-50 (these six), 1 draws it accent-tinted. White",
+    "  ships; a header that changed colour with the selection would be a defect.",
+    "",
+    "  the context strip at 40 tall — 38 boards draw it 32, these 6 draw it 40.",
+    "  32 ships. One strip, not a per-profile one.",
+    "",
+    "  the accent-tint chip carrying the PROFILE name. 32:2 and 642:3112 put the",
+    "  ELEMENT's own name there and so does live.",
+    "",
+    "  the footer's `--color/ink-placeholder` #9CA3AF, which is 2.54:1 on white",
+    "  at 11px against a 4.5 floor. It ships --bk-ink-muted (4.83:1). Said loudly",
+    "  because it is a contrast refusal, not a taste call.",
+    "",
+    "  every `hotspot/…` node — prototype wiring, not chrome.",
+    "",
+    "NOT JOINED on THIS board specifically:",
+    "",
+    "  SPACING (2069:20351) is drawn shut and arrives open — the grid container",
+    "  the Insert row creates carries a gap, so the section applies. Eleven of the",
+    "  twelve headers agree and are joined.",
+    "",
+    "  2069:20345 (Display, 42) and 2069:20347 (Columns): Display is the board's",
+    "  last-row-in-section form and is drawn as a value frame where the shipped",
+    "  Layout section uses icon tiles; Columns is GridSection's own track editor,",
+    "  not a labelled 160 row. 2069:20349 (Col gap) is 42 for the same reason —",
+    "  its CONTROL and LABEL are joined and match.",
+    "",
+    "  COPY LEAD, recorded not fixed: 807:8495 spells this row 'Col gap' and the",
+    "  product spells it 'Column gap' (SpacingSection, shared by every container",
+    "  type). One board names it; the abbreviation is the board's, the full word",
+    "  is the product's, and the label is joined for its TYPE only."
+  ]
+}

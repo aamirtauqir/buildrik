@@ -1,0 +1,156 @@
+{
+  "surface": "onboarding-achievement-step-complete",
+  "board": "Onboarding · achievement prompt · step complete (Figma 430:2348)",
+  "_note": [
+    "boards.json records this row `authority=code:state-exists` and names the",
+    "file in the board title — the board was drawn FROM AchievementPrompt.tsx.",
+    "That does not make it a mirror: eight properties disagreed, and the board",
+    "won all eight (card radius 8->12, badge glyph 20->18, title weight 700->600,",
+    "CTA radius 10->8, next-up arrow 16->14, the missing countdown TRACK, and",
+    "the body/head-text/next-text gaps, which the code expressed as per-child",
+    "margins that summed to the same picture and measured 0).",
+    "",
+    "UNREACHABLE BY CLICKING, so it is a probe: every checklist step credits on",
+    "an OUTCOME event (OnboardingMount STEP_SIGNALS — a brand applied, a page",
+    "created, a section inserted, a review sent, a publish), never on a CTA",
+    "press. Reaching this overlay in the demo means performing one of those for",
+    "real. The probe mounts the REAL component over the SSOT step list; only",
+    "`completed` and `isLastStep` are fixtures.",
+    "",
+    "NOT JOINED, and why:",
+    "  430:2358 countdown-FILL and 430:2361 badge and 430:2372 btn/primary are",
+    "  all `--flowbite/blue/500` (#3F83F8). Refused, and the refusal is",
+    "  computed, not taste: DESIGN.md §Color makes #1A56DB the single accent",
+    "  for CTAs, and white 14px on #3F83F8 is 3.61:1 against a 4.5 floor while",
+    "  the 3px fill on its own #E5E7EB track is 2.92:1 against 1.4.11's 3.",
+    "  On #1A56DB those are 6.18:1 and 4.99:1. Conforming would have introduced",
+    "  a WCAG AA failure on the one CTA this surface has. The board should be",
+    "  redrawn to `--color/accent`; every other property on those three nodes",
+    "  is already met in the code (44 tall, 11 top/bottom, radius 8, radius",
+    "  full, 3 tall).",
+    "  430:2357 countdown-TRACK — the board gives the card AND the bar 380,",
+    "  which Figma can do because its stroke does not consume layout. In CSS",
+    "  the card's 1px border does, so a 380 card has a 378 content box. The",
+    "  card's 380 is the load-bearing number, so the card is joined and the",
+    "  track is measured-only. The track itself is NEW — it did not exist",
+    "  before this pass.",
+    "  430:2371 next-desc — `leading-[1.4]`. `getComputedStyle` reports the USED",
+    "  line-height in px (16.8), the board states the ratio, and lib.mjs's",
+    "  length normaliser reads a bare `1.4` as 1.4px, so this node can only ever",
+    "  FAIL by 15.4. The ratio IS implemented (`tw:leading-[1.4]`); the harness",
+    "  has no way to say so. Same for 430:2393 on the sibling board.",
+    "",
+    "Board sample data (\"Add your first section\", \"Set your brand colours\") is",
+    "not conformed to — the probe uses the real step list, per the founder rule.",
+    "",
+    "countdown-FILL (430:2358) is not a target at all, joined or measured: its width is wall-clock (100%->0 over 4s), so any number read from it says when the browser looked, not what the code renders. Measured it once anyway and it cost a run — playwright's locator.screenshot on the 0-width frame aborted the whole screenshot pass. The TRACK is static and stays.",
+    "",
+    "badge-glyph (430:2362) is measured, not joined: the board sizes it 18, and the DS type scale has no 18 (11/12/13/14/16/20/24) with `gate:design-debt-ratchet` locked at zero off-scale sizes. Snapped to 16 — the same call InspectorEmptyState.tsx made when board 1175:4847 asked for 10 against the scale's 11 floor — which still moves in the board's direction, since 20 is what shipped. The glyph's white fill and `normal` leading are unchanged and were passing; only the size is unjoinable."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=onboarding-achievement-step-complete",
+  "viewport": {
+    "width": 1440,
+    "height": 852
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "achievement-card"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "card",
+      "testId": "achievement-card",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2356"
+    },
+    {
+      "name": "countdown-track",
+      "testId": "achievement-countdown-track"
+    },
+    {
+      "name": "body",
+      "testId": "achievement-body",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2359"
+    },
+    {
+      "name": "head",
+      "testId": "achievement-head",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2360"
+    },
+    {
+      "name": "badge",
+      "testId": "achievement-badge"
+    },
+    {
+      "name": "badge-glyph",
+      "testId": "achievement-badge-glyph"
+    },
+    {
+      "name": "head-text",
+      "testId": "achievement-head-text",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2363"
+    },
+    {
+      "name": "kicker",
+      "testId": "achievement-kicker",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2364"
+    },
+    {
+      "name": "title",
+      "testId": "achievement-title",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2365"
+    },
+    {
+      "name": "next-up",
+      "testId": "achievement-next-up",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2366"
+    },
+    {
+      "name": "next-arrow",
+      "testId": "achievement-next-arrow",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2367"
+    },
+    {
+      "name": "next-text",
+      "testId": "achievement-next-text",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2368"
+    },
+    {
+      "name": "next-kicker",
+      "testId": "achievement-next-kicker",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2369"
+    },
+    {
+      "name": "next-label",
+      "testId": "achievement-next-label",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2370"
+    },
+    {
+      "name": "next-desc",
+      "testId": "achievement-next-desc"
+    },
+    {
+      "name": "cta",
+      "testId": "achievement-cta"
+    },
+    {
+      "name": "cta-label",
+      "testId": "achievement-cta-label",
+      "spec": "onboarding-achievement-prompt-step-complete-",
+      "nodeId": "430:2373"
+    }
+  ]
+}

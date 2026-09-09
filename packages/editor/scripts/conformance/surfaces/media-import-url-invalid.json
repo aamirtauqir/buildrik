@@ -1,0 +1,70 @@
+{
+  "surface": "media-import-url-invalid",
+  "board": "Media · modal · import-url · invalid (Figma 1205:4816)",
+  "_note": "Same probe case as media-import-url, driven into the error state by TYPING the board's own value rather than by a fixture that pre-sets it: `valid` is derived from the field's value through `isFetchableUrl`, so a case that injected the message would have measured a screen the product cannot produce. The field is autoFocus, so nine key presses reach it. The waitFor is on `import-url-error`, which is the state.\n\nNOT joined, and the reasons carry over from media-import-url: 1205:4816 the card (shared MODAL_FRAME_BASE_CLASS), 1205:4820 the field (authority=open:input-fill — and this frame's own sibling 1205:4804 is one of the two boards that disagree), 1205:4825 / 1205:4827 the buttons (bare chrome-ui Button; this board wants py-8/radius-6 where 1175:4827 wants py-7, so no single frame settles the primitive).\n\n1205:4819 is skipped for a third reason worth naming: it is the SAME `MEDIA URL` label as 1205:4807 one frame away, and the two boards give it 9px and 11px. The code keeps 11 — the --bk-text-11 caption step the rest of the editor uses. (This recipe first joined the label to 1205:4818 and PASSED, which is the trap check-boards.mjs exists for: 1205:4818 is the SUBTITLE, also 11px, so a wrong id agreed by coincidence. Read back from raw-figma before believing a join.)\n\nONE UNKNOWN, declared: 1205:4822's line-height is Figma AUTO (`leading-[normal]`), as is every text node on this frame. The line ships at the system's 11/16 caption step, so the comparison reports UNKNOWN rather than agreeing. Kept rather than dropped because it is the only anchor the error state has, and an UNKNOWN that is visible in the verdict is worth more than a board with no target on it.",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-import-url",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "click",
+      "testId": "import-url-input"
+    },
+    {
+      "action": "press",
+      "key": "n"
+    },
+    {
+      "action": "press",
+      "key": "o"
+    },
+    {
+      "action": "press",
+      "key": "t"
+    },
+    {
+      "action": "press",
+      "key": "-"
+    },
+    {
+      "action": "press",
+      "key": "a"
+    },
+    {
+      "action": "press",
+      "key": "-"
+    },
+    {
+      "action": "press",
+      "key": "u"
+    },
+    {
+      "action": "press",
+      "key": "r"
+    },
+    {
+      "action": "press",
+      "key": "l"
+    },
+    {
+      "action": "waitFor",
+      "testId": "import-url-error"
+    }
+  ],
+  "targets": [
+    {
+      "name": "foot",
+      "testId": "import-url-foot",
+      "spec": "media-import-url-invalid",
+      "nodeId": "1205:4823"
+    },
+    {
+      "name": "error",
+      "testId": "import-url-error",
+      "spec": "media-import-url-invalid",
+      "nodeId": "1205:4822"
+    }
+  ]
+}

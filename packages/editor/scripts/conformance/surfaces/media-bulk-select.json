@@ -1,0 +1,24 @@
+{
+  "surface": "media-bulk-select",
+  "board": "Media · bulk-select (Figma 145:300)",
+  "_note": "Probe: four cards selected. The waitFor is on `media-bulk-bar`, which only mounts in selection mode — waiting on the panel would have measured the ordinary grid as this board. The bar REPLACES the footer links (145:347 is the last child of this frame, where 144:46's footer sits on the default board), so this is the one Media state with no footer target: adding while choosing among what is already there is a different job, and the board agrees. NOT joined: 145:306 (inner search field, authority=open:input-fill) and 145:310 (the folder row's Select, a text-frame auto-width).",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-drawer-bulk-select",
+  "viewport": { "width": 280, "height": 812 },
+  "steps": [
+    { "action": "waitFor", "testId": "media-bulk-bar" }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    { "name": "panel",        "testId": "media-panel",         "spec": "media-bulk-select", "nodeId": "145:300" },
+    { "name": "panel-header", "testId": "panel-header",        "spec": "media-bulk-select", "nodeId": "208:341" },
+    { "name": "search",       "testId": "media-search",        "spec": "media-bulk-select", "nodeId": "145:305" },
+    { "name": "folder-row",   "testId": "media-folder-row",    "spec": "media-bulk-select", "nodeId": "145:308" },
+    { "name": "type-chips",   "testId": "media-type-chips",    "spec": "media-bulk-select", "nodeId": "145:311" },
+    { "name": "chip-image",   "testId": "media-type-chip-img", "spec": "media-bulk-select", "nodeId": "145:312" },
+    { "name": "chip-video",   "testId": "media-type-chip-vid", "spec": "media-bulk-select", "nodeId": "145:315" },
+    { "name": "chip-svg",     "testId": "media-type-chip-ico", "spec": "media-bulk-select", "nodeId": "145:318" },
+    { "name": "chip-icon",    "testId": "media-type-chip-fnt", "spec": "media-bulk-select", "nodeId": "145:321" },
+    { "name": "asset-grid",   "testId": "media-grid",          "spec": "media-bulk-select", "nodeId": "145:324" },
+    { "name": "bulk-bar",     "testId": "media-bulk-bar",      "spec": "media-bulk-select", "nodeId": "145:347" }
+  ]
+}

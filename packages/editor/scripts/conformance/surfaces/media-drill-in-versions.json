@@ -1,0 +1,135 @@
+{
+  "surface": "media-drill-in-versions",
+  "board": "Media · drill-in · versions (Figma 146:32)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=media-versions",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "media-version-v1"
+    },
+    {
+      "action": "click",
+      "testId": "media-version-menu-v1"
+    },
+    {
+      "action": "waitFor",
+      "testId": "media-restore-confirm"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "_note": [
+    "THE PROBE CASE IS NEW, and the reason it did not exist was wrong. The",
+    "fixture header said versions rows 'come from IndexedDB, so a probe would",
+    "capture the empty list and call it a pass'. They do not: reloadDbVersions",
+    "calls `listAssetVersions`, which is a tRPC read over the wire",
+    "(MediaVersionService:34), and this probe has answered that transport for",
+    "the review surfaces since they were boarded. So `media-versions` stubs",
+    "`media.listAssetVersions` and the overlay mounts exactly as it ships. The",
+    "old reasoning is what left a four-row board measured against a screen that",
+    "had none — the same shape as USAGE_COMPOSER never answering",
+    "getUsagesByPage. The wait names a ROW, not the panel, so an empty list",
+    "cannot pass as this state.",
+    "",
+    "THE VERSION ROWS ARE JOINED TO 75:71 / 75:77 / 75:83, NOT to this board's",
+    "own 241:1444 / 241:1452 / 241:1460, and that needs saying plainly. This",
+    "board draws every row 56 tall, full-bleed and square (radius 4, no fill).",
+    "Board 75:59's card draws the same rows as 44-high bg-subtle chips on a 6",
+    "radius at a 10 inset — the same box as the CURRENT version, which",
+    "boards.json already records as drift-fixed against 75:65 (2026-09-08).",
+    "Two boards disagree and the verified one stands; but the code was",
+    "following NEITHER: it shipped a 44 chip for the current version directly",
+    "above 56-tall full-bleed rows for the older ones, which reads as two",
+    "different lists stacked. Conformed to the chip, so the joins are real",
+    "measurements rather than a decision deferred.",
+    "",
+    "BOARD WON — 146:64, THE RESTORE CONFIRM, and this is the one that matters",
+    "on this screen. It shipped as a 32-high strip reading 'Restore?'. The",
+    "board's band is 84 tall and says what restoring costs: 'Restore this",
+    "version? It is used in 3 places — those will update too.' Asking for an",
+    "irreversible decision while withholding the single fact needed to make it",
+    "is not a size difference. The place count is real (`usageCount`), and the",
+    "clause is dropped entirely when the asset is used nowhere rather than",
+    "printing 'used in 0 places'.",
+    "",
+    "ALSO FIXED, found by conforming rather than by looking: the current chip's",
+    "children carried mt-4 / ml-5 / ml-3 / mt-2.5 / mr-4 — absolute-era offsets",
+    "left over from when the row was 56 tall and full-bleed. Inside a 44 chip",
+    "that is `items-center` with gap-10 and px-10 they push every child below",
+    "the centre line. The chip's own box measured green against 75:65 the whole",
+    "time, because a diff of a container cannot see where its children sit.",
+    "",
+    "NOT JOINED, and why: 146:37 / 146:38, the back row at 56 — 146:7, 147:7",
+    "and 147:60 all give the same shared control 36, which is what ships and",
+    "what media-drill-in-asset-detail measured green; three frames to two does",
+    "not re-settle a shared row. 146:65, the confirm's sentence, carries",
+    "w-248: Figma strokes do not consume layout and CSS borders do, so the 1px",
+    "gray-100 edge this board itself mandates leaves the child at 246 (the",
+    "media-no-results note records the same arithmetic). 75:65 (the current",
+    "chip) is measured by media-drill-ins-the-five-destinations and is not",
+    "joined twice. 1720:17375 is a hotspot.",
+    "",
+    "CONTRAST, BOARD-MANDATED AND DECLARED — 2 failures, neither introduced by",
+    "this pass. 'current' is --bk-ink-muted on the accent-tint chip at 4.38:1",
+    "(pre-existing; already recorded on media-drill-ins-the-five-destinations).",
+    "'Cancel' is --bk-ink-muted on the confirm band's --bk-bg-subtle at 4.39:1 —",
+    "146:66 names ink-muted and 146:64 names bg-subtle, so the board pins both",
+    "halves and conforming cannot fix it. The band was already that pair when it",
+    "was 32 tall; making it 84 did not create it. Standing",
+    "CONTRAST-INK-MUTED.md defect; the fix is ink-soft at 7.0:1 and deviates",
+    "from a board that names the token."
+  ],
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "media-detail-panel",
+      "spec": "media-drill-in-versions",
+      "nodeId": "146:32"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "media-drill-in-versions",
+      "nodeId": "208:371"
+    },
+    {
+      "name": "version-row-1",
+      "testId": "media-version-v3",
+      "spec": "media-drill-ins-the-five-destinations",
+      "nodeId": "75:71"
+    },
+    {
+      "name": "version-row-2",
+      "testId": "media-version-v2",
+      "spec": "media-drill-ins-the-five-destinations",
+      "nodeId": "75:77"
+    },
+    {
+      "name": "version-row-3",
+      "testId": "media-version-v1",
+      "spec": "media-drill-ins-the-five-destinations",
+      "nodeId": "75:83"
+    },
+    {
+      "name": "restore-confirm",
+      "testId": "media-restore-confirm",
+      "spec": "media-drill-in-versions",
+      "nodeId": "146:64"
+    },
+    {
+      "name": "restore-cancel",
+      "testId": "media-restore-cancel",
+      "spec": "media-drill-in-versions",
+      "nodeId": "146:66"
+    },
+    {
+      "name": "restore-go",
+      "testId": "media-restore-go",
+      "spec": "media-drill-in-versions",
+      "nodeId": "146:67"
+    }
+  ]
+}

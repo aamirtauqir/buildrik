@@ -1,0 +1,237 @@
+{
+  "surface": "brand-export-exported",
+  "board": "Brand · export · exported (Figma 306:2232)",
+  "url": "http://localhost:5050/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "topbar"
+    },
+    {
+      "action": "clickIfPresent",
+      "testId": "rail-coach-got-it"
+    },
+    {
+      "action": "press",
+      "key": "b"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-panel"
+    },
+    {
+      "action": "click",
+      "testId": "brand-row-export"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-import-head"
+    },
+    {
+      "action": "click",
+      "testId": "brand-format-download-css"
+    },
+    {
+      "action": "waitFor",
+      "testId": "brand-section-status-exported"
+    },
+    {
+      "action": "hover",
+      "testId": "panel-header-title"
+    }
+  ],
+  "contrastScope": "[data-testid=\"brand-panel\"]",
+  "targets": [
+    {
+      "name": "panel",
+      "testId": "brand-panel"
+    },
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2233"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "brand-export-exported",
+      "nodeId": "I306:2233;16:7"
+    },
+    {
+      "name": "back-row",
+      "testId": "brand-back-row",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2234"
+    },
+    {
+      "name": "back-link",
+      "testId": "brand-back-link",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2235"
+    },
+    {
+      "name": "dark-row",
+      "testId": "brand-export-dark-row",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2236"
+    },
+    {
+      "name": "dark-label",
+      "testId": "brand-export-dark-label",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2237"
+    },
+    {
+      "name": "export-head",
+      "testId": "brand-export-head",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2239"
+    },
+    {
+      "name": "export-head-fill",
+      "testId": "brand-export-head",
+      "spec": "brand-export-exported",
+      "nodeId": "I306:2239;220:6"
+    },
+    {
+      "name": "format-css",
+      "testId": "format-row-css",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2240"
+    },
+    {
+      "name": "format-css-title",
+      "testId": "brand-format-title-css",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2241"
+    },
+    {
+      "name": "format-css-desc",
+      "testId": "brand-format-desc-css",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2242"
+    },
+    {
+      "name": "format-css-download",
+      "testId": "brand-format-download-css",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2244"
+    },
+    {
+      "name": "format-json",
+      "testId": "format-row-json",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2245"
+    },
+    {
+      "name": "format-json-title",
+      "testId": "brand-format-title-json",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2246"
+    },
+    {
+      "name": "format-json-desc",
+      "testId": "brand-format-desc-json",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2247"
+    },
+    {
+      "name": "format-json-download",
+      "testId": "brand-format-download-json",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2249"
+    },
+    {
+      "name": "format-tailwind",
+      "testId": "format-row-tailwind"
+    },
+    {
+      "name": "format-tailwind-title",
+      "testId": "brand-format-title-tailwind",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2251"
+    },
+    {
+      "name": "format-tailwind-desc",
+      "testId": "brand-format-desc-tailwind",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2252"
+    },
+    {
+      "name": "format-tailwind-download",
+      "testId": "brand-format-download-tailwind",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2254"
+    },
+    {
+      "name": "format-figma",
+      "testId": "format-row-figma"
+    },
+    {
+      "name": "format-figma-title",
+      "testId": "brand-format-title-figma",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2256"
+    },
+    {
+      "name": "import-head",
+      "testId": "brand-import-head",
+      "spec": "brand-export-exported",
+      "nodeId": "306:2258"
+    },
+    {
+      "name": "import-head-fill",
+      "testId": "brand-import-head",
+      "spec": "brand-export-exported",
+      "nodeId": "I306:2258;220:6"
+    },
+    {
+      "name": "drop-zone",
+      "testId": "import-drop-zone"
+    },
+    {
+      "name": "badge",
+      "testId": "brand-section-status-exported",
+      "spec": "brand-export-exported",
+      "nodeId": "333:2362"
+    },
+    {
+      "name": "badge-text",
+      "testId": "brand-section-status-exported",
+      "spec": "brand-export-exported",
+      "nodeId": "I333:2362;12:9"
+    }
+  ],
+  "_note": [
+    "MEASURED LIVE, and the state is REACHED not faked: rail -> `b` -> Import /",
+    "export -> press the CSS row's own `Download`. That call is what sets",
+    "`lastExport` in DesignSystemTab, so the badge under the back row is the",
+    "product's, not a fixture's.",
+    "",
+    "boards.json's finding — \"board shows a persistent 'Exported CSS' pill; live",
+    "shows only a transient toast + a Copied! label swap\" — is FIXED and was",
+    "already fixed before this pass: `SectionStatusBadge status=\"exported\"` renders",
+    "with the format name appended, and it is what this recipe waits for.",
+    "",
+    "WHAT THE BOARD WON here, beyond everything brand-import-export lists (the two",
+    "boards draw the same screen and this recipe re-measures all of it against",
+    "306:2232's own node ids):",
+    "  badge label  `--flowbite/green/700` = `--bk-green-700` #046c4e (I333:2362;",
+    "               12:9), a shade darker than `--bk-success-text` green-600",
+    "               #057a55 that shipped. Same call `starter-applied` already made",
+    "               on 333:2358 — the board names the palette entry, not the",
+    "               semantic. Only the `exported` variant moved; `imported`",
+    "               (306:2265) belongs to another recipe and was left alone.",
+    "",
+    "NOT JOINED — identical to brand-import-export and for the same reasons:",
+    "306:2250 (Tailwind row, 48 vs a live 64 because its description takes a second",
+    "line when the emitter drops dark variants — data), 306:2255 (Figma row, 60,",
+    "where the board does not fit its own two-line description), the drop zone",
+    "(width 248 against the drawer's 279 content box) and 306:2232 itself."
+  ]
+}

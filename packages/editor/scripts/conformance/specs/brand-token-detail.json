@@ -1,0 +1,417 @@
+{
+  "surface": "brand-token-detail",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "152:83",
+  "boardName": "brand-token-detail",
+  "figmaHash": "8edd18d2047827d68fee8d6b1675ff6d7c59cae0b3b6f00436ad6062588551bb",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:45:20.794Z",
+  "copy": [
+    "Brand",
+    "‹ Back to tokens",
+    "primary",
+    "color-primary",
+    "Light value",
+    "#1A56DB",
+    "Dark value",
+    "#76A9FA",
+    "Used by",
+    "▸ 34 elements",
+    "Lint",
+    "✓ pass",
+    "Replace value",
+    "Rename ID",
+    "Delete token"
+  ],
+  "targets": [
+    {
+      "nodeId": "152:83",
+      "name": "Brand · token-detail",
+      "className": "bg-[var(--color\\/bg-panel,white)] border border-[var(--flowbite\\/gray\\/100,#f3f4f6)] border-solid content-stretch cursor-pointer flex flex-col items-start relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--flowbite/gray/100",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "208:521",
+      "name": "Panel header",
+      "className": "bg-[var(--color\\/bg-panel,white)] content-stretch flex gap-[8px] h-[44px] items-center pl-[16px] pr-[12px] relative shrink-0 w-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "gap": {
+          "value": "8px"
+        },
+        "height": {
+          "value": "44px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "12px"
+        }
+      }
+    },
+    {
+      "nodeId": "I208:521;16:7",
+      "name": null,
+      "className": "[word-break:break-word] flex-[1_0_0] font-['Inter:Medium'] font-medium leading-[16px] min-w-px not-italic relative text-[11px] text-[color:var(--color\\/ink-soft,#4b5563)] text-left tracking-[0.5px]",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/ink-soft",
+          "value": "#4b5563"
+        }
+      }
+    },
+    {
+      "nodeId": "152:88",
+      "name": "Back row",
+      "className": "h-[36px] overflow-clip relative shrink-0 w-full",
+      "props": {
+        "height": {
+          "value": "36px"
+        }
+      }
+    },
+    {
+      "nodeId": "152:89",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[20px] left-[16px] not-italic text-[13px] text-[color:var(--color\\/accent-text,#1a56db)] text-left top-[8px] whitespace-pre",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/accent-text",
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6943",
+      "name": "Token header",
+      "className": "h-[60px] relative shrink-0 w-[280px]",
+      "props": {
+        "height": {
+          "value": "60px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6944",
+      "name": "swatch",
+      "className": "absolute bg-[#1a56db] left-[16px] rounded-[4px] size-[24px] top-[18px]",
+      "props": {
+        "background-color": {
+          "value": "#1a56db"
+        },
+        "border-radius": {
+          "value": "4px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6945",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Semi_Bold'] font-semibold leading-[normal] left-[48px] not-italic text-[#111827] text-[16px] text-left top-[14px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "16px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6946",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Geist_Mono:Medium'] font-medium leading-[normal] left-[48px] text-[#6b7280] text-[11px] text-left top-[36px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "normal"
+        },
+        "color": {
+          "value": "#6b7280"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6947",
+      "name": "Field · Light value",
+      "className": "[word-break:break-word] h-[44px] leading-[normal] relative shrink-0 text-left w-[280px] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6948",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[16px] not-italic text-[#4b5563] text-[13px] top-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6949",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Medium'] font-medium left-[217px] text-[#111827] text-[11px] top-[14px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6950",
+      "name": "Field · Dark value",
+      "className": "[word-break:break-word] h-[44px] leading-[normal] relative shrink-0 text-left w-[280px] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6951",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal left-[16px] not-italic text-[#4b5563] text-[13px] top-[12px]",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6952",
+      "name": null,
+      "className": "absolute font-['Geist_Mono:Medium'] font-medium left-[217px] text-[#111827] text-[11px] top-[14px]",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6953",
+      "name": "Field · Used by",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[normal] not-italic relative shrink-0 text-left w-[280px]",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6954",
+      "name": null,
+      "className": "absolute left-[16px] text-[#4b5563] text-[13px] top-[12px] whitespace-nowrap",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6955",
+      "name": null,
+      "className": "absolute left-[182px] text-[#111827] text-[11px] top-[14px] whitespace-pre",
+      "props": {
+        "color": {
+          "value": "#111827"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6956",
+      "name": "Field · Lint",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[normal] not-italic relative shrink-0 text-left w-[280px]",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6957",
+      "name": null,
+      "className": "absolute left-[16px] text-[#4b5563] text-[13px] top-[12px] whitespace-nowrap",
+      "props": {
+        "color": {
+          "value": "#4b5563"
+        },
+        "font-size": {
+          "value": "13px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6958",
+      "name": null,
+      "className": "absolute left-[223px] text-[#057a55] text-[11px] top-[14px] whitespace-pre",
+      "props": {
+        "color": {
+          "value": "#057a55"
+        },
+        "font-size": {
+          "value": "11px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6959",
+      "name": "Actions",
+      "className": "[word-break:break-word] font-['Inter:Regular'] font-normal h-[44px] leading-[normal] not-italic relative shrink-0 text-[13px] text-left w-[280px] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "44px"
+        },
+        "line-height": {
+          "value": "normal"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "width": {
+          "value": "280px"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6960",
+      "name": null,
+      "className": "absolute left-[16px] text-[#1a56db] top-[12px]",
+      "props": {
+        "color": {
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6961",
+      "name": null,
+      "className": "absolute left-[116px] text-[#1a56db] top-[12px]",
+      "props": {
+        "color": {
+          "value": "#1a56db"
+        }
+      }
+    },
+    {
+      "nodeId": "1700:6962",
+      "name": null,
+      "className": "absolute left-[196px] text-[#c81e1e] top-[12px]",
+      "props": {
+        "color": {
+          "value": "#c81e1e"
+        }
+      }
+    },
+    {
+      "nodeId": "1670:7229",
+      "name": "hotspot/back · Brand · tokens",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[-1px] opacity-0 top-[773px] w-[150px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "150px"
+        }
+      }
+    },
+    {
+      "nodeId": "1670:7231",
+      "name": "hotspot/state · Brand · tokens · add",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[34px] left-[149px] opacity-0 top-[773px] w-[130px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "34px"
+        },
+        "width": {
+          "value": "130px"
+        }
+      }
+    }
+  ]
+}

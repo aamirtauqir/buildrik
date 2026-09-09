@@ -1,0 +1,77 @@
+{
+  "surface": "history-saves-restoring",
+  "board": "History \u00b7 Saves \u00b7 restoring (Figma 163:220)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=history-saves-restoring",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "history-restoring-notice"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "restoring-block",
+      "testId": "history-restoring-notice",
+      "spec": "history-saves-restoring",
+      "nodeId": "163:266"
+    },
+    {
+      "name": "restoring-title",
+      "testId": "history-restoring-title",
+      "spec": "history-saves-restoring",
+      "nodeId": "163:267"
+    },
+    {
+      "name": "restoring-sub",
+      "testId": "history-restoring-sub",
+      "spec": "history-saves-restoring",
+      "nodeId": "163:268"
+    },
+    {
+      "name": "prune-note-text",
+      "testId": "history-prune-note-text",
+      "spec": "history-saves-restoring",
+      "nodeId": "163:263"
+    }
+  ],
+  "_note": [
+    "VERSION_RESTORING fires from a restore already under way and carries the name",
+    "it saved the current work as \u2014 no click can hold that window open, so the",
+    "probe emits the real event into the real subscription.",
+    "",
+    "280 \u2014 see history-saves-changes.",
+    "",
+    "WHAT DRIFTED: the same block as 163:269, and it is the same component, so",
+    "both boards were fixed by one change \u2014 56 tall, inset 16, 12/18 over 11/16.",
+    "One thing does NOT travel between them: 163:315 rounds its corners 8 and",
+    "163:266 does not round at all, so the radius sits on the two variants rather",
+    "than on the shared base. Two boards, one component, one property they",
+    "genuinely disagree about \u2014 and they are the same designer's two states of the",
+    "same block, so this is drawn intent, not a conflict to adjudicate.",
+    "",
+    "NOT anchored, and why:",
+    "  163:227 Approved anchor + 163:233 Now row \u2014 a live `reviews.status` round.",
+    "  241:1549.. Version rows \u2014 board 162:2's own surface.",
+    "  1657:7237\u20267260 header / switcher / filter / search \u2014 anchored on 163:64.",
+    "  163:262 Prune note BLOCK \u2014 height is not a contract (40 here, 64 on 163:2);",
+    "  163:263, the text, is anchored.",
+    "  163:264/163:265 Footer \u2014 anchored on 163:64.",
+    "",
+    "CONTRAST: two failures, both the board's own token pairs and both already in",
+    "the baseline from sibling surfaces \u2014 4.38 for ink-muted on accent-tint",
+    "(163:268 on 163:266; the same pair history-saves-changes records for the",
+    "entry time) and 4.39 for ink-muted on bg-subtle in the prune note. Neither",
+    "was introduced here.",
+    "",
+    "BOARD-COPY (2026-09-08). Same set of leads as 163:269 (placeholder, the",
+    "unfixtured approval band and version rows, the template-literal extractor",
+    "gap) plus one that WAS drift and is fixed: 163:268 writes the name bare \u2014",
+    "'Saving your current work as v4 first.' \u2014 and the code wrapped it in curly",
+    "quotes, which at 11px read as scare quotes around a version name."
+  ]
+}

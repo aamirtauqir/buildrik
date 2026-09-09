@@ -1,0 +1,309 @@
+{
+  "surface": "modal-open",
+  "fileKey": "g4GzQFqzNYz5sosz1QtZXC",
+  "nodeId": "183:2",
+  "boardName": "modal-open",
+  "figmaHash": "2d5ca8e79bc8634e1057fa5df87d28e74ebe9850c182864761fb449cbbb5e4c5",
+  "extractorVersion": 2,
+  "extractedAt": "2026-09-07T22:25:24.098Z",
+  "copy": [
+    "Delete 3 pages?",
+    "“Menu”, “Contact” and “About” will be removed from this site. This cannot be undone.",
+    "Cancel",
+    "Delete 3 pages",
+    "Destructive primaries are red and NAMED — never “Confirm”."
+  ],
+  "targets": [
+    {
+      "nodeId": "183:2",
+      "name": "Modal · open",
+      "className": "bg-[var(--color\\/bg-subtle,#f3f4f6)] block cursor-pointer relative size-full",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-subtle",
+          "value": "#f3f4f6"
+        }
+      }
+    },
+    {
+      "nodeId": "183:3",
+      "name": "scrim",
+      "className": "absolute bg-[var(--flowbite\\/gray\\/900,#111827)] h-[900px] left-0 top-0 w-[1440px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/gray/900",
+          "value": "#111827"
+        },
+        "height": {
+          "value": "900px"
+        },
+        "width": {
+          "value": "1440px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:4",
+      "name": "modal/440",
+      "className": "absolute bg-[var(--color\\/bg-card,white)] h-[260px] left-[500px] overflow-clip rounded-[12px] shadow-[0px_12px_32px_0px_rgba(15,23,41,0.16)] top-[320px] w-[440px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        },
+        "height": {
+          "value": "260px"
+        },
+        "border-radius": {
+          "value": "12px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:5",
+      "name": "Title",
+      "className": "[word-break:break-word] absolute h-[56px] left-0 not-italic overflow-clip text-left top-0 w-[440px] whitespace-nowrap",
+      "props": {
+        "height": {
+          "value": "56px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:6",
+      "name": null,
+      "className": "absolute font-['Inter:Semi_Bold'] font-semibold leading-[24px] left-[24px] text-[16px] text-[color:var(--color\\/ink,#111827)] top-[18px] tracking-[-0.16px]",
+      "props": {
+        "line-height": {
+          "value": "24px"
+        },
+        "font-size": {
+          "value": "16px"
+        },
+        "color": {
+          "token": "--color/ink",
+          "value": "#111827"
+        }
+      }
+    },
+    {
+      "nodeId": "183:7",
+      "name": null,
+      "className": "absolute font-['Inter:Regular'] font-normal leading-[20px] left-[404px] text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] top-[18px]",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        }
+      }
+    },
+    {
+      "nodeId": "183:8",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal h-[40px] leading-[20px] left-[24px] not-italic text-[13px] text-[color:var(--color\\/ink-muted,#6b7280)] text-left top-[72px] w-[392px]",
+      "props": {
+        "height": {
+          "value": "40px"
+        },
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "13px"
+        },
+        "color": {
+          "token": "--color/ink-muted",
+          "value": "#6b7280"
+        },
+        "width": {
+          "value": "392px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:9",
+      "name": "Footer",
+      "className": "absolute h-[64px] left-0 overflow-clip top-[196px] w-[440px]",
+      "props": {
+        "height": {
+          "value": "64px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "229:1154",
+      "name": "Button",
+      "className": "absolute bg-[var(--color\\/bg-panel,white)] border border-[var(--color\\/border,#e5e7eb)] border-solid content-stretch flex h-[var(--size\\/row,32px)] items-center justify-center left-[196px] px-[16px] py-[10px] rounded-[8px] top-[14px]",
+      "props": {
+        "background-color": {
+          "token": "--color/bg-panel",
+          "value": "white"
+        },
+        "border-color": {
+          "token": "--color/border",
+          "value": "#e5e7eb"
+        },
+        "height": {
+          "token": "--size/row",
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I229:1154;9:43",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--flowbite\\/gray\\/700,#374151)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--flowbite/gray/700",
+          "value": "#374151"
+        }
+      }
+    },
+    {
+      "nodeId": "229:1156",
+      "name": "Button",
+      "className": "absolute bg-[var(--flowbite\\/red\\/600,#e02424)] content-stretch drop-shadow-[0px_1px_1.5px_rgba(0,0,0,0.05),0px_1px_1px_rgba(0,0,0,0.05)] flex h-[var(--size\\/row,32px)] items-center justify-center left-[292px] px-[16px] py-[10px] rounded-[8px] top-[14px]",
+      "props": {
+        "background-color": {
+          "token": "--flowbite/red/600",
+          "value": "#e02424"
+        },
+        "height": {
+          "token": "--size/row",
+          "value": "32px"
+        },
+        "padding-left": {
+          "value": "16px"
+        },
+        "padding-right": {
+          "value": "16px"
+        },
+        "padding-top": {
+          "value": "10px"
+        },
+        "padding-bottom": {
+          "value": "10px"
+        },
+        "border-radius": {
+          "value": "8px"
+        }
+      }
+    },
+    {
+      "nodeId": "I229:1156;9:91",
+      "name": null,
+      "className": "[word-break:break-word] font-['Inter:Medium'] font-medium leading-[20px] not-italic relative shrink-0 text-[14px] text-[color:var(--color\\/ink-inverse,white)] text-left whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "20px"
+        },
+        "font-size": {
+          "value": "14px"
+        },
+        "color": {
+          "token": "--color/ink-inverse",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "183:14",
+      "name": "note",
+      "className": "absolute h-[40px] left-[500px] overflow-clip top-[592px] w-[440px]",
+      "props": {
+        "height": {
+          "value": "40px"
+        },
+        "width": {
+          "value": "440px"
+        }
+      }
+    },
+    {
+      "nodeId": "183:15",
+      "name": null,
+      "className": "[word-break:break-word] absolute font-['Inter:Regular'] font-normal leading-[16px] left-0 not-italic text-[11px] text-[color:var(--color\\/bg-card,white)] text-left top-[10px] whitespace-nowrap",
+      "props": {
+        "line-height": {
+          "value": "16px"
+        },
+        "font-size": {
+          "value": "11px"
+        },
+        "color": {
+          "token": "--color/bg-card",
+          "value": "white"
+        }
+      }
+    },
+    {
+      "nodeId": "881:4599",
+      "name": "hotspot/alt · S1 · Editor — ASSEMBLED (1",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[32px] left-[8px] opacity-0 top-[860px] w-[220px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "220px"
+        }
+      }
+    },
+    {
+      "nodeId": "881:4601",
+      "name": "hotspot/alt · Modal · dirty",
+      "className": "absolute bg-[rgba(0,0,0,0)] h-[32px] left-[8px] opacity-0 top-[824px] w-[220px]",
+      "props": {
+        "background-color": {
+          "value": "rgba(0,0,0,0)"
+        },
+        "height": {
+          "value": "32px"
+        },
+        "width": {
+          "value": "220px"
+        }
+      }
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 {
   "surface": "content-load-error",
   "board": "Content · load-error (Figma 453:4010)",
-  "_note": "The CMS hydrate failing is a server condition; ContentTab takes an injected status so the screen can be measured at all.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=content-load-error",
   "viewport": {
     "width": 280,
@@ -16,10 +15,60 @@
   "contrastScope": "[data-probe]",
   "targets": [
     {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "content-load-error",
+      "nodeId": "453:4011"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "content-load-error",
+      "nodeId": "I453:4011;16:7"
+    },
+    {
       "name": "error-block",
       "testId": "content-load-error",
       "spec": "content-load-error",
       "nodeId": "453:4013"
+    },
+    {
+      "name": "error-title",
+      "testId": "content-load-error-title",
+      "spec": "content-load-error",
+      "nodeId": "453:4014"
+    },
+    {
+      "name": "error-hint",
+      "testId": "content-load-error-hint",
+      "spec": "content-load-error",
+      "nodeId": "789:4299"
+    },
+    {
+      "name": "error-retry",
+      "testId": "content-load-retry",
+      "spec": "content-load-error",
+      "nodeId": "453:4015"
     }
+  ],
+  "_note": [
+    "The CMS hydrate failing is a server condition; ContentTab takes an injected",
+    "status so the screen can be measured at all.",
+    "",
+    "2026-09-08 — widened from 1 target to 6. Nothing drifted: the block already",
+    "carried the board's 36/32/24 insets, 6 gap, 13/20 error-text headline, 12/normal",
+    "ink-muted hint and 13/20 accent-text link. Two data-testids were added to the",
+    "two <p>s so the type could be compared at all.",
+    "",
+    "NOT anchored: 453:4016 the 618px spacer (a Figma frame that pads the board to",
+    "812; the panel column does it with flex) and the three hotspot/* nodes (prototype",
+    "wiring, not design).",
+    "",
+    "FOUND, NOT FIXED: this block is a hand-rolled copy of",
+    "src/editor/sidebar/shared/PanelErrorState.tsx, which Brand and Components use",
+    "and which brand-load-error measures at 781:4368. Folding Content onto it would",
+    "be the SSOT move, but the two boards disagree on line-height (Brand's block is",
+    "leading-normal throughout; this board draws 20 on the headline and 20 on the",
+    "link), so one screen board cannot re-settle the shared component. Recorded."
   ]
 }

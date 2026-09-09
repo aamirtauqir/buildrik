@@ -1,0 +1,153 @@
+{
+ "surface": "layers-context-menu",
+ "board": "Layers · context-menu (Figma 1082:4527)",
+ "url": "http://localhost:5051/e2e/probe/probe.html?case=layers-tree",
+ "viewport": {
+  "width": 280,
+  "height": 812
+ },
+ "steps": [
+  {
+   "action": "waitFor",
+   "testId": "layer-row-lx-section"
+  },
+  {
+   "action": "contextmenu",
+   "testId": "layer-row-lx-section"
+  },
+  {
+   "action": "waitFor",
+   "testId": "layer-context-menu"
+  }
+ ],
+ "contrastScope": "[data-testid=\"layer-context-menu\"]",
+ "targets": [
+  {
+   "name": "panel-header",
+   "testId": "panel-header",
+   "spec": "layers-context-menu",
+   "nodeId": "1650:15983"
+  },
+  {
+   "name": "panel-header-title",
+   "testId": "panel-header-title",
+   "spec": "layers-context-menu",
+   "nodeId": "I1650:15983;16:7"
+  },
+  {
+   "name": "toolbar",
+   "testId": "layers-toolbar",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4532"
+  },
+  {
+   "name": "search-box",
+   "testId": "layers-search",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4533"
+  },
+  {
+   "name": "menu",
+   "testId": "layer-context-menu"
+  },
+  {
+   "name": "sep",
+   "testId": "layer-menu-sep",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4571"
+  },
+  {
+   "name": "item-cut",
+   "testId": "layer-menu-cut",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4565"
+  },
+  {
+   "name": "label-cut",
+   "testId": "layer-menu-cut",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4566"
+  },
+  {
+   "name": "item-copy",
+   "testId": "layer-menu-copy",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4567"
+  },
+  {
+   "name": "label-copy",
+   "testId": "layer-menu-copy",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4568"
+  },
+  {
+   "name": "item-paste",
+   "testId": "layer-menu-paste",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4569"
+  },
+  {
+   "name": "label-paste",
+   "testId": "layer-menu-paste"
+  },
+  {
+   "name": "item-duplicate",
+   "testId": "layer-menu-duplicate",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4572"
+  },
+  {
+   "name": "label-duplicate",
+   "testId": "layer-menu-duplicate",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4573"
+  },
+  {
+   "name": "item-delete",
+   "testId": "layer-menu-delete",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4574"
+  },
+  {
+   "name": "label-delete",
+   "testId": "layer-menu-delete",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4575"
+  },
+  {
+   "name": "item-rename",
+   "testId": "layer-menu-rename",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4577"
+  },
+  {
+   "name": "label-rename",
+   "testId": "layer-menu-rename",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4578"
+  },
+  {
+   "name": "item-group",
+   "testId": "layer-menu-group",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4579"
+  },
+  {
+   "name": "label-group",
+   "testId": "layer-menu-group"
+  },
+  {
+   "name": "item-copy-link",
+   "testId": "layer-menu-copy-link",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4584"
+  },
+  {
+   "name": "label-copy-link",
+   "testId": "layer-menu-copy-link",
+   "spec": "layers-context-menu",
+   "nodeId": "1082:4585"
+  }
+ ],
+ "_note": "['MEASURED LIVE against the probe host the rest of the Layers family uses', \"(`probe.html?case=layers-tree`, 280x812 — the board's own size), and the menu\", 'is opened with a REAL right-click: `contextmenu` on the root layer row. No', 'fixture stands in for the menu state.', '', 'WHAT THE BOARD WON:', '  menu width   140 (1082:4564). `.bdc-menu` was 180 and its comment CLAIMED', '               the board said 180 — re-extracted 2026-09-08 the frame is', '               `w-[140px]`, and the widest label (`Group selection`, ~103px at', '               13px) clears 140 - 24 of inset. A stale citation in a comment,', '               exactly the class of drift this harness exists to find.', '  item padding 5/12 (1082:4565). It was `0 12px` — the 28px height did all the', '               work, which is identical right up until a label wraps.', '  line-height  `normal` on the menu font (1082:4566 and its seven siblings).', '               `.bdc-menu` set `13px/18px`.', '  separators   `--color/bg-subtle` and NO margin (1082:4571 / 4576 / 4581).', '               They were `--bk-border` with 4px above and below — the one', \"               thing boards.json's row still had against this menu, and also\", \"               16px of the height it was over the board's 260.\", '', 'NOT JOINED — 1082:4570 (`Paste`) and 1082:4580 (`Group selection`) LABEL', 'colours. Both items render DISABLED in this state, and correctly so: nothing', 'is on the clipboard and one row is selected, which are the two preconditions', 'the items name in their own `title`. `.bdc-menu-item:disabled` paints', '`--bk-ink-muted` (4.83:1 on white, no contrast cost). The board draws every', 'item enabled. Their FRAMES are joined and pass; only the two colours are the', \"state's, not the board's.\", '', 'NOT JOINED — 1082:4564, the menu surface: its `height: 260` is nine items and', 'three rules, and live there are eight items and two rules. Width, radius, fill', 'and the 4px vertical pad are all conformed in `.bdc-menu` and visible in', 'measured/.', '', 'NOT CONFORMED — 1082:4582, `Move to page…`, and the board says why itself: its', 'Figma name is `[not-implemented] Move to page… — LayerContextMenu.tsx:58-60', \"deliberately omits it: 'waits for real backing — a dead item is worse than a\", \"missing one'`. The board is quoting this repo's own comment back at it.\", '', \"FOUND, NOT FIXED — the board's frame name records a live defect this pass did\", 'not touch: `SCOPE SPLIT — with five rows selected every item except Group acts', 'on the ONE right-clicked row (useLayerContextActions.ts:16-19 vs :97-99), and', 'Delete removes the element and every descendant with no confirm, no count and', 'no toast (useLayerActions.ts:208-217)`. That is behaviour, not style.', '', 'FOUND, NOT FIXED — there are TWO LayerContextMenu files. The live one is', '`panels/layers/components/LayerContextMenu.tsx` (the only one', '`panels/layers/index.tsx` imports). `sidebar/tabs/layers/components/', 'LayerContextMenu.tsx` has no importer outside its own test — dead code by', \"CLAUDE.md's rule, and a trap for the next person who greps the filename.\", '', 'ORDER, not conformed and not a defect the diff can see: the board groups', 'Cut/Copy/Paste | Duplicate/Delete | Rename/Group | Move to page…/Copy link;', 'live puts `Copy link` at the head of the second group and has two rules, not', 'three. Every item states identical properties, so each is joined by NAME.'] ROOT ROW REMOVED 2026-09-08 (founder call, BLOCKERS.md B6): the page root is no longer a layer, so `layer-row-lx-root` does not exist and the first row is the first seeded element. ROOT ROW REMOVED 2026-09-08 (founder call, BLOCKERS.md B6). The page root is no longer a layer. Its targets are DELETED rather than re-pointed — there is no row to measure — and the gating `waitFor` now names `lx-section`, the first TOP-LEVEL row, which is visible before any expansion exactly as the root row was."
+}

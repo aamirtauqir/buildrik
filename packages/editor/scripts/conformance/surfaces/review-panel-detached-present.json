@@ -1,0 +1,204 @@
+{
+  "surface": "review-panel-detached-present",
+  "board": "Review panel · detached-present (Figma 157:2)",
+  "_note": [
+    "The chassis board for the whole review arc. 157:2 and 157:169 draw the",
+    "same frame, so where they agree they settle the panel; boards.json also",
+    "records S5.3's five 1440 boards as `superseded:by-review-panel-156-158`,",
+    "which is this family.",
+    "",
+    "Probe, not the live app: every state here needs a review round, an invited",
+    "client, comments, and — for the Detached group — the orphan announcement",
+    "only the canvas CommentLayer makes. `NEXT_PUBLIC_FEATURE_COLLAB` is off in",
+    "production, so no click in the standalone editor reaches any of it. The",
+    "probe mounts the REAL ReviewTab and stubs the tRPC transport underneath,",
+    "so ReviewService's own mapping still runs.",
+    "",
+    "WHAT MOVED, and why the board won:",
+    "  · CommentRow was 14/20 with a WRAPPING body and its per-row actions on a",
+    "    fourth line — a ~90px row against component 17:40's 64 ('64h' is the",
+    "    component's own description). Body is now 13/20 clipped to one line",
+    "    (`title` keeps the full text), meta 12/18 Inter (it was the mono/11",
+    "    ROW_META_CLASS), body gap 2, padding 16/12/10, fill bg-card. The",
+    "    actions kept their capability and moved to the row's trailing slot.",
+    "  · The progress block and the sent line were one padded column; 157:8 and",
+    "    157:12 are a 44 block and a 28 block. The track is fixed at 140 rather",
+    "    than flex-1 — the count is mono and tabular exactly so it does not",
+    "    move, which a flexible track would undo. The count was 12px, board 11/16.",
+    "  · The section band's count is now mono (component 16:16: 'the",
+    "    right-aligned count is mono so the numbers do not jitter'), and the",
+    "    band label carries its 16px line box and 0.5px tracking.",
+    "  · Compare was a default 40-tall Button in a 53-tall bordered foot;",
+    "    229:1090 is the 28 dense secondary in a 40 block with no rule above it.",
+    "  · The round strip's label was ink-soft; 157:46 is ink.",
+    "",
+    "NOT anchored, and why:",
+    "  157:2 root — the board fills it bg-panel and rules it gray-100. The",
+    "    panel's own root is transparent and takes white from the shell slot it",
+    "    mounts into (the 164:22 ruling, issues-filtered).",
+    "  157:10 progress FILL — `w-[95px]` of a 140 track is 68%, on a board whose",
+    "    own label says 9 of 12 (75%). That is sample data, and the width is the",
+    "    only property on the node, so the fill cannot be anchored at all.",
+    "  157:14 Detached band (h32) and 157:39 Resolved band (h32) — both are",
+    "    one-off frames on this board; the Section header COMPONENT drawn twice",
+    "    beside them (220:855, 220:859) is 28, and so is the code. A component",
+    "    instance outranks a hand-drawn copy of itself.",
+    "  157:54/55/56/57 Detached list — the same row drawn by hand rather than as",
+    "    Comment row. Its body and note carry `w-[135px]` / `w-[178px]`, which",
+    "    are Figma text-frame widths inside a 280 column, not layout. Its meta is",
+    "    11/16 where the component beside it is 12/18.",
+    "  157:44 Round history — 70 tall for a single 18px line sitting at top 8.",
+    "    Both boards draw it; neither explains 44px of empty tint. Its label",
+    "    (157:46) IS anchored. See the report's Found-not-fixed.",
+    "  157:51 Re-send block (h44) — the code also renders `Revoke link` under",
+    "    the primary, which 158:105/158:162 require and this board omits.",
+    "  229:1092 Re-send button — the board fills it `--flowbite/blue/600`",
+    "    (#1C64F2). The product has ONE accent, `#1A56DB` (DESIGN.md §Color,",
+    "    root CLAUDE.md), which the S5.4 gate boards in this same arc use for",
+    "    their primary. A single board does not re-settle the accent, so only",
+    "    its LABEL (I229:1092;9:19) is anchored.",
+    "  I228:1017;17:37 Comment body column — filling it bg-card would put an",
+    "    opaque white block over the row's hover tint.",
+    "",
+    "COPY (`check-board-copy`, advisory): every lead on this surface is either",
+    "tokenisation or already recorded above.",
+    "  \"⚠ detached\" vs \"detached\" — the board sets a warning GLYPH in the text;",
+    "  the code renders a lucide AlertCircle beside it. Same mark, different",
+    "  carrier, and the icon is the one that can be hidden from a screen reader.",
+    "  \"reattach\" / \"resolve\" — product renders, no board draws. True, named",
+    "  above: the boards draw no per-row control, and the arc does not delete a",
+    "  working capability to match a drawing. They moved to the row's trailing",
+    "  slot so the row is still the board's 64.",
+    "  \"# of #\", \"sara · client · home · #d\", \"round # of #\" — the live line is",
+    "  several text nodes and the checker compares whole nodes. The strings are",
+    "  in `measured/review-panel-detached-present.json` under `rendered`."
+  ],
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=review-panel-detached-present&siteId=probe-site",
+  "viewport": {
+    "width": 280,
+    "height": 812
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "review-comment-row-2"
+    }
+  ],
+  "contrastScope": "[data-probe]",
+  "targets": [
+    {
+      "name": "panel-header",
+      "testId": "panel-header",
+      "spec": "review-panel-detached-present",
+      "nodeId": "208:651"
+    },
+    {
+      "name": "panel-header-title",
+      "testId": "panel-header-title",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I208:651;16:7"
+    },
+    {
+      "name": "progress-block",
+      "testId": "review-progress",
+      "spec": "review-panel-detached-present",
+      "nodeId": "157:8"
+    },
+    {
+      "name": "progress-track",
+      "testId": "review-progress-track",
+      "spec": "review-panel-detached-present",
+      "nodeId": "157:9"
+    },
+    {
+      "name": "progress-count",
+      "testId": "review-progress-count",
+      "spec": "review-panel-detached-present",
+      "nodeId": "157:11"
+    },
+    {
+      "name": "sent-meta-block",
+      "testId": "review-sent-meta",
+      "spec": "review-panel-detached-present",
+      "nodeId": "157:12"
+    },
+    {
+      "name": "sent-line",
+      "testId": "review-sent-line",
+      "spec": "review-panel-detached-present",
+      "nodeId": "157:13"
+    },
+    {
+      "name": "band",
+      "testId": "review-band-0",
+      "spec": "review-panel-detached-present",
+      "nodeId": "220:855"
+    },
+    {
+      "name": "band-tint",
+      "testId": "review-band-0",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I220:855;220:6"
+    },
+    {
+      "name": "band-label",
+      "testId": "review-band-label-0",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I220:855;16:17"
+    },
+    {
+      "name": "band-count",
+      "testId": "review-band-count-0",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I220:855;16:18"
+    },
+    {
+      "name": "comment-row",
+      "testId": "review-comment-row-2",
+      "spec": "review-panel-detached-present",
+      "nodeId": "228:1017"
+    },
+    {
+      "name": "comment-body",
+      "testId": "review-comment-body-2",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I228:1017;17:38"
+    },
+    {
+      "name": "comment-meta",
+      "testId": "review-comment-meta-2",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I228:1017;17:39"
+    },
+    {
+      "name": "round-strip-label",
+      "testId": "review-rounds-toggle",
+      "spec": "review-panel-detached-present",
+      "nodeId": "157:46"
+    },
+    {
+      "name": "compare-block",
+      "testId": "review-compare-block",
+      "spec": "review-panel-detached-present",
+      "nodeId": "157:48"
+    },
+    {
+      "name": "compare-button",
+      "testId": "review-compare",
+      "spec": "review-panel-detached-present",
+      "nodeId": "229:1090"
+    },
+    {
+      "name": "compare-label",
+      "testId": "review-compare",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I229:1090;9:31"
+    },
+    {
+      "name": "primary-label",
+      "testId": "review-primary",
+      "spec": "review-panel-detached-present",
+      "nodeId": "I229:1092;9:19"
+    }
+  ]
+}

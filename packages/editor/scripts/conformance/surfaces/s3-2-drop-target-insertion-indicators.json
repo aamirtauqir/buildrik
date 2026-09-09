@@ -1,0 +1,93 @@
+{
+  "surface": "s3-2-drop-target-insertion-indicators",
+  "board": "S3.2 \u00b7 drop-target \u00b7 insertion-indicators (Figma 807:7301)",
+  "url": "http://localhost:5051/e2e/probe/probe.html?case=canvas-drop-indicators",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "steps": [
+    {
+      "action": "waitFor",
+      "testId": "drop-insertion-line"
+    }
+  ],
+  "contrastScope": "[data-testid=\"drop-breadcrumb\"]",
+  "targets": [
+    {
+      "name": "insertion-line",
+      "testId": "drop-insertion-line",
+      "spec": "s3-2-drop-target-insertion-indicators",
+      "nodeId": "807:7514"
+    },
+    {
+      "name": "breadcrumb-type",
+      "testId": "drop-breadcrumb",
+      "spec": "s3-2-drop-target-insertion-indicators",
+      "nodeId": "807:7518"
+    },
+    {
+      "name": "dot-start",
+      "testId": "drop-insertion-dot-start"
+    },
+    {
+      "name": "dot-end",
+      "testId": "drop-insertion-dot-end"
+    },
+    {
+      "name": "breadcrumb",
+      "testId": "drop-breadcrumb"
+    }
+  ],
+  "_note": [
+    "REACHED VIA PROBE with the REAL DropFeedbackOverlay. The state is a drag in",
+    "flight, and the overlay derives every pixel from `targetRect` \u2014 it measures",
+    "`canvasRef.current.querySelector('[data-buildrick-id=\u2026]')` in an effect. So",
+    "the probe supplies exactly what a drag supplies: a canvas containing a",
+    "target with real geometry, plus the session fields useDropTargetResolver",
+    "writes (isDragOver / dropTargetId / dropPosition / isValidDrop /",
+    "dropTargetPath). The indicator is drawn by the shipping component; nothing",
+    "here draws a line.",
+    "",
+    "The target is 672 wide ON PURPOSE: the overlay draws the line at",
+    "`targetRect.width + 8`, and the board draws it across a 680 page. That is",
+    "the board's scenario reproduced in the probe's coordinates \u2014 the same move",
+    "the smart-guides recipe makes \u2014 not a number fitted to buy a pass.",
+    "",
+    "ALREADY CONFORMANT, now measured: 807:7514's 3-tall accent bar on a 2",
+    "radius, its two 8px endcap dots (807:7515/7516), and 807:7518's 11px white",
+    "Medium label. DropFeedbackOverlay's own comments already cite these nodes;",
+    "this recipe is the first thing to check them.",
+    "",
+    "BOARD WON \u2014 the breadcrumb pill height. 807:7517 draws it 28 tall; 6/8",
+    "padding on an 11px line box measured 25. It is now an explicit 28 with the",
+    "label still at x=8.",
+    "",
+    "NOT JOINED, and why:",
+    "  807:7517 the breadcrumb BOX \u2014 its 220 width is Figma frame slack. The",
+    "  board's own label is 'Drop inside: Section > Column' inside a fixed 220",
+    "  frame; at 11px Medium that string plus the 8/8 insets measures 174, and",
+    "  the live pill is content-sized with a 300 clamp. Sample data, not a spec",
+    "  (founder rule). Its fill, radius and height ARE conformed and measured \u2014",
+    "  ink ground, radius 4, 28 tall \u2014 they just cannot be JOINED without the",
+    "  width coming with them, since a join compares every property of a node.",
+    "  807:7519 the drag-ghost \u2014 it belongs to s3-1-dragging, which owns the",
+    "  drag-source side of this flow, and it is adjudicated in that recipe.",
+    "  807:7515/7516 the dots \u2014 the extractor reads no properties off them",
+    "  (`size-[8px]` is a size shorthand, not a width/height class), so there is",
+    "  nothing to compare. Measured: both are 8x8 and take the line's accent",
+    "  through `bg-current`.",
+    "",
+    "NOT THIS BOARD'S: 807:7371 'Hero \u2014 SELECTED' is the SELECTION ring, not the",
+    "drop-target highlight \u2014 the accent border there is what a selected element",
+    "wears. The drop-target highlight the code paints",
+    "(`.bd-drop-feedback-target.valid`, --bk-success / --bk-success-tint) has no",
+    "node on this frame at all; the board shows the insertion INDICATORS, which",
+    "is what it is named for.",
+    "",
+    "FOUND, NOT FIXED: `useDropTargetResolver.ts:74,77,84` adds and removes the",
+    "class `bd-drop-target--active` on the target node, and NO rule anywhere in",
+    "the repo matches that selector. It is a DOM marker that paints nothing \u2014",
+    "either dead, or a stylesheet that never landed."
+  ]
+}
