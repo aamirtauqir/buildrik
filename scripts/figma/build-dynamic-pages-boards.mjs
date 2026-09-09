@@ -1,5 +1,5 @@
 /**
- * Fill in the four `Content · dynamic-pages` boards.
+ * Fill in the `Content · dynamic-pages` boards.
  *
  * DynamicPagesView is fully built and reachable — CollectionView draws the
  * "Dynamic pages ›" row (ContentViews.tsx:660), ContentTab wires it (:245) and
@@ -7,38 +7,42 @@
  * none of them this screen. It is also the screen carrying the module's two most
  * consequential warnings, which is why its absence mattered more than its size.
  *
- * The four boards were cloned from `Content · collection · empty` so they keep
- * the panel header, crumb and meta chrome. This rewrites their bodies.
+ * The boards were cloned from `Content · collection · empty` so they keep the
+ * panel header, crumb and meta chrome. This rewrites their bodies.
  *
- * Two facts the copy has to carry, both measured:
- *   - the template path is free text and must match an EXPORTED page path
- *     exactly (cms.service.ts:240-241 find() then continue; ExportEngine.ts
- *     :788-797 emits only index.html / <slug>.html), so a typed path publishes
- *     zero pages;
- *   - the "Generates N pages" count reads LOCAL IndexedDB records while
- *     generation reads SERVER entries (ContentViews.tsx:623 vs
- *     cms.service.ts:198-202), so a queued sync makes it overstate.
+ * SIX variants, one per branch of ContentViews.tsx:655-687 — the file had four
+ * and the two the code produces most often were missing (QA-A-13): the
+ * unknown-key warning (:675-681, the only state that says every record resolves
+ * to the same URL) and the "No records yet" branch (:663).
+ *
+ * WHAT THIS SCREEN DOES NOT DRAW, and why (QA-A-01/02/03, V2-TO-V1 pass):
+ * there is no TEMPLATE PAGE field. `pageTemplatePath` is READ here, once, to
+ * decide a warning; ContentViews.tsx:630 says in the code's own words "Nothing
+ * in this panel sets it", and the only writer in either tree is the
+ * create-collection wizard (CMSCollectionSetupModal.tsx:211), as free text.
+ *
+ * Commentary about the code lives in a `caption/*` node OUTSIDE the 280px panel
+ * — the pattern of 155:47-155:55 — not as a field hint inside it. Two audit
+ * paragraphs were drawn inside these frames and took 135px of a 280px panel
+ * (QA-A-11); `add-board-captions.mjs` now carries them, from
+ * docs/design-jobs/V2-TO-V1/plans/content-captions-new.json.
  *
  * Usage: node scripts/figma/build-dynamic-pages-boards.mjs [--apply]
  */
+import fs from "node:fs";
 import { connect, rpc } from "../baseline/figma-mcp.mjs";
 
 const APPLY = process.argv.includes("--apply");
 
-const BOARDS = [
-  { id: "2429:12111", crumb: "‹  Menu items · dynamic pages", meta: "Dynamic pages",
-    tone: "muted", state: "Generates 4 pages from published records.",
-    pattern: "/menu/{slug}", template: "menu.html" },
-  { id: "2429:21243", crumb: "‹  Menu items · dynamic pages", meta: "Dynamic pages",
-    tone: "warn", state: "No pattern set — this collection generates no pages.",
-    pattern: "", template: "menu.html" },
-  { id: "2429:21262", crumb: "‹  Menu items · dynamic pages", meta: "Dynamic pages",
-    tone: "warn", state: "No records published yet. Dynamic pages generate only from published records.",
-    pattern: "/menu/{slug}", template: "menu.html" },
-  { id: "2429:21281", crumb: "‹  Menu items · dynamic pages", meta: "Dynamic pages",
-    tone: "warn", state: "No template page is bound, so publishing emits none of these yet.",
-    pattern: "/menu/{slug}", template: "" },
-];
+/* The bodies are DATA, in a plan file, so the copy can be reviewed and applied
+   by someone who is not the author of this script. Copy is ContentViews.tsx
+   verbatim (a board that paraphrases a string is a board a reader cannot
+   check), and `tone` follows the code's own colour choice: the no-pattern line
+   carries NO override (:670-672) and is muted; the count / none-published /
+   unknown-key / no-template lines are warning. */
+const PLAN = JSON.parse(fs.readFileSync(
+  new URL("../../docs/design-jobs/V2-TO-V1/plans/content-dynamic-pages-body.json", import.meta.url), "utf8"));
+const BOARDS = PLAN.boards;
 
 await connect();
 const call = async (code, description) => {
@@ -52,6 +56,7 @@ await figma.loadFontAsync({family:"Inter",style:"Regular"});
 await figma.loadFontAsync({family:"Inter",style:"Semi Bold"});
 const pg=figma.root.children.find(p=>p.id==="1:3");
 await figma.setCurrentPageAsync(pg);
+const sec=await figma.getNodeByIdAsync("1776:8376");
 const rgb=(h)=>({r:parseInt(h.slice(1,3),16)/255,g:parseInt(h.slice(3,5),16)/255,b:parseInt(h.slice(5,7),16)/255});
 const solid=(h)=>[{type:"SOLID",color:rgb(h)}];
 const OUT=[];
@@ -59,13 +64,18 @@ const BOARDS=${JSON.stringify(BOARDS)};
 const APPLY=${APPLY};
 
 for(const B of BOARDS){
-  const b=await figma.getNodeByIdAsync(B.id);
-  if(!b){ OUT.push("MISSING "+B.id); continue; }
+  /* the two variants added by this pass are addressed by NAME — their ids were
+     minted by add-state-board.mjs and hardcoding a minted id is how the
+     reachability checker went stale (667fd830d) */
+  let b = /^\\d+:\\d+$/.test(B.id) ? await figma.getNodeByIdAsync(B.id) : null;
+  if(!b) b = sec.children.find(c=>c.name===B.name) || null;
+  if(!b){ OUT.push("MISSING "+B.id+" / "+B.name); continue; }
   const byName=(n)=>b.children.find(c=>c.name===n);
   const crumbF=byName("Crumb"), metaF=byName("meta"), blockF=byName("block"), spacer=byName("spacer");
-  if(!crumbF||!metaF||!blockF||!spacer){ OUT.push("SHAPE-CHANGED "+B.id); continue; }
-  if(!APPLY){ OUT.push("WOULD fill "+B.id+" "+b.name); continue; }
+  if(!crumbF||!metaF||!blockF||!spacer){ OUT.push("SHAPE-CHANGED "+b.id); continue; }
+  if(!APPLY){ OUT.push("WOULD fill "+b.id+" "+b.name); continue; }
 
+  if(b.name!==B.name) b.name=B.name;
   crumbF.children[0].characters=B.crumb;
   metaF.children[0].characters=B.meta;
   // the cloned "+ Add" action does not exist on this screen
@@ -77,6 +87,18 @@ for(const B of BOARDS){
 
   // clear a previous fill so the script is re-runnable
   for(const c of [...spacer.children]) if(String(c.name).indexOf("dp/")===0) c.remove();
+
+  /* Belt and braces for QA-A-01/02: an earlier pass drew a TEMPLATE PAGE label
+     and a "Choose a page…" input on all four boards — a picker that exists
+     nowhere in either tree. The dp/ sweep above removes it if it was named
+     dp/*; this catches it if it was not. Reported either way, because "we
+     already fixed that" is a claim and this is a measurement. */
+  const strays=[];
+  const hunt=(n)=>{ if(n.type==="TEXT"&&/TEMPLATE PAGE|Choose a page/i.test(n.characters)) strays.push(n);
+                    if(n.children) for(const c of [...n.children]) hunt(c); };
+  hunt(b);
+  for(const st of strays){ OUT.push("  stray removed: "+st.id+" "+JSON.stringify(st.characters.slice(0,40))); const p=st.parent; st.remove(); if(p&&p.children&&p.children.length===0&&String(p.name).indexOf("dp/")===0) p.remove(); }
+  if(!strays.length) OUT.push("  no TEMPLATE PAGE / Choose a page node on this board");
 
   const mk=async (s,size,style,color,x,y,w,lh,tag)=>{
     const t=figma.createText();
@@ -91,24 +113,18 @@ for(const B of BOARDS){
     q.name="dp/"+tag; spacer.appendChild(q); q.x=x; q.y=y; return q; };
 
   let y=12;
-  await mk("URL PATTERN",11,"Semi Bold","#6B7280",12,y,256,14,"lbl-pattern"); y+=18;
+  /* FIELD_LABEL is 12/regular ink-muted with no uppercase transform
+     (ContentViews.tsx:69), so the shipped label reads "URL pattern". The board
+     drew "URL PATTERN" in Semi Bold 11 — a caps field label the product does
+     not have (QA-A-10). */
+  await mk("URL pattern",12,"Regular","#6B7280",12,y,256,16,"lbl-pattern"); y+=20;
   box(12,y,256,32,"in-pattern");
-  await mk(B.pattern||"/collection/{slug}",12,"Regular",B.pattern?"#111827":"#9CA3AF",22,y+8,236,16,"val-pattern"); y+=38;
-  const h1=await mk("One page per record. Use a field slug in braces \\u2014 {slug} \\u2014 to build the URL.",11,"Regular","#6B7280",12,y,256,15,"hint-pattern"); y+=h1.height+18;
+  await mk(B.pattern||"/menu/{slug}",12,"Regular",B.pattern?"#111827":"#9CA3AF",22,y+8,236,16,"val-pattern"); y+=38;
+  const h1=await mk("One page per record. Use a field slug in braces \\u2014 {slug} \\u2014 to build the URL.",11,"Regular","#6B7280",12,y,256,15,"hint-pattern"); y+=h1.height+12;
+  if(B.warn){ await mk(B.warn,11,"Regular","#723B13",12,y,256,15,"warn"); }
 
-  /* There is NO template control on this screen. ContentViews.tsx:630 says it
-     outright - "Nothing in this panel sets it" - and :635 only READS
-     pageTemplatePath, to decide a warning. An earlier version of this board drew
-     a "Choose a page..." picker that exists nowhere, which is precisely the
-     defect this arc exists to remove. */
-  const h2=await mk(B.template
-    ? "Template page: menu.html \\u2014 shown here, never set here. Nothing in this panel binds one (ContentViews.tsx:630); the only writer in either tree is the create-collection wizard, as free text. It must match an EXPORTED page path exactly \\u2014 index.html or <slug>.html \\u2014 or the publish emits none of these pages (cms.service.ts:240-241)."
-    : "No template page is bound, and nothing in this panel can bind one (ContentViews.tsx:630). It is set once, in the create-collection wizard, as free text.",
-    11,"Regular","#723B13",12,y,256,15,"hint-template"); y+=h2.height+18;
-
-  await mk("The \\u201cGenerates N pages\\u201d count reads LOCAL records; generation reads SERVER entries, so a queued sync makes it overstate (ContentViews.tsx:623 vs cms.service.ts:198-202).",11,"Regular","#9CA3AF",12,y,256,15,"note-count");
-  OUT.push("filled "+B.id+"  "+b.name);
+  OUT.push("filled "+b.id+"  "+b.name);
 }
 return OUT.join(String.fromCharCode(10));
 `;
-console.log(await call(code, (APPLY ? "fill" : "dry-run filling") + " the four Content · dynamic-pages boards"));
+console.log(await call(code, (APPLY ? "fill" : "dry-run filling") + " the six Content · dynamic-pages boards"));

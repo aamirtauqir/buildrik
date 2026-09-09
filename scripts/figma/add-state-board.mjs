@@ -15,6 +15,12 @@
  *
  * --wire-from adds an ON_CLICK from an existing node to the new board, because a
  * board with no inbound edge is not a screen, it is a picture.
+ *
+ * --at <x>,<y> pins the slot instead of taking the first free one. The scan
+ * fills the FIRST row with a gap, which puts a new sibling rows away from the
+ * family it belongs to and, on a wide section, can push it past the section's
+ * right edge (the scan collides against siblings, not against the section
+ * bounds). A pinned slot is still collision-tested, and is refused if it clashes.
  */
 import { connect, rpc } from "/Users/shahg/Desktop/pencil/buildrik/scripts/baseline/figma-mcp.mjs";
 
@@ -24,13 +30,15 @@ const NAME = args[1];
 const APPLY = args.includes("--apply");
 const wi = args.indexOf("--wire-from");
 const WIRE = wi >= 0 ? args[wi + 1] : "";
+const ai = args.indexOf("--at");
+const AT = ai >= 0 ? args[ai + 1] : "";
 if (!SRC || !NAME) {
-  console.error('usage: add-state-board.mjs <sourceBoardId> "<new name>" [--wire-from <nodeId>] [--apply]');
+  console.error('usage: add-state-board.mjs <sourceBoardId> "<new name>" [--wire-from <nodeId>] [--at <x>,<y>] [--apply]');
   process.exit(1);
 }
 await connect();
 const code = `
-const SRC=${JSON.stringify(SRC)}, NAME=${JSON.stringify(NAME)}, WIRE=${JSON.stringify(WIRE)}, APPLY=${APPLY};
+const SRC=${JSON.stringify(SRC)}, NAME=${JSON.stringify(NAME)}, WIRE=${JSON.stringify(WIRE)}, APPLY=${APPLY}, AT=${JSON.stringify(AT)};
 const OUT=[];
 const pg=figma.root.children.find(p=>p.id==="1:3");
 await figma.setCurrentPageAsync(pg);
@@ -50,8 +58,19 @@ OUT.push("section '"+sec.name+"'  source "+W+"x"+H+"  grid x="+xs.slice(0,6).joi
 
 const hits=(x,y)=>sibs.some(c=>x<c.x+c.width-1 && x+W>c.x+1 && y<c.y+c.height-1 && y+H>c.y+1);
 let slot=null;
+if(AT){
+  const [ax,ay]=AT.split(",").map(Number);
+  if(!Number.isFinite(ax)||!Number.isFinite(ay)) return "--at needs <x>,<y> - refusing";
+  if(hits(ax,ay)){
+    const bad=sibs.filter(c=>ax<c.x+c.width-1&&ax+W>c.x+1&&ay<c.y+c.height-1&&ay+H>c.y+1);
+    return "pinned slot "+ax+","+ay+" clashes with "+bad.map(c=>c.name).join(", ")+" - refusing";
+  }
+  if(ax<0||ay<0||ax+W>sec.width||ay+H>sec.height) return "pinned slot "+ax+","+ay+" falls outside the section ("+Math.round(sec.width)+"x"+Math.round(sec.height)+") - refusing";
+  slot={x:ax,y:ay};
+  OUT.push("pinned slot from --at");
+}
 outer:
-for(const y of ys){
+for(const y of (slot?[]:ys)){
   for(let k=0;k<24;k++){
     const x=xs[0]+k*pitchX;
     if(!hits(x,y)){ slot={x,y}; break outer; }
