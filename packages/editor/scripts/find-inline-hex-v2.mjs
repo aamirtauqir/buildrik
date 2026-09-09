@@ -114,8 +114,30 @@ function collectFiles() {
   return files;
 }
 
+// A hex inside a comment is prose, not a rendered colour. Blank out block
+// comments (keeping their newlines so reported line numbers stay true) and
+// whole-line `//` comments before scanning. Found 2026-09-09: four "new" hex
+// literals were all explanatory comments, one of them a Toast.tsx note saying
+// the board's #80B2FF was deliberately NOT used because this ratchet may only
+// go down. A gate that counts the sentence explaining the fix as the defect
+// teaches people to delete the sentence.
+// `@lint-hex-policy:` markers live in comments and suppress the line they sit
+// on and the one after, so those lines survive stripping verbatim — blanking
+// them would REVIVE the hexes they exist to excuse (measured: 72 -> 75).
+function stripComments(text) {
+  const original = text.split("\n");
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
+    .split("\n")
+    .map((l, i) => {
+      if (POLICY_RE.test(original[i])) return original[i];
+      return /^\s*\/\//.test(l) ? "" : l;
+    })
+    .join("\n");
+}
+
 function scanFile(file) {
-  const text = fs.readFileSync(file, "utf8");
+  const text = stripComments(fs.readFileSync(file, "utf8"));
   const lines = text.split("\n");
   const sites = [];
   for (let i = 0; i < lines.length; i++) {
