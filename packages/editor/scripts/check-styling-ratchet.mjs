@@ -67,6 +67,19 @@ function walk(dir, out = []) {
   return out;
 }
 
+// A comment is not a style. Counting raw lines made a file that documents WHY
+// a row is 28 tall look identical to one that hand-styles thirty more rows,
+// and the Figma rebuild is heavily commented: of a reported +717 lines across
+// the twelve panels it flagged on 2026-09-09, +198 were declarations and the
+// rest were prose and blank lines. The metric this gate wants is CSS that
+// isn't in chrome-ui yet, so count only lines that carry a declaration.
+function cssLines(text) {
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
+    .split("\n")
+    .filter((l) => l.trim() !== "").length;
+}
+
 function measure() {
   let inline_literal = 0;
   let inline_hoisted = 0;
@@ -86,7 +99,7 @@ function measure() {
       if (lit + hoi > 0) worst.push([lit + hoi, p.slice(p.indexOf("/src/") + 1)]);
     } else if (p.endsWith(".css")) {
       const rel = relative(SRC, p);
-      const n = readFileSync(p, "utf8").split("\n").length;
+      const n = cssLines(readFileSync(p, "utf8"));
       const why = outOfScope(rel);
       if (why) {
         excluded.push([n, rel, why[1]]);
