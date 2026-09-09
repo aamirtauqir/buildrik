@@ -88,6 +88,28 @@ const page = await browser.newPage({ viewport: recipe.viewport ?? { width: 1440,
 // domcontentloaded + the recipe's own waitFor steps — networkidle is flaky
 // under load (vite dev serves hundreds of modules) and never settles on
 // pages that poll.
+/*
+ * A failed measurement must not leave a PASSING verdict behind it.
+ *
+ * `diff.mjs` reads `measured/<surface>.json` and has no way to know the run
+ * that should have written it aborted. So while `modal-success-then-close` was
+ * timing out on a step — measuring nothing at all — `diff` kept reporting
+ * "11 compared · 11 pass · 0 fail" from the previous run's file, which is the
+ * exact shape of silent success this harness exists to prevent.
+ *
+ * Stamping the file (rather than deleting it) keeps the evidence and the PNGs
+ * for debugging, and gives `diff` something explicit to refuse.
+ */
+function invalidateMeasured(id, why) {
+  try {
+    const p = `scripts/conformance/measured/${id}.json`;
+    if (!existsSync(p)) return;
+    const prev = JSON.parse(readFileSync(p, "utf8"));
+    prev.measurementFailed = { why, at: new Date().toISOString() };
+    writeFileSync(p, JSON.stringify(prev, null, 1));
+  } catch { /* best effort: never mask the real error with a bookkeeping one */ }
+}
+
 try {
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120000 });
 } catch (err) {
@@ -130,7 +152,11 @@ if (fontStatus !== "loaded") {
  *
  * `testId` is the contract (see the recipe's own _note). A raw `selector` is
  * still accepted for state waits — "the panel has finished opening" is a class,
- * not an element — but never for targets, which is enforced below.
+ * not an element — and, since 2026-09-08, for POINTER steps that carry a
+ * `because`: the canvas body is `dangerouslySetInnerHTML` from the engine, so
+ * every node there has `data-buildrick-id` and none has `data-testid`. Three
+ * boards were unreachable for that reason alone. Never for targets, which is
+ * enforced in lib.mjs.
  */
 const refToSelector = (ref, where) => {
   if (ref.testId) return `[data-testid="${ref.testId}"]`;
@@ -154,8 +180,24 @@ for (const step of recipe.steps ?? []) {
   const sel = step.action === "press" || step.action === "wait" ? null : refToSelector(step, `step ${step.action}`);
   try {
     if (step.action === "click") await page.click(sel, { timeout: 15000 });
+    /* A right-click is the only way into a context menu, and three boards in
+       the Media family draw one. Without it those states were unreachable by
+       any recipe and had to be faked from a fixture, which measures the
+       fixture rather than the menu the product opens. */
+    else if (step.action === "contextmenu") await page.click(sel, { button: "right", timeout: 15000 });
+    /* Present-or-not, and a short timeout because the answer is already on the
+       page — a long one would pay 15s on every run where the thing is absent. */
+    else if (step.action === "clickIfPresent") {
+      const el = await page.$(sel);
+      if (el) await page.click(sel, { timeout: 3000 }).catch(() => {});
+    }
     else if (step.action === "hover") await page.hover(sel, { timeout: 15000 });
-    else if (step.action === "waitFor") await page.waitForSelector(sel, { timeout: 15000 });
+    /* `waitForState` was in the schema (lib.mjs STEP_ACTIONS, and validateRecipe
+       has a rule demanding a `because` for it) but never in this switch, so any
+       recipe that used the one action the schema allows a CSS selector for died
+       on "unknown step action". It waits the same way; the difference is only
+       that its selector is a state with no element of its own. */
+    else if (step.action === "waitFor" || step.action === "waitForState") await page.waitForSelector(sel, { timeout: 15000 });
     else if (step.action === "press") await page.keyboard.press(step.key);
     else if (step.action === "wait") await page.waitForTimeout(step.ms ?? 300);
     else throw new Error(`unknown step action: ${step.action}`);
@@ -170,6 +212,7 @@ for (const step of recipe.steps ?? []) {
       `          ${err.message.split("\n")[0]}`
     );
     await browser.close();
+    invalidateMeasured(surfaceId, `step ${JSON.stringify(step)} could not resolve "${sel}"`);
     process.exit(3);
   }
 }
@@ -206,9 +249,40 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
     };
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
   };
+  /* Anything the rgb() regex cannot read is rasterised instead of being called
+     transparent. Tailwind v4 emits `oklab(0 0 0 / 0.6)` for every `bg-*` colour carrying
+     a `/NN` opacity modifier, and this regex returned null for it — which `effectiveBg`
+     reads as "no fill", composites past, and reports as the page's white. So
+     eight white-on-dark-scrim delete buttons on the media picker measured
+     white-on-white at 1.00:1: a fabricated failure, and the same silence would
+     hide a real one on any element whose fill is an oklab/oklch/color() value.
+     A 1x1 canvas answers in the browser's own colour engine (unpremultiplied
+     RGBA), so no colour-space maths lives here. */
+  let _px = null;
+  const rasterise = (css) => {
+    if (!_px) {
+      const c = document.createElement("canvas");
+      c.width = c.height = 1;
+      _px = c.getContext("2d", { willReadFrequently: true });
+    }
+    try {
+      _px.clearRect(0, 0, 1, 1);
+      _px.fillStyle = "#000";
+      _px.fillStyle = css;
+      /* An unparseable value leaves fillStyle at the sentinel, and painting it
+         would report opaque black for a colour the browser rejected. */
+      if (_px.fillStyle === "#000000") return null;
+      _px.fillRect(0, 0, 1, 1);
+      const d = _px.getImageData(0, 0, 1, 1).data;
+      return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 };
+    } catch {
+      return null;
+    }
+  };
   const parse = (css) => {
     const m = css.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/);
-    return m ? { r: +m[1], g: +m[2], b: +m[3], a: m[4] === undefined ? 1 : +m[4] } : null;
+    if (!m) return /^(?:oklab|oklch|lab|lch|color|hwb|hsla?)\(|^#/.test(css.trim()) ? rasterise(css) : null;
+    return { r: +m[1], g: +m[2], b: +m[3], a: m[4] === undefined ? 1 : +m[4] };
   };
   const blend = (fg, bg) => ({
     r: fg.r * fg.a + bg.r * (1 - fg.a),
@@ -230,6 +304,65 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
     let bg = { r: 255, g: 255, b: 255, a: 1 };
     for (const layer of layers.reverse()) bg = blend(layer, bg);
     return bg;
+  };
+  /**
+   * The background to COMPARE a target against: what a person sees, not what
+   * the element declares.
+   *
+   * A Figma frame's fill describes the surface as rendered. Chrome mostly does
+   * not restate an inherited fill — a modal foot inside a white card is left
+   * transparent and simply looks white. Comparing `s.backgroundColor` directly
+   * reports `rgba(0, 0, 0, 0)` against the board's `#ffffff` and calls a
+   * pixel-identical surface a failure. Three of them appeared the moment the
+   * extractor learned to read `bg-white` (2026-09-08).
+   *
+   * The lenient-looking direction is the one that matters: transparent over a
+   * GRAY parent still composites to gray and still fails a board that says
+   * white, which is the case worth catching. Only the invisible difference is
+   * forgiven.
+   *
+   * The declared value is kept alongside as `background-color-declared` — no
+   * spec names it, so nothing compares it, but the evidence is there when a
+   * verdict looks wrong.
+   */
+  /**
+   * Opacity inherited from ancestors, multiplied down the chain.
+   *
+   * `getComputedStyle(el).color` reports the DECLARED colour and knows nothing
+   * about an ancestor's `opacity`, which composites the whole subtree after
+   * paint. So a completed onboarding row inside `tw:opacity-55` reported its
+   * `#6B7280` at 4.83:1 while the actual pixels were 2.1:1 — and at 7/7 that
+   * was the entire list. The sweep called a legible-looking failure a pass.
+   *
+   * `opacity` on the element itself counts too: it fades the text against the
+   * background BEHIND the element, which is what `effectiveBg` already returns.
+   */
+  const inheritedAlpha = (el) => {
+    let a = 1;
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
+      const o = parseFloat(getComputedStyle(n).opacity);
+      if (!Number.isNaN(o)) a *= o;
+    }
+    return a;
+  };
+  const bgFor = (el) => {
+    // An element that declares its OWN fill reports that fill, even a
+    // translucent one. Only a fully transparent element — one that declares
+    // nothing and simply shows what is behind it — is composited.
+    //
+    // The line matters because both cases exist and they are opposites. A
+    // modal foot with no fill looks exactly like the white card behind it, and
+    // comparing `rgba(0, 0, 0, 0)` to the board's `#ffffff` fails a
+    // pixel-identical surface. A SCRIM at `rgba(17, 24, 39, 0.4)` is a
+    // deliberate translucent layer, and compositing it to `#979da5` would
+    // silently redefine what the target is. Figma cannot export a layer
+    // opacity, so the board bakes the scrim to an opaque `#111827` — that
+    // mismatch is a known export artifact and belongs in the recipe's skip
+    // list with a reason, not hidden by an averaging rule here.
+    const own = parse(getComputedStyle(el).backgroundColor);
+    if (own && own.a > 0) return getComputedStyle(el).backgroundColor;
+    const c = effectiveBg(el);
+    return `rgb(${Math.round(c.r)}, ${Math.round(c.g)}, ${Math.round(c.b)})`;
   };
   const ratio = (fg, bg) => {
     const l1 = lum(fg.r, fg.g, fg.b);
@@ -285,7 +418,9 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
         "margin-bottom": s.marginBottom,
         "margin-left": s.marginLeft,
         "gap": s.gap === "normal" ? "0px" : s.gap,
-        "background-color": s.backgroundColor,
+        // COMPOSITED, not declared — see the note above `bgFor`.
+        "background-color": bgFor(el),
+        "background-color-declared": s.backgroundColor,
         "color": s.color,
         "border-color": s.borderTopColor,
         "border-top-width": s.borderTopWidth,
@@ -345,7 +480,22 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
     const fgRaw = parse(s.color);
     if (!fgRaw) continue;
     const bg = effectiveBg(el);
-    const fg = fgRaw.a < 1 ? blend(fgRaw, bg) : fgRaw;
+    /* Ancestor opacity fades the glyph into whatever is behind it; fold it
+       into the alpha before compositing. See `inheritedAlpha`.
+
+       Fully transparent text is SKIPPED, not failed. Folding opacity in
+       without this reported 18 nodes on `s1-1-coach-dismissed` at a ratio of
+       exactly 1:1 — gray-500 on white, which is 4.83 — because the Insert
+       drawer sits under the coach mark at effective opacity 0 and the
+       foreground blended entirely into the background. WCAG governs text a
+       person can see; invisible text is not a failure, and reporting it as one
+       buries the real ones. `checkVisibility` does not catch this on its own:
+       an ANCESTOR's opacity leaves the element itself visible by its own
+       computed style. */
+    const alpha = inheritedAlpha(el);
+    if (alpha < 0.05) continue;
+    const fgA = { ...fgRaw, a: fgRaw.a * alpha };
+    const fg = fgA.a < 1 ? blend(fgA, bg) : fgA;
     const px = parseFloat(s.fontSize);
     const bold = +s.fontWeight >= 700;
     const large = px >= 18 || (px >= 14 && bold);
@@ -407,7 +557,10 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
     const raw = parse(pick(cs.stroke) ?? pick(cs.fill) ?? cs.color);
     if (!raw) continue;
     const bg = effectiveBg(control);
-    const fg = raw.a < 1 ? blend(raw, bg) : raw;
+    const alphaI = inheritedAlpha(control);
+    if (alphaI < 0.05) continue;              // invisible: see the text sweep
+    const rawA = { ...raw, a: raw.a * alphaI };
+    const fg = rawA.a < 1 ? blend(rawA, bg) : rawA;
     const got = ratio(fg, bg);
     const needed = 3;                              // non-text UI component
     if (got < needed) {
@@ -427,7 +580,64 @@ const readAll = () => page.evaluate(({ targets, contrastScope, ignore }) => {
     }
   }
 
-  return { targets: targets_, contrastFailures: pairs, nonTextFailures: nonText };
+  /* Every visible string on the surface, deduped and in render order.
+     `diff.mjs` compares geometry, colour and type — all property classes, none
+     of them text — and it reads only ANCHORED targets, so it cannot see a
+     control that exists on one side and not the other. That is the harness's
+     largest stated blind spot: the shipped topbar renders three controls board
+     681:26 does not contain, and only a screenshot caught it.
+     Captured here rather than derived later because it needs the live DOM. */
+  const scopeEl = document.querySelector(contrastScope || "body") || document.body;
+  const seen = new Set();
+  const rendered = [];
+  /* Two lists, because the two comparison directions need different evidence.
+
+     `rendered` is what a person SEES: text nodes, plus `placeholder` and
+     `value`, which have no text node but are read off the screen exactly like
+     one. A board draws "Search elements" as a text layer and the product
+     renders it as a placeholder attribute — without these, that read as
+     "board draws, product does not render" on eight surfaces at once.
+
+     `accessibleNames` is `aria-label` / `title`: real, but NOT visible. They
+     may SATISFY a board line (a board draws a word where the product has an
+     icon with an accessible name), and they must never GENERATE an extra —
+     a board cannot draw an accessible name, so every one of them would report
+     as "product renders, no board draws". Including them in both directions
+     turned 8 leads into 25 on the first surface tried. */
+  const accessibleNames = [];
+  const seenA = new Set();
+  const push = (raw) => {
+    const t = String(raw ?? "").replace(/\s+/g, " ").trim();
+    if (t.length < 2 || seen.has(t)) return;
+    seen.add(t); rendered.push(t);
+  };
+  const pushA = (raw) => {
+    const t = String(raw ?? "").replace(/\s+/g, " ").trim();
+    if (t.length < 2 || seenA.has(t)) return;
+    seenA.add(t); accessibleNames.push(t);
+  };
+  for (const el of scopeEl.querySelectorAll("*")) {
+    if (!el.checkVisibility?.({ checkOpacity: true, checkVisibilityCSS: true })) continue;
+    for (const n of el.childNodes) if (n.nodeType === 3) push(n.textContent);
+    push(el.getAttribute?.("placeholder"));
+    if (el.tagName === "INPUT" && el.type !== "password") push(el.value);
+    pushA(el.getAttribute?.("aria-label"));
+    pushA(el.getAttribute?.("title"));
+  }
+
+  return {
+    targets: targets_, contrastFailures: pairs, nonTextFailures: nonText, rendered, accessibleNames,
+    /* How much the contrast sweep actually looked at. A scope that resolves to
+       an empty subtree reports "0 failures" — indistinguishable from a clean
+       screen, and that is exactly how five recipes came to certify modals
+       nobody had measured: `ModalRoot` PORTALS to the overlay root, so
+       `[data-probe]` (and any scrim- or panel-scoped selector) contains none of
+       the dialog. The moment one was corrected it found a `--bk-warning` cell
+       at 3.51:1. Reported so the caller can refuse a clean verdict from an
+       empty sweep rather than banking it. */
+    contrastScopeFound: !!document.querySelector(contrastScope || "body"),
+    contrastTextNodes: rendered.length,
+  };
 }, {
   targets: (recipe.targets ?? []).map((t) => ({ name: t.name, sel: refToSelector(t, `target ${t.name}`) })),
   contrastScope: recipe.contrastScope,
@@ -512,14 +722,25 @@ if (Object.keys(states).length) {
   const after = await readAll();
   const before = JSON.stringify(baseline.targets);
   if (JSON.stringify(after.targets) !== before) {
+    /* Walk RECT as well as CSS. The comparison above is over the whole target —
+       geometry included — but this explanation used to inspect `css` only, so a
+       geometry-only difference produced an EMPTY diff list. An empty array is
+       truthy in JS, so the run then reported "STATE LEAK" and printed nothing
+       to show for it, which is unfalsifiable: no way to tell a real leak from a
+       harness artefact. Name what moved, and say so explicitly when nothing did. */
     const diffs = [];
     for (const [i, b] of baseline.targets.entries()) {
       const a = after.targets[i];
+      if (!a) { diffs.push(`${b.name}: target disappeared after the interaction cycle`); continue; }
+      for (const k of Object.keys(b.rect ?? {})) {
+        if (b.rect[k] !== a.rect?.[k]) diffs.push(`${b.name}.rect.${k}: ${b.rect[k]} -> ${a.rect?.[k]}`);
+      }
       for (const k of Object.keys(b.css ?? {})) {
-        if (b.css[k] !== a?.css?.[k]) diffs.push(`${b.name}.${k}: ${b.css[k]} -> ${a?.css?.[k]}`);
+        if (b.css[k] !== a.css?.[k]) diffs.push(`${b.name}.${k}: ${b.css[k]} -> ${a.css?.[k]}`);
       }
     }
-    leak = diffs;
+    leak = diffs.length ? diffs : null;
+    if (!leak) console.warn(`[measure] targets stringify differently before/after the cycle, but no rect or css value differs — treating as no leak. Check readAll() for a field the diff does not walk.`);
   }
 }
 
@@ -550,6 +771,21 @@ writeFileSync(outPath, JSON.stringify(out, null, 2));
 
 const missing = out.targets.filter((t) => !t.found);
 console.log(`[measure] ${surfaceId}: ${out.targets.length} targets (${missing.length} missing), ${out.contrastFailures.length} text-contrast + ${(out.nonTextFailures ?? []).length} icon-contrast failure(s) → ${resolve(outPath)}`);
+
+/* An empty contrast sweep is an instrument failure, not a clean result — see
+   `contrastScopeFound` above. Loud, and non-zero, because a silent zero here is
+   what the whole harness exists to prevent. */
+if (out.targets.length && !out.contrastTextNodes) {
+  const why = out.contrastScopeFound
+    ? `it resolved but contains no text — a portalled dialog (ModalRoot renders into the overlay root) is the usual cause`
+    : `it matched no element at all`;
+  console.error(
+    `[measure] ${surfaceId}: contrastScope ${JSON.stringify(recipe.contrastScope ?? "body")} saw NOTHING — ${why}.\n` +
+    `          "0 contrast failures" from an empty subtree is not a pass. Point contrastScope at the\n` +
+    `          element under test (the dialog's own testId), or drop it to sweep the whole body.`
+  );
+  process.exitCode = 3;
+}
 for (const t of missing) console.log(`  MISSING target: ${t.name} (${t.selector})`);
 for (const p of out.contrastFailures)
   console.log(`  CONTRAST ${p.ratio} < ${p.needed}  ${p.selector}  "${p.text}"  ${p.color} on ${p.bg} @${p.fontSize}/${p.fontWeight}`);

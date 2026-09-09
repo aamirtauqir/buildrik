@@ -117,11 +117,38 @@ export function normalizeColor(v) {
   return s;
 }
 
-/** "56px" | "56" | 56 -> 56. Returns null when there is no number to read. */
+/**
+ * "56px" | "56" | 56 -> 56. Returns null when there is no number to read.
+ *
+ * A pill radius is the one length CSS does not report as a number. Tailwind's
+ * `rounded-full` computes to `calc(infinity * 1px)`, which this parser read as
+ * null, so every pill in the product compared UNCOMPARABLE against a board
+ * drawing `rounded-[9999px]` — the badge component's radius was simply not
+ * being checked. Both spellings mean "fully round", so both fold to the same
+ * sentinel and compare equal; a board asking for 9999px and a product shipping
+ * a 4px corner still fails, which is the case that matters.
+ */
+const PILL = 9999;
+/* Where the fold STARTS. Boards in this file are authored with both 9999 and
+   999 for the same intent — 1160:58's quota track is 5px tall on a 999 radius,
+   which is a pill by any reading — and comparing 999 against a product's
+   `--bk-radius-full` (9999) reported a 9000px difference on a shape that is
+   pixel-identical. Nothing in this design system asks for a literal radius
+   between 999 and 9999, so folding from 999 cannot mask a real difference. */
+const PILL_FLOOR = 999;
 export function normalizeLength(v) {
   if (v == null) return null;
-  const m = String(v).trim().match(/^(-?[\d.]+)\s*px$|^(-?[\d.]+)$/);
-  return m ? parseFloat(m[1] ?? m[2]) : null;
+  const s = String(v).trim();
+  if (/^calc\(\s*infinity\s*\*\s*1px\s*\)$/.test(s)) return PILL;
+  // ...and Chrome does not always hand back that calc() spelling: on a
+  // `rounded-full` element it resolves the radius itself and reports
+  // "3.35544e+07px". Without the exponent in this pattern the match failed,
+  // the parser returned null, and the pill was UNCOMPARABLE again — the same
+  // blind spot the calc() branch above was written to close, reopened by the
+  // browser rather than by Tailwind. Found 2026-09-08 on the Media type chips.
+  const m = s.match(/^(-?[\d.]+(?:e[+-]?\d+)?)\s*px$|^(-?[\d.]+(?:e[+-]?\d+)?)$/i);
+  const n = m ? parseFloat(m[1] ?? m[2]) : null;
+  return n !== null && n >= PILL_FLOOR ? PILL : n;
 }
 
 // ── Tolerance ─────────────────────────────────────────────────────────────
@@ -199,7 +226,13 @@ export function compareValue(prop, expected, actual) {
 
 // ── Recipe schema ─────────────────────────────────────────────────────────
 
-const STEP_ACTIONS = new Set(["click", "hover", "waitFor", "waitForState", "press", "wait"]);
+/* `clickIfPresent` is a PRECONDITION, not an interaction: dismiss a thing if it
+   happens to be there. It exists because the first-run coach mark appears only
+   on a fresh session — a plain `click` fails when it is absent, and omitting the
+   step fails when it is present, so neither expresses "get this out of the way".
+   It is deliberately NOT a general escape hatch: it swallows a miss, so a step
+   that must happen has to stay a `click`. */
+const STEP_ACTIONS = new Set(["click", "clickIfPresent", "contextmenu", "hover", "waitFor", "waitForState", "press", "wait"]);
 
 /**
  * Read and validate a surface recipe.
@@ -235,6 +268,19 @@ export function validateRecipe(recipe, surfaceId) {
     if (t.mode && !["single", "uniform"].includes(t.mode)) {
       err(`target "${t.name}" has unknown mode "${t.mode}" (expected "single" or "uniform")`);
     }
+    if (t.skipProps != null) {
+      if (typeof t.skipProps !== "object" || Array.isArray(t.skipProps)) {
+        err(`target "${t.name}" has a skipProps that is not an object of property -> reason`);
+      } else {
+        for (const [prop, why] of Object.entries(t.skipProps)) {
+          if (typeof why !== "string" || why.trim().length < 12) {
+            err(`target "${t.name}" skips "${prop}" without a real reason. A refusal that does not ` +
+                `say why is indistinguishable from an oversight — write what the board asks for and ` +
+                `why the code does not follow it.`);
+          }
+        }
+      }
+    }
     if (t.nth != null && !t.because) {
       err(`target "${t.name}" uses nth:${t.nth} without a \`because\`. Position is not identity — ` +
           `filtering or sorting makes nth point at a different element. Prefer mode:"uniform", ` +
@@ -245,7 +291,25 @@ export function validateRecipe(recipe, surfaceId) {
   for (const [i, s] of (recipe.steps ?? []).entries()) {
     if (!STEP_ACTIONS.has(s.action)) err(`step[${i}] has unknown action "${s.action}"`);
     if (s.action === "press" || s.action === "wait") continue;
-    if (s.selector && s.action !== "waitForState") {
+    /* Pointer actions may address by CSS **with a `because`**, on the same
+       terms waitForState already had. The canvas body is
+       `dangerouslySetInnerHTML` from the engine: every node carries
+       `data-buildrick-id` and none carries `data-testid`, so three boards
+       (1176:4866 ctx-menu, 1176:4925 hover-levels, 1176:4824 inline-edit) could
+       not be reached at all — a `contextmenu` on the canvas container lands
+       above the element and `closest("[data-buildrick-id]")` returns null.
+       The alternative was stamping conformance anchors into engine output,
+       i.e. changing the product to suit the instrument. `data-buildrick-id` is
+       a real, stable contract; addressing it is honest, and the mandatory
+       `because` keeps it from becoming a general escape hatch. TARGETS still
+       may not use CSS — only steps. */
+    const CSS_STEPS = new Set(["waitForState", "click", "clickIfPresent", "hover", "contextmenu"]);
+    if (s.selector && CSS_STEPS.has(s.action) && s.action !== "waitForState" && !s.because) {
+      err(`step[${i}] (${s.action}) uses a CSS selector without a \`because\`. Say why no ` +
+          `testId can reach this element — the canvas's engine-rendered nodes are the ` +
+          `case this exists for, not a shortcut past adding an anchor.`);
+    }
+    if (s.selector && !CSS_STEPS.has(s.action)) {
       err(`step[${i}] (${s.action}) uses a CSS selector. Only waitForState may, and only ` +
           `with a \`because\` naming the state that has no element of its own.`);
     }
@@ -450,13 +514,76 @@ export function compareContrast(nowSet, baseSet) {
  * id is ever produced. Only a browser settles that, and measure.mjs already
  * does. This check exists to catch an anchor that has left the codebase.
  */
+/*
+ * Literal prefixes of every id-building template in a file, memoised.
+ *
+ * Two shapes. The attribute form — `` data-testid={`insert-group-${k}`} `` —
+ * and ONE LEVEL OF INDIRECTION, because the id is often not built in the
+ * attribute at all: `ListRow` renders `data-testid={sub("label")}` where
+ * ``const sub = (part) => `row-${part}-${rowId}` ``. The attribute holds a
+ * CALL and the template lives in a helper, so an attribute-only regex reported
+ * all 66 of that component's derived anchors as missing while every one of
+ * them renders.
+ *
+ * Memoised per haystack because `anchorForm` is called once per anchor and the
+ * scan is per file: recomputing it made `check-anchors` — documented at ~0.3s
+ * — exceed two minutes.
+ */
+const PREFIX_CACHE = new WeakMap();
+const PREFIX_CACHE_STR = new Map();
+function templatePrefixes(haystack) {
+  const cache = typeof haystack === "string" ? PREFIX_CACHE_STR : PREFIX_CACHE;
+  const hit = cache.get(haystack);
+  if (hit) return hit;
+
+  const out = [...haystack.matchAll(/(?:data-testid|testId)=\{`([^`$]*)\$\{/g)].map((m) => m[1]);
+  const called = new Set(
+    [...haystack.matchAll(/(?:data-testid|testId)=\{([A-Za-z_$][\w$]*)/g)].map((m) => m[1]),
+  );
+  /* Line-scoped, not whole-file: the first version used
+     `(?:const|let|var|function)\s+(?:a|b|c)\b[^\n]*?\`([^\`$]*)\$\{`
+     across the entire text and its lazy `[^\n]*?` backtracked hard enough to
+     take `check-anchors` from ~0.3s to 37s. A declaration and its template
+     literal sit on the same line in every case here, so scan lines. */
+  if (called.size) {
+    /* A three-line window, not a single line. The first version required the
+       declaration and its template literal to sit on the SAME line, which made
+       the instrument dictate the source: an agent reformatted three helpers
+       onto one line each purely to be seen. A prettier-wrapped arrow —
+           const sub = (part: string) =>
+             `row-${part}-${rowId}`;
+       is the normal shape, and a checker that cannot read it is the one that is
+       wrong. Three lines covers declaration + arrow + body; still linear, and
+       measured at no cost against the whole-file regex it replaced. */
+    const lines = haystack.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      if (!/(?:const|let|var|function)\s/.test(lines[i])) continue;
+      let names = false;
+      for (const n of called) { if (lines[i].includes(n)) { names = true; break; } }
+      if (!names) continue;
+      const window = lines.slice(i, i + 3).join("\n");
+      for (const m of window.matchAll(/`([^`$]*)\$\{/g)) out.push(m[1]);
+    }
+  }
+  const list = out.filter(Boolean);
+  cache.set(haystack, list);
+  return list;
+}
+
 export function anchorForm(id, haystack) {
   const has = (s) => haystack.includes(s);
   if (has(`data-testid="${id}"`) || has(`data-testid='${id}'`)
     || has(`data-testid={"${id}"}`) || has(`data-testid={\`${id}\`}`)) return "literal";
+  /* A two-literal ternary — `data-testid={open ? "a-open" : "a-shut"}` — names
+     BOTH ids literally, and both render. The checker used to see neither, so an
+     agent changed the SOURCE to satisfy the tool: a real id was replaced with a
+     literal plus a data- attribute purely to be greppable. That is the
+     instrument dictating code shape, which is the wrong way round. */
+  for (const m of haystack.matchAll(/data-testid=\{[^}]*?\?\s*["'`]([^"'`]+)["'`]\s*:\s*["'`]([^"'`]+)["'`]/g)) {
+    if (m[1] === id || m[2] === id) return "literal";
+  }
   if (has(`testId="${id}"`) || has(`testId='${id}'`)
     || has(`testId={"${id}"}`) || has(`testId={\`${id}\`}`)) return "forwarded";
-  const prefix = [...haystack.matchAll(/(?:data-testid|testId)=\{`([^`$]*)\$\{/g)]
-    .map((m) => m[1]).filter(Boolean).find((p) => id.startsWith(p));
+  const prefix = templatePrefixes(haystack).find((p) => id.startsWith(p));
   return prefix ? `template:${prefix}\${…}` : null;
 }

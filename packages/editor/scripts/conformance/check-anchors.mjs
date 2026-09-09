@@ -120,10 +120,33 @@ const haystack = readSource();
  * that, and measure.mjs already does — this check exists to catch the string
  * being gone from the codebase entirely.
  */
+/**
+ * The mirror of case 2, which `anchorForm` cannot answer: a template whose
+ * literal part FOLLOWS the interpolation — `data-testid={`${testId}-foot`}`,
+ * which is how Modal names every dialog footer in this codebase. anchorForm
+ * captures the literal PREFIX of a template and drops empty ones (it has to:
+ * every id starts with ""), so a suffix template reads as an anchor that does
+ * not exist anywhere. Two recipes in the components/templates families were
+ * blocked by exactly that while the element rendered fine — the failure mode
+ * the note above says this gate must not have.
+ *
+ * Matched on the SUFFIX instead, and reported just as weakly: it proves a
+ * template exists that ends the way this id ends, never that this id is the
+ * one produced. measure.mjs settles it, and does — it refuses any target that
+ * does not resolve to exactly one element.
+ */
+const suffixTemplateForm = (id, hay) => {
+  const suffix = [...hay.matchAll(/(?:data-testid|testId)=\{[^`}]*`\$\{[^`]*?\}([^`$]+)`/g)]
+    .map((m) => m[1])
+    .filter(Boolean)
+    .find((sfx) => id.endsWith(sfx));
+  return suffix ? `template:\${…}${suffix}` : null;
+};
+
 const missing = [];
 const weak = [];
 for (const [id, whereSet] of referenced) {
-  const form = anchorForm(id, haystack);
+  const form = anchorForm(id, haystack) ?? suffixTemplateForm(id, haystack);
   if (!form) missing.push({ id, where: [...whereSet] });
   else if (form.startsWith("template:")) weak.push({ id, form });
 }

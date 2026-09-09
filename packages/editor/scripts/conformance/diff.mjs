@@ -80,6 +80,25 @@ if (!existsSync(measuredPath)) {
          `       A missing measurement is MISSING, never a pass.`);
 }
 const measured = JSON.parse(readFileSync(measuredPath, "utf8"));
+
+/* A measurement that aborted leaves its previous file on disk, and this script
+   cannot otherwise tell. `modal-success-then-close` reported
+   "11 compared · 11 pass · 0 fail" while `measure.mjs` was timing out on a step
+   and reading nothing at all — a green verdict for a surface nobody had looked
+   at. measure.mjs stamps the file on abort; refuse it here. Exit 2 (STALE),
+   because that is what it is: a real file, describing an older build. */
+if (measured.measurementFailed) {
+  console.error(
+    `[diff] surface "${surfaceId}": the last measurement FAILED and this file is what the run
+` +
+    `       before it wrote — ${measured.measurementFailed.why}
+` +
+    `       at ${measured.measurementFailed.at}.
+` +
+    `       Refusing to report a verdict from it. Fix the step, re-run measure, then diff.`
+  );
+  process.exit(2);
+}
 const measuredByName = new Map((measured.targets ?? []).map((t) => [t.name, t]));
 
 // ── Freshness: a spec describing a board that has moved is STALE ──────────
@@ -118,6 +137,7 @@ const loadSpec = (specName) => {
 
 const rows = [];
 const skipped = [];
+const refused = [];   // per-property skipProps — a judgement, not a gap
 
 for (const target of recipe.targets) {
   if (!target.spec || !target.nodeId) { skipped.push(target.name); continue; }
@@ -136,7 +156,19 @@ for (const target of recipe.targets) {
   }
   const css = m.css ?? {};
 
+  /* Per-property skip. A target used to be all-or-nothing: to refuse ONE
+     property you dropped the whole join and lost its geometry too. That cost
+     real coverage — an agent measured ~25 checks lost across its recipes for
+     want of this — and it pushed the alternative, which is worse: conforming to
+     a board value you have already judged wrong.
+     `skipProps` takes a mandatory reason per property, so the refusal is on the
+     record next to the thing refused, and the rest of the target still counts. */
+  const skipProps = target.skipProps ?? {};
   for (const [prop, expected] of Object.entries(node.props)) {
+    if (skipProps[prop]) {
+      refused.push(`${target.name}·${prop} — ${skipProps[prop]}`);
+      continue;
+    }
     const actual = css[prop];
     // When the board names a token we can place, THAT token's value is the
     // expectation — not the literal fallback baked into the class. The board's
@@ -183,6 +215,15 @@ const passes = rows.filter((r) => r.verdict === "PASS");
 console.log(`\nconformance · ${surfaceId} · ${measured.board ?? ""}`);
 console.log(`${rows.length} compared · ${passes.length} pass · ${fails.length} fail · ${unknown.length} unknown · ${skipped.length} skipped`);
 if (skipped.length) console.log(`skipped (no spec yet): ${skipped.join(", ")}`);
+/* Two different facts, and lumping them together said the wrong one. A target
+   with no spec is a GAP — nobody has joined it. A refused property is a
+   JUDGEMENT — someone measured it, read the board, and declined with a reason.
+   Printing a judgement as "no spec yet" hides the reasoning behind the exact
+   kind of vague label this harness exists to stop. */
+if (refused.length) {
+  console.log(`refused (board read, deliberately not conformed) — ${refused.length}:`);
+  for (const r of refused) console.log(`  ${r}`);
+}
 console.log("");
 
 // `--json` writes the same data the table is built from. At 287 surfaces the

@@ -14,7 +14,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, mkdirSync, copyFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, copyFileSync, readFileSync, existsSync, rmSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -46,7 +46,7 @@ function makeRepo({ raw, spec, recipe, measured, baseline } = {}) {
   mkdirSync(join(dir, 'scripts/conformance/measured'), { recursive: true });
   mkdirSync(join(dir, 'scripts/conformance/raw-figma'), { recursive: true });
   mkdirSync(join(dir, 'scripts/tokens'), { recursive: true });
-  for (const f of ['extract.mjs', 'diff.mjs', 'lib.mjs', 'check-spec-age.mjs', 'check-anchors.mjs']) {
+  for (const f of ['extract.mjs', 'diff.mjs', 'lib.mjs', 'check-spec-age.mjs', 'check-anchors.mjs', 'check-board-copy.mjs', 'check-boards.mjs']) {
     copyFileSync(join(CONF, f), join(dir, 'scripts/conformance', f));
   }
   copyFileSync(TOKENS, join(dir, 'scripts/tokens/figma-tokens.json'));
@@ -87,6 +87,85 @@ describe('extract.mjs — derive a spec from a committed Figma response', () => 
     const spec = JSON.parse(readFileSync(join(dir, 'scripts/conformance/specs/t.json'), 'utf8'));
     expect(spec.targets[0].props['padding-left'].value).toBe('16px');
     expect(spec.targets[0].props['padding-right'].value).toBe('16px');
+  });
+
+  // Regression: `propsFrom` matched only ARBITRARY values (`bg-[#fff]`), so
+  // when the topbar board came back from Figma with a bare `bg-white` the
+  // topbar's background silently stopped being compared and diff.mjs still
+  // said PASS — one fewer property is an absence, not a failure. 57 `bg-white`
+  // and 8 `text-white` were hidden this way across the committed boards.
+  it('reads a NAMED colour, not only an arbitrary one', () => {
+    const dir = makeRepo({
+      raw: { ...RAW, code: '<div data-node-id="9:9" className="bg-white text-white h-[20px]" />' },
+    });
+    expect(run(dir, 'extract.mjs', ['t']).code).toBe(0);
+    const spec = JSON.parse(readFileSync(join(dir, 'scripts/conformance/specs/t.json'), 'utf8'));
+    expect(spec.targets[0].props['background-color']).toEqual({ value: '#ffffff' });
+    expect(spec.targets[0].props['color']).toEqual({ value: '#ffffff' });
+  });
+
+  // The reason NAMED is keyed on whole class names and not on the prefix that
+  // SINGLE uses: `border-` maps to border-COLOR, so a prefix lookup would read
+  // `border-b` (a WIDTH, 177 occurrences) and `border-solid` (a STYLE, 876) as
+  // colours. `text-left` sits in the same trap one level down.
+  it('does not mistake a border width or a text alignment for a colour', () => {
+    const dir = makeRepo({
+      raw: {
+        ...RAW,
+        code: '<div data-node-id="9:9" className="border-b border-2 border-solid text-left text-ellipsis h-[20px]" />',
+      },
+    });
+    expect(run(dir, 'extract.mjs', ['t']).code).toBe(0);
+    const spec = JSON.parse(readFileSync(join(dir, 'scripts/conformance/specs/t.json'), 'utf8'));
+    expect(spec.targets[0].props['border-color']).toBeUndefined();
+    expect(spec.targets[0].props['color']).toBeUndefined();
+    expect(spec.targets[0].props['height'].value).toBe('20px');
+  });
+
+  // get_design_context wraps a string in a JSX template literal whenever it
+  // carries a character JSX would escape, so the ORIGINAL `[^<>{}]` pattern
+  // dropped exactly the interesting copy: "What's live" (apostrophe) and
+  // "+  Save a version" (leading +). check-board-copy then reported both as
+  // "product renders, no board draws" — a false lead made by the extractor.
+  it('reads copy from a JSX template-literal child, not only plain text', () => {
+    const dir = makeRepo({
+      raw: {
+        ...RAW,
+        code: '<div data-node-id="9:9" className="h-[20px]"><span>Plain label</span><span>{`What\'s live`}</span></div>',
+      },
+    });
+    expect(run(dir, 'extract.mjs', ['t']).code).toBe(0);
+    const spec = JSON.parse(readFileSync(join(dir, 'scripts/conformance/specs/t.json'), 'utf8'));
+    expect(spec.copy).toContain('Plain label');
+    expect(spec.copy).toContain("What's live");
+  });
+
+  // `text-[…]` is two properties wearing one prefix, and `color:` is only ONE
+  // of the ways a colour arrives. A bare hex — what Figma emits when the layer
+  // has no variable behind it — fell to the else branch and was recorded as
+  // `{"font-size": "#6b7280"}`: the colour check silently vanished AND a bogus
+  // font-size took its place, which normalizeLength reads as null, so it
+  // degraded to UNKNOWN and never failed. 70 such props sat across 53 specs.
+  it('reads a bare hex in text-[…] as a colour, not a font size', () => {
+    const dir = makeRepo({
+      raw: { ...RAW, code: '<div data-node-id="9:9" className="text-[#6b7280] h-[20px]" />' },
+    });
+    expect(run(dir, 'extract.mjs', ['t']).code).toBe(0);
+    const spec = JSON.parse(readFileSync(join(dir, 'scripts/conformance/specs/t.json'), 'utf8'));
+    expect(spec.targets[0].props['color']).toEqual({ value: '#6b7280' });
+    expect(spec.targets[0].props['font-size']).toBeUndefined();
+  });
+
+  it('still reads a real font size, and still honours the explicit color: marker', () => {
+    const dir = makeRepo({
+      raw: { ...RAW, code: '<div data-node-id="9:9" className="text-[13px]" /><span data-node-id="9:10" className="text-[color:#111827]" />' },
+    });
+    expect(run(dir, 'extract.mjs', ['t']).code).toBe(0);
+    const spec = JSON.parse(readFileSync(join(dir, 'scripts/conformance/specs/t.json'), 'utf8'));
+    const byId = Object.fromEntries(spec.targets.map((t) => [t.nodeId, t.props]));
+    expect(byId['9:9']['font-size']).toEqual({ value: '13px' });
+    expect(byId['9:9']['color']).toBeUndefined();
+    expect(byId['9:10']['color']).toEqual({ value: '#111827' });
   });
 
   it('is deterministic — same input, same hash', () => {
@@ -421,5 +500,167 @@ describe('check-anchors.mjs — a recipe may not name an anchor nobody renders',
       { targets: [{ name: 'card', testId: 'card', root: 'grid' }] },
       '<div data-testid="card" />');
     expect(run(dir, 'check-anchors.mjs').code).toBe(3);
+  });
+});
+
+
+// ── check-board-copy.mjs ───────────────────────────────────────────────────
+
+describe('check-board-copy.mjs — the structural blind spot, through text', () => {
+  const seed = (dir, { copy, rendered, targets }) => {
+    mkdirSync(join(dir, 'scripts/conformance/surfaces'), { recursive: true });
+    writeFileSync(join(dir, 'scripts/conformance/specs/b.json'), JSON.stringify({ copy }));
+    writeFileSync(join(dir, 'scripts/conformance/measured/s.json'), JSON.stringify({ rendered }));
+    writeFileSync(join(dir, 'scripts/conformance/surfaces/s.json'), JSON.stringify({ surface: 's', targets }));
+  };
+
+  it('reports a board line the product never renders', () => {
+    const dir = makeRepo({});
+    seed(dir, {
+      copy: ['Export site as HTML', 'Shared line'],
+      rendered: ['Export site as', 'Shared line'],
+      targets: [{ name: 'a', testId: 'a', spec: 'b' }],
+    });
+    const r = run(dir, 'check-board-copy.mjs', ['s']);
+    expect(r.code).toBe(0);                       // advisory, never a gate
+    expect(r.out).toMatch(/board draws, product does not render/);
+    expect(r.out).toMatch(/export site as html/);
+  });
+
+  // Boards render SAMPLE values; the product templates them. Folding digits and
+  // quoted spans is what keeps "3 open" from being reported against "7 open".
+  it('folds sample counts and quoted values instead of reporting them', () => {
+    const dir = makeRepo({});
+    seed(dir, {
+      copy: ['In review · 3 open', "Nothing matches 'hero'"],
+      rendered: ['In review · 7 open', "Nothing matches 'footer'"],
+      targets: [{ name: 'a', testId: 'a', spec: 'b' }],
+    });
+    expect(run(dir, 'check-board-copy.mjs', ['s']).out).toMatch(/no leads/);
+  });
+
+  // shell-default sweeps `body` but joins ONE spec out of five targets, and
+  // reported 88 "extras" that were simply the rest of the editor. The extras
+  // direction is only meaningful at full coverage.
+  it('suppresses the extras direction when the recipe does not cover the scope', () => {
+    const dir = makeRepo({});
+    seed(dir, {
+      copy: ['Shared line'],
+      rendered: ['Shared line', 'Sidebar thing', 'Footer thing'],
+      targets: [{ name: 'a', testId: 'a', spec: 'b' }, { name: 'b', testId: 'b' }],
+    });
+    const out = run(dir, 'check-board-copy.mjs', ['s']).out;
+    expect(out).toMatch(/withheld, only 1\/2 targets carry a spec/);
+    expect(out).not.toMatch(/product renders, no board draws/);
+  });
+
+  it('reports extras once every target carries a spec', () => {
+    const dir = makeRepo({});
+    seed(dir, {
+      copy: ['Shared line'],
+      rendered: ['Shared line', 'Undrawn control'],
+      targets: [{ name: 'a', testId: 'a', spec: 'b' }],
+    });
+    expect(run(dir, 'check-board-copy.mjs', ['s']).out).toMatch(/product renders, no board draws \(1\)/);
+  });
+
+  it('says so when a surface was measured before the check existed', () => {
+    const dir = makeRepo({});
+    seed(dir, { copy: ['x'], rendered: undefined, targets: [{ name: 'a', testId: 'a', spec: 'b' }] });
+    expect(run(dir, 'check-board-copy.mjs', ['s']).out).toMatch(/measured before this check existed/);
+  });
+});
+
+
+// ── check-boards.mjs · recipe/board join ───────────────────────────────────
+
+describe('check-boards.mjs — a row may not claim a recipe that measures another board', () => {
+  const seed = (dir, { boardNodeId, recipeName, recipeNodeId }) => {
+    writeFileSync(join(dir, 'scripts/conformance/specs/b.json'), JSON.stringify({ nodeId: recipeNodeId, targets: [] }));
+    writeFileSync(join(dir, `scripts/conformance/surfaces/${recipeName}.json`), JSON.stringify({
+      surface: recipeName, targets: [{ name: 'a', testId: 'a', spec: 'b' }],
+    }));
+    writeFileSync(join(dir, 'scripts/conformance/boards.json'), JSON.stringify({
+      coveredFloor: 0,
+      counts: { active: 1 },
+      boards: [{ nodeId: boardNodeId, name: 'Board', family: 'F', status: 'active', verified: 'drift-fixed', recipe: recipeName }],
+    }));
+  };
+
+  // The exact 2026-09-08 error: eleven Brand rows recorded from an agent's
+  // prose rather than from the recipes, six node ids wrong, every gate green.
+  it('fails when the named recipe joins a different board', () => {
+    const dir = makeRepo({});
+    seed(dir, { boardNodeId: '152:112', recipeName: 'brand-starters', recipeNodeId: '152:137' });
+    const r = run(dir, 'check-boards.mjs');
+    expect(r.code).not.toBe(0);
+    expect(r.out).toMatch(/names recipe "brand-starters", but that recipe measures 152:137/);
+  });
+
+  it('fails when the named recipe does not exist at all', () => {
+    const dir = makeRepo({});
+    seed(dir, { boardNodeId: '152:112', recipeName: 'brand-starters', recipeNodeId: '152:112' });
+    const bp = join(dir, 'scripts/conformance/boards.json');
+    const b = JSON.parse(readFileSync(bp, 'utf8'));
+    b.boards[0].recipe = 'no-such-recipe';
+    writeFileSync(bp, JSON.stringify(b));
+    expect(run(dir, 'check-boards.mjs').out).toMatch(/names recipe "no-such-recipe", which does not exist/);
+  });
+
+  it('passes when the recipe really does join the board', () => {
+    const dir = makeRepo({});
+    seed(dir, { boardNodeId: '152:137', recipeName: 'brand-starters', recipeNodeId: '152:137' });
+    expect(run(dir, 'check-boards.mjs').code).toBe(0);
+  });
+});
+
+// ── diff.mjs · a failed measurement is not a verdict ───────────────────────
+
+describe('diff.mjs — refuses a measured file the last run failed to write', () => {
+  // `modal-success-then-close` reported "11 compared · 11 pass · 0 fail" while
+  // measure.mjs was timing out on a step and reading nothing at all: diff was
+  // reporting the run BEFORE it. A green verdict for a surface nobody looked at
+  // is the exact shape of silent success this harness exists to prevent.
+  it('exits 2 (STALE) and says why, instead of reporting the previous run', () => {
+    const dir = repoReadyForDiff();
+    const mp = join(dir, 'scripts/conformance/measured/s.json');
+    const m = JSON.parse(readFileSync(mp, 'utf8'));
+    m.measurementFailed = { why: 'step {"action":"waitFor"} could not resolve', at: '2026-09-08T00:00:00.000Z' };
+    writeFileSync(mp, JSON.stringify(m, null, 2));
+    const r = run(dir, 'diff.mjs', ['s']);
+    expect(r.code).toBe(2);
+    expect(r.out).toMatch(/the last measurement FAILED/);
+    expect(r.out).toMatch(/Refusing to report a verdict/);
+  });
+
+  it('reports normally when the file carries no failure stamp', () => {
+    const r = run(repoReadyForDiff(), 'diff.mjs', ['s']);
+    expect(r.code).toBe(0);
+    expect(r.out).not.toMatch(/Refusing to report a verdict/);
+  });
+});
+
+// ── every harness script must parse ────────────────────────────────────────
+
+describe('the harness itself is syntactically valid', () => {
+  // A block comment containing `bg-*/NN` closed itself early at measure.mjs:244
+  // and left the file unparseable. Nothing caught it: the gates that import it
+  // simply failed, agents retried against a broken tool, and the harness was
+  // unusable for every parallel worker until one of them read the file. A tool
+  // that cannot parse verifies nothing, and that is the one failure this suite
+  // should never have to be told about twice.
+  it('every .mjs in scripts/conformance parses', () => {
+    const dir = resolve(HERE, '..', 'conformance');
+    const files = readdirSync(dir).filter((f) => f.endsWith('.mjs'));
+    expect(files.length).toBeGreaterThan(5);
+    const broken = [];
+    for (const f of files) {
+      try {
+        execFileSync('node', ['--check', join(dir, f)], { stdio: ['ignore', 'pipe', 'pipe'] });
+      } catch (err) {
+        broken.push(`${f}: ${String(err.stderr ?? '').split('\n').find((l) => l.includes('Error')) ?? 'parse failed'}`);
+      }
+    }
+    expect(broken).toEqual([]);
   });
 });
