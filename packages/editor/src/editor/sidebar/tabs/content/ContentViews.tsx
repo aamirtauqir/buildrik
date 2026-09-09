@@ -125,7 +125,7 @@ const INLINE_HINT = "tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:leading-4 t
    16… which is right here, but only by accident: state it. */
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:leading-4 tw:text-[var(--bk-accent-text)]";
 /* 151:12 / 151:17 / 151:38 draw this 11/16 in `--color/ink-disabled`, and the
-   code followed them — so board and code AGREED on #D1D5DB, which is 1.47:1 on
+   code followed them — so board and code AGREED on `var(--bk-gray-300)`, which is 1.47:1 on
    white. Nothing failed, because agreement is what the diff checks; that is the
    one case where agreement is not evidence.
    A tag stating a field is MANDATORY is not decoration, and `ink-disabled` is
@@ -138,7 +138,7 @@ const REQUIRED_TAG = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
    Badge (12:16): a bordered pill, 10/2 padding, 12/16 medium. The two states
    differ only in ramp — grey for "nothing connected", green for "watching".
    Live drew the first as a plain 11px sentence and the second as a borderless
-   green wash in --bk-success (#0E9F6E), which is the DOT's colour, not the
+   green wash in --bk-success (`var(--bk-green-500)`), which is the DOT's colour, not the
    label's: on green-100 the board uses green-700. */
 const STATUS_PILL =
   "tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-solid " +

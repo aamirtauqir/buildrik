@@ -36,7 +36,7 @@
      board's block height depends on this one. */
   height: 52px;
   /* --bk-border is the panel rule; an INPUT edge is its own token
-     (--color/border-input on 170:8), and at #E5E7EB the field was invisible
+     (--color/border-input on 170:8), and at `var(--bk-gray-200)` the field was invisible
      against the white panel it sits on. */
   border: 1px solid var(--bk-border-input);
   border-radius: var(--bk-radius-lg);

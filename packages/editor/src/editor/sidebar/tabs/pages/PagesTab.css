@@ -829,7 +829,7 @@
 }
 
 /* Board 155:4 paints this `--color/ink-disabled` and the code used
-   `--bk-gray-300` — the SAME value, #D1D5DB, so the join passed while the line
+   `--bk-gray-300` — the SAME value, `var(--bk-gray-300)`, so the join passed while the line
    measured 1.47:1 on white. Board and code had agreed on something a person
    cannot read since it was built.
    The folder a page lives in is real information, not a disabled control.

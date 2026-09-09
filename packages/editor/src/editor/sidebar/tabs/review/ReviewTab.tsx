@@ -797,7 +797,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {detached.length > 0 && (
           <div data-detached-group>
             {/* Board 157:2 fills this band, it does not merely tint its words:
-                measured off the frame at #FCFCEA on #723B13, against #F3F4F6
+                measured off the frame at #FCFCEA on `var(--bk-yellow-800)`, against `var(--bk-gray-100)`
                 for the OPEN/RESOLVED bands beside it. A detached comment is
                 the one row in this list that lost its anchor, and a grey band
                 with amber text reads as the same band as its neighbours. */}

@@ -307,8 +307,8 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const lintRow = (() => {
     if (lintIssues.length === 0) {
       return (
-        /* 11px in `--bk-success-text` (#057a55) — 1700:6958. `--bk-success` is
-           #0E9F6E, which measures 3.0:1 on white; the board names the darker
+        /* 11px in `--bk-success-text` (`var(--bk-green-600)`) — 1700:6958. `--bk-success` is
+           `var(--bk-green-500)`, which measures 3.0:1 on white; the board names the darker
            text tone and it is the one that passes AA. */
         <div className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[11px] tw:text-[var(--bk-success-text)]" data-testid="brand-token-lint-value" data-lint-status="pass">
           <span aria-hidden="true">✓</span>

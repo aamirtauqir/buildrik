@@ -90,7 +90,7 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
       {/* 1747:8400. The mode's own explanation was a `title` attribute — a
           tooltip on a control whose whole job is to say what the panel will
           show you, invisible unless you hovered the thing you were trying to
-          understand. `--bk-ink-muted` on white is 4.83:1; the board's #6b7280
+          understand. `--bk-ink-muted` on white is 4.83:1; the board's `var(--bk-gray-500)`
           IS that token. */}
       <span
         data-testid="ds-mode-hint"

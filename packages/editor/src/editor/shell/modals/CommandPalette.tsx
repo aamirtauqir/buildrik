@@ -587,7 +587,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                            is flowbite's PRIMARY button: the `tw:bg-*` above
                            overrides its resting fill through twMerge, but
                            nothing overrode `enabled:hover:bg-primary-800`, so
-                           hovering any command row painted it #1E429F under a
+                           hovering any command row painted it `var(--bk-blue-800)` under a
                            13px --bk-ink label — 1.97:1, well under AA, on the
                            row the pointer is actually on. Boards 166:2/166:18/
                            166:27/303:1978 draw no hover state at all, so the

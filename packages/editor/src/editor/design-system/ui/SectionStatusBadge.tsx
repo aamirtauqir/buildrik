@@ -101,8 +101,8 @@ const COLOR: Record<SectionStatus, string> = {
      call to action on a state that is only a fact. */
   draft: "tw:border-[var(--bk-gray-400)] tw:bg-[var(--bk-gray-200)] tw:text-[var(--bk-gray-700)]",
   /* 333:2362 names `--flowbite/green/700` for the label, which is
-     `--bk-green-700` #046c4e — a shade darker than `--bk-success-text`
-     (green-600, #057a55). Same call as `starter-applied` on 333:2358: the
+     `--bk-green-700` `var(--bk-green-700)` — a shade darker than `--bk-success-text`
+     (green-600, `var(--bk-green-600)`). Same call as `starter-applied` on 333:2358: the
      board names the palette entry, not the semantic. Only `exported` moves;
      `imported` is measured on 306:2265 by another recipe. */
   exported: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-green-700)]",

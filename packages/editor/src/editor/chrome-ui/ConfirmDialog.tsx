@@ -25,7 +25,7 @@ export interface ConfirmDialogProps {
    * What kind of consequence the confirm carries.
    *
    * `destructive` is red — the thing is gone. `warning` is
-   * `--bk-warning` (#C27803) — consequential and reversible, which is a real
+   * `--bk-warning` (`var(--bk-yellow-500)`) — consequential and reversible, which is a real
    * and separate category here: board 184:24's rollback confirm spends its
    * whole body saying "nothing is deleted or rewritten" and then draws an
    * amber button, because re-publishing an older version over a live site is
@@ -69,8 +69,8 @@ const SUCCESS_CLOSE_MS = 1400;
    restating the padding and drifting from it. */
 const SUCCESS_BODY = "tw:px-2 tw:pt-4 tw:pb-6 tw:text-center";
 /* `--bk-success-text`, not `--bk-success`: board 183:67 fixes the mark at
-   16/600 white, and white on #0E9F6E is 3.39 — under the 4.5 a 16px face needs
-   (WCAG large-text relief starts at 18.66px bold). #057A55 carries the same
+   16/600 white, and white on `var(--bk-green-500)` is 3.39 — under the 4.5 a 16px face needs
+   (WCAG large-text relief starts at 18.66px bold). `var(--bk-green-600)` carries the same
    green at 5.36. The board's own disc is an exported SVG asset, so its fill is
    not a value this can conform to either way. */
 const SUCCESS_DISC =

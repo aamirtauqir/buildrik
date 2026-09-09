@@ -97,7 +97,7 @@ export function displayKey(key: string): string {
 
 /* Board 815:4527/4528 draws the chord as a 24-high chip on a 4 radius:
    bg-subtle inside a --color/border-medium hairline, the glyphs 12px in
-   ink-soft at a 7 inset. It shipped 11px ink inside --bk-border (#E5E7EB,
+   ink-soft at a 7 inset. It shipped 11px ink inside --bk-border (`var(--bk-gray-200)`,
    one step lighter) on 2/6 padding with no height, so a row of chips had no
    common baseline box.
 

@@ -215,7 +215,7 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
   >
     <p className="tw:m-0 tw:flex tw:items-center tw:gap-2">
       {/* success-TEXT, not success: board 1169:4736 colours this line
-          --color/success-text #057A55, and the raw #0E9F6E measured 3.39:1 on
+          --color/success-text `var(--bk-green-600)`, and the raw `var(--bk-green-500)` measured 3.39:1 on
           the modal's white ground — under the 4.5 floor the conformance run
           enforces. The board's own token is the accessible one. */}
       <span className="tw:text-[var(--bk-success-text)]" aria-hidden="true">✓</span>

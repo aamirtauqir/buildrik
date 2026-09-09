@@ -28,8 +28,8 @@ export type ToastTone = "info" | "success" | "warning" | "error" | "neutral" | "
  * catalog. It was a 3px left border on a white card, which reads as the same
  * toast five times with a coloured tick mark; the board tints the whole
  * surface, and every value it draws is already a token pair: measured off the
- * frame, #DEF7EC/#057A55, #EBF5FF/#1A56DB, #FDE8E8/#C81E1E, #FDFDEA/#723B13
- * and #F3F4F6 for the neutral one, in that order.
+ * frame, `var(--bk-green-100)`/`var(--bk-green-600)`, `var(--bk-blue-50)`/`var(--bk-blue-700)`, `var(--bk-red-100)`/`var(--bk-red-700)`, `var(--bk-yellow-50)`/`var(--bk-yellow-800)`
+ * and `var(--bk-gray-100)` for the neutral one, in that order.
  *
  * Same-property values can't be additive (Row/PanelFrame precedent), so each
  * tone carries its own complete pair rather than layering on a base.
@@ -78,9 +78,9 @@ const TONE_BODY_CLASS: Record<ToastTone, string> = {
 };
 
 /* The reverse-action link. 814:7034 draws it #80B2FF, which is NOT a token —
-   the nearest step in the generated scale is --bk-blue-300 #A4CAFE, and
+   the nearest step in the generated scale is --bk-blue-300 `var(--bk-blue-300)`, and
    Gate 16's hex ratchet over chrome may only go down, so the literal cannot
-   be introduced. Measured on ink: #A4CAFE is 10.4:1, #80B2FF would be 8.0:1;
+   be introduced. Measured on ink: `var(--bk-blue-300)` is 10.4:1, #80B2FF would be 8.0:1;
    both clear AA, and the token is the one this repo can hold. */
 const DARK_BTN_CLASS =
   "tw:h-auto tw:min-h-0 tw:p-0 tw:text-[11px] tw:font-semibold tw:border-transparent tw:bg-transparent " +

@@ -174,8 +174,8 @@ const TAB_RESTING = "tw:font-medium tw:text-[var(--bk-ink-muted)] tw:enabled:hov
 const CHIP =
   "tw:h-6 tw:min-h-0 tw:rounded-full tw:border-0 tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4";
 /* `--bk-accent-tint`, not `--bk-accent-subtle`. Board 1124:4536 says
-   `--color/bg-selected` #EBF5FF; the class already carried #EBF5FF as its
-   FALLBACK while naming the token that resolves to #E1EFFE, so the fallback was
+   `--color/bg-selected` `var(--bk-blue-50)`; the class already carried `var(--bk-blue-50)` as its
+   FALLBACK while naming the token that resolves to `var(--bk-blue-100)`, so the fallback was
    right and the token was wrong, and the fallback never applies. */
 const CHIP_ACTIVE = "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent-text)]";
 const CHIP_RESTING = "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]";

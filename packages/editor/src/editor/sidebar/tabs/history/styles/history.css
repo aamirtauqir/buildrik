@@ -35,7 +35,7 @@
      `border-bottom: 1px solid <colour>`. Same paint, but the element's
      border-COLOR is now the board's on all four edges — and border-top-color
      is what a computed-style read reports, so the shorthand made this rule
-     unmeasurable (it read #111827, the inherited `color`). */
+     unmeasurable (it read `var(--bk-gray-900)`, the inherited `color`). */
   border: 0 solid var(--bk-border);
   border-bottom-width: 1px;
   /* The board fills it bg-panel. It had no fill of its own and showed whatever
@@ -52,7 +52,7 @@
   font-size: 13px;
   line-height: normal;
   font-weight: 400;
-  /* 1657:7155 — the inactive tab is ink-MUTED (#6b7280); it was ink-soft. */
+  /* 1657:7155 — the inactive tab is ink-MUTED (`var(--bk-gray-500)`); it was ink-soft. */
   color: var(--bk-ink-muted);
   background: none;
   border: none;
@@ -78,7 +78,7 @@
   font-size: 11px;
   line-height: normal;
   font-weight: 400;
-  /* NOT the board's colour, deliberately. 1657:7153/7156 paint this #9CA3AF
+  /* NOT the board's colour, deliberately. 1657:7153/7156 paint this `var(--bk-gray-400)`
      (gray-400), which is 2.54:1 on the panel's white — a WCAG AA failure at
      11px, measured by the conformance run the moment it was adopted. Board
      wins on visuals, but not into an accessibility regression: ink-muted is

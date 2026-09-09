@@ -50,7 +50,7 @@ export interface PublishWizardProps {
 
 /* Board 914:4510/4512/4514: a 28-high pill on a 14 radius, 10 either side,
    12px SEMIBOLD in both states — and the inactive fill is --color/bg-selected
-   (#EBF5FF), not the grey the pills shipped with. `rounded-full` measured
+   (`var(--bk-blue-50)`), not the grey the pills shipped with. `rounded-full` measured
    9999 against the board's 14, and `py-1` on a 16 line box made them 24. */
 const STEP_PILL =
   "tw:inline-flex tw:h-7 tw:items-center tw:rounded-[14px] tw:px-2.5 tw:text-[12px] tw:font-semibold";
@@ -82,7 +82,7 @@ const CheckIcon: React.FC<{ status: "pass" | "warning" | "fail" }> = ({ status }
   <span
     className={`tw:flex tw:size-5 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-[11px] tw:font-semibold tw:text-white ${
       /* Board 893:4518 paints the FAILING row's disc the same amber as the
-         warning rows — measured off the board at #C27803, not eyeballed — and
+         warning rows — measured off the board at `var(--bk-yellow-500)`, not eyeballed — and
          distinguishes severity by the glyph alone. This was `--bk-error`;
          founder call 2026-08-17 was to follow the board. Severity still
          reaches a screen reader through SR_STATUS, so colour is not the only
@@ -93,7 +93,7 @@ const CheckIcon: React.FC<{ status: "pass" | "warning" | "fail" }> = ({ status }
     {/* Board 893:4518 is the only board with a failing row, and it draws ✕ —
         `!` was going out for both non-pass severities, so the one row that
         stops the publish looked exactly like the four that do not. The disc
-        COLOUR on that board is #C27803, the same amber as the warning rows
+        COLOUR on that board is `var(--bk-yellow-500)`, the same amber as the warning rows
         (measured, not eyeballed); this keeps `--bk-error` for fail because
         recolouring a blocking state to the warning tone is a semantic change,
         not a visual one — flagged for the founder rather than done quietly. */}

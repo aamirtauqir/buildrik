@@ -36,7 +36,7 @@ interface GroupSectionProps {
 /** Board 1069:4979 group header: dense row · ▾/▸ 11 · LABEL 11/600 caps tracking .5 · count 11/400 right.
  *
  *  The count is --bk-ink-muted, not the board's ink-placeholder. That token is
- *  #9CA3AF — the SAME value as --bk-border-strong and --bk-border-input — so
+ *  `var(--bk-gray-400)` — the SAME value as --bk-border-strong and --bk-border-input — so
  *  the board asks a border colour to paint a number: 2.54:1 on white, measured
  *  on four counts, against a 4.5 floor. --bk-ink-muted measures 4.83 and is the
  *  chrome-furniture ink DESIGN.md:518 already names for exactly this.

@@ -215,8 +215,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           <div
             /* Board 1712:8412 fills this panel --flowbite/gray/50, not
                --bk-bg-subtle, and the difference is not cosmetic: its two
-               hints are --bk-ink-muted (#6B7280), which lands at 4.39:1 on
-               #F3F4F6 — under the 4.5 floor — and 4.66:1 on #F9FAFB. The
+               hints are --bk-ink-muted (`var(--bk-gray-500)`), which lands at 4.39:1 on
+               `var(--bk-gray-100)` — under the 4.5 floor — and 4.66:1 on `var(--bk-gray-50)`. The
                conformance run flagged both lines; the board's own fill is the
                fix. */
             className="tw:mt-3 tw:p-3 tw:rounded-lg tw:bg-[var(--bk-gray-50)]"

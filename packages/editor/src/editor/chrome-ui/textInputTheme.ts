@@ -12,9 +12,9 @@
  *
  * BK_TEXT_INPUT_THEME — every plain `<Input>` call site in the app needs
  * the identical correction: flowbite's default `color="gray"` background
- * (`bg-gray-50`) is one ramp step off `--bk-bg-card` (#FFFFFF), and its
- * default focus ring/border (`primary-500` / #3F83F8) is not the exact
- * `--bk-accent` (#1A56DB = `primary-700`). `TextInputColors` has no
+ * (`bg-gray-50`) is one ramp step off `--bk-bg-card` (`var(--bk-bg-panel)`), and its
+ * default focus ring/border (`primary-500` / `var(--bk-blue-500)`) is not the exact
+ * `--bk-accent` (`var(--bk-blue-700)` = `primary-700`). `TextInputColors` has no
  * `"blue"` entry the way Checkbox/Radio do (`Pick<FlowbiteColors, "gray" |
  * "info" | "failure" | "warning" | "success">`), so the fix is a
  * `colors.gray` override, not a `color` prop swap — consistent with the

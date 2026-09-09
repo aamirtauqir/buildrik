@@ -107,7 +107,7 @@ const ZOOM_ROW =
   "tw:px-3 tw:py-0 tw:text-[13px] tw:font-medium tw:leading-[normal] tw:whitespace-nowrap tw:bg-transparent " +
   "tw:text-[var(--bk-gray-700)] tw:hover:bg-[var(--bk-gray-100)]";
 /* 12px — 817:4728. The COLOUR stays `--bk-ink-muted`: the board names
-   `--color/ink-placeholder` #9ca3af, which measures 2.54:1 on the flyout's
+   `--color/ink-placeholder` `var(--bk-gray-400)`, which measures 2.54:1 on the flyout's
    white and is a contrast failure, and a chord is information, not decoration. */
 const ZOOM_KEY = "tw:text-[12px] tw:text-[var(--bk-ink-muted)]";
 

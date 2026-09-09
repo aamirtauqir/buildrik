@@ -123,7 +123,7 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
       className={[
         // T3 — MEASURED, not read off a PNG (2026-08-04). Figma `148:2`'s header
         // instance `208:411`, title node `I208:411;16:7`: Inter Medium (500),
-        // 11px, 16px line-height, 0.88px tracking, ink-soft #4B5563, and the
+        // 11px, 16px line-height, 0.88px tracking, ink-soft `var(--bk-gray-600)`, and the
         // layer's own text is "Content" — Title Case, no transform.
         //
         // So the size, weight, tracking and colour here were already right and

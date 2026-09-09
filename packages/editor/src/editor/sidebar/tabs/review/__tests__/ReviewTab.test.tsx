@@ -315,8 +315,8 @@ describe("actions", () => {
 
 describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
   /* The band is the one row in the list whose comment lost its anchor. The
-     board fills it — measured off the frame at #FCFCEA on #723B13, against
-     #F3F4F6 for the OPEN and RESOLVED bands beside it. It shipped grey with
+     board fills it — measured off the frame at #FCFCEA on `var(--bk-yellow-800)`, against
+     `var(--bk-gray-100)` for the OPEN and RESOLVED bands beside it. It shipped grey with
      amber words only, which reads as the same band as its neighbours. */
   function makeComposer(orphanIds: string[]) {
     const handlers: Record<string, ((p: unknown) => void)[]> = {};

@@ -110,7 +110,7 @@ const styles = {
   } as React.CSSProperties,
 
   /* The dots were `rgba(255,255,255,0.03)`, painted over `--bk-bg-panel`, which
-     the token file sets to `#FFFFFF`. White at 3% on white is not faint, it is
+     the token file sets to ``var(--bk-bg-panel)``. White at 3% on white is not faint, it is
      absent — the backdrop grid has drawn nothing at all since the theme flipped
      from dark to light. `--bk-border` is the faint-line token and reads as a
      light grey dot on the panel. */

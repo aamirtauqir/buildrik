@@ -65,7 +65,7 @@
   border-bottom: 1px solid var(--bk-border);
 }
 
-/* Board 165:8 — accent-TINT (#EBF5FF), not accent-subtle (#E1EFFE), plus
+/* Board 165:8 — accent-TINT (`var(--bk-blue-50)`), not accent-subtle (`var(--bk-blue-100)`), plus
    165:9: a 2px full-height accent bar at the row's left edge. Row's own
    selected-state bar is 3px and hangs off aria-selected, which this is not —
    an unread notification is not a selection — so the bar is panel-local.

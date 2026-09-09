@@ -471,8 +471,8 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
         <div className={MODAL_INSET}>
           {/* 184:42 draws the track bg-subtle with a 4 radius and 184:43 fills it
               --color/accent. flowbite's own defaults are gray-200, a full pill,
-              and `bg-primary-600` — which resolves to #1C64F2 (blue-600), one
-              step off the single accent #1A56DB this product allows. Measured,
+              and `bg-primary-600` — which resolves to `var(--bk-blue-600)` (blue-600), one
+              step off the single accent `var(--bk-blue-700)` this product allows. Measured,
               not assumed: the fill read rgb(28,100,242) before this.
               `className` lands on the TRACK and `data-testid` on the root — the
               two reach different elements (Progress.js:41) — and `theme.color`
@@ -612,7 +612,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             </div>
           </>
         }
-        /* Board 184:24's button is #C27803 — `--bk-warning`, measured off the
+        /* Board 184:24's button is `var(--bk-yellow-500)` — `--bk-warning`, measured off the
            board. Not red: the modal spends its whole body saying nothing is
            deleted or rewritten, and then a red button would contradict it.
            Re-publishing an older version over a live site is a decision, not

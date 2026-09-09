@@ -55,9 +55,9 @@ const sectionLabel = (t: TemplateItem): string => {
 const TemplateLoadError: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
   /* Frame 781:4429 verbatim: pt-36 pb-32 px-24, 6px gaps, and three lines at
      13 / 12 / 13 on 16px boxes. The middle line was 13 like its neighbours,
-     and the first used `--bk-error` (#E02424) where the board names
+     and the first used `--bk-error` (`var(--bk-red-600)`) where the board names
      `--color/error-text` — a token this system already has at exactly its
-     value, #C81E1E. */
+     value, `var(--bk-red-700)`. */
   <div
     className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pt-9 tw:pb-8"
     role="alert"

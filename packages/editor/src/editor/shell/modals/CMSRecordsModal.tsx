@@ -78,8 +78,8 @@ function MediaCell({ filled, label }: { filled: boolean; label: string }) {
   return filled ? (
     <span className="tw:text-[var(--bk-ink-muted)]">✓ {label}</span>
   ) : (
-    /* 1170:4769 names --color/warning-text (#723B13), not --color/warning
-       (#C27803, the DOT's amber). The amber measured 3.51:1 on white — under
+    /* 1170:4769 names --color/warning-text (`var(--bk-yellow-800)`), not --color/warning
+       (`var(--bk-yellow-500)`, the DOT's amber). The amber measured 3.51:1 on white — under
        AA for a cell whose whole job is to report a gap; warning-text is 9.9. */
     <span className="tw:text-[var(--bk-warning-text)]">— missing</span>
   );

@@ -235,7 +235,7 @@
   background: var(--bk-bg-card);
   /* Boards 301:2019 / 301:2226 name the drawer's edge --flowbite/gray/100 —
      the same hairline the topbar, the panel headers and (since 32:2) the
-     inspector already use. It was --bk-border #E5E7EB, one step darker than
+     inspector already use. It was --bk-border `var(--bk-gray-200)`, one step darker than
      every other panel edge beside it.
 
      `border: 0 solid <colour>` rather than `border-right: 1px solid <colour>`,

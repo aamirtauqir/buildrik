@@ -58,7 +58,7 @@
    rename was open was the input's own 1px bottom border.
 
    The board writes the stroke #1A57DB. That is one digit off --color/accent
-   (#1A56DB), i.e. an untokenised copy of the same blue, so the token is used.
+   (`var(--bk-blue-700)`), i.e. an untokenised copy of the same blue, so the token is used.
    Border-box keeps the row 28 tall with the stroke on. */
 .bdc-lr.bdc-editing {
   background: var(--bk-bg-panel);
@@ -184,9 +184,9 @@
 .bdc-lr-comp {
   font-size: var(--bk-text-11);
   line-height: 16px;
-  /* `--bk-success` (#0E9F6E) is a FILL token and reads 3.39:1 on the row's
+  /* `--bk-success` (`var(--bk-green-500)`) is a FILL token and reads 3.39:1 on the row's
      white — measured by the conformance run, under the 4.5 floor for 11px
-     text. `--bk-success-text` (#057A55) is the same hue's text token and
+     text. `--bk-success-text` (`var(--bk-green-600)`) is the same hue's text token and
      reads 5.36:1. The diamond is the only thing in the tree that says a row
      follows a component, so it has to be legible at rest — the same call
      already recorded below for the eye and lock. */

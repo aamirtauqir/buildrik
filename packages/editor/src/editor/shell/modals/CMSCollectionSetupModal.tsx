@@ -85,8 +85,8 @@ const BOARD_GROUP_LABEL = "tw:text-[length:var(--bk-text-11)] tw:font-semibold t
 const BOARD_FIELD_LABEL = "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-muted)]";
 const BOARD_ROW =
   "tw:flex tw:items-center tw:gap-2 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-1.5";
-/* The board calls this colour ink-placeholder (#9ca3af); the generated token
-   set has no such name — ink-muted is #6B7280 and ink-disabled is #D1D5DB —
+/* The board calls this colour ink-placeholder (`var(--bk-gray-400)`); the generated token
+   set has no such name — ink-muted is `var(--bk-gray-500)` and ink-disabled is `var(--bk-gray-300)` —
    so this uses the utility that IS that colour rather than inventing a token.
    Caught by gate:token-resolution, which fails an undefined ref with no
    fallback: it would have rendered no colour at all. */

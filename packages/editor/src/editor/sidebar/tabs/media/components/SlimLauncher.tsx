@@ -161,7 +161,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
 
   return (
     <PanelFrame
-      /* Board 144:2 gives the panel a --flowbite/gray/100 (#f3f4f6) edge, which
+      /* Board 144:2 gives the panel a --flowbite/gray/100 (`var(--bk-gray-100)`) edge, which
          the shipped panel did not draw at all — measured border-color came back
          #000000, the initial value. Set here rather than via PanelFrame's
          `bordered` prop: that prop paints gray-200, and a single screen board
@@ -205,7 +205,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
       ) : null}
 
       {/* Board 144:7/144:8 — bare 28h box, no magnifier, no inline clear. */}
-      {/* Board 144:7 draws ONE box: 36 high, border --color/border (#e5e7eb),
+      {/* Board 144:7 draws ONE box: 36 high, border --color/border (`var(--bk-gray-200)`),
           radius 6. The code had the 36 on this wrapper and the border+radius on
           the input inside it, so the measured wrapper reported no border and
           radius 0 while the height passed — three failures for one structural

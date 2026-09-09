@@ -55,9 +55,9 @@ const MONO =
    40 tall against board 1124:4570's 24. Identical trap, identical fix, in
    ImageEditorModal's own CHIP. */
 const CHIP = "tw:h-6 tw:min-h-0 tw:rounded-full tw:border-0 tw:px-3 tw:py-0.5 tw:text-[12px] tw:leading-4";
-/* `--bk-accent-tint` (#EBF5FF), which is what board 1124:4570's
+/* `--bk-accent-tint` (`var(--bk-blue-50)`), which is what board 1124:4570's
    `--color/bg-selected` names. The class carried that hex as the FALLBACK of a
-   token that resolves to #E1EFFE, so the fallback was right, the token was
+   token that resolves to `var(--bk-blue-100)`, so the fallback was right, the token was
    wrong, and the fallback never applies. */
 const CHIP_ACTIVE =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent-text)]";
@@ -304,9 +304,9 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
                 a bigger file is not a success and must not read as one.
 
                 The TEXT tokens, not the raw signal colours: board 1124:4584
-                names `--color/success-text` #057A55, and the `--bk-success`
-                #0E9F6E this carried measures 3.39:1 on white at 11px — a WCAG
-                failure the board's own choice fixes. `--bk-warning` #C27803
+                names `--color/success-text` `var(--bk-green-600)`, and the `--bk-success`
+                `var(--bk-green-500)` this carried measures 3.39:1 on white at 11px — a WCAG
+                failure the board's own choice fixes. `--bk-warning` `var(--bk-yellow-500)`
                 (3.51:1) is the same defect on the branch no board draws, so it
                 moves with it rather than being left as the one inaccessible
                 readout in the panel. */}

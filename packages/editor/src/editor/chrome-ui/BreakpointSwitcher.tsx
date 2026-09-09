@@ -59,8 +59,8 @@ function widthHint(id: Breakpoint): string {
 
 /* The well is gray-50, which is the ground board 807:8321 sits its chips on
    — and it is load-bearing for legibility, not decoration. Moving the resting
-   label to the board's ink-muted #6B7280 (below) measures 4.39:1 on gray-100
-   #F3F4F6, i.e. an AA failure the board never had; on gray-50 #F9FAFB the same
+   label to the board's ink-muted `var(--bk-gray-500)` (below) measures 4.39:1 on gray-100
+   `var(--bk-gray-100)`, i.e. an AA failure the board never had; on gray-50 `var(--bk-gray-50)` the same
    ink is 5.0:1. Measured, not guessed. */
 const WELL_CLASS =
   "tw:inline-flex tw:p-0.5 tw:gap-0.5 tw:bg-[var(--bk-gray-50)] tw:rounded-lg tw:border tw:border-[var(--bk-gray-200)]";

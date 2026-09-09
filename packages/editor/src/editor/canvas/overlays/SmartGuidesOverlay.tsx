@@ -41,9 +41,9 @@ export const SmartGuidesOverlay: React.FC<SmartGuidesOverlayProps> = ({ snapLine
            these from the chrome token rules: this paints ON the customer's
            canvas, not chrome.
 
-           The red is #E02424, which is what the board DRAWS — all four
+           The red is `var(--bk-red-600)`, which is what the board DRAWS — all four
            spacing rects (815:4633/4635/4643/4645) are filled --color/error,
-           and that token is #E02424. The board's own blurb (815:4610) says
+           and that token is `var(--bk-red-600)`. The board's own blurb (815:4610) says
            "#FF4444", and that sentence is what this code was built from. A
            tokenised fill in the drawing beats an untokenised number in a
            caption: the drawing is the design, the caption describes it. */

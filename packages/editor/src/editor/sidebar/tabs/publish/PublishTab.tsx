@@ -521,7 +521,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 one screen board is what this arc's own precedent forbids
                 (boards.json _note, BK_TEXT_INPUT_THEME, 2026-08-17).
                 COLOUR does not: flowbite fills the bar `bg-primary-600` =
-                #1C64F2 (blue-600), one step off the single accent #1A56DB, and
+                `var(--bk-blue-600)` (blue-600), one step off the single accent `var(--bk-blue-700)`, and
                 "one blue everywhere" is a DESIGN.md rule that holds whether or
                 not a board is being read. So the fill is corrected and the
                 geometry is left alone. `theme.color` and not `theme.bar`,

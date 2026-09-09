@@ -199,8 +199,8 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                   fixed activity indicator rather than real progress. It is
                   flowbite's Progress now instead of a hand-built track+fill. */}
               <div className="tw:my-2">
-                {/* flowbite fills Progress with `bg-primary-600` = #1C64F2 (blue-600), one
-                step off the single accent #1A56DB. DESIGN.md allows ONE blue, so
+                {/* flowbite fills Progress with `bg-primary-600` = `var(--bk-blue-600)` (blue-600), one
+                step off the single accent `var(--bk-blue-700)`. DESIGN.md allows ONE blue, so
                 this override is a project rule rather than a board reading — no
                 board is being conformed to here. `theme.color` and not
                 `theme.bar`, because the colour class is twMerged AFTER bar and

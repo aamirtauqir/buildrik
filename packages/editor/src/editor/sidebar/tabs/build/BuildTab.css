@@ -86,7 +86,7 @@
 }
 
 /* Group header hover, measured 2026-09-08. The header inherits flowbite's
-   `color="light"` hover fill — gray-100, the same #F3F4F6 the list rows use —
+   `color="light"` hover fill — gray-100, the same `var(--bk-gray-100)` the list rows use —
    and its three spans stay --bk-ink-muted, which is 4.39:1 on that fill
    against a 4.5 floor for 11px text. Every one of the four Insert boards
    draws the label at rest only, so there is no board reading to conform to;
