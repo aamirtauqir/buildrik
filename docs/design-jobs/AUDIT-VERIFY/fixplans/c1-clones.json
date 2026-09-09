@@ -1,0 +1,134 @@
+{
+ "slug": "fix-c1-clones",
+ "page": "1:3",
+ "rows": [
+
+  { "op": "text", "id": "2850:22372",
+    "text": "Delete “hero-dark.jpg”?",
+    "expect": "Delete 34 files?",
+    "why": "M01 · 2850:22371 is named 'single file' and carries the bulk board's title verbatim. Code: ConfirmDeleteModal.tsx:45-47 renders `Delete file?` when !isBulk and lists the name under it (:53-58 visibleNames → '📄 hero-dark.jpg'); the board has no name row, so the title carries it — the board owns copy (founder precedence). Sample name is the media family's own (hero-dark.jpg / menu-01.jpg / pasta.jpg / team.jpg, I218:686-702 in b*.tsv). Geometry: node is WIDTH_AND_HEIGHT, currently 106px at 14/Semi Bold = 6.625px/char over 16 chars; 23 chars ≈ 152px inside a 440-wide board with 408 of content. No width needed, no growth. Bulk source 1175:4827 untouched." },
+
+  { "op": "text", "id": "2850:22374",
+    "text": "⚠ Used by 3 elements on Home and Menu. Deleting breaks them.",
+    "expect": "⚠ 5 files are currently used on the canvas. Deleting will break those elements.",
+    "why": "M01 — '5 files are ... those elements' is the bulk plural on a single-asset dialog. Code: ConfirmDeleteModal.tsx:70-72 renders the singular arm `⚠ {n} file is currently used ...` and :77-86 names the file and the pages it is on (`{u.name} — {u.pages.join(\", \")}`), which is the impact this board must state for ONE asset. Geometry, and it also repairs an existing clip: the node is 406px wide at x=6846 inside in-use-warn 2850:22373 [6836,21175,408,25] which CLIPS — 6846+406=7252 vs the frame's right edge 6836+408=7244, so the current string is cut by 8px (more with the 10px inset: 398px available). New string is 60 chars × 5.139px/char (calibrated from this very node: 406px / 79 chars at 11/Regular) ≈ 308px — 90px inside the 398px available. Shorter, so no width row and no growth. Page names are the pages-tree sample set (140:2 rows: Home, Menu, Contact, About)." },
+
+  { "op": "text", "id": "2850:22383",
+    "text": "Delete",
+    "expect": "Delete 34 files",
+    "why": "M01 — the direct destructive action the brief asks for, and it is exactly what the code emits for one key: ConfirmDeleteModal.tsx:251 `Delete{keys.length > 1 ? ` ${keys.length} files` : \"\"}`. 6 chars × 5.133px/char (11/Medium, calibrated from this node: 77px / 15 chars) ≈ 31px, down from 77px; the node is WIDTH_AND_HEIGHT so the btn frame hugs smaller. No width, no growth." },
+
+  { "op": "delete", "id": "2850:22375", "expect": "Type DELETE to confirm:",
+    "note": "M01 typed-confirmation label",
+    "why": "M01 — typed confirmation is BULK-only. Code: ConfirmDeleteModal.tsx:25 `LARGE_BULK_THRESHOLD = 20`, :30 `isLargeBulk = isBulk && keys.length > LARGE_BULK_THRESHOLD`, :91 `{isLargeBulk && ( ... )}` — the whole gate, label and input, renders only for a bulk selection above 20. The apply-queue `delete` op HIDES (visible=false), it does not remove, so this is reversible. Height accounted for in the 2850:22371 resize row below." },
+
+  { "op": "delete", "id": "2850:22376", "expect": "confirm-input",
+    "note": "M01 typed-confirmation input",
+    "why": "M01 — same gate as 2850:22375 (ConfirmDeleteModal.tsx:91-105, the TextField inside `{isLargeBulk && ...}`). Hidden, not removed." },
+
+  { "op": "delete", "id": "2850:22384", "expect": "Delete stays disabled until the word matches exactly.",
+    "note": "M01 disabled-reason hint",
+    "why": "M01 — the hint explains the typing gate and the code renders it only with the gate: ConfirmDeleteModal.tsx:261 `{isLargeBulk && !canConfirm && (<p>Delete stays disabled until the word matches exactly.</p>)}`. With the gate gone the sentence describes a control that is not on the board." },
+
+  { "op": "resize", "id": "2850:22371", "h": 117,
+    "why": "M01 auto-layout compensation — this SHRINKS, it cannot clip. 2850:22371 is layout=VERTICAL, clips=true, box [6820,21134,440,202]. Measured from the fresh dump: padding 14 top / 14 bottom, itemSpacing 10, and 14+17(title)+10+25(in-use-warn)+10+13(2850:22375)+10+29(2850:22376)+10+27(foot)+10+13(2850:22384)+14 = 202, which matches the board exactly. Hiding 2850:22375, :22376 and :22384 removes 13+29+13 of content and their three 10px gaps = 85px. 202 − 85 = 117, and the residue checks: 14+17+10+25+10+27+14 = 117 — the same 117 the sibling confirm modal 1171:4820/2898:22178 uses. If the frame hugs (every board height in this family equals its content sum exactly, so it probably does) this row is a no-op; if it is fixed, without it the board keeps 85px of dead space under the footer." },
+
+  { "op": "advisory", "hold": true, "id": "2850:22385",
+    "detail": "M01 HOLD — both back-hotspots end up outside the shortened board, and one of them points at the wrong screen. 2850:22385 hotspot/back [6820,21299,320,34] and 2850:22386 hotspot/back · Media · bulk-select [6820,21295,280,34] are absolutely positioned (x = board x, not board x + 14 inset) at parent-relative y 165 and 161. After the resize the board is 117 tall, so a 34px hotspot has to sit at rel y ≤ 83, and the only band there is the foot itself (rel 76-103 after reflow) — placing them there would swallow clicks on Cancel and Delete. In the source board they sat BELOW the foot, over the type-DELETE hint, and that band no longer exists. Two further facts for whoever owns this: (a) apply-queue's `move` writes node.x/node.y, which are PARENT-RELATIVE, while every box in the b*.tsv dumps is absoluteBoundingBox (audit-verify-dump.mjs:42) — a move authored from dump coordinates lands 6820,21134 away from where it was meant to go; (b) 2850:22386 is a clone artifact in its own right: its name and its NAVIGATE edge both still go to 145:300, the BULK-select screen, from a single-file dialog. QUESTION: do these two hotspots move outside the board (the C4 treatment) or re-anchor over the title, and where should the single-file back edge actually land?",
+    "why": "M01 — held, not authored: this is hotspot geometry plus a rewire, not copy, and the coordinate space is a trap I will not guess through." },
+
+  { "op": "advisory", "hold": true, "id": "2850:22378",
+    "detail": "M01 HOLD — the primary button's FRAME is still named `btn/Delete 34 files` on a single-file board (visible as the `par=` column of text 2850:22383 in b*.tsv). That is the same defect as C3's `btn/Apply 4 changes`. It cannot be authored here: the frame's node id is not in the fresh dump — only `foot` 2850:22378 was dumped, its children were not, and the board's two reactions name only the back hotspots. Once the id is read: rename to `btn/Delete`, expect `btn/Delete 34 files`.",
+    "why": "M01 — held for a missing node id. Authoring a rename against a guessed id is exactly what the `expect` guard exists to prevent." },
+
+  { "op": "delete", "id": "2881:12613", "expect": "result-clean",
+    "note": "M02 success column",
+    "why": "M02 — 2881:12608 is named 'all-failed (rollback)' and still carries the reference board's SUCCESS column: 2881:12614 'Replaced 3 uses ✓' and 2881:12615 'Done'. An all-failed rollback shows no successes. Hidden rather than rewritten because the surviving column (result-partial, 2881:12616) is the only one with the disclosure row the all-failed arm needs — result-clean has just a body and a text link. Reference board 1174:4849 untouched. Layout compensation is the width row on 2881:12608 below." },
+
+  { "op": "text", "id": "2881:12617",
+    "text": "Nothing replaced — all 3 updates failed.\nNo changes committed.",
+    "expect": "2 replaced, 1 failed.",
+    "why": "M02 — this is the PARTIAL arm's sentence on the ALL-FAILED board. Code, verbatim: ReplaceAcrossDialog.tsx:294-297 `Nothing replaced — all {failed.length} update{s} failed. No changes committed.` in the `replaced.length === 0` branch, role=alert (:295); the partial arm is the later branch at :316-318. 'No changes committed' is the rollback the board is named for (MediaCommandLayer.ts reason 'all-failed'). Geometry: the line break is EXPLICIT so the line count is not a guess. Node is 12/Semi Bold, WIDTH_AND_HEIGHT, currently 112px for 21 chars = 5.333px/char; line 1 is 40 chars ≈ 213px and line 2 is 21 chars ≈ 112px, both inside the 272px content width of result-partial 2881:12616 (300 wide, text inset 14 at x=762, symmetric). So 2 lines, hugging to ≈213px — no width row needed and no horizontal overflow. Height goes 15 → 29-30 (AUTO leading, Inter 12 ≈ 14.5px/line); the two resize rows below carry that." },
+
+  { "op": "text", "id": "2881:12618",
+    "text": "▸ Show errors (3)",
+    "expect": "▸ Failed elements (1)",
+    "why": "M02 — the two arms use different disclosure words and different default states, and the board has the partial one. Code: ReplaceAcrossDialog.tsx:298-299 all-failed is `<details>` (CLOSED) with `<summary>Show errors ({failed.length})</summary>`; :319-320 partial is `<details open>` with `<summary>Failed elements ({failed.length})</summary>`. The ▸ glyph already on the board is the closed marker, so it stays correct. Count moves 1 → 3 to agree with 'all 3 updates failed'. 17 chars × 4.571px/char (10/Regular, calibrated from this node: 96px / 21 chars) ≈ 78px, down from 96px. Shorter; no width, no growth." },
+
+  { "op": "delete", "id": "2881:12621", "expect": "Retry failed",
+    "note": "M02 Retry action",
+    "why": "M02 — the all-failed footer is Close ONLY. Code: ReplaceAcrossDialog.tsx:305-309 `<footer className=\"med-rx-footer\"><Button onClick={onClose}>Close</Button></footer>` with no retry; onRetryFailed is reached only from the partial arm. Drawing Retry here would offer an action the code does not ship. Safe to hide the TEXT rather than a button frame: the `btns` row is 13px tall (from the column arithmetic 12+15+8+12+8+13+12 = 80) and holds the two labels as text runs 8px apart (Close 762..792, Retry 800..861), so there is no filled pill left behind — the row just hugs narrower." },
+
+  { "op": "rename", "id": "2881:12616",
+    "name": "result-all-failed",
+    "expect": "result-partial",
+    "why": "M02 — the frame keeps the source's name while its contents become the all-failed arm; a stale layer name is how this whole cause was found (2898:22178 admits its clone in its own name)." },
+
+  { "op": "resize", "id": "2881:12616", "h": 95,
+    "why": "M02 auto-layout compensation for the +15px the body gains. 2881:12616 is [748,31790,300,80], clips=true. Fresh-dump arithmetic for the column: padding 12 top / 12 bottom, itemSpacing 8, children 2881:12617 (31802..31817, h15), 2881:12618 (31825..31837, h12), btns (31845..31858, h13) — 12+15+8+12+8+13+12 = 80, matching the frame exactly. The body goes from 1 line (15) to 2 explicit lines (≈29-30 at Inter-12 AUTO leading), so 12+30+8+12+8+13+12 = 95. Rounded UP to 95 deliberately: 1px of slack is invisible, 1px short of a clipping frame is the C2 defect this arc is repairing." },
+
+  { "op": "resize", "id": "2881:12608", "w": 624, "h": 95,
+    "why": "M02 — the board is layout=HORIZONTAL, clips=true, [100,31790,948,80], zero padding (children start at the board's own x and y) and itemSpacing 24, verified: 300 + 24 + 300 + 24 + 300 = 948 and its height 80 = max(52, 60, 80) = the tallest child. Hiding result-clean leaves committing (300) + 24 + result-all-failed (300) = 624, otherwise 324px of dead strip. Height follows the tallest surviving child, now 95 (see the row above). It grows DOWN by 15px, from 31870 to 31885; the only other child in that band is the hotspot 2881:12622 at [100,31750,320,34], which sits 40px ABOVE the board and is unaffected." },
+
+  { "op": "add-text", "parent": "2850:21560", "name": "inline-error",
+    "text": "Can't add Button — a heading doesn't take children.\nSelect a container first.",
+    "x": 16, "y": 221, "w": 348, "size": 13, "leading": 20, "style": "Regular", "color": "#E02424", "align": "LEFT",
+    "why": "M03 — 2850:21560 is named 'refused' and holds the default picker verbatim (title, search, BASIC/MEDIA/LAYOUT/FORMS), with no refusal anywhere. Code, read before writing: BlockPickerModal.tsx has FOUR silent-close branches — :42-50 target element not found, :53-62 block config not found, :77-84 no parent for sibling insertion, :91-99 `!canNestElement(blockConfig.elementType, parentType)` — each one a devLogger call plus onClose(), no user-facing anything; and useElementsState.ts:151-161 has ALREADY fired addToast('Added {label} to canvas', tone success) at :158 BEFORE calling onBlockClick at :160. So today the product shows a green success toast over an unchanged canvas and no refusal at all. The nesting branch is the one a user actually hits, so the copy names the block, the target and the next step. Because the code cannot render this today, the companion rename row marks the board [not-implemented] — the board is the target, not the shipping state. Geometry: 2850:21560 is layout=NONE (absolute), so nothing reflows. Children end at categories 2850:21566 [2916,7362,348,120] → absolute bottom 7482 = parent-relative 209; +12px gap → rel y 221; x 16 matches the 16px inset every child uses (2916 − 2900). NOTE the coordinate space: add-text writes t.x/t.y AFTER appendChild, i.e. PARENT-RELATIVE, while the dumps are absoluteBoundingBox — 16/221 are relative on purpose. Width 348 matches search and categories. Line breaks are EXPLICIT so the height is arithmetic, not a guess: 51 chars × 6.143px/char (13/Regular, calibrated from 2850:21565 '⌕  Search elements...' 129px / 21 chars) ≈ 313px and 25 chars ≈ 154px, both inside 348 → exactly 2 lines × 20px leading = 40px. Colour #E02424 is --bk-error. This row has no `expect` because there is no prior value to guard; its guard is add-text's own name dedupe (a child already named `inline-error` reports SAME and is not duplicated)." },
+
+  { "op": "resize", "id": "2850:21560", "h": 277,
+    "why": "M03 auto-layout compensation — the board is layout=NONE and clips=false, so nothing reflows and nothing is currently cut, but the frame must contain the new band or the add-text read-back reports OOB. [2900,7273,380,225]; children in parent-relative terms: title rel 16..33, Close rel 12..44, search rel 48..81, categories rel 89..209, and 225 − 209 = 16px bottom padding, matching the 16px inset on every side. New band rel 221..261, + the same 16 → 277." },
+
+  { "op": "rename", "id": "2850:21560",
+    "name": "Modal · Add Child Element · refused — [not-implemented] the product never draws this. BlockPickerModal.tsx:42-50, :53-62, :77-84 and :91-99 each hit a devLogger line and onClose(), so all four refusals (target missing, block config missing, no parent for a sibling insert, canNestElement false) close the modal silently; useElementsState.ts:151-161 has already fired the success toast at :158 before onBlockClick at :160, so what the user actually sees is 'Added {label} to canvas' over an unchanged page (UX-A-02). Source board: 1706:8501.",
+    "expect": "Modal · Add Child Element · refused",
+    "why": "M03 — the inline-error row above draws a state the code cannot produce, so the board says so in its name, which is this file's existing convention: the source board 1706:8501 carries the same marker. Without it the board reads as a shipping screen." },
+
+  { "op": "text", "id": "2898:22179",
+    "text": "Delete “Menu”?",
+    "expect": "Discard unsaved SEO changes?",
+    "why": "M04 — 2898:22178 is literally named '(of 1171:4820)' and carries 1171:4820's unsaved-SEO title. Code: PagesTab.tsx:325 `title={`Delete \"${deleteTarget?.name}\"?`}` — the dialog names the page. 'Menu' is the pages-tree sample set's own page (140:2 rows: Home, Menu, Contact, About, plus the Marketing and Legal folders), and a Menu page is the one a restaurant site's nav and footer would both link to, which is what this board's inbound-link variant needs. Curly quotes match the family (“Bella Cucina”, “Osteria” in b*.tsv). Node is WIDTH_AND_HEIGHT; 14 chars ≈ 93px at 14/Semi Bold, down from 199px. No width, no growth. Source 1171:4820 untouched." },
+
+  { "op": "text", "id": "2898:22180",
+    "text": "This page and everything on it is removed. Undo (⌘Z) brings it back.\n⚠  3 links on 2 pages point here — after publish they go to Home.",
+    "expect": "You edited the page title and description but didn't save. Leaving this tab throws those e",
+    "width": 408,
+    "why": "M04 — line 1 is the shipped sentence VERBATIM (PagesTab.tsx:330 `message=\"This page and everything on it is removed. Undo (⌘Z) brings it back.\"`, with the in-source note at :322-325 explaining why it does not claim permanence). Line 2 is the impact this board exists for, written to what the exporter ACTUALLY does: ExportEngine.ts:801-802 `resolveHref` returns `this.pageHrefs.get(href.slice(\"#page:\".length)) ?? \"index.html\"`, so a `#page:` link to a deleted page silently resolves to the site root — the home page — not to a broken link. I did NOT write 'left broken, not redirected' (a proposal about the exporter, not today's behaviour) and I did NOT add a 'See them ›' affordance, because no shipping UI lists inbound links. NOTE the `expect` is the dump's own 90-char truncation of this node (audit-verify-dump.mjs cuts at 90; the K and T rows both end at '...throws those e'); apply-queue's guard is a PREFIX test — `had.indexOf(expect)!==0` at apply-queue.mjs:128 — so a truncated prefix is a valid and safe guard, and a longer invented tail would REFUSE the row. Geometry: the node is already textAutoResize=HEIGHT at 408px (ar=HEIGHT in the dump), and the break is EXPLICIT so the line count is fixed at 2. Line 1 is 68 chars and line 2 is 65 chars; at 5.139px/char (11/Regular, calibrated from 2850:22374: 406px / 79 chars) that is ≈350px and ≈334px against 408px available — 58px and 74px of margin, so neither wraps to a third line. Height therefore stays 26px and the board needs NO resize: 14+16(title)+10+26(body)+10+27(foot)+14 = 117, which is the board's current height exactly." },
+
+  { "op": "text", "id": "2898:22184",
+    "text": "Cancel",
+    "expect": "Keep editing",
+    "why": "M04 — 'Keep editing' is the unsaved-SEO modal's verb; nothing is being edited here. 6 chars ≈ 31px at 11/Medium, down from 66px, WIDTH_AND_HEIGHT so the btn hugs smaller. Matches the Cancel on the sibling delete-confirm 2850:22371 and ConfirmDeleteModal.tsx:245." },
+
+  { "op": "text", "id": "2898:22186",
+    "text": "Delete page",
+    "expect": "Discard changes",
+    "why": "M04 — the destructive action the board is named for. Code ships `confirmLabel=\"Delete Page\"` (PagesTab.tsx:331); sentence case here to match this page's own voice ('Delete 34 files', 'Add page', 'Keep editing'). 11 chars ≈ 57px at 11/Medium, down from 88px. No width, no growth." },
+
+  { "op": "rename", "id": "2898:22183",
+    "name": "btn/Cancel",
+    "expect": "btn/Keep editing",
+    "why": "M04 — the frame name is the clone's, and a frame named for copy it no longer carries is exactly C3's `btn/Apply 4 changes`. Id and current name both come from the board's own reaction rows in the fresh dump (R 2898:22183 → 302:1978, fname `btn/Keep editing`)." },
+
+  { "op": "rename", "id": "2898:22185",
+    "name": "btn/Delete page",
+    "expect": "btn/Discard changes",
+    "why": "M04 — same, for the primary. Id and current name from R 2898:22185 → 140:2, fname `btn/Discard changes`." },
+
+  { "op": "advisory", "hold": true, "id": "2898:22178",
+    "detail": "M04 HOLD — the board's own name still ends '(of 1171:4820)', a clone-provenance marker that is stale once the content is its own; it should become 'Pages · delete-page · confirm · inbound links'. NOT authored because two rows already in docs/design-jobs/V2-TO-V1/queue.json resolve this board BY THAT EXACT NAME and would stop resolving: `pages-hotspots-11#0` (selector boardName 'Pages · delete-page · confirm · inbound links (of 1171:4820)') and the four `pages-text-08-newboards#0..3` selector rows. Second, related conflict for whoever sequences this: those four queue rows target the SAME four text nodes this plan targets, with different strings and the same `expect` values — whichever plan is applied second will be REFUSED by the expect guard, which is safe but means one of the two must be withdrawn rather than both run. QUESTION: withdraw pages-text-08-newboards#0..3 in favour of these rows, then rename?",
+    "why": "M04 — held: a rename here breaks two selector-resolved rows in the live queue, and that is a sequencing decision, not a copy one." },
+
+  { "op": "advisory", "hold": true, "id": "2898:22183",
+    "detail": "M04 HOLD — the secondary button's NAVIGATE edge is the clone's too: 2898:22183 → 302:1978, which is the page-settings screen the source modal 1171:4820 was cancelling back into. Cancelling a delete should return to 140:2 'Pages · tree' (where the primary, 2898:22185, already goes) or to the context-menu row that raised it. Not authored: rewiring is not copy, and I did not verify apply-queue's `rewire` row schema.",
+    "why": "M04 — held: prototype wiring, outside C1's copy scope, and unverified op." },
+
+  { "op": "delete", "id": "1164:4731", "expect": "foot",
+    "note": "M08 multi-select footer",
+    "why": "M08 — 1164:4713 is titled 'Choose an image' / 'for Hero · Image', a single-image destination, and its footer says '2 selected' (1173:4813) with 'Use Selected' (1164:4737). That footer is not merely wrong for one target, it NEVER RENDERS in the shipping product. Code: MediaLibraryPanel.tsx:55 `multiple = false` is the default; :151-165 handleSelect only populates selectedIds in the `if (multiple)` branch and otherwise calls `onSelect?.(asset); onClose();` — the tile IS the confirm; :351 the footer is gated `{selectedIds.size > 0 && ( ... )}`, i.e. multiple-only; and the ONLY mount in the product, StudioModals.tsx:172-179, passes isOpen/onClose/onSelect/allowedTypes/forLabel/composer and does NOT pass `multiple`. So selectedIds is empty on every real open and the '{n} selected' + 'Use Selected' row is dead chrome — the same shape as F18's FROM BRAND group, and the reason to remove rather than re-word it. `forLabel` (:176) is what produces the board's 'for Hero · Image'. Hiding the frame hides both texts; the head already carries the single-target statement, and the footnote 1173:4814 is code-pinned (MediaLibraryPanel.tsx:365-368) and untouched. No layout compensation needed: the board is layout=VERTICAL but NOT hugging — its children run 29196..29571 inside a box [100,29182,640,520] whose bottom is 29702, so it already carries 131px of fixed slack; removing 29+12 makes that 172px and clips nothing." },
+
+  { "op": "advisory", "hold": true, "id": "1164:4736",
+    "detail": "M08 HOLD — hiding the footer takes the `btn/use` NAVIGATE edge with it: 1164:4736 → 807:8521. The board keeps an outgoing edge via the ✕ (1164:4718 → 807:8521), but it loses the one that means 'this image was chosen'. In the shipping single-target flow the TILE is the confirm (MediaLibraryPanel.tsx:162-164 `onSelect?.(asset); onClose();`), so that edge belongs on pick-row-0 (1164:4721) or on the first asset card inside it. Not authored: rewiring is not copy, and the row-level node ids inside 1164:4721 were not in the fresh dump.",
+    "why": "M08 — held: prototype wiring plus a missing node id." }
+
+ ]
+}

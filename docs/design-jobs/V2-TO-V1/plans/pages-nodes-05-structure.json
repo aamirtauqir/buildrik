@@ -1,0 +1,167 @@
+[
+  {
+    "op": "move",
+    "id": "2430:21526",
+    "x": 30,
+    "why": "QA-A-27 — SiteStructureTree.tsx:79-80 mounts the '/' root at depth 0 holding the HOME page and :42 pads by depth*14, so Home sits one level LEFT of /menu, /legal and /contact and the leaves sit at 28, not 14. The board drew Menu at the wrong depth.",
+    "_id_source": "READ — the eight row labels on 2430:12214.",
+    "_geometry_source": "x READ from QA-A-27's own measurement of this board (st/row x values 16,16,30,30,16,30,30,16). y is NOT touched — edit-board-nodes.mjs's move op leaves an omitted axis alone."
+  },
+  {
+    "op": "move",
+    "id": "2430:21528",
+    "x": 44,
+    "why": "QA-A-27 — SiteStructureTree.tsx:79-80 mounts the '/' root at depth 0 holding the HOME page and :42 pads by depth*14, so Home sits one level LEFT of /menu, /legal and /contact and the leaves sit at 28, not 14. The board drew Lunch at the wrong depth.",
+    "_id_source": "READ — the eight row labels on 2430:12214.",
+    "_geometry_source": "x READ from QA-A-27's own measurement of this board (st/row x values 16,16,30,30,16,30,30,16). y is NOT touched — edit-board-nodes.mjs's move op leaves an omitted axis alone."
+  },
+  {
+    "op": "move",
+    "id": "2430:21530",
+    "x": 44,
+    "why": "QA-A-27 — SiteStructureTree.tsx:79-80 mounts the '/' root at depth 0 holding the HOME page and :42 pads by depth*14, so Home sits one level LEFT of /menu, /legal and /contact and the leaves sit at 28, not 14. The board drew Dinner at the wrong depth.",
+    "_id_source": "READ — the eight row labels on 2430:12214.",
+    "_geometry_source": "x READ from QA-A-27's own measurement of this board (st/row x values 16,16,30,30,16,30,30,16). y is NOT touched — edit-board-nodes.mjs's move op leaves an omitted axis alone."
+  },
+  {
+    "op": "move",
+    "id": "2430:21532",
+    "x": 30,
+    "why": "QA-A-27 — SiteStructureTree.tsx:79-80 mounts the '/' root at depth 0 holding the HOME page and :42 pads by depth*14, so Home sits one level LEFT of /menu, /legal and /contact and the leaves sit at 28, not 14. The board drew legal/ at the wrong depth.",
+    "_id_source": "READ — the eight row labels on 2430:12214.",
+    "_geometry_source": "x READ from QA-A-27's own measurement of this board (st/row x values 16,16,30,30,16,30,30,16). y is NOT touched — edit-board-nodes.mjs's move op leaves an omitted axis alone."
+  },
+  {
+    "op": "move",
+    "id": "2430:21534",
+    "x": 44,
+    "why": "QA-A-27 — SiteStructureTree.tsx:79-80 mounts the '/' root at depth 0 holding the HOME page and :42 pads by depth*14, so Home sits one level LEFT of /menu, /legal and /contact and the leaves sit at 28, not 14. The board drew Privacy at the wrong depth.",
+    "_id_source": "READ — the eight row labels on 2430:12214.",
+    "_geometry_source": "x READ from QA-A-27's own measurement of this board (st/row x values 16,16,30,30,16,30,30,16). y is NOT touched — edit-board-nodes.mjs's move op leaves an omitted axis alone."
+  },
+  {
+    "op": "move",
+    "id": "2430:21536",
+    "x": 44,
+    "why": "QA-A-27 — SiteStructureTree.tsx:79-80 mounts the '/' root at depth 0 holding the HOME page and :42 pads by depth*14, so Home sits one level LEFT of /menu, /legal and /contact and the leaves sit at 28, not 14. The board drew Terms at the wrong depth.",
+    "_id_source": "READ — the eight row labels on 2430:12214.",
+    "_geometry_source": "x READ from QA-A-27's own measurement of this board (st/row x values 16,16,30,30,16,30,30,16). y is NOT touched — edit-board-nodes.mjs's move op leaves an omitted axis alone."
+  },
+  {
+    "op": "move",
+    "id": "2430:21538",
+    "x": 30,
+    "why": "QA-A-27 — SiteStructureTree.tsx:79-80 mounts the '/' root at depth 0 holding the HOME page and :42 pads by depth*14, so Home sits one level LEFT of /menu, /legal and /contact and the leaves sit at 28, not 14. The board drew Contact at the wrong depth.",
+    "_id_source": "READ — the eight row labels on 2430:12214.",
+    "_geometry_source": "x READ from QA-A-27's own measurement of this board (st/row x values 16,16,30,30,16,30,30,16). y is NOT touched — edit-board-nodes.mjs's move op leaves an omitted axis alone."
+  },
+  {
+    "op": "clone-label",
+    "src": "2433:11972",
+    "parent": "2430:12214",
+    "name": "act/legal-create",
+    "text": "+ Create page",
+    "x": 156,
+    "y": 229,
+    "why": "UX-B-33 — a '(no page)' segment is exactly the gap that invites creating a page at that route, and Structure offers nothing: SiteStructureTree.tsx:42-69 renders a name button and a path and nothing else.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "2430:12214",
+    "name": "act/row-menu-home",
+    "text": "⋯",
+    "x": 250,
+    "y": 109,
+    "why": "UX-B-33 — carry the same row actions into Structure. Today the view is read-only and leads nowhere: no rename, no settings, no reorder, no context menu, and selecting a page leaves the user standing in Structure with the canvas silently changed behind the panel.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "2430:12214",
+    "name": "act/row-menu-menu",
+    "text": "⋯",
+    "x": 250,
+    "y": 139,
+    "why": "UX-B-33 — carry the same row actions into Structure. Today the view is read-only and leads nowhere: no rename, no settings, no reorder, no context menu, and selecting a page leaves the user standing in Structure with the canvas silently changed behind the panel.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "2430:12214",
+    "name": "act/row-menu-lunch",
+    "text": "⋯",
+    "x": 250,
+    "y": 169,
+    "why": "UX-B-33 — carry the same row actions into Structure. Today the view is read-only and leads nowhere: no rename, no settings, no reorder, no context menu, and selecting a page leaves the user standing in Structure with the canvas silently changed behind the panel.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "2430:12214",
+    "name": "act/row-menu-dinner",
+    "text": "⋯",
+    "x": 250,
+    "y": 199,
+    "why": "UX-B-33 — carry the same row actions into Structure. Today the view is read-only and leads nowhere: no rename, no settings, no reorder, no context menu, and selecting a page leaves the user standing in Structure with the canvas silently changed behind the panel.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "2430:12214",
+    "name": "act/row-menu-privacy",
+    "text": "⋯",
+    "x": 250,
+    "y": 259,
+    "why": "UX-B-33 — carry the same row actions into Structure. Today the view is read-only and leads nowhere: no rename, no settings, no reorder, no context menu, and selecting a page leaves the user standing in Structure with the canvas silently changed behind the panel.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "2430:12214",
+    "name": "act/row-menu-terms",
+    "text": "⋯",
+    "x": 250,
+    "y": 289,
+    "why": "UX-B-33 — carry the same row actions into Structure. Today the view is read-only and leads nowhere: no rename, no settings, no reorder, no context menu, and selecting a page leaves the user standing in Structure with the canvas silently changed behind the panel.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "2430:12214",
+    "name": "act/row-menu-contact",
+    "text": "⋯",
+    "x": 250,
+    "y": 319,
+    "why": "UX-B-33 — carry the same row actions into Structure. Today the view is read-only and leads nowhere: no rename, no settings, no reorder, no context menu, and selecting a page leaves the user standing in Structure with the canvas silently changed behind the panel.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — QA-A-27 records the eight rows spanning y 115..325, i.e. a 30px pitch (115,145,175,205,235,265,295,325). Row 5 is legal/. VERIFY the pitch before --apply."
+  },
+  {
+    "op": "clone-label",
+    "src": "2430:21540",
+    "parent": "2430:12214",
+    "name": "note/UX-B-33",
+    "text": "UX-B-33 — Structure carries the row's own actions, and a segment with no page of its own offers to create one at that route. Cloned from this board's own annotation node so the note type matches.",
+    "x": 16,
+    "y": 600,
+    "why": "UX-B-33",
+    "width": 248,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule.",
+    "_geometry_source": "INFERRED — 2430:12214 is 280x812; the band around rel y 600 is assumed free, as it is on 140:2."
+  }
+]

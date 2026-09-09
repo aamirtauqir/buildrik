@@ -1,0 +1,60 @@
+{
+ "rows": [],
+ "note": "STRUCTURAL and UNRESOLVED — every row here needs one read of 1688:7195 (and, for the third, of component set 2041:19572) before it can be applied, and none of the three has an applier yet. Recorded in full so the read is the only thing missing.",
+ "structural": [
+  {
+   "board": "1688:7195",
+   "boardName": "S7 · Settings · root",
+   "action": "add-nav-row",
+   "row": {
+    "group": "SITE",
+    "after": "SEO",
+    "title": "Canvas",
+    "subtitle": "Grid size, snap to grid",
+    "shape": "drill-in"
+   },
+   "instanceOf": "2041:19572 (Settings nav row, COMPONENT_SET) — INSTANCE it, do not draw a fourteenth row by hand",
+   "idProvenance": "unresolved-id — 1688:7195 was never read in this session, so the y of the SEO row and the pitch of the nav column are unknown. One read of that board resolves the whole file.",
+   "applier": "none yet — no script in scripts/figma/ inserts a nav row, and writing one without the board's geometry would be guessing at the pitch. Build it against the read.",
+   "why": "UX-I-30 (Critical) — the fix is 'fold Canvas (grid/snap) into the full-page Settings as a Canvas section, point ⌘, and the Site menu at it, and delete the modal'. settings-truth-marks.json retires the modal; this is the other half, and without it the retirement strands grid size and snap-to-grid with no home. Fields come from ProjectSettingsModal.tsx:41-45 (tab 'canvas')."
+  },
+  {
+   "board": "1688:7195",
+   "boardName": "S7 · Settings · root",
+   "action": "add-badge",
+   "row": {
+    "onRows": [
+     "Custom code",
+     "Integrations"
+    ],
+    "badge": "Pro"
+   },
+   "idProvenance": "unresolved-id — no lane row names the nav-row nodes on 1688:7195.",
+   "applier": "none yet — same read dependency as the Canvas row.",
+   "why": "UX-I-38 (Major, dead-end) support, and FIG-M-09 filed the same gap: types.ts:70-73 gates custom-code and integrations at 'pro' and SettingsTab.tsx:767 renders a Pro chip on those rows on the free tier. The badge is the ONLY warning before the locked screen, and the root board draws neither. A locked door with no label is indistinguishable from a broken one — the label starts here, one screen earlier."
+  },
+  {
+   "board": "1688:7195",
+   "boardName": "S7 · Settings · root",
+   "action": "add-variant-then-swap",
+   "component": "2041:19572 · Settings nav row (COMPONENT_SET, 600 instances)",
+   "row": {
+    "newVariant": "Destination=leaves-app",
+    "appliesTo": [
+     "Members",
+     "Billing"
+    ],
+    "shape": "no chevron; a trailing ↗ glyph in ink-muted; the row's own hairline top border removed so the group reads as a block that leaves rather than a continuation of the list"
+   },
+   "secondChange": {
+    "onRow": "Export",
+    "from": "drill-in",
+    "to": "opens the exporter directly",
+    "note": "SettingsTab.tsx:736-750 makes Export a whole section whose entire content is one 'Open exporter' Button emitting UI_TOGGLE_EXPORTER. UX-I-39: make the nav row open the exporter instead of costing a drill-in to reach one button. Branding (SettingsTab.tsx:161-211) is the same shape — a signpost with no settings — and should take the same treatment, which is also UX-I-37's 'either give Branding real fields or fold its signposts into the sections that own them'."
+   },
+   "idProvenance": "unresolved-id — the component set's variant structure was never read.",
+   "applier": "none yet, and it must NOT be a bulk edit. ADD a variant to 2041:19572 and swap only the Members / Billing instances. Editing the existing default restyles 600 instances across page 1:3, and the brief requires listing every instance checked — 600 cannot be checked in any budget this arc has.",
+   "why": "UX-I-39 (Minor, confusing-nav) — one nav list mixes three kinds of destination and flags only one of them: most rows drill into an in-place form, Export drills in to reach a single button, and Members / Billing are anchors that open the dashboard in a new tab while wearing the same bd-set-snav-row shape as everything above them."
+  }
+ ]
+}

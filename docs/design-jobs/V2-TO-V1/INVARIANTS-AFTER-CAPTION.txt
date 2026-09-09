@@ -1,0 +1,12 @@
+loose nodes on page: 81 -> 2591:11986 '375', 2591:11988 '768', 2591:11990 'fills canvas (min 1024)', 2591:11992 '1920', 2598:11986 '375', 2598:11988 '768', 2598:11990 'fills canvas (min 1024)', 2598:11992 '1920'
+  SECTION OVERLAP 07 · Brand · 51 x 06 · Content · 46
+  SECTION OVERLAP 12 · AI · 30 x 13 · Command palette · 13 — two palettes ship: shell ⌘K and canvas ⌘⇧P — one decision open
+section overlaps: 2
+  OOB 1719:8421 'Ecommerce · bound · inspec' <- 1719:8442 'Bound row is seeded from c'
+sections: 29  boards: 1045
+board overlaps: 0
+out-of-bounds children: 1  (boards affected: 1)
+  top offenders: 1719:8421 Ecommerce · bound · insp=1
+prototype edges: 3579  dangling: 0
+
+FAIL

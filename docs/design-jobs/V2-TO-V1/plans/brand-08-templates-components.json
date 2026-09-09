@@ -1,0 +1,85 @@
+{
+  "slug": "brand",
+  "sections": ["1084:4527 · 11 · Templates · 18", "1938:8372 · 10 · Components · 12"],
+  "why_here": "the two sections nobody else owns. The V2 source carries no Templates- or Components-specific UX row (its brand slice is the seven UX-H rows), so the lens applied here is V2 §4 Missing Screens & States — the async-state coverage gap it names — plus the board-level lanes, plus what the code says today.",
+
+  "v2_section_8_component_library": {
+    "status": "NOT-APPLICABLE to my sections",
+    "reason": "V2 §8 is a census of the FIGMA component masters and the merged Nav row decision (Nav item 1026 instances × Settings nav row 600 → one component, Size[compact|default] × State[rest|hover|active], active = accent tint + accent label + weight 600, the Active bar retires). Those masters live on page 1:2 and in section 2040:8372 '28 · Library · shared chrome'. Section 1938:8372 is the editor's saved-components PANEL — the product screen, not the library — and the boards I measured there instance `Panel header` and `Section header`, not `Nav item` or `Settings nav row`. The merged-nav decision is DRAWN AND NOT APPLIED by design (build-proposal-page.mjs's own note), and I did not apply it. Nobody should read this row as having done so.",
+    "one_thing_to_carry": "if the merge is ever applied, section 2040:8372's owner must re-check every instance. My four sections contribute none."
+  },
+
+  "v2_section_4_async_coverage": {
+    "claim": "loading states are unexamined in 10 of 13 modules and error states in 8 of 13",
+    "templates": {
+      "boards_measured": {
+        "641:2487": "Templates · gallery — 280x812, 22 TEXT, 16 bound",
+        "782:4402": "Templates · no-results — 280x812, 5 TEXT, 1 bound",
+        "781:4372": "Templates · load-error — 280x812, 6 TEXT, 1 bound",
+        "778:4102": "Templates · loading — RETIRED 2026-09-02 (no producer) — 280x812, 7 TEXT, 1 bound",
+        "1138:13413": "Templates · empty — NOT in this section; stranded in 1776:8379 Insert (ARR-A-18). Id from the lane, not read by me."
+      },
+      "code_re_derived_today": {
+        "loading": { "verdict": "RETIRED IS CORRECT", "evidence": "TemplatesTab.tsx has no fetch and no isLoading. Its two useEffects (:77, :135) sync appliedId from page meta and emit the panel-width override; the catalogue is synchronous. Nothing can produce a loading state. The board's own marker already says so." },
+        "empty_and_no_results": { "verdict": "BOTH SHIP, AND THEY ARE TWO DIFFERENT STRINGS", "evidence": "TemplatesTab.tsx:502-503 renders `No templates found for \"${sel.searchQ}\"` when a search is active and `No templates in this category` otherwise. So `no-results` (search) and `empty` (category) are distinct states with distinct copy — which is exactly why 1138:13413 and 782:4402 are two boards and not one. Check 782:4402 draws the SEARCH string and 1138:13413 the CATEGORY one; if either draws the other's, they are one board drawn twice." },
+        "load_error": {
+          "verdict": "THE BOARD IS MIS-TITLED — NEW FINDING, derived from source 2026-09-07, owned by nobody",
+          "evidence": "There is no load, so there can be no load error. What ships is an APPLY error: TemplatesTab.tsx:575-586 renders `tpl-error-banner` with a Retry button (gated on canRetry, set at :281) and a Dismiss. The error is raised applying a template to a page (:229-291), not fetching the list.",
+          "fix": "rename 781:4372 to `Templates · apply-error (banner · Retry / Dismiss)` and redraw it as a banner INSIDE the gallery rather than a full-panel error state — the gallery stays on screen, which is what the code does. If the redraw is deferred, mark the board `[not-implemented] as drawn — the panel has no load; the shipped error is an apply-error banner over the gallery (TemplatesTab.tsx:575-586)` with apply-truth-marks.mjs, which never deletes a design.",
+          "also_fix": "caption 788:4312 `caption/Templates · load-error` must say the same thing. Its current string was not read by me — read before writing."
+        }
+      }
+    },
+    "components": {
+      "boards_measured": {
+        "641:2546": "Components · library — 280x812, 24 TEXT, 18 bound",
+        "641:2599": "Components · detail — 280x812, 24 TEXT, 15 bound",
+        "1138:13394": "Components · empty — 280x812, 6 TEXT, 0 bound",
+        "778:4173": "Components · loading — 280x812, 6 TEXT, 0 bound",
+        "781:4433": "Components · load-error — 280x812, 5 TEXT, 0 bound"
+      },
+      "verdict": "the async family is COMPLETE — empty, loading and error all drawn. Components is one of the 3 of 13 modules V2 §4's coverage gap does not indict.",
+      "but": [
+        {
+          "ref": "C1",
+          "finding": "FIG-F-57, re-derived from source today and still unfixed",
+          "boards": ["781:4433", "788:4315"],
+          "what": "781:4433 draws a live '+ Create component' footer button, and caption 788:4315 says 'Create component stays live because it does not depend on the list.' Neither is true.",
+          "evidence": "ComponentsTab.tsx:93-113 — the error branch returns a PanelFrame containing only the header and `<PanelErrorState title=\"Couldn't load your components.\" message=\"Your components are safe — only this list failed.\" onRetry={...} />` and then RETURNS. No footer is reached. The one primary '+ Create component' lives at :278-287 in the normal branch, under the comment 'Board 641:2596 panel footer — the screen's ONE primary button.'",
+          "fix": "delete the footer button from 781:4433 and rewrite caption 788:4315 to 'The error branch returns before the footer, so no Create button renders when the list fails — Retry is the only way out.'",
+          "second_order": "the branch that produces this state is the guard `!composer?.components?.isAvailable()` (:65), not a fetch failure. The copy says 'Couldn't load', so the board is right about what the user SEES and the board NAME is slightly wrong about why. Worth a note on the board; not worth a rename on its own."
+        },
+        {
+          "ref": "C2",
+          "finding": "CONF-1-11, confirmed by my own measurement",
+          "boards": ["2476:12064 (0/11 bound)", "2476:12081 (0/6 bound)"],
+          "what": "the two boards this section inherited from the 22-board arc bind zero TEXT nodes to a text style, against 52.8% for the section around them",
+          "fix": "in brand-03-conformance.json bind_text_styles.priority_3"
+        },
+        {
+          "ref": "C3",
+          "finding": "CONF-1-10, measured by me",
+          "board": "641:2599",
+          "nodes": ["2483:11988", "2483:11991"],
+          "what": "two 10px labels painted #6B7380 — one digit off ink-muted #6B7280 — and unbound",
+          "fix": "in brand-03-conformance.json repaint + promote. These two nodes carry both defects, so one pass closes both findings on them."
+        }
+      ]
+    }
+  },
+
+  "identified_not_covered": {
+    "note": "found while working, out of my lane, recorded so it is not lost. NONE of these was applied and NONE was read back.",
+    "fig_f_rows_still_open_in_1938:8372": [
+      "FIG-F-45 — 641:2546 draws a 'FROM BRAND' section with rows badged 'linked'. No brand-linked component exists in the model; ComponentDefinition has no field that could carry one and the panel renders ONE section (ComponentsTab.tsx:233 says so in its own comment).",
+      "FIG-F-47 — 641:2599 draws a PROPERTIES section ('Image — instance swap', 'Title — text', 'Price — text · CMS bound'). The product has no component-property concept; ComponentDefinition carries variantProperties and nothing else.",
+      "FIG-F-48 — 641:2599's 'USED ON' breaks instances down per page. The editor can only produce one flat number for the whole site.",
+      "FIG-F-49 — 641:2599's action row is drawn as 'Edit main component' + 'Detach all'. The shipped row is Insert Component, then Duplicate · Update · Delete.",
+      "FIG-F-50 — 1170:4792's left half is a 'Switch variant' picker. A component's variants array is always empty and the entry point is not rendered.",
+      "FIG-F-52 / FIG-F-53 — 1170:4777's variant hint and 'Pre-fill from DS styles' promise. Nothing binds; the count is computed and dropped.",
+      "FIG-F-55 — 642:3112 is named 'Components · create' and draws no component-creation affordance of any kind.",
+      "FIG-F-59 — renaming a saved component ships in code and is UNREACHABLE (ComponentRow is rendered nowhere), and no board draws it."
+    ],
+    "why_not_covered": "FIG-F is a previous arc's lane and is not one of the board-level lanes in _board-level.json that this arc assigned me. Every row above has its evidence already written; each is a small apply-text-fixes or apply-truth-marks plan. They are the obvious next slice for this section."
+  }
+}

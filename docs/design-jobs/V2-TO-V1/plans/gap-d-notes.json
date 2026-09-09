@@ -1,0 +1,16 @@
+[
+  {
+    "id": "2876:12480",
+    "key": "UX-E-05 FIX",
+    "add": "UX-E-05 FIX (Critical) — replace the generated page's head identity, do not append to it: one <title>, one meta description, one og:title / og:description / twitter:* derived from the entry, with the template's own head removed first (cms.service.ts:206-215 clones the template head whole and appends a second title and description before </head>). The collection's page-generation settings show one real entry's rendered head before publish. The canonical / og:url half is REFUTED and must not be drawn — publish-html.ts:88-97 already injects a correct per-path pair. Owed elsewhere, not drawn here: UX-E-19 — the SEO tab's Google-preview card must render from the resolver the export uses and print the URL the deploy serves, not domain > slug (SeoTab.tsx:78,81); owner 04 . Pages 1776:8377. UX-E-20 — one SEO destination per page with site defaults inline as the greyed fallback, or a link and a sentence naming which wins (precedence: SEOInjector.ts:110-128); owners 1776:8377 and 21 . Settings 1776:8387.",
+    "maxHeight": 230,
+    "why": "UX-E-05 (Critical) fix half, plus the recorded ownership of UX-E-19 and UX-E-20"
+  },
+  {
+    "id": "204:4",
+    "key": "UX-E-18",
+    "add": "Whatever the sanitizer drops must be reported once at the top of the overlay rather than silently changing the design: a style ATTRIBUTE containing url( is removed wholesale and a whole <style> block is dropped on the same match (ExportUtils.ts:12, 56-61, 71-76), so any element with a background image renders unstyled and a hero loses its size, colour, spacing and typography too. Filter declarations, not whole attributes and sheets (UX-E-18).",
+    "maxHeight": 90,
+    "why": "UX-E-18 second half — the drop-report banner belongs on the preview overlay board, which is 65:211 in this section"
+  }
+]

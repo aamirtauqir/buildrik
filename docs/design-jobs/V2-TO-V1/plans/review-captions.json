@@ -1,0 +1,136 @@
+[
+  {
+    "id": "161:11",
+    "why": "UX-I-17 — the caption contradicts its own board. 158:213's name already carries the corrected mechanism ('Review has NO rail row at all — tabsConfig.figma.test.ts:46-49 pins its absence'); this caption still says 'the rail row is unconditional'. UX-QA-REPORT §1.1 REFUTED the rail clauses of UX-I-17, and a caption asserting a refuted claim is the exact failure this arc exists to prevent.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "board": "158:213",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "The panel and the rail entry both stay",
+    "width": 280,
+    "text": "The panel stays — ReviewTab renders a round in ANY status. There is no rail entry to stay: Review has no rail row at all, and tabsConfig.figma.test.ts:46-49 pins its absence. Only the ReviewBar strip under the topbar hides (ReviewBar.tsx:50,116). Redraw this frame as the approved-round panel."
+  },
+  {
+    "id": "161:12",
+    "why": "UX-I-17 — the cold-start door. UX-QA-REPORT §1.1 REFUTED three of this finding's four clauses (the zone mechanism, the 'only module' superlative and the one-door count); what survives is that Review has no rail button and no persistent header affordance until a round exists. This caption records the surviving claim only, and aligns with the shell module's plans/shell-rail-more-seat.json rather than proposing a second, competing rail answer.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "board": "157:221",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "PENDING, no comments yet.",
+    "width": 280,
+    "text": "PENDING, no comments yet. Nothing notifies the designer — no Notification row, no email — so the panel has to say the reply appears the next time they open it. COLD START (UX-I-17): before a round exists there is no topbar pill (REVIEW_PILL.none = null, StudioHeader.tsx:136-142) and no ReviewBar (ReviewBar.tsx:116), so the first send is reachable only from the site-menu row (SiteMenu.tsx:203), bare R and ⌘K. Two answers, and they are complements, not rivals. SYSTEMIC: the shell adds one rail seat, 'More ⋯', opening a Rail · More index that lists all seven off-rail panels including Review (UX-F-01, SPEC-NAVIGATION §2.2) — Review must appear in that index. REVIEW-SPECIFIC: draw 'Send for review' on the topbar beside Publish, where the intent actually forms; an index makes Review findable, it does not put the first send where the user is looking. A Review-only rail seat is NOT taken — tabsConfig.figma.test.ts:46-49 pins Review's absence from RAIL_FIGMA and the rail is the shell's board. The topbar CTA is OPEN for the founder.",
+    "cross_module_dependency": "plans/shell-rail-more-seat.json + plans/shell-new-boards.json own the 'More ⋯' seat and the 'Rail · More index (popover · 240)' board. Review MUST be one of the rows on that index board — verify it is there when the shell plan is applied. The topbar 'Send for review' CTA is a shell-section draw (the topbar is not drawn on any board in 1776:8383) and is handed off, not taken here."
+  },
+  {
+    "id": "161:8",
+    "why": "UX-I-18 — the caption already states the two-path defect correctly; what is missing is the decision. Append the single-owner rule.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "board": "158:57",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "In flight. The button holds its place",
+    "width": 280,
+    "text": "In flight. The button holds its place rather than swapping to a spinner elsewhere. Two Re-send paths exist: the panel passes the round’s invitedEmail (ReviewTab.tsx:295); the ReviewBar strip calls the same handler with no argument (ReviewBar.tsx:108), which on a CHANGES_REQUESTED round opens a new round, revokes the client’s live token and mints no replacement. This board draws the panel path. DECISION (UX-I-18): there is ONE re-send path and the panel owns it — the bar links to this confirm and the panel passes the round's invitedEmail. A bar re-send that ships token: null reports success and hands the client a dead link."
+  },
+  {
+    "id": "161:7",
+    "why": "UX-I-19 — the safer copy exists on this confirm and the more prominent control (the bar) does not use it. Record that this confirm is the only re-send path in the design.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "board": "158:2",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "Below 100% it confirms.",
+    "width": 280,
+    "text": "Below 100% it confirms. The confirm must say the old link dies — re-sending issues a new token and revokes the old one (contract §1.4), and a client on the dead link gets no explanation otherwise. SINGLE OWNER (UX-I-19): this confirm is the only re-send path in the design. The ReviewBar's Re-send sits under the topbar the whole time a round is live and fires straight through with no confirm at all (ReviewBar.tsx:148-159). It routes here, or it goes. Two live affordances for one irreversible action is the condition this confirm exists to prevent."
+  },
+  {
+    "id": "161:2",
+    "why": "UX-I-22 (role) and UX-I-26 (reply target) both land on the panel's work surface. Record both on the root state's caption.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "board": "156:2",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "The wedge",
+    "width": 280,
+    "_note": "apostrophe in 'wedge's' read as straight U+0027; the expect guard is punctuation-free so a curly form would still pass. Re-read before apply if that matters.",
+    "text": "The wedge's work surface. It answers one question: what do I still owe the client before I re-send? Progress 44h is the number that decides that. Comments group by page because fixing is page-by-page work. n / p jump to next and previous open comment without leaving the canvas. ROLE (UX-I-22): every mutating control here — Resolve, Reopen, Reattach, Revoke, Re-send — renders live for a VIEWER and is refused by the server after the click. The panel already computes the role and spends it in one place only, Send for review's disabled reason (ReviewTab.tsx:146,479). Same named-reason treatment on all of them; the shut state is drawn on 'Review panel · viewer — read-only'. REPLY (UX-I-26): one composer at the foot posts against comments[0].pageId, so an answer to the third comment lands on the first comment's page."
+  },
+  {
+    "id": "161:6",
+    "why": "UX-I-25 — the strip reads as broken navigation. The fix is honesty, not a feature: label it a log and strip the row affordances.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "board": "157:169",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "Read-only. Without round history",
+    "width": 280,
+    "text": "Read-only. Without round history, round 3 cannot see rounds 1 and 2, and a client who repeats feedback looks unreasonable when they are not. LOG, NOT NAVIGATION (UX-I-25): the rows are spans and open nothing — comments carry no round id, so an older round's comments are not retrievable at all (ReviewTab.tsx:743-790). Title the strip 'Round history', and give the rows no hover, no chevron and no row fill, so it reads as a record of outcomes rather than a list of destinations. Carrying a round id on comments is the other answer, and it is a schema change, not a redraw."
+  },
+  {
+    "id": "161:3",
+    "why": "UX-I-28 (no position in the comment walk) and VIS-1-16 (the round pager wraps 'Round 3 of 3' mid-word into a ~40px box) are the same control failing two ways. Record both on the board that draws the pager.",
+    "page": "1:3",
+    "section": "1776:8383",
+    "board": "157:58",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "12 of 12. Re-send is not gated on this",
+    "width": 280,
+    "text": "12 of 12. Re-send is not gated on this — you can send with comments open — but reaching it is the normal exit. PAGER (VIS-1-16 / UX-I-28): the round pager between the two chevrons is about 40px wide and wraps 'Round 3 of 3' mid-word to three lines. Widen the label box so the position prints on one line. The comment walk needs the same thing: ReviewBar's 'Next ›' steps the open comments modulo their length and never says where you are (ReviewBar.tsx:88-102) — print '3 of 7', add a Prev step, and mark visited comments so the walk has an end."
+  },
+  {
+    "id": "172:9",
+    "why": "UX-I-21 (Compare is a full-surface job, not a 280 drawer job; one header, not two) and UX-I-20 (Compare ends nowhere). The §17 boards are already drawn 1080 wide — the canvas surface — which IS the recommendation; the caption must say so, because the code still mounts Compare in the drawer.",
+    "page": "1:3",
+    "section": "1776:8382",
+    "board": "168:2",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "Two independent panes.",
+    "width": 420,
+    "text": "Two independent panes. Left is the approved snapshot, right is the site as it is now. Each pane is a sandboxed frame and nothing syncs them — the labels carry the asymmetry, not colour. (A third mode, List, shows the same comparison as rows.) SURFACE (UX-I-21): these boards are drawn 1080 wide — the canvas surface, 1440 less the 60 rail and the 300 inspector — not the drawer the code mounts Compare in today (ReviewTab.tsx:497-532; --bk-size-drawer 280, expanded 700). Two full web pages at about 130px a pane is not a comparison. Compare opens on the canvas surface, the way Settings already does with mode: fullpage. ONE header, not two: the inner toolbar currently replaces the panel header and takes the expand, close and help controls off the one screen that needs them. ENDING (UX-I-20): Compare is read-only and stops. It ends on a decision — see the footer."
+  },
+  {
+    "id": "172:11",
+    "why": "UX-I-27 — every change row is a plain div. Make a row a destination.",
+    "page": "1:3",
+    "section": "1776:8382",
+    "board": "168:48",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "No render at all",
+    "width": 420,
+    "text": "No render at all — just what moved. The fastest of the three when you only need the inventory. DESTINATION (UX-I-27): every change row is a plain div today — 'Added', 'Removed', 'Content', a label and a detail line, and none of them clickable (ApprovedCompareView.tsx:211-226). A row is a destination: click it to switch to that page and select the element. Having found that a section was removed from /pricing, nobody should have to leave Compare, change page and find it by eye. The comparison is only useful if it ends on the canvas."
+  },
+  {
+    "id": "172:10",
+    "why": "UX-I-20 second half — there is no conflict state, and there must not be a second drawing of one: 807:6965 already draws it and is correctly marked [not-implemented]. Say what this family does and does not claim.",
+    "page": "1:3",
+    "section": "1776:8382",
+    "board": "168:26",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "One pane. The current page is blended",
+    "width": 420,
+    "text": "One pane. The current page is blended over the approved one and a slider moves between them, so a change reads as a shift when you scrub. Nothing is tinted or outlined — the frames are sandboxed and cannot be marked up. CONFLICT (UX-I-20): Compare has no notion of 'the client approved v3 while you were editing' — the two sides are always presented as different, never as competing. That state is drawn once, on 807:6965, and is marked [not-implemented] because nothing can produce it: the only conflict code is OTEngine, engine-internal and behind the off-by-default collab flag. This family shows drift, not conflict, and must not grow a second conflict drawing."
+  },
+  {
+    "id": "172:12",
+    "why": "UX-I-20 — the decision footer goes on the drift boards only. This board has no drift to decide about; saying so stops the footer being applied here by pattern-matching.",
+    "page": "1:3",
+    "section": "1776:8382",
+    "board": "168:82",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "Identical, so say so and stop.",
+    "width": 420,
+    "text": "Identical, so say so and stop. An empty diff view that renders two blank panes reads as broken. NO DECISION FOOTER (UX-I-20): the drift boards — side-by-side, overlay, list, single-page — end on 'Send these changes for approval / Publish anyway / Dismiss'. This one has nothing to decide, so it keeps a single Back and nothing else. An action row offering to send zero changes for approval is worse than no action row."
+  },
+  {
+    "id": "172:16",
+    "why": "UX-I-19 corroboration — this board was already SUPERSEDED by 158:2 on 2026-09-02, which is the same decision UX-I-19 asks for, taken once already. Name it as the precedent.",
+    "page": "1:3",
+    "section": "1776:8382",
+    "board": "169:92",
+    "id_source": "read-from-file 2026-09-07 (caption dump)",
+    "expect": "Re-sending kills the old link",
+    "width": 420,
+    "text": "Re-sending kills the old link (contract §1.4). Her comments carry over; only the link changes — and both halves of that must be on the confirm. SUPERSEDED 2026-09-02 by 158:2: ApprovedCompareView has no re-send at all and ReviewTab.tsx:839 owns the confirm. This is UX-I-19's decision already taken once — one confirm, one owner. The ReviewBar's second Re-send is the copy of it that is still live."
+  }
+]

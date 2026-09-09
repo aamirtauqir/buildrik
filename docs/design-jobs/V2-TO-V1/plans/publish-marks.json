@@ -1,0 +1,67 @@
+[
+ {
+  "id": "784:4326",
+  "name": "Publish · published (this session) — a publish that ran in THIS session, never a hydrated URL from a previous day. Gated on publishJob.jobId != null (PublishTab.tsx:233). Until commit 11541dc35 the panel drew this on every RELOAD of an already-published site and greyed its own CTA while the topbar offered \"Publish changes\" (UX-E-01 — code Critical now closed; the change count is still the undo stack, UX-E-02)",
+  "why": "UX-E-01"
+ },
+ {
+  "id": "784:4480",
+  "name": "Publish · unavailable (feature off) — the shipping panel prints the VERCEL copy in this state instead (PublishTab.tsx:336 noPublishPath, :436 \"Connect Vercel to publish.\"), while the topbar says \"Publishing isn't switched on for this workspace yet\" (lifecycle.ts:104-109). Two mutually exclusive reasons for one state; the missing-connection state has its own board now (UX-E-04)",
+  "why": "UX-E-04"
+ },
+ {
+  "id": "833:4518",
+  "name": "Publish · pre-checks — row 7 CLIENT APPROVAL is proposed, not built: runPrePublishChecks returns six checks (publish.service.ts:18-108) and the approval gate refuses later, inside startPublish (:248-300), after PublishWizard.tsx:269 has closed the wizard (UX-E-06). With no ?siteId the checklist renders \"Open this site from the dashboard\" and STILL enables Continue; the refusal arrives two screens later as a toast (UX-E-30: PublishTab.tsx:266-278, PublishWizard.tsx:222-229)",
+  "why": "UX-E-06, UX-E-30"
+ },
+ {
+  "id": "893:4518",
+  "name": "Publish · pre-checks · blocked — row 7 CLIENT APPROVAL is proposed, not built; the approval gate lives in startPublish (publish.service.ts:248-300) and reaches the user as a 6-second toast (UX-E-06). Fix › must deep-link the SUB-SCREEN and return here with that row re-checked; today it closes the wizard and emits a bare tab id, so three of five land on Settings' 14-row default (UX-E-11: PublishTab.tsx:76-83, 805-813). A collection that will generate zero pages belongs on this list too (UX-E-22: cms.service.ts:240 matches pageTemplatePath by exact string)",
+  "why": "UX-E-06, UX-E-11, UX-E-22"
+ },
+ {
+  "id": "914:4507",
+  "name": "Publish · Confirm — the DEPLOY MANIFEST row is proposed: the count today is the browser's export and the server appends one page per published CMS entry afterwards (UX-E-23: PublishConfirmFacts.tsx:118-138, publish.service.ts:329). Both publish doors reach this surface; only this one carries a per-row Fix and a Connect primary (UX-E-12)",
+  "why": "UX-E-23, UX-E-12"
+ },
+ {
+  "id": "1172:4825",
+  "name": "Export · HTML (modal) — the scope line is proposed; the shipping modal never says which page HTML writes as index.html, and the ZIP chip silently switches to every page (UX-E-14: ExportModal.tsx:97-100, ExportEngine.ts:216, :1090-1102). Both download handlers catch to a dev-only console log, so a failed export returns from its spinner as if it worked (UX-E-13: ExportModal.tsx:135, :156). Options › CMS bindings never renders — OptionsPanel is called without hasCMSBindings (:264), so the one option that changes what the content SAYS is dead (UX-E-16)",
+  "why": "UX-E-13, UX-E-14, UX-E-16"
+ },
+ {
+  "id": "817:4899",
+  "name": "[not-implemented] Preview · accessibility checker — no PAGE-level a11y audit exists; the only a11y rule engine is the design-token contrast lint (contrastLint.ts; ColorTokenList.tsx:382 \"Fix all\"), which never inspects rendered markup. No axe, no alt-text or heading-order rule, no per-page score — the 72 drawn here has no producer",
+  "why": "QA-B-12"
+ },
+ {
+  "id": "817:4774",
+  "name": "[not-implemented · superseded by 988:2 · Site · Access] Preview · share link — same hand-off; share links are owned by access-tab.tsx + share-link.service.ts. Expiry and password are REAL there (createShareLink, both plan-gated); the QR code exists but encodes nothing (access-tab.tsx:17-52 draws hash noise, no qrcode dependency); Invite-via-email has no producer at all",
+  "why": "QA-B-19"
+ },
+ {
+  "id": "817:4950",
+  "name": "[not-implemented] Preview · performance audit — no performance measurement exists; the publish worker's \"Performance check\" step is in SKIPPED_STEPS (packages/dashboard/app/api/workers/publish/[jobId]/route.ts:34-37) and never runs, and publishResultSchema.lighthouseScore has no writer",
+  "why": "QA-B-21"
+ },
+ {
+  "id": "1157:4593",
+  "name": "[not-implemented] Preview · performance audit · all-clear — no performance measurement exists (packages/dashboard/app/api/workers/publish/[jobId]/route.ts:34-37 SKIPPED_STEPS; lighthouseScore has no writer)",
+  "why": "QA-B-21"
+ },
+ {
+  "id": "879:6901",
+  "name": "[not-implemented] Preview · performance audit · issue detail — no performance measurement exists (packages/dashboard/app/api/workers/publish/[jobId]/route.ts:34-37 SKIPPED_STEPS; lighthouseScore has no writer)",
+  "why": "QA-B-21"
+ },
+ {
+  "id": "879:6896",
+  "name": "[not-implemented] Preview · performance audit · running — no performance measurement exists (packages/dashboard/app/api/workers/publish/[jobId]/route.ts:34-37 SKIPPED_STEPS; lighthouseScore has no writer)",
+  "why": "QA-B-21"
+ },
+ {
+  "id": "817:4856",
+  "name": "[not-implemented] Preview · interaction test — the in-shell PreviewOverlay strips every <script> (ExportUtils.ts:38-43) AND renders its iframe with sandbox=\"\" (PreviewOverlay.tsx:106), so no interaction, form or internal link can run there; the export-modal preview window (ExportUtils.ts:110) and PreviewFrame.tsx:147 are sandboxed differently. Interactions DO work on the published page (UX-E-17)",
+  "why": "QA-A-17, UX-E-17"
+ }
+]

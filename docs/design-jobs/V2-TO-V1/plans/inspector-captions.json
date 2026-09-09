@@ -1,0 +1,38 @@
+[
+  {
+    "id": "161:15",
+    "width": 300,
+    "why": "UX-D-03 + COVER-1-41 + COVER-1-47. The caption said 'Header reads the count'; there is no header in multi-select — ProInspector.tsx:298-310 short-circuits to MultiSelectToolbar before the header, the pill row and every banner. COVER-1-47 additionally requires the dead MixedValueBadge apparatus be recorded so nobody rebuilds a board around it.",
+    "text": "The toolbar reads the count — the header, the pill row and every banner are short-circuited (ProInspector.tsx:298). Six align actions, two distribute, and five shared fields: Background, Text color, Radius, Padding, Font size (BatchStylePanel.tsx:97-123). UX-D-03: no list of what is selected, no per-row remove, no delete, no group — and the batch write lands on the canvas's current breakpoint with nothing on screen saying so. The 'Mixed' a user sees is a placeholder on those five fields (BatchStylePanel.tsx:92). MixedValueBadge cannot render here: detectMixedValues returns an empty set below two elements (detectMixedValues.ts:10), and at two or more this branch returns before InspectorTabContent, its only consumer."
+  },
+  {
+    "id": "161:18",
+    "width": 300,
+    "why": "UX-D-20 + COVER-1-42. 'Every overridden control' was the untrue clause: the per-control dot is passed by exactly seven controls (six in Size, one in Position). And the strip itself has no upper bound.",
+    "text": "A dot on the breakpoint pill, and a separate Overrides block listing each overridden property with a cobalt left bar, a ↺ and the Base value (BreakpointOverrides.tsx:96,104-120,124). On the controls themselves the dot reaches only Size and Position — seven controls in all (InputControls.tsx:15; SizeSection.tsx:189-306; PositionControls.tsx:203). An override in Typography, Spacing, Border, Background, Flexbox, Grid or Effects is invisible where you edit it. UX-D-20: the block draws one row PLUS a full-width tinted banner per override, unconditionally, mounted above the scroll container (ProInspector.tsx:501-505) — ten tablet overrides is twenty stacked blocks in a 300px column, with no collapse, no count and no revert-all."
+  },
+  {
+    "id": "161:19",
+    "width": 300,
+    "why": "UX-D-21 + COVER-1-43. 'Same treatment, and the column header tints' was wrong twice: there is no header tint, and none of the breakpoint treatment reaches a pseudo layer.",
+    "text": "A dot on the state pill, a dot beside each state in the dropdown that carries overrides, and a banner reading 'Editing :hover — not Base' (StateDropdown.tsx:65-70,120-125; ProInspector.tsx:489-499). No column tint, and none of the breakpoint treatment: a pseudo override has no left bar, no ↺ and no named Base value, because BreakpointOverrides reads getBreakpointStyle only (BreakpointOverrides.tsx:41). UX-D-21: nothing forces the picked state on the canvas node — grep forceState / previewState returns nothing in the package — so a hover colour is edited blind. All five states are offered on every element type (StateDropdown.tsx:27), including plain containers where three of them can never fire."
+  },
+  {
+    "id": "161:21",
+    "width": 300,
+    "why": "UX-D-01 + COVER-1-45. The caption stated the product's reassurance as fact; the file's own conformance manifest records the opposite. Board kept, not deleted.",
+    "text": "The takeover renders no back row: an 'AI' label, the running step's summary, and the line 'Your selection is kept and restored when you go back.' (ProInspector.tsx:510-517). That line is a promise the product does not keep — entering the AI tab clears the selection, which is why boards.json marks this state unreachable, so the state the reassurance was written for is the one that cannot occur. UX-D-01: the '✦ AI' chip REPLACES the inspector rather than docking beside it, and selecting an element afterwards does not restore it — the flag clears only from onClose/onBack (StudioPanels.tsx:495-501)."
+  },
+  {
+    "id": "161:22",
+    "width": 300,
+    "why": "COVER-1-46. 'Header renders, sections skeleton' — the header does not render, and the caption omitted the gate.",
+    "text": "A 48px header bar and six skeleton rows — the real header is not mounted yet (InspectorLoading.tsx:27). Only reached with nothing selected: ProInspector.tsx:315 gates on projectLoading && !selectedElement, so a load that begins with a selection shows the profile, never this."
+  },
+  {
+    "id": "189:104",
+    "width": 300,
+    "why": "UX-D-06 + COVER-1-44. Two names were wrong — ReachScopeStrip was deleted and the hand-off does not go to a Styles tab.",
+    "text": "ScopeDropdown's third reach. The takeover reads 'Editing the whole site — every page' with Open Brand and Back to this element (ProInspector.tsx:518-537), while the pill directly above still reads 'This' — wholeSite is never passed to it (ScopeDropdown.tsx:113). The button opens the Brand panel (ui:switch-tab, tab 'design'), though the dropdown's own option subtitle still says 'colors & fonts — Styles tab' (ScopeDropdown.tsx:174). UX-D-06: this is navigation, not a reach — it has no controls behind it and is lost on any selection change (ProInspector.tsx:112). SPEC-INSPECTOR §2.4 takes it out of the dropdown; recorded as an open decision, not applied here."
+  }
+]

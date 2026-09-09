@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QA — editor vs Figma · 2026-08-03</title>
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#111827;--soft:#4b5563;--line:#e5e7eb;--card:#f9fafb;--accent:#1a56db}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--fg:#e5e7eb;--soft:#9ca3af;--line:#2a2f3a;--card:#161a22;--accent:#7ba2f0}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:15px/1.65 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased}
+main{max-width:860px;margin:0 auto;padding:56px 24px 96px}
+h1{font-size:30px;line-height:1.25;font-weight:600;letter-spacing:-.02em;margin:0 0 8px}
+h2{font-size:21px;font-weight:600;letter-spacing:-.01em;margin:44px 0 12px;
+   padding-top:22px;border-top:1px solid var(--line)}
+h3{font-size:16px;font-weight:600;margin:28px 0 8px}
+p,li{color:var(--fg)}
+strong{font-weight:600}
+em{color:var(--soft)}
+a{color:var(--accent)}
+hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+code{font:13px/1.5 "Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow-x:auto}
+pre code{background:none;border:0;padding:0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--soft)}
+td:has(+td:last-child),td:last-child{font-variant-numeric:tabular-nums}
+img{max-width:100%;height:auto;display:block;margin:14px 0;
+  border:1px solid var(--line);border-radius:8px;background:var(--card)}
+blockquote{margin:16px 0;padding:2px 0 2px 16px;border-left:3px solid var(--line);color:var(--soft)}
+ul,ol{padding-left:22px}
+li{margin:5px 0}
+</style></head><body><main>
+<h1>QA — "the UI is entirely different than Figma"</h1>
+<p><strong>Date:</strong> 2026-08-03 · <strong>Branch:</strong> main · <strong>Target:</strong> editor shell, <code>localhost:5050</code> @1440×900
+<strong>Tier:</strong> Standard (fix critical + high + medium) · <strong>Mode:</strong> design-conformance
+<strong>Reference:</strong> Figma <code>g4GzQFqzNYz5sosz1QtZXC</code> — Buildrick — Product</p>
+<hr />
+<h2>The finding that reframes the complaint</h2>
+<p><strong>Figma has no full-editor frame.</strong> The file is a component library: atoms
+(Button, Input, Badge), molecules (Panel header, Nav item), and a handful of
+per-surface frames (<code>19:46</code> Drawer, <code>19:47</code> Right panel, <code>681:122</code> Topbar,
+<code>20:6</code> GATE A). There is no composed screen to diff a screenshot against.</p>
+<p>So "entirely different" cannot be answered as one comparison. It has to be
+answered surface by surface, property by property — which is what this run did.</p>
+<p>And when you do that, the divergence splits into three piles, and only one of
+them is bugs:</p>
+<table>
+<thead>
+<tr>
+<th>Pile</th>
+<th>Count</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Real defects</strong></td>
+<td>2</td>
+<td>Nobody decided this. Fixed.</td>
+</tr>
+<tr>
+<td><strong>Deliberate divergence</strong></td>
+<td>3</td>
+<td>The code is <em>newer</em> than the board. Board is stale.</td>
+</tr>
+<tr>
+<td><strong>Fidelity gaps, need a call</strong></td>
+<td>3</td>
+<td>Real differences, but with a tradeoff or a blast radius. Deferred to you.</td>
+</tr>
+</tbody>
+</table>
+<p>The single most useful correction to the premise: <strong>on the topbar, the board is
+behind the code more often than the code is behind the board.</strong></p>
+<hr />
+<h2>Health score</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th style="text-align: right;">Before</th>
+<th style="text-align: right;">After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Console</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td>Visual</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">92</td>
+</tr>
+<tr>
+<td>Functional</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr>
+<td>Accessibility</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">85</td>
+</tr>
+<tr>
+<td><strong>Weighted</strong></td>
+<td style="text-align: right;"><strong>86</strong></td>
+<td style="text-align: right;"><strong>95</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Console: 1 error, a 401 on an unauthenticated API call in the standalone demo —
+expected without a session, not a defect.</p>
+<hr />
+<h2>Fixed</h2>
+<h3>QA-001 · high · Publish CTA shipped with a 2px black ring</h3>
+<p><code>7683eabc</code></p>
+<p>The primary call-to-action had a black outset border around the blue. Visible at
+1× in the default state.</p>
+<p><strong>Root cause.</strong> <code>chrome-reset.css</code> calls itself a "minimal reset … replaces
+preflight" but replaced only half. Tailwind's preflight zeroes borders
+(<code>border: 0 solid</code>) precisely because the UA stylesheet puts <code>border: 2px outset
+ButtonBorder</code> on form controls. That half was missing, so any chrome control not
+setting its own border kept the UA one. flowbite's <code>&lt;Button&gt;</code> doesn't set one.</p>
+<p><strong>Why it hid.</strong> Nearly every other control carries <code>tw:border-0</code> or
+<code>tw:border-transparent</code> at its call site. Those read as styling choices; they are
+workarounds for this missing reset.</p>
+<p><strong>Measured twice — the first number was too small.</strong> A sweep of the default shell
+found 1 leak in 42 controls. That was scoped to one surface. The parity baselines
+then showed <code>content-field-rows&gt;9</code> and <code>&gt;15</code> carrying the same <code>2px outset</code> on a
+surface the shell never renders. <strong>The baselines had recorded the defect as
+expected output.</strong></p>
+<p><strong>Fix:</strong> one line in the reset, scoped to <code>button/input/select/textarea</code> (the only
+elements the UA borders), <code>solid</code> not <code>none</code> so a later <code>border-width</code> still
+paints, in the <code>reset</code> layer so <code>tw:border-*</code> utilities still win.</p>
+<p><strong>Baselines regenerated and audited, not trusted:</strong> all 32 changed values across 5
+surfaces are <code>border-*</code> or width/height. Zero other properties changed. Zero keys
+added or removed. Every size delta is exactly <strong>±4.00px</strong> — 2px of border on two
+sides; controls shrank by it, containers grew by it.</p>
+<p><code>screenshots-2026-08-03-qa/qa-001-publish-before.png</code> → <code>qa-001-publish-after.png</code> (4×)</p>
+<h3>QA-002 · medium · Publish rendered 8px taller than the design</h3>
+<p><code>af315d82</code></p>
+<p>Board <code>681:26 btn/publish</code> is 32px tall with 13px medium text. It rendered 40px
+with 14px text.</p>
+<p><strong>Cause.</strong> Both Publish branches (<code>Topbar.tsx:209</code> blocked, <code>:219</code> ready) rendered
+a bare <code>&lt;Button&gt;</code> with no <code>size</code>, taking flowbite's default md. Every other Button
+in the same bar declares <code>size="xs"</code>. The asymmetry is the bug — the one call site
+where the prop was never passed, on the most prominent control in the editor.</p>
+<p><strong>After, against the board:</strong> height 32 · font-size 13px · weight 500 · padding
+0 20px · radius 8px · background <code>#1a56db</code> · colour white. Every value exact.
+Width lands 85.6 vs the symbol's 82 — text metrics, not geometry.</p>
+<p><code>screenshots-2026-08-03-qa/qa-002-topbar-before.png</code> → <code>qa-002-topbar-after.png</code> vs
+<code>figma-681-26-topbar.png</code></p>
+<hr />
+<h2>Not defects — the code is newer than the board</h2>
+<p>Do not "fix" these to match Figma. Each carries its rationale in-source.</p>
+<table>
+<thead>
+<tr>
+<th>What the board shows</th>
+<th>What renders</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Save status as a green tinted pill (<code>#def7ec</code> / <code>#057a55</code>)</td>
+<td>plain muted grey text</td>
+<td><code>SaveStatus.tsx:53</code> — <strong>T8/D7 rule 4, text-first</strong>: saved/saving/unsaved are plain; only offline/error/conflict get tint</td>
+</tr>
+<tr>
+<td>Review pill amber (<code>#fdfdea</code>) "In review · 3 open"</td>
+<td>neutral grey pill</td>
+<td><code>Topbar.tsx:236</code> — <strong>T8/D7 rule 3, neutral-unless-blocking</strong>: only "Changes requested" blocks a publish, so only it keeps amber. The bar's colour budget goes to signals that gate publishing</td>
+</tr>
+<tr>
+<td>No eye / comment / shield icons</td>
+<td>three tool icons render</td>
+<td><code>Topbar.tsx:275</code> — "Eye/Comment/Spinner: Figma nodes <strong>pending</strong>". The board hasn't caught up</td>
+</tr>
+</tbody>
+</table>
+<p>I flagged "review pill missing" mid-run and was wrong: <code>ReviewBadge</code>
+(<code>Topbar.tsx:253</code>) and the bell's unread dot (<code>:182</code>) both exist and are
+state-dependent. With no review open and no unread notifications, absent is
+correct.</p>
+<hr />
+<h2>Deferred — real gaps, your call</h2>
+<h3>D1 · IconButton is 28×28, the board says 32×32</h3>
+<p><code>Icon.tsx:51</code> — <code>tw:h-7 tw:w-7</code>. Figma's Icon button component is 32×32 and its
+doc states the reason: <em>"32×32 so it clears the 24px touch minimum."</em></p>
+<p><strong>Not an a11y violation</strong> — 28 already clears WCAG 2.5.8's 24×24 minimum. It is a
+fidelity gap with a <strong>13-instance, 10-file blast radius</strong> that visibly changes the
+whole chrome. No decision record exists for 28. Worth doing, but it's a look
+change across the editor, not a bug fix.</p>
+<h3>D2 · Exit button off on four properties</h3>
+<p>Board <code>btn/exit</code>: h28 · px10 · 12px <strong>regular</strong> · <code>#111827</code>.
+Renders: h32 · px12 · 12px <strong>medium</strong> · <code>#4b5563</code>.</p>
+<p>Geometry is unambiguous. <strong>The colour is not:</strong> <code>GHOST_BTN_CLASS</code> sets grey-600
+resting → grey-900 on hover. Matching the board's grey-900 at rest would delete
+that hover affordance. The board only draws a rest state, so it can't settle it.
+Cosmetic; deferred per Standard tier.</p>
+<h3>D3 · Controls below the 24×24 target minimum</h3>
+<p>Exposed by measurement, pre-existing, not caused by either fix.
+<code>content-field-rows</code> entries 9/14/15 measure <strong>21.92 × 18</strong> — under WCAG 2.5.8's
+24×24. They were 25.92 × 22 before, but 4px of that was the QA-001 black border,
+which was never real spacing. Both readings are under the minimum.</p>
+<hr />
+<h2>Also noticed</h2>
+<p><strong><code>GHOST_BTN_CLASS</code> is duplicated verbatim in 4 files</strong> — <code>Topbar.tsx:29</code>,
+<code>Toast.tsx:22</code>, <code>PanelFrame.tsx:13</code>, <code>PanelHeader.tsx:9</code>, identical string. The
+repo's own CLAUDE.md bans exactly this ("same concept, same value, one place").
+A refactor, not a QA fix, so left alone.</p>
+<p><strong>Untracked directories appeared mid-session</strong> and are not mine:
+<code>packages/editor/{MISSION,NOTES,RESOURCES}.md</code>, <code>assets/</code>, <code>learning-records/</code>,
+<code>lessons/</code>, <code>reference/</code>. None sit under <code>src/</code>, so the CI reference-snapshot
+guard is unaffected. Flagged because the repo is in collaborative mode.</p>
+<hr />
+<h2>Verification</h2>
+<ul>
+<li>Leaked-border sweep: <strong>1 → 0</strong> of 42 controls</li>
+<li>Style parity: <strong>6/6</strong> (baselines regenerated, every delta audited)</li>
+<li>chrome-ui + StudioHeader: <strong>34 files, 269 tests, 0 failed</strong></li>
+<li><code>verify:ds</code>: <strong>13 gates PASS</strong>, every ratchet unchanged</li>
+<li>Insert drawer pixel-identical after the reset change — nothing lost a border</li>
+</ul>
+<p><strong>PR summary:</strong> QA found 8 differences from Figma; 2 were defects and are fixed,
+3 were deliberate divergences where the board is stale, 3 need a product call.
+Health 86 → 95.</p>
+</main>
+<script>
+document.querySelectorAll('table').forEach(t=>{const d=document.createElement('div');d.className='tw';t.parentNode.insertBefore(d,t);d.appendChild(t)});
+</script></body></html>

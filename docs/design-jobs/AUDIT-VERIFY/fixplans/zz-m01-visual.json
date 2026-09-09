@@ -1,0 +1,11 @@
+{
+ "slug": "zz-m01-visual",
+ "page": "1:3",
+ "note": "Two defects the screenshot found on the repaired M01 board. Neither is visible to any arithmetic this arc ran.",
+ "rows": [
+  {"op": "opacity", "id": "2850:22382", "value": 1,
+   "why": "M01 · THE DESTRUCTIVE BUTTON STILL LOOKS DISABLED, AND NOTHING JUSTIFIES IT ANY MORE. Found by looking, not by measuring. The rendered board shows 'Delete' as a washed-out salmon pill, while the read says the frame's fill is #E02424 at full fill-opacity — so the washing out is NODE opacity, a disabled treatment. It was correct before: the audit's own original screenshot pairs that exact appearance with the hint 'Delete stays disabled until the word matches exactly'. M01 removed the typed-confirmation gate (correctly — ConfirmDeleteModal.tsx:25 makes typed confirm a BULK-only affordance) and hid that hint, which leaves a primary action that looks unavailable with nothing on the dialog explaining why. Restoring full opacity is what makes the repaired dialog coherent: one enabled destructive action, one Cancel."},
+  {"op": "rename", "id": "2850:22382", "name": "btn/Delete", "expect": "btn/Delete 34 files",
+   "why": "M01 · the frame is still named for the bulk board it was cloned from. c1-clones#2 rewrote the LABEL text 2850:22383 from 'Delete 34 files' to 'Delete', but a text row cannot touch its parent frame's name, so the layer tree still reads 'btn/Delete 34 files' on a single-file dialog. Same class as the mislabelled 'btn/Apply 4 changes' that C3 caught on the Brand modal: the row was changed, the name was not, and the name is what the next reader searches."}
+ ]
+}

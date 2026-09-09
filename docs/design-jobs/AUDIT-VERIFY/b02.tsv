@@ -1,0 +1,140 @@
+N	1164:4713	Media · modal · picker (choose for element)	FRAME	100,29182,640,520	true	VERTICAL	8	true
+K	1164:4714	FRAME	116,29196,608,17	true	true	head
+K	1173:4804	FRAME	116,29225,265,23	true	true	tabs
+K	1164:4719	FRAME	116,29260,608,29	true	true	search
+K	1164:4721	FRAME	116,29301,590,96	true	true	pick-row-0
+K	1164:4726	FRAME	116,29409,590,96	true	true	pick-row-1
+K	1164:4731	FRAME	116,29517,608,29	true	true	foot
+K	1173:4814	TEXT	116,29558,434,13	true		Upload tab accepts image/video/audio · max 10 MB each
+K	1746:8390	FRAME	634,29278,90,28	true	false	view-toggle
+C	1164:4713	texts=13
+T	1746:8393	693,29285,21,15	12	Medium	true	WIDTH_AND_HEIGHT	btn/List	List
+T	1746:8391	644,29285,25,15	12	Medium	true	WIDTH_AND_HEIGHT	btn/Grid	Grid
+T	1173:4814	116,29558,434,13	11	Regular	true	HEIGHT	Media · modal · picker (choose for element)	Upload tab accepts image/video/audio · max 10 MB each
+T	1164:4737	640,29525,70,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/use	Use Selected
+T	1173:4813	116,29525,55,13	11	Medium	true	WIDTH_AND_HEIGHT	foot	2 selected
+T	1164:4720	126,29267,107,15	12	Regular	true	WIDTH_AND_HEIGHT	search	🔍  Search library…
+T	1173:4812	324,29230,47,13	11	Regular	true	WIDTH_AND_HEIGHT	tab/Optimize	Optimize
+T	1173:4810	249,29230,51,13	11	Regular	true	WIDTH_AND_HEIGHT	tab/From URL	From URL
+T	1173:4808	187,29230,38,13	11	Regular	true	WIDTH_AND_HEIGHT	tab/Upload	Upload
+T	1173:4806	126,29230,37,13	11	Medium	true	WIDTH_AND_HEIGHT	tab/Library	Library
+T	1164:4718	712,29197,12,16	13	Regular	true	WIDTH_AND_HEIGHT	head	✕
+T	1164:4716	243,29198,84,13	11	Regular	true	WIDTH_AND_HEIGHT	head	for Hero · Image
+T	1164:4715	116,29196,117,17	14	Semi Bold	true	WIDTH_AND_HEIGHT	head	Choose an image
+R	1164:4736	807:8521	NAVIGATE	btn/use
+R	1164:4718	807:8521	NAVIGATE	✕
+N	1169:4753	Templates · save-as-template (modal)	FRAME	100,61621,460,146	true	VERTICAL	4	true
+K	1169:4754	TEXT	116,61635,143,16	true		Save page as template
+K	1169:4755	FRAME	116,61661,428,29	true	true	field/name
+K	1169:4757	TEXT	116,61700,403,16	true		Tokens are snapshotted — applying it later re-maps them to that site's brand.
+K	1169:4762	FRAME	116,61726,428,27	true	true	foot
+C	1169:4753	texts=5
+T	1169:4761	456,61733,76,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Save template	Save template
+T	1169:4759	387,61733,37,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Cancel	Cancel
+T	1169:4757	116,61700,403,16	11	Regular	true	WIDTH_AND_HEIGHT	Templates · save-as-template (modal)	Tokens are snapshotted — applying it later re-maps them to that site's brand.
+T	1169:4756	126,61669,107,13	11	Regular	true	WIDTH_AND_HEIGHT	field/name	Autumn menu layout
+T	1169:4754	116,61635,143,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	Templates · save-as-template (modal)	Save page as template
+R	1169:4753	137:2	NAVIGATE	Templates · save-as-template (modal)
+R	1169:4760	641:2487	NAVIGATE	btn/Save template
+R	1169:4758	641:2487	NAVIGATE	btn/Cancel
+N	1170:4713	Content · collection-setup (modal) — step 1's Content type is read by nothing: contentType	FRAME	900,32529,500,474	true	VERTICAL	7	true
+K	1170:4714	TEXT	916,32543,135,16	true		Fields for Menu items
+K	1173:4815	FRAME	916,32569,188,17	true	true	step-bar
+K	1170:4715	TEXT	916,32596,327,13	true		A collection turns rows of data into pages — one page per row.
+K	1170:4716	FRAME	916,32619,468,46	true	true	field/NAME
+K	1170:4720	FRAME	916,32675,468,216	true	true	fields-list
+K	1173:4825	FRAME	916,32901,468,51	true	true	[not-implemented] dynamic-pages — a typed template path can never match an exported page p
+K	1170:4747	FRAME	916,32962,468,27	true	true	foot
+C	1170:4713	texts=33
+T	1170:4746	1280,32969,92,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Create collection	Create Collection
+T	1170:4744	1211,32969,37,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Cancel	Cancel
+T	1173:4830	926,32931,432,13	11	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] dynamic-pages — a typed template path can never match an exported page p	Slug pattern — /blog/{slug} · Template — blog/_template · SEO title — {title} — Blog
+T	1173:4829	962,32911,139,13	11	Medium	true	WIDTH_AND_HEIGHT	toggle-row	Generate a page per entry
+T	1753:8421	1364,32875,12,12	12	Regular	true	WIDTH_AND_HEIGHT	row/field	🗑
+T	1753:8420	1364,32874,6,13	11	Regular	true	WIDTH_AND_HEIGHT	Select · type	⌄
+T	1753:8419	1276,32874,25,15	12	Regular	true	WIDTH_AND_HEIGHT	Select · type	Text
+T	1753:8417	942,32874,70,16	13	Regular	true	WIDTH_AND_HEIGHT	TextInput · name	Description
+T	1753:8415	916,32875,9,15	12	Regular	true	WIDTH_AND_HEIGHT	row/field	⠿
+T	1753:8413	1364,32815,12,12	12	Regular	true	WIDTH_AND_HEIGHT	row/field	🗑
+T	1753:8412	1364,32814,6,13	11	Regular	true	WIDTH_AND_HEIGHT	Select · type	⌄
+T	1753:8411	1276,32814,35,15	12	Regular	true	WIDTH_AND_HEIGHT	Select · type	Image
+T	1753:8409	942,32814,37,16	13	Regular	true	WIDTH_AND_HEIGHT	TextInput · name	Photo
+T	1753:8407	916,32815,9,15	12	Regular	true	WIDTH_AND_HEIGHT	row/field	⠿
+T	1753:8405	1364,32755,12,12	12	Regular	true	WIDTH_AND_HEIGHT	row/field	🗑
+T	1753:8404	1364,32754,6,13	11	Regular	true	WIDTH_AND_HEIGHT	Select · type	⌄
+T	1753:8403	1276,32754,46,15	12	Regular	true	WIDTH_AND_HEIGHT	Select · type	Number
+T	1753:8401	942,32754,32,16	13	Regular	true	WIDTH_AND_HEIGHT	TextInput · name	Price
+T	1753:8399	916,32755,9,15	12	Regular	true	WIDTH_AND_HEIGHT	row/field	⠿
+T	1753:8397	1364,32695,12,12	12	Regular	true	WIDTH_AND_HEIGHT	row/field	🗑
+T	1753:8396	1364,32694,6,13	11	Regular	true	WIDTH_AND_HEIGHT	Select · type	⌄
+T	1753:8395	1276,32694,25,15	12	Regular	true	WIDTH_AND_HEIGHT	Select · type	Text
+T	1753:8393	942,32694,27,16	13	Regular	true	WIDTH_AND_HEIGHT	TextInput · name	Title
+T	1753:8391	916,32695,9,15	12	Regular	true	WIDTH_AND_HEIGHT	row/field	⠿
+T	1170:4719	926,32644,61,13	11	Regular	true	WIDTH_AND_HEIGHT	input	Menu items
+T	1170:4717	916,32619,33,13	11	Medium	true	WIDTH_AND_HEIGHT	field/NAME	NAME
+T	1170:4715	916,32596,327,13	11	Regular	true	WIDTH_AND_HEIGHT	Content · collection-setup (modal) — step 1's Content type is read by nothing: contentType	A collection turns rows of data into pages — one page per row.
+T	1173:4824	1072,32571,32,13	11	Medium	true	WIDTH_AND_HEIGHT	step2	Fields
+T	1173:4823	1051,32571,7,13	11	Medium	true	WIDTH_AND_HEIGHT	d2	2
+T	1173:4820	1024,32571,11,13	11	Regular	true	WIDTH_AND_HEIGHT	step-bar	→
+T	1173:4819	946,32571,70,13	11	Regular	true	WIDTH_AND_HEIGHT	step1	Name & Type
+T	1173:4818	923,32571,10,13	11	Medium	true	WIDTH_AND_HEIGHT	d1	✓
+T	1170:4714	916,32543,135,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	Content · collection-setup (modal) — step 1's Content type is read by nothing: contentType	Fields for Menu items
+R	1170:4745	149:50	NAVIGATE	btn/Create collection
+R	1170:4743	148:2	NAVIGATE	btn/Cancel
+N	1170:4749	Content · records (modal) — the SECOND record editor, reachable only from ⌘⇧P. Delete asks	FRAME	100,34577,640,350	true	VERTICAL	12	true
+K	1170:4750	TEXT	116,34591,159,16	true		Menu items — 12 records
+K	1744:8390	FRAME	116,34617,280,32	true	false	Select · collection
+K	1170:4751	FRAME	116,34659,608,28	true	true	thead
+K	1170:4756	FRAME	116,34697,608,41	true	true	rec/Margherita
+K	1170:4761	FRAME	116,34748,608,41	true	true	rec/Carbonara
+K	1170:4766	FRAME	116,34799,608,41	true	true	rec/Tiramisu
+K	1170:4775	FRAME	116,34850,608,27	true	true	foot
+K	1720:17426	FRAME	100,34807,150,28	true	false	hotspot/state · CMS records · no-collections
+K	1720:17430	FRAME	254,34807,150,28	true	false	hotspot/state · CMS records · none-published
+K	1720:17434	FRAME	408,34807,150,28	true	false	hotspot/state · CMS records · empty
+K	1720:17438	FRAME	562,34807,150,28	true	false	hotspot/state · CMS records · publish-error
+K	1744:8416	TEXT	116,34887,608,26	true		Width stays 640: F15 adds the matching kind to Modal.tsx KIND_WIDTH. The code renders this
+C	1170:4749	texts=36
+T	1744:8416	116,34887,608,26	11	Regular	true	HEIGHT	Content · records (modal) — the SECOND record editor, reachable only from ⌘⇧P. Delete asks	Width stays 640: F15 adds the matching kind to Modal.tsx KIND_WIDTH. The code renders this
+T	1720:17439	568,34815,138,12	10	Medium	false	HEIGHT	hotspot/state · CMS records · publish-error	CMS records · publish-error
+T	1720:17435	414,34815,138,12	10	Medium	false	HEIGHT	hotspot/state · CMS records · empty	CMS records · empty
+T	1720:17431	260,34815,138,24	10	Medium	false	HEIGHT	hotspot/state · CMS records · none-published	CMS records · none-published
+T	1720:17427	106,34815,138,24	10	Medium	false	HEIGHT	hotspot/state · CMS records · no-collections	CMS records · no-collections
+T	1170:4774	639,34857,73,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/＋ Add record	＋ Add record
+T	1170:4772	539,34857,68,13	11	Medium	true	WIDTH_AND_HEIGHT	[not-implemented] Import JSON — CMSRecordsModal.tsx:396-402 documents it as not built	Import JSON
+T	1744:8415	689,34813,11,11	11	Regular	true	WIDTH_AND_HEIGHT	btn/Delete record	🗑
+T	1744:8413	661,34813,12,13	11	Regular	true	WIDTH_AND_HEIGHT	btn/Edit record	✎
+T	1744:8411	604,34813,39,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Publish	Publish
+T	1170:4770	476,34806,72,12	10	Regular	true	HEIGHT	rec/Tiramisu	Aug 2
+T	1170:4769	376,34806,88,12	10	Regular	true	NONE	rec/Tiramisu	— missing
+T	1170:4768	308,34806,56,13	11	Regular	true	NONE	rec/Tiramisu	$9
+T	1170:4767	126,34806,170,13	11	Regular	true	NONE	rec/Tiramisu	Tiramisu
+T	1744:8408	689,34762,11,11	11	Regular	true	WIDTH_AND_HEIGHT	btn/Delete record	🗑
+T	1744:8406	661,34762,12,13	11	Regular	true	WIDTH_AND_HEIGHT	btn/Edit record	✎
+T	1744:8404	592,34762,53,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Unpublish	Unpublish
+T	1170:4765	476,34755,72,12	10	Regular	true	HEIGHT	rec/Carbonara	Aug 5
+T	1170:4764	376,34755,88,12	10	Regular	true	NONE	rec/Carbonara	✓ photo
+T	1170:4763	308,34755,56,13	11	Regular	true	NONE	rec/Carbonara	$18
+T	1170:4762	126,34755,170,13	11	Regular	true	NONE	rec/Carbonara	Carbonara
+T	1744:8401	689,34711,11,11	11	Regular	true	WIDTH_AND_HEIGHT	btn/Delete record	🗑
+T	1744:8399	661,34711,12,13	11	Regular	true	WIDTH_AND_HEIGHT	btn/Edit record	✎
+T	1744:8397	592,34711,53,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Unpublish	Unpublish
+T	1170:4760	476,34704,72,12	10	Regular	true	HEIGHT	rec/Margherita	today
+T	1170:4759	376,34704,88,12	10	Regular	true	NONE	rec/Margherita	✓ photo
+T	1170:4758	308,34704,56,13	11	Regular	true	NONE	rec/Margherita	$14
+T	1170:4757	126,34704,170,13	11	Regular	true	NONE	rec/Margherita	Margherita
+T	1744:8394	560,34667,146,13	11	Medium	true	HEIGHT	cell/actions	Actions
+T	1170:4755	476,34663,72,12	10	Semi Bold	true	NONE	thead	Updated
+T	1170:4754	376,34663,88,12	10	Semi Bold	true	NONE	thead	Photo
+T	1170:4753	308,34663,56,12	10	Semi Bold	true	NONE	thead	Price
+T	1170:4752	126,34663,170,12	10	Semi Bold	true	NONE	thead	Title
+T	1744:8392	374,34624,7,15	12	Regular	true	WIDTH_AND_HEIGHT	Select · collection	⌄
+T	1744:8391	126,34625,72,16	13	Regular	true	WIDTH_AND_HEIGHT	Select · collection	Menu items
+T	1170:4750	116,34591,159,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	Content · records (modal) — the SECOND record editor, reachable only from ⌘⇧P. Delete asks	Menu items — 12 records
+R	1720:17438	1706:8451	NAVIGATE	hotspot/state · CMS records · publish-error
+R	1720:17434	1706:8444	NAVIGATE	hotspot/state · CMS records · empty
+R	1720:17430	1706:8437	NAVIGATE	hotspot/state · CMS records · none-published
+R	1720:17426	1706:8433	NAVIGATE	hotspot/state · CMS records · no-collections
+R	1170:4773	149:84	NAVIGATE	btn/＋ Add record
+R	1170:4771	151:46	NAVIGATE	[not-implemented] Import JSON — CMSRecordsModal.tsx:396-402 documents it as not built
+END	done=1164:4713|1169:4753|1170:4713|1170:4749	stopped=false	bytes=11392

@@ -1,0 +1,9 @@
+--- 1779:2  (6)
+OVERPRINT	165:2	Notifications · unread — UX-F-26 /	165:22 x 165:23	by 14
+OVERPRINT	165:2	Notifications · unread — UX-F-26 /	165:16 x 165:17	by 14
+OVERPRINT	165:2	Notifications · unread — UX-F-26 /	165:11 x 165:12	by 14
+OVERPRINT	165:24	Notifications · all-read — NO CODE	165:42 x 165:43	by 14
+OVERPRINT	165:24	Notifications · all-read — NO CODE	165:36 x 165:37	by 14
+OVERPRINT	165:24	Notifications · all-read — NO CODE	165:32 x 165:33	by 14
+
+render defects >= 4px: 6 (across 1 of 1 sections)

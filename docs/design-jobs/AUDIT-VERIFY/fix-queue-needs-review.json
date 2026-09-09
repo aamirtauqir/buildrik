@@ -1,0 +1,16 @@
+[
+ {
+  "file": "c8-assembled.json",
+  "row": 0,
+  "why": "unclassified",
+  "keys": "op,id,selector,unresolved-id,hex,expect,sequence,why,hold,holdWhy",
+  "sample": "{\"op\":\"fill\",\"id\":null,\"selector\":{\"board\":\"52:2\",\"name\":\"Hero — SELECTED\"},\"unresolved-id\":true,\"hex\":\"#1A56DB\",\"expect\":\"frame named 'Hero — SELECTED' on 52:2 — the parent of 52:160 'Wood-fired pizz"
+ },
+ {
+  "file": "c8-assembled.json",
+  "row": 1,
+  "why": "unclassified",
+  "keys": "op,id,selector,unresolved-id,hex,expect,sequence,why,hold,holdWhy",
+  "sample": "{\"op\":\"fill\",\"id\":null,\"selector\":{\"board\":\"199:205\",\"name\":\"Hero — SELECTED\"},\"unresolved-id\":true,\"hex\":\"#1A56DB\",\"expect\":\"frame named 'Hero — SELECTED' on 199:205 — the parent of 199:293 'Wood-fir"
+ }
+]

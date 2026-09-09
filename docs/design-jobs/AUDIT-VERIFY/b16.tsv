@@ -1,0 +1,92 @@
+N	642:3401	Site menu (⋯)	FRAME	680,147173,1440,900	true	VERTICAL	10	true
+C	642:3401	texts=116
+T	642:3694	1872,147560,109,20	13	Regular	true	WIDTH_AND_HEIGHT	menu · Exit to dashboard	Exit to dashboard
+T	642:3691	2082,147529,6,16	11	Regular	true	WIDTH_AND_HEIGHT	menu · Keyboard shortcuts	?
+T	642:3689	1872,147527,121,20	13	Regular	true	WIDTH_AND_HEIGHT	menu · Keyboard shortcuts	Keyboard shortcuts
+T	642:3687	2069,147497,19,16	11	Regular	true	WIDTH_AND_HEIGHT	menu · Components	⇧A
+T	642:3685	1872,147495,79,20	13	Regular	true	WIDTH_AND_HEIGHT	menu · Components	Components
+T	642:3683	2080,147465,8,16	11	Regular	true	WIDTH_AND_HEIGHT	menu · Templates	T
+T	642:3681	1872,147463,64,20	13	Regular	true	WIDTH_AND_HEIGHT	menu · Templates	Templates
+T	926:4485	1872,147430,112,20	13	Regular	true	WIDTH_AND_HEIGHT	menu · Share preview link	Share preview link
+R	1688:16205	1688:7195	NAVIGATE	hotspot/state · S7 · Settings · root
+R	1682:7241	815:4518	NAVIGATE	hotspot/state · S3.10 · keyboard-shortcuts
+R	1682:7205	1343:7162	NAVIGATE	hotspot/state · S1.6 · view-mode
+R	1172:4895	1172:4867	NAVIGATE	hotspot/state · Project settings modal
+R	1172:4893	1172:4825	NAVIGATE	hotspot/state · Export · HTML
+R	642:3693	65:412	NAVIGATE	menu · Exit to dashboard
+R	642:3688	58:215	NAVIGATE	menu · Keyboard shortcuts
+R	642:3684	641:2546	NAVIGATE	menu · Components
+R	642:3680	641:2487	NAVIGATE	menu · Templates
+R	926:4484	817:4774	NAVIGATE	menu · Share preview link
+R	926:4479	817:5114	NAVIGATE	menu · Activity log
+R	926:4474	817:5289	NAVIGATE	menu · Site health
+R	642:3676	639:2754	NAVIGATE	menu · Export code
+R	642:3673	184:2	NAVIGATE	menu · Publish history
+R	642:3669	162:2	NAVIGATE	menu · Version history
+R	642:3665	638:2378	NAVIGATE	menu · Site settings
+R	642:3663	52:2	NAVIGATE	scrim
+R	642:3636	164:2	NAVIGATE	Footer
+R	642:3538	159:2	NAVIGATE	Inspector
+R	920:4690	170:17	NAVIGATE	btn/ai
+R	642:3469	301:1979	NAVIGATE	Canvas
+R	I2040:18408;2034:8431	1333:7162	NAVIGATE	rail/Brand
+R	I2040:18408;2034:8428	148:2	NAVIGATE	rail/Content
+R	I2040:18408;2034:8425	144:2	NAVIGATE	rail/Media
+R	I2040:18408;2034:8422	140:2	NAVIGATE	rail/Pages
+N	642:3538	Inspector	FRAME	1820,147229,300,812	true	VERTICAL	1	true
+C	642:3538	texts=45
+T	I2144:11421;92:12	2064,147765,34,16	12	Regular	true	HEIGHT	field	100
+T	642:3629	1836,147764,88,18	12	Regular	true	HEIGHT	row	Opacity
+T	642:3627	2099,147733,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	642:3626	1836,147733,255,16	11	Medium	true	HEIGHT	row	EFFECTS
+T	642:3624	1940,147701,8,16	12	Regular	true	WIDTH_AND_HEIGHT	input	8
+T	642:3621	1836,147700,88,18	12	Regular	true	HEIGHT	row	Radius
+T	642:3619	2099,147669,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	642:3618	1836,147669,255,16	11	Medium	true	HEIGHT	row	BORDER
+R	642:3538	159:2	NAVIGATE	Inspector
+R	920:4690	170:17	NAVIGATE	btn/ai
+N	926:4484	menu · Share preview link	FRAME	1860,147424,240,32	true	HORIZONTAL	2	true
+C	926:4484	texts=1
+T	926:4485	1872,147430,112,20	13	Regular	true	WIDTH_AND_HEIGHT	menu · Share preview link	Share preview link
+R	926:4484	817:4774	NAVIGATE	menu · Share preview link
+N	1172:4895	hotspot/state · Project settings modal	FRAME	1796,148035,320,34	false	NONE	0	true
+C	1172:4895	texts=0
+R	1172:4895	1172:4867	NAVIGATE	hotspot/state · Project settings modal
+N	1172:4867	RETIRED — Project settings modal (⌃,) · superseded	FRAME	100,97555,560,244	true	VERTICAL	6	true
+C	1172:4867	texts=11
+T	1172:4888	606,97765,26,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Save	Save
+T	1172:4886	537,97765,37,13	11	Medium	true	WIDTH_AND_HEIGHT	btn/Cancel	Cancel
+T	1172:4884	116,97736,403,12	10	Regular	true	WIDTH_AND_HEIGHT	RETIRED — Project settings modal (⌃,) · superseded	Canvas tab: grid size + snap-to-grid. SEO tab: def
+T	1172:4883	126,97705,50,13	11	Regular	true	WIDTH_AND_HEIGHT	input	John Doe
+T	1172:4881	116,97682,108,11	9	Semi Bold	true	WIDTH_AND_HEIGHT	field/AUTHOR	AUTHOR / DESCRIPTION
+T	1172:4879	126,97651,109,13	11	Regular	true	WIDTH_AND_HEIGHT	input	My Awesome Project
+T	1172:4877	116,97628,71,11	9	Semi Bold	true	WIDTH_AND_HEIGHT	field/PROJECT NAME	PROJECT NAME
+T	1172:4875	254,97600,22,13	11	Regular	true	WIDTH_AND_HEIGHT	tab/Social image	SEO
+R	1172:4867	1171:4767	NAVIGATE	RETIRED — Project settings modal (⌃,) · superseded
+R	1172:4887	199:2	NAVIGATE	btn/Save
+R	1172:4885	199:2	NAVIGATE	btn/Cancel
+N	159:2	Inspector · single-selection — RETIRED 2026-09-02,	FRAME	900,149127,300,812	true	VERTICAL	19	true
+C	159:2	texts=45
+T	I2144:11415;92:12	1144,149663,34,16	12	Regular	true	HEIGHT	field	100
+T	159:92	916,149662,88,18	12	Regular	true	HEIGHT	row	Opacity
+T	159:90	1179,149631,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	159:89	916,149631,255,16	11	Medium	true	HEIGHT	row	EFFECTS
+T	159:87	1020,149599,8,16	12	Regular	true	WIDTH_AND_HEIGHT	input	8
+T	159:84	916,149598,88,18	12	Regular	true	HEIGHT	row	Radius
+T	159:82	1179,149567,5,16	11	Regular	true	WIDTH_AND_HEIGHT	row	▾
+T	159:81	916,149567,255,16	11	Medium	true	HEIGHT	row	BORDER
+R	159:2	807:8342	NAVIGATE	Inspector · single-selection — RETIRED 2026-09-02,
+R	633:4013	429:2350	NAVIGATE	hotspot/state · B9.1 · Animation editor
+R	920:4669	170:17	NAVIGATE	btn/ai
+N	817:4774	[not-implemented · superseded by 988:2 · Site · Ac	FRAME	1340,70569,480,560	true	NONE	15	true
+C	817:4774	texts=16
+T	817:4854	1746,71065,30,15	12	Medium	true	WIDTH_AND_HEIGHT	Frame	Send
+T	817:4852	1376,71064,147,16	13	Regular	true	WIDTH_AND_HEIGHT	Frame	Enter email addresses…
+T	817:4850	1364,71029,94,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	[not-implemented · superseded by 988:2 · Site · Ac	Invite via email
+T	817:4849	1480,70993,182,15	12	Regular	true	WIDTH_AND_HEIGHT	[not-implemented · superseded by 988:2 · Site · Ac	Scan to open preview on mobile
+T	817:4795	1364,70797,54,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	[not-implemented · superseded by 988:2 · Site · Ac	QR code
+T	817:4792	1364,70755,124,16	13	Regular	true	WIDTH_AND_HEIGHT	[not-implemented · superseded by 988:2 · Site · Ac	Password protected
+T	817:4791	1689,70718,32,13	11	Medium	true	WIDTH_AND_HEIGHT	Frame	Never
+T	817:4789	1618,70718,43,13	11	Medium	true	WIDTH_AND_HEIGHT	Frame	30 days
+R	817:4774	52:2	NAVIGATE	[not-implemented · superseded by 988:2 · Site · Ac
+END	done=642:3401|642:3538|926:4484|1172:4895|1172:4867|159:2|817:4774	stopped=false	bytes=6132

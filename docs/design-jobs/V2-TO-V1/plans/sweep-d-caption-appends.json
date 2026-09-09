@@ -1,0 +1,14 @@
+[
+  { "id":"813:4869", "key":"six states", "maxHeight":600,
+    "add":"Corrected 2026-09-07 against the code this board describes: chrome-ui/SaveStatus.tsx:18 ships six states — saved · saving · unsaved · conflict · offline · error. Saved (fresh) and Saved (stale) are ONE state, saved plus a relative time from savedAt, and the two states that matter most — conflict (Conflict — reload) and offline (Offline — not saved) — are drawn nowhere on this board. The three sub-lines have been corrected in place; the title still says 5-states and the missing pair is undrawn, not hidden. Canonical topbar states live in 01 · Shell: 65:2 unsaved · 2162:11660 saving · 199:2 saved · 2162:11838 save-failed.",
+    "why":"mirror of the shell save-lifecycle correction (fix-save-lifecycle.mjs)" },
+  { "id":"807:7521", "key":"Canonical drawing of drop feedback", "maxHeight":170,
+    "add":"Canonical drawing of drop feedback is 2474:12031 Canvas · drop feedback — anatomy (09 · Canvas), with the drag that reports success and places nothing in 26 · REVIEW · Insert (UX-A-01, UX-A-19). Two things this step does not say and that board does: the whole visual block is gated on a RESOLVED drop target, so over empty canvas there is no affordance at all; and the accept cue is shown before legality is checked, so an insertion line is drawn on rows that will reject the drop.",
+    "why":"mirror pointer — three boards draw drop feedback" },
+  { "id":"463:2378", "key":"Rail contract", "maxHeight":185,
+    "add":"Rail contract, read back on this board 2026-09-07: the Rail instance 2040:20649 renders exactly six seats — rail/Insert · rail/Layers · rail/Pages · rail/Media · rail/Content · rail/Brand — which matches the shipped RAIL_FIGMA group of six ids (tabsConfig.ts:350). Publish and History have keyboard shortcuts (U, H) and no rail seat, and the expanded drawer is 700, not 560 (LeftSidebar.tsx:586-587); the 560 proposal is filed as an open decision on 2844:12186 and must not be applied here. Every 1440-wide journey step in this section instances the same Rail component, so the seat correction reaches them through the component, not board by board.",
+    "why":"shell mirror — canonical rail/drawer contract for the whole section" },
+  { "id":"172:19", "key":"element catalog", "maxHeight":185,
+    "add":"UX-A-26, owed to this section by the Insert pass and undrawn until now: the shell palette builds Navigation, Edit, View, History, Commands and Recent — GROUPED_TABS_CONFIG plus the CommandCenter registry (CommandPalette.tsx:47-63, 160-210) — and no element catalog, so nothing Insert can place is reachable from ⌘K. Not drawn as UI here: the commands do not exist.",
+    "why":"UX-A-26 — cross-module row the Insert pass routed to 13 · Command palette" }
+]

@@ -1,0 +1,5 @@
+[
+ { "op": "text", "id": "963:4761", "expect": "Drawer slot · 320",
+   "text": "Drawer slot · 280 · pinned, pushes canvas",
+   "why": "SH-C-10 / SH-E-23 in support of UX-F-25 — the slot-proof board states 320; all fifteen shell state boards and --bk-size-drawer say 280. The earlier row tried to replace the substring '320' and its expect guard fired because the node holds the whole sentence. Replacing the sentence." }
+]

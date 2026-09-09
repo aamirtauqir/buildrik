@@ -1,0 +1,21 @@
+N	1339:7171	Client sign-off · A · viewing · 1280 — echo of 1:6 at the 1280×720 minimum fold; canonical	FRAME	100,92589,1280,720	true	NONE	7	true
+K	1339:7172	FRAME	100,92589,1280,56	true	true	Agency header
+K	1339:7175	FRAME	520,92765,440,180	true	true	Card
+K	1339:7178	FRAME	100,93181,1280,68	true	true	Action bar (clears the cookie banner)
+K	1339:7184	FRAME	100,93261,1280,48	true	true	Cookie banner (app-wide, must not overlap the bar)
+K	1671:7309	FRAME	100,93275,200,34	true	true	hotspot/state · Client · B commenting
+K	1671:7311	FRAME	300,93275,200,34	true	true	hotspot/state · Client · C changes-requested
+K	1671:7313	FRAME	500,93275,200,34	true	true	hotspot/state · Client · D approved
+C	1339:7171	texts=8
+T	1339:7185	164,93277,250,15	12	Regular	true	WIDTH_AND_HEIGHT	Cookie banner (app-wide, must not overlap the bar)	We use cookies to improve your experience.
+T	1339:7183	1149,93207,124,16	13	Medium	true	WIDTH_AND_HEIGHT	Approve (primary)	Approve this design
+T	1339:7181	994,93207,108,16	13	Medium	true	WIDTH_AND_HEIGHT	Request changes (secondary)	Request changes
+T	1339:7179	188,93205,700,15	12	Regular	true	HEIGHT	Action bar (clears the cookie banner)	Signed as {Name}. You are looking at the version sent to you {date} — later edits will not
+T	1339:7177	544,92821,392,32	13	Regular	true	HEIGHT	Card	Signed as {Name}. You are looking at the version sent to you {date} — later edits will not
+T	1339:7176	544,92789,392,24	20	Semi Bold	true	HEIGHT	Card	(the site, page tabs, and Your notes)
+T	1339:7174	220,92610,153,15	12	Regular	true	WIDTH_AND_HEIGHT	Agency header	is asking for your feedback
+T	1339:7173	124,92609,59,16	13	Semi Bold	true	WIDTH_AND_HEIGHT	Agency header	{Agency}
+R	1671:7313	1339:7186	NAVIGATE	hotspot/state · Client · D approved
+R	1671:7311	1339:7193	NAVIGATE	hotspot/state · Client · C changes-requested
+R	1671:7309	1340:7162	NAVIGATE	hotspot/state · Client · B commenting
+END	done=1339:7171	stopped=false	bytes=1900

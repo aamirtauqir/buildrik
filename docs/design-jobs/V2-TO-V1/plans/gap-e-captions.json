@@ -1,0 +1,13 @@
+[
+ { "op": "add-caption", "board": "137:2", "name": "caption/UX-A-07 · the onboarding step and this panel disagree",
+   "text": "The onboarding checklist says “Drop a ready-made section — hero, features, footer — onto the canvas” and its button opens this panel. Hero and features are not element rows: they exist only inside BLOCKS, which is COLLAPSED by default and sits below 53 element rows. Either put the section-shaped blocks where the step points — a SECTIONS group open by default, or hero/features promoted into the first screenful, droppable — or rewrite the step to name something the panel actually offers on open. The taxonomy above is founder-final (blocks/groups.ts:1-19), so this is a board decision, not a silent rename.",
+   "why": "UX-A-07 (Major, broken-flow)" },
+
+ { "op": "add-caption", "board": "140:2", "name": "caption/UX-B-31 · there is no recently-deleted",
+   "text": "Deleted pages are recoverable only through Undo, and Undo is the single editor-wide history stack — a page deleted and then followed by three canvas edits needs four undos, which also throw away those three edits. The confirm dialog names ⌘Z as the way back and it is honest only for the case where nothing has happened since. Keep deleted pages recoverable for a session INDEPENDENTLY of the undo stack, reachable from this panel. No such screen exists anywhere in the file.",
+   "why": "UX-B-31 (Major, missing-screen)" },
+
+ { "op": "add-caption", "board": "640:2440", "name": "caption/UX-I-33 · deleting a redirect has no confirm",
+   "text": "Deleting a redirect fires the server mutation on the first click — no confirm, no undo, no toast, and the only feedback is the row disappearing. A redirect is a live routing rule that search engines and existing inbound links depend on. Confirm, naming the rule and what breaks: “/old-pricing will start returning 404.” An undo window on the row would be better still.",
+   "why": "UX-I-33 (Critical, destructive-confirm)" }
+]

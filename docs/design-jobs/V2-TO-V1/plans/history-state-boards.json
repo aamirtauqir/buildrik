@@ -1,0 +1,212 @@
+{
+ "section": "1776:8374",
+ "sectionName": "16 · History",
+ "howToApply": "Each row is one `node scripts/figma/add-state-board.mjs <cloneFrom.id> \"<newBoardName>\" --wire-from <wireFrom.id> --apply`. The clone inherits the source board's panel chrome (tab row, filter chips, approval band, prune note) rather than a second hand-drawn copy of it. THEN resolve the clone's own TEXT ids and write `copy` onto it with history-resolve-ids.mjs + apply-text-fixes.mjs; the copy plan cannot be authored before the clones have ids.",
+ "markerPolicy": "A state the code can already produce ships unmarked; a state the code cannot yet produce ships '[design-ahead]', which is this section's own convention (the seven Backups boards). The marker is in the name at CREATION rather than added by a later apply-truth-marks pass, so a board cannot exist for even one run without the claim it makes about the code attached to it.",
+ "boards": [
+  {
+   "finding": "UX-I-01",
+   "severity": "Critical",
+   "newBoardName": "History · Saves · changes · restore-confirm",
+   "designAhead": false,
+   "cloneFrom": {
+    "id": "163:2",
+    "name": "History · Saves · changes"
+   },
+   "wireFrom": {
+    "id": "163:2",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "The 'All changes' timestamp shipped labelled 'Jump to 14:32' and called composer.history.restoreEntry straight from the click; restoreEntry empties the redo stack and does undoStack.slice(0, entry.index + 1) (HistoryManager.ts:757-775), so everything after that point is gone with no confirm, no toast and no way back. The word 'Jump' promised navigation and performed an irreversible edit.",
+   "copy": {
+    "title": "Restore to 14:32?",
+    "body": "This rewinds the project to Added block at 14:32. It permanently discards 12 later changes and everything you can currently redo. Some of that work has not been saved yet.",
+    "cancel": "Cancel",
+    "confirm": "Restore, discard 12 changes",
+    "rowLabel": "14:32",
+    "rowTooltip": "Restore the project to 14:32 — discards every later change"
+   },
+   "notes": [
+    "NOT design-ahead. The code has already moved: ActivityView.tsx:400-462 (working tree, uncommitted) routes the timestamp through requestRestore -> ConfirmDialog with exactly these strings, and the discard count is derived from the UNFILTERED stack so a search box cannot undercount it. If that working-tree change is reverted, re-mark this board [design-ahead].",
+    "Board sample data ('Added block', 12, 14:32) is shape, not content — the SHAPE is title / consequence sentence naming the count / Cancel / a confirm label that repeats the cost."
+   ]
+  },
+  {
+   "finding": "UX-I-02",
+   "severity": "Critical",
+   "newBoardName": "[design-ahead] History · Saves · time-travel · restore-confirm",
+   "designAhead": true,
+   "cloneFrom": {
+    "id": "163:113",
+    "name": "History · Saves · time-travel"
+   },
+   "wireFrom": {
+    "id": "163:113",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "'Restore this point' fires straight into the same truncating restore with no confirmation (TimeTravelScrubber.tsx:264-268 -> HistoryTab.tsx:195-201 -> composer.history.restoreEntry), while the identical operation on a named version two clicks away shows a confirm band. A user who scrubs to explore and presses the obvious primary button loses everything after that point without being asked. The drawer's own band already says 'Nothing is written until Restore' — make the button honour it.",
+   "copy": {
+    "title": "Restore to 14:32?",
+    "body": "Your current work is saved as a version first. This discards 12 later changes and everything you can currently redo.",
+    "cancel": "Keep scrubbing",
+    "confirm": "Restore, discard 12 changes"
+   },
+   "notes": [
+    "One restore contract across the module: preview -> confirm that names the cost -> restore, with the current state auto-saved as a version first. Same three parts as UX-I-01's dialog and as VersionHistoryPanel.tsx:359-378's band."
+   ]
+  },
+  {
+   "finding": "UX-I-12",
+   "severity": "Critical",
+   "newBoardName": "[design-ahead] History · Saves · time-travel · no-preview",
+   "designAhead": true,
+   "cloneFrom": {
+    "id": "163:113",
+    "name": "History · Saves · time-travel"
+   },
+   "wireFrom": {
+    "id": "163:113",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "The scrub preview is the nearest NAMED version's screenshot, not a render of the past. With no named versions the preview layer is set to opacity 0 (TimeTravelScrubber.tsx:237-241) and the live canvas shows through unchanged, while the drawer prints 'Previewing: 14:32 — Added block' regardless (:131-133). The user is looking at the present, being told it is the past, with a restore button under it.",
+   "copy": {
+    "title": "No preview for this point",
+    "body": "The nearest saved frame is from 13:05. Scrub there to see it, or save a version now so this point has one.",
+    "primaryDisabled": "Restore this point",
+    "disabledReason": "Nothing to compare against — restore would be blind.",
+    "secondary": "Go to 13:05"
+   },
+   "notes": [
+    "The alternative in the finding — 'fall back to restoring into a preview mode the user can back out of' — is a bigger behavioural change than a state board can carry. This board takes the first branch: say so, and disable Restore."
+   ]
+  },
+  {
+   "finding": "UX-I-05",
+   "severity": "Major",
+   "newBoardName": "[design-ahead] History · Saves · changes · start-of-history",
+   "designAhead": true,
+   "cloneFrom": {
+    "id": "163:2",
+    "name": "History · Saves · changes"
+   },
+   "wireFrom": {
+    "id": "163:2",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "Undo is capped at 100 steps and trimHistory() shifts entries off the front with no emit (HistoryManager.ts:613-629; config.ts:108). The list simply stops going back, with no line saying where history begins or that anything was dropped. HISTORY_CAPACITY_WARNING (events.ts:133) has zero emitters and zero listeners — its declaration is its only occurrence in packages/editor/src.",
+   "copy": {
+    "boundaryTitle": "History starts here",
+    "boundaryBody": "Earlier steps were dropped — this list keeps the last 100.",
+    "action": "Save a version to keep a point",
+    "firstHitNotice": "Undo now only reaches back 100 steps. Save a version to keep this point for good."
+   },
+   "notes": [
+    "163:269 'History · Saves · pruned-notice' is NOT this state. Measured live in LEDGER J-163:269, it draws the VERSION store's 50-item rule ('Older auto-saves were removed / Past 50. Named versions and the approved one were kept.'). Two different stores, two different boundaries — reusing that board would re-create the exact conflation UX-I-09 is about.",
+    "The 'Save a version' action here is also the session-row half of UX-I-14."
+   ]
+  },
+  {
+   "finding": "UX-I-06",
+   "severity": "Major",
+   "newBoardName": "[design-ahead] History · Saves · changes · load-error",
+   "designAhead": true,
+   "cloneFrom": {
+    "id": "453:4031",
+    "name": "History · Saves · load-error"
+   },
+   "wireFrom": {
+    "id": "163:2",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "The 'All changes' list has a built error state (alert, 'Failed to load activity', Retry) that no user can reach: HistoryTab.tsx:333-341 mounts ActivityView with composer/searchQuery/onOpenTimeTravel/onClearHistory/canClear only — never `error` or `onRetry` (ActivityView.tsx:643-658). A failed read falls through to 'No undo history', which is the same lie the Saves list was explicitly fixed for on its own board.",
+   "copy": {
+    "title": "Couldn't load your recent changes.",
+    "body": "Your saved versions are unaffected. Only this list failed to load.",
+    "footNote": "Retry, or reopen History in a moment.",
+    "action": "Try again"
+   },
+   "notes": [
+    "Cloned from 453:4031 because that board's live copy is already the honest form this finding asks for — measured verbatim in LEDGER J-453:4031: \"Couldn't load version history.\" / 'Your versions are still stored. Only this list failed to load.' / 'Try again'. The clone inherits the right shape; only the subject changes.",
+    "The finding's other branch — 'or delete the branch' — is a code decision, not a board one. Drawing the state is the move that makes the decision visible."
+   ]
+  },
+  {
+   "finding": "UX-I-07",
+   "severity": "Major",
+   "newBoardName": "[design-ahead] History · Saves · changes · clear-confirm",
+   "designAhead": true,
+   "cloneFrom": {
+    "id": "163:2",
+    "name": "History · Saves · changes"
+   },
+   "wireFrom": {
+    "id": "163:2",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "'Clear' wipes the entire undo stack (HistoryManager.ts:783-799 empties BOTH stacks). The confirm is the same button re-labelled 'Clear all' with a Cancel beside it (ActivityView.tsx:471-490) and never states the consequence. It also lives only inside the 'All changes' filter, so the control that destroys history is hidden behind a filter chip — while the list it destroys is the one feeding the change counts shown on the other filter.",
+   "copy": {
+    "title": "Clear this session's history?",
+    "body": "Undo will stop working for the 47 steps before now, and it cannot be brought back. Saved versions are not affected.",
+    "cancel": "Cancel",
+    "confirm": "Clear 47 steps"
+   },
+   "notes": [
+    "The finding's alternative is 'or drop the control — nothing about a session's undo stack needs manual clearing, and the button's only reachable outcome is data loss.' Recorded as an open decision on this board rather than taken: deleting a control is a founder call, and the costed confirm is safe either way."
+   ]
+  },
+  {
+   "finding": "UX-I-15",
+   "severity": "Major",
+   "newBoardName": "[design-ahead] History · Saves · changes · undo-unavailable",
+   "designAhead": true,
+   "cloneFrom": {
+    "id": "163:2",
+    "name": "History · Saves · changes"
+   },
+   "wireFrom": {
+    "id": "163:2",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "Some features deliberately change the project outside history and disable Undo until the next recorded action (HistoryManager.ts:639-646 noteUnrecordedAction -> EVENTS.HISTORY_UNRECORDED; callers BaseBindingManager.ts:106,125,134 and MediaCommandLayer.ts:108). The switch-off is not announced where the state lives — the user learns by pressing Cmd+Z and reading the refusal.",
+   "copy": {
+    "notice": "Undo isn't covering your last action",
+    "body": "Binding a field to content isn't undoable. Undo starts working again with your next edit.",
+    "action": "Save a version first",
+    "undoTooltip": "Undo unavailable — binding a field to content isn't recorded in history"
+   },
+   "notes": [
+    "PARTIALLY STALE FINDING. UX-I-15 says 'nothing in the UI listens'. That stopped being true on 2026-09-04: useComposerInit.ts:705-716 includes EVENTS.HISTORY_UNRECORDED in HISTORY_STATE_EVENTS and re-reads canUndo/canRedo on it, so the Undo CONTROL is already disabled (commit de36af334 'fix(history): Undo stops offering after an action that is not in history'). What is still missing — and what this board draws — is NAMING the action. The switch-off is no longer silent, only anonymous.",
+    "The label is engine-supplied user-facing copy: noteUnrecordedAction's `label` argument is 'said the way the toast will say it' per its own docblock, and BaseBindingManager.ts:106 passes 'binding a field to content'."
+   ]
+  },
+  {
+   "finding": "UX-I-08",
+   "severity": "Minor",
+   "newBoardName": "[design-ahead] History · Saves · overflow — Export / Import",
+   "designAhead": true,
+   "cloneFrom": {
+    "id": "162:2",
+    "name": "History · Saves"
+   },
+   "wireFrom": {
+    "id": "162:2",
+    "note": "add-state-board's --wire-from puts an ON_CLICK on this node. Replace with the hotspot row in history-hotspots.json once the label's own id is resolved — a board-level reaction makes the WHOLE board clickable, which is the defect add-hotspots.mjs exists to avoid."
+   },
+   "why": "VersionTimelineManager.ts:360-389 exportVersions(download) / importVersions(file, clearExisting) are implemented, including a clear-existing mode, and no screen calls either — grep over src/ returns only engine/ and its tests. Versions live in IndexedDB in one browser, so a user cannot back up, move or restore their saves at all.",
+   "copy": {
+    "menuTitle": "Saves",
+    "item1": "Export version history…",
+    "item1Sub": "A .json file of every saved version.",
+    "item2": "Import version history…",
+    "item2Sub": "Adds the imported versions to the ones you have.",
+    "item3": "Replace everything with an import…",
+    "item3Sub": "Deletes every version in this browser first. Cannot be undone.",
+    "note": "Versions are stored in this browser. Export before switching machines."
+   },
+   "notes": [
+    "Import defaults to MERGE and the destructive mode is a separate, explicitly-named row — the finding's requirement. importVersions(file, clearExisting=false) already has that default.",
+    "The finding's alternative — 'if this is deliberately out of scope, delete the engine surface so the next audit does not re-file it' — is a code decision and is recorded as an open decision, not taken."
+   ]
+  }
+ ]
+}

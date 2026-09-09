@@ -1,0 +1,96 @@
+{
+  "slug": "components",
+  "plan": "components-duplicates",
+  "written": "2026-09-07",
+  "state": "CANDIDATES — NOT APPLIED, and deliberately NOT PRESENTED AS A CENSUS. Blocked on the Figma MCP seat quota.",
+
+  "provenance_warning": "Read this before quoting any number below. Every instance count here comes from scratchpad_audit/mod/component-census.txt, a run made by the PREVIOUS session at 2026-09-06 23:02. That run had the zero-use roll-up fix but NOT the collision fix — its own 'NAME COLLISIONS (12)' block is the known-wrong output, compare-variant-strings-as-names. This job did not re-measure it. The only Figma read this job completed first-hand is the section 2040:8372 structure quoted in components-nav-row-merge.json. Treat everything else as a lead to verify, not a finding.",
+
+  "how_these_were_found": "Not by the exact-name compare — that pass returns 0 on this file and is right to. The duplicates below differ only in NAMING CONVENTION, which string equality cannot see. The normalised and leaf passes added to scripts/figma/audit-components.mjs on 2026-09-07 are what surface them; scripts/figma/audit-components.selftest.mjs proves both passes on a fixture built from these exact pairs, offline, with no quota.",
+
+  "definite_duplicates_pending_verification": [
+    {
+      "id": "DUP-01",
+      "kind": "two icon libraries under two naming conventions",
+      "pairs": [
+        { "a": "91:67 'Icon / bell' (0 instances)", "b": "681:4338 'icon/bell' (114 instances)" },
+        { "a": "91:49 'Icon / ellipsis' (0 instances)", "b": "681:4343 'icon/ellipsis' (110 instances)" },
+        { "a": "91:30 'Icon / chevron-left' (0 instances)", "b": "681:4334 'icon/chevron-left' (0 instances)" }
+      ],
+      "evidence_class": "NORMALISED — identical after lowercasing and stripping separators. Same glyph, two masters.",
+      "unambiguous": true,
+      "proposed_action": "Keep the USED master in each pair, retire the unused twin by description marker rather than deletion (the brief forbids deleting a board and the same caution applies to a master nothing can be recovered from). For the chevron-left pair, where NEITHER is used, keep the one whose siblings are used — the 681:* family — so one convention survives.",
+      "do_not_do_yet": "Do not delete. Do not swap instances. Run scripts/figma/instance-map.mjs on each surviving master first; a master with 114 instances is not something to touch on the strength of a name."
+    },
+    {
+      "id": "DUP-02",
+      "kind": "three nav-row masters for one job",
+      "members": [
+        "16:26 'Nav item' — 1,026 instances, pages Site / Portfolio / Dashboard",
+        "2041:19572 'Settings nav row' — 600 instances, page 1:3",
+        "975:615 'Dashboard nav' — 251 instances per DECISIONS-OPEN section 5"
+      ],
+      "evidence_class": "founder decision, already taken: MERGE (DECISIONS-OPEN section 5, 2026-09-06)",
+      "unambiguous": false,
+      "proposed_action": "See plan components-nav-row-merge.json. Two of the three are merged there. The third, 975:615, stays separate: DECISIONS-OPEN section 1 established the dashboard legitimately runs its own nav component with its own type system, and its active state is a 2px bottom underline (top-nav.tsx:60) — a third treatment again. Merging it would be a product decision about the dashboard, not a cleanup of the editor."
+    }
+  ],
+
+  "candidates_that_need_judgement": [
+    {
+      "id": "DUP-03",
+      "kind": "same glyph, different size suffix",
+      "pairs": [
+        { "a": "91:42 'Icon / plus' (0)", "b": "980:677 'icon/plus-16' (0)", "caught_by": "leaf pass" },
+        { "a": "91:129 'Icon / external-link' (0)", "b": "980:685 'icon/external-16' (0)", "caught_by": "NEITHER pass — the leaves are 'externallink' and 'external'. Found by reading, and recorded so the next audit does not assume the tool would have caught it." }
+      ],
+      "unambiguous": false,
+      "why": "A -16 suffix may mean a genuinely different size variant of the same glyph, in which case it is one component with a Size axis, or it may be a second library that happens to overlap. Both are zero-use, so nothing is at stake in getting it wrong except tidiness — which is exactly why it must not be merged on a guess."
+    },
+    {
+      "id": "DUP-04",
+      "kind": "four row masters",
+      "members": [
+        "8:47 'Row' — flat list row at five sizes; superseded for tree rows per DECISIONS-OPEN section 10 and 12",
+        "232:6 'List row' — 61 instances",
+        "243:6 'Layers tree row — chevron · icon · name · eye · lock' — 57 instances",
+        "2142:11082 'List row · indented (label only) — Depth 0-5 x State' — 387 instances"
+      ],
+      "unambiguous": false,
+      "NOT_A_DUPLICATE": "243:6 against 2142:11082. Section 2040:8372's own name carries this correction and it is load-bearing — read first-hand 2026-09-07: '...NOTE: the List row here is NOT the Layers tree row; Layers instances 243:6 on page 🧩 Components, 57 times, and this set zero times.' Different anatomy: the Layers row carries chevron, icon, eye and lock; the indented List row is label-only. Recorded here so the next audit does not re-file it as a duplicate, which is the failure mode this note exists to prevent.",
+      "open": "8:47 'Row' against 232:6 'List row' is a real consolidation candidate and is UNMEASURED. DECISIONS-OPEN section 12 already argues against folding Tree row into Row (120 cells for one real shape); whether the same argument covers List row needs the shapes census."
+    }
+  ],
+
+  "zero_use_masters_that_need_a_verdict": {
+    "note": "From the prior run's list, minus the ones already ruled on. 'Zero uses' does not mean neglect — DECISIONS-OPEN section 10 records three of four zero-use components as unadoptable for specific reasons, and two prior sessions were conservative-wrong about that in the other direction. Each of these needs the --shapes sweep to say whether boards draw a copy of it, and a pilot on one board, before it is costed.",
+    "already_ruled": [
+      "10:27 'Status dot' — cannot adopt, six semantic jobs share the circle; DECISIONS-OPEN section 14, with evidence",
+      "92:30 'Slider' — adopted, DECISIONS-OPEN section 13",
+      "14:20 'Radio' — adopted, DECISIONS-OPEN section 10"
+    ],
+    "unruled": [
+      "17:23 'Progress row'",
+      "19:46 'Drawer frame'",
+      "19:47 'Right panel frame'",
+      "19:79 'Modal frame'",
+      "982:677 'Dashboard / Page header'",
+      "984:683 'Dashboard / Section card'",
+      "985:729 'Dashboard / State — loading (table)'",
+      "992:707 'icon/gauge'",
+      "977:669 'icon/users'",
+      "977:672 'icon/shield'",
+      "980:690 'icon/triangle-alert-16'",
+      "~30 masters in the 91:* 'Icon / *' family"
+    ],
+    "the_test_to_run": "node scripts/figma/audit-components.mjs --shapes --min=8 — a repeated hand-drawn signature WITH a matching master is a board drawing a copy of something it could instance; one WITHOUT a master is a component that does not exist yet. Three of the four frames above (Drawer, Right panel, Modal) are exactly the shapes the founder's standardise list names, so if boards are drawing them by hand this sweep is where it shows."
+  },
+
+  "library_legibility_defect": {
+    "id": "DUP-05",
+    "measured_first_hand": "2026-09-07, section 2040:8372: Rail 2034:8519 is a 60x812 set holding seven 60x812 variants; Settings nav row 2041:19572 is a 140x30 set holding two 140x30 variants; List row 2142:11082 is a 280x28 set holding twelve 280x28 variants.",
+    "what_it_means": "Every variant is stacked at one point. A set whose union bounds equal one variant's bounds has all of them on top of each other, so the library page shows one variant per component and the states these sets exist to document cannot be seen.",
+    "scope": "Only the Nav row set is laid out by components-nav-row-merge.json, because adding four variants forces the question. Rail and List row are left stacked and are OWED — laying them out is a page-1:3 write inside section 2040:8372, which is in scope, and costs one MCP call each.",
+    "constraint": "Laying out the List row set at 2 columns x 6 rows is roughly 600x248 and will not fit under the Nav row without growing the section. verify-invariants.mjs counts two boards in one section covering the same pixels as a failure — resize the section, do not overlap."
+  }
+}

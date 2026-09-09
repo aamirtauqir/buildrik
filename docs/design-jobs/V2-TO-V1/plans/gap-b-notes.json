@@ -1,0 +1,86 @@
+{
+  "_": "Gap-B: the 24 findings that had NO queue row at all. Their module agents ran out of Figma quota before writing one, so each sat PENDING with nothing behind it. This file carries the eight section notes that give the non-drawable half of them a visible home on page 1:3. Placement is measured, not guessed: dump-section-freespace.mjs (2026-09-07) returned each section's maxBottom, and every note sits in the strip BETWEEN maxBottom and the section's bottom edge, which is free by definition. Four sections were grown in gap-b-sections.json to open that strip.",
+  "page": "1:3",
+  "rows": [
+    {
+      "board": "148:2",
+      "from": "155:47",
+      "name": "note/Content · V2→V1 gap findings (UX-C-10/13/21/26/27/30)",
+      "x": 100,
+      "y": 5837,
+      "w": 3200,
+      "text": "V2 → V1 · Content gap findings, closed 2026-09-07. No queue row existed for any of these.\nUX-C-30 (Critical · module summary) — the spine is collection → fields → records → repeater on canvas → publish, and it is what this section must be sequenced around; every other Content row is a consequence of its absence. The collection still has no settings screen owning rename, delete, display field and dynamic pages.\nUX-C-10 · UX-C-13 · UX-C-26 — the binding popover. Drawn where it lives: 1707:8427 in 08 · Inspector, not here.\nUX-C-21 — the e-commerce collection-setup offer. Drawn where it lives: 1719:8391 in 22 · Ecommerce.\nUX-C-27 — restoring persisted bindings must not mark history dirty. Recorded in 16 · History.",
+      "why": "UX-C-30 module summary + the placement record for the five Content findings whose boards live in other sections"
+    },
+    {
+      "board": "162:2",
+      "from": "172:5",
+      "name": "note/History · V2→V1 gap findings (UX-C-27, UX-I-03/04/11/13/14)",
+      "x": 100,
+      "y": 4583,
+      "w": 3600,
+      "text": "V2 → V1 · History gap findings, closed 2026-09-07. No queue row existed for any of these.\nUX-C-27 (Minor, carried from 06 · Content) — restoring persisted CMS bindings at load counts as an unrecorded change, so a freshly opened site disables Undo before the user has done anything, and the refusal names an action they did not perform. Restoring persisted state is not a user action: importing bindings must not mark history dirty, and any refusal must name something the user did.\nUX-I-03 (Critical) — checked on the BOARD, not only in code. 163:113 draws no keyboard contract at all; its only safety line is 163:166 “Nothing is written until Restore.” The Enter-in-the-search-box defect is therefore a code fact with no board that states it wrongly. NOT-APPLICABLE to this section; the code half is already guarded in the working tree.\nUX-I-04 (Major) — panel half only: the drawer must say that time-travel is a MODE — “Time-travel is on. The canvas is read-only; ← → step the timeline.” The canvas half belongs to 09 · Canvas and 01 · Shell and is deliberately not drawn here.\nUX-I-11 (Minor) — NOT-APPLICABLE, confirmed on measurement: 163:113 is a 360-wide panel board and draws no canvas-relative geometry, so the drawer's hardcoded left and right insets cannot be wrong on it. Carrying it would mean inventing a full-screen History board duplicating 1776:8385.\nUX-I-13 (Minor) — the scrubber opens with the thumb parked at the MIDDLE of the stack. It must open at now, with the timeline running back from it.\nUX-I-14 (Major) — “Save this point as a version” belongs on every session row in this section; the topbar half belongs to 01 · Shell.",
+      "why": "UX-C-27, UX-I-03, UX-I-04, UX-I-11, UX-I-13, UX-I-14 — six findings with no queue row, given the one home that draws the surface they are about"
+    },
+    {
+      "board": "807:8342",
+      "from": "161:13",
+      "name": "note/Inspector · V2→V1 gap findings (UX-D-17/18/22/23/29 + UX-C-10/13/26)",
+      "x": 100,
+      "y": 5953,
+      "w": 2800,
+      "text": "V2 → V1 · Inspector gap findings, closed 2026-09-07. No queue row existed for any of these. Companion to 2866:21879 Inspector · OPEN DECISIONS.\nUX-D-17 (Minor) — the footer's “N of M sections apply” cannot ever count six of the sections in a profile, because link, interactions, animation, element-properties, css-classes and all-css declare no CSS keys. The line understates every element. Remove it, or let a section report its own has-content.\nUX-D-18 (Minor) — Visibility declares display / visibility / opacity / pointer-events and writes --hide-<breakpoint>. Declare the real keys so that applies, auto-expand and the footer count all describe what the section does. A labelling defect, not a dead control: the write is honoured end to end.\nUX-D-22 (Major) — the raw-CSS escape hatch ships as CUSTOM CSS, an ordinary collapsed section for everyone, not behind a hand-set localStorage key; and the two Border implementations resolve to one.\nUX-D-23 (Minor) — ID / Title / Tab Index is ADVANCED HTML, not “Element properties”. Hide it when it has nothing type-specific to say. The freed name belongs to UX-D-08's element editor.\nUX-D-29 (Major · module summary) — the sequence is: the missing editors (UX-D-08, UX-D-09) → lock and multi-select (UX-D-02, UX-D-03) → findability (UX-D-10, 11, 25, 26) → collapse the two animation systems (UX-D-14).\nCarried here from 06 · Content, because the binding popover 1707:8427 is an Inspector board: UX-C-10 (its dead end named a command-palette entry as the destination — corrected in place), UX-C-13 (the popover must ask WHICH property to bind, defaulted from element type and field type, and offer only fields that can drive the selected element; today every field type binds text content, so an Image bound to a Photo field never changes), UX-C-26 (+ Create Collection must return the created collection to whoever asked, reopen the popover on it and let the first record be created in the same flow, instead of abandoning the user in a wizard that auto-dismisses).",
+      "why": "UX-D-17, UX-D-18, UX-D-22, UX-D-23, UX-D-29 with no queue row, plus the three Content findings whose board lives in this section"
+    },
+    {
+      "board": "641:2652",
+      "from": "788:4319",
+      "name": "note/Publish · V2→V1 gap findings (UX-E-15/28/31)",
+      "x": 100,
+      "y": 4353,
+      "w": 2600,
+      "text": "V2 → V1 · Publish gap findings, closed 2026-09-07. No queue row existed for any of these.\nUX-E-15 (Minor) — ALREADY-CORRECT on the board, read back 2026-09-07: the footer of 1172:4825 holds 1172:4835 “Cancel” and 1172:4837 “Export as HTML” and nothing else. No Download All, no Download CSS. The three-unlabelled-buttons defect is code-only.\nUX-E-28 (Minor) — OPEN DECISION, deliberately not drawn. The fix offers drop the row or replace it with the draft-share link; SPEC-PUBLISH-PANEL §3 deletes ENVIRONMENT as a section, and the draft-share link is owned by the dashboard. Relabelling the row would entrench a section the spec removes, and no IA edge is invented here. The Preview — None row therefore stands on 641:2652, 784:4250, 784:4326 and 784:4403 until the section question is settled.\nUX-E-31 (Critical · module summary) — one state machine with one publishable / not-publishable answer, one progress vocabulary shared with the worker, and a named way out of every terminal and stuck state; the topbar gate and the panel gate merge into one. Cancellation is NOT built end to end — no cancel check spans the Vercel deploy — so the cancelled state says “If the deploy had already started it may still finish. We will tell you which.” One correction the finding carries and this section must keep: on CMS detail pages the server DOES inject a correct per-path canonical and og:url. What IS the template's is the first title, og:title, og:description and twitter:* — that is UX-E-05, and the refuted half must not be drawn.",
+      "why": "UX-E-15 (already-correct, with the read-back), UX-E-28 (recorded open, per the founder instruction), UX-E-31 (module summary, refuted half excluded)"
+    },
+    {
+      "board": "168:2",
+      "from": "172:9",
+      "name": "note/Compare · V2→V1 gap findings (UX-I-23/24/29)",
+      "x": 100,
+      "y": 2132,
+      "w": 3600,
+      "text": "V2 → V1 · Review and Compare gap findings, closed 2026-09-07. No queue row existed for any of these.\nUX-I-24 (Major) — one diff, one component. The publish gate 1168:4713 (in 15 · Publish) computes its own page-level diff, lists bare page names capped at six, and offers no door to the real thing. It needs a “See what changed ›” that opens 168:2, and the second implementation goes.\nUX-I-29 (Major) — the approval band in 16 · History offers “Compare with current”, which switches the whole left panel to Review and opens Compare here; Compare's only exit lands the user in the Review comment thread, a module they never asked for. Cross-module deep links need a return address: relabel the back control on 168:2 to ‹ Review, and add a second, conditional ‹ History › Saves exit on this board only.\nUX-I-23 (Major) — NOT TOUCHED, deliberately. It asks to drop the “Opened · no reply” distinction; DECISIONS-OPEN §17 already settled that distinction as real, and this arc does not re-open a settled decision. The pill and bar boards live in 23 · Journeys · S-flows, not in this section. What is still owed is one vocabulary, defined once and consumed by the pill, the bar and the panel alike.",
+      "why": "UX-I-24, UX-I-29 specified against the boards they name; UX-I-23 recorded as not-touched with the reason"
+    },
+    {
+      "board": "161:11",
+      "from": "161:11",
+      "name": "note/Review · V2→V1 gap findings (UX-I-23 panel half)",
+      "x": 100,
+      "y": 5538,
+      "w": 3600,
+      "text": "V2 → V1 · Review gap findings, closed 2026-09-07. UX-I-23, UX-I-24 and UX-I-29 are recorded in full on the note at the foot of 17 · Compare. The panel half of UX-I-23 belongs here: the empty-state sentence this section draws is the long form that the topbar pill must be the short form of, and if “Opened · no reply” is a real distinction — DECISIONS-OPEN §17 says it is — then it has to appear in this panel too, not only in the pill.",
+      "why": "UX-I-23 — the third of its three surfaces is in this section; the finding itself is not applied, per DECISIONS-OPEN §17"
+    },
+    {
+      "board": "153:120",
+      "from": "155:65",
+      "name": "note/Brand · V2→V1 gap findings (UX-H-27, UX-H-35)",
+      "x": 100,
+      "y": 7551,
+      "w": 3200,
+      "text": "V2 → V1 · Brand gap findings, closed 2026-09-07. No queue row existed for either.\nUX-H-27 (Major) — “12 ID collisions” is a number nobody can act on. The IMPORT detail block on 153:120 owes a per-token list — token name, your value, their value — with a per-row keep / take and a + N more overflow row; the whole-file strategy chips stay as bulk shortcuts OVER that list, not instead of it. The data already exists and is never shown: diffTokens computes parsed.diff.modified today.\nUX-H-35 (Major · module summary) — put a what-will-change step in front of every whole-brand write: starter, import and AI. Import is UX-H-27 above. Starters owe the same diff. The AI door already has the right shape — propose → diff → apply → single undo — because its success modal draws a schema preview and no Accept button.",
+      "why": "UX-H-27 and UX-H-35 — the two brand findings with no queue row"
+    },
+    {
+      "board": "1719:8391",
+      "from": "155:47",
+      "name": "note/Ecommerce · V2→V1 gap finding (UX-C-21)",
+      "x": 100,
+      "y": 1992,
+      "w": 1000,
+      "text": "V2 → V1 · UX-C-21 (Major), carried from 06 · Content and closed here 2026-09-07. Dropping a product block offers to create a Products collection and promises it is ready for CMS data binding — then stops. It creates the collection and the sample products and binds nothing, so the block that triggered the offer still shows placeholder copy. Finish the flow: after 1719:8391 creates the collection, bind the inserted block to it and show the sample products on the canvas, which is the whole point of having offered. And make the offer recoverable — an action on the block or in the Content panel — rather than a one-shot prompt the user can only ever answer once.",
+      "why": "UX-C-21 — the Content lane handed it on because the dialog's board is in this section; it is placed rather than handed on again"
+    }
+  ]
+}

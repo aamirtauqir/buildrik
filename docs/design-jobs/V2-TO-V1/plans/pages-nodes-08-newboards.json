@@ -1,0 +1,135 @@
+[
+  {
+    "op": "resize",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · delete-page · confirm · inbound links (of 1171:4820)"
+    },
+    "width": 440,
+    "height": 216,
+    "why": "UX-B-04 — the source modal 1171:4820 is 440x117, which fits two lines. The confirm has to carry the inbound-link count, a way to see the links and the undo promise, so it grows vertically only and keeps the 440 class.",
+    "_resolve_into": "id"
+  },
+  {
+    "op": "clone-row",
+    "src": "1717:17220",
+    "name": "drag/indicator",
+    "x": 16,
+    "y": 79,
+    "why": "UX-B-06 + UX-B-07 — the insertion line at the computed drop position, drawn ABOVE the first row. That position is the whole point: PagesTab.css:319 already has .bd-pg-drop-indicator.show and nothing adds the class (PageList.tsx:155, :351), and PageList.tsx:313-315 always inserts AFTER a target so the first slot is unreachable — while PageManager.reorderPage:342 already accepts afterId === null. CLONED FROM A HAIRLINE RULE, so it arrives border-grey: its fill must be set to the accent by hand, because I never read a fill on this file and cloning is the only way I can match a style without guessing a hex.",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · tree · drag · drop indicator (of 140:2)"
+    },
+    "_resolve_into": "parent",
+    "_note": "resolve-selectors.mjs writes the resolved id onto `id`; for these rows COPY it onto `parent` before running edit-board-nodes.mjs. The clones do not exist until pages-boards-07-new.sh runs, so no id could be read.",
+    "width": 248,
+    "height": 2,
+    "_geometry_source": "READ-derived from 140:2 — Row · Marketing begins at rel y 80, so the line above the first row sits at 79."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "name": "note/UX-B-06",
+    "x": 16,
+    "y": 640,
+    "why": "UX-B-06 / UX-B-07",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · tree · drag · drop indicator (of 140:2)"
+    },
+    "_resolve_into": "parent",
+    "_note": "resolve-selectors.mjs writes the resolved id onto `id`; for these rows COPY it onto `parent` before running edit-board-nodes.mjs. The clones do not exist until pages-boards-07-new.sh runs, so no id could be read.",
+    "text": "UX-B-06 / UX-B-07 — the line shows where the drop lands, and where it lands depends on which half of the row the pointer is in: above the midpoint inserts BEFORE. That is the only way the first slot becomes reachable, and on a site where nobody chose a homepage the first slot is the homepage. Today dragover sets only dropEffect (PageRow.tsx:115-119), so a drag shows the user nothing at all.",
+    "width": 248
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "name": "pub/state",
+    "x": 138,
+    "y": 8,
+    "why": "UX-B-05 — on a site where nobody has chosen a homepage the root is whichever row is first, and no row says so. PageManager.ts:243 is the only writer of isHome, createPage (:61-93) never sets it, and PageRow.tsx:231 draws the roof glyph only when page.isHome — so the panel looks like a site with no homepage while ExportEngine.ts:146 quietly serves pages[0]. Until isHome is flagged at creation, the row that is ACTING as home carries the qualifier, so reorder and delete can warn before the root moves.",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · tree · homepage by position (of 140:2)",
+      "name": "Row · Home"
+    },
+    "_resolve_into": "parent",
+    "_note": "resolve-selectors.mjs writes the resolved id onto `id`; for these rows COPY it onto `parent` before running edit-board-nodes.mjs. The clones do not exist until pages-boards-07-new.sh runs, so no id could be read.",
+    "text": "Homepage (by position)",
+    "_geometry_source": "READ-derived from 140:2 — Row · Home is rel y 112, 280x32, and its dirty dot ends at rel x 260. 'Homepage (by position)' is ~122px at Inter Regular 11, hence x 138."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "name": "note/UX-B-05",
+    "x": 16,
+    "y": 640,
+    "why": "UX-B-05",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · tree · homepage by position (of 140:2)"
+    },
+    "_resolve_into": "parent",
+    "_note": "resolve-selectors.mjs writes the resolved id onto `id`; for these rows COPY it onto `parent` before running edit-board-nodes.mjs. The clones do not exist until pages-boards-07-new.sh runs, so no id could be read.",
+    "text": "UX-B-05 — no page on this site is flagged isHome. The row serving / is the first one, so deleting it or reordering above it MOVES the site root, and the delete guard that is supposed to protect the homepage never fires because nothing is flagged. Either flag the first page at creation (PageManager.ts:61-93) or say this.",
+    "width": 248
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "name": "note/local-only",
+    "x": 16,
+    "y": 640,
+    "why": "UX-B-27",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · local-only · project load failed (of 141:124)"
+    },
+    "_resolve_into": "parent",
+    "_note": "resolve-selectors.mjs writes the resolved id onto `id`; for these rows COPY it onto `parent` before running edit-board-nodes.mjs. The clones do not exist until pages-boards-07-new.sh runs, so no id could be read.",
+    "text": "Editing is held back until the real project arrives, or until you choose to work offline. The panel hears the load failure directly instead of drawing an invented site confidently.",
+    "width": 248
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "name": "toast/one",
+    "x": 16,
+    "y": 640,
+    "why": "UX-B-11 — one toast for one user action, which is what the confirm dialog already promises (PagesTab.tsx:345-347). Drawn as an annotation-styled line rather than a dark toast surface, because I never read a dark fill anywhere in this section and inventing one is exactly the hand-chosen styling edit-board-nodes.mjs exists to prevent. Re-style it as a real toast once a toast master is available.",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · bulk · one toast per action (of 141:78)"
+    },
+    "_resolve_into": "parent",
+    "_note": "resolve-selectors.mjs writes the resolved id onto `id`; for these rows COPY it onto `parent` before running edit-board-nodes.mjs. The clones do not exist until pages-boards-07-new.sh runs, so no id could be read.",
+    "text": "3 pages deleted · Undo",
+    "width": 248
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "name": "note/UX-B-12",
+    "x": 16,
+    "y": 690,
+    "why": "UX-B-12",
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · bulk · one toast per action (of 141:78)"
+    },
+    "_resolve_into": "parent",
+    "_note": "resolve-selectors.mjs writes the resolved id onto `id`; for these rows COPY it onto `parent` before running edit-board-nodes.mjs. The clones do not exist until pages-boards-07-new.sh runs, so no id could be read.",
+    "text": "UX-B-12 — bulk duplicate speaks too: it toasts its count, selects the new copies and scrolls the first into view. Today the selection clears, the copies append to the bottom of a possibly-scrolled list, and nothing is said at all (PagesTab.tsx:151-154; usePages.ts:228-254 toasts only in the failure and catch branches).",
+    "width": 248
+  }
+]

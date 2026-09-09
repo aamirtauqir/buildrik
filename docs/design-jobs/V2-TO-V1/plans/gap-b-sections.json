@@ -1,0 +1,10 @@
+{
+  "_": "Gap-B section headroom. Four sections whose content already reached (or passed) their own bottom edge, grown just enough to seat the gap notes INSIDE the section rather than below it. Every new height was checked against the next section's top from the same read that measured maxBottom: Publish 72169+4620=76789 < 77134 History · History 77134+4900=82034 < 82702 Compare · Compare 82702+2320=85022 < 85764 Review · Inspector 46149+6220=52369 < 53156 Canvas. No section is moved and none is allowed to reach the next. Publish is also a repair: caption 788:4321 ends at 4333 inside a 4293-tall section, so it hung 40px out of its own frame before this ran.",
+  "page": "1:3",
+  "rows": [
+    { "op": "resize", "id": "1776:8378", "h": 4620, "why": "15 · Publish — content already ended at 4333 in a 4293 frame; +327 seats note/Publish and repairs the pre-existing overhang" },
+    { "op": "resize", "id": "1776:8374", "h": 4900, "why": "16 · History — 140px of slack could not hold a seven-line note; +197, still 668 clear of 17 · Compare" },
+    { "op": "resize", "id": "1776:8382", "h": 2320, "why": "17 · Compare — 68px of slack; +140, still 742 clear of 18 · Review" },
+    { "op": "resize", "id": "1776:8381", "h": 6220, "why": "08 · Inspector — grew by 10 boards earlier today; +147, still 787 clear of 09 · Canvas" }
+  ]
+}

@@ -1,0 +1,107 @@
+MASTERS	338
+--- TOP BY INSTANCE COUNT ---
+998	16:19	State=rest	🗔 Site:644,🏢 Portfolio:256,🏠 Dashboard — OLD SPINE (super
+560	2041:19568	Active=Off	🖥️ Editor v1:560
+261	697:424	State=rest	🧩 Components:51,🖥️ Editor v1:210
+208	975:615	State=Default	🧩 Components:5,🏠 Dashboard v2 — screens (CODE-CANONICAL: m
+179	9:18	Kind=primary, Size=md, State=rest	🧩 Components:21,🖥️ Editor v1:94,🗔 Site:1,🏢 Portfolio:7,�
+179	16:6	Icons=expand-close	🖥️ Editor v1:179
+169	11:28	Icon / content	🧩 Components:1,🖥️ Editor v1:168
+166	11:9	Icon / insert	🧩 Components:1,🖥️ Editor v1:152,🏠 Dashboard — OLD SPINE (
+138	681:4338	icon/bell	🧩 Components:33,🖥️ Editor v1:105
+137	9:54	Kind=ghost, Size=sm, State=rest	🧩 Components:25,🖥️ Editor v1:110,🗔 Site:2
+135	989:7125	State=Default	🏠 Dashboard v2 — screens (CODE-CANONICAL: matches nav.ts si
+130	681:4343	icon/ellipsis	🧩 Components:25,🖥️ Editor v1:105
+125	692:421	State=solo	🧩 Components:20,🖥️ Editor v1:105
+112	697:444	State=saved	🧩 Components:20,🖥️ Editor v1:92
+111	11:14	Icon / layers	🖥️ Editor v1:111
+111	11:18	Icon / pages	🖥️ Editor v1:111
+111	11:23	Icon / media	🖥️ Editor v1:111
+111	11:35	Icon / brand	🖥️ Editor v1:111
+95	10:10	State=filled	🖥️ Editor v1:34,🗔 Site:23,🗃️ Archive:1,🏠 Dashboard — OLD
+95	232:6	List row	🖥️ Editor v1:82,🏠 Dashboard — OLD SPINE (superseded by 988
+86	2142:11054	Depth=1, State=rest	🖥️ Editor v1:86
+86	2142:11072	Depth=4, State=rest	🖥️ Editor v1:86
+85	9:24	Kind=primary, Size=md, State=disabled	🧩 Components:5,🖥️ Editor v1:80
+78	681:27	Publish=disabled, Review=open	🧩 Components:1,🖥️ Editor v1:77
+70	9:42	Kind=secondary, Size=md, State=rest	🖥️ Editor v1:16,🗔 Site:1,🏢 Portfolio:8,👤 Client review:8
+68	16:16	Section header	🖥️ Editor v1:68
+64	980:669	icon/search-16	🧩 Components:1,🏠 Dashboard v2 — screens (CODE-CANONICAL: m
+61	980:673	icon/bell-18	🧩 Components:1,🏠 Dashboard v2 — screens (CODE-CANONICAL: m
+59	9:30	Kind=secondary, Size=sm, State=rest	🖥️ Editor v1:54,🗔 Site:4,🏠 Dashboard — OLD SPINE (superse
+58	9:6	Kind=primary, Size=sm, State=rest	🖥️ Editor v1:57,👤 Client review:1
+--- UNITS JUDGED (125 sets + standalone; 338 raw masters incl. variants) ---
+--- TRULY ZERO-USE (37) — no variant of these is placed anywhere ---
+0	10:27	Status dot	🧩 Components
+0	17:23	Progress row	🧩 Components
+0	19:46	Drawer frame	🧩 Components
+0	19:47	Right panel frame	🧩 Components
+0	19:79	Modal frame	🧩 Components
+0	91:15	Icon / x	🧩 Components
+0	91:20	Icon / chevron-right	🧩 Components
+0	91:30	Icon / chevron-left	🧩 Components
+0	91:36	Icon / search	🧩 Components
+0	91:42	Icon / plus	🧩 Components
+0	91:49	Icon / ellipsis	🧩 Components
+0	91:54	Icon / check	🧩 Components
+0	91:67	Icon / bell	🧩 Components
+0	91:79	Icon / eye	🧩 Components
+0	91:87	Icon / eye-off	🧩 Components
+0	91:102	Icon / trash-2	🧩 Components
+0	91:108	Icon / copy	🧩 Components
+0	91:115	Icon / download	🧩 Components
+0	91:122	Icon / upload	🧩 Components
+0	91:129	Icon / external-link	🧩 Components
+0	91:135	Icon / settings	🧩 Components
+0	91:142	Icon / image	🧩 Components
+0	91:149	Icon / type	🧩 Components
+0	91:163	Icon / refresh-cw	🧩 Components
+0	91:169	Icon / undo-2	🧩 Components
+0	91:174	Icon / flag	🧩 Components
+0	91:180	Icon / circle-check	🧩 Components
+0	91:185	Icon / message-square	🧩 Components
+0	91:195	Icon / grip-vertical	🧩 Components
+0	91:200	Icon / folder	🧩 Components
+0	681:4334	icon/chevron-left	🧩 Components
+0	980:677	icon/plus-16	🧩 Components
+0	980:685	icon/external-16	🧩 Components
+0	980:690	icon/triangle-alert-16	🧩 Components
+0	982:677	Dashboard / Page header	🧩 Components
+0	984:683	Dashboard / Section card	🧩 Components
+0	985:729	Dashboard / State — loading (table)	🧩 Components
+--- TOP UNITS BY TOTAL (variants rolled up) ---
+1026	16:26	Nav item	COMPONENT_SET
+600	2041:19572	Settings nav row	COMPONENT_SET
+595	9:102	Button	COMPONENT_SET
+387	2142:11082	List row · indented (label only) — Depth 0-5 × Sta	COMPONENT_SET
+264	697:440	Icon button	COMPONENT_SET
+257	975:632	Dashboard / Nav item	COMPONENT_SET
+235	2100:11651	Panel header	COMPONENT_SET
+169	11:28	Icon / content	COMPONENT
+166	11:9	Icon / insert	COMPONENT
+156	989:7133	Dashboard / Section tab	COMPONENT_SET
+138	681:4338	icon/bell	COMPONENT
+130	681:4343	icon/ellipsis	COMPONENT
+130	692:472	Presence	COMPONENT_SET
+130	697:461	Save status	COMPONENT_SET
+124	681:122	Topbar	COMPONENT_SET
+112	10:16	Input	COMPONENT_SET
+111	11:14	Icon / layers	COMPONENT
+111	11:18	Icon / pages	COMPONENT
+111	11:23	Icon / media	COMPONENT
+111	11:35	Icon / brand	COMPONENT
+--- EXACT NAME COLLISIONS (0) — same string; definite ---
+--- NORMALISED COLLISIONS (4) — same after case/separator strip; definite ---
+iconbell	681:4338(138 inst, 24x24, 🧩 Component)  vs  91:67(0 inst, 24x24, 🧩 Component)
+iconellipsis	681:4343(130 inst, 24x24, 🧩 Component)  vs  91:49(0 inst, 24x24, 🧩 Component)
+icontrash2	992:742(1 inst, 20x20, 🧩 Component)  vs  91:102(0 inst, 24x24, 🧩 Component)
+iconchevronleft	91:30(0 inst, 24x24, 🧩 Component)  vs  681:4334(0 inst, 24x24, 🧩 Component)
+--- LEAF COLLISIONS (8) — CANDIDATES ONLY, judge each ---
+navitem	16:26(1026 inst, 288x160, 🧩 Component)  vs  975:632(257 inst, 297x154, 🧩 Component)
+button	9:102(595 inst, 163x2044, 🧩 Component)  vs  981:700(107 inst, 131x1180, 🧩 Component)
+media	11:23(111 inst, 24x24, 🧩 Component)  vs  17:6(46 inst, 136x104, 🧩 Component)
+search	980:669(64 inst, 16x16, 🧩 Component)  vs  91:36(0 inst, 24x24, 🧩 Component)
+chevronright	980:680(18 inst, 16x16, 🧩 Component)  vs  91:20(0 inst, 24x24, 🧩 Component)
+lock	984:678(7 inst, 32x32, 🧩 Component)  vs  91:93(3 inst, 24x24, 🧩 Component)
+trianglealert	91:61(4 inst, 24x24, 🧩 Component)  vs  980:690(0 inst, 16x16, 🧩 Component)
+plus	91:42(0 inst, 24x24, 🧩 Component)  vs  980:677(0 inst, 16x16, 🧩 Component)

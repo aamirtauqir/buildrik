@@ -1,0 +1,900 @@
+{
+ "_note": "PHASE 2. Every row here targets a node that DID NOT EXIST when this plan was written, because it is created by media-04-state-boards.json (a clone) or media-05-node-edits.json (a clone-label / clone-row). No node ids could be read: the Figma MCP seat quota was exhausted account-wide part-way through this pass. Each row therefore carries a SELECTOR — section + board name + the node's name or its current characters — which the applier resolves against the file, plus the exact string / geometry / destination to write. Run media-04 and media-05 first, then resolve and run this.",
+ "_status": "unresolved-id",
+ "groups": [
+  {
+   "tag": "not-configured-720",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · stock · not-configured"
+   },
+   "clonedFrom": "1716:8497",
+   "edits": [
+    {
+     "op": "text",
+     "select": {
+      "nodeNameStartsWith": "No photos found for"
+     },
+     "text": "Stock search isn’t set up on this site.",
+     "width": 248,
+     "why": "UX-H-02 CRITICAL — 'Stock search isn\\'t set up on this site' is a different screen from 'No photos match beach', and only one of them is worth a retry button."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "No photos found for"
+     },
+     "name": "note/how-to-fix",
+     "text": "Ask an admin to add an Unsplash access key (photos) or a Pexels key (video) to this deployment.",
+     "x": 236,
+     "y": 300,
+     "width": 248,
+     "fontSize": 11,
+     "why": "UX-H-02 — the not-configured arm is the only one with an action that is not a retry. Server: stock.service.ts:55-56 UNSPLASH_ACCESS_KEY, :102-103 PEXELS_API_KEY."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "qqzzx"
+     },
+     "text": "beach",
+     "width": 37,
+     "why": "UX-H-02 — a not-configured search fails for a normal query, not a nonsense one; 'qqzzx' is the no-results board's sample and must not be reused here."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "stock-source-pills"
+     },
+     "why": "UX-H-02 / COVER-1-23 / FIG-E-13 — the provider switch is inert (StockService.ts:75-78 drops `source`; searchStockPhotos' input schema has no source parameter, media.ts:301-308). It must not be the most prominent control on the screen that says the provider is missing."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · stock · search-failed",
+      "nodeName": "act/Try again"
+     },
+     "kind": "hotspot",
+     "note": "NO — do not wire Try again to this board. Recorded so a later pass does not add it."
+    },
+    {
+     "from": {
+      "boardName": "Media · grid",
+      "nodeName": "☁ Stock"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/state · stock · not-configured",
+     "note": "Optional second door; the primary ☁ Stock edge is 147:55 (media-03)."
+    }
+   ]
+  },
+  {
+   "tag": "fonts-empty",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · stock · fonts · empty"
+   },
+   "clonedFrom": "1716:8541",
+   "edits": [
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "No icons found."
+     },
+     "text": "No fonts found.",
+     "width": 120,
+     "why": "UX-H-05 — the Fonts door needs a destination. 'No icons found.' is StockSourceModal.tsx:331 verbatim; the fonts arm renders the same shell."
+    },
+    {
+     "op": "rename",
+     "select": {
+      "nodeNameEquals": "Fonts"
+     },
+     "newName": "Fonts (active)",
+     "why": "UX-H-05 — the active tab on this board is Fonts, not Icons."
+    },
+    {
+     "op": "move",
+     "select": {
+      "nodeNameEquals": "active"
+     },
+     "x": 214,
+     "y": 37,
+     "why": "UX-H-05 — move the 2px active underline from the Icons tab (x155) to the Fonts tab (x214)."
+    },
+    {
+     "op": "rename",
+     "select": {
+      "boardSelf": true
+     },
+     "newName": "[not-implemented] Media · stock · fonts · empty — Fonts is NOT a stock provider: MediaManager.ts:1588-1600 getFonts() is a hardcoded four-item array (Icons the same at :1571-1583). The tab renders, the search does nothing.",
+     "why": "COVER-1-24 — the clone inherits 1716:8541's marker, which names ICONS; it must be re-stated for fonts or the board reads as unmarked."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "nodeName": "Aa Fonts",
+      "onEveryBoard": [
+       "144:2",
+       "145:2",
+       "145:49",
+       "145:96",
+       "145:148",
+       "145:199",
+       "145:250",
+       "145:359",
+       "453:3931",
+       "777:4093",
+       "782:4353",
+       "2430:21365"
+      ]
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/footer · Aa Fonts",
+     "pad": 6,
+     "why": "UX-H-05 — the fourth footer door must not be a fourth dead control. Twelve rows, one per drawer board (add-hotspots takes them all in one call)."
+    }
+   ]
+  },
+  {
+   "tag": "sb-no-results",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · drill-in · stock-browser · no-results"
+   },
+   "clonedFrom": "147:55",
+   "edits": [
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Results"
+     },
+     "why": "UX-H-03 — the drawer's overlay needs the genuinely-empty arm. StockBrowserOverlay.tsx:303-307 renders 'Search to browse free photos.' unconditionally, which is the pre-search zero state, not an empty result. The four result cards must not remain on a board whose point is that there are none."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Loading row"
+     },
+     "why": "Same — 'Loading 8 more…' contradicts an empty/failed result."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Load more"
+     },
+     "why": "Same."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "‹ Stock photos"
+     },
+     "name": "empty/line",
+     "text": "Nothing matches ‘restaurant interior’.",
+     "x": 16,
+     "y": 220,
+     "width": 248,
+     "why": "UX-H-03 — the drawer's overlay needs the genuinely-empty arm. StockBrowserOverlay.tsx:303-307 renders 'Search to browse free photos.' unconditionally, which is the pre-search zero state, not an empty result."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · drill-in · stock-browser",
+      "nodeName": "Results"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/state · no-results",
+     "pad": 0,
+     "why": "UX-H-03 — park the three result states off the overlay itself so the drawer's stock browser has the same three-way state as the modal."
+    }
+   ]
+  },
+  {
+   "tag": "sb-search-failed",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · drill-in · stock-browser · search-failed"
+   },
+   "clonedFrom": "147:55",
+   "edits": [
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Results"
+     },
+     "why": "UX-H-03 — 'the drawer's stock browser is not wired to the failure flag at all, so even after UX-H-02 is fixed the drawer would still show a blank grid'. MediaTab.tsx:378-392 passes no failure prop; StockBrowserOverlayProps (:26-38) declares none. The four result cards must not remain on a board whose point is that there are none."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Loading row"
+     },
+     "why": "Same — 'Loading 8 more…' contradicts an empty/failed result."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Load more"
+     },
+     "why": "Same."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "‹ Stock photos"
+     },
+     "name": "empty/line",
+     "text": "Couldn’t reach the stock provider.",
+     "x": 16,
+     "y": 220,
+     "width": 248,
+     "why": "UX-H-03 — 'the drawer's stock browser is not wired to the failure flag at all, so even after UX-H-02 is fixed the drawer would still show a blank grid'. MediaTab.tsx:378-392 passes no failure prop; StockBrowserOverlayProps (:26-38) declares none."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "‹ Stock photos"
+     },
+     "name": "act/Try again",
+     "text": "Try again",
+     "x": 16,
+     "y": 248,
+     "width": 248,
+     "fontSize": 11,
+     "why": "UX-H-02 — only the unreachable-provider arm gets a retry."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · drill-in · stock-browser",
+      "nodeName": "Results"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/state · search-failed",
+     "pad": 0,
+     "why": "UX-H-03 — park the three result states off the overlay itself so the drawer's stock browser has the same three-way state as the modal."
+    }
+   ]
+  },
+  {
+   "tag": "sb-not-configured",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · drill-in · stock-browser · not-configured"
+   },
+   "clonedFrom": "147:55",
+   "edits": [
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Results"
+     },
+     "why": "UX-H-02 + UX-H-03 — the configured-ness signal is owed at both stock surfaces. The four result cards must not remain on a board whose point is that there are none."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Loading row"
+     },
+     "why": "Same — 'Loading 8 more…' contradicts an empty/failed result."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Load more"
+     },
+     "why": "Same."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "‹ Stock photos"
+     },
+     "name": "empty/line",
+     "text": "Stock search isn’t set up on this site.",
+     "x": 16,
+     "y": 220,
+     "width": 248,
+     "why": "UX-H-02 + UX-H-03 — the configured-ness signal is owed at both stock surfaces."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "‹ Stock photos"
+     },
+     "name": "note/how-to-fix",
+     "text": "Ask an admin to add an Unsplash access key to this deployment.",
+     "x": 16,
+     "y": 248,
+     "width": 248,
+     "fontSize": 11,
+     "why": "UX-H-02 — the not-configured arm's action is not a retry."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · drill-in · stock-browser",
+      "nodeName": "Results"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/state · not-configured",
+     "pad": 0,
+     "why": "UX-H-03 — park the three result states off the overlay itself so the drawer's stock browser has the same three-way state as the modal."
+    }
+   ]
+  },
+  {
+   "tag": "alt-failed",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · drill-in · asset-detail · alt-generate-failed"
+   },
+   "clonedFrom": "146:2",
+   "edits": [
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "✨ Generate"
+     },
+     "text": "✨ Generate",
+     "width": 72,
+     "why": "UX-H-09 — the label is unchanged; what changes is that it is drawn disabled (ink-muted #6B7280) on this board. Set the fill in Figma by hand or by a follow-up plan row — the arc has no colour-setting op."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameEquals": "✨ Generate"
+     },
+     "name": "err/alt",
+     "fill": "#E02424",
+     "fontSize": 11,
+     "text": "Couldn’t generate alt text — AI isn’t configured for this site.",
+     "x": 16,
+     "y": 82,
+     "width": 248,
+     "why": "UX-H-09 — 'Say what happened: an inline error under the field, or hide the Generate affordance entirely when AI is not configured. A magic button that does nothing teaches the user to distrust every other button on the panel.' AssetDetailOverlay.tsx:270-289's catch body is a comment; the structured error codes exist and are discarded at the last hop (AiTrpcClient.ts:37-56). The node is cloned into the Alt text frame (146:11 on the source), whose height must grow from 80 to 108."
+    },
+    {
+     "op": "resize",
+     "select": {
+      "nodeNameStartsWith": "Alt text"
+     },
+     "width": 280,
+     "height": 108,
+     "why": "UX-H-09 — room for the error line under the field."
+    },
+    {
+     "op": "note",
+     "text": "ALTERNATIVE the finding also allows: hide the ✨ Generate affordance entirely when AI is unconfigured. That needs a capability signal the product does not have (same shape as the stock configured-ness gap, UX-H-02). Recorded as an open decision, not applied."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · drill-in · asset-detail",
+      "nodeName": "✨ Generate"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/act · ✨ Generate → failed",
+     "pad": 6,
+     "why": "UX-H-09 — the state must be reachable from the control that produces it."
+    }
+   ]
+  },
+  {
+   "tag": "detail-device-only",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · drill-in · asset-detail · device-only (re-upload)"
+   },
+   "clonedFrom": "146:2",
+   "edits": [
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "2400×1600"
+     },
+     "name": "lo/strip-text",
+     "fill": "#723B13",
+     "text": "⚠ Only on this device — it did not reach the server, so it will not show on the page and will not publish.",
+     "x": 16,
+     "y": 244,
+     "width": 248,
+     "fontSize": 11,
+     "why": "UX-H-11 CRITICAL — 'a device-only asset needs a persistent badge in the grid AND a line in the detail screen with the action that fixes it (re-upload), not two toasts that are gone in five seconds'. Copy derived from the shipped toasts: useMediaState.ts:268-273 '{name} is only on this device — it won\\'t show on the page or publish. Re-upload when you\\'re back online.'"
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameEquals": "✨ Generate"
+     },
+     "name": "act/Re-upload",
+     "text": "↻ Re-upload",
+     "x": 16,
+     "y": 296,
+     "width": 90,
+     "why": "UX-H-11 — 'with the action that fixes it (re-upload)'. This is the only control on either Media surface that would clear localOnly."
+    },
+    {
+     "op": "move",
+     "select": {
+      "nodeNameStartsWith": "Alt text"
+     },
+     "y": 320,
+     "why": "UX-H-11 — push the alt block down by the strip's height so nothing overprints."
+    },
+    {
+     "op": "note",
+     "text": "The five List rows below (and the four added by media-05 group G) shift down by 80 with the Alt text frame; move each by the same delta."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · local-only assets",
+      "nodeName": "lo/badge"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/card · device-only asset → its detail",
+     "pad": 0,
+     "why": "UX-H-11 — the grid badge and the detail line are two halves of one signal; the badge must open the screen that carries the fix."
+    }
+   ]
+  },
+  {
+   "tag": "delete-single",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · delete-confirm · single file"
+   },
+   "clonedFrom": "1175:4827",
+   "edits": [
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Delete 34 files?"
+     },
+     "text": "Delete file?",
+     "width": 106,
+     "why": "W-A-27 — ConfirmDeleteModal.tsx:45-47 titles it 'Delete file?' when not bulk."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameStartsWith": "⚠ 5 files are currently used"
+     },
+     "text": "⚠ hero-dark.jpg is currently used on the canvas. Deleting will break those elements.",
+     "width": 406,
+     "why": "W-A-27 — ConfirmDeleteModal.tsx:71-72, singular arm."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Type DELETE to confirm:"
+     },
+     "why": "W-A-27 — the typing gate renders only for large bulk (ConfirmDeleteModal.tsx:25 LARGE_BULK_THRESHOLD=20, :91-105)."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "confirm-input"
+     },
+     "why": "Same."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameStartsWith": "Delete stays disabled until"
+     },
+     "why": "Same — that sentence is about the gate."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Delete 34 files"
+     },
+     "text": "Delete",
+     "width": 45,
+     "why": "W-A-27 — singular arm."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameStartsWith": "Delete stays disabled until"
+     },
+     "name": "note/undo",
+     "text": "Deleting shows an 8-second Undo (useSelectionState.ts:184-193, duration 8000, composer.mediaOps.deleteWithGrace). The picker's own confirm says the opposite — 'This cannot be undone.' (MediaLibraryPanel.tsx:401) — and is wrong.",
+     "x": 16,
+     "y": 110,
+     "width": 408,
+     "fontSize": 11,
+     "why": "W-A-26 + W-A-27 — 'settle the undo copy: the grace path does undo'. Two confirms contradict each other in the shipped product."
+    },
+    {
+     "op": "resize",
+     "select": {
+      "boardSelf": true
+     },
+     "width": 440,
+     "height": 170,
+     "why": "W-A-27 — the gate rows are gone; close the gap."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · drill-in · asset-detail",
+      "nodeName": "List row · Delete"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/row · Delete",
+     "pad": 0,
+     "why": "UX-H-10 — the new Delete row on the drill-in needs its confirm."
+    },
+    {
+     "from": "1161:154",
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/act · Delete",
+     "pad": 6,
+     "why": "W-A-29 — the fullpage rail's Delete (1161:154, id READ from the file) has no confirm to open; the only one is the >20-file bulk dialog."
+    },
+    {
+     "from": {
+      "boardName": "Media · detail · context-menu · asset (drawer right-click, of 144:2)",
+      "nodeName": "Delete"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/mi · Delete",
+     "pad": 0,
+     "why": "UX-H-01 / W-A-07."
+    }
+   ]
+  },
+  {
+   "tag": "ctx-drawer",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · detail · context-menu · asset (drawer right-click, of 144:2)"
+   },
+   "clonedFrom": "1717:17203",
+   "edits": [
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "submenu"
+     },
+     "why": "UX-H-01 — this board is the menu itself, not the Move-to submenu; 1717:17203 keeps that job."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Download"
+     },
+     "text": "Copy URL",
+     "width": 56,
+     "why": "W-A-49 — the two context-menu boards list DIFFERENT items. 1717:17203 adds 'Download', which MediaContextMenu.tsx:5-10 does not have, and drops Copy URL, Copy alt text and Edit image…, which it does. Download exists only as the fullpage BULK action (LibraryManager.tsx:335)."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameEquals": "Download"
+     },
+     "name": "Copy alt text",
+     "text": "Copy alt text",
+     "x": 12,
+     "y": 190,
+     "width": 80,
+     "why": "W-A-49 — restore the code's ninth item."
+    },
+    {
+     "op": "clone-label",
+     "selectSrc": {
+      "nodeNameEquals": "Download"
+     },
+     "name": "Edit image…",
+     "text": "Edit image…",
+     "x": 12,
+     "y": 218,
+     "width": 80,
+     "why": "W-A-49 — MediaContextMenu.tsx:5-10."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Replace…"
+     },
+     "text": "Replace across pages…",
+     "width": 120,
+     "why": "W-A-49 — the code's label."
+    },
+    {
+     "op": "note",
+     "text": "Final item order (MediaContextMenu.tsx:5-10): Insert to canvas · Select · Rename… · Move to folder › · Copy URL · Copy alt text · Edit image… · Replace across pages… · rule · Delete. Grow MENU_SURFACE from 196 to 280 and the board from 260 to 320 so the last item falls inside the white card — VIS-2-18 records that 'Delete' currently renders OUTSIDE it on 1717:17203, and the clone inherits that defect."
+    },
+    {
+     "op": "resize",
+     "select": {
+      "nodeNameEquals": "MENU_SURFACE"
+     },
+     "width": 200,
+     "height": 280,
+     "why": "VIS-2-18 — the Delete row and its 8px bottom padding must fall inside the white fill."
+    },
+    {
+     "op": "resize",
+     "select": {
+      "boardSelf": true
+     },
+     "width": 420,
+     "height": 330,
+     "why": "VIS-2-18 — room for the taller menu plus its footnote."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameStartsWith": "folderTree is empty"
+     },
+     "text": "Right-click on the 280 drawer. MediaContextMenu is imported at MediaTab.tsx:16 and never rendered there; SlimLauncher.tsx:469-476 maps onContextMenu to onEnterSelection instead, so today this gesture silently enters bulk mode. V2 UX-H-01.",
+     "width": 420,
+     "why": "UX-H-01 — the footnote belongs to the no-folders board it was cloned from."
+    }
+   ],
+   "edges": [
+    {
+     "from": "1671:7213",
+     "to": "THIS",
+     "kind": "reaction-repoint",
+     "why": "UX-H-01 — the existing right-click gesture hotspot on 144:2 currently navigates to bulk-select (145:300). Re-point it here. Its name is corrected in media-01."
+    },
+    {
+     "from": {
+      "boardName": "Media · detail · context-menu · asset (drawer right-click, of 144:2)",
+      "nodeName": "Move to folder ›"
+     },
+     "to": "1717:17203",
+     "kind": "hotspot",
+     "name": "hotspot/mi · Move to folder ›",
+     "pad": 0,
+     "why": "W-A-07 — the submenu board exists and the row is dead."
+    },
+    {
+     "from": {
+      "nodeName": "Insert to canvas"
+     },
+     "to": "52:2",
+     "kind": "hotspot",
+     "name": "hotspot/mi · Insert to canvas",
+     "pad": 0,
+     "why": "W-A-01 / W-A-07."
+    },
+    {
+     "from": {
+      "nodeName": "Select"
+     },
+     "to": "145:300",
+     "kind": "hotspot",
+     "name": "hotspot/mi · Select",
+     "pad": 0,
+     "why": "W-A-07."
+    },
+    {
+     "from": {
+      "nodeName": "Edit image…"
+     },
+     "to": "1124:4527",
+     "kind": "hotspot",
+     "name": "hotspot/mi · Edit image…",
+     "pad": 0,
+     "why": "W-A-07 — destination 1124:4527 is named by W-A-07/W-A-11; it lives OUTSIDE section 1776:8372 and its id was NOT read by this pass. Verify before wiring."
+    },
+    {
+     "from": {
+      "nodeName": "Replace across pages…"
+     },
+     "to": "1164:4738",
+     "kind": "hotspot",
+     "name": "hotspot/mi · Replace across pages…",
+     "pad": 0,
+     "why": "W-A-07."
+    }
+   ]
+  },
+  {
+   "tag": "folder-menu",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · detail · folder-menu · ＋ New folder (of 144:2)"
+   },
+   "clonedFrom": "1717:17203",
+   "edits": [
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "submenu"
+     },
+     "why": "UX-H-07 — this is the 📁 All ▾ scope menu, not a submenu."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Insert to canvas"
+     },
+     "text": "🏠 All assets",
+     "width": 91,
+     "why": "UX-H-07 — FolderTree.tsx:327."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Select"
+     },
+     "text": "🕐 Recent",
+     "width": 70,
+     "why": "UX-H-07 — the smart scopes, FolderTree.tsx:288-330."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Rename…"
+     },
+     "text": "● In use",
+     "width": 70,
+     "why": "UX-H-07."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Move to folder ›"
+     },
+     "text": "○ Unused",
+     "width": 90,
+     "why": "UX-H-07."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Replace…"
+     },
+     "text": "📁 Products",
+     "width": 80,
+     "why": "UX-H-07 — a user folder, to show the scope list is not empty once folders exist."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Download"
+     },
+     "text": "📁 Hero shots",
+     "width": 90,
+     "why": "UX-H-07."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "Delete"
+     },
+     "text": "＋ New folder…",
+     "width": 90,
+     "fill": "#1A56DB",
+     "why": "UX-H-07 MAJOR — 'Put New folder in the drawer's own folder menu. A disabled scope control with no reachable way to enable it is worse than no control.' state.createFolder reaches only FolderTree in the fullpage manager (LibraryManager.tsx:354, input at FolderTree.tsx:378), so the drawer's scope button (SlimLauncher.tsx:255 disabled when allFolders is empty) can never enable and the bulk Move-to picker's only entry is (Root) (SlimLauncher.tsx:536-548)."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameStartsWith": "folderTree is empty"
+     },
+     "text": "The drawer's own folder menu. Today it is a disabled scope button (SlimLauncher.tsx:255) with no way to create the folder that would enable it. V2 UX-H-07.",
+     "width": 420,
+     "why": "UX-H-07."
+    }
+   ],
+   "edges": [
+    {
+     "from": "144:11",
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/folder-row · 📁 All ▾",
+     "pad": 6,
+     "why": "UX-H-07 — 144:11 is the '📁 All ▾' label on Media · grid; id READ from the file."
+    },
+    {
+     "from": {
+      "nodeName": "＋ New folder…"
+     },
+     "to": "1205:4829",
+     "kind": "hotspot",
+     "name": "hotspot/mi · ＋ New folder… → inline field",
+     "pad": 0,
+     "why": "UX-H-07 — 1205:4829 'Media · fullpage · folders · new-folder (inline)' is the existing board for the field ('Enter to create · Esc to cancel' = FolderTree.tsx:365-392). It is 240 wide and drawn for the fullpage rail; a 280-drawer variant is owed and is NOT in this plan."
+    }
+   ]
+  },
+  {
+   "tag": "replace-all-failed",
+   "board": {
+    "section": "1776:8372",
+    "boardName": "Media · modal · replace-across · all-failed (rollback)"
+   },
+   "clonedFrom": "1174:4849",
+   "edits": [
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "2 replaced, 1 failed."
+     },
+     "text": "Nothing replaced — all 3 updates failed. No changes committed.",
+     "width": 280,
+     "why": "COVER-1-25 — ReplaceAcrossDialog.tsx:296-311. The operation ROLLS BACK (MediaCommandLayer.ts:280-287, :414-418, reason 'all-failed'), which is materially different from the partial arm that commits what succeeded."
+    },
+    {
+     "op": "text",
+     "select": {
+      "nodeNameEquals": "▸ Failed elements (1)"
+     },
+     "text": "▸ Show errors (3)",
+     "width": 96,
+     "why": "COVER-1-25 — ReplaceAcrossDialog.tsx:302."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "Retry failed"
+     },
+     "why": "COVER-1-25 — 'Close only, with no Retry, because there is nothing to retry against'."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameEquals": "result-clean"
+     },
+     "why": "COVER-1-25 — this board is the all-failed arm alone."
+    },
+    {
+     "op": "hide",
+     "select": {
+      "nodeNameStartsWith": "[no-producer] committing"
+     },
+     "why": "Same."
+    },
+    {
+     "op": "resize",
+     "select": {
+      "boardSelf": true
+     },
+     "width": 520,
+     "height": 140,
+     "why": "W-A-15 — the result strip is 948x80, a section listing, not a modal state; the confirm it follows is 520x300. Give the arm the modal's width."
+    }
+   ],
+   "edges": [
+    {
+     "from": {
+      "boardName": "Media · modal · replace-across-site",
+      "nodeName": "btn/replace"
+     },
+     "to": "THIS",
+     "kind": "hotspot",
+     "name": "hotspot/btn · replace → all-failed",
+     "pad": 0,
+     "why": "W-A-15 / COVER-1-25 — 1164:4750 btn/replace currently points at the 948-wide strip. Its id comes from W-A-15 and was NOT read by this pass."
+    }
+   ]
+  }
+ ]
+}

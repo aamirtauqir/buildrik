@@ -1,0 +1,626 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>14-screen-specs</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--muted:#5b6472;--line:#e5e7eb;--accent:#2D6DFF;--code:#f4f6f8;--th:#f8fafc;}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b2;--line:#232a33;--accent:#6ea8ff;--code:#161b22;--th:#161b22;}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:15.5px/1.65 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;}
+.wrap{max-width:1000px;margin:0 auto;padding:52px 32px 140px;}
+h1{font-size:1.9rem;line-height:1.2;margin:.1em 0 .4em;letter-spacing:-.02em}
+h2{font-size:1.35rem;margin:2em 0 .6em;padding-top:.7em;border-top:1px solid var(--line);letter-spacing:-.01em}
+h3{font-size:1.08rem;margin:1.5em 0 .4em}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--code);padding:.12em .4em;border-radius:4px;font:13px/1.4 "SF Mono",ui-monospace,Menlo,monospace}
+pre{background:var(--code);padding:14px 16px;border-radius:8px;overflow-x:auto}pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600;white-space:nowrap}
+blockquote{margin:1em 0;padding:.3em 1em;border-left:3px solid var(--accent);color:var(--muted)}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}strong{font-weight:650}del{color:var(--muted)}
+</style></head><body><div class="wrap"><h1>Editor PRD · Ch.14 — Screen Specs (every screen, build-ready)</h1>
+<blockquote>
+<p>Per-screen PRD for the redesigned editor. One block per screen so a UI-UX designer can design each in isolation and an engineer can build it. <strong>Grounded in the 6-agent code inventory (2026-07-18)</strong> — features cited are verified in the codebase, not assumed. IA/roadmap SSOT = <code>docs/designs/2026-07-17-editor-product-redesign-complete.md</code>; feature catalog SSOT = Ch.12; enhancement SSOT = <code>2026-07-18-feature-improvements.md</code>. This chapter owns per-screen specs only — it links, never re-derives.</p>
+<p><strong>Template per screen:</strong> Job · IA home · Build-status · Purpose · Entry→Exit · Features (verified) · States · Roles · Data/backend · Improvements (★/◆) · Open questions.
+Status: <strong>EXISTS</strong> (works) · <strong>REDESIGN</strong> · <strong>BUILD</strong> (new) · <strong>FIX</strong> (broken). Roles: OW=Owner, AD=Admin, DE=Designer, CL=Client.</p>
+<p>⚠ <strong>IA-home values in this chapter are SUPERSEDED by §4.3 of the redesign doc</strong> (the authoritative placement map). They were written against the earlier CREATE/STRUCTURE/BRAND/REVIEW grouping. Current homes: rail = <strong>Insert · Pages · Layers · Media · Content · Brand</strong> (6, canvas-interacting only) · topbar = <strong>global only</strong> (Exit/site · save-pill→Versions→Compare · review-pill→review-bar · CTA · ⋯Site) · canvas toolbar = undo/redo · device · preview · 💬comment-mode · view-options · zoom · right = inspector (+ component management) · footer = issues→panel · sync · breadcrumb · <strong>Site full-page</strong> = settings ×11 · domains · export · publish history · brand-push. Templates dissolved (New-Page flow + Insert); AI = ⌘K + selection toolbar; comments = canvas mode; versions = save-pill.</p>
+</blockquote>
+<hr>
+<h2>J1 · Discover &amp; onboard</h2>
+<h3>S1.1 — First-open (empty canvas)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J1 · shell (rail collapsed, canvas max) · REDESIGN</li>
+<li><strong>Purpose:</strong> New site opens; designer knows what to do in &lt;5s.</li>
+<li><strong>Entry→Exit:</strong> editor URL (no last-edit) → S1.3 new-page choice, or straight to S3.1 canvas.</li>
+<li><strong>Features:</strong> empty-canvas CTA (&quot;Browse templates / Start blank&quot;, <code>canvas/Canvas.tsx:369</code>); first-run coach (replaces orphan SpotlightOverlay); rail collapsed to job-group icons.</li>
+<li><strong>States:</strong> first-run (coach visible) · coach-dismissed · empty-canvas idle.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> none (local); onboarding phase in localStorage.</li>
+<li><strong>Improvements:</strong> ◆ real coach highlighting the 6 rail icons once (&quot;start here&quot;).</li>
+<li><strong>Open:</strong> does the coach block canvas or overlay non-modally?</li>
+</ul>
+<h3>S1.2 — Returning-open</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J1 · shell · EXISTS</li>
+<li><strong>Purpose:</strong> Resume last-edited site instantly.</li>
+<li><strong>Entry→Exit:</strong> editor URL (has draft) → S3.1 canvas.</li>
+<li><strong>Features:</strong> last-edited restore; RecoveryManager crash/inactivity check (<code>engine/recovery</code>).</li>
+<li><strong>States:</strong> clean-restore · <strong>crash-recovery banner</strong> (&quot;restore unsaved work from 3m ago&quot;) · load-error.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> ProjectData via BuildrikSyncProvider (<code>sites.get</code>).</li>
+<li><strong>Improvements:</strong> ◆ surface RecoveryManager as a real recover-banner (X7).</li>
+<li><strong>Open:</strong> recovery UX copy + retention window.</li>
+</ul>
+<h3>S1.3 — New-page choice</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J1 · modal · REDESIGN</li>
+<li><strong>Purpose:</strong> Blank vs Template vs AI-draft.</li>
+<li><strong>Entry→Exit:</strong> S1.1 / add-page → Blank→S3.1 · Template→S3.4 · AI→S2.1.</li>
+<li><strong>Features:</strong> 3-way choice. <strong>Cut the fake PageWizard</strong> (<code>wizard/PageWizard.tsx</code> simulated).</li>
+<li><strong>States:</strong> 3-way idle · loading · error.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> creates page via PageManager.</li>
+<li><strong>Improvements:</strong> ◆ route AI branch to real J2 wizard (S2.1).</li>
+<li><strong>Open:</strong> §6.5 binary — PageWizard cut vs wire.</li>
+</ul>
+<h3>S1.4 — Onboarding checklist</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J1 · overlay panel · EXISTS</li>
+<li><strong>Purpose:</strong> Guided first-run tasks.</li>
+<li><strong>Entry→Exit:</strong> first-run auto (OnboardingMount) → deep-links into J3/J4/J5.</li>
+<li><strong>Features:</strong> 7-step checklist, minimize-to-pill, CTA routing, AchievementPrompt toasts (4s), orchestrator SSOT (<code>onboarding/useOnboardingOrchestrator</code>).</li>
+<li><strong>States:</strong> 0/7…7/7 · minimized-pill · dismissed.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> localStorage (server-persist = improvement).</li>
+<li><strong>Improvements:</strong> • agency-flavored steps (&quot;connect first client&quot;, &quot;set brand&quot;, &quot;send for review&quot;); server-persist.</li>
+<li><strong>Open:</strong> none.</li>
+</ul>
+<h3>S1.5 — Load-error</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J1 · full-screen · BUILD</li>
+<li><strong>Purpose:</strong> Session expired / load failure → recover.</li>
+<li><strong>Entry→Exit:</strong> load failure → sign-in / retry → S1.2.</li>
+<li><strong>Features:</strong> error message + retry (retrySync exists in some tabs; needs a shell-level screen).</li>
+<li><strong>States:</strong> session-expired · network-error · retrying.</li>
+<li><strong>Roles:</strong> all.</li>
+<li><strong>Data:</strong> auth/session.</li>
+<li><strong>Improvements:</strong> —</li>
+<li><strong>Open:</strong> distinguish auth-expiry vs transient net.</li>
+</ul>
+<hr>
+<h2>J2 · AI-draft</h2>
+<h3>S2.1 — AI brief entry</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J2 · CREATE › AI · REDESIGN</li>
+<li><strong>Purpose:</strong> Capture a real brief (industry/pages/tone) for whole-site draft.</li>
+<li><strong>Entry→Exit:</strong> S1.3 AI branch / rail AI → S2.2.</li>
+<li><strong>Features:</strong> prompt/brief input, scope. (Today AITab is edit-scope; whole-site is a stub.)</li>
+<li><strong>States:</strong> empty · typing · submit.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> → server AI (PageGenerator is a dead stub — must build).</li>
+<li><strong>Improvements:</strong> ◆ brief wizard (industry→pages→tone→assets).</li>
+<li><strong>Open:</strong> §6.5 binary — build whole-site AI vs cut.</li>
+</ul>
+<h3>S2.2 — Generating</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J2 · CREATE › AI (panel) · BUILD</li>
+<li><strong>Purpose:</strong> Show real generation progress.</li>
+<li><strong>Entry→Exit:</strong> S2.1 → S2.3.</li>
+<li><strong>Features:</strong> progress (real, not fake); cancel.</li>
+<li><strong>States:</strong> streaming · slow · cancel · error/quota.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> server AI stream (subscriptionClient exists for edit-AI).</li>
+<li><strong>Improvements:</strong> ◆ real progress; brand-aware images (not picsum).</li>
+<li><strong>Open:</strong> —</li>
+</ul>
+<h3>S2.3 — Result &amp; accept</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J2 · canvas + AI panel · BUILD</li>
+<li><strong>Purpose:</strong> Preview draft; accept or regenerate.</li>
+<li><strong>Entry→Exit:</strong> S2.2 → accept→S3.1 · regenerate→S2.2.</li>
+<li><strong>Features:</strong> preview draft, accept/regenerate.</li>
+<li><strong>States:</strong> preview · accepted · regen.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> applies generated ProjectData into composer.</li>
+<li><strong>Improvements:</strong> ◆ per-section regenerate.</li>
+<li><strong>Open:</strong> —</li>
+</ul>
+<h3>S2.4 — AI unavailable</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J2 · CREATE › AI · BUILD</li>
+<li><strong>Purpose:</strong> Honest &quot;not configured / quota&quot;.</li>
+<li><strong>Entry→Exit:</strong> guards S2.1.</li>
+<li><strong>Features:</strong> no-key / quota / error states (AIError taxonomy exists, <code>services/ai/AIErrors</code>).</li>
+<li><strong>States:</strong> no-key · quota · generic-error.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> —</li>
+<li><strong>Open:</strong> —</li>
+</ul>
+<h3>S2.5 — AITab chat (edit-AI)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J2 · CREATE › AI · EXISTS (hardened)</li>
+<li><strong>Purpose:</strong> In-editor AI edit (chat + agent).</li>
+<li><strong>Entry→Exit:</strong> ✨/⌘J/⌘K → AITab; edits apply to selection/page.</li>
+<li><strong>Features (verified):</strong> chat/agent toggle; single-element streaming edit w/ accept/reject/regenerate diff; page-scope batch (attaches elements+tokens+assets); multi-select guard (v1=one); agent plan/steps/approve/skip/stop/auto-apply; privileged-action confirm gate; adoption tracking (<code>sidebar/tabs/ai/AITab.tsx</code>).</li>
+<li><strong>States:</strong> idle · thinking · applied · reject · agent-plan · error.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> tRPC AI (AiTrpcClient, 30/60s rate-limit, 30s timeout).</li>
+<li><strong>Improvements:</strong> ◆ ⌘K launcher; inline actions on selection (&quot;make modern&quot;).</li>
+<li><strong>Open:</strong> whole-site vs edit-scope boundary.</li>
+</ul>
+<hr>
+<h2>J3 · Build the page (protect — 9/10)</h2>
+<h3>S3.1 — Canvas</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · center · EXISTS (do not disturb)</li>
+<li><strong>Purpose:</strong> Direct-manipulation editing.</li>
+<li><strong>Entry→Exit:</strong> always present; select→S3.9 inspector; exits to J4/J5/J6.</li>
+<li><strong>Features (verified):</strong> drag/select/resize/rotate, 48 element types, nesting rules, inline dbl-click edit, right-click ElementContextMenu (edit/insert/layout/style/standalone), pick-mode crosshair, zoom-to-fit, aria-live selection, imperative undo/redo/getHTML/getCSS (<code>canvas/Canvas.tsx</code>).</li>
+<li><strong>States:</strong> empty (CTA) · selected · multi-select · dragging · pick-mode · inline-edit.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> engine (Composer, StyleEngine).</li>
+<li><strong>Improvements:</strong> ◆ edit-one-breakpoint-see-all live preview.</li>
+<li><strong>Open:</strong> none — protect.</li>
+</ul>
+<h3>S3.1a — Canvas overlays &amp; viewport toolbar (part of S3.1)</h3>
+<ul>
+<li><strong>Features (verified):</strong> overlays — Grid, Hover(+spacing labels), Rulers, Guides, SmartGuides, SelectionBox(+resize handles), SelectionLabel, Alignment, MultiSelectBadge, RichText bar, DropFeedback, CanvasBreadcrumb, SectionReorder, RemoteCursors🔵. CanvasFooterToolbar: undo/redo, BreakpointSwitcher, toggles <strong>Snap/Spacing/Grid/Rulers/Badges/X-Ray</strong>, zoom, help(?), DeviceFrame. UnifiedSelectionToolbar (floating): nav-ancestors/dup/delete/copy/wrap/move/+Add/✨AI(AiPromptPopover). BlockPickerModal (insert child/before/after + nesting-validate).</li>
+<li><strong>Build:</strong> EXISTS; <strong>FIX</strong> zoom ×3 (B20), cut orphan overlays (MediaQuickActions, TemplatePreviewPanel).</li>
+</ul>
+<h3>S3.2 — Insert (rail)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · CREATE › Insert · EXISTS (FIX)</li>
+<li><strong>Purpose:</strong> Add elements/blocks.</li>
+<li><strong>Entry→Exit:</strong> rail Insert → drag/click onto S3.1.</li>
+<li><strong>Features (verified):</strong> BuildTab — <strong>53-block</strong> catalog (basic/layout/forms/media/navigation/interactive), exclusive-accordion, debounced search (&quot;/&quot;+Esc), drag+click, TipsFooter carousel, TransitionCallout (<code>sidebar/tabs/build</code>).</li>
+<li><strong>States:</strong> category · empty-search · results · drag · disabled &quot;Soon&quot;.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> build/catalog (53).</li>
+<li><strong>Improvements:</strong> ◆ type-to-insert; recent/favorites (favorites currently DEAD — N3).</li>
+<li><strong>Open:</strong> N2 — unify with the 63-block registry (ElementsTab/BlockPickerModal).</li>
+</ul>
+<h3>S3.3 — Blocks catalog (part of Insert)</h3>
+<ul>
+<li><strong>Features (verified):</strong> 63-block registry (Basic11/Media9/Layout5/Forms16/Sections5/Components13/Ecommerce4), nesting-validated + sanitized insert (<code>blocks/blockRegistry.ts</code>).</li>
+<li><strong>Build:</strong> EXISTS; <strong>FIX</strong> contact-form orphan (absent from registry); reconcile 53-vs-63 (N2).</li>
+</ul>
+<h3>S3.4 — Templates</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · <strong>DISSOLVED</strong> — full-page templates → New-Page flow · section templates → Insert · REDESIGN</li>
+<li><strong>Purpose:</strong> Start/insert from templates.</li>
+<li><strong>Entry→Exit:</strong> rail Templates → apply-to-current (replace confirm + backup) or add-as-new-page → S3.1.</li>
+<li><strong>Features (verified):</strong> 10 SITE_TEMPLATES, 4 category pills, 2 type pills + 7 sub-tags, 4-col grid + pagination + drill-in + search-highlight, token-resolution <code>{{token.kind.name}}</code> before import, apply-progress + retry, preview modal, usage drawer, applied-template persistence, &quot;Go to page&quot; (B4 fixed) (<code>sidebar/tabs/templates</code>).</li>
+<li><strong>States:</strong> gallery · preview · applying · error-retry · empty.</li>
+<li><strong>Roles:</strong> OW/AD/DE; Pro upgrade gate on premium.</li>
+<li><strong>Data:</strong> templatesData (10) + My Templates (localStorage + templateSync server mirror).</li>
+<li><strong>Improvements:</strong> ◆ collapse the 3 template surfaces (sidebar 10 + TemplateLibrary modal 15 + SectionTemplates) into ONE.</li>
+<li><strong>Open:</strong> which surface becomes canonical; FullPageRouter templates branch is unreachable (N4).</li>
+</ul>
+<h3>S3.5 — Components</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · <strong>SPLIT</strong> — browse+insert → Insert · management (variants/detach) → Inspector · FIX</li>
+<li><strong>Purpose:</strong> Reusable component authoring.</li>
+<li><strong>Entry→Exit:</strong> rail Components → drag instance / detail-screen.</li>
+<li><strong>Features (verified):</strong> legacy ComponentsTab (grouped accordions, filter chips, search, favorites, instance counts); create-from-selection (name/group/prefill-DS); ComponentRow (drag/instantiate/rename/dup/swap-variant/favorite/delete); variant picker; ComponentDetailScreen (insert/dup/delete + instance-count warn); detach (Pro) + DetachConfirmModal (<code>sidebar/tabs/component-library</code>). ComponentsPanelV2 gated OFF.</li>
+<li><strong>States:</strong> list · detail · instance · overridden · reset · no-storage · error.</li>
+<li><strong>Roles:</strong> OW/AD/DE; detach = Pro.</li>
+<li><strong>Data:</strong> ComponentManager + ComponentStorage (IDB) + componentSync.</li>
+<li><strong>Improvements:</strong> ◆ Figma-grade variant props; instance swap.</li>
+<li><strong>Open:</strong> <strong>FIX reset-to-master</strong> path-scheme (§13-A2, <code>ComponentInstance.ts:72</code> <code>#/</code> vs <code>:174</code> <code>/elements/</code>); <code>handleDetailInsert</code> no-op; &quot;Swap&quot; removed (no engine API).</li>
+</ul>
+<h3>S3.6 — Media library</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · CREATE › Media · EXISTS (FIX stubs)</li>
+<li><strong>Purpose:</strong> Manage/insert media.</li>
+<li><strong>Entry→Exit:</strong> rail Media (slim/expanded) or fullpage LibraryManager → insert onto S3.1.</li>
+<li><strong>Features (verified):</strong> grid + type-pills + counts + sort + multi-select + bulk delete/move; UploadZone (drag-drop, retry, quota-disable); MediaContextMenu (insert/rename/move/delete/copy-url/edit/replace-across); ImageEditorModal (crop/rotate/flip/adjust brightness-contrast-saturation-blur/6 filter presets/resize/save-as-version); OptimizationPanel (WebP/AVIF/JPEG/PNG); IconPickerModal (<strong>370 icons/17 cat</strong>, recent); StockSourceModal (photos/videos/icons/fonts + orientation/color filters); AssetDetailOverlay (rename/versions/used-in/replace-across); smart folders (recent/used/unused); FolderTree; storage-quota bar (<strong>1GB enforced</strong>) (<code>editor/media</code>, <code>sidebar/tabs/media</code>).</li>
+<li><strong>States:</strong> grid · detail · upload · editing · optimizing · stock-search · empty · quota-full.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> MediaManager + MediaStorage (IDB) + AssetUploadService (Vercel Blob) + MediaVersionService + StockService.</li>
+<li><strong>Improvements:</strong> • —</li>
+<li><strong>Open:</strong> <strong>FIX</strong> From-URL modal stub (MediaLibraryPanel) vs live LibraryManager import; Trash stub; MediaLibraryPanel upload-fail unhandled (B11).</li>
+</ul>
+<h3>S3.7 — Pages</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · STRUCTURE › Pages · EXISTS</li>
+<li><strong>Purpose:</strong> Page management + site SEO.</li>
+<li><strong>Entry→Exit:</strong> rail Pages → page-settings drawer / switch page.</li>
+<li><strong>Features (verified):</strong> page tree vs SearchListingsTable (site SEO); CRUD (add/dup/delete+undo/set-home/rename+dup-guard/copy-link); delete guards (home/only-page); bulk (shift-range dup/delete/move-to-folder); bulk-delete-all spares first (B3 fixed); folders (localStorage); PageContextMenu (6 actions); ⌘K PageCommandPalette; canSearch≥5. <strong>page-settings drawer</strong> (580px, SEO/Social/Advanced tabs; slug validate; password-protect; custom head; autosave 500ms+⌘S) (<code>sidebar/tabs/pages</code>).</li>
+<li><strong>States:</strong> tree · SEO-table · empty · bulk-select · folder · load-error; drawer: SEO/Social/Advanced.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> PageManager + PageRouter; page meta composer-persisted → publish.</li>
+<li><strong>Improvements:</strong> • folders server-persist.</li>
+<li><strong>Open:</strong> password-protect + custom-head enforcement depends on publish middleware (saved-not-live).</li>
+</ul>
+<h3>S3.8 — Layers</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · STRUCTURE › Layers · EXISTS</li>
+<li><strong>Purpose:</strong> Tree navigation/structure.</li>
+<li><strong>Entry→Exit:</strong> rail Layers → select→S3.1/S3.9.</li>
+<li><strong>Features (verified):</strong> search, expand/collapse-all, display-settings, node-count; tree reorder/hover/select (LayersPanel); LayerContextMenu (Rename/Group/Lock-Unlock/Delete); DragTooltip validation; stats event (<code>sidebar/tabs/layers</code>).</li>
+<li><strong>States:</strong> tree · filtered · locked/hidden · drag.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> ElementManager; hide/lock localStorage/page.</li>
+<li><strong>Improvements:</strong> • —</li>
+<li><strong>Open:</strong> also mirrored in footer StructurePopover.</li>
+</ul>
+<h3>S3.9 — Inspector</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · RIGHT · REDESIGN (density 6→2)</li>
+<li><strong>Purpose:</strong> Edit selected element.</li>
+<li><strong>Entry→Exit:</strong> select on S3.1/S3.8 → edit.</li>
+<li><strong>Features (verified):</strong> 3 tabs Look/Layout/Effects; <strong>18-section registry</strong>, 7 element profiles (CONTAINER/TEXT/FLEX/GRID/MEDIA/BUTTON/INPUT); sections — QuickActions(4), Layout(display6/size Fixed-Fill-Hug/position5+offsets+z/overflow/visibility/float/clear), Size(W-H+spacing-token-chain/min-max/object-fit), Spacing(box-model/link-sides/gaps), Flexbox(cond), Grid(cond), Typography(cond: FontPicker+GoogleFonts/token-chain/weight9/advanced), Background(color/gradient/image/blend), Border(width/style9/color/sides/outline), CornerRadius, Effects(opacity/box-shadow7/inner-shadow/transform/transition/cursor13/filters/blend10/text-shadow/will-change), Visibility(per-bp), Link(cond), ElementProperties(15 types + data/aria), CSSClasses, AllCSS(👻 devMode-dead); reach-strip (This🔵/All-like✅ blast/Whole-site🔵); BreakpointPill; StatePills(Base/hover/focus/active/disabled); per-breakpoint+pseudo cascade; DSBindingChip(3 states); ColorInput(alpha 🔵); <strong>BindingPopover</strong> (bind element→CMS collection→field→record); pick-on-canvas; select-parent; overflow-menu (dup/copy-paste-styles/delete); DeleteConfirmModal; density full/fewer; per-element scroll persistence; error boundary; empty-state CTAs (<code>editor/inspector</code>).</li>
+<li><strong>States:</strong> no-selection (CTA) · single · multi (MultiSelectToolbar align/distribute/batch) · per-breakpoint · pseudo-state · overridden.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> StyleEngine + designSystem.</li>
+<li><strong>Improvements:</strong> ◆ contextual density (only relevant sections, advanced collapsed) — the 6→2 target.</li>
+<li><strong>Open:</strong> <strong>FIX</strong> B14 (no memo, re-render per keystroke), B15 (link/attr keystroke-transaction undo-spam), AllCSS dead, ColorInput alpha, Background titled &quot;Colors&quot;.</li>
+</ul>
+<h3>S3.10 — Inspector › Interactions (part of Effects tab)</h3>
+<ul>
+<li><strong>Features (verified):</strong> add/list/edit/remove/enable interactions; <strong>14 triggers</strong> (element5: hover/click/active/focus/blur; page3: load/scroll/leave; scroll3: into-view/while/out; mouse3: over/move/out); <strong>39 presets</strong>; per-interaction preset/duration/delay/easing + preview (<code>inspector/sections/interactions</code>).</li>
+<li><strong>Build:</strong> EXISTS; <strong>FIX</strong> editor-preview≠published (InteractionRuntime.reverseAnimation no-op, B9).</li>
+</ul>
+<h3>S3.11 — Inspector › Animation (part of Effects tab)</h3>
+<ul>
+<li><strong>Features (verified):</strong> enable/disable; AnimationEditor — <strong>25 presets</strong> (12 entrance/8 attention/5 exit) + 7 easings + generated-CSS preview; triggers removed (<code>animation/AnimationEditor.tsx</code>).</li>
+<li><strong>Build:</strong> EXISTS; <strong>CUT</strong> Timeline/ScrollTrigger L0 stubs.</li>
+</ul>
+<h3>S3.12 — CMS / dynamic content</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · STRUCTURE › Data/CMS · COMPLETE the front-door</li>
+<li><strong>Purpose:</strong> Data-driven content.</li>
+<li><strong>Entry→Exit:</strong> today via ecom block-drop or inspector BindingPopover → needs discoverable rail entry.</li>
+<li><strong>Features (verified):</strong> CollectionManager (collections/fields/items CRUD/query/validate); CMSBindingManager (bind element→field, repeaters); <strong>CMSCollectionSetupModal</strong> (2-step + <strong>dynamic-page-per-entry</strong>); <strong>CMSRecordsModal</strong> (record CRUD + <strong>publish/unpublish</strong>); BindingPopover (inspector); ProductCollectionService (<code>engine/cms</code>, <code>shell/modals</code>).</li>
+<li><strong>States:</strong> empty · collection · fields · record-draft/published · bound.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> CollectionStorage (IDB) + cmsSync server mirror.</li>
+<li><strong>Improvements:</strong> ◆ discoverable dynamic-page builder front-door.</li>
+<li><strong>Open:</strong> RepeaterRenderer/DataBindResolver are 👻 (0 non-test importers) — wire or cut.</li>
+</ul>
+<h3>S3.12b — Data binding (DataManager) — NEW surface</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · STRUCTURE › Data · BUILD (engine exists, no UI home)</li>
+<li><strong>Purpose:</strong> Bind element content/style/traits to data sources + global variables + conditions.</li>
+<li><strong>Features (verified):</strong> DataManager (data-source registry, path resolution, condition eval, contexts, global vars, watch); StyleDataBinding/TextDataBinding/TraitDataBinding; useDataManager hook (<code>engine/data</code>).</li>
+<li><strong>States:</strong> no-source · bound · conditional · watching.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> DataManager registry.</li>
+<li><strong>Improvements:</strong> ◆ give it a discoverable panel.</li>
+<li><strong>Open:</strong> is this shipped scope or advanced/beta?</li>
+</ul>
+<h3>S3.13 — Ecommerce</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · CREATE › Insert + modal · KEEP</li>
+<li><strong>Features (verified):</strong> 4 product blocks (productCard/Grid/Detail/cartButton — reachable under &quot;Advanced&quot;); CollectionSetupModal (Products collection + 3 sample products + 8-field schema); ProductCollectionService.</li>
+<li><strong>States:</strong> setup · sample-added · bound.</li>
+<li><strong>Build:</strong> EXISTS (earlier &quot;excluded&quot; claim wrong).</li>
+</ul>
+<h3>S3.14 — Command palette</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · overlay (⌘K) · REDESIGN (unify)</li>
+<li><strong>Purpose:</strong> Keyboard-driven everything.</li>
+<li><strong>Entry→Exit:</strong> ⌘K (shell) / ⌘⇧P (canvas) → run command / navigate.</li>
+<li><strong>Features (verified):</strong> shell CommandPalette (nav from GROUPED_TABS_CONFIG + hardcoded Edit/View/History); canvas CommandPalette (~27 hardcoded, requiresSelection gating); PageCommandPalette (jump-to-page). CommandCenter has <strong>39 registered commands</strong> but both palettes <strong>ignore it</strong> (<code>shell/modals</code>, <code>canvas/controls</code>, <code>engine/commands</code>).</li>
+<li><strong>States:</strong> closed · open · results · empty · recent.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> CommandCenter registry (unread).</li>
+<li><strong>Improvements:</strong> ◆ unify 2→1, registry-backed, AI-aware.</li>
+<li><strong>Open:</strong> <strong>FIX</strong> B8 (bypass CommandCenter; export-html/json unreachable); N6 (shell palette mounts twice).</li>
+</ul>
+<h3>S3.15 — Preview / device / color-mode (chrome)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J3 · <strong>canvas toolbar</strong> (color-mode → Brand) · EXISTS</li>
+<li><strong>Features (verified):</strong> preview ⌘P (sanitized new-window); device switch (desktop/tablet/mobile/watch/wide via BreakpointSwitcher); color-mode cycle (light/dark/system); DeviceFrame preview.</li>
+<li><strong>States:</strong> edit · preview · per-device.</li>
+<li><strong>Open:</strong> footer device-dims label (1440×900) mismatches canvas wide-render (1920) — P1-5.</li>
+</ul>
+<hr>
+<h2>J4 · On-brand</h2>
+<h3>S4.1 — Design tokens</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J4 · BRAND › Design · EXISTS (REDESIGN density)</li>
+<li><strong>Purpose:</strong> Edit design tokens.</li>
+<li><strong>Entry→Exit:</strong> rail Design → token detail / add.</li>
+<li><strong>Features (verified):</strong> <strong>14 token kinds</strong> (border/breakpoint/color/grid/icon/imagery/motion/opacity/radius/shadow/sizing/spacing/type/zindex); <strong>94 default tokens</strong>; TokensSection/Router, TokenKindCard, TokenDetailView, TokenRow, TokenUsageChip; AddTokenModal; <strong>TokenReplaceModal</strong> (find/replace token across usages); persistAll 14/14; global ⌘Z dirty-guard (B1 fixed) (<code>editor/design-system</code>).</li>
+<li><strong>States:</strong> view · edit · dirty/save/discard · add · replace.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> TokenRegistry + versioned projectMigrations.</li>
+<li><strong>Improvements:</strong> ◆ token usage-map + safe-rename; import-from-URL.</li>
+<li><strong>Open:</strong> density REDESIGN.</li>
+</ul>
+<h3>S4.2 — Styles / presets</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J4 · BRAND › Design · EXISTS</li>
+<li><strong>Features (verified):</strong> <strong>18 presets / 11 categories</strong> (button3/card2/form1/link2/badge2/alert2/tooltip1/modal1/nav1/table1/layout1); StylesSection/Router, PresetDetailPane, PresetBindingRow, BindingRow; DraftChip (<code>design-system/ui/sections</code>).</li>
+<li><strong>States:</strong> list · bound · unbound · draft.</li>
+<li><strong>Improvements:</strong> ◆ component-level theming; <strong>COMPLETE</strong> binding picker (click no-op).</li>
+</ul>
+<h3>S4.3 — Starters</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J4 · BRAND › Design · EXISTS (🟡 scaffolds)</li>
+<li><strong>Features (verified):</strong> <strong>6 starters</strong> (cobalt-default/stripe-blue/notion-warm/apple-minimal/linear-dark/vercel-mono); StarterGalleryModal (preview+apply); no longer auto-opens.</li>
+<li><strong>States:</strong> gallery · applied.</li>
+<li><strong>Improvements:</strong> • starter = full brand kit (tokens+components+sample pages).</li>
+</ul>
+<h3>S4.4 — DS lint</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J4 · BRAND › Design · EXISTS</li>
+<li><strong>Features (verified):</strong> DSLinter (banned/off-brand/no-black/alias-depth); DSLintBanner (dismissible); LintState (persisted suppressions).</li>
+<li><strong>States:</strong> clean · warnings · suppressed.</li>
+<li><strong>Improvements:</strong> • one-click auto-fix (snap off-token to nearest).</li>
+</ul>
+<h3>S4.5 — Import / export</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J4 · BRAND › Export · EXISTS (🟡 Figma stub)</li>
+<li><strong>Features (verified):</strong> ExportSection 4 rows CSS/JSON/Tailwind/<strong>Figma</strong>; dark-strategy (media/data-attr/off); ExportDropdown; ImportCard (incl &quot;Figma Variables JSON&quot;, darkValue fix).</li>
+<li><strong>States:</strong> idle · exported · imported · error.</li>
+<li><strong>Improvements:</strong> ◆ import-brand-from-URL/Figma/logo.</li>
+<li><strong>Open:</strong> Figma export = 🔵 stub envelope — build or cut.</li>
+</ul>
+<h3>S4.6 — Dark-mode preview</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J4 · BRAND › Design · EXISTS</li>
+<li><strong>Features (verified):</strong> ColorModeToggle/IconCycle (light/dark preview); DarkResolver (dark-missing detection).</li>
+<li><strong>States:</strong> light · dark.</li>
+<li><strong>Improvements:</strong> <strong>COMPLETE</strong> the inspector dark-missing warn-chip (DarkResolver UI &quot;later phase&quot;).</li>
+</ul>
+<h3>S4.7 — Cross-site brand push (NEW — 2nd wedge)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J4 · BRAND › Push · BUILD</li>
+<li><strong>Purpose:</strong> Push one brand change across all client sites.</li>
+<li><strong>Entry→Exit:</strong> BRAND → pick sites → diff → confirm → rollback.</li>
+<li><strong>Features:</strong> NONE in-editor today (link-out only); backend <code>theme.*</code> schemas exist.</li>
+<li><strong>States:</strong> pick-sites · diff-preview · blast-radius (N sites, M elements) · confirm · pushing · rollback.</li>
+<li><strong>Roles:</strong> OW/AD (agency-level).</li>
+<li><strong>Data:</strong> <code>theme.*</code> server; cross-workspace.</li>
+<li><strong>Improvements:</strong> ★ this IS the improvement.</li>
+<li><strong>Open:</strong> blast-radius scope; per-site opt-out; versioned rollback.</li>
+</ul>
+<hr>
+<h2>J5 · Client sign-off (the wedge — build first)</h2>
+<blockquote>
+<p>Full wireframes: <code>docs/designs/2026-07-18-j5-signoff-wireframes.md</code>. Specs condensed here.</p>
+</blockquote>
+<h3>J5 — architecture reality (code-verified 2026-07-18) — READ FIRST</h3>
+<p><strong>J5 spans THREE packages, not one.</strong> The editor-only redesign doc under-scoped it.</p>
+<pre><code>editor/ (Vite SPA)          S5.1 send-review · S5.2 status · S5.3 comments UI · S5.4 gate-error
+dashboard/ (Next.js)        S5.5 CLIENT PAGE  →  app/review/[token]/   ← MISSING, must live here
+server/ + prisma/           models · routers · services                ← mostly EXISTS
+</code></pre>
+<p>The client page <strong>cannot</strong> live in the Vite editor: no server routes (token must be verified server-side), multi-MB engine bundle for a one-click approve, and composer init assumes an authed session + siteId. The dashboard already ships the exact pattern at <code>app/share/[token]/</code> + <code>app/api/share/[token]/</code>.</p>
+<p><strong>What already EXISTS (verified):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ReviewRequest</code> model — PENDING/APPROVED/CHANGES_REQUESTED, note, <code>changeSummary</code></td>
+<td><code>prisma/schema.prisma:428</code></td>
+</tr>
+<tr>
+<td><code>Comment</code> model — <strong>pin coords x/y as 0..1 fractions + <code>targetSelector</code></strong>, OPEN/RESOLVED (explicitly designed for a preview-based reviewer without canvas access)</td>
+<td><code>prisma/schema.prisma:403</code></td>
+</tr>
+<tr>
+<td><code>ShareLink</code> model — unique <code>token</code>, <code>passwordHash</code>, <code>expiresAt</code>, <code>viewCount</code>, <code>isActive</code></td>
+<td><code>prisma/schema.prisma:560</code></td>
+</tr>
+<tr>
+<td><strong><code>Client</code> model — <code>logoUrl</code>, <code>brandColor</code>, <code>customDomain</code>, <code>hideBuildrik</code></strong> = the ★ white-label infra already modelled</td>
+<td><code>prisma/schema.prisma:508</code></td>
+</tr>
+<tr>
+<td><code>reviewsRouter</code> — submit / list / resolve</td>
+<td><code>server/trpc/routers/reviews.ts</code></td>
+</tr>
+<tr>
+<td><code>commentsRouter</code> — create / list / workspaceList / resolve</td>
+<td><code>server/trpc/routers/comments.ts</code></td>
+</tr>
+<tr>
+<td>Agency review queue UI</td>
+<td><code>dashboard/app/dashboard/agency/(tabs)/reviews/</code></td>
+</tr>
+<tr>
+<td>Editor submit path</td>
+<td><code>editor/src/services/ReviewService.ts</code> → <code>reviews.submit</code></td>
+</tr>
+<tr>
+<td>Public tokenized route pattern</td>
+<td><code>dashboard/app/share/[token]/</code></td>
+</tr>
+</tbody></table>
+<p><strong>⚠ The real gap — what&#39;s built is INTERNAL, the wedge is EXTERNAL.</strong>
+Every review/comment procedure is <code>protectedProcedure</code> and workspace-member-scoped: <code>commentsRouter.create</code> authors with <code>ctx.session.user.id</code> after <code>assertSiteAccess</code>; <code>reviewsRouter.resolve</code> requires workspace <strong>ADMIN</strong>. The schema comment states the intent plainly — &quot;a content editor sends for review; <strong>an admin</strong> approves.&quot; That is <em>staff approval</em>, not <em>client sign-off</em>. <strong>Sara (no account) can neither comment nor approve today.</strong> Note also <code>Client</code> = the client <strong>organization</strong> (branding container), not a person — the human reviewer is not modelled at all.</p>
+<p><strong>Genuinely MISSING for the external wedge:</strong></p>
+<ol>
+<li><strong>External reviewer identity</strong> — <code>Comment.authorId</code> and <code>ReviewRequest.resolvedById</code> are Users. Needs a non-User path.</li>
+<li><strong>Token → review binding</strong> — <code>ShareLink</code> is not linked to <code>ReviewRequest</code>; no review-scoped token.</li>
+<li><strong>Public API surface</strong> — token-scoped <code>publicProcedure</code>s: <code>getReviewByToken</code> · <code>addCommentByToken</code> · <code>approveByToken</code> · <code>requestChangesByToken</code>.</li>
+<li><strong>Authorization by token possession</strong> rather than workspace role (today <code>resolve</code> = ADMIN-only).</li>
+<li><strong>The page</strong> — <code>dashboard/app/review/[token]/</code>.</li>
+<li><strong>Notifications</strong> — email on send / on approve / on changes-requested.</li>
+<li><strong>Post-approval invalidation</strong> — no content snapshot/hash to detect edits-since-approval.</li>
+<li><strong>Flag</strong> — the whole review surface sits behind the <code>agency_layer</code> feature flag; the client flow inherits it.</li>
+</ol>
+<p><strong>RESOLVED (founder-locked 2026-07-18) → option C, hybrid.</strong> Token grants access; on first visit capture name + email (no password, no verification loop); returning visits skip it. Attribution attaches to every comment and to the approval record (powers the ★ audit-trail). Design: client-page <strong>State A0</strong> in <code>2026-07-18-j5-signoff-wireframes.md</code>. Schema implication: <code>Comment.authorId</code> nullable + <code>authorName</code>/<code>authorEmail</code>; reviewer identity on <code>ReviewRequest</code>.</p>
+<p><strong>The fork as considered — how is Sara identified?</strong></p>
+<ul>
+<li><strong>A · Anonymous token-scoped</strong> — <code>Comment.authorId</code> nullable + <code>authorName</code>/<code>authorEmail</code>; approval authorized by token possession. Zero friction (matches the locked &quot;no login&quot; decision), but needs a schema migration and gives a weaker audit trail.</li>
+<li><strong>B · Lightweight invited client User</strong> — Sara gets a magic-link account with a CLIENT role; every existing protected procedure and <code>authorId</code> works unchanged, full audit trail. More friction for a one-off client.</li>
+<li><strong>C · Hybrid (recommended)</strong> — token grants access, then capture name+email on first use (Figma-style &quot;who are you?&quot;). Zero password friction, keeps attribution for the ★ approval audit-trail.</li>
+</ul>
+<h3>S5.1 — Send-for-review</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J5 · topbar (action) · FIX/BUILD</li>
+<li><strong>Features (verified):</strong> Topbar send-for-review popover (summary+note → ReviewService.submit <code>reviews.submit</code>), clientView-gated.</li>
+<li><strong>States:</strong> compose · sending · sent (link) · error.</li>
+<li><strong>Roles:</strong> OW/AD/DE (submitters).</li>
+<li><strong>Data:</strong> ReviewService → <code>reviews.submit</code>.</li>
+<li><strong>Improvements:</strong> ◆ multi-stakeholder reviewers; deadline+reminder.</li>
+<li><strong>Open:</strong> link token security (expiry/single-use/re-issue).</li>
+</ul>
+<h3>S5.2 — Review status</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J5 · <strong>topbar review-status pill → review bar</strong> · BUILD</li>
+<li><strong>Features:</strong> pending/changes/approved status; version compare.</li>
+<li><strong>States:</strong> draft · pending · opened-not-acted · changes-requested · approved · approved-edited-since.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> ReviewRequest server model.</li>
+<li><strong>Improvements:</strong> ◆ audit trail.</li>
+<li><strong>Open:</strong> —</li>
+</ul>
+<h3>S5.3 — Comments (editor)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J5 · <strong>canvas 💬 comment mode + slide-in thread list</strong> · BUILD</li>
+<li><strong>Features:</strong> create/pin/resolve/thread (backend is internal/workspace-scoped only; external-client path missing — see &quot;J5 — architecture reality&quot;).</li>
+<li><strong>States:</strong> none · open-thread · replied · resolved · show-resolved.</li>
+<li><strong>Roles:</strong> OW/AD/DE + CL (create).</li>
+<li><strong>Data:</strong> comments backend (server done).</li>
+<li><strong>Improvements:</strong> ★ threaded, @mention, filter, notify.</li>
+<li><strong>Open:</strong> —</li>
+</ul>
+<h3>S5.4 — Approval gate error-state</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J5 · modal/inline · BUILD</li>
+<li><strong>Features:</strong> ADMIN publish blocked → &quot;needs approval + who + link&quot; (today raw PRECONDITION_FAILED). Gate enforced server-side (D1, OWNER-exempt), flagged.</li>
+<li><strong>States:</strong> pending · changes-requested · no-review-sent.</li>
+<li><strong>Roles:</strong> AD (blocked); OW exempt.</li>
+<li><strong>Data:</strong> publish-approval + ReviewRequest.</li>
+<li><strong>Open:</strong> per-workspace flag rollout (S5).</li>
+</ul>
+<h3>S5.5 — CLIENT review page (<code>/review/&lt;token&gt;</code>) — DESKTOP dedicated (L2)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J5 · public desktop surface · BUILD (#1 priority)</li>
+<li><strong>Purpose:</strong> Non-authed client reviews + approves.</li>
+<li><strong>Entry→Exit:</strong> tokenized link → view → comment/approve/request-changes.</li>
+<li><strong>Features:</strong> branded bar (agency logo+version); site preview (view-only); comment pins; Approve / Request-changes.</li>
+<li><strong>States:</strong> landing · viewing · commenting · request-changes · approved · post-approval(unchanged) · post-approval(edited-since) · expired-token · loading · load-error.</li>
+<li><strong>Roles:</strong> CL (no account).</li>
+<li><strong>Data:</strong> tokenized review session; comments; approval.</li>
+<li><strong>Improvements:</strong> ★ video walkthrough · white-label · &quot;what changed since last review&quot;.</li>
+<li><strong>Open:</strong> desktop-only (no mobile, L2); token model; reviewer identity (email-link vs light login).</li>
+</ul>
+<h3>S5.6 — Post-approval lock</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J5 · topbar/gate · BUILD</li>
+<li><strong>Features:</strong> invalidate approval on post-approval edit (change-since-approval tracking) — else gate is theater.</li>
+<li><strong>States:</strong> approved-clean · approved-edited-since (N changes) · re-sent.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+<li><strong>Data:</strong> change-tracking vs approved snapshot.</li>
+<li><strong>Open:</strong> diff granularity.</li>
+</ul>
+<hr>
+<h2>J6 · Ship &amp; run</h2>
+<h3>S6.1 — Publish flow</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · topbar → modal · EXISTS (FIX)</li>
+<li><strong>Features (verified):</strong> PublishDropdown (draft/published reachable; in-review/approved DEAD B18); PublishTab (status badge, published-URL+copy, <strong>7-check</strong> pre-publish checklist [title/favicon/≥1 page/content/SEO title/meta desc/social img], B2 fixed); Vercel BYO-OAuth publish (PublishService <code>sites.publish</code>, polls job).</li>
+<li><strong>States:</strong> ready · connect-vercel · publishing · live · failed.</li>
+<li><strong>Roles:</strong> OW/AD (AD gated by J5 approval).</li>
+<li><strong>Data:</strong> PublishService + dashboard worker.</li>
+<li><strong>Improvements:</strong> ◆ staging URL → real Lighthouse → preview-before-live → rollback.</li>
+<li><strong>Open:</strong> <strong>FIX</strong> worker fake &quot;Optimizing images&quot;/&quot;Performance&quot; steps (no-op, lighthouseScore null); B18 dead dropdown states.</li>
+</ul>
+<h3>S6.2 — Export</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · modal · EXISTS</li>
+<li><strong>Features (verified):</strong> ExportModal 3 tabs (preview/code/options); formats <strong>HTML/ZIP/React</strong> (Vue/Next 🔵 coming-soon; JSON ambiguous); CodePreview (cssCode prop fixed); PreviewFrame; ReactExporter (dup-name fixed).</li>
+<li><strong>States:</strong> idle · exporting · done · error.</li>
+<li><strong>Improvements:</strong> • cut Vue/Next stubs or build.</li>
+</ul>
+<h3>S6.3 — Custom domain</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · SETTINGS · COMPLETE</li>
+<li><strong>Features:</strong> connect + DNS-verify (untested e2e).</li>
+<li><strong>States:</strong> none · pending · verified · failed.</li>
+<li><strong>Improvements:</strong> ◆ guided connect + auto DNS-verify + SSL status.</li>
+</ul>
+<h3>S6.4 — Settings: General (SiteSettings)</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · SETTINGS · EXISTS</li>
+<li><strong>Features (verified):</strong> site name/favicon/language, social links, legal links; composer-persisted → publish.</li>
+<li><strong>States:</strong> view · edit · saved.</li>
+<li><strong>Roles:</strong> OW/AD/DE.</li>
+</ul>
+<h3>S6.5 — Settings: SEO</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · SETTINGS · FIX (score labels)</li>
+<li><strong>Features (verified):</strong> twitter handle, default OG image (site-level); composer-persisted.</li>
+<li><strong>Improvements:</strong> ◆ SEO score labels → live earned points.</li>
+</ul>
+<h3>S6.6 — Settings: Analytics + Custom-code</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · SETTINGS · EXISTS (N1 gate-bug)</li>
+<li><strong>Features (verified):</strong> Analytics (GA4 regex-validated/Meta Pixel/cookie banner → injected on publish); Advanced/Custom-code (head/body scripts + global CSS, validated, sanitized).</li>
+<li><strong>Open:</strong> <strong>FIX N1</strong> — custom-code plan-gate no-op (id mismatch <code>custom-code</code> vs <code>advanced</code>).</li>
+</ul>
+<h3>S6.7 — Settings: Redirects / Headers / Localization</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · SETTINGS · FIX (saved-not-live)</li>
+<li><strong>Features (verified):</strong> Redirects (301/302, toUrl validated B12); Headers (CSP/HSTS/X-Frame/Referrer/Permissions); Localization (default+enabled locales, 24 common). All persist, <strong>not enforced live</strong> (self-declare via banner).</li>
+<li><strong>States:</strong> saved · beta-label (not live).</li>
+<li><strong>Improvements:</strong> ◆ enforce on live (publish middleware) or honest beta-label.</li>
+</ul>
+<h3>S6.8 — Settings: Forms inbox</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · SETTINGS · EXISTS</li>
+<li><strong>Features (verified):</strong> submissions inbox (form picker, inbox/unread/spam/archived filters, read/spam/archive/delete, pagination, <strong>CSV export</strong>), server-backed (formsRouter).</li>
+<li><strong>States:</strong> empty · list · filtered · exported.</li>
+<li><strong>Improvements:</strong> ◆ notifications + spam-guard + Slack/webhook integrations.</li>
+<li><strong>Open:</strong> editor-preview submissions in-memory (published uses real endpoint).</li>
+</ul>
+<h3>S6.9 — Settings: Integrations + Locked</h3>
+<ul>
+<li><strong>Job/IA/Build:</strong> J6 · SETTINGS · CUT dead cards / KEEP Locked</li>
+<li><strong>Features (verified):</strong> IntegrationsHub (Analytics+IntegrationsScreen+Advanced, Pro-gated); IntegrationsScreen 6 cards (Formspree/Netlify/Stripe/Mailchimp/ConvertKit/Zapier) all &quot;Coming Soon&quot; + docs link 🔵; LockedScreen (pro/enterprise/coming-soon + waitlist).</li>
+<li><strong>Improvements:</strong> CUT the 6 dead cards; KEEP LockedScreen (X1).</li>
+</ul>
+<hr>
+<h2>Chrome (cross-cutting surfaces — actions/status, not job screens)</h2>
+<h3>C1 — Topbar</h3>
+<ul>
+<li><strong>Build:</strong> EXISTS. <strong>Features (verified):</strong> brand→dashboard · Exit · Issues-pill · collab-slot🔒 · offline-pill · status-pill(Saved/Saving/Unsaved+click-save) · freshness-ticker · ✨AI (<strong>E3-mode-only, hidden in default figma mode</strong>) · Preview⌘P · Send-for-review · PublishDropdown · Export-fallback🔒 · color-mode-cycle · ⌘K · ⋯overflow[Design-system·Site-settings(ProjectSettingsModal)·Version-history·Invite·Command-palette·Preview-as-client·Help·Account].</li>
+<li><strong>TARGET (§4.3) — topbar becomes GLOBAL-only, 6 items:</strong> <code>‹Exit · site name</code> · <strong>save-status pill → opens Versions → Compare/diff</strong> (absorbs the offline pill) · <strong>review-status pill → expands into the review bar while a review is active</strong> · <strong>[ Send for review ] / [ Publish ]</strong> → publish-progress modal · <code>⋯</code> (Site full-page · preview-as-client · invite · Help+checklist/coach replay · ⌘K · account). A one-time <strong>recovery banner</strong> sits directly beneath it.</li>
+<li><strong>MOVED OFF the topbar → canvas toolbar:</strong> undo/redo · device/breakpoint switcher · preview ⌘P · 💬 comment-mode. <strong>→ Brand panel:</strong> color-mode. <strong>→ footer:</strong> issues pill (opens an issues panel). <strong>→ Site page:</strong> design-system/site-settings/version-history overflow rows.</li>
+<li><strong>FIX:</strong> ✨AI is hidden in the default figma rail mode — retire the E3/legacy rail modes and move AI to ⌘K + the canvas selection toolbar (no topbar icon, no rail slot).</li>
+</ul>
+<h3>C2 — Footer (StudioFooter)</h3>
+<ul>
+<li><strong>Build:</strong> EXISTS (FIX). <strong>Features (verified):</strong> Structure ⌗ (<strong>E3-only, hidden default</strong>) · sync-pill &quot;Connected·main&quot; (branch static🟡) · breadcrumb 2-level · device-dims (1440×900 vs canvas 1920 mismatch🟡) · zoom (3rd impl B20) · version &quot;v2.14.0&quot; hardcoded🔵.</li>
+<li><strong>TARGET (§4.3) — footer becomes a status strip only:</strong> issues pill → <strong>issues panel</strong> (errors · warnings · a11y) · sync status · breadcrumb. <strong>Zoom and view-options move to the canvas toolbar</strong>; the <strong>Structure ⌗ popover is CUT</strong> (it duplicated the Layers rail item).</li>
+<li><strong>FIX:</strong> static &quot;main&quot; sync label, zoom implemented 3× (B20), hardcoded &quot;v2.14.0&quot;, device-dims 1440×900 vs canvas 1920 mismatch.</li>
+</ul>
+<h3>C3 — PageTabBar (multi-page tabs)</h3>
+<ul>
+<li><strong>Build:</strong> EXISTS. <strong>Features (verified):</strong> page tabs (active/home🏠/dirty-dot) · add-page · inline rename F2+slug · context (rename/dup/set-home/delete) · home-delete-guard · delete-confirm+undo · keyboard nav.</li>
+<li>A real multi-page navigation surface above the canvas.</li>
+</ul>
+<h3>C4 — ProjectSettingsModal (chrome ⋯)</h3>
+<ul>
+<li><strong>Build:</strong> EXISTS · <strong>REDESIGN (design-review):</strong> de-dup vs SETTINGS. <strong>Features (verified):</strong> General / Canvas (grid+snap) / SEO tabs → composer metadata/settings.</li>
+<li><strong>Fix:</strong> General + SEO <strong>duplicate</strong> the Settings tab&#39;s SiteSettings/SEO screens (two settings homes). Keep only <strong>Canvas (grid/snap)</strong> here (editor prefs); route General/SEO to SETTINGS. Nav-hierarchy: one home per settings concern.</li>
+</ul>
+<h3>C5 — ConflictModal (save state)</h3>
+<ul>
+<li><strong>Build:</strong> EXISTS. <strong>Features (verified):</strong> Reload / Save-backup / Overwrite(confirm) on SAVE_CONFLICT_EVENT. NOTE: P1-2 spurious-conflict for solo user (BuildrikSyncProvider save-race).</li>
+</ul>
+<h3>C6 — Recovery banner (NEW)</h3>
+<ul>
+<li><strong>Build:</strong> BUILD (engine RecoveryManager exists). Restore-unsaved-work on reopen (X7).</li>
+</ul>
+<h3>C7 — Keyboard shortcuts panel + Canvas cheat-sheet</h3>
+<ul>
+<li><strong>Build:</strong> EXISTS (FIX B5 — <code>?</code> opens BOTH; unify).</li>
+</ul>
+<hr>
+<h2>Engine / invisible (no screen — infra, listed for completeness)</h2>
+<p>Composer + ~30 managers · History (undo/redo/time-travel/checkpoints) · VersionTimeline (named versions/compare/export) · Selection · Viewport · <strong>FontManager</strong> (system/Google/custom-upload/favorites) · <strong>RecoveryManager</strong> · <strong>DataManager</strong> (data-binding subsystem) · <strong>PluginManager</strong> (🔒 flag-dead) · AliasResolver · DarkResolver · StyleEngine/GlobalStyleManager · MediaManager · CollectionManager/CMSBindingManager · InteractionManager/Runtime (B9/B10) · export injectors (SEO/Sitemap/Analytics/Stripe/Formspree/sanitizeHeadCode) · StorageAdapter/VersionHistoryStorage · MigrationManager · PageRouter · commands (CommandCenter 39 cmds, B8) · sanitize SSOT (DOMPurify).
+<strong>Dead engine dirs (cut):</strong> engine/history StateReconstructor · engine/templates (TemplateManager) · engine/ai generators · engine/integrations (EmailMarketingService) · cms/RepeaterRenderer+DataBindResolver · data/TemplateEngine.</p>
+<hr>
+<h2>Screen count (this chapter)</h2>
+<p>J1=5 · J2=5 · J3=17 (incl. S3.1a/S3.12b) · J4=7 · J5=6 · J6=9 · Chrome=7 = <strong>56 specs</strong>. Net-new build (from scratch): S1.5, S2.1-2.4, S3.12b, S4.7, S5.2-5.6, C6 = <strong>~14</strong>; of which <strong>6 = J5 wedge</strong> (build first).</p>
+</div></body></html>

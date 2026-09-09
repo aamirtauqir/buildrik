@@ -1,0 +1,71 @@
+{
+  "slug": "gap-c-history-text2",
+  "why": "The gap-C text rows whose targets had to be READ before they could be written. Every row here replaced a selector authored against a string the board does not draw: 'changes since approval' (5 boards), 'Exit time-travel' and 'Ctrl+Shift+T' (163:113), 'Upgrade your plan to unlock this feature.' (1138:13436). All eight ids are read-backs from find-text-nodes.mjs on 2026-09-07, not lookups from a 5-day-old ledger.",
+  "rows": [
+    {
+      "op": "text",
+      "id": "162:17",
+      "text": "Now — edited since v3",
+      "expect": "Now — 12 changes since v3",
+      "board": "162:2 History · Saves",
+      "why": "UX-I-16 (Major) — 'Now — N changes since approval' and the per-version counts are computed from the in-memory undo stack (SavesChrome.tsx:89-107 filters getHistoryStack() on timestamp > approvedAt), and HistoryManager.ts:136-157 resets both stacks to one 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days. Drop the number, keep the anchor. NOTE the deviation from history-text.json's row: that plan wrote 'Now — edited since approval', authored against a string nobody had read. Every one of these five boards actually draws 'Now — 12 changes since v3', and v3 IS the approved version on the same board ('⚑  APPROVED · v3'). 'edited since v3' is the finding's instruction — say the thing that is true rather than a number nothing backs — in the board's own vocabulary."
+    },
+    {
+      "op": "text",
+      "id": "163:17",
+      "text": "Now — edited since v3",
+      "expect": "Now — 12 changes since v3",
+      "board": "163:2 · changes",
+      "why": "UX-I-16 (Major) — 'Now — N changes since approval' and the per-version counts are computed from the in-memory undo stack (SavesChrome.tsx:89-107 filters getHistoryStack() on timestamp > approvedAt), and HistoryManager.ts:136-157 resets both stacks to one 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days. Drop the number, keep the anchor. NOTE the deviation from history-text.json's row: that plan wrote 'Now — edited since approval', authored against a string nobody had read. Every one of these five boards actually draws 'Now — 12 changes since v3', and v3 IS the approved version on the same board ('⚑  APPROVED · v3'). 'edited since v3' is the finding's instruction — say the thing that is true rather than a number nothing backs — in the board's own vocabulary."
+    },
+    {
+      "op": "text",
+      "id": "163:182",
+      "text": "Now — edited since v3",
+      "expect": "Now — 12 changes since v3",
+      "board": "163:167 · restore-confirm",
+      "why": "UX-I-16 (Major) — 'Now — N changes since approval' and the per-version counts are computed from the in-memory undo stack (SavesChrome.tsx:89-107 filters getHistoryStack() on timestamp > approvedAt), and HistoryManager.ts:136-157 resets both stacks to one 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days. Drop the number, keep the anchor. NOTE the deviation from history-text.json's row: that plan wrote 'Now — edited since approval', authored against a string nobody had read. Every one of these five boards actually draws 'Now — 12 changes since v3', and v3 IS the approved version on the same board ('⚑  APPROVED · v3'). 'edited since v3' is the finding's instruction — say the thing that is true rather than a number nothing backs — in the board's own vocabulary."
+    },
+    {
+      "op": "text",
+      "id": "163:235",
+      "text": "Now — edited since v3",
+      "expect": "Now — 12 changes since v3",
+      "board": "163:220 · restoring",
+      "why": "UX-I-16 (Major) — 'Now — N changes since approval' and the per-version counts are computed from the in-memory undo stack (SavesChrome.tsx:89-107 filters getHistoryStack() on timestamp > approvedAt), and HistoryManager.ts:136-157 resets both stacks to one 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days. Drop the number, keep the anchor. NOTE the deviation from history-text.json's row: that plan wrote 'Now — edited since approval', authored against a string nobody had read. Every one of these five boards actually draws 'Now — 12 changes since v3', and v3 IS the approved version on the same board ('⚑  APPROVED · v3'). 'edited since v3' is the finding's instruction — say the thing that is true rather than a number nothing backs — in the board's own vocabulary."
+    },
+    {
+      "op": "text",
+      "id": "163:284",
+      "text": "Now — edited since v3",
+      "expect": "Now — 12 changes since v3",
+      "board": "163:269 · pruned-notice",
+      "why": "UX-I-16 (Major) — 'Now — N changes since approval' and the per-version counts are computed from the in-memory undo stack (SavesChrome.tsx:89-107 filters getHistoryStack() on timestamp > approvedAt), and HistoryManager.ts:136-157 resets both stacks to one 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days. Drop the number, keep the anchor. NOTE the deviation from history-text.json's row: that plan wrote 'Now — edited since approval', authored against a string nobody had read. Every one of these five boards actually draws 'Now — 12 changes since v3', and v3 IS the approved version on the same board ('⚑  APPROVED · v3'). 'edited since v3' is the finding's instruction — say the thing that is true rather than a number nothing backs — in the board's own vocabulary."
+    },
+    {
+      "op": "text",
+      "id": "I229:1138;9:31",
+      "text": "Exit  (Esc)",
+      "expect": "Exit",
+      "board": "163:113 · time-travel",
+      "why": "UX-I-10 (Major) — the drawer declares role='dialog' aria-modal='true' (TimeTravelScrubber.tsx:315-318) and implements ArrowLeft/ArrowRight/Enter/Ctrl+Shift+T with no 'Escape' case (:270-286). Escape is the reflex key for a modal; the board is where that promise is made. Board leads code."
+    },
+    {
+      "op": "text",
+      "id": "163:166",
+      "text": "Nothing is written until Restore. Esc exits time-travel.",
+      "expect": "Nothing is written until Restore.",
+      "board": "163:113 · time-travel",
+      "why": "UX-I-10 second half, RE-AIMED. history-text.json planned a splice of the printed 'Ctrl+Shift+T' to 'Esc'. Measured 2026-09-07: 163:113 draws no chord at all — a full TEXT read of the board returns 30 nodes and not one contains 'Ctrl'. There is nothing to splice, so the browser-owned-chord half is NOT-APPLICABLE on the board and survives only as a code fix. What the board can carry is the exit contract itself, and the drawer's own safety line is where it belongs."
+    },
+    {
+      "op": "text",
+      "id": "1138:13508",
+      "width": 520,
+      "text": "Custom code injects your own <head> markup, end-of-<body> scripts and CSS into every published page — analytics, fonts, chat widgets. It ships on every publish.",
+      "expect": "Set CSP, HSTS",
+      "board": "1138:13436 S7 · Settings · Custom code · locked (Pro)",
+      "why": "UX-I-38 (Major, dead-end) — LockedScreen takes a per-screen `message` prop (LockedScreen.tsx:36,58) and nothing passes one. settings-text.json guarded this row on 'Upgrade your plan to unlock this feature.'; a full TEXT read of 1138:13436 shows that string is NOT on the board. What is on it is worse and nobody had filed it: the CUSTOM CODE locked screen is titled 'Custom code is a Pro feature' and then describes a different feature — 'Set CSP, HSTS and frame policy on your own domain', which is the Headers screen's subject. The locked door is not merely unlabelled, it is labelled with the wrong room. `width` is set because the node is WIDTH_AND_HEIGHT and would otherwise grow to a single ~1000px line."
+    }
+  ]
+}

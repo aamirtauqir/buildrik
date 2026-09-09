@@ -1,0 +1,85 @@
+{
+ "rows": [],
+ "note": "STRUCTURAL — band insertion, which no queue op can do. Run: node scripts/figma/add-settings-blocks.mjs docs/design-jobs/V2-TO-V1/plans/settings-notices.json [--apply]. Every board id here was read from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt, not from the file in this session. The script refuses any board whose pane has less slack than the band needs, because pushing the last card past the pane foot is oob.",
+ "structural": [
+  {
+   "board": "639:3092",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Custom domains are stored on the server, not in the project file, so restoring an earlier version of the site leaves domains exactly as they are now — History's “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 — half of Settings is inside version history and half is outside it, and nothing says which"
+  },
+  {
+   "board": "639:3795",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Locales are stored on the server, not in the project file, so restoring an earlier version of the site leaves localization exactly as they are now — History's “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 — half of Settings is inside version history and half is outside it, and nothing says which"
+  },
+  {
+   "board": "640:2440",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Redirect rules are stored on the server, not in the project file, so restoring an earlier version of the site leaves redirects exactly as they are now — History's “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 — half of Settings is inside version history and half is outside it, and nothing says which"
+  },
+  {
+   "board": "640:2789",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Security headers are stored on the server, not in the project file, so restoring an earlier version of the site leaves headers exactly as they are now — History's “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 — half of Settings is inside version history and half is outside it, and nothing says which"
+  },
+  {
+   "board": "640:3135",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. Form submissions live on the server, not in the project file, so restoring an earlier version of the site leaves forms exactly as they are now — History's “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 — half of Settings is inside version history and half is outside it, and nothing says which"
+  },
+  {
+   "board": "640:3849",
+   "name": "Notice · not in version history",
+   "tone": "warning",
+   "text": "Not covered by version history. The endpoint and its events are stored on the server, not in the project file, so restoring an earlier version of the site leaves webhooks exactly as they are now — History's “nothing is lost” applies to General, SEO, Analytics and Custom code only.",
+   "why": "UX-I-40 — half of Settings is inside version history and half is outside it, and nothing says which"
+  },
+  {
+   "board": "639:3092",
+   "name": "Notice · saves immediately",
+   "tone": "info",
+   "text": "Saved as you go. Every action on this screen writes to the server the moment you press it — there is nothing buffered, so this screen shows no savebar and never reports unsaved changes.",
+   "why": "UX-I-36 — one savebar over three different commit models; a section that writes immediately must say so and not render the bar"
+  },
+  {
+   "board": "640:3135",
+   "name": "Notice · saves immediately",
+   "tone": "info",
+   "text": "Saved as you go. Every action on this screen writes to the server the moment you press it — there is nothing buffered, so this screen shows no savebar and never reports unsaved changes.",
+   "why": "UX-I-36 — one savebar over three different commit models; a section that writes immediately must say so and not render the bar"
+  },
+  {
+   "board": "640:3849",
+   "name": "Notice · saves immediately",
+   "tone": "info",
+   "text": "Saved as you go. Every action on this screen writes to the server the moment you press it — there is nothing buffered, so this screen shows no savebar and never reports unsaved changes.",
+   "why": "UX-I-36 — one savebar over three different commit models; a section that writes immediately must say so and not render the bar"
+  },
+  {
+   "board": "1688:7195",
+   "kind": "field",
+   "name": "Filter · settings",
+   "text": "Filter settings…",
+   "tone": "info",
+   "why": "UX-I-37 — thirteen sections in three groups and no search. A grep for 'search' in SettingsTab.tsx returns only the SEO subtitle string."
+  },
+  {
+   "board": "1688:7195",
+   "kind": "notice",
+   "tone": "info",
+   "name": "Open decision · nav grouping",
+   "text": "OPEN DECISION — group names and membership. UX-I-37 asks for the groups to be renamed into the user's vocabulary and for two rows to move: “PLUMBING” is an implementer's word, Analytics is not distribution and Forms is not plumbing. Proposed: SITE (General, Branding, SEO, Canvas) · PUBLISHING (Export, Domains, Redirects, Localization) · VISITORS (Analytics, Forms) · ADVANCED (Custom code, Headers, Integrations, Webhooks) · WORKSPACE ↗ (Members, Billing). Drawn, not applied — renaming a group also rewrites the breadcrumb on 30 section boards, so it lands as one decision or none.",
+   "why": "UX-I-37 — group rename is a founder-level naming call and it invalidates 30 breadcrumbs; drawn as an open decision rather than half-applied"
+  }
+ ]
+}

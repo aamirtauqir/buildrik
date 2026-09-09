@@ -1,0 +1,212 @@
+[
+ {
+  "op": "rename",
+  "id": "1703:10582",
+  "name": "[not-in-shipped-header] Button \u00b7 Save changes \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; it has no twin and needs none \u2014 the sticky savebar at the foot IS the control (SettingsTab.tsx:883-903).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1702:7162",
+  "name": "[not-in-shipped-header] Button \u00b7 Add domain \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (DomainsScreen.tsx:219-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1702:7328",
+  "name": "[not-in-shipped-header] Button \u00b7 Add domain \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (DomainsScreen.tsx:219-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1702:6998",
+  "name": "[not-in-shipped-header] Button \u00b7 Add domain \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (DomainsScreen.tsx:219-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1702:7492",
+  "name": "[not-in-shipped-header] Button \u00b7 Add domain \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (DomainsScreen.tsx:219-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "640:3444",
+  "name": "[not-in-shipped-header] Button \u00b7 Export CSV \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn, disabled until submissions exist (FormsScreen.tsx:292-300).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:9275",
+  "name": "[not-in-shipped-header] Button \u00b7 Export CSV \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn, disabled until submissions exist (FormsScreen.tsx:292-300).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:8949",
+  "name": "[not-in-shipped-header] Button \u00b7 Export CSV \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn, disabled until submissions exist (FormsScreen.tsx:292-300).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:9113",
+  "name": "[not-in-shipped-header] Button \u00b7 Export CSV \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn, disabled until submissions exist (FormsScreen.tsx:292-300).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:9599",
+  "name": "[not-in-shipped-header] Button \u00b7 Export CSV \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn, disabled until submissions exist (FormsScreen.tsx:292-300).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:9437",
+  "name": "[not-in-shipped-header] Button \u00b7 Export CSV \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn, disabled until submissions exist (FormsScreen.tsx:292-300).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:8787",
+  "name": "[not-in-shipped-header] Button \u00b7 Export CSV \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn, disabled until submissions exist (FormsScreen.tsx:292-300).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "640:3098",
+  "name": "[not-in-shipped-header] Button \u00b7 Save changes \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; it has no twin and needs none \u2014 the sticky savebar at the foot IS the control (SettingsTab.tsx:883-903).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:7827",
+  "name": "[not-in-shipped-header] Button \u00b7 Save changes \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; it has no twin and needs none \u2014 the sticky savebar at the foot IS the control (SettingsTab.tsx:883-903).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:7673",
+  "name": "[not-in-shipped-header] Button \u00b7 Save changes \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; it has no twin and needs none \u2014 the sticky savebar at the foot IS the control (SettingsTab.tsx:883-903).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:7981",
+  "name": "[not-in-shipped-header] Button \u00b7 Save changes \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; it has no twin and needs none \u2014 the sticky savebar at the foot IS the control (SettingsTab.tsx:883-903).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:7353",
+  "name": "[not-in-shipped-header] Button \u00b7 Add locale \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (LocalizationScreen.tsx:262).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:7194",
+  "name": "[not-in-shipped-header] Button \u00b7 Add locale \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (LocalizationScreen.tsx:262).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:7512",
+  "name": "[not-in-shipped-header] Button \u00b7 Add locale \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (LocalizationScreen.tsx:262).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "640:2749",
+  "name": "[not-in-shipped-header] Button \u00b7 Add redirect \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (RedirectsScreen.tsx:225-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:8299",
+  "name": "[not-in-shipped-header] Button \u00b7 Add redirect \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (RedirectsScreen.tsx:225-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:8461",
+  "name": "[not-in-shipped-header] Button \u00b7 Add redirect \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (RedirectsScreen.tsx:225-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:8137",
+  "name": "[not-in-shipped-header] Button \u00b7 Add redirect \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (RedirectsScreen.tsx:225-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:8623",
+  "name": "[not-in-shipped-header] Button \u00b7 Add redirect \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn (RedirectsScreen.tsx:225-227).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "640:4158",
+  "name": "[not-in-shipped-header] Button \u00b7 Add endpoint \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn as Connect endpoint (WebhooksScreen.tsx:195-197).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:9924",
+  "name": "[not-in-shipped-header] Button \u00b7 Add endpoint \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn as Connect endpoint (WebhooksScreen.tsx:195-197).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:10419",
+  "name": "[not-in-shipped-header] Button \u00b7 Add endpoint \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn as Connect endpoint (WebhooksScreen.tsx:195-197).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:10089",
+  "name": "[not-in-shipped-header] Button \u00b7 Add endpoint \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn as Connect endpoint (WebhooksScreen.tsx:195-197).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:9761",
+  "name": "[not-in-shipped-header] Button \u00b7 Add endpoint \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn as Connect endpoint (WebhooksScreen.tsx:195-197).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ },
+ {
+  "op": "rename",
+  "id": "1703:10252",
+  "name": "[not-in-shipped-header] Button \u00b7 Add endpoint \u2014 DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete props interface and carries no action, no actions and no children. Delete this node; its in-body twin is already drawn as Connect endpoint (WebhooksScreen.tsx:195-197).",
+  "expect": "Button",
+  "why": "COVER-1-01 (Critical) \u2014 marker only. The FIX is deletion, which no queue op can do; scripts/figma/fix-settings-headers.mjs performs it and reads every board back. This rename is the applyable half: it costs no read, it never deletes a design, and it stops the next pass drawing from a header that cannot exist."
+ }
+]

@@ -1,0 +1,202 @@
+[
+ {
+  "op": "text",
+  "id": "172:43",
+  "text": "The panel's answer, and only the panel's. The message is honest and reachable \u2014 the server distinguishes this case with its own error code before it spends quota \u2014 but two other shipped AI entry points hit the same server error and show nothing at all: Pages \u2192 SEO \u201cWrite with AI\u201d and Media \u2192 \u201c\u2728 Generate\u201d both swallow the exception, flip the label back and leave the field blank. This board is not the product-wide answer until those two carry the same two sentences.",
+  "expect": "Not hypothetical. A dev fallback that quietly succeeded is why AI was dead in pr",
+  "width": 280,
+  "why": "UX-G-05 + UX-G-15's board-side twin FIG-K-15(b). The board id and size (172:43, 280x72 @100,2498) ARE read; its CURRENT TEXT is not. | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "144:12",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 144:2 Media \u00b7 grid | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:12",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:2 Media \u00b7 filtered | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:59",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:49 Media \u00b7 folder-scoped | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:106",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:96 Media \u00b7 uploading | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:158",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:148 Media \u00b7 upload-failed | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:209",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:199 Media \u00b7 quota-warn | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:260",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:250 Media \u00b7 quota-full | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:310",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:300 Media \u00b7 bulk-select | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:369",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 145:359 Media \u00b7 empty | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "453:3938",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 453:3931 Media \u00b7 load-error | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "777:4100",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 777:4093 Media \u00b7 loading | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "782:4360",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 782:4353 Media \u00b7 no-results | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "2430:21372",
+  "text": "\u2611 Select",
+  "expect": "\u229e  \u229f   \u2191",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 \u2014 Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work \u2014 the fullpage manager. Board 2430:21365 Media \u00b7 local-only assets | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "144:48",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:48",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:95",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:142",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:194",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:245",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:296",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "145:405",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "453:3959",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "777:4124",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ },
+ {
+  "op": "text",
+  "id": "782:4384",
+  "text": "\u2601 Stock",
+  "expect": "\u2601  Browse stock",
+  "width": 54,
+  "why": "UX-H-05 \u2014 the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34). | guard reset to the node's ACTUAL text: the plan's expect had collapsed whitespace, so the row refused while its id was correct."
+ }
+]

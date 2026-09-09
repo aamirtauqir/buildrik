@@ -1,0 +1,7 @@
+[
+  {
+    "id": "160:512",
+    "name": "[unreachable] Inspector · ai-agent-run — entering the AI tab clears the selection, so the takeover (ProInspector.tsx:510-517) is never reached with an element selected",
+    "why": "UX-D-01 / COVER-1-45. packages/editor/scripts/conformance/boards.json already records this board as verified:\"unreachable\", verifiedNote \"unreachable-selection-cleared-on-ai-tab-entry\" — the manifest says it and the board name does not. The board is kept, not deleted: the design is the record of what the takeover would look like if the selection survived."
+  }
+]

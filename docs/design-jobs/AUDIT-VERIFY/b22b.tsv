@@ -1,0 +1,230 @@
+N	2865:22206	Inspector · MOTION · one section	FRAME	1360,48973,300,812	true	NONE	26	true
+K	2865:22207	TEXT	1376,48991,180,14	true		MOTION
+K	2865:22208	TEXT	1624,48991,20,14	true		2
+K	2865:22209	RECTANGLE	1360,49021,300,1	true		Rectangle
+K	2865:22210	TEXT	1376,49028,150,16	true		👆 On Hover
+K	2865:22211	TEXT	1376,49045,150,14	true		Fade In Up · Entrances
+K	2865:22212	TEXT	1596,49035,48,16	true		▶ ✕
+K	2865:22213	RECTANGLE	1556,49037,32,16	true		Rectangle
+K	2865:22214	RECTANGLE	1360,49069,300,1	true		Rectangle
+K	2865:22215	TEXT	1376,49076,150,32	true		👁 When it scrolls into view
+K	2865:22216	TEXT	1376,49093,150,14	true		Slide In Up · Entrances
+K	2865:22217	TEXT	1596,49083,48,16	true		▶ ✕
+K	2865:22218	RECTANGLE	1556,49085,32,16	true		Rectangle
+K	2865:22219	RECTANGLE	1360,49117,300,1	true		Rectangle
+K	2865:22220	RECTANGLE	1376,49129,268,32	true		Rectangle
+K	2865:22221	TEXT	1376,49137,268,16	false		+ Add interaction
+K	2865:22222	RECTANGLE	1360,49181,300,1	false		Rectangle
+K	2865:22223	TEXT	1376,49193,268,14	false		WHAT THIS SURFACE CANNOT DO
+K	2865:22224	TEXT	1376,49211,268,105	false		Nothing animates on the editor canvas — the runtime's only starter, Composer.setPreviewMod
+K	2865:22225	RECTANGLE	1366,49127,288,36	false		hotspot/+ Add interaction
+K	2865:22226	RECTANGLE	1368,49020,166,32	false		hotspot/open interaction · On Hover
+K	2866:21826	TEXT	1376,49173,268,14	true		section/Triggers
+K	2866:21827	TEXT	1376,49197,268,56	true		note/Triggers
+K	2866:21828	TEXT	1376,49273,268,14	true		section/Presets
+K	2866:21829	TEXT	1376,49297,268,84	true		note/Presets
+K	2866:21830	TEXT	1376,49389,268,56	true		note/Undo
+K	2866:21831	TEXT	1376,49453,268,168	true		note/18 duplicates
+C	2865:22206	texts=17
+T	2866:21831	1376,49453,268,168	11	Regular	true	HEIGHT	Inspector · MOTION · one section	18 preset labels are identical across the two lists, not 16 — Bounce, Fade In, Fade In Dow
+T	2866:21830	1376,49389,268,56	11	Regular	true	HEIGHT	Inspector · MOTION · one section	Delete an interaction → toast with Undo, matching the element delete's own promise (Delete
+T	2866:21829	1376,49297,268,84	11	Regular	true	HEIGHT	Inspector · MOTION · one section	Entrances · Exits · Emphasis · Attention · Motion paths · Transforms — the six families th
+T	2866:21828	1376,49273,268,14	11	Semi Bold	true	HEIGHT	Inspector · MOTION · one section	PRESETS — SIX GROUPS, NOT A FLAT LIST
+T	2866:21827	1376,49197,268,56	11	Regular	true	HEIGHT	Inspector · MOTION · one section	On click · On hover · When it scrolls into view · On page load — each with a one-line desc
+T	2866:21826	1376,49173,268,14	11	Semi Bold	true	HEIGHT	Inspector · MOTION · one section	TRIGGERS THAT APPLY TO THIS ELEMENT
+T	2865:22224	1376,49211,268,105	11	Regular	false	HEIGHT	Inspector · MOTION · one section	Nothing animates on the editor canvas — the runtime's only starter, Composer.setPreviewMod
+T	2865:22223	1376,49193,268,14	11	Semi Bold	false	HEIGHT	Inspector · MOTION · one section	WHAT THIS SURFACE CANNOT DO
+T	2865:22221	1376,49137,268,16	12	Semi Bold	false	HEIGHT	Inspector · MOTION · one section	+  Add interaction
+T	2865:22217	1596,49083,48,16	12	Regular	true	HEIGHT	Inspector · MOTION · one section	▶     ✕
+T	2865:22216	1376,49093,150,14	11	Regular	true	HEIGHT	Inspector · MOTION · one section	Slide In Up · Entrances
+T	2865:22215	1376,49076,150,32	12	Semi Bold	true	HEIGHT	Inspector · MOTION · one section	👁 When it scrolls into view
+T	2865:22212	1596,49035,48,16	12	Regular	true	HEIGHT	Inspector · MOTION · one section	▶     ✕
+T	2865:22211	1376,49045,150,14	11	Regular	true	HEIGHT	Inspector · MOTION · one section	Fade In Up · Entrances
+T	2865:22210	1376,49028,150,16	12	Semi Bold	true	HEIGHT	Inspector · MOTION · one section	👆  On Hover
+T	2865:22208	1624,48991,20,14	11	Semi Bold	true	HEIGHT	Inspector · MOTION · one section	2
+T	2865:22207	1376,48991,180,14	11	Semi Bold	true	HEIGHT	Inspector · MOTION · one section	MOTION
+R	2865:22226	2430:11996	NAVIGATE	hotspot/open interaction · On Hover
+R	2865:22225	2430:11959	NAVIGATE	hotspot/+ Add interaction
+N	2898:12617	Pages · tree · drag · drop indicator (of 140:2)	FRAME	2500,15970,280,812	true	VERTICAL	38	true
+K	2898:12618	INSTANCE	2500,15970,280,44	true	false	Panel header
+K	2898:12619	FRAME	2500,16014,280,36	true	true	Search
+K	2898:12625	FRAME	2500,16050,280,32	true	true	Row · Marketing
+K	2898:12631	FRAME	2500,16082,280,32	true	true	Row · Home
+K	2898:12636	FRAME	2500,16114,280,32	true	true	Row · Menu
+K	2898:12639	FRAME	2500,16146,280,32	true	true	Row · Contact
+K	2898:12643	FRAME	2500,16178,280,32	true	true	Row · Legal
+K	2898:12649	FRAME	2500,16210,280,32	true	true	Row · About
+K	2898:12653	FRAME	2500,16242,280,129	true	true	spacer
+K	2898:12654	FRAME	2500,16371,280,36	true	true	Add page
+K	2898:12656	FRAME	2500,16748,150,34	true	true	hotspot/state · S3.7 · page-settings · SEO
+K	2898:12657	FRAME	2500,16712,160,34	true	false	hotspot/state · Pages · loading
+K	2898:12658	FRAME	2620,16712,160,34	true	false	hotspot/state · Pages · no-results
+K	2898:12659	FRAME	2500,16407,36,36	true	true	hotspot/back · to editor
+K	2898:12660	FRAME	2500,16443,140,28	true	false	hotspot/return · publish readiness
+K	2898:12661	FRAME	2500,16744,280,34	true	false	hotspot/state · Pages · context-menu
+K	2898:12662	FRAME	2500,16744,280,34	true	false	hotspot/state · Pages · command-palette
+K	2898:12663	FRAME	2670,16676,110,34	true	true	hotspot/state · Pages · bulk-select
+K	2898:12664	FRAME	2500,16642,140,34	true	true	hotspot/state · Pages · empty
+K	2898:12665	FRAME	2640,16642,140,34	true	true	hotspot/state · Pages · load-error
+K	2898:12666	FRAME	2500,16726,150,28	true	false	hotspot/state · page-settings · save-failed
+K	2898:12668	FRAME	2630,16754,150,28	true	false	hotspot/state · page-settings · crash
+K	2898:12670	FRAME	2630,16754,150,28	true	false	hotspot/state · rename · name-conflict
+K	2898:12672	RECTANGLE	2695,16018,81,27	true		hotspot/state · Pages · structure
+K	2898:12673	TEXT	2500,16471,248,13	true		note/folders-are-local
+K	2898:12674	RECTANGLE	2500,16484,280,1	true		rule/generated-top
+K	2898:12675	TEXT	2500,16485,89,20	true		grp/from-blog
+K	2898:12676	TEXT	2500,16505,14,16	true		grp/from-blog-count
+K	2898:12677	TEXT	2500,16521,228,26	true		grp/from-blog-sub
+K	2898:12678	RECTANGLE	2500,16547,280,1	true		rule/generated-end
+C	2898:12617	texts=36
+T	2898:12692	2522,16558,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · rename-url-offer	Pages · rename · URL offer
+T	2898:12690	2522,16522,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · bulk-toast	Pages · bulk · one toast
+T	2898:12688	2522,16486,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · local-only	Pages · local-only
+T	2898:12686	2522,16450,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · home-by-position	Pages · home by position
+T	2898:12684	2522,16414,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · drag	Pages · drag
+T	2898:12682	2522,16378,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · delete-confirm	Pages · delete-confirm
+T	2898:12680	2500,16665,248,117	11	Regular	true	HEIGHT	Pages · tree · drag · drop indicator (of 140:2)	UX-B-32 — Pages owns the per-page fact ('show in nav') and the visibility of which pages n
+T	2898:12679	2500,16548,248,117	11	Regular	true	HEIGHT	Pages · tree · drag · drop indicator (of 140:2)	UX-B-13 — '+ Add page' routes through the uniqueness helpers duplicate already uses (PageM
+T	2898:12677	2500,16521,228,26	11	Regular	true	HEIGHT	Pages · tree · drag · drop indicator (of 140:2)	/blog/{slug} · template: Blog post · read-only
+T	2898:12676	2500,16505,14,16	11	Medium	true	WIDTH_AND_HEIGHT	Pages · tree · drag · drop indicator (of 140:2)	12
+T	2898:12675	2500,16485,89,20	13	Regular	true	WIDTH_AND_HEIGHT	Pages · tree · drag · drop indicator (of 140:2)	▾  FROM BLOG
+T	2898:12673	2500,16471,248,13	11	Regular	true	HEIGHT	Pages · tree · drag · drop indicator (of 140:2)	Folders are yours only, on this browser.
+T	2898:12671	2636,16762,138,12	10	Medium	false	HEIGHT	hotspot/state · rename · name-conflict	rename · name-conflict
+T	2898:12669	2636,16762,104,12	10	Medium	false	HEIGHT	hotspot/state · page-settings · crash	page-settings · crash
+T	2898:12667	2506,16734,138,12	10	Medium	false	HEIGHT	hotspot/state · page-settings · save-failed	page-settings · save-failed
+T	2898:12655	2516,16379,76,20	13	Regular	true	WIDTH_AND_HEIGHT	Add page	+  Add page
+T	2898:12652	2688,16218,86,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · About	Won't publish
+T	2898:12651	2556,16216,37,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · About	About
+T	2898:12648	2750,16186,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Legal	2
+T	2898:12647	2576,16184,34,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	Legal
+T	2898:12646	2556,16186,12,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	📁
+T	2898:12645	2540,16186,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	▸
+T	2898:12642	2732,16154,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Contact	Draft
+T	2898:12641	2556,16152,49,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Contact	Contact
+T	2898:12638	2556,16120,35,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Menu	Menu
+T	2898:12634	2574,16088,37,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Home	Home
+T	2898:12633	2556,16089,9,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Home	⌂
+T	2898:12630	2750,16058,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Marketing	3
+T	2898:12629	2576,16056,62,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	Marketing
+T	2898:12628	2556,16058,12,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	📁
+T	2898:12627	2540,16058,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	▾
+T	2898:12624	2701,16068,66,18	12	Regular	true	WIDTH_AND_HEIGHT	Search	⚂ Structure
+T	2898:12623	2701,16024,66,15	12	Regular	false	WIDTH_AND_HEIGHT	Search	⚂ Structure
+T	2898:12622	2636,16024,57,18	12	Regular	true	WIDTH_AND_HEIGHT	Search	⊞ Listings
+T	2898:12621	2526,16023,43,20	13	Regular	true	WIDTH_AND_HEIGHT	search box	Search
+T	I2898:12618;16:7	2516,15984,204,16	11	Medium	true	HEIGHT	Panel header	Pages
+R	2898:12617	141:2	NAVIGATE	Pages · tree · drag · drop indicator (of 140:2)
+R	2898:12691	1706:8505	NAVIGATE	hotspot/state · Pages · rename-url-offer
+R	2898:12689	1706:8505	NAVIGATE	hotspot/state · Pages · bulk-toast
+R	2898:12687	1706:8505	NAVIGATE	hotspot/state · Pages · local-only
+R	2898:12685	1706:8505	NAVIGATE	hotspot/state · Pages · home-by-position
+R	2898:12683	1706:8505	NAVIGATE	hotspot/state · Pages · drag
+R	2898:12681	1706:8505	NAVIGATE	hotspot/state · Pages · delete-confirm
+R	2898:12672	2430:12214	NAVIGATE	hotspot/state · Pages · structure
+R	2898:12670	1717:17217	NAVIGATE	hotspot/state · rename · name-conflict
+R	2898:12668	1706:8509	NAVIGATE	hotspot/state · page-settings · crash
+R	2898:12666	1706:8505	NAVIGATE	hotspot/state · page-settings · save-failed
+R	2898:12665	141:165	NAVIGATE	hotspot/state · Pages · load-error
+R	2898:12664	141:124	NAVIGATE	hotspot/state · Pages · empty
+R	2898:12663	141:78	NAVIGATE	hotspot/state · Pages · bulk-select
+R	2898:12662	1171:4767	NAVIGATE	hotspot/state · Pages · command-palette
+R	2898:12661	1171:4713	NAVIGATE	hotspot/state · Pages · context-menu
+R	2898:12660	833:4518	NAVIGATE	hotspot/return · publish readiness
+R	2898:12659	52:2	NAVIGATE	hotspot/back · to editor
+R	2898:12658	782:4212	NAVIGATE	hotspot/state · Pages · no-results
+R	2898:12656	302:1978	NAVIGATE	hotspot/state · S3.7 · page-settings · SEO
+R	2898:12654	295:1972	NAVIGATE	Add page
+R	2898:12631	302:1978	NAVIGATE	Row · Home
+R	2898:12627	141:2	NAVIGATE	▾
+R	2898:12624	141:207	NAVIGATE	Structure link (ink)
+R	2898:12622	141:207	NAVIGATE	⊞ Listings
+N	2898:21981	Pages · tree · homepage by position (of 140:2)	FRAME	2800,15970,280,812	true	VERTICAL	38	true
+K	2898:21982	INSTANCE	2800,15970,280,44	true	false	Panel header
+K	2898:21983	FRAME	2800,16014,280,36	true	true	Search
+K	2898:21989	FRAME	2800,16050,280,32	true	true	Row · Marketing
+K	2898:21995	FRAME	2800,16082,280,32	true	true	Row · Home
+K	2898:22000	FRAME	2800,16114,280,32	true	true	Row · Menu
+K	2898:22003	FRAME	2800,16146,280,32	true	true	Row · Contact
+K	2898:22007	FRAME	2800,16178,280,32	true	true	Row · Legal
+K	2898:22013	FRAME	2800,16210,280,32	true	true	Row · About
+K	2898:22017	FRAME	2800,16242,280,129	true	true	spacer
+K	2898:22018	FRAME	2800,16371,280,36	true	true	Add page
+K	2898:22020	FRAME	2800,16748,150,34	true	true	hotspot/state · S3.7 · page-settings · SEO
+K	2898:22021	FRAME	2800,16712,160,34	true	false	hotspot/state · Pages · loading
+K	2898:22022	FRAME	2920,16712,160,34	true	false	hotspot/state · Pages · no-results
+K	2898:22023	FRAME	2800,16407,36,36	true	true	hotspot/back · to editor
+K	2898:22024	FRAME	2800,16443,140,28	true	false	hotspot/return · publish readiness
+K	2898:22025	FRAME	2800,16744,280,34	true	false	hotspot/state · Pages · context-menu
+K	2898:22026	FRAME	2800,16744,280,34	true	false	hotspot/state · Pages · command-palette
+K	2898:22027	FRAME	2970,16676,110,34	true	true	hotspot/state · Pages · bulk-select
+K	2898:22028	FRAME	2800,16642,140,34	true	true	hotspot/state · Pages · empty
+K	2898:22029	FRAME	2940,16642,140,34	true	true	hotspot/state · Pages · load-error
+K	2898:22030	FRAME	2800,16726,150,28	true	false	hotspot/state · page-settings · save-failed
+K	2898:22032	FRAME	2930,16754,150,28	true	false	hotspot/state · page-settings · crash
+K	2898:22034	FRAME	2930,16754,150,28	true	false	hotspot/state · rename · name-conflict
+K	2898:22036	RECTANGLE	2995,16018,81,27	true		hotspot/state · Pages · structure
+K	2898:22037	TEXT	2800,16471,248,13	true		note/folders-are-local
+K	2898:22038	RECTANGLE	2800,16484,280,1	true		rule/generated-top
+K	2898:22039	TEXT	2800,16485,89,20	true		grp/from-blog
+K	2898:22040	TEXT	2800,16505,14,16	true		grp/from-blog-count
+K	2898:22041	TEXT	2800,16521,228,26	true		grp/from-blog-sub
+K	2898:22042	RECTANGLE	2800,16547,280,1	true		rule/generated-end
+C	2898:21981	texts=36
+T	2898:22056	2822,16558,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · rename-url-offer	Pages · rename · URL offer
+T	2898:22054	2822,16522,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · bulk-toast	Pages · bulk · one toast
+T	2898:22052	2822,16486,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · local-only	Pages · local-only
+T	2898:22050	2822,16450,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · home-by-position	Pages · home by position
+T	2898:22048	2822,16414,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · drag	Pages · drag
+T	2898:22046	2822,16378,138,12	10	Medium	false	HEIGHT	hotspot/state · Pages · delete-confirm	Pages · delete-confirm
+T	2898:22044	2800,16665,248,117	11	Regular	true	HEIGHT	Pages · tree · homepage by position (of 140:2)	UX-B-32 — Pages owns the per-page fact ('show in nav') and the visibility of which pages n
+T	2898:22043	2800,16548,248,117	11	Regular	true	HEIGHT	Pages · tree · homepage by position (of 140:2)	UX-B-13 — '+ Add page' routes through the uniqueness helpers duplicate already uses (PageM
+T	2898:22041	2800,16521,228,26	11	Regular	true	HEIGHT	Pages · tree · homepage by position (of 140:2)	/blog/{slug} · template: Blog post · read-only
+T	2898:22040	2800,16505,14,16	11	Medium	true	WIDTH_AND_HEIGHT	Pages · tree · homepage by position (of 140:2)	12
+T	2898:22039	2800,16485,89,20	13	Regular	true	WIDTH_AND_HEIGHT	Pages · tree · homepage by position (of 140:2)	▾  FROM BLOG
+T	2898:22037	2800,16471,248,13	11	Regular	true	HEIGHT	Pages · tree · homepage by position (of 140:2)	Folders are yours only, on this browser.
+T	2898:22035	2936,16762,138,12	10	Medium	false	HEIGHT	hotspot/state · rename · name-conflict	rename · name-conflict
+T	2898:22033	2936,16762,104,12	10	Medium	false	HEIGHT	hotspot/state · page-settings · crash	page-settings · crash
+T	2898:22031	2806,16734,138,12	10	Medium	false	HEIGHT	hotspot/state · page-settings · save-failed	page-settings · save-failed
+T	2898:22019	2816,16379,76,20	13	Regular	true	WIDTH_AND_HEIGHT	Add page	+  Add page
+T	2898:22016	2988,16218,86,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · About	Won't publish
+T	2898:22015	2856,16216,37,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · About	About
+T	2898:22012	3050,16186,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Legal	2
+T	2898:22011	2876,16184,34,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	Legal
+T	2898:22010	2856,16186,12,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	📁
+T	2898:22009	2840,16186,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Legal	▸
+T	2898:22006	3032,16154,33,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Contact	Draft
+T	2898:22005	2856,16152,49,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Contact	Contact
+T	2898:22002	2856,16120,35,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Menu	Menu
+T	2898:21998	2874,16088,37,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Home	Home
+T	2898:21997	2856,16089,9,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Home	⌂
+T	2898:21994	3050,16058,7,16	11	Medium	true	WIDTH_AND_HEIGHT	Row · Marketing	3
+T	2898:21993	2876,16056,62,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	Marketing
+T	2898:21992	2856,16058,12,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	📁
+T	2898:21991	2840,16058,5,18	12	Regular	true	WIDTH_AND_HEIGHT	Row · Marketing	▾
+T	2898:21988	3001,16068,66,18	12	Regular	true	WIDTH_AND_HEIGHT	Search	⚂ Structure
+R	2898:21981	141:2	NAVIGATE	Pages · tree · homepage by position (of 140:2)
+R	2898:22055	1706:8505	NAVIGATE	hotspot/state · Pages · rename-url-offer
+R	2898:22053	1706:8505	NAVIGATE	hotspot/state · Pages · bulk-toast
+R	2898:22051	1706:8505	NAVIGATE	hotspot/state · Pages · local-only
+R	2898:22049	1706:8505	NAVIGATE	hotspot/state · Pages · home-by-position
+R	2898:22047	1706:8505	NAVIGATE	hotspot/state · Pages · drag
+R	2898:22045	1706:8505	NAVIGATE	hotspot/state · Pages · delete-confirm
+R	2898:22036	2430:12214	NAVIGATE	hotspot/state · Pages · structure
+R	2898:22034	1717:17217	NAVIGATE	hotspot/state · rename · name-conflict
+R	2898:22032	1706:8509	NAVIGATE	hotspot/state · page-settings · crash
+R	2898:22030	1706:8505	NAVIGATE	hotspot/state · page-settings · save-failed
+R	2898:22029	141:165	NAVIGATE	hotspot/state · Pages · load-error
+R	2898:22028	141:124	NAVIGATE	hotspot/state · Pages · empty
+R	2898:22027	141:78	NAVIGATE	hotspot/state · Pages · bulk-select
+R	2898:22026	1171:4767	NAVIGATE	hotspot/state · Pages · command-palette
+R	2898:22025	1171:4713	NAVIGATE	hotspot/state · Pages · context-menu
+R	2898:22024	833:4518	NAVIGATE	hotspot/return · publish readiness
+R	2898:22023	52:2	NAVIGATE	hotspot/back · to editor
+R	2898:22022	782:4212	NAVIGATE	hotspot/state · Pages · no-results
+R	2898:22020	302:1978	NAVIGATE	hotspot/state · S3.7 · page-settings · SEO
+R	2898:22018	295:1972	NAVIGATE	Add page
+R	2898:21995	302:1978	NAVIGATE	Row · Home
+R	2898:21991	141:2	NAVIGATE	▾
+R	2898:21988	141:207	NAVIGATE	Structure link (ink)
+R	2898:21986	141:207	NAVIGATE	⊞ Listings
+END	done=2865:22206|2898:12617|2898:21981	stopped=true	bytes=18630

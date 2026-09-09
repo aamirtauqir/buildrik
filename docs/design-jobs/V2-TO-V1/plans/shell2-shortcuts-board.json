@@ -1,0 +1,219 @@
+{
+ "note": "One shortcuts screen, drawn in section 13 · Command palette — the section that already owns the file's keyboard surfaces. The first shell pass closed UX-F-05 as out-of-section because the SHIPPED overlay board 815:4518 lives in section 23 · Journeys. That is true of the existing drawing and it is not a reason to leave the target undrawn: this board states the merged screen, and it is where the ⌘K boards already are. Placement read back 2026-09-07: section 1779:3 is 4520x1450 with 13 children; row y=852 holds only 166:45 at x=100 w=640 (ends 1272, caption 172:20 at y=1292). (820,852) 1000x420 is free and the caption sits on the row's existing 1292 line.",
+ "page": "1:3",
+ "section": "1779:3",
+ "boards": [
+  {
+   "name": "Shortcuts · one screen (? and ⌘/)",
+   "x": 820,
+   "y": 852,
+   "w": 1000,
+   "h": 420,
+   "bg": "#FFFFFF",
+   "caption": {
+    "y": 1292,
+    "w": 1000,
+    "text": "caption/Shortcuts · one screen — the merged target for UX-F-05. Today “?” draws KeyboardCheatSheet (6 groups) and ⌘/ draws KeyboardShortcutsPanel (3 groups); the shipped overlay board is 815:4518 in section 23. This board also carries the two shell-level shortcut defects: the missing modal guard (UX-F-31) and ⌘R (UX-F-32)."
+   },
+   "nodes": [
+    {
+     "t": "text",
+     "x": 16,
+     "y": 16,
+     "w": 968,
+     "v": "Shortcuts · one screen — “?” and ⌘/ open the same thing",
+     "s": 14,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 44,
+     "w": 968,
+     "h": 1,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 60,
+     "w": 300,
+     "v": "PANELS · no modifier",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 84,
+     "w": 200,
+     "v": "Insert\nLayers\nPages\nMedia\nContent\nBrand\nTemplates\nComponents\nAI\nPublish\nHistory\nReview\nSettings",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 236,
+     "y": 84,
+     "w": 80,
+     "v": "A\nL\nP\nM\nD\nB\nT\n⇧A\nI\nU\nH\nR\nS",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 300,
+     "w": 300,
+     "h": 1,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 312,
+     "w": 300,
+     "v": "Twelve are bare letters; Components is ⇧A (tabsConfig.ts:82-259). The panel prints them today with no note that they take no modifier, and the rail shows them only on hover. (UX-F-05, UX-F-31)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 350,
+     "y": 60,
+     "w": 300,
+     "v": "CANVAS · selection and escape",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 350,
+     "y": 84,
+     "w": 170,
+     "v": "Select all\nClear selection\nNext / previous\nSibling · parent · child\nMove 10px / 1px\nContext menu\nLeave the canvas",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 530,
+     "y": 84,
+     "w": 120,
+     "v": "⌘A\nEsc\nTab / ⇧Tab\n↑ ↓ ← →\n⇧ / ⌘ + arrow\n⇧F10\nF6",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 350,
+     "y": 208,
+     "w": 300,
+     "v": "F6 is the only way out: Tab is captured and preventDefault-ed (useCanvasKeyboard.ts:87-107) and neither screen prints F6 today. (UX-F-18)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 350,
+     "y": 272,
+     "w": 300,
+     "v": "VIEW · zoom and overlays",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 350,
+     "y": 296,
+     "w": 170,
+     "v": "100% · fit · selection\nZoom in / out\nGuides · spacing\nGrid\nBadges\nRulers\nX-ray",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 530,
+     "y": 296,
+     "w": 120,
+     "v": "⌘0 ⌘1 ⌘2\n⌘= / ⌘-\n⌘; / ⌘⇧;\n⌘'\n⌘B\n⌘R\n⌘⇧X",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 684,
+     "y": 60,
+     "w": 300,
+     "v": "WHY ONE SCREEN",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 684,
+     "y": 84,
+     "w": 300,
+     "v": "Two ship. “?” opens the canvas cheat sheet — six groups: Selection, Navigation, Positioning, Editing, View, Context Menu (KeyboardCheatSheet.tsx:27-101). ⌘/ opens the app shortcuts panel — three groups: Panels, Edit, View (KeyboardShortcutsPanel.tsx:26-68). Each answers half of “what are the shortcuts”. One screen, grouped by surface, on both chords. (UX-F-05)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 684,
+     "y": 228,
+     "w": 300,
+     "v": "THE GUARD THAT IS MISSING",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 684,
+     "y": 252,
+     "w": 300,
+     "v": "The bare letters fire while a modal is open. useSidebarKeyboard.ts:16-53 guards inputs, contenteditable and modifiers and nothing else; every other global handler calls isModalOpen() first (useEditorShortcuts.ts:85, CanvasFooterToolbar.tsx:226). Add the guard. (UX-F-31)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "rect",
+     "x": 684,
+     "y": 348,
+     "w": 300,
+     "h": 1,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 684,
+     "y": 360,
+     "w": 300,
+     "v": "⌘R is the browser’s reload and the shell takes it for Rulers (CanvasFooterToolbar.tsx:271). Move the overlay chords off keys the browser owns. (UX-F-32)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ]
+  }
+ ]
+}

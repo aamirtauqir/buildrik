@@ -1,0 +1,32 @@
+{
+ "note": "Driven by scripts/figma/add-rail-more-seat.mjs, whose only argument is the destination board. Captured here so an applier who is not the author can execute and check it. The component-set id and four of the seven variant ids were READ from the file on 2026-09-07; the other three variants were truncated out of that dump, which is why the script iterates set.children rather than a hard-coded id list.",
+ "page": "1:3",
+ "componentSet": { "id": "2034:8519", "name": "Rail", "size": "60x812", "section": "2040:8372", "id-source": "read" },
+ "variants-read": [
+  { "id": "2034:8392", "name": "Active=None" },
+  { "id": "2034:8413", "name": "Active=Insert" },
+  { "id": "2034:8434", "name": "Active=Layers" },
+  { "id": "2034:8455", "name": "Active=Pages" }
+ ],
+ "variants-not-read": ["Active=Media", "Active=Content", "Active=Brand"],
+ "existing-item-geometry-read": {
+  "items": ["rail/Insert @8,10", "rail/Layers @8,58", "rail/Pages @8,106", "rail/Media @8,154", "rail/Content @8,202", "rail/Brand @8,250"],
+  "item": "44x44", "pitch": 48,
+  "child-shape": "INSTANCE 'glyph' 18x18 @13,4  +  TEXT label 16 tall @y24"
+ },
+ "add": {
+  "rail/divider": { "type": "RECTANGLE", "x": 16, "y": 304, "w": 28, "h": 1, "fill": "#E5E7EB" },
+  "rail/More": {
+   "type": "FRAME", "x": 8, "y": 312, "w": 44, "h": 44, "fills": [],
+   "children": [
+    { "name": "glyph", "type": "TEXT", "chars": "⋯", "size": 14, "style": "Medium", "x": 13, "y": 4, "w": 18, "align": "CENTER" },
+    { "name": "More", "type": "TEXT", "chars": "More", "size": 11, "style": "Regular", "x": 0, "y": 24, "w": 44, "align": "CENTER" }
+   ],
+   "paint": "copied from the existing rail/Brand label so the new seat cannot invent a colour",
+   "reaction": { "trigger": "ON_CLICK", "to": "the 'Rail · More index (popover · 240)' board built by shell-new-boards.json" }
+  }
+ },
+ "why": "UX-F-01 (Critical). RAIL_FIGMA renders six ids (tabsConfig.ts:349-351) while TabRouter renders twelve destinations (TabRouter.tsx:125-244); Templates, Components, AI, Publish, History and Review are reachable only by a memorised letter, ⌘K, or a row in the ⋯ menu. SPEC-NAVIGATION §2.2 takes the audit's own second option — one new seat that is honestly an index — because promoting seven icons breaks the 48px pitch and the one-group reading the board commits to.",
+ "blast-radius": "every rail instance on page 1:3. The script reports the instance census (total / with rail/More) instead of asserting propagation; that number is the read-back for brief rule 6.",
+ "fits": "the last existing item ends at y=294; divider 304 and seat 312-356 sit inside the 812 component height, and inside every 900-tall board that instances it."
+}

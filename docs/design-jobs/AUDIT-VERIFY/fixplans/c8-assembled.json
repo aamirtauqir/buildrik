@@ -1,0 +1,312 @@
+{
+ "slug": "c8-assembled",
+ "page": "1:3",
+ "cause": "C8 - corrections drawn on new boards were never assembled into the screens (PLAN.md), plus the two assembled boards that contradict themselves",
+ "run_order": [
+  "1. node scripts/figma/resolve-selectors.mjs docs/design-jobs/AUDIT-VERIFY/fixplans/c8-assembled.json --apply   — ONE Figma call; fills `id` on the 8 selector rows (2 hero fills + 6 zoom chips) and clears their unresolved-id flag. Ambiguous/nomatch rows are LEFT unresolved on purpose.",
+  "2. mv docs/design-jobs/AUDIT-VERIFY/fixplans/c8-assembled.resolved.json docs/design-jobs/AUDIT-VERIFY/fixplans/c8-assembled.json   — TRAP: resolve-selectors writes a SECOND file (<plan>.resolved.json) next to the first, and normalize-plans globs the whole directory. Leave both in place and every row is queued TWICE.",
+  "3. node scripts/figma/normalize-plans.mjs",
+  "4. node scripts/figma/apply-queue.mjs --only=c8 --apply"
+ ],
+ "rows": [
+  {
+   "op": "fill",
+   "id": null,
+   "selector": {
+    "board": "52:2",
+    "name": "Hero — SELECTED"
+   },
+   "unresolved-id": true,
+   "hex": "#1A56DB",
+   "expect": "frame named 'Hero — SELECTED' on 52:2 — the parent of 52:160 'Wood-fired pizza, five minutes from home' and 52:161 'Open Tuesday to Sunday, from 5pm' (b08a pn column); it is the node the Inspector is describing",
+   "sequence": 1,
+   "why": "F02 — Inspector BACKGROUND · Fill on 52:2 reads 52:131 '#1A56DB' (fresh read b08a) while the selected hero renders light gray. The hex is MEASURED; the hero's paint is not (a text dump carries no paint), so the repair that uses only known values is to make the canvas obey the inspector, not the reverse. Same element on both counts: the footer says the selection is 680 x 250 and the selection label 52:163 sits at board-relative x=404 y=236, so the outlined box runs roughly x 504..1184 y 111299..111549 — which contains 52:160 (642..1038) and 52:161 (730..950) and excludes the site nav row above it. No id for the frame is in any dump, so this row resolves by exact layer name: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` BEFORE normalize-plans.mjs — normalize has no selector branch for op:fill (normalize-plans.mjs:115) and an id-less fill row degrades to advisory. The op is idempotent: if the frame already holds #1A56DB the applier reports SAME and writes nothing.",
+   "hold": true,
+   "holdWhy": "F02 HELD by the parent, pending ONE read of the hero frame's fills[0].color on 52:2 and 199:205. Two reasons. (1) #1A56DB is BUILDRIK'S OWN accent (DESIGN.md's single accent colour), and this hero belongs to the mock customer site 'Bella Cucina' — painting a customer's hero in the product's brand blue is a category error, which makes the INSPECTOR SAMPLE the more likely wrong half, not the canvas. (2) op:fill has no expect guard (apply-queue enforces expect only for text and rename), so painting over an unread colour cannot be undone — the old value would never have been recorded. The read costs one call and settles which half is wrong."
+  },
+  {
+   "op": "fill",
+   "id": null,
+   "selector": {
+    "board": "199:205",
+    "name": "Hero — SELECTED"
+   },
+   "unresolved-id": true,
+   "hex": "#1A56DB",
+   "expect": "frame named 'Hero — SELECTED' on 199:205 — the parent of 199:293 'Wood-fired pizza, five minutes from home' and 199:294 'Open Tuesday to Sunday, from 5pm' (b08b pn column); it is the node the Inspector is describing",
+   "sequence": 1,
+   "why": "F02 — Inspector BACKGROUND · Fill on 199:205 reads 199:377 '#1A56DB' (fresh read b08b) while the selected hero renders light gray. The hex is MEASURED; the hero's paint is not (a text dump carries no paint), so the repair that uses only known values is to make the canvas obey the inspector, not the reverse. Same element on both counts: the footer says the selection is 680 x 250 and the selection label 199:296 sits at board-relative x=404 y=236, so the outlined box runs roughly x 3624..4304 y 472..722 — which contains 199:293 (3762..4158) and 199:294 (3850..4070) and excludes the site nav row above it. No id for the frame is in any dump, so this row resolves by exact layer name: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` BEFORE normalize-plans.mjs — normalize has no selector branch for op:fill (normalize-plans.mjs:115) and an id-less fill row degrades to advisory. The op is idempotent: if the frame already holds #1A56DB the applier reports SAME and writes nothing.",
+   "hold": true,
+   "holdWhy": "F02 HELD by the parent, pending ONE read of the hero frame's fills[0].color on 52:2 and 199:205. Two reasons. (1) #1A56DB is BUILDRIK'S OWN accent (DESIGN.md's single accent colour), and this hero belongs to the mock customer site 'Bella Cucina' — painting a customer's hero in the product's brand blue is a category error, which makes the INSPECTOR SAMPLE the more likely wrong half, not the canvas. (2) op:fill has no expect guard (apply-queue enforces expect only for text and rename), so painting over an unread colour cannot be undone — the old value would never have been recorded. The read costs one call and settles which half is wrong."
+  },
+  {
+   "op": "fill",
+   "id": "52:160",
+   "hex": "#FFFFFF",
+   "expect": "TEXT 'Wood-fired pizza, five minutes from home', 20/Semi Bold, box=[642, 111397, 396, 30], parent 'Hero — SELECTED' on 52:2 (fill not carried by the dump)",
+   "sequence": 2,
+   "why": "F02 — the ink half of the same change, and it is NOT optional: #1A56DB has relative luminance 0.118, so white on it is (1.05)/(0.168) = 6.2:1 (AA for body and large text) while the dark ink this hero currently uses would fall under 2:1. COUPLING: apply this ONLY in the same pass as the two hero fills above, and only if both read back OK — a white heading on a still-gray hero is a worse board than the one we started with. Safe under uncertainty in the other direction: op:fill compares before it writes, so if this text is already white the applier reports SAME.",
+   "hold": true,
+   "holdWhy": "F02 HELD by the parent, pending ONE read of the hero frame's fills[0].color on 52:2 and 199:205. Two reasons. (1) #1A56DB is BUILDRIK'S OWN accent (DESIGN.md's single accent colour), and this hero belongs to the mock customer site 'Bella Cucina' — painting a customer's hero in the product's brand blue is a category error, which makes the INSPECTOR SAMPLE the more likely wrong half, not the canvas. (2) op:fill has no expect guard (apply-queue enforces expect only for text and rename), so painting over an unread colour cannot be undone — the old value would never have been recorded. The read costs one call and settles which half is wrong."
+  },
+  {
+   "op": "fill",
+   "id": "52:161",
+   "hex": "#FFFFFF",
+   "expect": "TEXT 'Open Tuesday to Sunday, from 5pm', 13/Regular, box=[730, 111439, 220, 20], parent 'Hero — SELECTED' on 52:2 (fill not carried by the dump)",
+   "sequence": 2,
+   "why": "F02 — the ink half of the same change, and it is NOT optional: #1A56DB has relative luminance 0.118, so white on it is (1.05)/(0.168) = 6.2:1 (AA for body and large text) while the dark ink this hero currently uses would fall under 2:1. COUPLING: apply this ONLY in the same pass as the two hero fills above, and only if both read back OK — a white heading on a still-gray hero is a worse board than the one we started with. Safe under uncertainty in the other direction: op:fill compares before it writes, so if this text is already white the applier reports SAME.",
+   "hold": true,
+   "holdWhy": "F02 HELD by the parent, pending ONE read of the hero frame's fills[0].color on 52:2 and 199:205. Two reasons. (1) #1A56DB is BUILDRIK'S OWN accent (DESIGN.md's single accent colour), and this hero belongs to the mock customer site 'Bella Cucina' — painting a customer's hero in the product's brand blue is a category error, which makes the INSPECTOR SAMPLE the more likely wrong half, not the canvas. (2) op:fill has no expect guard (apply-queue enforces expect only for text and rename), so painting over an unread colour cannot be undone — the old value would never have been recorded. The read costs one call and settles which half is wrong."
+  },
+  {
+   "op": "fill",
+   "id": "199:293",
+   "hex": "#FFFFFF",
+   "expect": "TEXT 'Wood-fired pizza, five minutes from home', 20/Semi Bold, box=[3762, 570, 396, 30], parent 'Hero — SELECTED' on 199:205 (fill not carried by the dump)",
+   "sequence": 2,
+   "why": "F02 — the ink half of the same change, and it is NOT optional: #1A56DB has relative luminance 0.118, so white on it is (1.05)/(0.168) = 6.2:1 (AA for body and large text) while the dark ink this hero currently uses would fall under 2:1. COUPLING: apply this ONLY in the same pass as the two hero fills above, and only if both read back OK — a white heading on a still-gray hero is a worse board than the one we started with. Safe under uncertainty in the other direction: op:fill compares before it writes, so if this text is already white the applier reports SAME.",
+   "hold": true,
+   "holdWhy": "F02 HELD by the parent, pending ONE read of the hero frame's fills[0].color on 52:2 and 199:205. Two reasons. (1) #1A56DB is BUILDRIK'S OWN accent (DESIGN.md's single accent colour), and this hero belongs to the mock customer site 'Bella Cucina' — painting a customer's hero in the product's brand blue is a category error, which makes the INSPECTOR SAMPLE the more likely wrong half, not the canvas. (2) op:fill has no expect guard (apply-queue enforces expect only for text and rename), so painting over an unread colour cannot be undone — the old value would never have been recorded. The read costs one call and settles which half is wrong."
+  },
+  {
+   "op": "fill",
+   "id": "199:294",
+   "hex": "#FFFFFF",
+   "expect": "TEXT 'Open Tuesday to Sunday, from 5pm', 13/Regular, box=[3850, 612, 220, 20], parent 'Hero — SELECTED' on 199:205 (fill not carried by the dump)",
+   "sequence": 2,
+   "why": "F02 — the ink half of the same change, and it is NOT optional: #1A56DB has relative luminance 0.118, so white on it is (1.05)/(0.168) = 6.2:1 (AA for body and large text) while the dark ink this hero currently uses would fall under 2:1. COUPLING: apply this ONLY in the same pass as the two hero fills above, and only if both read back OK — a white heading on a still-gray hero is a worse board than the one we started with. Safe under uncertainty in the other direction: op:fill compares before it writes, so if this text is already white the applier reports SAME.",
+   "hold": true,
+   "holdWhy": "F02 HELD by the parent, pending ONE read of the hero frame's fills[0].color on 52:2 and 199:205. Two reasons. (1) #1A56DB is BUILDRIK'S OWN accent (DESIGN.md's single accent colour), and this hero belongs to the mock customer site 'Bella Cucina' — painting a customer's hero in the product's brand blue is a category error, which makes the INSPECTOR SAMPLE the more likely wrong half, not the canvas. (2) op:fill has no expect guard (apply-queue enforces expect only for text and rename), so painting over an unread colour cannot be undone — the old value would never have been recorded. The read costs one call and settles which half is wrong."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "intended_op": "text",
+   "ids": [
+    "52:131",
+    "199:377"
+   ],
+   "expect": "52:131 '#1A56DB' and 199:377 '#1A56DB' — both 12/Regular, parent 'input'",
+   "detail": "F02 REJECTED ALTERNATIVE — rewrite the Inspector's Fill value to the hero's real colour instead of painting the hero. Held because it needs a fact no dump on disk carries. The read that settles it: one use_figma call returning fills[0].color for the frame named 'Hero — SELECTED' on 52:2 and on 199:205. Note that read is a strict SUPERSET of what the authored option needs (that one needs only the frame's id, which the same call returns), so this branch is never the cheaper one — it is recorded so the choice is on the record, not because it should be taken.",
+   "why": "F02 — the unmeasured half. See VERDICTS F02 'CONFIRMED-VALUE-RENDER-CAVEAT': value measured, mismatch corroborated by two renders and never measured."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "intended_op": "fill (or an instance-variant swap, which nothing here can do)",
+   "board": "52:2",
+   "id": "I2143:20597;2142:11053",
+   "expect": "I2143:20597;2142:11053 'section' at board-relative x=92 (row indent 92) and I2143:20605;2142:11080 'heading-that-is-long' at board-relative x=156 (row indent 156) — the two candidate rows, both parented to a frame named 'row'",
+   "detail": "F01 DECISION — move the LAYERS highlight to the 'section' row (I2143:20597;2142:11053); do NOT rename the other surfaces. Arithmetic for the decision: on 52:2 three text surfaces plus the outline already agree — inspector header, canvas selection label and footer all say Section/Hero, and the outlined canvas frame is literally NAMED 'Hero — SELECTED'. Moving one highlight is 1 edit; renaming every surface to the heading is 4 edits AND still leaves the outline contradicting all four, because no op in scripts/figma/apply-queue.mjs can move a selection outline. 1 beats 4-that-do-not-converge. HELD because the repair is out of the applier's reach, not because the decision is unclear: (a) the highlight is paint or a variant on the ROW INSTANCE frame and the fresh dumps carry only instance-sublayer TEXT ids, no frame ids and no paint; (b) all nine row frames are named 'row', so resolve-selectors.mjs returns AMBIGUOUS(9) by design and refuses to guess; (c) if the row is a component with a 'selected' variant, NOTHING in this toolchain can set it — normalize-plans.mjs:152-154 maps any op starting with 'setProperties' to advisory. What the applier CAN do on these instances is text: the nine rows already carry per-instance overrides of the same inner component text nodes (2142:11053 reads 'section' on one instance and 'footer' on another), so text overrides demonstrably work here. It is the highlight, not the copy, that is unreachable. THE READ THAT SETTLES IT (1 call, both boards together): for 52:2 and 199:205, list the nine row instances under the LAYERS panel returning each row's node id, fills[0].color and componentProperties. That answers which row is highlighted and whether it is a paint (then this becomes an op:fill row on I2143:20597;2142:11053) or a variant (then it is hand work in Figma).",
+   "why": "F01 — 52:2: highlight on 'heading-that-is-long', every other surface on the section. See VERDICTS F01."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "intended_op": "fill (or an instance-variant swap, which nothing here can do)",
+   "board": "199:205",
+   "id": "I2143:20489;2142:11053",
+   "expect": "I2143:20489;2142:11053 'section' at board-relative x=92 (row indent 92) and I2143:20497;2142:11080 'heading-that-is-long' at board-relative x=156 (row indent 156) — the two candidate rows, both parented to a frame named 'row'",
+   "detail": "F01 DECISION — move the LAYERS highlight to the 'section' row (I2143:20489;2142:11053); do NOT rename the other surfaces. Arithmetic for the decision: on 199:205 three text surfaces plus the outline already agree — inspector header, canvas selection label and footer all say Section/Hero, and the outlined canvas frame is literally NAMED 'Hero — SELECTED'. Moving one highlight is 1 edit; renaming every surface to the heading is 4 edits AND still leaves the outline contradicting all four, because no op in scripts/figma/apply-queue.mjs can move a selection outline. 1 beats 4-that-do-not-converge. HELD because the repair is out of the applier's reach, not because the decision is unclear: (a) the highlight is paint or a variant on the ROW INSTANCE frame and the fresh dumps carry only instance-sublayer TEXT ids, no frame ids and no paint; (b) all nine row frames are named 'row', so resolve-selectors.mjs returns AMBIGUOUS(9) by design and refuses to guess; (c) if the row is a component with a 'selected' variant, NOTHING in this toolchain can set it — normalize-plans.mjs:152-154 maps any op starting with 'setProperties' to advisory. What the applier CAN do on these instances is text: the nine rows already carry per-instance overrides of the same inner component text nodes (2142:11053 reads 'section' on one instance and 'footer' on another), so text overrides demonstrably work here. It is the highlight, not the copy, that is unreachable. THE READ THAT SETTLES IT (1 call, both boards together): for 52:2 and 199:205, list the nine row instances under the LAYERS panel returning each row's node id, fills[0].color and componentProperties. That answers which row is highlighted and whether it is a paint (then this becomes an op:fill row on I2143:20489;2142:11053) or a variant (then it is hand work in Figma).",
+   "why": "F01 — 199:205: highlight on 'heading-that-is-long', every other surface on the section. See VERDICTS F01."
+  },
+  {
+   "op": "delete",
+   "id": "638:2614",
+   "expect": "TEXT 'Section · Hero', 11/Regular, box=[6356, 101491, 74, 16], parent 'Footer' on 638:2378 (S7 · Settings · General)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 638:2378 is [6340,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 6356 = board x + 16, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "638:2615",
+   "expect": "TEXT '680 × 250', 11/Regular, box=[6446, 101491, 55, 16], parent 'Footer' on 638:2378 (S7 · Settings · General)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 638:2378 is [6340,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 6446 = board x + 106, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "638:2617",
+   "expect": "TEXT 'Desktop · 100%', 11/Regular, box=[7683, 101491, 81, 16], parent 'Footer' on 638:2378 (S7 · Settings · General)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 638:2378 is [6340,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 7683 = board x + 1343, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:2676",
+   "expect": "TEXT 'Section · Hero', 11/Regular, box=[6356, 103531, 74, 16], parent 'Footer' on 640:2440 (S7 · Settings · Redirects)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:2440 is [6340,102655,1440,900]; its bottom edge is 103555. This text runs y 103531..103547 and x 6356 = board x + 16, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:2677",
+   "expect": "TEXT '680 × 250', 11/Regular, box=[6446, 103531, 55, 16], parent 'Footer' on 640:2440 (S7 · Settings · Redirects)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:2440 is [6340,102655,1440,900]; its bottom edge is 103555. This text runs y 103531..103547 and x 6446 = board x + 106, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:2679",
+   "expect": "TEXT 'Desktop · 100%', 11/Regular, box=[7683, 103531, 81, 16], parent 'Footer' on 640:2440 (S7 · Settings · Redirects)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:2440 is [6340,102655,1440,900]; its bottom edge is 103555. This text runs y 103531..103547 and x 7683 = board x + 1343, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:3025",
+   "expect": "TEXT 'Section · Hero', 11/Regular, box=[116, 102511, 74, 16], parent 'Footer' on 640:2789 (S7 · Settings · Headers)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:2789 is [100,101635,1440,900]; its bottom edge is 102535. This text runs y 102511..102527 and x 116 = board x + 16, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:3026",
+   "expect": "TEXT '680 × 250', 11/Regular, box=[206, 102511, 55, 16], parent 'Footer' on 640:2789 (S7 · Settings · Headers)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:2789 is [100,101635,1440,900]; its bottom edge is 102535. This text runs y 102511..102527 and x 206 = board x + 106, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:3028",
+   "expect": "TEXT 'Desktop · 100%', 11/Regular, box=[1443, 102511, 81, 16], parent 'Footer' on 640:2789 (S7 · Settings · Headers)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:2789 is [100,101635,1440,900]; its bottom edge is 102535. This text runs y 102511..102527 and x 1443 = board x + 1343, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:3371",
+   "expect": "TEXT 'Section · Hero', 11/Regular, box=[3236, 100471, 74, 16], parent 'Footer' on 640:3135 (S7 · Settings · Forms)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:3135 is [3220,99595,1440,900]; its bottom edge is 100495. This text runs y 100471..100487 and x 3236 = board x + 16, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:3372",
+   "expect": "TEXT '680 × 250', 11/Regular, box=[3326, 100471, 55, 16], parent 'Footer' on 640:3135 (S7 · Settings · Forms)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:3135 is [3220,99595,1440,900]; its bottom edge is 100495. This text runs y 100471..100487 and x 3326 = board x + 106, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "640:3374",
+   "expect": "TEXT 'Desktop · 100%', 11/Regular, box=[4563, 100471, 81, 16], parent 'Footer' on 640:3135 (S7 · Settings · Forms)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 640:3135 is [3220,99595,1440,900]; its bottom edge is 100495. This text runs y 100471..100487 and x 4563 = board x + 1343, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "1703:9149",
+   "expect": "TEXT 'Section · Hero', 11/Regular, box=[116, 101491, 74, 16], parent 'Footer' on 1703:9046 (S7 · Settings · Forms · error)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 1703:9046 is [100,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 116 = board x + 16, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "1703:9150",
+   "expect": "TEXT '680 × 250', 11/Regular, box=[206, 101491, 55, 16], parent 'Footer' on 1703:9046 (S7 · Settings · Forms · error)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 1703:9046 is [100,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 206 = board x + 106, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "1703:9152",
+   "expect": "TEXT 'Desktop · 100%', 11/Regular, box=[1443, 101491, 81, 16], parent 'Footer' on 1703:9046 (S7 · Settings · Forms · error)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 1703:9046 is [100,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 1443 = board x + 1343, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "1703:9311",
+   "expect": "TEXT 'Section · Hero', 11/Regular, box=[1676, 101491, 74, 16], parent 'Footer' on 1703:9208 (S7 · Settings · Forms · action-error)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 1703:9208 is [1660,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 1676 = board x + 16, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "1703:9312",
+   "expect": "TEXT '680 × 250', 11/Regular, box=[1766, 101491, 55, 16], parent 'Footer' on 1703:9208 (S7 · Settings · Forms · action-error)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 1703:9208 is [1660,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 1766 = board x + 106, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": "1703:9314",
+   "expect": "TEXT 'Desktop · 100%', 11/Regular, box=[3003, 101491, 81, 16], parent 'Footer' on 1703:9208 (S7 · Settings · Forms · action-error)",
+   "why": "F15 — a full-page Settings shell has no canvas, so it must not print a canvas selection readout or a zoom level. op:delete is HIDE (visible=false, apply-queue.mjs 'Hide, never remove'), so this is reversible. Containment arithmetic: 1703:9208 is [1660,100615,1440,900]; its bottom edge is 101515. This text runs y 101491..101507 and x 3003 = board x + 1343, i.e. inside the bottom 32px footer band — the SAME band 52:2 uses (Footer 52:10 at y 111915..111947, texts at 111923). That identity is the mechanism: these boards were drawn from the assembled-shell template and the footer was never made conditional. No height changes, so BRIEF rule 4 (auto-layout compensation) does not apply; if the Footer is a horizontal auto-layout its three children are hidden together and the band simply empties."
+  },
+  {
+   "op": "delete",
+   "id": null,
+   "selector": {
+    "board": "52:2",
+    "name": "chip/−"
+   },
+   "unresolved-id": true,
+   "expect": "a frame named 'chip/−' on 52:2 whose only TEXT is 462:3993 '−' at board-relative x=368 y=824 (b08a)",
+   "why": "F16 — applying the decision on 2855:12407 as written. Read first: 2875:12447 'One viewport control' + 2875:12448, whose dumped run truncates at 'DeviceSelector ' and whose FULL text is on disk at docs/design-jobs/V2-TO-V1/reports/shell-gap.md:45 — 'chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site - delete both. (UX-F-28)'. So the rule is: the canvas bar's breakpoint switcher is the one viewport control, and the named deletions are DEAD CODE. CODE-TRUTH.md:27 then measures what the audit got stale: CanvasFooterToolbar renders W/D/T/M and NO zoom percentage at all - the only zoom readout/control in the product is the footer's 'Desktop . 100%' flyout (StudioFooter.tsx:236). The board draws a zoom group the code does not have, and that is the one thing on this board F16 should remove. Geometry says the two boards carry the same cluster: on 52:2 and on 199:205 the trio sits at IDENTICAL board-relative x 368 / 406 / 463 with chip/CMD at 518, so they are one drawn template and both must go or neither. Hiding the CHIP FRAME, not its label, because hiding the label alone leaves an empty rounded chip - hence the name selector: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` first (one call resolves every selector in this plan). POST-APPLY VISUAL CHECK: chip/CMD at relative x 518 is the trio's right-hand neighbour; if that chip row is auto-layout it reflows left, if it is absolute it leaves a ~150px gap. Look at it."
+  },
+  {
+   "op": "delete",
+   "id": null,
+   "selector": {
+    "board": "52:2",
+    "name": "chip/100%"
+   },
+   "unresolved-id": true,
+   "expect": "a frame named 'chip/100%' on 52:2 whose only TEXT is 462:3995 '100%' at board-relative x=406 y=824 (b08a)",
+   "why": "F16 — applying the decision on 2855:12407 as written. Read first: 2875:12447 'One viewport control' + 2875:12448, whose dumped run truncates at 'DeviceSelector ' and whose FULL text is on disk at docs/design-jobs/V2-TO-V1/reports/shell-gap.md:45 — 'chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site - delete both. (UX-F-28)'. So the rule is: the canvas bar's breakpoint switcher is the one viewport control, and the named deletions are DEAD CODE. CODE-TRUTH.md:27 then measures what the audit got stale: CanvasFooterToolbar renders W/D/T/M and NO zoom percentage at all - the only zoom readout/control in the product is the footer's 'Desktop . 100%' flyout (StudioFooter.tsx:236). The board draws a zoom group the code does not have, and that is the one thing on this board F16 should remove. Geometry says the two boards carry the same cluster: on 52:2 and on 199:205 the trio sits at IDENTICAL board-relative x 368 / 406 / 463 with chip/CMD at 518, so they are one drawn template and both must go or neither. Hiding the CHIP FRAME, not its label, because hiding the label alone leaves an empty rounded chip - hence the name selector: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` first (one call resolves every selector in this plan). POST-APPLY VISUAL CHECK: chip/CMD at relative x 518 is the trio's right-hand neighbour; if that chip row is auto-layout it reflows left, if it is absolute it leaves a ~150px gap. Look at it."
+  },
+  {
+   "op": "delete",
+   "id": null,
+   "selector": {
+    "board": "52:2",
+    "name": "chip/+"
+   },
+   "unresolved-id": true,
+   "expect": "a frame named 'chip/+' on 52:2 whose only TEXT is 462:3997 '+' at board-relative x=463 y=824 (b08a)",
+   "why": "F16 — applying the decision on 2855:12407 as written. Read first: 2875:12447 'One viewport control' + 2875:12448, whose dumped run truncates at 'DeviceSelector ' and whose FULL text is on disk at docs/design-jobs/V2-TO-V1/reports/shell-gap.md:45 — 'chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site - delete both. (UX-F-28)'. So the rule is: the canvas bar's breakpoint switcher is the one viewport control, and the named deletions are DEAD CODE. CODE-TRUTH.md:27 then measures what the audit got stale: CanvasFooterToolbar renders W/D/T/M and NO zoom percentage at all - the only zoom readout/control in the product is the footer's 'Desktop . 100%' flyout (StudioFooter.tsx:236). The board draws a zoom group the code does not have, and that is the one thing on this board F16 should remove. Geometry says the two boards carry the same cluster: on 52:2 and on 199:205 the trio sits at IDENTICAL board-relative x 368 / 406 / 463 with chip/CMD at 518, so they are one drawn template and both must go or neither. Hiding the CHIP FRAME, not its label, because hiding the label alone leaves an empty rounded chip - hence the name selector: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` first (one call resolves every selector in this plan). POST-APPLY VISUAL CHECK: chip/CMD at relative x 518 is the trio's right-hand neighbour; if that chip row is auto-layout it reflows left, if it is absolute it leaves a ~150px gap. Look at it."
+  },
+  {
+   "op": "delete",
+   "id": null,
+   "selector": {
+    "board": "199:205",
+    "name": "chip/−"
+   },
+   "unresolved-id": true,
+   "expect": "a frame named 'chip/−' on 199:205 whose only TEXT is 463:4240 '−' at board-relative x=368 y=799 (b08b)",
+   "why": "F16 — applying the decision on 2855:12407 as written. Read first: 2875:12447 'One viewport control' + 2875:12448, whose dumped run truncates at 'DeviceSelector ' and whose FULL text is on disk at docs/design-jobs/V2-TO-V1/reports/shell-gap.md:45 — 'chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site - delete both. (UX-F-28)'. So the rule is: the canvas bar's breakpoint switcher is the one viewport control, and the named deletions are DEAD CODE. CODE-TRUTH.md:27 then measures what the audit got stale: CanvasFooterToolbar renders W/D/T/M and NO zoom percentage at all - the only zoom readout/control in the product is the footer's 'Desktop . 100%' flyout (StudioFooter.tsx:236). The board draws a zoom group the code does not have, and that is the one thing on this board F16 should remove. Geometry says the two boards carry the same cluster: on 52:2 and on 199:205 the trio sits at IDENTICAL board-relative x 368 / 406 / 463 with chip/CMD at 518, so they are one drawn template and both must go or neither. Hiding the CHIP FRAME, not its label, because hiding the label alone leaves an empty rounded chip - hence the name selector: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` first (one call resolves every selector in this plan). POST-APPLY VISUAL CHECK: chip/CMD at relative x 518 is the trio's right-hand neighbour; if that chip row is auto-layout it reflows left, if it is absolute it leaves a ~150px gap. Look at it."
+  },
+  {
+   "op": "delete",
+   "id": null,
+   "selector": {
+    "board": "199:205",
+    "name": "chip/100%"
+   },
+   "unresolved-id": true,
+   "expect": "a frame named 'chip/100%' on 199:205 whose only TEXT is 463:4242 '100%' at board-relative x=406 y=799 (b08b)",
+   "why": "F16 — applying the decision on 2855:12407 as written. Read first: 2875:12447 'One viewport control' + 2875:12448, whose dumped run truncates at 'DeviceSelector ' and whose FULL text is on disk at docs/design-jobs/V2-TO-V1/reports/shell-gap.md:45 — 'chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site - delete both. (UX-F-28)'. So the rule is: the canvas bar's breakpoint switcher is the one viewport control, and the named deletions are DEAD CODE. CODE-TRUTH.md:27 then measures what the audit got stale: CanvasFooterToolbar renders W/D/T/M and NO zoom percentage at all - the only zoom readout/control in the product is the footer's 'Desktop . 100%' flyout (StudioFooter.tsx:236). The board draws a zoom group the code does not have, and that is the one thing on this board F16 should remove. Geometry says the two boards carry the same cluster: on 52:2 and on 199:205 the trio sits at IDENTICAL board-relative x 368 / 406 / 463 with chip/CMD at 518, so they are one drawn template and both must go or neither. Hiding the CHIP FRAME, not its label, because hiding the label alone leaves an empty rounded chip - hence the name selector: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` first (one call resolves every selector in this plan). POST-APPLY VISUAL CHECK: chip/CMD at relative x 518 is the trio's right-hand neighbour; if that chip row is auto-layout it reflows left, if it is absolute it leaves a ~150px gap. Look at it."
+  },
+  {
+   "op": "delete",
+   "id": null,
+   "selector": {
+    "board": "199:205",
+    "name": "chip/+"
+   },
+   "unresolved-id": true,
+   "expect": "a frame named 'chip/+' on 199:205 whose only TEXT is 463:4244 '+' at board-relative x=463 y=799 (b08b)",
+   "why": "F16 — applying the decision on 2855:12407 as written. Read first: 2875:12447 'One viewport control' + 2875:12448, whose dumped run truncates at 'DeviceSelector ' and whose FULL text is on disk at docs/design-jobs/V2-TO-V1/reports/shell-gap.md:45 — 'chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site - delete both. (UX-F-28)'. So the rule is: the canvas bar's breakpoint switcher is the one viewport control, and the named deletions are DEAD CODE. CODE-TRUTH.md:27 then measures what the audit got stale: CanvasFooterToolbar renders W/D/T/M and NO zoom percentage at all - the only zoom readout/control in the product is the footer's 'Desktop . 100%' flyout (StudioFooter.tsx:236). The board draws a zoom group the code does not have, and that is the one thing on this board F16 should remove. Geometry says the two boards carry the same cluster: on 52:2 and on 199:205 the trio sits at IDENTICAL board-relative x 368 / 406 / 463 with chip/CMD at 518, so they are one drawn template and both must go or neither. Hiding the CHIP FRAME, not its label, because hiding the label alone leaves an empty rounded chip - hence the name selector: run `node scripts/figma/resolve-selectors.mjs <this file> --apply` first (one call resolves every selector in this plan). POST-APPLY VISUAL CHECK: chip/CMD at relative x 518 is the trio's right-hand neighbour; if that chip row is auto-layout it reflows left, if it is absolute it leaves a ~150px gap. Look at it."
+  },
+  {
+   "op": "advisory",
+   "hold": true,
+   "board": "52:2",
+   "ids": [
+    "52:65",
+    "53:23"
+   ],
+   "expect": "52:65 'Desktop ▾' at board-relative x=1218 y=112 (parent 'Desktop ▾', the This ▾ / Desktop ▾ / Base ▾ row) and 53:23 'Desktop · 100%' at board-relative x=1343 y=876 (parent 'Footer')",
+   "detail": "F16 REMAINDER — device still has three representations after the rows above, and that is CORRECT for the board: all three match shipping code. 52:65 is ProInspector.tsx:428-432 BreakpointPill (the This/Desktop/Base row at :417-419); 53:23 is StudioFooter.tsx:236 `{deviceLabel} . {Math.round(zoom)}%` verbatim; the W/D/T/M chips are CanvasFooterToolbar.tsx:318-332. Per the founder precedence rule (behaviour -> the CODE contract), a board must not stop drawing what ships. Collapsing device to one representation is a CODE change and 2855:12407 does not make it - the only deletions that decision names are DeviceSelector.tsx and useDeviceZoom.ts, both of which already have no call site. NOTE the audit's own wording is wrong about one thing and the fresh geometry proves it: 52:65 is not a canvas toolbar control. It sits at x=1318 inside the inspector column (inspector texts run x 1256..1524) at y=111159, 112px below the board top; the canvas floating bar is at y 111843/111871, x 463..1145. Different panel entirely.",
+   "why": "F16 — what is deliberately NOT authored, and why. CODE-TRUTH.md:27 tags the '+100%' half CONTRADICTS-FIX and the device half SUPPORTS-FIX-in-code."
+  }
+ ],
+ "not_authored": {
+  "F14": "The three corrections exist only as small spec boards - 2844:12025 'Rail · More index (popover · 240)' 240x320, 2844:12121 'Topbar · location line' 1440x320, 2844:12136 'Shell · full-page mode - Back to canvas' 1440x320 (fresh read b20) - while 52:2 still renders the six-item rail (I2040:20649;2034:8417/8420/8424/8427/8430/8433 = Insert, Layers, Pages, Media, Content, Brand). ASSEMBLING THEM IS A BUILD JOB, NOT A QUEUE ROW, and no rows are authored for it. A queue row edits ONE existing node; every one of these needs new nodes inside an existing shell: a 7th rail seat plus its More popover, a topbar location line 'site > page > panel', and a 'Back to canvas' affordance in the full-page shell. scripts/figma/ already has add-rail-more-seat.mjs and build-polished-editor.mjs, which is the shape such a script takes. It would have to: (1) read each spec board's node tree once and record the seat/line/button geometry; (2) clone those nodes into 52:2's rail frame, topbar instance and full-page shell - and into 199:205 and the 55:* / 58:* variant boards, or the variants drift from the specimen the moment 52:2 changes; (3) re-space the rail (six 48px seats currently at board-relative y 90..503 by the label boxes; a seventh needs the column re-pitched or the More seat pinned to the bottom); (4) read every touched node back. IT MUST COME AFTER ITEMS 1-4: F02 repaints the hero and F16 hides three chips INSIDE 52:2 and 199:205, and F15 hides footer text on six boards. A build script that clones a shell mid-edit copies whichever half landed. Assemble after the small edits have landed and been read back, not before - the same reason PLAN.md sequences C8 last.",
+  "F15_code_fix": "The board rows here hide a SYMPTOM. The cause is code and belongs in a separate change: AquibraStudio.tsx:710-729 renders <footer className='layout-shell__footer'> as an unconditional flex sibling of the whole grid (root is a flex column, AquibraStudio.tsx:468), so it sits outside every --fullpage rule - LayoutShell.css:286-294 re-areas the grid with no footer area and :311-320 hides only __drawer/__canvas/__inspector. Meanwhile LayoutShell has its own Footer slot (LayoutShell.tsx:169 + :332 `LayoutShell.Footer = Footer;`) with ZERO consumers repo-wide. Moving the footer into that slot fixes F15 and drains the dead export in one move (CODE-TRUTH.md:131-132). Until that lands, a corrected board is not a corrected editor.",
+  "F15_unread_boards": "SIX full-page Settings boards carry the identical three-text canvas footer, not the three the audit and the verdict name: 638:2378 General (638:2614/2615/2617), 640:2440 Redirects (640:2676/2677/2679), 640:2789 Headers (640:3025/3026/3028), 640:3135 Forms (640:3371/3372/3374), 1703:9046 Forms · error (1703:9149/9150/9152), 1703:9208 Forms · action-error (1703:9311/9312/9314). All six are 1440x900 and every readout sits at board x+16 in the bottom 32px band. LIKELY THE SAME AND NEVER READ: the S7 Settings screens that reports/settings.md:209 lists as outside every plan - 638:3070 SEO, 639:2754 Export, 639:3443 Analytics, 639:4144 Custom code, 640:3488 Integrations, 1138:13436 Custom code · locked. None of the six is in any b*.tsv dump (checked with `analyze.py have`), so NO row is authored for them. They are the same family, drawn from the same shell template, and the six we did read were 6 for 6. One batched read of those six boards' footer texts would settle it and would add 18 more delete rows of the same shape."
+ },
+ "verified_offline": [
+  "normalize-plans.mjs dry-run on this file BEFORE resolution: read 34 rows -> queued 32 (24 delete, 4 fill, 4 advisory), 6 unresolved, 2 needs-review. The 2 needs-review rows are the selector-based hero fills: normalize-plans.mjs:115 is `if (r.op === 'fill' && r.id)` and there is NO selector branch for fill, so an id-less fill row is carried to needs-review rather than executed. Step 1 above is what makes them executable. Cost: 0 Figma calls.",
+  "normalize-plans.mjs dry-run AFTER injecting resolved ids: read 34 -> queued 34 (24 delete, 6 fill, 4 advisory), 0 unresolved, 0 needs-review.",
+  "apply-queue.mjs OPS set does not contain 'advisory', so the 4 held rows are reported as not-executable-here and cannot run. This matters: `hold: true` is NOT read by normalize-plans.mjs or apply-queue.mjs (grep returns only prose). A held row written with a LIVE op would be normalized into a live row and applied. That is why every held row here carries op:advisory and records its real op under intended_op.",
+  "apply-queue.mjs checks `expect` ONLY for op:text and op:rename. delete/fill/resize/move have no expect guard at all — they act on whatever sits at the id. Every expect below is therefore documentation of the node's state at the 18:29 fresh read, plus the proof that the id is the node meant, not a guard the applier will enforce."
+ ]
+}

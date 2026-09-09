@@ -1,0 +1,42 @@
+[
+  {
+    "id": "151:87",
+    "name": "[not-implemented] Content · conditions — the screen ships; its OUTCOME does not. Evaluating a condition writes data-condition-hidden=\"true\" (DataManager.ts:482-491); no stylesheet and no export step reads that attribute, and it is evaluated once at creation, so the element stays fully visible on the canvas and on the published site.",
+    "why": "UX-C-03 (Critical) — the panel's own copy promises 'shows or hides an element based on data'."
+  },
+  {
+    "id": "1705:8378",
+    "name": "[not-implemented] Content · conditions · empty — same as 151:87: a condition's only effect is a data-condition-hidden attribute nothing reads (DataManager.ts:482-491).",
+    "why": "UX-C-03 (Critical) — sibling state of the marked parent."
+  },
+  {
+    "id": "151:46",
+    "name": "[not-implemented] Content · data-sources — the rows and the green \"Watching for changes\" pill are drawn over an in-memory Map (DataManager.ts:47). ProjectData has no field for sources (project.ts:30-66), so every source is gone on reload and every Condition and {{site.*}} path built on it stops resolving silently.",
+    "why": "UX-C-16 (Major) — sources are presented as a saved thing and are not saved anywhere."
+  },
+  {
+    "id": "151:62",
+    "name": "[not-implemented] Content · variables — the value is stored in THIS BROWSER under a key built from the project NAME (useContentPanel.ts:81, contentPanelUtils.ts:21-23), so renaming the site orphans every variable and two sites sharing a name share theirs. The screen's own empty state admits pages do not read them.",
+    "why": "UX-C-18 (Major)."
+  },
+  {
+    "id": "1705:8339",
+    "name": "[not-implemented] Content · variables · empty — same as 151:62: browser-local, keyed on the project NAME, and no page reads a variable (contentPanelUtils.ts:21-23).",
+    "why": "UX-C-18 (Major) — sibling state of the marked parent."
+  },
+  {
+    "id": "1705:8454",
+    "name": "[not-implemented] Content · variables · key-error — same as 151:62. The key is validated for a store no page reads (contentPanelUtils.ts:21-23).",
+    "why": "UX-C-18 (Major) — sibling state of the marked parent."
+  },
+  {
+    "id": "1170:4713",
+    "name": "Content · collection-setup (modal) — step 1's Content type is read by nothing: contentType is declared at CMSCollectionSetupModal.tsx:112, rendered at :326 and never read by handleCreate (:168-227). The field row's drag handle draws a grab cursor with no drag handlers (:378). Five field types here (:47) against nine on the Fields screen (ContentViews.tsx:440), so the Slug field this wizard's own /{slug} default depends on cannot be created here.",
+    "why": "UX-C-20, UX-C-22 (Major) — the wizard is one of three disagreeing definitions of a collection."
+  },
+  {
+    "id": "1170:4749",
+    "name": "Content · records (modal) — the SECOND record editor, reachable only from ⌘⇧P. Delete asks nothing here (CMSRecordsModal.tsx:168) while the panel's Delete record confirms (ContentViews.tsx:382-390); changing the collection dropdown throws an in-progress form away with no guard; and there is no record import or export anywhere (:426-432).",
+    "why": "UX-C-07, UX-C-28 (Critical/Major) — two record editors, neither a superset, disagreeing on a destructive action."
+  }
+]

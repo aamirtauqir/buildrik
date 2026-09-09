@@ -1,0 +1,21 @@
+{
+ "slug": "zz-qa-final",
+ "page": "1:3",
+ "note": "The last QA pass found four items with no disposition. One is a real fixable defect; three are decisions or hazards that must be on the record rather than in prose.",
+ "rows": [
+  {"op": "resize", "id": "2865:22215", "w": 172, "expect": "1376,49076,150,32",
+   "why": "F19 sub-defect, found by the final QA and fixed here. The MOTION board this arc built overprints itself: 2865:22216 'Slide In Up · Entrances' sits inside 2865:22215 '👁 When it scrolls into view', 150x14px. CAUSE, from the kids dump: the two interaction rows are built alike, but row 1's trigger 2865:22210 '👆 On Hover' is 150x16 (one line) while row 2's trigger 2865:22215 is 150x32 — the longer string wrapped at 150px, and the row's layout assumed one line, so the preset label beneath at y49093 falls inside the trigger's 49076-49108 span. FIX: widen the trigger so it stops wrapping. The row's controls begin at x1556 (Rectangle 2865:22218), so 1376..1548 is free — w=172 leaves an 8px gutter. At 172 the string sets on one line, height returns to 16, the trigger spans 49076-49092 and the preset starts at 49093: a 1px gap, exactly the relationship row 1 already has. Widening is right and moving is wrong here, because moving the preset down would push it into the 49117 divider."},
+
+  {"op": "advisory", "hold": true, "id": "1164:4736",
+   "holdWhy": "M08 — A SECOND ARC-CAUSED EDGE LOSS, milder than the qa-hotfix one but real. Hiding the single-picker's footer 1164:4731 (correct: MediaLibraryPanel.tsx:55 defaults multiple=false and :351 gates the footer on selectedIds.size>0, and StudioModals.tsx:172-179 never passes multiple, so it is dead chrome) also hid its child 1164:4736 'btn/use' and that button's NAVIGATE to 807:8521. Unlike 2850:22371 this is not a dead end — the board's ✕ carries an edge to the same destination — so the flow survives and the repair is optional. It is recorded because an edge this arc removed must not be discovered later as if it had always been missing. TO REPAIR: re-point the ✕'s edge or add one to a visible control on pick-row-0 (1164:4721), whose child ids were never dumped.",
+   "why": "M08 — edge removed with dead chrome; flow survives via ✕"},
+
+  {"op": "advisory", "hold": true, "id": "2865:22206",
+   "holdWhy": "M19 — HAZARD FOR WHOEVER ADDS A fontSize OP. Three of the held M19 rows (m-missed#38/#40/#41) were authored as harmless no-ops, i.e. their text equals the string that was in the file when they were written. But c1-clones#0, c1-clones#2 and c3-c4-counts-annotations#0 overwrote those same nodes about fifty minutes earlier in this arc. While the rows stay held this costs nothing. If a fontSize op is added and the rows are un-held as written, they would write the OLD strings back and silently revert M01's 'Delete “hero-dark.jpg”?' and M07's 'Review 3 staged changes · 1 not supported'. RE-READ ALL SEVEN M19 TARGETS BEFORE UN-HOLDING ANY OF THEM.",
+   "why": "M19 — un-holding as written would revert landed M01 and M07 copy"},
+
+  {"op": "advisory", "hold": true, "id": "1703:9208",
+   "holdWhy": "F11 — THE REAL BOARD DEFECT, still undecided. The audit's own F11 (no retry on the Forms error) is NOT-APPLICABLE as a board fix: FormsScreen.tsx:127/:306-308 render the error as a bare role=alert with no action, so the board is faithful and adding a retry is a PRODUCT change. But the board carries a different, genuine defect that nobody has dispositioned: COVER-1-11 says the error state should reduce the screen to one block, while FormsScreen.tsx:306-307 keeps the Select and the filter chips above it. CONTRADICTIONS.md:118 records this unresolved against UX-I-32 and says the two cannot both land. It needs a decision, not a row.",
+   "why": "F11 — COVER-1-11 vs UX-I-32, unresolved decision carried forward"}
+ ]
+}

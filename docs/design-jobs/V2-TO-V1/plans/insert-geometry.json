@@ -1,0 +1,128 @@
+[
+  {
+    "op": "tips-strip-two-line",
+    "why": "UX-A-14 (Major)",
+    "decision": "The strip draws a counter and arrows for text nobody can read: TipsFooter.tsx:101-110 renders only the emoji, 'Tip n/N' and the nav, and puts the body on a title attribute of the whole strip. Pressing next changes a number. Either show the text or remove the carousel — showing it is the only option that keeps the panel's ONLY guidance, which UX-A-15 shows is one click from being gone forever. The strip becomes two lines: body on top, counter + nav below.",
+    "resolved": {
+      "board": "137:2",
+      "board_id_source": "read from file — FULL node tree of 137:2, 2026-09-07",
+      "steps": [
+        {
+          "node": "137:43",
+          "nodeName": "TipsFooter",
+          "was": {
+            "x": 0,
+            "y": 736,
+            "w": 280,
+            "h": 40
+          },
+          "set": {
+            "h": 48
+          },
+          "note": "Board is 812 tall and the strip currently ends at 776, so there are 36 free px below it. Growing to h=48 ends at 784 and stays inside the board. Do NOT move y."
+        },
+        {
+          "node": "NEW TEXT",
+          "name": "tip-body",
+          "parent": "137:43",
+          "at": {
+            "x": 16,
+            "y": 8,
+            "w": 248,
+            "h": 16
+          },
+          "text": "Press / to search. Esc or ✕ clears.",
+          "spec": "11px / leading 16 / --bk-ink-soft #4B5563, textAutoResize HEIGHT, width 248",
+          "why": "Board 137:2 shows 'Tip 2/4', i.e. TIPS[1], which is catalog/tips.ts's '/ to search — Press / to jump to search. Esc or ✕ to clear.' The ✕ half becomes true once insert-text-fixes-unresolved.json puts the ✕ on the searching field (UX-A-12)."
+        },
+        {
+          "node": "137:44",
+          "nodeName": "💡 Tip 2/4",
+          "was": {
+            "x": 16,
+            "y": 12,
+            "w": 60,
+            "h": 18
+          },
+          "set": {
+            "y": 28
+          },
+          "text_unchanged": "💡  Tip 2/4"
+        },
+        {
+          "node": "137:45",
+          "nodeName": "‹ › ✕",
+          "was": {
+            "x": 212,
+            "y": 12,
+            "w": 33,
+            "h": 18
+          },
+          "set": {
+            "y": 28
+          },
+          "text_unchanged": "‹  ›  ✕"
+        }
+      ]
+    },
+    "unresolved": {
+      "unresolved-id": true,
+      "boards": [
+        "138:2",
+        "138:53",
+        "138:106",
+        "138:153",
+        "138:198",
+        "775:4053",
+        "781:4154",
+        "1069:4529",
+        "1069:4707",
+        "1069:4790",
+        "1069:4970"
+      ],
+      "excluded": [
+        "138:244 — Insert · tip-dismissed: the strip is correctly absent there (TipsFooter.tsx:98 `if (dismissed) return null`)"
+      ],
+      "selector": {
+        "frameName": "TipsFooter",
+        "counterMatch": "Tip ",
+        "navMatch": "‹"
+      },
+      "instruction": "Apply the identical three-step transform on every board that carries a TipsFooter frame. The frame sits at (0,736 280x40) on 137:2 and these boards are the same 280x812 panel, so expect the same geometry. Each board's own tip index decides the body string — map from catalog/tips.ts as CORRECTED below; do not copy the shipped text for tips 3 and 4.",
+      "correctedTipBodies": {
+        "1/4": "Drag an ELEMENTS row onto the canvas to place it.",
+        "2/4": "Press / to search. Esc or ✕ clears.",
+        "3/4": "Save any element as a component from the right-click menu — it appears under MINE.",
+        "4/4": "Four source groups. Click a header to open one in place."
+      },
+      "why": "UX-A-14 — 'two of the four tips are also stale: one tells the user to \"Click any category row to expand it\" (the panel has no categories, it has source groups) and one says saved components will be available \"once available\" (MINE ships today)'. Copy is visual, so the board moves first; catalog/tips.ts:11-28 follows."
+    }
+  },
+  {
+    "op": "fix-clipped-drag-annotation",
+    "why": "VIS-2-21 (Major, board-level — carried because it sits on my board and the clone in insert-new-boards.json inherits it)",
+    "unresolved-id": true,
+    "selector": {
+      "board": "138:153",
+      "boardName": "Insert · dragging",
+      "match": "Dragging to canvas — the panel keeps its scroll",
+      "hint": "annotation TEXT under the ELEMENTS group, immediately above the BLOCKS group-header row"
+    },
+    "problem": "The string wraps to two lines inside a frame fixed at roughly 1.3 line heights (~22px). The second line is sheared horizontally through the glyphs and the BLOCKS row starts immediately below it.",
+    "fix": "Set the node to textAutoResize HEIGHT at width 248 (it will settle at ~34px) and shift the BLOCKS / COMPONENTS / MINE group headers below it down by 14px. Alternative if the reflow is unwelcome: shorten the string to one line — 'Dragging to canvas keeps the panel scroll.'",
+    "apply_also_to": "the clone Insert · drop-refused, which inherits the defect"
+  },
+  {
+    "op": "components-expanded-row-count",
+    "why": "VIS-3-29 (Minor, board-level — carried because this board moves into my section)",
+    "unresolved-id": true,
+    "selector": {
+      "board": "1069:4790",
+      "boardName": "Insert · components-expanded"
+    },
+    "problem": "The COMPONENTS group header reads 14 and 21 rows are drawn beneath it (Button through Modal). Geometry is fine; the board contradicts itself.",
+    "fix": "14 is the code truth — blockRegistry.ts:187-202 componentBlockDefinitions has exactly 14 entries. Keep the count and trim the list to these fourteen shipped labels, in registry order: Card · Slider/Carousel · Testimonials · Pricing Table · Progress Bar · Countdown Timer · Accordion / FAQ · Social Icons · Contact Form · Stack (Vertical) · Switch / Toggle · Tabs · Modal / Dialog · Table.",
+    "labels_source": "read from packages/editor/src/blocks/**/*.tsx — each config's own `label`, 2026-09-07",
+    "note": "Rows named 'Button' cannot be right here: button is a BLOCKS entry, not a component (blockRegistry.ts:187-202 does not list it)."
+  }
+]

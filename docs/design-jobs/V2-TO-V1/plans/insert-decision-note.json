@@ -1,0 +1,71 @@
+{
+  "op": "create-note-frame",
+  "section": "1776:8379",
+  "section_id_source": "read from file, 2026-09-07",
+  "name": "note/Insert · OPEN DECISIONS — founder call needed (V2→V1, 2026-09-07)",
+  "geometry": {
+    "w": 900,
+    "h": 620,
+    "place": "own row below the last board row; layout-section.mjs will slot it. Fill --bk-bg-panel #FFFFFF, 1px --bk-border #E5E7EB, radius 8 (--bk-radius-lg), 24px padding."
+  },
+  "typeSpec": {
+    "title": "16px / leading 24 / 600 / --bk-ink #111827",
+    "heading": "13px / leading 20 / 600 / --bk-ink",
+    "body": "12px / leading 18 / --bk-ink-soft #4B5563",
+    "rule": "1px --bk-border #E5E7EB between entries, 16px above and below"
+  },
+  "why": "The brief's own instruction for a conflict of this shape: file the proposal as an open decision on the board rather than applying it. Every entry below is a change SPEC-INSERT-PANEL or a finding asks for that would overwrite a founder-final decision, or that spans modules Insert does not own. None of them is applied silently.",
+  "title": "Insert · OPEN DECISIONS",
+  "subtitle": "Eight calls the V2 audit asks for that this pass did NOT make. Each names what is founder-final today and what would move.",
+  "entries": [
+    {
+      "n": 1,
+      "heading": "Rename BLOCKS → Section, fold MINE into Component, open SECTIONS by default",
+      "body": "SPEC-INSERT-PANEL §2 and §3. blocks/groups.ts:1-19 records ELEMENTS · BLOCKS · COMPONENTS · MINE as founder-final 2026-08-07, and BuildTab.tsx:48 records board 137:2's default as ELEMENTS open, the rest closed. Both are visual, so the board would have to move first — deliberately, not as a side effect of drawing the spec. NOT APPLIED. Applying it moves 137:2, 1069:4529, 1069:4707, 1069:4790, 1069:4970 and the onboarding step copy.",
+      "flag": "founder-final vs spec"
+    },
+    {
+      "n": 2,
+      "heading": "The RECENT band",
+      "body": "SPEC-INSERT-PANEL §3 puts RECENT at the top of the panel, above SECTIONS, annotated \"the built-but-unrendered feature\". It is not built. Only the constant BUILD_RECENT (storageKeys.ts:59) exists, with zero consumers anywhere in src/ — no ring buffer, no push-on-insert, no read (PHASE4-QA-REPORT §1.1, Critical). NOT DRAWN. Favourites ARE fully built and rendered nowhere (useBuildTab.ts:104-106,131-133,140-147,159-168 behind BUILD_FAVORITES) — that is the real win and it is drawn on Insert · favourites.",
+      "flag": "spec rests on a feature that does not exist"
+    },
+    {
+      "n": 3,
+      "heading": "Make ELEMENTS and BLOCKS disjoint",
+      "body": "UX-A-04. All 53 ELEMENTS rows are the same registry block as something further down the panel — 40 reappear as a BLOCKS card, 13 as a COMPONENTS row, 0 in neither. The fix (ELEMENTS = single primitives, BLOCKS = only composed section-shaped entries) is a taxonomy change against the founder-final list. NOT APPLIED — the duplication is stated in the captions instead, so it is visible while the call is open.",
+      "flag": "founder-final"
+    },
+    {
+      "n": 4,
+      "heading": "Rename one of the two 'Components'",
+      "body": "UX-A-25. In Insert, COMPONENTS is the 14 blocks Buildrick ships and the user's own are MINE; off the panel, the Components tab is the management surface for the user's own library and is not on the default rail at all (tabsConfig.ts:349-351 RAIL_FIGMA = add, layers, pages, assets, content, design). The finding's fix — fold the shipped 14 into BLOCKS and let COMPONENTS mean the user's own, which also removes the need for MINE — is the same founder-final taxonomy as entry 1. NOT APPLIED.",
+      "flag": "founder-final"
+    },
+    {
+      "n": 5,
+      "heading": "One catalog, one picker, three doors",
+      "body": "UX-A-03 and UX-A-27. Three insert surfaces disagree about what the catalog is: the sidebar groups by SOURCE off a hand-written 53-entry catalog; the canvas toolbar's + opens BlockPickerModal → ElementsTab, grouped by TYPE with Most Used / Recents / Favourites and per-element descriptions, reading the 64-entry registry directly; the right-click Insert submenu offers no catalog at all — all four positions insert the same container div whose content is the literal text \"New element\" (insertActions.ts:13-19). A fourth implementation, handleQuickAdd, is threaded from AquibraStudio into StudioPanels and destructured to _onQuickAdd, unreachable (UX-A-30, StudioPanels.tsx:156-157) — delete it. Routing all three live doors at one picker spans Insert, Canvas and the context menu and needs one owner. NOT APPLIED.",
+      "flag": "cross-module"
+    },
+    {
+      "n": 6,
+      "heading": "Where the onboarding step points",
+      "body": "UX-A-07. The checklist says \"Drop a ready-made section — hero, features, footer — onto the canvas\" (onboardingSteps.ts:57-65). hero and features have no ELEMENTS row at all: they exist only in BLOCKS, which is collapsed by default below 53 rows, and BLOCKS cards cannot be dropped. Two ways out and they are not equivalent: promote the section-shaped blocks into the first screenful (entry 1's taxonomy change), or rewrite the step to name something the panel offers on open — Section, Footer, Navbar or Call to Action, which is what actually completes the step today. NOT APPLIED.",
+      "flag": "founder-final vs copy"
+    },
+    {
+      "n": 7,
+      "heading": "What the tips ✕ should promise",
+      "body": "UX-A-15. Its tooltip says \"Hide tips for this session — bring them back from Help\". Both halves are false: the flag is localStorage not session storage and nothing clears it, and Insert is never given an onHelpClick so PanelHeader draws no Help button. Either give Insert the Help entry and let it restore tips, or make the dismissal genuinely per-session and rewrite the tooltip. NOT APPLIED — the tips strip now draws its body (UX-A-14), which raises the cost of dismissing it either way.",
+      "flag": "one of two"
+    },
+    {
+      "n": 8,
+      "heading": "One feedback contract for click and drag",
+      "body": "UX-A-20. A click raises \"Inserted: Heading\"; a drag routes the same sentence into a visually-hidden live region and toasts only while the operation is still in flight (Canvas.tsx:149-162). SPEC-INSERT-PANEL §4 picks a brief highlight on the placed element for both, because it also answers where did it go. That deletes the click toast — which is where UX-A-32's proposed Undo action would have lived — and it is a Canvas/shell board change, not an Insert one. NOT APPLIED here; flagged to the shell module.",
+      "flag": "cross-module"
+    }
+  ],
+  "footer": "Code the drawn panel cannot honour until it lands: useDropExecution.ts:302-303 (a drag that places nothing reports success — the single highest-value fix, one line); GroupSection.tsx:206-262 (BLOCKS/COMPONENTS/MINE pass no draggable); utils/search.ts:16-26 (no MINE case); BuildTab.tsx:49-51 + TabRouter.tsx:124-126 (open state does not survive the tab); GroupSection.tsx:186-187 (descriptions render only when disabled); useBlockInsertion.ts:118-127 and dropOperations.tsx:494-514 (no scrollIntoView on any insert path); useBlockInsertion.ts:77-115 and dropOperations.tsx:409-489 (no isLocked / isComponentInstance guard); useCallout.ts:37-45 (dismiss() exists and is never passed)."
+}

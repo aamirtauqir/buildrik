@@ -1,0 +1,108 @@
+[
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · delete-page · confirm · inbound links (of 1171:4820)",
+      "type": "TEXT",
+      "equals": "Discard unsaved SEO changes?"
+    },
+    "expect": "Discard unsaved SEO changes?",
+    "text": "Delete “Pricing”?",
+    "why": "UX-B-04 — retitles the cloned modal. 440 is SPEC-NAVIGATION's modal-sm class; SPEC-PAGES-PANEL drew this confirm at 420 and the V2 board at 380, and PHASE4-QA-REPORT §2.4 is right that both are fresh literals at fresh call sites.",
+    "width": 400,
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  },
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · delete-page · confirm · inbound links (of 1171:4820)",
+      "type": "TEXT",
+      "equals": "You edited the page title and description but didn't save. Leaving this tab throws those edits away."
+    },
+    "expect": "You edited the page title and description but didn't save. Leaving this tab throws those edits away.",
+    "text": "This page and everything on it is removed.\n\n⚠  3 links on 2 pages point here — Home · nav “See pricing”, Menu · footer “Pricing”. They will be left broken, not redirected to Home.   See them ›\n\nUndo (⌘Z) brings it back — for the very next action only.",
+    "why": "UX-B-04 — the count is computable from the same #page:<id> hrefs the exporter resolves (LinkSection.tsx:191, ExportEngine.ts:801-802), and today the dialog says only 'This page and everything on it is removed' (PagesTab.tsx:329) while the exporter silently re-points every orphaned link at index.html. Sharper than filed: pageHrefs is built from the LIVE-filtered set (:705, :788), so a link to a merely HIDDEN page becomes a link to Home too. 'Left broken, not redirected' is a PROPOSAL about the exporter, not today's behaviour. The last line also answers UX-B-31: there is no trash and undo is one editor-wide stack (HistoryManager), so the dialog stops over-promising instead of pretending a recently-deleted exists.",
+    "width": 400,
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  },
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · delete-page · confirm · inbound links (of 1171:4820)",
+      "type": "TEXT",
+      "equals": "Keep editing"
+    },
+    "expect": "Keep editing",
+    "text": "Cancel",
+    "why": "UX-B-04 — the cloned modal's secondary action, retitled.",
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  },
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · delete-page · confirm · inbound links (of 1171:4820)",
+      "type": "TEXT",
+      "equals": "Discard changes"
+    },
+    "expect": "Discard changes",
+    "text": "Delete page",
+    "why": "UX-B-04 — the cloned modal's primary action, retitled.",
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  },
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · local-only · project load failed (of 141:124)",
+      "type": "TEXT",
+      "equals": "This site has one page."
+    },
+    "expect": "This site has one page.",
+    "text": "Couldn't reach your site.",
+    "why": "UX-B-27 — the shell falls back to browser storage and, failing that, creates a page called Home (useComposerInit.ts:339-381), and the panel then draws 'This site has one page.' with a '+ Add page' invitation over a site that has ten pages on the server. The panel has no degraded state of its own: its load-error body only appears if reading the page list throws, which a network failure never does.",
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  },
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · local-only · project load failed (of 141:124)",
+      "type": "TEXT",
+      "equals": "+ Add page"
+    },
+    "expect": "+ Add page",
+    "text": "These pages are local only — try again",
+    "why": "UX-B-27 — '+ Add page' is the wrong invitation over a site that did not load; a page added here is one importProject will silently discard. NOTE the board carries TWO similar strings: the empty state's '+ Add page' (141:164) and the footer's '+  Add page' with two spaces (141:161). The exact `equals` above picks the empty-state one; if resolve-selectors reports AMBIGUOUS, the footer node has drifted and the row must be resolved by id.",
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  },
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · rename · URL offer (of 1717:17217)",
+      "type": "TEXT",
+      "equals": "A page with this name already exists"
+    },
+    "expect": "A page with this name already exists",
+    "text": "Also change the URL to /pricing?    Keep /page-3   ·   Change",
+    "why": "UX-B-08 — at rename, offer the matching slug inline for any page whose slug was never hand-edited, which the engine already tracks as slugManuallySet (PageManager.ts:145). Today commitRename writes { name } only (usePages.ts:213-222) and seoScore.ts:24 then withholds 10 points for the page-\\d+ slug the rename refused to update.",
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  },
+  {
+    "unresolved-id": true,
+    "selector": {
+      "section": "1776:8377",
+      "boardName": "Pages · rename · URL offer (of 1717:17217)",
+      "type": "TEXT",
+      "equals": "role=\"alert\" aria-live=\"assertive\" · .bd-pg-name-error, 11px --bk-error. The commit is refused; the row stays in edit."
+    },
+    "expect": "role=\"alert\" aria-live=\"assertive\" · .bd-pg-name-error, 11px --bk-error. The commit is refused; the row stays in edit.",
+    "text": "UX-B-09 — whichever screen displays a URL writes the one it displayed. The canvas tab bar's rename popover computes normalizeSlug(editName) and renders /{slug} (PageTabBar.tsx:64-74, :328-332), then submits updatePage(id, { name }) alone (:139-145). The one place in the product that shows a user the URL consequence of a rename is the one place lying about it.",
+    "why": "UX-B-09 — replaces the source board's own annotation, keeping its type style.",
+    "_note": "id is filled by scripts/figma/resolve-selectors.mjs in one call; the source string is the clone's inherited text, which is why `equals` can be exact."
+  }
+]

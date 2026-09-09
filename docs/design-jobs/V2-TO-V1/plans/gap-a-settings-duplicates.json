@@ -1,0 +1,210 @@
+{
+ "rows": [],
+ "note": "STRUCTURAL — guarded deletion. Run: node scripts/figma/drop-settings-duplicates.mjs docs/design-jobs/V2-TO-V1/plans/gap-a-settings-duplicates.json --apply  (15 rows, CHUNK=12, so 2 calls). Exact-string match inside a named scope; more than one match is REFUSED, never applied; a board that never drew the control reports NOT-DRAWN rather than failing. Rows 1-9 close UX-I-32, rows 10-15 close the not-rendering half of UX-I-36. The UX-I-32 vs COVER-1-11 conflict the settings report flagged as unresolved is resolved on rows 5 and 9 — see their why.",
+ "structural": [
+  {
+   "board": "640:2789",
+   "boardName": "S7 · Settings · Headers",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NOT-DRAWN",
+    "read_back": "no TEXT node on this board holds the exact string — the duplicate this row removes is not drawn here"
+   }
+  },
+  {
+   "board": "2209:11816",
+   "boardName": "S7 · Settings · Headers · dirty (unsaved changes)",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NOT-DRAWN",
+    "read_back": "no TEXT node on this board holds the exact string — the duplicate this row removes is not drawn here"
+   }
+  },
+  {
+   "board": "1703:7606",
+   "boardName": "… · loading",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NOT-DRAWN",
+    "read_back": "no TEXT node on this board holds the exact string — the duplicate this row removes is not drawn here"
+   }
+  },
+  {
+   "board": "1703:7760",
+   "boardName": "… · load-error",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NOT-DRAWN",
+    "read_back": "no TEXT node on this board holds the exact string — the duplicate this row removes is not drawn here"
+   }
+  },
+  {
+   "board": "1703:7914",
+   "boardName": "… · save-error",
+   "text": "Save headers",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump scratchpad_audit/mod/sections/21-settings-s7-46.txt; the node itself is unresolved-id and is found by its exact string at apply time",
+   "why": "UX-I-32 (Major, duplicate-feature) — HeadersScreen.tsx:268-280 renders its own primary AND registers with the central savebar (:119), so two identical-in-effect, differently-labelled Saves are live at once. One Save, in one place: the savebar. NOTE the script reports NOT-DRAWN rather than failing where the board never drew this button — FIG-M-21 says 2209:11816 draws a header 'Save changes' instead, and that node is deleted by the header pass. CONFLICT RESOLVED IN THIS PASS (UX-I-32 vs COVER-1-11): COVER-1-11 asks the four save-failure boards to be redrawn as the full screen with the error at the foot ‘beside Save headers’ / ‘beside Save locales’ — i.e. WITH the very button UX-I-32 removes. Both cannot land as written. Decision: UX-I-32 wins the button, COVER-1-11 keeps its substance. COVER-1-11's real claim is that a save failure is never an early return and the whole form stays on screen; only the anchor for the error line moves, from the in-body Save to the savebar's single Save. COVER-1-11 is UNAPPLIED today (register: PENDING; its redraw is manual-draw class), so nothing is being undone — its instruction is amended in one line, recorded as an advisory row in gap-a-triage.json so its future owner sees it.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "OK",
+    "read_back": "removed 1703:8069 — getNodeByIdAsync returned null after remove()",
+    "at": "2026-09-07"
+   }
+  },
+  {
+   "board": "639:3795",
+   "boardName": "S7 · Settings · Localization",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NOT-DRAWN",
+    "read_back": "no TEXT node on this board holds the exact string — the duplicate this row removes is not drawn here"
+   }
+  },
+  {
+   "board": "1703:7127",
+   "boardName": "… · loading",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NOT-DRAWN",
+    "read_back": "no TEXT node on this board holds the exact string — the duplicate this row removes is not drawn here"
+   }
+  },
+  {
+   "board": "1703:7286",
+   "boardName": "… · load-error",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NOT-DRAWN",
+    "read_back": "no TEXT node on this board holds the exact string — the duplicate this row removes is not drawn here"
+   }
+  },
+  {
+   "board": "1703:7445",
+   "boardName": "… · save-error",
+   "text": "Save locales",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string at apply time",
+   "why": "UX-I-32 (Major) — LocalizationScreen.tsx:288-305 plus the savebar registration at :163, same defect as Headers. CONFLICT RESOLVED IN THIS PASS (UX-I-32 vs COVER-1-11): COVER-1-11 asks the four save-failure boards to be redrawn as the full screen with the error at the foot ‘beside Save headers’ / ‘beside Save locales’ — i.e. WITH the very button UX-I-32 removes. Both cannot land as written. Decision: UX-I-32 wins the button, COVER-1-11 keeps its substance. COVER-1-11's real claim is that a save failure is never an early return and the whole form stays on screen; only the anchor for the error line moves, from the in-body Save to the savebar's single Save. COVER-1-11 is UNAPPLIED today (register: PENDING; its redraw is manual-draw class), so nothing is being undone — its instruction is amended in one line, recorded as an advisory row in gap-a-triage.json so its future owner sees it.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "OK",
+    "read_back": "removed 1703:7605 — getNodeByIdAsync returned null after remove()",
+    "at": "2026-09-07"
+   }
+  },
+  {
+   "board": "639:3092",
+   "boardName": "S7 · Settings · Domains",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Domains writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NO-SCOPE",
+    "read_back": "no FRAME/GROUP/INSTANCE/COMPONENT named savebar|save bar|bd-set-savebar exists on this board — there is nothing drawn to remove. A TEXT node whose NAME matches the same pattern does exist (it is what crashed the first predicate); it was not touched and is not the savebar frame the row targets."
+   }
+  },
+  {
+   "board": "639:3092",
+   "boardName": "S7 · Settings · Domains",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Domains writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NO-SCOPE",
+    "read_back": "no FRAME/GROUP/INSTANCE/COMPONENT named savebar|save bar|bd-set-savebar exists on this board — there is nothing drawn to remove. A TEXT node whose NAME matches the same pattern does exist (it is what crashed the first predicate); it was not touched and is not the savebar frame the row targets."
+   }
+  },
+  {
+   "board": "640:3135",
+   "boardName": "S7 · Settings · Forms",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Forms writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NO-SCOPE",
+    "read_back": "no FRAME/GROUP/INSTANCE/COMPONENT named savebar|save bar|bd-set-savebar exists on this board — there is nothing drawn to remove. A TEXT node whose NAME matches the same pattern does exist (it is what crashed the first predicate); it was not touched and is not the savebar frame the row targets."
+   }
+  },
+  {
+   "board": "640:3135",
+   "boardName": "S7 · Settings · Forms",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Forms writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NO-SCOPE",
+    "read_back": "no FRAME/GROUP/INSTANCE/COMPONENT named savebar|save bar|bd-set-savebar exists on this board — there is nothing drawn to remove. A TEXT node whose NAME matches the same pattern does exist (it is what crashed the first predicate); it was not touched and is not the savebar frame the row targets."
+   }
+  },
+  {
+   "board": "640:3849",
+   "boardName": "S7 · Settings · Webhooks",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Webhooks writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NO-SCOPE",
+    "read_back": "no FRAME/GROUP/INSTANCE/COMPONENT named savebar|save bar|bd-set-savebar exists on this board — there is nothing drawn to remove. A TEXT node whose NAME matches the same pattern does exist (it is what crashed the first predicate); it was not touched and is not the savebar frame the row targets."
+   }
+  },
+  {
+   "board": "640:3849",
+   "boardName": "S7 · Settings · Webhooks",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Webhooks writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run).",
+   "applied": {
+    "status": "NO-SCOPE",
+    "read_back": "no FRAME/GROUP/INSTANCE/COMPONENT named savebar|save bar|bd-set-savebar exists on this board — there is nothing drawn to remove. A TEXT node whose NAME matches the same pattern does exist (it is what crashed the first predicate); it was not touched and is not the savebar frame the row targets."
+   }
+  }
+ ],
+ "applied_summary": "2 OK (the two save-error boards), 7 NOT-DRAWN, 6 NO-SCOPE. 3 calls (2 lost to a batch-aborting throw, since fixed at source)."
+}

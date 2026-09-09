@@ -1,0 +1,141 @@
+[
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "140:25",
+    "name": "pub/state",
+    "text": "Draft",
+    "x": 232,
+    "y": 8,
+    "why": "UX-B-01 — the row states the publication fact, in the right-hand slot PageRow.tsx:290-300 already reserves after its flex:1 spacer. Draft is the EXCEPTION; a page that will publish stays silent, because a label on every row is noise that stops being read (SPEC-PAGES-PANEL §3). x is set so the auto-sized label ends near the row's right edge at 260 (where the dirty dot ends); 'Draft' is ~28px at Inter Regular 11. Nudge after the dry run reports the real width.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them.",
+    "_geometry_source": "READ — 140:2 was dumped with absolute boxes and sits at abs 100,15970, so every parent-relative coordinate here is arithmetic, not a guess. Rows are 280x32 at rel y 80/112/144/176/208/240; spacer 272..712; first existing hotspot at rel y 672."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "140:34",
+    "name": "pub/state",
+    "text": "Won't publish",
+    "x": 188,
+    "y": 8,
+    "why": "UX-B-01 / UX-B-02 / UX-B-24 — hidden and password both mean 'left out of the deploy' (ExportEngine.ts:658), so the row prints the deploy's word rather than the storage vocabulary. ~72px at 11px, ending at 260.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them.",
+    "_geometry_source": "READ — 140:2 was dumped with absolute boxes and sits at abs 100,15970, so every parent-relative coordinate here is arithmetic, not a guess. Rows are 280x32 at rel y 80/112/144/176/208/240; spacer 272..712; first existing hotspot at rel y 672."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "parent": "140:2",
+    "name": "note/folders-are-local",
+    "text": "Folders are yours only, on this browser.",
+    "x": 16,
+    "y": 282,
+    "why": "UX-B-17 — folders live in localStorage key pg-folders-v1-<siteId> (useFolders.ts:24-30) and never in ProjectData, so they vanish on another device and are invisible to a teammate. A group drawn like site structure that is not site structure is the more expensive lie (SPEC-PAGES-PANEL §3).",
+    "width": 248,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them.",
+    "_geometry_source": "READ — 140:2 was dumped with absolute boxes and sits at abs 100,15970, so every parent-relative coordinate here is arithmetic, not a guess. Rows are 280x32 at rel y 80/112/144/176/208/240; spacer 272..712; first existing hotspot at rel y 672."
+  },
+  {
+    "op": "clone-row",
+    "src": "1717:17220",
+    "parent": "140:2",
+    "name": "rule/generated-top",
+    "x": 0,
+    "y": 306,
+    "why": "UX-B-25 — separates the pages this panel owns from the routes it does not.",
+    "width": 280,
+    "height": 1,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:15",
+    "parent": "140:2",
+    "name": "grp/from-blog",
+    "text": "▾  FROM BLOG",
+    "x": 16,
+    "y": 316,
+    "why": "UX-B-25 — generated routes as a read-only group under their collection (SPEC-PAGES-PANEL §3). usePages.ts:103 lists only getAllPages(), so a site can publish forty URLs this panel has never heard of.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:16",
+    "parent": "140:2",
+    "name": "grp/from-blog-count",
+    "text": "12",
+    "x": 244,
+    "y": 318,
+    "why": "UX-B-25 — the count is the first place in the product a user can see that publishing emits URLs the page manager does not own. x mirrors the folder counts at rel 250.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "parent": "140:2",
+    "name": "grp/from-blog-sub",
+    "text": "/blog/{slug} · template: Blog post · read-only",
+    "x": 32,
+    "y": 338,
+    "why": "UX-B-25 — the pattern, the template page (which is also the argument for making pageTemplatePath a picker over real pages rather than free text, CMSCollectionSetupModal.tsx:440), and the fact that Pages cannot rename, reorder or delete any of them.",
+    "width": 228,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them."
+  },
+  {
+    "op": "clone-row",
+    "src": "1717:17220",
+    "parent": "140:2",
+    "name": "rule/generated-end",
+    "x": 0,
+    "y": 362,
+    "why": "UX-B-25 — closes the read-only group.",
+    "width": 280,
+    "height": 1,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "parent": "140:2",
+    "name": "note/UX-B-13",
+    "text": "UX-B-13 — '+ Add page' routes through the uniqueness helpers duplicate already uses (PageManager.ts:460-475), so two adds after a delete produce two different names at two different URLs. Today createPage checks neither (PageManager.ts:61-93) and the exporter silently dedupes the collision to page-3-2.html (ExportEngine.ts:789-795) — a URL the user never chose and never sees.",
+    "x": 16,
+    "y": 640,
+    "why": "UX-B-13",
+    "width": 248,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them.",
+    "_geometry_source": "READ — 140:2's spacer runs rel 272..712 and the door chips in pages-nodes-09-doors.json occupy 400..608, so the two notes sit at 640 and 700. 700 is 12px above the Add page frame at rel 712 and a wrapped 248-wide note will run past it; if the dry run reports a tall node, drop note/UX-B-32 onto the caption 155:18 instead."
+  },
+  {
+    "op": "clone-label",
+    "src": "1717:17234",
+    "parent": "140:2",
+    "name": "note/UX-B-32",
+    "text": "UX-B-32 — Pages owns the per-page fact ('show in nav') and the visibility of which pages nothing links to; the navigation editor belongs to whoever owns the navbar element, where propertiesRegistry.ts:1037 declares a menuEditor control type with no renderer. Adding a page does not make it reachable today: the navbar block is a fixed HTML string of four href=\"#\" links.",
+    "x": 16,
+    "y": 700,
+    "why": "UX-B-32 — SPEC-PAGES-PANEL §5 rules the builder out of this panel; what Pages owns is stated on the board so the boundary is visible.",
+    "width": 248,
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them.",
+    "_geometry_source": "READ — 140:2's spacer runs rel 272..712 and the door chips in pages-nodes-09-doors.json occupy 400..608, so the two notes sit at 640 and 700. 700 is 12px above the Add page frame at rel 712 and a wrapped 248-wide note will run past it; if the dry run reports a tall node, drop note/UX-B-32 onto the caption 155:18 instead."
+  },
+  {
+    "op": "hide",
+    "id": "2433:11972",
+    "why": "QA-A-33 — PageList.tsx:186 and :197 carry the same className, so Structure and Listings render identically; the board invented an accent on Structure that reads as 'this view is active'. Hidden rather than deleted (edit-board-nodes never deletes), and replaced by a clone of the Listings label, which inherits the ink that is already correct there. I never read a fill, so cloning is the only way to match one without guessing a hex.",
+    "_id_source": "READ — 2433:11972 '⚂ Structure', abs 301,16024 66x15."
+  },
+  {
+    "op": "clone-label",
+    "src": "140:10",
+    "parent": "140:7",
+    "name": "Structure link (ink)",
+    "text": "⚂ Structure",
+    "x": 201,
+    "y": 54,
+    "why": "QA-A-33 — the replacement, in the Listings ink. NOTE the glyph is kept as U+2682 because QA-A-32 asks for that to be ADJUDICATED, not silently changed: the code ships U+2442 (PageList.tsx:202). Filed as an open decision on the section name instead.",
+    "_style_source": "Every new node is a CLONE of a sibling whose style is already right, per edit-board-nodes.mjs's own rule — this file has 920 nodes below the 11px floor because hand-chosen type is what produced them.",
+    "_geometry_source": "READ — 140:2 was dumped with absolute boxes and sits at abs 100,15970, so every parent-relative coordinate here is arithmetic, not a guess. Rows are 280x32 at rel y 80/112/144/176/208/240; spacer 272..712; first existing hotspot at rel y 672. 140:7 (Search) is rel 0,44 280x36; the label sat at rel 201,54."
+  }
+]

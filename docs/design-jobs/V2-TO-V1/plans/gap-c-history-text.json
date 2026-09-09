@@ -1,0 +1,39 @@
+{
+  "slug": "gap-c-history-text",
+  "why": "Text-only halves of the gap-C history/settings findings. Every row is selector-only; resolve-selectors.mjs turns them into ids in one call and apply-text via apply-queue.mjs reads each node back in the same call. Ids frozen in after resolve-selectors landed them 2026-09-07. The UX-I-38 row that stood here moved to gap-c-history-text2.json: its `expect` ('Upgrade your plan to unlock this feature.') is not on the board and never was, which is why it resolved NOMATCH — see that file.",
+  "rows": [
+    {
+      "op": "text",
+      "selector": {
+        "board": "2854:21779",
+        "type": "TEXT",
+        "matches": "load version history"
+      },
+      "text": "Couldn’t load your recent changes.",
+      "why": "UX-I-06 — the clone inherits 453:4031's honest load-error shape; only the SUBJECT changes. The built error branch that no user can reach belongs to the 'All changes' list (ActivityView's error/onRetry props are never passed), not to the version store, and a board that says 'version history' would put the finding on the wrong list.",
+      "id": "2854:21796"
+    },
+    {
+      "op": "text",
+      "selector": {
+        "board": "2854:21779",
+        "type": "TEXT",
+        "matches": "Only this list failed to load"
+      },
+      "text": "Your saved versions are unaffected. Only this list failed to load.",
+      "why": "UX-I-06 — a list that cannot distinguish 'nothing happened' from 'I could not read it' will tell people their work is gone. The reassurance has to name the store that is NOT affected, which for the session list is the saved versions.",
+      "id": "2854:21797"
+    },
+    {
+      "op": "text",
+      "selector": {
+        "board": "2854:21779",
+        "type": "TEXT",
+        "matches": "Retry, or reopen"
+      },
+      "text": "Retry, or reopen History in a moment.",
+      "why": "UX-I-06 — same sentence, correct surface name.",
+      "id": "2854:21800"
+    }
+  ]
+}

@@ -1,0 +1,5972 @@
+{
+ "rows": {
+  "ai-03-text-not-configured#0": {
+   "status": "OK",
+   "detail": "AI isn’t available on this workspace.",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "ai-03-text-not-configured#1": {
+   "status": "OK",
+   "detail": "No AI provider is configured for this deployment. It is a server setting — OPENAI_API_KEY, or OLLAMA_BASE_URL for a loca",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "ai-03-text-not-configured#2": {
+   "status": "OK",
+   "detail": "Contact your workspace owner",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "ai-03b-caption-not-configured#0": {
+   "status": "SAME",
+   "detail": "The panel's answer, and only the panel's. The message is honest and reachable — ",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "brand-01-text#0": {
+   "status": "OK",
+   "detail": "Drop tokens.json — JSON only",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-01-text#1": {
+   "status": "OK",
+   "detail": "Drop tokens.json — JSON only",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-01-text#2": {
+   "status": "OK",
+   "detail": "Drop tokens.json — JSON only",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-01-text#3": {
+   "status": "OK",
+   "detail": "Selecting a starter previews it on the canvas. Applying replaces your colour, type and spacing tokens and clears per-tok",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-01-text#4": {
+   "status": "OK",
+   "detail": "Selecting a starter previews it on the canvas. Applying replaces your colour, type and spacing tokens and clears per-tok",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-01-text#5": {
+   "status": "OK",
+   "detail": "6-card gallery, a drill-in rather than the old modal. Selecting a card previews it; a footer 'Apply <name>' commits, and",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-01-text#6": {
+   "status": "OK",
+   "detail": "Value · used-in · replace-on-delete. Editing here repaints every consumer immediately, which is why used-in sits next to",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-01-text#7": {
+   "status": "OK",
+   "detail": "Nine sections, each a 32h row with a count. Above them: the palette swatches, then a live specimen — a card at the brand",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-02-text-unresolved#0": {
+   "status": "OK",
+   "detail": "Drop tokens.json — JSON only",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "brand-02-text-unresolved#1": {
+   "status": "OK",
+   "detail": "3 — heading-xl, radius-pill, shadow-soft",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#0": {
+   "status": "OK",
+   "detail": "Saved versions",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#1": {
+   "status": "OK",
+   "detail": "This session",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#4": {
+   "status": "OK",
+   "detail": "Saved versions",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#5": {
+   "status": "OK",
+   "detail": "This session",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#8": {
+   "status": "OK",
+   "detail": "Saved versions",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#9": {
+   "status": "OK",
+   "detail": "This session",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#10": {
+   "status": "OK",
+   "detail": "Saved versions",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#11": {
+   "status": "OK",
+   "detail": "This session",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#12": {
+   "status": "OK",
+   "detail": "Saved versions",
+   "at": "2026-09-07T04:38:19.361Z",
+   "op": "text"
+  },
+  "history-text#13": {
+   "status": "OK",
+   "detail": "This session",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "history-text#14": {
+   "status": "OK",
+   "detail": "Saved versions",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "history-text#15": {
+   "status": "OK",
+   "detail": "This session",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "history-text#18": {
+   "status": "OK",
+   "detail": "This session only — the last 100 steps, cleared when you reload. Save a version to keep a point.",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#0": {
+   "status": "SAME",
+   "detail": "💡  Tip 2/4",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#1": {
+   "status": "OK",
+   "detail": "ELEMENTS open, BLOCKS · COMPONENTS · MINE closed — founder-final taxonomy (blocks/groups.ts:1-19, BuildTab.tsx:48). That",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#2": {
+   "status": "OK",
+   "detail": "A second group open. Reaching it with the keyboard costs 53 tab stops — every ELEMENTS row is a focusable role=button, t",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#3": {
+   "status": "OK",
+   "detail": "Search covers ELEMENTS, BLOCKS and COMPONENTS. It does NOT cover MINE — searchInsert is passed catalog + blockRows + com",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#4": {
+   "status": "OK",
+   "detail": "“Clear search” renders only in this zero-results branch. A search that matched three wrong things leaves the user with n",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#5": {
+   "status": "OK",
+   "detail": "The drag is drawn; the drop is not honoured. handleBlockDrop re-reads e.dataTransfer past an await and gets \"\", returns ",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#6": {
+   "status": "OK",
+   "detail": "BUILT, MOUNTED NOWHERE. Disabled, never hidden: a “Soon” badge beside the label, no drag, and a tooltip carrying the ele",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#7": {
+   "status": "OK",
+   "detail": "One click and the panel’s only guidance is gone for good. The ✕’s own tooltip says “Hide tips for this session — bring t",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#8": {
+   "status": "OK",
+   "detail": "BUILT, MOUNTED NOWHERE — InsertStateBlocks.tsx:55 InsertLoadingSkeleton ships and is unit-tested; BuildTab.tsx never imp",
+   "at": "2026-09-07T04:38:19.362Z",
+   "op": "text"
+  },
+  "insert-text-fixes#9": {
+   "status": "OK",
+   "detail": "BUILT, MOUNTED NOWHERE — InsertStateBlocks.tsx:79 InsertLoadError ships and is unit-tested with zero mounts. Same withdr",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "inspector-captions#0": {
+   "status": "OK",
+   "detail": "The toolbar reads the count — the header, the pill row and every banner are short-circuited (ProInspector.tsx:298). Six ",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "inspector-captions#1": {
+   "status": "OK",
+   "detail": "A dot on the breakpoint pill, and a separate Overrides block listing each overridden property with a cobalt left bar, a ",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "inspector-captions#2": {
+   "status": "OK",
+   "detail": "A dot on the state pill, a dot beside each state in the dropdown that carries overrides, and a banner reading 'Editing :",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "inspector-captions#3": {
+   "status": "OK",
+   "detail": "The takeover renders no back row: an 'AI' label, the running step's summary, and the line 'Your selection is kept and re",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "inspector-captions#4": {
+   "status": "OK",
+   "detail": "A 48px header bar and six skeleton rows — the real header is not mounted yet (InspectorLoading.tsx:27). Only reached wit",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "inspector-captions#5": {
+   "status": "OK",
+   "detail": "ScopeDropdown's third reach. The takeover reads 'Editing the whole site — every page' with Open Brand and Back to this e",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "layers-text#0": {
+   "status": "OK",
+   "detail": "28h dense rows. At depth 5 the name gets 96px: 280 − 92 indent − 12 chevron − 12 icon − 4×8 gaps − 30 for the two toggle",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "layers-text#1": {
+   "status": "OK",
+   "detail": "The line is drawn over illegal targets too — the drop is what refuses, not the hover. The reason appears as an alert at ",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "layers-text#2": {
+   "status": "OK",
+   "detail": "Hidden is not deleted. 45% opacity, keeps its place in the tree. Dimming opens no undo step, so ⌘Z undoes your previous ",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "layers-text#3": {
+   "status": "OK",
+   "detail": "Locked has no row treatment: no dim, no tint. The only signals are the darker padlock, the aria-label suffix and draggab",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "layers-text#4": {
+   "status": "OK",
+   "detail": "button cannot contain children",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#0": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#1": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#2": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#3": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#4": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#5": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#6": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#7": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#8": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#9": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#10": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#11": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#12": {
+   "status": "SAME",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#13": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#14": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#15": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#16": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#17": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#18": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#19": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#20": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#21": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#22": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#23": {
+   "status": "SAME",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:27:08.517Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#24": {
+   "status": "OK",
+   "detail": "PNG · JPG · GIF · WebP · AVIF · SVG · MP4 · WebM · MOV · TTF · OTF · WOFF · WOFF2 — up to 50 MB per file",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#25": {
+   "status": "OK",
+   "detail": "terrace-night.jpg → uploading…",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#26": {
+   "status": "OK",
+   "detail": "Upload failed — file is 62 MB, the limit is 50 MB per file",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#27": {
+   "status": "OK",
+   "detail": "Upload tab accepts image/video/audio · max 10 MB each",
+   "at": "2026-09-07T04:38:25.321Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#28": {
+   "status": "OK",
+   "detail": "Couldn’t reach the stock provider.",
+   "at": "2026-09-07T04:38:25.322Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#29": {
+   "status": "OK",
+   "detail": "This is the only signal today and it auto-dismisses. The grid must say it too, and only this arm gets Try again.",
+   "at": "2026-09-07T04:38:25.322Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#30": {
+   "status": "OK",
+   "detail": "Needs a configured-ness signal from the server. StockService.ts:54-57 admits it: 'A real configured-ness signal needs a ",
+   "at": "2026-09-07T04:38:25.322Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#31": {
+   "status": "OK",
+   "detail": "localOnly is set whenever the server mirror fails — no blob token, offline, or a plan size rejection. The only PERSISTEN",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#32": {
+   "status": "OK",
+   "detail": "⚠ 2 not on the server",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#33": {
+   "status": "OK",
+   "detail": "⚠ 2 not on the server",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#34": {
+   "status": "OK",
+   "detail": "⚠ 2 not on the server",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#35": {
+   "status": "OK",
+   "detail": "⚠ 2 not on the server",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#36": {
+   "status": "OK",
+   "detail": "J. Lin · Unsplash",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#37": {
+   "status": "OK",
+   "detail": "S. Patel · Unsplash",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-02-text-fixes#38": {
+   "status": "OK",
+   "detail": "K. Mori · Unsplash",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-07-captions#0": {
+   "status": "OK",
+   "detail": "V2 UX-H-33 — THE STRUCTURAL PROBLEM: Media has two surfaces with unequal powers. This 280 drawer is the default (MediaTa",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-07-captions#1": {
+   "status": "OK",
+   "detail": "V2 UX-H-04 — there are TWO stock browsers with different powers and which one you get depends on which Media surface you",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-07-captions#2": {
+   "status": "OK",
+   "detail": "V2 UX-H-12 — an upload in flight could not be cancelled or dismissed: UploadZone.tsx:163-192 renders a name, a percent a",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-07-captions#3": {
+   "status": "OK",
+   "detail": "V2 UX-H-06 — the file picker offered more formats than the product can store: UploadZone.tsx:15 accepts image/*,video/* ",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-07-captions#4": {
+   "status": "OK",
+   "detail": "V2 UX-H-10 — the one screen entirely about a single file offered no rename, no delete, no download and no copy-URL; its ",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-07-captions#5": {
+   "status": "OK",
+   "detail": "V2 UX-H-01 — this state used to be entered by right-clicking an asset, a gesture the drawer stole from the per-asset men",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "media-07-captions#6": {
+   "status": "OK",
+   "detail": "V2 UX-H-07 — the drawer's folder scope button was disabled whenever the library had no folders (SlimLauncher.tsx:255) an",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "pages-text-01#0": {
+   "status": "OK",
+   "detail": "7 pages, by route.",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "pages-text-01#1": {
+   "status": "OK",
+   "detail": "▾  legal/ (no page)",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "pages-text-01#2": {
+   "status": "OK",
+   "detail": "/legal",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-1#0": {
+   "status": "OK",
+   "detail": "CHANGES IN THIS SESSION",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-1#1": {
+   "status": "OK",
+   "detail": "CHANGES IN THIS SESSION",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-1#2": {
+   "status": "OK",
+   "detail": "v15 · live · just now · published in this session",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-1#3": {
+   "status": "OK",
+   "detail": "Vercel rejected the token · step 4 of 5. Nothing was deployed.",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-1#4": {
+   "status": "OK",
+   "detail": "Publishing is off for this workspace.",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-1#5": {
+   "status": "OK",
+   "detail": "Ask a workspace owner to turn it on. A missing Vercel connection is a different state.",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-2#0": {
+   "status": "OK",
+   "detail": "⚠ 4 warnings — none block. Client approval is checked on this list, not after it.",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-2#1": {
+   "status": "OK",
+   "detail": "Deploy manifest",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-2#2": {
+   "status": "OK",
+   "detail": "⚠ This replaces the live site immediately for all visitors. 1 hidden page will not be deployed.",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-2#3": {
+   "status": "OK",
+   "detail": "One HTML file, styles inlined — the page open now (About), saved as index.html.",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-2#4": {
+   "status": "OK",
+   "detail": "12 elements · 48 KB HTML · 12 KB CSS · 1 of 12 pages — pick ZIP for the whole site",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-3-captions#0": {
+   "status": "OK",
+   "detail": "Done — and only for a publish that ran in THIS session. Gated on publishJob.jobId != null (PublishTab.tsx:233); before 1",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-3-captions#1": {
+   "status": "OK",
+   "detail": "In flight. Five steps; two never run (Optimizing images, Performance check) and report skipped. The step line never rend",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-3-captions#2": {
+   "status": "OK",
+   "detail": "Nothing was deployed. The board now draws the TRANSLATED sentence; the shipping panel prints the job's raw error code, a",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-3-captions#3": {
+   "status": "OK",
+   "detail": "Deploy state unknown. The button should be disabled here; the shipping panel leaves it live (PublishTab.tsx:710 does not",
+   "at": "2026-09-07T04:38:31.707Z",
+   "op": "text"
+  },
+  "publish-text-3-captions#4": {
+   "status": "OK",
+   "detail": "Publishing is not wired in this build (NEXT_PUBLIC_FEATURE_PUBLISH off), and this is what PublishTab renders then — noPu",
+   "at": "2026-09-07T04:38:37.624Z",
+   "op": "text"
+  },
+  "review-captions#0": {
+   "status": "OK",
+   "detail": "The panel stays — ReviewTab renders a round in ANY status. There is no rail entry to stay: Review has no rail row at all",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#1": {
+   "status": "OK",
+   "detail": "PENDING, no comments yet. Nothing notifies the designer — no Notification row, no email — so the panel has to say the re",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#2": {
+   "status": "OK",
+   "detail": "In flight. The button holds its place rather than swapping to a spinner elsewhere. Two Re-send paths exist: the panel pa",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#3": {
+   "status": "OK",
+   "detail": "Below 100% it confirms. The confirm must say the old link dies — re-sending issues a new token and revokes the old one (",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#4": {
+   "status": "OK",
+   "detail": "The wedge's work surface. It answers one question: what do I still owe the client before I re-send? Progress 44h is the ",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#5": {
+   "status": "OK",
+   "detail": "Read-only. Without round history, round 3 cannot see rounds 1 and 2, and a client who repeats feedback looks unreasonabl",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#6": {
+   "status": "OK",
+   "detail": "12 of 12. Re-send is not gated on this — you can send with comments open — but reaching it is the normal exit. PAGER (VI",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#7": {
+   "status": "OK",
+   "detail": "Two independent panes. Left is the approved snapshot, right is the site as it is now. Each pane is a sandboxed frame and",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#8": {
+   "status": "OK",
+   "detail": "No render at all — just what moved. The fastest of the three when you only need the inventory. DESTINATION (UX-I-27): ev",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#9": {
+   "status": "OK",
+   "detail": "One pane. The current page is blended over the approved one and a slider moves between them, so a change reads as a shif",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#10": {
+   "status": "OK",
+   "detail": "Identical, so say so and stop. An empty diff view that renders two blank panes reads as broken. NO DECISION FOOTER (UX-I",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "review-captions#11": {
+   "status": "OK",
+   "detail": "Re-sending kills the old link (contract §1.4). Her comments carry over; only the link changes — and both halves of that ",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "shell-text-fixes#3": {
+   "status": "REFUSED",
+   "detail": "has: Drawer slot · 320 · pinned, pushes canvas",
+   "at": "2026-09-07T08:35:10.424Z",
+   "op": "text"
+  },
+  "shell-text-fixes#4": {
+   "status": "OK",
+   "detail": "Drop an element from the Insert panel, or drag a section.",
+   "at": "2026-09-07T04:38:37.625Z",
+   "op": "text"
+  },
+  "content-captions-append#0": {
+   "status": "OK",
+   "detail": "h=162 , publish and delete, and the refusal arrives as a sync-failure toast.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-append#1": {
+   "status": "OK",
+   "detail": "h=144 ingManager.ts:215) have no UI caller. No search, no filter, no paging.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-append#2": {
+   "status": "OK",
+   "detail": "h=198 not survive a reload — sites.ts:192-214 strips cmsBindings in transit.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-append#3": {
+   "status": "OK",
+   "detail": "h=162 , so a mistyped field name is permanent unless the field is destroyed.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-append#4": {
+   "status": "OK",
+   "detail": "h=126  A duplicate top-level key throws and is reported as “Not valid JSON”.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-append#5": {
+   "status": "OK",
+   "detail": "h=126 hans every variable at once and two sites sharing a name share theirs.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-append#6": {
+   "status": "OK",
+   "detail": "h=144  site. Pick mode arms with no notice and no Cancel until after a pick.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-append#7": {
+   "status": "OK",
+   "detail": "h=162  date and select are free text here and real widgets in the ⌘⇧P modal.",
+   "at": "2026-09-07T04:38:45.558Z",
+   "op": "append-text"
+  },
+  "content-captions-new#0": {
+   "status": "OK",
+   "detail": "2838:12009 280x180 @2320,1044",
+   "at": "2026-09-07T04:38:52.174Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#1": {
+   "status": "OK",
+   "detail": "2838:12010 280x72 @900,4897",
+   "at": "2026-09-07T04:38:52.175Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#2": {
+   "status": "OK",
+   "detail": "2838:12011 280x90 @1700,4897",
+   "at": "2026-09-07T04:38:52.175Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#3": {
+   "status": "OK",
+   "detail": "2838:12012 280x108 @1300,4897",
+   "at": "2026-09-07T04:38:52.175Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#4": {
+   "status": "OK",
+   "detail": "2994:12649 280x90 @2800,1044",
+   "at": "2026-09-07T11:31:34.463Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#5": {
+   "status": "OK",
+   "detail": "2994:12650 280x72 @3100,1044",
+   "at": "2026-09-07T11:31:34.463Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#6": {
+   "status": "OK",
+   "detail": "2838:12013 500x162 @900,706",
+   "at": "2026-09-07T04:38:52.175Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#7": {
+   "status": "OK",
+   "detail": "2838:12014 640x54 @100,2630",
+   "at": "2026-09-07T04:38:52.175Z",
+   "op": "add-caption"
+  },
+  "content-captions-new#8": {
+   "status": "OK",
+   "detail": "2838:12015 280x144 @2100,4897",
+   "at": "2026-09-07T04:38:52.175Z",
+   "op": "add-caption"
+  },
+  "content-dynamic-pages-body#0": {
+   "status": "SAME",
+   "detail": "Content · dynamic-pages",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-dynamic-pages-body#1": {
+   "status": "SAME",
+   "detail": "Content · dynamic-pages · no-pattern",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-dynamic-pages-body#2": {
+   "status": "SAME",
+   "detail": "Content · dynamic-pages · none-published",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-dynamic-pages-body#3": {
+   "status": "SAME",
+   "detail": "Content · dynamic-pages · no-template",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-dynamic-pages-body#4": {
+   "status": "SAME",
+   "detail": "Content · dynamic-pages · unknown-key",
+   "at": "2026-09-07T11:31:39.717Z",
+   "op": "rename"
+  },
+  "content-dynamic-pages-body#5": {
+   "status": "SAME",
+   "detail": "Content · dynamic-pages · no-records",
+   "at": "2026-09-07T11:31:39.717Z",
+   "op": "rename"
+  },
+  "content-marks#0": {
+   "status": "OK",
+   "detail": "[not-implemented] Content · conditions — the screen ships; its OUTCOME does not. Evaluating a condition writes data-cond",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-marks#1": {
+   "status": "OK",
+   "detail": "[not-implemented] Content · conditions · empty — same as 151:87: a condition's only effect is a data-condition-hidden at",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-marks#2": {
+   "status": "OK",
+   "detail": "[not-implemented] Content · data-sources — the rows and the green \"Watching for changes\" pill are drawn over an in-memor",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-marks#3": {
+   "status": "OK",
+   "detail": "[not-implemented] Content · variables — the value is stored in THIS BROWSER under a key built from the project NAME (use",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-marks#4": {
+   "status": "OK",
+   "detail": "[not-implemented] Content · variables · empty — same as 151:62: browser-local, keyed on the project NAME, and no page re",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-marks#5": {
+   "status": "OK",
+   "detail": "[not-implemented] Content · variables · key-error — same as 151:62. The key is validated for a store no page reads (cont",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-marks#6": {
+   "status": "OK",
+   "detail": "Content · collection-setup (modal) — step 1's Content type is read by nothing: contentType is declared at CMSCollectionS",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "content-marks#7": {
+   "status": "OK",
+   "detail": "Content · records (modal) — the SECOND record editor, reachable only from ⌘⇧P. Delete asks nothing here (CMSRecordsModal",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "insert-truth-marks#0": {
+   "status": "OK",
+   "detail": "Insert · dragging — CONDITION-ONLY — leaves on drop/dragend, no control (GroupSection.tsx:189-190; ELEMENTS rows only). ",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "insert-truth-marks#1": {
+   "status": "OK",
+   "detail": "Insert · blocks-expanded — [not-implemented] the thumbnails. shared/types/block.ts:25 declares preview?: string and noth",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "insert-truth-marks#2": {
+   "status": "OK",
+   "detail": "Modal · Add Child Element — [not-implemented] its refusal. useElementsState.ts:151-161 raises \"Added {label} to canvas\" ",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "insert-truth-marks#3": {
+   "status": "OK",
+   "detail": "Insert · components-expanded — COMPONENTS here is the registry's 14 shipped component blocks (blockRegistry.ts:187-202),",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "insert-truth-marks#4": {
+   "status": "OK",
+   "detail": "Insert · mine-expanded — [not-implemented] finding one of these by name. searchInsert is passed catalog + blockRows + co",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "insert-truth-marks#5": {
+   "status": "OK",
+   "detail": "hotspot/state · Insert · loading — the 2026-09-02 \"CUT (RETIRED, no producer)\" was withdrawn: InsertStateBlocks.tsx:55 I",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "insert-truth-marks#6": {
+   "status": "OK",
+   "detail": "hotspot/state · Insert · load-error — the 2026-09-02 \"CUT (RETIRED, no producer)\" was withdrawn: InsertStateBlocks.tsx:7",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "inspector-truth-marks#0": {
+   "status": "OK",
+   "detail": "[unreachable] Inspector · ai-agent-run — entering the AI tab clears the selection, so the takeover (ProInspector.tsx:510",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "layers-rename#0": {
+   "status": "OK",
+   "detail": "Layers · hidden — EDITOR-ONLY DIM — the eye writes data-hidden on the canvas node and nothing else; the element publishe",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "layers-rename#1": {
+   "status": "OK",
+   "detail": "Layers · locked — TWO SOURCES OF TRUTH — the padlock is drawn from a per-page localStorage set; the lock the canvas enfo",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "layers-rename#2": {
+   "status": "OK",
+   "detail": "Layers · context-menu — SCOPE SPLIT — with five rows selected every item except Group acts on the ONE right-clicked row ",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "layers-rename#3": {
+   "status": "OK",
+   "detail": "bdc-layers-drop-alert — a full-width bar at the top of the panel, after the drop, cleared at 3s (index.tsx:400-404, laye",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#0": {
+   "status": "OK",
+   "detail": "[not-implemented] Media · local-only assets — the localOnly flag is real (shared/constants/media.ts:182) but the drawer ",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#1": {
+   "status": "OK",
+   "detail": "Media · drill-in · stock-browser — [not-implemented] insert-to-canvas: this 280 overlay can only SAVE into the library (",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#2": {
+   "status": "OK",
+   "detail": "alt-row — [not-implemented] failure is silent: AssetDetailOverlay.tsx:270-289 catches and discards, so an unconfigured o",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#3": {
+   "status": "OK",
+   "detail": "alt-row — [not-implemented] failure is silent: AssetDetailOverlay.tsx:270-289 catches and discards, so an unconfigured o",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#4": {
+   "status": "OK",
+   "detail": "alt-row — [not-implemented] failure is silent: AssetDetailOverlay.tsx:270-289 catches and discards, so an unconfigured o",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#5": {
+   "status": "OK",
+   "detail": "Alt text — ✨ Generate fails in total silence (AssetDetailOverlay.tsx:270-289, the catch body is a comment). See the asse",
+   "at": "2026-09-07T04:38:57.932Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#6": {
+   "status": "OK",
+   "detail": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). There is no s",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#7": {
+   "status": "OK",
+   "detail": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delet",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#8": {
+   "status": "OK",
+   "detail": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delet",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#9": {
+   "status": "OK",
+   "detail": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delet",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#10": {
+   "status": "OK",
+   "detail": "row/🗑 Trash — NOT IMPLEMENTED: onTrashClick only toasts \"Trash coming soon\" (LibraryManager.tsx:356-358). No soft-delet",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#11": {
+   "status": "OK",
+   "detail": "hotspot/state · ⬚ expand does NOT widen the drawer — it CLOSES it and opens the fullpage library (MediaTab.tsx:87-96, us",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#12": {
+   "status": "OK",
+   "detail": "hotspot/gesture · right-click a card → per-asset menu (Rename / Copy URL / Copy alt text / Move to folder / Edit image /",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#13": {
+   "status": "OK",
+   "detail": "hotspot/state · opens the 720 StockSourceModal — a DIFFERENT component from this 280 overlay (StockBrowserOverlay vs Sto",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#14": {
+   "status": "OK",
+   "detail": "Media · stock · search-failed — COULD NOT REACH THE PROVIDER. Distinct from no-results (1716:8497) and from not-configur",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "media-01-truth-marks#15": {
+   "status": "OK",
+   "detail": "upload-queue — [not-implemented] archive extraction: no zip/extract path exists in the editor, the upload route or the t",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "pages-truth-10#0": {
+   "status": "OK",
+   "detail": "hotspot/state · Pages · loading",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "pages-truth-10#1": {
+   "status": "OK",
+   "detail": "hotspot/state · Pages · loading",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "pages-truth-10#2": {
+   "status": "OK",
+   "detail": "04 · Pages · 33 — expanded drawer drawn at 700 (LeftSidebar.tsx:586-587); SPEC-NAVIGATION's 560 is an OPEN DECISION, not",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename",
+   "note": "count bumped 32 -> 33 by add-state-board when the sixth Pages state board landed; the section name carries a live count, so the file leads the recorded read-back here"
+  },
+  "publish-marks#0": {
+   "status": "OK",
+   "detail": "Publish · published (this session) — a publish that ran in THIS session, never a hydrated URL from a previous day. Gated",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#1": {
+   "status": "OK",
+   "detail": "Publish · unavailable (feature off) — the shipping panel prints the VERCEL copy in this state instead (PublishTab.tsx:33",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#2": {
+   "status": "OK",
+   "detail": "Publish · pre-checks — row 7 CLIENT APPROVAL is proposed, not built: runPrePublishChecks returns six checks (publish.ser",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#3": {
+   "status": "OK",
+   "detail": "Publish · pre-checks · blocked — row 7 CLIENT APPROVAL is proposed, not built; the approval gate lives in startPublish (",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#4": {
+   "status": "OK",
+   "detail": "Publish · Confirm — the DEPLOY MANIFEST row is proposed: the count today is the browser's export and the server appends ",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#5": {
+   "status": "OK",
+   "detail": "Export · HTML (modal) — the scope line is proposed; the shipping modal never says which page HTML writes as index.html, ",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#6": {
+   "status": "OK",
+   "detail": "[not-implemented] Preview · accessibility checker — no PAGE-level a11y audit exists; the only a11y rule engine is the de",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#7": {
+   "status": "OK",
+   "detail": "[not-implemented · superseded by 988:2 · Site · Access] Preview · share link — same hand-off; share links are owned by a",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#8": {
+   "status": "OK",
+   "detail": "[not-implemented] Preview · performance audit — no performance measurement exists; the publish worker's \"Performance che",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#9": {
+   "status": "OK",
+   "detail": "[not-implemented] Preview · performance audit · all-clear — no performance measurement exists (packages/dashboard/app/ap",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#10": {
+   "status": "OK",
+   "detail": "[not-implemented] Preview · performance audit · issue detail — no performance measurement exists (packages/dashboard/app",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#11": {
+   "status": "OK",
+   "detail": "[not-implemented] Preview · performance audit · running — no performance measurement exists (packages/dashboard/app/api/",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "publish-marks#12": {
+   "status": "OK",
+   "detail": "[not-implemented] Preview · interaction test — the in-shell PreviewOverlay strips every <script> (ExportUtils.ts:38-43) ",
+   "at": "2026-09-07T04:39:16.857Z",
+   "op": "rename"
+  },
+  "review-marks-page1-3#0": {
+   "status": "OK",
+   "detail": "Review · compare · load-error — panel-mounted; ApprovedCompareView renders inside the Review drawer, 280 collapsed / 700",
+   "at": "2026-09-07T04:39:16.858Z",
+   "op": "rename"
+  },
+  "review-marks-page1-3#1": {
+   "status": "OK",
+   "detail": "Review · compare · loading — panel-mounted at 280 collapsed / 700 expanded (ReviewTab.tsx:497-532). UX-I-21: this board ",
+   "at": "2026-09-07T04:39:16.858Z",
+   "op": "rename"
+  },
+  "review-marks-page1-3#2": {
+   "status": "OK",
+   "detail": "[not-implemented] Review · reply-composer band — comments are flat (no parentId in the schema) and a reply is filed agai",
+   "at": "2026-09-07T04:39:16.858Z",
+   "op": "rename"
+  },
+  "review-marks-page1-3#3": {
+   "status": "OK",
+   "detail": "Client sign-off · F · dead-link · not-found · 1280 — echo of 1:6 canonical 1736:8397, which is also 1280×720. Kept becau",
+   "at": "2026-09-07T04:39:16.858Z",
+   "op": "rename"
+  },
+  "settings-header-marks#0": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#1": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#2": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#3": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#4": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#5": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#6": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#7": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#8": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#9": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#10": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#11": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#12": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#13": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#14": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#15": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#16": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add locale — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.414Z",
+   "op": "rename"
+  },
+  "settings-header-marks#17": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add locale — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#18": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add locale — DrillInHeader has no action slot: ",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#19": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#20": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#21": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#22": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#23": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#24": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#25": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#26": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#27": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#28": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:19.415Z",
+   "op": "rename"
+  },
+  "settings-header-marks#29": {
+   "status": "SAME",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot",
+   "at": "2026-09-07T05:27:24.640Z",
+   "op": "rename"
+  },
+  "settings-truth-marks#0": {
+   "status": "OK",
+   "detail": "RETIRED — Project settings modal (⌃,) · superseded by the full-page Settings per UX-I-30. Canvas (grid size + snap-to-gr",
+   "at": "2026-09-07T04:39:27.831Z",
+   "op": "rename"
+  },
+  "shell-truth-marks#0": {
+   "status": "OK",
+   "detail": "Canvas · command palette (⌘⇧P) — the CANVAS palette (Cmd+Shift+P, canvas/controls/CommandPalette). Also shipping; NOT th",
+   "at": "2026-09-07T04:39:27.831Z",
+   "op": "rename"
+  },
+  "shell-truth-marks#1": {
+   "status": "OK",
+   "detail": "Shell state 7 · Preview — the shipped overlay is the ACTIVE page only, inside <iframe sandbox=\"\"> behind a sanitizer tha",
+   "at": "2026-09-07T04:39:27.831Z",
+   "op": "rename"
+  },
+  "shell-truth-marks#2": {
+   "status": "OK",
+   "detail": "Canvas · empty page — first run · after Start blank (anatomy) — after Start blank a session flag removes BOTH buttons pe",
+   "at": "2026-09-07T04:39:27.831Z",
+   "op": "rename"
+  },
+  "shell-truth-marks#3": {
+   "status": "OK",
+   "detail": "Shell · 360 overlay panel (slot proof) — ONE right-hand class: --bk-size-panel-right 360 for notifications, Issues and S",
+   "at": "2026-09-07T04:39:27.831Z",
+   "op": "rename"
+  },
+  "shell-truth-marks#4": {
+   "status": "OK",
+   "detail": "Exit · Editor (leaves to your sites) — the control must NAME this destination (“Exit to dashboard” / the workspace name)",
+   "at": "2026-09-07T04:39:27.831Z",
+   "op": "rename"
+  },
+  "shell-truth-marks#5": {
+   "status": "OK",
+   "detail": "Shell state 9 · AI agent run — AI has ONE home: the inspector column. StudioPanels.tsx:494-501 renders AITab INSTEAD of ",
+   "at": "2026-09-07T04:39:27.831Z",
+   "op": "rename"
+  },
+  "content-dynamic-pages-edges#4": {
+   "status": "SAME",
+   "detail": "already -> 149:50",
+   "at": "2026-09-07T11:31:45.177Z",
+   "op": "rewire"
+  },
+  "content-dynamic-pages-edges#5": {
+   "status": "SAME",
+   "detail": "already -> 149:50",
+   "at": "2026-09-07T11:31:45.177Z",
+   "op": "rewire"
+  },
+  "layers-move#3": {
+   "status": "OK",
+   "detail": "16,6",
+   "at": "2026-09-07T04:39:44.842Z",
+   "op": "move"
+  },
+  "layers-move#15": {
+   "status": "OK",
+   "detail": "1700,3136",
+   "at": "2026-09-07T04:39:44.842Z",
+   "op": "move"
+  },
+  "media-05-node-edits#5": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.842Z",
+   "op": "move"
+  },
+  "media-05-node-edits#6": {
+   "status": "OK",
+   "detail": "152,14",
+   "at": "2026-09-07T04:39:44.842Z",
+   "op": "move"
+  },
+  "media-05-node-edits#10": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.842Z",
+   "op": "move"
+  },
+  "media-05-node-edits#15": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#20": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#25": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#30": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#35": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#40": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#45": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#50": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#55": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#60": {
+   "status": "OK",
+   "detail": "89,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#61": {
+   "status": "OK",
+   "detail": "152,14",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#65": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#66": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#67": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#68": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#69": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#70": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#71": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#72": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#73": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#74": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#75": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#76": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#77": {
+   "status": "OK",
+   "detail": "200,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#78": {
+   "status": "OK",
+   "detail": "206,8",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#80": {
+   "status": "OK",
+   "detail": "206,6",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#98": {
+   "status": "SAME",
+   "detail": "1243,7",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#100": {
+   "status": "SAME",
+   "detail": "1243,7",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#102": {
+   "status": "SAME",
+   "detail": "1243,7",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "media-05-node-edits#104": {
+   "status": "SAME",
+   "detail": "1243,7",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "pages-nodes-05-structure#0": {
+   "status": "OK",
+   "detail": "30,145",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "pages-nodes-05-structure#1": {
+   "status": "OK",
+   "detail": "44,175",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "pages-nodes-05-structure#2": {
+   "status": "OK",
+   "detail": "44,205",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "pages-nodes-05-structure#3": {
+   "status": "OK",
+   "detail": "30,235",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "pages-nodes-05-structure#4": {
+   "status": "OK",
+   "detail": "44,265",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "pages-nodes-05-structure#5": {
+   "status": "OK",
+   "detail": "44,295",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "pages-nodes-05-structure#6": {
+   "status": "OK",
+   "detail": "30,325",
+   "at": "2026-09-07T04:39:44.843Z",
+   "op": "move"
+  },
+  "layers-move#2": {
+   "status": "SAME",
+   "detail": "#111827",
+   "at": "2026-09-07T04:39:50.403Z",
+   "op": "fill"
+  },
+  "layers-move#4": {
+   "status": "SAME",
+   "detail": "#FFFFFF",
+   "at": "2026-09-07T04:39:50.403Z",
+   "op": "fill"
+  },
+  "media-05-node-edits#0": {
+   "status": "SAME",
+   "detail": "280x297",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#1": {
+   "status": "SAME",
+   "detail": "280x116",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#2": {
+   "status": "SAME",
+   "detail": "280x240",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#4": {
+   "status": "SAME",
+   "detail": "280x44",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#84": {
+   "status": "SAME",
+   "detail": "637x6",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#97": {
+   "status": "SAME",
+   "detail": "121x18",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#99": {
+   "status": "SAME",
+   "detail": "121x18",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#101": {
+   "status": "SAME",
+   "detail": "121x18",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#103": {
+   "status": "SAME",
+   "detail": "121x18",
+   "at": "2026-09-07T04:39:55.537Z",
+   "op": "resize"
+  },
+  "media-05-node-edits#7": {
+   "status": "OK",
+   "detail": "2838:12021 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#8": {
+   "status": "OK",
+   "detail": "2838:12022 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#9": {
+   "status": "OK",
+   "detail": "2838:12023 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#11": {
+   "status": "OK",
+   "detail": "2838:12024 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#12": {
+   "status": "OK",
+   "detail": "2838:12025 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#13": {
+   "status": "OK",
+   "detail": "2838:12026 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#14": {
+   "status": "OK",
+   "detail": "2838:12027 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#16": {
+   "status": "OK",
+   "detail": "2838:12028 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#17": {
+   "status": "OK",
+   "detail": "2838:12029 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#18": {
+   "status": "OK",
+   "detail": "2838:12030 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.062Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#19": {
+   "status": "OK",
+   "detail": "2838:12031 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#21": {
+   "status": "OK",
+   "detail": "2838:12032 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#22": {
+   "status": "OK",
+   "detail": "2838:12033 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#23": {
+   "status": "OK",
+   "detail": "2838:12034 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#24": {
+   "status": "OK",
+   "detail": "2838:12035 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#26": {
+   "status": "OK",
+   "detail": "2838:12036 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#27": {
+   "status": "OK",
+   "detail": "2838:12037 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#28": {
+   "status": "OK",
+   "detail": "2838:12038 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#29": {
+   "status": "OK",
+   "detail": "2838:12039 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#31": {
+   "status": "OK",
+   "detail": "2838:12040 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#32": {
+   "status": "OK",
+   "detail": "2838:12041 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#33": {
+   "status": "OK",
+   "detail": "2838:12042 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#34": {
+   "status": "OK",
+   "detail": "2838:12043 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#36": {
+   "status": "OK",
+   "detail": "2838:12044 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#37": {
+   "status": "OK",
+   "detail": "2838:12045 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#38": {
+   "status": "OK",
+   "detail": "2838:12046 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#39": {
+   "status": "OK",
+   "detail": "2838:12047 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#41": {
+   "status": "OK",
+   "detail": "2838:12048 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#42": {
+   "status": "OK",
+   "detail": "2838:12049 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#43": {
+   "status": "OK",
+   "detail": "2838:12050 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#44": {
+   "status": "OK",
+   "detail": "2838:12051 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#46": {
+   "status": "OK",
+   "detail": "2838:12052 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#47": {
+   "status": "OK",
+   "detail": "2838:12053 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#48": {
+   "status": "OK",
+   "detail": "2838:12054 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#49": {
+   "status": "OK",
+   "detail": "2838:12055 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#51": {
+   "status": "OK",
+   "detail": "2838:12056 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#52": {
+   "status": "OK",
+   "detail": "2838:12057 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#53": {
+   "status": "OK",
+   "detail": "2838:12058 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#54": {
+   "status": "OK",
+   "detail": "2838:12059 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#56": {
+   "status": "OK",
+   "detail": "2838:12060 52x20 @152,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#57": {
+   "status": "OK",
+   "detail": "2838:12061 50x40 @213,14",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#58": {
+   "status": "OK",
+   "detail": "2838:12062 248x60 @16,44",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#59": {
+   "status": "OK",
+   "detail": "2838:12063 248x40 @16,90",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#62": {
+   "status": "SAME",
+   "detail": "2838:12064 already named Aa Fonts",
+   "at": "2026-09-07T04:42:32.286Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#63": {
+   "status": "SAME",
+   "detail": "2838:12065 already named note/formats",
+   "at": "2026-09-07T04:42:32.286Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#64": {
+   "status": "SAME",
+   "detail": "2838:12066 already named note/where-it-lives",
+   "at": "2026-09-07T04:42:32.286Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#79": {
+   "status": "OK",
+   "detail": "2838:12067 14x16 @250,8",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#81": {
+   "status": "OK",
+   "detail": "2838:12068 14x18 @250,6",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#83": {
+   "status": "OK",
+   "detail": "2838:12069 38x12 @738,10",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#85": {
+   "status": "OK",
+   "detail": "2838:12070 38x12 @738,10",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#88": {
+   "status": "OK",
+   "detail": "2838:12071 280x32 @0,480",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#89": {
+   "status": "OK",
+   "detail": "2838:12076 280x32 @0,512",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#90": {
+   "status": "OK",
+   "detail": "2838:12081 280x32 @0,544",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#91": {
+   "status": "OK",
+   "detail": "2838:12086 280x32 @0,576",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#92": {
+   "status": "OK",
+   "detail": "2838:12091 136x16 @0,108",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#93": {
+   "status": "OK",
+   "detail": "2838:12092 96x16 @0,100",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#94": {
+   "status": "OK",
+   "detail": "2838:12093 136x16 @0,108",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#95": {
+   "status": "OK",
+   "detail": "2838:12094 96x16 @0,100",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#96": {
+   "status": "OK",
+   "detail": "2838:12095 248x16 @236,238",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#0": {
+   "status": "OK",
+   "detail": "2838:12096 33x16 @232,8",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#1": {
+   "status": "OK",
+   "detail": "2838:12097 86x16 @188,8",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#2": {
+   "status": "OK",
+   "detail": "2838:12098 248x13 @0,799",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#3": {
+   "status": "OK",
+   "detail": "2838:12099 280x1 @0,811",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#4": {
+   "status": "OK",
+   "detail": "2838:12100 89x20 @0,792",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#5": {
+   "status": "OK",
+   "detail": "2838:12101 14x16 @0,796",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#6": {
+   "status": "OK",
+   "detail": "2838:12102 228x26 @0,786",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#7": {
+   "status": "OK",
+   "detail": "2838:12103 280x1 @0,811",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#8": {
+   "status": "OK",
+   "detail": "2838:12104 248x117 @0,695",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#9": {
+   "status": "OK",
+   "detail": "2838:12105 248x117 @0,695",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-02-tree#11": {
+   "status": "SAME",
+   "detail": "2838:12106 already named Structure link (ink)",
+   "at": "2026-09-07T04:42:32.286Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#0": {
+   "status": "OK",
+   "detail": "2838:12107 12x16 @28,88",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#1": {
+   "status": "OK",
+   "detail": "2838:12108 52x27 @0,418",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#2": {
+   "status": "OK",
+   "detail": "2838:12110 12x16 @28,88",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#3": {
+   "status": "OK",
+   "detail": "2838:12111 52x27 @0,340",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#4": {
+   "status": "OK",
+   "detail": "2838:12113 12x16 @28,88",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#5": {
+   "status": "OK",
+   "detail": "2838:12114 52x27 @0,340",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#6": {
+   "status": "OK",
+   "detail": "2838:12116 380x26 @0,445",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#7": {
+   "status": "OK",
+   "detail": "2838:12117 71x15 @0,471",
+   "at": "2026-09-07T04:40:02.063Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#8": {
+   "status": "OK",
+   "detail": "2838:12118 580x39 @430,726",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#9": {
+   "status": "OK",
+   "detail": "2838:12119 580x52 @430,782",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#10": {
+   "status": "OK",
+   "detail": "2838:12120 580x52 @430,838",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#11": {
+   "status": "OK",
+   "detail": "2838:12121 128x27 @0,367",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#12": {
+   "status": "OK",
+   "detail": "2838:12123 62x27 @0,394",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#13": {
+   "status": "OK",
+   "detail": "2838:12125 524x26 @0,421",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#14": {
+   "status": "OK",
+   "detail": "2838:12126 33x16 @0,70",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#15": {
+   "status": "OK",
+   "detail": "2838:12127 40x16 @0,70",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#16": {
+   "status": "OK",
+   "detail": "2838:12128 580x26 @430,726",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#17": {
+   "status": "OK",
+   "detail": "2838:12129 65x16 @0,367",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#18": {
+   "status": "OK",
+   "detail": "2838:12130 85x27 @0,383",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#19": {
+   "status": "OK",
+   "detail": "2838:12132 51x27 @0,410",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#20": {
+   "status": "OK",
+   "detail": "2838:12134 62x27 @0,437",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#21": {
+   "status": "OK",
+   "detail": "2838:12136 76x27 @0,464",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#22": {
+   "status": "OK",
+   "detail": "2838:12138 524x13 @0,491",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#23": {
+   "status": "OK",
+   "detail": "2838:12139 580x39 @430,726",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#24": {
+   "status": "OK",
+   "detail": "2838:12140 580x39 @430,782",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-03-settings#25": {
+   "status": "OK",
+   "detail": "2838:12141 580x52 @430,838",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#0": {
+   "status": "OK",
+   "detail": "2838:12142 33x16 @232,8",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#1": {
+   "status": "OK",
+   "detail": "2838:12143 86x16 @188,8",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#2": {
+   "status": "OK",
+   "detail": "2838:12144 33x16 @232,8",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#3": {
+   "status": "OK",
+   "detail": "2838:12145 86x16 @188,8",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#4": {
+   "status": "OK",
+   "detail": "2838:12146 33x16 @232,8",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#5": {
+   "status": "OK",
+   "detail": "2838:12147 86x16 @188,8",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#6": {
+   "status": "OK",
+   "detail": "2838:12148 14x16 @64,7",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#7": {
+   "status": "OK",
+   "detail": "2838:12149 16x16 @61,7",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#8": {
+   "status": "OK",
+   "detail": "2838:12150 7x16 @75,7",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#9": {
+   "status": "OK",
+   "detail": "2838:12151 248x91 @0,721",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-04-siblings#10": {
+   "status": "OK",
+   "detail": "2838:12152 248x117 @0,695",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#7": {
+   "status": "OK",
+   "detail": "2838:12153 82x15 @0,797",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#8": {
+   "status": "OK",
+   "detail": "2838:12154 10x16 @0,796",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#9": {
+   "status": "OK",
+   "detail": "2838:12155 10x16 @0,796",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#10": {
+   "status": "OK",
+   "detail": "2838:12156 10x16 @0,796",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#11": {
+   "status": "OK",
+   "detail": "2838:12157 10x16 @0,796",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#12": {
+   "status": "OK",
+   "detail": "2838:12158 10x16 @0,796",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#13": {
+   "status": "OK",
+   "detail": "2838:12159 10x16 @0,796",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#14": {
+   "status": "OK",
+   "detail": "2838:12160 10x16 @0,796",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-05-structure#15": {
+   "status": "OK",
+   "detail": "2838:12161 248x75 @16,600",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#0": {
+   "status": "OK",
+   "detail": "2838:12162 248x117 @0,695",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#1": {
+   "status": "OK",
+   "detail": "2838:12163 248x65 @0,747",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#2": {
+   "status": "OK",
+   "detail": "2838:12164 248x130 @0,682",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#3": {
+   "status": "OK",
+   "detail": "2838:12165 248x104 @0,708",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#4": {
+   "status": "OK",
+   "detail": "2838:12166 248x91 @0,721",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#5": {
+   "status": "OK",
+   "detail": "2838:12167 248x143 @0,669",
+   "at": "2026-09-07T04:40:08.471Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#6": {
+   "status": "OK",
+   "detail": "2838:12168 248x91 @0,721",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-06-annotations#7": {
+   "status": "OK",
+   "detail": "2838:12169 248x130 @0,682",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-09-doors#0": {
+   "status": "OK",
+   "detail": "2838:12170 150x28 @16,400",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-09-doors#1": {
+   "status": "OK",
+   "detail": "2838:12172 150x28 @16,436",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-09-doors#2": {
+   "status": "OK",
+   "detail": "2838:12174 150x28 @16,472",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-09-doors#3": {
+   "status": "OK",
+   "detail": "2838:12176 150x28 @16,508",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-09-doors#4": {
+   "status": "OK",
+   "detail": "2838:12178 150x28 @16,544",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-09-doors#5": {
+   "status": "OK",
+   "detail": "2838:12180 150x28 @16,580",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-12-tabbar#0": {
+   "status": "OK",
+   "detail": "2838:12182 1040x52 @40,892",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-12-tabbar#1": {
+   "status": "OK",
+   "detail": "2838:12183 1040x39 @40,956",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "pages-nodes-12-tabbar#2": {
+   "status": "OK",
+   "detail": "2838:12184 1040x39 @40,1007",
+   "at": "2026-09-07T04:40:15.474Z",
+   "op": "clone-node"
+  },
+  "media-05-node-edits#86": {
+   "status": "OK",
+   "detail": "sync-pill ",
+   "at": "2026-09-07T04:40:21.204Z",
+   "op": "delete"
+  },
+  "media-05-node-edits#87": {
+   "status": "MISSING",
+   "detail": "1758:8372",
+   "at": "2026-09-07T12:02:40.845Z",
+   "op": "delete"
+  },
+  "pages-nodes-02-tree#10": {
+   "status": "OK",
+   "detail": "⚂ Structure ",
+   "at": "2026-09-07T04:40:21.204Z",
+   "op": "delete"
+  },
+  "review-marks-page1-6#0": {
+   "status": "OK",
+   "detail": "APPEND to whatever the current name is: \" UX-I-18: this is also the screen a ReviewBar Re-send produces — it calls the s",
+   "at": "2026-09-07T04:40:27.111Z",
+   "op": "rename"
+  },
+  "layers-move#0": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#5": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#6": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#7": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#8": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#9": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#10": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#11": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#12": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#13": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#16": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#17": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#18": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#19": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#20": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#21": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#22": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#23": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#24": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#26": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#27": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#28": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#29": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "layers-move#30": {
+   "status": "SAME",
+   "detail": "resolved by redesign: bdc-layers-drop-alert 143:177 moved index 6 -> 2 in the VERTICAL auto-layout 143:119; the ladder reflowed to a clean 28px pitch (149,177,205,233,261,289,317,345) with the 51px hole closed. Setting y on auto-layout children was a no-op.",
+   "at": "2026-09-07T05:53:54.998Z",
+   "op": "move"
+  },
+  "media-05-node-edits#3": {
+   "status": "AUTOLAYOUT",
+   "detail": "parent 2430:21365 is VERTICAL - x/y are the parent's; setting them is a no-op",
+   "at": "2026-09-07T12:02:35.581Z",
+   "op": "move"
+  },
+  "media-05-node-edits#82": {
+   "status": "AUTOLAYOUT",
+   "detail": "parent 1163:14188 is HORIZONTAL - x/y are the parent's; setting them is a no-op",
+   "at": "2026-09-07T12:02:35.581Z",
+   "op": "move"
+  },
+  "content-dynamic-pages-edges#0": {
+   "status": "OK",
+   "detail": "149:50,149:50",
+   "at": "2026-09-07T04:44:19.559Z",
+   "op": "rewire"
+  },
+  "content-dynamic-pages-edges#1": {
+   "status": "OK",
+   "detail": "149:50,149:50",
+   "at": "2026-09-07T04:44:19.559Z",
+   "op": "rewire"
+  },
+  "content-dynamic-pages-edges#2": {
+   "status": "OK",
+   "detail": "149:50,149:50",
+   "at": "2026-09-07T04:44:19.559Z",
+   "op": "rewire"
+  },
+  "content-dynamic-pages-edges#3": {
+   "status": "OK",
+   "detail": "149:50,149:50",
+   "at": "2026-09-07T04:44:19.559Z",
+   "op": "rewire"
+  },
+  "zz-regression-fixes#0": {
+   "status": "SAME",
+   "detail": "248x48",
+   "at": "2026-09-07T04:47:24.593Z",
+   "op": "resize"
+  },
+  "zz-settings-headers-queue#0": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Analytics",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#6": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Domains",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#9": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Domains",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#12": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Domains",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#15": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Domains",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#18": {
+   "status": "OK",
+   "detail": "PLUMBING / Forms",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#21": {
+   "status": "OK",
+   "detail": "PLUMBING / Forms",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#24": {
+   "status": "OK",
+   "detail": "PLUMBING / Forms",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#27": {
+   "status": "OK",
+   "detail": "PLUMBING / Forms",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#30": {
+   "status": "OK",
+   "detail": "PLUMBING / Forms",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#33": {
+   "status": "OK",
+   "detail": "PLUMBING / Forms",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#36": {
+   "status": "OK",
+   "detail": "PLUMBING / Forms",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#39": {
+   "status": "OK",
+   "detail": "PLUMBING / Headers",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#44": {
+   "status": "OK",
+   "detail": "PLUMBING / Headers",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#49": {
+   "status": "OK",
+   "detail": "PLUMBING / Headers",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#54": {
+   "status": "OK",
+   "detail": "PLUMBING / Headers",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#59": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Localization",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#62": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Localization",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#65": {
+   "status": "OK",
+   "detail": "DISTRIBUTION / Localization",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#68": {
+   "status": "OK",
+   "detail": "PLUMBING / Redirects",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#71": {
+   "status": "OK",
+   "detail": "PLUMBING / Redirects",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#74": {
+   "status": "OK",
+   "detail": "PLUMBING / Redirects",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#77": {
+   "status": "OK",
+   "detail": "PLUMBING / Redirects",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#80": {
+   "status": "OK",
+   "detail": "PLUMBING / Redirects",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#83": {
+   "status": "OK",
+   "detail": "PLUMBING / Webhooks",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#86": {
+   "status": "OK",
+   "detail": "PLUMBING / Webhooks",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#89": {
+   "status": "OK",
+   "detail": "PLUMBING / Webhooks",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#92": {
+   "status": "OK",
+   "detail": "PLUMBING / Webhooks",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#95": {
+   "status": "OK",
+   "detail": "PLUMBING / Webhooks",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#98": {
+   "status": "OK",
+   "detail": "PLUMBING / Webhooks",
+   "at": "2026-09-07T04:57:58.721Z",
+   "op": "text"
+  },
+  "zz-settings-headers-queue#1": {
+   "status": "OK",
+   "detail": "GA4, Plausible, PostHog, Pixel ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#2": {
+   "status": "MISSING",
+   "detail": "Plausible",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#3": {
+   "status": "MISSING",
+   "detail": "PostHog",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#4": {
+   "status": "MISSING",
+   "detail": "'",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#5": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#7": {
+   "status": "OK",
+   "detail": "Custom domain + DNS ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#8": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#10": {
+   "status": "OK",
+   "detail": "Custom domain + DNS ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#11": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#13": {
+   "status": "OK",
+   "detail": "Custom domain + DNS ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#14": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#16": {
+   "status": "OK",
+   "detail": "Custom domain + DNS ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#17": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#19": {
+   "status": "OK",
+   "detail": "Submissions inbox + config ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#20": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#22": {
+   "status": "OK",
+   "detail": "Submissions inbox + config ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#23": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#25": {
+   "status": "OK",
+   "detail": "Submissions inbox + config ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#26": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#28": {
+   "status": "OK",
+   "detail": "Submissions inbox + config ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#29": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#31": {
+   "status": "OK",
+   "detail": "Submissions inbox + config ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#32": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#34": {
+   "status": "OK",
+   "detail": "Submissions inbox + config ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#35": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.562Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#37": {
+   "status": "OK",
+   "detail": "Submissions inbox + config ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#38": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#40": {
+   "status": "OK",
+   "detail": "CSP, HSTS, security policy ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#41": {
+   "status": "MISSING",
+   "detail": "HSTS",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#42": {
+   "status": "MISSING",
+   "detail": "security poli'",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#43": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#45": {
+   "status": "OK",
+   "detail": "CSP, HSTS, security policy ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#46": {
+   "status": "MISSING",
+   "detail": "HSTS",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#47": {
+   "status": "MISSING",
+   "detail": "security poli'",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#48": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#50": {
+   "status": "OK",
+   "detail": "CSP, HSTS, security policy ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#51": {
+   "status": "MISSING",
+   "detail": "HSTS",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#52": {
+   "status": "MISSING",
+   "detail": "security poli'",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#53": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#55": {
+   "status": "OK",
+   "detail": "CSP, HSTS, security policy ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#56": {
+   "status": "MISSING",
+   "detail": "HSTS",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#57": {
+   "status": "MISSING",
+   "detail": "security poli'",
+   "at": "2026-09-07T12:02:40.846Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#58": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#60": {
+   "status": "OK",
+   "detail": "Locale claim and preview ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#61": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#63": {
+   "status": "OK",
+   "detail": "Locale claim and preview ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#64": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#66": {
+   "status": "OK",
+   "detail": "Locale claim and preview ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#67": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#69": {
+   "status": "OK",
+   "detail": "301 / 302 + 404 suggester ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#70": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#72": {
+   "status": "OK",
+   "detail": "301 / 302 + 404 suggester ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#73": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#75": {
+   "status": "OK",
+   "detail": "301 / 302 + 404 suggester ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#76": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#78": {
+   "status": "OK",
+   "detail": "301 / 302 + 404 suggester ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#79": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#81": {
+   "status": "OK",
+   "detail": "301 / 302 + 404 suggester ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#82": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#84": {
+   "status": "OK",
+   "detail": "Workspace event deliveries ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#85": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#87": {
+   "status": "OK",
+   "detail": "Workspace event deliveries ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#88": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#90": {
+   "status": "OK",
+   "detail": "Workspace event deliveries ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#91": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#93": {
+   "status": "OK",
+   "detail": "Workspace event deliveries ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#94": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#96": {
+   "status": "OK",
+   "detail": "Workspace event deliveries ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#97": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#99": {
+   "status": "OK",
+   "detail": "Workspace event deliveries ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-settings-headers-queue#100": {
+   "status": "OK",
+   "detail": "Button ",
+   "at": "2026-09-07T04:58:04.563Z",
+   "op": "delete"
+  },
+  "zz-history-qa-c-01#0": {
+   "status": "OK",
+   "detail": "280x136",
+   "at": "2026-09-07T04:58:43.865Z",
+   "op": "resize"
+  },
+  "zz-history-qa-c-01#1": {
+   "status": "OK",
+   "detail": "16,98",
+   "at": "2026-09-07T04:58:49.613Z",
+   "op": "move"
+  },
+  "zz-history-qa-c-01#2": {
+   "status": "OK",
+   "detail": "192,98",
+   "at": "2026-09-07T04:58:49.613Z",
+   "op": "move"
+  },
+  "zz-settings-marks-retry#0": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#1": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#2": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#3": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#4": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add domain — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#5": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#6": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#7": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#8": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#9": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#10": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#11": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Export CSV — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#12": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#13": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#14": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#15": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Save changes — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#16": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add locale — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#17": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add locale — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#18": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add locale — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complete ",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#19": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#20": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#21": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#22": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#23": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add redirect — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#24": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#25": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.995Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#26": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.996Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#27": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.996Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#28": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.996Z",
+   "op": "rename"
+  },
+  "zz-settings-marks-retry#29": {
+   "status": "OK",
+   "detail": "[not-in-shipped-header] Button · Add endpoint — DrillInHeader has no action slot: DrillInHeader.tsx:12-47 is the complet",
+   "at": "2026-09-07T05:01:52.996Z",
+   "op": "rename"
+  },
+  "zz-text-guard-retry#0": {
+   "status": "OK",
+   "detail": "The panel's answer, and only the panel's. The message is honest and reachable — the server distinguishes this case with ",
+   "at": "2026-09-07T05:02:51.882Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#1": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#2": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#3": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#4": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#5": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#6": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#7": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#8": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#9": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#10": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#11": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#12": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#13": {
+   "status": "OK",
+   "detail": "☑ Select",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#14": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#15": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#16": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#17": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#18": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#19": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#20": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#21": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#22": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#23": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "zz-text-guard-retry#24": {
+   "status": "OK",
+   "detail": "☁ Stock",
+   "at": "2026-09-07T05:02:51.883Z",
+   "op": "text"
+  },
+  "brand-02-text-unresolved#3": {
+   "status": "OK",
+   "detail": "Apply",
+   "at": "2026-09-07T05:27:08.516Z",
+   "op": "text"
+  },
+  "insert-text-fixes-unresolved#0": {
+   "status": "NOTTEXT",
+   "detail": "FRAME",
+   "at": "2026-09-07T06:04:50.532Z",
+   "op": "text"
+  },
+  "insert-text-fixes-unresolved#1": {
+   "status": "NOTTEXT",
+   "detail": "FRAME",
+   "at": "2026-09-07T06:04:50.533Z",
+   "op": "text"
+  },
+  "insert-text-fixes-unresolved#2": {
+   "status": "NOTTEXT",
+   "detail": "FRAME",
+   "at": "2026-09-07T06:04:50.533Z",
+   "op": "text"
+  },
+  "publish-text-4-preview#0": {
+   "status": "NOTTEXT",
+   "detail": "FRAME",
+   "at": "2026-09-07T06:04:50.533Z",
+   "op": "text"
+  },
+  "publish-text-4-preview#1": {
+   "status": "NOTTEXT",
+   "detail": "FRAME",
+   "at": "2026-09-07T06:04:50.533Z",
+   "op": "text"
+  },
+  "publish-text-4-preview#2": {
+   "status": "SAME",
+   "op": "text",
+   "at": "2026-09-07",
+   "detail": "recorded NOTTEXT because the selector resolved to a FRAME, but the gap-d pass READ the corrected strings on 2429:11934 / 2429:11935. A row outcome is not the node state."
+  },
+  "publish-text-4-preview#3": {
+   "status": "SAME",
+   "op": "text",
+   "at": "2026-09-07",
+   "detail": "recorded NOTTEXT because the selector resolved to a FRAME, but the gap-d pass READ the corrected strings on 2429:11934 / 2429:11935. A row outcome is not the node state."
+  },
+  "history-hotspots#3": {
+   "status": "OK",
+   "detail": "2864:12411 over 163:160 -> 2854:21676",
+   "at": "2026-09-07T06:10:08.088Z",
+   "op": "hotspot"
+  },
+  "history-hotspots#6": {
+   "status": "OK",
+   "detail": "2864:12413 over 162:47 -> 2854:21894",
+   "at": "2026-09-07T06:10:08.088Z",
+   "op": "hotspot"
+  },
+  "insert-hotspots#0": {
+   "status": "MISSINGTARGET",
+   "detail": "BLOCKS-ROWS-BOARD-ID",
+   "at": "2026-09-07T12:02:30.134Z",
+   "op": "hotspot"
+  },
+  "insert-hotspots#1": {
+   "status": "OK",
+   "detail": "2865:21880 over 137:26 -> 1069:4707",
+   "at": "2026-09-07T06:27:46.601Z",
+   "op": "hotspot"
+  },
+  "insert-hotspots#2": {
+   "status": "MISSINGTARGET",
+   "detail": "MINE-EMPTY-BOARD-ID",
+   "at": "2026-09-07T12:02:30.134Z",
+   "op": "hotspot"
+  },
+  "insert-hotspots#3": {
+   "status": "OK",
+   "detail": "2865:21882 over 137:30 -> 1069:4790",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "insert-hotspots#4": {
+   "status": "OK",
+   "detail": "2865:21884 over 137:13 -> 1069:4529",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "insert-hotspots#5": {
+   "status": "OK",
+   "detail": "2865:21886 over 137:9 -> 138:53",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "insert-hotspots#6": {
+   "status": "MISSING",
+   "detail": "TIP-NAV-NODE",
+   "at": "2026-09-07T12:02:30.134Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#0": {
+   "status": "OK",
+   "detail": "2865:21888 over 1161:146 -> 52:2",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#1": {
+   "status": "OK",
+   "detail": "2865:21890 over 1163:4832 -> 52:2",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#2": {
+   "status": "OK",
+   "detail": "2865:21892 over 1163:14139 -> 52:2",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#3": {
+   "status": "OK",
+   "detail": "2865:21894 over 218:686 -> 52:2",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#4": {
+   "status": "OK",
+   "detail": "2865:21896 over 144:48 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#5": {
+   "status": "OK",
+   "detail": "2865:21898 over 145:48 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#6": {
+   "status": "OK",
+   "detail": "2865:21900 over 145:95 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#7": {
+   "status": "OK",
+   "detail": "2865:21902 over 145:142 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#8": {
+   "status": "OK",
+   "detail": "2865:21904 over 145:194 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#9": {
+   "status": "OK",
+   "detail": "2865:21906 over 145:245 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#10": {
+   "status": "OK",
+   "detail": "2865:21908 over 145:296 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#11": {
+   "status": "OK",
+   "detail": "2865:21910 over 145:405 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#12": {
+   "status": "OK",
+   "detail": "2865:21912 over 453:3959 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#13": {
+   "status": "OK",
+   "detail": "2865:21914 over 777:4124 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#14": {
+   "status": "OK",
+   "detail": "2865:21916 over 782:4384 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#15": {
+   "status": "OK",
+   "detail": "2865:21918 over 2430:21399 -> 147:55",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#16": {
+   "status": "OK",
+   "detail": "2865:21920 over 1124:4588 -> 147:2",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#17": {
+   "status": "OK",
+   "detail": "2865:21922 over 2430:21400 -> 147:2",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#18": {
+   "status": "OK",
+   "detail": "2865:21924 over 144:12 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#19": {
+   "status": "OK",
+   "detail": "2865:21926 over 145:12 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#20": {
+   "status": "OK",
+   "detail": "2865:21928 over 145:59 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#21": {
+   "status": "OK",
+   "detail": "2865:21930 over 145:106 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#22": {
+   "status": "OK",
+   "detail": "2865:21932 over 145:158 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#23": {
+   "status": "OK",
+   "detail": "2865:21934 over 145:209 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#24": {
+   "status": "OK",
+   "detail": "2865:21936 over 145:260 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#25": {
+   "status": "OK",
+   "detail": "2865:21938 over 145:369 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#26": {
+   "status": "OK",
+   "detail": "2865:21940 over 453:3938 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#27": {
+   "status": "OK",
+   "detail": "2865:21942 over 777:4100 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#28": {
+   "status": "OK",
+   "detail": "2865:21944 over 782:4360 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#29": {
+   "status": "OK",
+   "detail": "2865:21946 over 2430:21372 -> 145:300",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#30": {
+   "status": "OK",
+   "detail": "2865:21948 over 233:1254 -> 146:68",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#31": {
+   "status": "OK",
+   "detail": "2865:21950 over 233:1259 -> 146:32",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#32": {
+   "status": "OK",
+   "detail": "2865:21952 over 233:1274 -> 1164:4738",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#33": {
+   "status": "OK",
+   "detail": "2865:21954 over 1160:13 -> 1716:8391",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#34": {
+   "status": "OK",
+   "detail": "2865:21956 over 1163:4676 -> 1716:8391",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#35": {
+   "status": "OK",
+   "detail": "2865:21958 over 1163:13730 -> 1716:8391",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#36": {
+   "status": "OK",
+   "detail": "2865:21960 over 1163:13983 -> 1716:8391",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#37": {
+   "status": "OK",
+   "detail": "2865:21962 over 1162:4652 -> 1716:8391",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#38": {
+   "status": "OK",
+   "detail": "2865:21964 over 1162:4858 -> 1716:8391",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#39": {
+   "status": "OK",
+   "detail": "2865:21966 over 1160:9 -> 1205:4804",
+   "at": "2026-09-07T06:27:46.602Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#40": {
+   "status": "OK",
+   "detail": "2865:21968 over 1163:4672 -> 1205:4804",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#41": {
+   "status": "OK",
+   "detail": "2865:21970 over 1163:13979 -> 1205:4804",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#42": {
+   "status": "OK",
+   "detail": "2865:21972 over 1162:4648 -> 1205:4804",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#43": {
+   "status": "OK",
+   "detail": "2865:21974 over 1716:8435 -> 144:2",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#44": {
+   "status": "OK",
+   "detail": "2865:21976 over 147:74 -> 52:2",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "media-03-hotspots#45": {
+   "status": "OK",
+   "detail": "2865:21978 over 1175:4837 -> 145:300",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#0": {
+   "status": "MISSING",
+   "detail": "hotspot/state · Pages · delete-confirm",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#1": {
+   "status": "MISSING",
+   "detail": "hotspot/state · Pages · drag",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#2": {
+   "status": "MISSING",
+   "detail": "hotspot/state · Pages · home-by-position",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#3": {
+   "status": "MISSING",
+   "detail": "hotspot/state · Pages · local-only",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#4": {
+   "status": "MISSING",
+   "detail": "hotspot/state · Pages · bulk-toast",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#5": {
+   "status": "MISSING",
+   "detail": "hotspot/state · Pages · rename-url-offer",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#6": {
+   "status": "SAME",
+   "detail": "787:4307",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "pages-hotspots-11#7": {
+   "status": "SAME",
+   "detail": "1171:4803",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "review-hotspots#0": {
+   "status": "MISSING",
+   "detail": "UNRESOLVED-ID",
+   "at": "2026-09-07T08:34:49.063Z",
+   "op": "hotspot"
+  },
+  "review-hotspots#1": {
+   "status": "MISSING",
+   "detail": "UNRESOLVED-ID",
+   "at": "2026-09-07T08:34:49.063Z",
+   "op": "hotspot"
+  },
+  "review-hotspots#2": {
+   "status": "MISSING",
+   "detail": "DOES-NOT-EXIST-YET",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "shell-hotspots#0": {
+   "status": "OK",
+   "detail": "2865:21980 over 2844:12111 -> 2844:12092",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "shell-hotspots#1": {
+   "status": "OK",
+   "detail": "2865:21982 over 2844:12099 -> 2844:12104",
+   "at": "2026-09-07T06:27:46.603Z",
+   "op": "hotspot"
+  },
+  "history-state-boards#0": {
+   "status": "SAME",
+   "detail": "board exists: 2854:12294 'History · Saves · changes · restore-confirm' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.436Z",
+   "op": "clone-board"
+  },
+  "history-state-boards#1": {
+   "status": "SAME",
+   "detail": "board exists: 2854:21613 '[design-ahead] History · Saves · time-travel · restore-confi' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.439Z",
+   "op": "clone-board"
+  },
+  "history-state-boards#2": {
+   "status": "SAME",
+   "detail": "board exists: 2854:21676 '[design-ahead] History · Saves · time-travel · no-preview' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.439Z",
+   "op": "clone-board"
+  },
+  "history-state-boards#3": {
+   "status": "SAME",
+   "detail": "board exists: 2854:21739 '[design-ahead] History · Saves · changes · start-of-history' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.439Z",
+   "op": "clone-board"
+  },
+  "history-state-boards#4": {
+   "status": "SAME",
+   "detail": "board exists: 2854:21779 '[design-ahead] History · Saves · changes · load-error' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.439Z",
+   "op": "clone-board"
+  },
+  "history-state-boards#5": {
+   "status": "SAME",
+   "detail": "board exists: 2854:21814 '[design-ahead] History · Saves · changes · clear-confirm' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.440Z",
+   "op": "clone-board"
+  },
+  "history-state-boards#6": {
+   "status": "SAME",
+   "detail": "board exists: 2854:21854 '[design-ahead] History · Saves · changes · undo-unavailable' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.440Z",
+   "op": "clone-board"
+  },
+  "history-state-boards#7": {
+   "status": "SAME",
+   "detail": "board exists: 2854:21894 '[design-ahead] History · Saves · overflow — Export / Import' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.440Z",
+   "op": "clone-board"
+  },
+  "insert-new-boards#3": {
+   "status": "SAME",
+   "detail": "board exists: 2850:21640 'Insert · mine-expanded · empty' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.440Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#0": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22031 'Media · stock · not-configured' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#1": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22075 'Media · stock · fonts · empty' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#2": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22091 'Media · drill-in · stock-browser · no-results' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#3": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22139 'Media · drill-in · stock-browser · search-failed' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#4": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22187 'Media · drill-in · stock-browser · not-configured' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#5": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22235 'Media · drill-in · asset-detail · alt-generate-failed' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#6": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22303 'Media · drill-in · asset-detail · device-only (re-upload)' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#7": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22371 'Media · delete-confirm · single file' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#8": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22387 'Media · detail · context-menu · asset (drawer right-click, o' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "media-04-state-boards#9": {
+   "status": "SAME",
+   "detail": "board exists: 2850:22401 'Media · detail · folder-menu · ＋ New folder (of 144:2)' (created by add-state-board, which does not write this state file)",
+   "at": "2026-09-07T06:29:41.441Z",
+   "op": "clone-board"
+  },
+  "settings-text#0": {
+   "status": "SAME",
+   "detail": "already applied to 1703:10579 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Analytics'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#1": {
+   "status": "SAME",
+   "detail": "already applied to 1702:7159 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Domains'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#2": {
+   "status": "SAME",
+   "detail": "already applied to 1702:7325 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Domains'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#3": {
+   "status": "SAME",
+   "detail": "already applied to 1702:6995 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Domains'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#4": {
+   "status": "SAME",
+   "detail": "already applied to 1702:7489 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Domains'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#5": {
+   "status": "SAME",
+   "detail": "already applied to 640:3441 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Forms'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#6": {
+   "status": "SAME",
+   "detail": "already applied to 1703:9272 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Forms'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#7": {
+   "status": "SAME",
+   "detail": "already applied to 1703:8946 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Forms'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#8": {
+   "status": "SAME",
+   "detail": "already applied to 1703:9110 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Forms'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#9": {
+   "status": "SAME",
+   "detail": "already applied to 1703:9596 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Forms'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#10": {
+   "status": "SAME",
+   "detail": "already applied to 1703:9434 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Forms'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#11": {
+   "status": "SAME",
+   "detail": "already applied to 1703:8784 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Forms'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#12": {
+   "status": "SAME",
+   "detail": "already applied to 640:3095 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Headers'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#13": {
+   "status": "SAME",
+   "detail": "already applied to 1703:7824 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Headers'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#14": {
+   "status": "SAME",
+   "detail": "already applied to 1703:7670 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Headers'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#15": {
+   "status": "SAME",
+   "detail": "already applied to 1703:7978 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Headers'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#16": {
+   "status": "SAME",
+   "detail": "already applied to 1703:7350 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Localization'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#17": {
+   "status": "SAME",
+   "detail": "already applied to 1703:7191 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Localization'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#18": {
+   "status": "SAME",
+   "detail": "already applied to 1703:7509 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'DISTRIBUTION / Localization'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#19": {
+   "status": "SAME",
+   "detail": "already applied to 640:2746 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Redirects'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#20": {
+   "status": "SAME",
+   "detail": "already applied to 1703:8296 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Redirects'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#21": {
+   "status": "SAME",
+   "detail": "already applied to 1703:8458 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Redirects'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#22": {
+   "status": "SAME",
+   "detail": "already applied to 1703:8134 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Redirects'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#23": {
+   "status": "SAME",
+   "detail": "already applied to 1703:8620 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Redirects'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#24": {
+   "status": "SAME",
+   "detail": "already applied to 640:4155 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Webhooks'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#25": {
+   "status": "SAME",
+   "detail": "already applied to 1703:9921 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Webhooks'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#26": {
+   "status": "SAME",
+   "detail": "already applied to 1703:10416 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Webhooks'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#27": {
+   "status": "SAME",
+   "detail": "already applied to 1703:10086 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Webhooks'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#28": {
+   "status": "SAME",
+   "detail": "already applied to 1703:9758 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Webhooks'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "settings-text#29": {
+   "status": "SAME",
+   "detail": "already applied to 1703:10249 by zz-settings-headers-queue (ids from the fix-settings-headers dry run); read back as 'PLUMBING / Webhooks'",
+   "at": "2026-09-07",
+   "op": "text"
+  },
+  "shell2-marks#0": {
+   "status": "OK",
+   "detail": "Shell · Issues joins the grid (right column, not a slab) — UX-F-08: today the panel is position:absolute top:56 right:0 ",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#1": {
+   "status": "OK",
+   "detail": "Shell · full-page mode — Back to canvas — UX-F-13: full-page is entered from tabs with no rail seat, so the rail lights ",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#2": {
+   "status": "OK",
+   "detail": "Shell · below 1024 — desktop-only — UX-F-14: LayoutShell.css:353-358 reserves the breakpoint and its only content is a c",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#3": {
+   "status": "OK",
+   "detail": "Topbar · location line — site › page › panel — UX-F-36 and UX-F-16: one location line that survives canvas, full-page an",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#4": {
+   "status": "OK",
+   "detail": "Topbar · Publish CTA states (five verbs · settled · refused) — UX-F-20: the refused state is grey with the reason printe",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#5": {
+   "status": "OK",
+   "detail": "Site menu (⋯) · regrouped — in-editor rows moved to More — UX-F-29: eighteen rows doing three jobs at once (SiteMenu.tsx",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#6": {
+   "status": "OK",
+   "detail": "Rail · More index (popover · 240) — UX-F-31 · UX-F-01 · UX-F-37: the letters printed where the user is, not only in a ho",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#7": {
+   "status": "OK",
+   "detail": "Shell · open decisions (700 vs 560 · two palettes · unpublish confirm) — UX-F-15’s 560 proposal is filed here and not ap",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#8": {
+   "status": "OK",
+   "detail": "Canvas · keyboard, zoom and viewport (one owner each) — UX-F-18 · F-19 · F-22 · F-23 · F-24 · F-27 · F-28 · F-32 · F-34:",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#9": {
+   "status": "OK",
+   "detail": "Shortcuts · one screen (? and ⌘/) — UX-F-05 · UX-F-31 · UX-F-32 · UX-F-18: one screen on both chords, the bare letters p",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#10": {
+   "status": "OK",
+   "detail": "Drawer · width steps and the drag handle (280 ↔ 700) — UX-F-15: no resize affordance exists in the sidebar today (LeftSi",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-marks#11": {
+   "status": "OK",
+   "detail": "Notifications · unread — UX-F-26 / UX-F-25: drawn 280 wide; the shipped dropdown is 360 (.bk-notifications, header.css:3",
+   "at": "2026-09-07T06:51:11.125Z",
+   "op": "rename"
+  },
+  "shell2-fix-overflow#0": {
+   "status": "OK",
+   "detail": "chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call",
+   "at": "2026-09-07T06:52:17.605Z",
+   "op": "text"
+  },
+  "gap-b-copy#0": {
+   "status": "OK",
+   "detail": "No records yet. Open Content › this collection to add the first one.",
+   "at": "2026-09-07T06:52:45.880Z",
+   "op": "text"
+  },
+  "gap-b-notes#0": {
+   "status": "OK",
+   "detail": "2876:12477 3200x90 @100,5837",
+   "at": "2026-09-07T06:52:52.492Z",
+   "op": "add-caption"
+  },
+  "gap-b-notes#1": {
+   "status": "OK",
+   "detail": "2876:12478 3600x126 @100,4583",
+   "at": "2026-09-07T06:52:52.492Z",
+   "op": "add-caption"
+  },
+  "gap-b-notes#2": {
+   "status": "OK",
+   "detail": "2876:12479 2800x144 @100,5953",
+   "at": "2026-09-07T06:52:52.492Z",
+   "op": "add-caption"
+  },
+  "gap-b-notes#3": {
+   "status": "OK",
+   "detail": "2876:12480 2600x108 @100,4353",
+   "at": "2026-09-07T06:52:52.492Z",
+   "op": "add-caption"
+  },
+  "gap-b-notes#4": {
+   "status": "OK",
+   "detail": "2876:12481 3600x72 @100,2132",
+   "at": "2026-09-07T06:52:52.492Z",
+   "op": "add-caption"
+  },
+  "gap-b-notes#5": {
+   "status": "OK",
+   "detail": "2876:12482 3600x18 @100,5538",
+   "at": "2026-09-07T06:52:52.492Z",
+   "op": "add-caption"
+  },
+  "gap-b-notes#6": {
+   "status": "OK",
+   "detail": "2876:12483 3200x54 @100,7551",
+   "at": "2026-09-07T06:52:52.492Z",
+   "op": "add-caption"
+  },
+  "gap-b-notes#7": {
+   "status": "OK",
+   "detail": "2876:12484 1000x72 @100,1992",
+   "at": "2026-09-07T06:52:58.239Z",
+   "op": "add-caption"
+  },
+  "ai2-02-board-additions#0": {
+   "status": "OK",
+   "detail": "h=144 so in the band, or be hidden when the scope cannot serve it (UX-G-19).",
+   "at": "2026-09-07T06:53:04.683Z",
+   "op": "append-text"
+  },
+  "ai2-02-board-additions#1": {
+   "status": "OK",
+   "detail": "2876:12485 over 2846:21471 -> 2476:12001",
+   "at": "2026-09-07T06:53:10.480Z",
+   "op": "hotspot"
+  },
+  "gap-b-sections#0": {
+   "status": "SAME",
+   "detail": "2960x4620",
+   "at": "2026-09-07T06:53:53.374Z",
+   "op": "resize"
+  },
+  "gap-b-sections#1": {
+   "status": "SAME",
+   "detail": "8280x4900",
+   "at": "2026-09-07T06:53:53.374Z",
+   "op": "resize"
+  },
+  "gap-b-sections#2": {
+   "status": "SAME",
+   "detail": "7280x2320",
+   "at": "2026-09-07T06:53:53.374Z",
+   "op": "resize"
+  },
+  "gap-b-sections#3": {
+   "status": "SAME",
+   "detail": "3420x6220",
+   "at": "2026-09-07T06:53:53.374Z",
+   "op": "resize"
+  },
+  "gap-b-fixups#0": {
+   "status": "OK",
+   "detail": "V2 → V1 · History gap findings, closed 2026-09-07. No queue row existed for any of these.",
+   "at": "2026-09-07T07:10:15.454Z",
+   "op": "text"
+  },
+  "gap-b-fixups#1": {
+   "status": "OK",
+   "detail": "V2 → V1 · Review and Compare gap findings, closed 2026-09-07. No queue row existed for any of these.",
+   "at": "2026-09-07T07:10:15.454Z",
+   "op": "text"
+  },
+  "ai-01-decision-boards#0": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.274Z",
+   "detail": "board exists: 2846:21441 in section 1776:8380, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "ai-01-decision-boards#1": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2846:21490 in section 1776:8380, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "ai-01-decision-boards#2": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2846:21575 in section 1776:8380, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "content-new-boards#0": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:12042 in section 1776:8376, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "content-new-boards#1": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:21351 in section 1776:8376, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "insert-new-boards#0": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:21381 in section 1776:8379, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "insert-new-boards#1": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:21560 in section 1776:8379, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "insert-new-boards#2": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:21571 in section 1776:8379, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "insert-new-boards#4": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:21682 in section 1776:8379, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "insert-new-boards#5": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:21767 in section 1776:8379, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "insert-new-boards#6": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.275Z",
+   "detail": "board exists: 2850:21946 in section 1776:8379, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "publish-states#0": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2846:12024 in section 1776:8378, matched by prepended marker — built by its own script, which does not write this state file"
+  },
+  "publish-states#1": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2846:21340 in section 1776:8378, matched by prepended marker — built by its own script, which does not write this state file"
+  },
+  "publish-states#2": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2846:21377 in section 1776:8378, matched by prepended marker — built by its own script, which does not write this state file"
+  },
+  "publish-states#3": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2846:21414 in section 1776:8378, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-canvas-board#0": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2855:12407 in section 1779:5, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#0": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12025 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#1": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12046 in section 1776:8385, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#2": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12066 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#3": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12092 in section 1776:8385, matched by exact name — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#4": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12104 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#5": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12121 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#6": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12136 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#7": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12149 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#8": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12158 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell-new-boards#9": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2844:12186 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell2-canvas-board#0": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2855:12407 in section 1779:5, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell2-drawer-handle#0": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2875:12471 in section 1776:8385, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "shell2-shortcuts-board#0": {
+   "status": "SAME",
+   "op": "add-board",
+   "at": "2026-09-07T07:11:54.276Z",
+   "detail": "board exists: 2875:12449 in section 1779:3, matched by name + appended marker — built by its own script, which does not write this state file"
+  },
+  "media-04-state-boards#10": {
+   "status": "SAME",
+   "op": "clone-board",
+   "at": "2026-09-07",
+   "detail": "board exists: 2881:12608 in section 1776:8372, created at 100,10876 after growing the section 10936 -> 11040 (459px of room to 06 Content); no overlap"
+  },
+  "gap-d-marks#0": {
+   "status": "OK",
+   "detail": "Rail · selected vs open (two signals) — UX-F-02: selected and open are two signals, not one. aria-selected and the accen",
+   "at": "2026-09-07T07:29:41.035Z",
+   "op": "rename"
+  },
+  "gap-d-marks#12": {
+   "status": "SAME",
+   "op": "advisory",
+   "at": "2026-09-07",
+   "detail": "DO-NOT-RUN: all six shell ⌘K boards were read (40 TEXT nodes) and none prints Ctrl+0, Ctrl+Y, Fit to view or Undo last action. Where chords are drawn they are already correct (1177:4829 shows ⌘1 beside Zoom to fit). The defect is code-only; these rows would NOMATCH and the delete row has nothing to delete."
+  },
+  "shell-deletions#0": {
+   "status": "SAME",
+   "op": "delete",
+   "at": "2026-09-07",
+   "detail": "DO-NOT-RUN: all six shell ⌘K boards were read (40 TEXT nodes) and none prints Ctrl+0, Ctrl+Y, Fit to view or Undo last action. Where chords are drawn they are already correct (1177:4829 shows ⌘1 beside Zoom to fit). The defect is code-only; these rows would NOMATCH and the delete row has nothing to delete."
+  },
+  "shell-text-fixes#0": {
+   "status": "SAME",
+   "op": "text",
+   "at": "2026-09-07",
+   "detail": "DO-NOT-RUN: all six shell ⌘K boards were read (40 TEXT nodes) and none prints Ctrl+0, Ctrl+Y, Fit to view or Undo last action. Where chords are drawn they are already correct (1177:4829 shows ⌘1 beside Zoom to fit). The defect is code-only; these rows would NOMATCH and the delete row has nothing to delete."
+  },
+  "shell-text-fixes#1": {
+   "status": "SAME",
+   "op": "text",
+   "at": "2026-09-07",
+   "detail": "DO-NOT-RUN: all six shell ⌘K boards were read (40 TEXT nodes) and none prints Ctrl+0, Ctrl+Y, Fit to view or Undo last action. Where chords are drawn they are already correct (1177:4829 shows ⌘1 beside Zoom to fit). The defect is code-only; these rows would NOMATCH and the delete row has nothing to delete."
+  },
+  "shell-text-fixes#2": {
+   "status": "SAME",
+   "op": "text",
+   "at": "2026-09-07",
+   "detail": "DO-NOT-RUN: all six shell ⌘K boards were read (40 TEXT nodes) and none prints Ctrl+0, Ctrl+Y, Fit to view or Undo last action. Where chords are drawn they are already correct (1177:4829 shows ⌘1 beside Zoom to fit). The defect is code-only; these rows would NOMATCH and the delete row has nothing to delete."
+  },
+  "gap-a-insert-marks#0": {
+   "status": "OK",
+   "detail": "Insert · blocks-expanded — [not-implemented] the thumbnails. shared/types/block.ts:25 declares preview?: string and noth",
+   "at": "2026-09-07T08:05:50.209Z",
+   "op": "rename"
+  },
+  "gap-c-history-text2#0": {
+   "status": "OK",
+   "detail": "Now — edited since v3",
+   "at": "2026-09-07T08:05:56.220Z",
+   "op": "text"
+  },
+  "gap-c-history-text2#1": {
+   "status": "OK",
+   "detail": "Now — edited since v3",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text2#2": {
+   "status": "OK",
+   "detail": "Now — edited since v3",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text2#3": {
+   "status": "OK",
+   "detail": "Now — edited since v3",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text2#4": {
+   "status": "OK",
+   "detail": "Now — edited since v3",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text2#5": {
+   "status": "OK",
+   "detail": "Exit  (Esc)",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text2#6": {
+   "status": "OK",
+   "detail": "Nothing is written until Restore. Esc exits time-travel.",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text2#7": {
+   "status": "OK",
+   "detail": "Custom code injects your own <head> markup, end-of-<body> scripts and CSS into every published page — analytics, fonts, ",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text#0": {
+   "status": "OK",
+   "detail": "Couldn’t load your recent changes.",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text#1": {
+   "status": "OK",
+   "detail": "Your saved versions are unaffected. Only this list failed to load.",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-c-history-text#2": {
+   "status": "OK",
+   "detail": "Retry, or reopen History in a moment.",
+   "at": "2026-09-07T08:05:56.221Z",
+   "op": "text"
+  },
+  "gap-e-captions#0": {
+   "status": "OK",
+   "detail": "2894:12613 280x252 @100,1044",
+   "at": "2026-09-07T08:28:35.985Z",
+   "op": "add-caption"
+  },
+  "gap-e-captions#1": {
+   "status": "OK",
+   "detail": "2894:12614 280x198 @100,1044",
+   "at": "2026-09-07T08:28:35.985Z",
+   "op": "add-caption"
+  },
+  "gap-e-captions#2": {
+   "status": "OK",
+   "detail": "2894:12615 1440x36 @6340,6232",
+   "at": "2026-09-07T08:28:35.985Z",
+   "op": "add-caption"
+  },
+  "gap-e-rename-bands#0": {
+   "status": "OK",
+   "detail": "caption/UX-I-01 · the timestamp must preview, not restore",
+   "at": "2026-09-07T08:29:37.572Z",
+   "op": "rename"
+  },
+  "gap-e-rename-bands#1": {
+   "status": "OK",
+   "detail": "caption/UX-I-02 · one restore contract across the module",
+   "at": "2026-09-07T08:29:37.572Z",
+   "op": "rename"
+  },
+  "gap-e-rename-bands#2": {
+   "status": "OK",
+   "detail": "caption/UX-I-05 · state where history begins",
+   "at": "2026-09-07T08:29:37.572Z",
+   "op": "rename"
+  },
+  "gap-e-rename-bands#3": {
+   "status": "OK",
+   "detail": "caption/UX-I-07 · the clear confirm must state its cost",
+   "at": "2026-09-07T08:29:37.572Z",
+   "op": "rename"
+  },
+  "gap-e-rename-bands#4": {
+   "status": "OK",
+   "detail": "caption/UX-I-15 · name the action that switched undo off",
+   "at": "2026-09-07T08:29:37.572Z",
+   "op": "rename"
+  },
+  "gap-d-notes#0": {
+   "status": "SAME",
+   "detail": "already contains it",
+   "at": "2026-09-07T08:34:43.814Z",
+   "op": "append-text"
+  },
+  "gap-d-notes#1": {
+   "status": "SAME",
+   "detail": "already contains it",
+   "at": "2026-09-07T08:34:43.814Z",
+   "op": "append-text"
+  },
+  "inspector-state-overflow-fix#0": {
+   "status": "SAME",
+   "detail": "16,628",
+   "at": "2026-09-07T08:34:54.545Z",
+   "op": "move"
+  },
+  "inspector-state-overflow-fix#2": {
+   "status": "SAME",
+   "detail": "16,520",
+   "at": "2026-09-07T08:34:54.545Z",
+   "op": "move"
+  },
+  "inspector-state-overflow-fix#1": {
+   "status": "SAME",
+   "detail": "300x1200",
+   "at": "2026-09-07T08:34:59.880Z",
+   "op": "resize"
+  },
+  "gap-f-shell-slot#0": {
+   "status": "OK",
+   "detail": "Drawer slot · 280 · pinned, pushes canvas",
+   "at": "2026-09-07T08:36:08.471Z",
+   "op": "text"
+  },
+  "sweep-a-01-captions#0": {
+   "status": "OK",
+   "detail": "2914:12649 280x90 @900,1052",
+   "at": "2026-09-07T08:56:56.574Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#1": {
+   "status": "OK",
+   "detail": "2914:12650 280x108 @1700,2286",
+   "at": "2026-09-07T08:56:56.574Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#2": {
+   "status": "OK",
+   "detail": "2914:12651 280x144 @2100,1052",
+   "at": "2026-09-07T08:56:56.574Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#3": {
+   "status": "OK",
+   "detail": "2914:12652 280x90 @500,1052",
+   "at": "2026-09-07T08:56:56.574Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#4": {
+   "status": "OK",
+   "detail": "2914:12653 280x72 @2100,2286",
+   "at": "2026-09-07T08:56:56.575Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#5": {
+   "status": "OK",
+   "detail": "2914:12654 280x144 @1300,1052",
+   "at": "2026-09-07T08:56:56.575Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#6": {
+   "status": "OK",
+   "detail": "2914:12655 300x72 @1780,5865",
+   "at": "2026-09-07T08:56:56.575Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#7": {
+   "status": "OK",
+   "detail": "2914:12656 300x72 @520,5865",
+   "at": "2026-09-07T08:56:56.575Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#8": {
+   "status": "OK",
+   "detail": "2914:12657 300x72 @1360,5865",
+   "at": "2026-09-07T08:56:56.575Z",
+   "op": "add-caption"
+  },
+  "sweep-a-01-captions#9": {
+   "status": "OK",
+   "detail": "2914:12658 300x72 @940,5865",
+   "at": "2026-09-07T08:56:56.575Z",
+   "op": "add-caption"
+  },
+  "sweep-a-02-appends#0": {
+   "status": "OK",
+   "detail": "h=198 Data.locked while the panel re-reads only the first. UX-H-14, UX-H-17.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#1": {
+   "status": "OK",
+   "detail": "h=144 Data.locked while the panel re-reads only the first. UX-H-14, UX-H-17.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#2": {
+   "status": "OK",
+   "detail": "h=180 anvas refuses (useLayerSelection.ts:68-74). UX-H-14, UX-H-15, UX-H-17.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#3": {
+   "status": "OK",
+   "detail": "h=378 ive for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#4": {
+   "status": "OK",
+   "detail": "h=126 ive for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#5": {
+   "status": "OK",
+   "detail": "h=234 ive for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#6": {
+   "status": "OK",
+   "detail": "h=360 ive for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#7": {
+   "status": "OK",
+   "detail": "h=252 ive for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-02-appends#8": {
+   "status": "OK",
+   "detail": "h=342 ive for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "at": "2026-09-07T08:57:02.398Z",
+   "op": "append-text"
+  },
+  "sweep-a-03-rename#0": {
+   "status": "OK",
+   "detail": "[not-implemented] Layers · display-settings — three of the four options drawn do not exist. LayerDisplaySettings.tsx shi",
+   "at": "2026-09-07T08:57:08.102Z",
+   "op": "rename"
+  },
+  "sweep-a-04-fix-overlap#0": {
+   "status": "OK",
+   "detail": "100,2580",
+   "at": "2026-09-07T08:58:30.323Z",
+   "op": "move"
+  },
+  "grid-snap-rows#0": {
+   "status": "OK",
+   "detail": "100,380",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#1": {
+   "status": "OK",
+   "detail": "3220,380",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#2": {
+   "status": "OK",
+   "detail": "1660,380",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#3": {
+   "status": "OK",
+   "detail": "4780,380",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#4": {
+   "status": "OK",
+   "detail": "6340,380",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#5": {
+   "status": "OK",
+   "detail": "100,1496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#6": {
+   "status": "OK",
+   "detail": "1660,1496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#7": {
+   "status": "OK",
+   "detail": "3220,1496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#8": {
+   "status": "OK",
+   "detail": "4780,1496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#9": {
+   "status": "OK",
+   "detail": "6340,1496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#10": {
+   "status": "OK",
+   "detail": "100,2516",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#11": {
+   "status": "OK",
+   "detail": "3220,2516",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#12": {
+   "status": "OK",
+   "detail": "1660,2516",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#13": {
+   "status": "OK",
+   "detail": "4780,2516",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#14": {
+   "status": "OK",
+   "detail": "6340,2516",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#15": {
+   "status": "OK",
+   "detail": "6340,3536",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#16": {
+   "status": "OK",
+   "detail": "3220,3536",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#17": {
+   "status": "OK",
+   "detail": "4780,3536",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#18": {
+   "status": "OK",
+   "detail": "100,3536",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#19": {
+   "status": "OK",
+   "detail": "1660,3536",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#20": {
+   "status": "OK",
+   "detail": "7900,3536",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#21": {
+   "status": "OK",
+   "detail": "100,4556",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#22": {
+   "status": "OK",
+   "detail": "100,5736",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#23": {
+   "status": "OK",
+   "detail": "100,6496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#24": {
+   "status": "OK",
+   "detail": "3220,6496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#25": {
+   "status": "OK",
+   "detail": "1660,6496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#26": {
+   "status": "OK",
+   "detail": "4780,6496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#27": {
+   "status": "OK",
+   "detail": "6340,6496",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#28": {
+   "status": "OK",
+   "detail": "3980,7588",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#29": {
+   "status": "OK",
+   "detail": "1660,7588",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#30": {
+   "status": "OK",
+   "detail": "3580,7588",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#31": {
+   "status": "OK",
+   "detail": "100,7588",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#32": {
+   "status": "OK",
+   "detail": "2060,7588",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#33": {
+   "status": "OK",
+   "detail": "3180,7588",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#34": {
+   "status": "OK",
+   "detail": "100,8684",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#35": {
+   "status": "OK",
+   "detail": "2360,8684",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#36": {
+   "status": "OK",
+   "detail": "3920,8684",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#37": {
+   "status": "OK",
+   "detail": "5480,8684",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#38": {
+   "status": "OK",
+   "detail": "7040,8684",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#39": {
+   "status": "OK",
+   "detail": "1660,8684",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#40": {
+   "status": "OK",
+   "detail": "100,9848",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#41": {
+   "status": "OK",
+   "detail": "2340,10964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#42": {
+   "status": "OK",
+   "detail": "3900,10964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#43": {
+   "status": "OK",
+   "detail": "100,10964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#44": {
+   "status": "OK",
+   "detail": "1420,10964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#45": {
+   "status": "OK",
+   "detail": "100,12024",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#46": {
+   "status": "OK",
+   "detail": "1660,12024",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#47": {
+   "status": "OK",
+   "detail": "6340,12024",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#48": {
+   "status": "OK",
+   "detail": "3220,12024",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#49": {
+   "status": "OK",
+   "detail": "4780,12024",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#50": {
+   "status": "OK",
+   "detail": "100,13080",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#51": {
+   "status": "OK",
+   "detail": "3220,13080",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#52": {
+   "status": "OK",
+   "detail": "1660,13080",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#53": {
+   "status": "OK",
+   "detail": "6340,13080",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#54": {
+   "status": "OK",
+   "detail": "4780,13080",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#55": {
+   "status": "OK",
+   "detail": "100,14140",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#56": {
+   "status": "OK",
+   "detail": "1660,14140",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#57": {
+   "status": "OK",
+   "detail": "3220,14140",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#58": {
+   "status": "OK",
+   "detail": "4780,14140",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#59": {
+   "status": "OK",
+   "detail": "6340,14140",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#60": {
+   "status": "OK",
+   "detail": "3220,15196",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#61": {
+   "status": "OK",
+   "detail": "4780,15196",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#62": {
+   "status": "OK",
+   "detail": "6340,15196",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#63": {
+   "status": "OK",
+   "detail": "100,15196",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#64": {
+   "status": "OK",
+   "detail": "1660,15196",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#65": {
+   "status": "OK",
+   "detail": "7900,15196",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#66": {
+   "status": "OK",
+   "detail": "1780,16596",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#67": {
+   "status": "OK",
+   "detail": "3340,16596",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#68": {
+   "status": "OK",
+   "detail": "100,16596",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#69": {
+   "status": "OK",
+   "detail": "660,16596",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#70": {
+   "status": "OK",
+   "detail": "1220,16596",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#71": {
+   "status": "OK",
+   "detail": "100,17616",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#72": {
+   "status": "OK",
+   "detail": "1660,18868",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#73": {
+   "status": "OK",
+   "detail": "100,18868",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#74": {
+   "status": "OK",
+   "detail": "100,2360",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#75": {
+   "status": "OK",
+   "detail": "1780,2360",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#76": {
+   "status": "OK",
+   "detail": "2620,2360",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#77": {
+   "status": "OK",
+   "detail": "940,2360",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#78": {
+   "status": "OK",
+   "detail": "2100,2716",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#79": {
+   "status": "OK",
+   "detail": "1300,2716",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#80": {
+   "status": "OK",
+   "detail": "1700,2716",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#81": {
+   "status": "OK",
+   "detail": "900,2716",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#82": {
+   "status": "OK",
+   "detail": "100,2716",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#83": {
+   "status": "OK",
+   "detail": "500,2716",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#84": {
+   "status": "OK",
+   "detail": "2100,3648",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#85": {
+   "status": "OK",
+   "detail": "100,3648",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#86": {
+   "status": "OK",
+   "detail": "900,3648",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#87": {
+   "status": "OK",
+   "detail": "1300,3648",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#88": {
+   "status": "OK",
+   "detail": "500,3648",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#89": {
+   "status": "OK",
+   "detail": "1700,3648",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#90": {
+   "status": "OK",
+   "detail": "1660,4580",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#91": {
+   "status": "OK",
+   "detail": "1260,4580",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#92": {
+   "status": "OK",
+   "detail": "100,4580",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#93": {
+   "status": "OK",
+   "detail": "100,5604",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#94": {
+   "status": "OK",
+   "detail": "500,5964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#95": {
+   "status": "OK",
+   "detail": "900,5964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#96": {
+   "status": "OK",
+   "detail": "1700,5964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#97": {
+   "status": "OK",
+   "detail": "1300,5964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#98": {
+   "status": "OK",
+   "detail": "100,5964",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#99": {
+   "status": "OK",
+   "detail": "100,1312",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#100": {
+   "status": "OK",
+   "detail": "1300,1312",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#101": {
+   "status": "OK",
+   "detail": "500,1312",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#102": {
+   "status": "OK",
+   "detail": "900,1312",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#103": {
+   "status": "OK",
+   "detail": "1700,1312",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "grid-snap-rows#104": {
+   "status": "OK",
+   "detail": "2100,1312",
+   "at": "2026-09-07T10:22:41.499Z",
+   "op": "move"
+  },
+  "sweep-d-captions#0": {
+   "status": "SAME",
+   "detail": "2914:12831",
+   "at": "2026-09-07T11:31:34.463Z",
+   "op": "add-caption"
+  },
+  "sweep-d-captions#1": {
+   "status": "SAME",
+   "detail": "2914:12832",
+   "at": "2026-09-07T11:31:34.463Z",
+   "op": "add-caption"
+  },
+  "sweep-b-01-brand-text#0": {
+   "status": "SAME",
+   "detail": "Drop tokens.json — JSON only",
+   "at": "2026-09-07T11:32:06.545Z",
+   "op": "text"
+  },
+  "sweep-b-01-brand-text#1": {
+   "status": "SAME",
+   "detail": "Drop tokens.json — JSON only",
+   "at": "2026-09-07T11:32:06.545Z",
+   "op": "text"
+  },
+  "sweep-b-01-brand-text#2": {
+   "status": "SAME",
+   "detail": "Drop tokens.json — JSON only",
+   "at": "2026-09-07T11:32:06.545Z",
+   "op": "text"
+  },
+  "sweep-d-text#0": {
+   "status": "SAME",
+   "detail": "Generating pages",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#1": {
+   "status": "SAME",
+   "detail": "Optimizing images",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#2": {
+   "status": "SAME",
+   "detail": "Skipped — not run in the MVP",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#3": {
+   "status": "SAME",
+   "detail": "–",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#4": {
+   "status": "SAME",
+   "detail": "Deploying to CDN",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#5": {
+   "status": "SAME",
+   "detail": "Verifying SSL",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#6": {
+   "status": "SAME",
+   "detail": "Performance check",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#7": {
+   "status": "SAME",
+   "detail": "Skipped — Lighthouse is not run",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#8": {
+   "status": "SAME",
+   "detail": "Generate CSS [not-implemented]",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#9": {
+   "status": "SAME",
+   "detail": "Not one of the five worker steps",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#10": {
+   "status": "SAME",
+   "detail": "DNS propagation [not-implemented]",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#11": {
+   "status": "SAME",
+   "detail": "Not one of the five worker steps",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#12": {
+   "status": "SAME",
+   "detail": "Green dot, straight after the save. Not its own state — saved with a fresh saved",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#13": {
+   "status": "SAME",
+   "detail": "Green dot, grey text. The same saved state as 2 — only savedAt is older. The res",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#14": {
+   "status": "SAME",
+   "detail": "Amber dot + amber text. Unsaved work. Offline is a SEPARATE state: Offline — not",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-d-text#15": {
+   "status": "SAME",
+   "detail": "Footer bar (1440×32) toggles. Each icon has on/off state with blue highlight whe",
+   "at": "2026-09-07T11:32:06.546Z",
+   "op": "text"
+  },
+  "sweep-c-restore-1-6-not-found#0": {
+   "status": "SAME",
+   "detail": "S5.5 · dead-link · not-found — UX-I-18: this is also the screen a ReviewBar Re-s",
+   "at": "2026-09-07T11:32:11.816Z",
+   "op": "rename"
+  },
+  "sweep-d-caption-appends#0": {
+   "status": "SAME",
+   "detail": "already contains it",
+   "at": "2026-09-07T11:32:17.170Z",
+   "op": "append-text"
+  },
+  "sweep-d-caption-appends#1": {
+   "status": "SAME",
+   "detail": "already contains it",
+   "at": "2026-09-07T11:32:17.170Z",
+   "op": "append-text"
+  },
+  "sweep-d-caption-appends#2": {
+   "status": "SAME",
+   "detail": "already contains it",
+   "at": "2026-09-07T11:32:17.170Z",
+   "op": "append-text"
+  },
+  "sweep-d-caption-appends#3": {
+   "status": "SAME",
+   "detail": "already contains it",
+   "at": "2026-09-07T11:32:17.170Z",
+   "op": "append-text"
+  }
+ },
+ "spend": {
+  "2026-09-07": 213
+ }
+}

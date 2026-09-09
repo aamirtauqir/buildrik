@@ -1,0 +1,31 @@
+[
+ { "id": "I641:2677;16:17",
+   "expect": "SINCE LAST DEPLOY",
+   "text": "CHANGES IN THIS SESSION",
+   "why": "UX-E-02 — the change list is the undo stack and is session-scoped. Labelled as what it is; it must never be the thing that decides whether publishing is offered (usePublishSnapshot.ts:156-166, HistoryManager.ts:156-158)." },
+
+ { "id": "I778:4251;16:17",
+   "expect": "SINCE LAST DEPLOY",
+   "text": "CHANGES IN THIS SESSION",
+   "why": "UX-E-02 — same header on the loading board." },
+
+ { "id": "784:4384",
+   "expect": "v15 · live · just now",
+   "text": "v15 · live · just now · published in this session",
+   "why": "UX-E-01 — the success beat is reserved for a publish that finished in THIS session (jobId != null && COMPLETED), never a hydrated URL from a previous day." },
+
+ { "id": "784:4461",
+   "expect": "VERCEL_TOKEN_INVALID",
+   "text": "Vercel rejected the token · step 4 of 5. Nothing was deployed.",
+   "why": "UX-E-25 (translate every server error into a sentence) + UX-E-07 (name the step that actually failed, not step 1). Today the panel prints the bare code and the log always blames buildSteps(0,true)." },
+
+ { "id": "784:4537",
+   "expect": "Connect Vercel to publish.",
+   "text": "Publishing is off for this workspace.",
+   "why": "UX-E-04 — feature-off and no-Vercel-connection are two different states with two different sentences. The Vercel copy moves to its own board." },
+
+ { "id": "784:4538",
+   "expect": "Buildrick deploys into your own Vercel account",
+   "text": "Ask a workspace owner to turn it on. A missing Vercel connection is a different state.",
+   "why": "UX-E-04 — do not send the user to reconnect an integration that is not the problem." }
+]

@@ -1,0 +1,11 @@
+{
+ "slug": "zz-f25-resolved",
+ "page": "1:3",
+ "note": "F25, measured for the first time. reports/publish.md said in the first person 'I never read inside 817:4856'; the read finally landed and the overlap is exact.",
+ "rows": [
+  {"op": "move", "id": "817:4884", "y": 540, "expect": "1732,70057,1016,100",
+   "why": "F25 · THE CONSOLE COVERS BOTH BOTTOM CARDS BY EXACTLY 100px, now measured rather than eyeballed. Board 817:4856 is 1080x540 at (1700,69637), so its bottom is 70177. The two lower cards 817:4874 and 817:4879 sit at y69947 with height 210, spanning 69947-70157. The dark console 817:4884 (#1F1F26, 1016x100) sits at y70057, spanning 70057-70157 — it covers the ENTIRE bottom 100px of both 210px cards, which is why 'Scroll & anchor' and 'Broken element' both read as cut off mid-sentence. FIX: put the console below the cards instead of on top of them. The board's own bottom padding is 20px (cards end 70157, board ends 70177), so the console goes to abs y70177, i.e. rel 540 against the board's 69637 origin. move writes PARENT-relative y and the console is a direct child of the board. x is left unset so the builder preserves its 32px inset. Paired with the board resize below; neither works alone."},
+  {"op": "resize", "id": "817:4856", "h": 660, "expect": "1700,69637,1080,540",
+   "why": "F25 · the height that pays for the move. With the console at abs 70177-70277 and the board's own 20px bottom padding, the board must end at 70297: 70297 - 69637 = 660. The board is FIXED/FIXED and layoutMode=NONE, so this is a direct resize with no reflow of its eight children, and it is a page-level board with no auto-layout parent to push. Note for whoever verifies: render-defects.mjs is structurally blind to this defect class — its six checks are parent-to-child or title-vs-right-sibling, never an opaque SIBLING frame over a card — so analyze.py cover() on a fresh dump, not the detector, is what confirms it."}
+ ]
+}

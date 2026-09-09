@@ -1,0 +1,3 @@
+B	229:1088	INSTANCE	116,87587,119,32	#1A56DB	FIXED/FIXED	HORIZONTAL	true	Button	Kind=primary;Size=md;State=rest	kids=1
+  K	I229:1088;9:19	TEXT	112,87593,127,20	#FFFFFF	HUG/HUG		true	Button	
+END	pairs=0	boards=1

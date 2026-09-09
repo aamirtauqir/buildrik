@@ -1,0 +1,772 @@
+[
+ {
+  "board": "2864:12415",
+  "why": "UX-D-08 — the one row where the user cannot finish the job at all",
+  "hideFrom": 11,
+  "ops": [
+   {
+    "src": "2067:20295",
+    "name": "section/SLIDER",
+    "insert": 2,
+    "texts": [
+     "SLIDER   [not-implemented]",
+     "v"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Slide 1",
+    "insert": 3,
+    "texts": [
+     "⠿  ▭  Slide 1 — Hero",
+     "✕"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Slide 2",
+    "insert": 4,
+    "texts": [
+     "⠿  ▭  Slide 2 — Offer",
+     "✕"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Slide 3",
+    "insert": 5,
+    "texts": [
+     "⠿  ▭  Slide 3 — Contact",
+     "✕"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Add slide",
+    "insert": 6,
+    "texts": [
+     "+ Add slide",
+     ""
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Autoplay",
+    "insert": 7,
+    "texts": [
+     "Autoplay",
+     "Off"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Loop",
+    "insert": 8,
+    "texts": [
+     "Loop",
+     "On"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Navigation",
+    "insert": 9,
+    "texts": [
+     "Navigation",
+     "Arrows · Dots"
+    ]
+   },
+   {
+    "src": "807:8613",
+    "name": "note/SLIDER not-implemented",
+    "abs": {
+     "x": 16,
+     "y": 640,
+     "width": 268
+    },
+    "text": "[not-implemented] on the SLIDER section only — the CSS stack below it ships. Today slider, accordion, navbar, nav, list and table all fall through to CONTAINER_PROFILE (elementProfiles.ts:246-254; the map runs :235-262) and “tabs” is not a key at all, so getProfileFor falls through (:289). Their only non-style section is ID / Title / Tab Index (elementProperties/config.ts:315-320). SPEC-INSPECTOR §2.1 gives this same shape to tabs, accordion, navbar (navbar.menuItems: menuEditor is declared at propertiesRegistry.ts:1037 with no renderer) and list/table. Those four are NAMED here, not drawn.",
+    "color": "#6B7280"
+   }
+  ]
+ },
+ {
+  "board": "2864:21821",
+  "why": "UX-D-09 — the panel never asks where a submission goes",
+  "resize": {
+   "w": 300,
+   "h": 960
+  },
+  "shift": {
+   "fromY": 44,
+   "dy": 320
+  },
+  "ops": [
+   {
+    "src": "2474:11974",
+    "name": "rule/where-top",
+    "abs": {
+     "x": 0,
+     "y": 44
+    }
+   },
+   {
+    "src": "2474:11975",
+    "name": "section/WHERE IT GOES",
+    "abs": {
+     "x": 16,
+     "y": 55,
+     "width": 150
+    },
+    "text": "WHERE IT GOES"
+   },
+   {
+    "src": "807:8613",
+    "name": "mark/where-not-implemented",
+    "abs": {
+     "x": 176,
+     "y": 55,
+     "width": 112
+    },
+    "text": "[not-implemented]",
+    "color": "#C27803"
+   },
+   {
+    "src": "2474:11974",
+    "name": "rule/where-bottom",
+    "abs": {
+     "x": 0,
+     "y": 76
+    }
+   },
+   {
+    "src": "807:8576",
+    "name": "label/Send to",
+    "abs": {
+     "x": 16,
+     "y": 88,
+     "width": 120
+    },
+    "text": "Send to"
+   },
+   {
+    "src": "807:8578",
+    "name": "value/Send to",
+    "abs": {
+     "x": 150,
+     "y": 88,
+     "width": 134
+    },
+    "text": "Email address ▾"
+   },
+   {
+    "src": "807:8576",
+    "name": "label/Address",
+    "abs": {
+     "x": 16,
+     "y": 112,
+     "width": 120
+    },
+    "text": "Address"
+   },
+   {
+    "src": "807:8578",
+    "name": "value/Address",
+    "abs": {
+     "x": 150,
+     "y": 112,
+     "width": 134
+    },
+    "text": "you@example.com"
+   },
+   {
+    "src": "807:8576",
+    "name": "label/Success message",
+    "abs": {
+     "x": 16,
+     "y": 136,
+     "width": 120
+    },
+    "text": "Success message"
+   },
+   {
+    "src": "807:8578",
+    "name": "value/Success message",
+    "abs": {
+     "x": 150,
+     "y": 136,
+     "width": 134
+    },
+    "text": "Thanks!"
+   },
+   {
+    "src": "807:8576",
+    "name": "label/Success redirect",
+    "abs": {
+     "x": 16,
+     "y": 160,
+     "width": 120
+    },
+    "text": "Success redirect"
+   },
+   {
+    "src": "807:8578",
+    "name": "value/Success redirect",
+    "abs": {
+     "x": 150,
+     "y": 160,
+     "width": 134
+    },
+    "text": "/thank-you"
+   },
+   {
+    "src": "2474:11974",
+    "name": "rule/advanced-top",
+    "abs": {
+     "x": 0,
+     "y": 184
+    }
+   },
+   {
+    "src": "2474:11975",
+    "name": "section/ADVANCED HTML",
+    "abs": {
+     "x": 16,
+     "y": 195,
+     "width": 200
+    },
+    "text": "ADVANCED HTML"
+   },
+   {
+    "src": "2474:11976",
+    "name": "chevron/ADVANCED HTML",
+    "abs": {
+     "x": 276,
+     "y": 195
+    },
+    "text": "›"
+   },
+   {
+    "src": "807:8613",
+    "name": "note/advanced contents",
+    "abs": {
+     "x": 16,
+     "y": 216,
+     "width": 268
+    },
+    "text": "Collapsed: Action URL · Method · Encoding · Disable Validation · Autocomplete — the five raw HTML attributes that are the whole section today.",
+    "color": "#6B7280"
+   },
+   {
+    "src": "807:8613",
+    "name": "note/exporter warning",
+    "abs": {
+     "x": 16,
+     "y": 264,
+     "width": 268
+    },
+    "text": "The exporter emits a form only when formConfig.webhookUrl is set (ExportEngine.ts:909). Two of the three Actions the shipped section offers — Store Submission and Send Email — export nothing, so the Action list here is cut to what ships.",
+    "color": "#C27803"
+   }
+  ]
+ },
+ {
+  "board": "2865:12419",
+  "why": "UX-D-02 — the inspector renders every control enabled for a locked element",
+  "hideFrom": 14,
+  "ops": [
+   {
+    "src": "2067:20296",
+    "name": "row/Locked banner",
+    "insert": 1,
+    "texts": [
+     "🔒  Locked",
+     "Unlock"
+    ]
+   },
+   {
+    "src": "2067:20295",
+    "name": "section/Disabled",
+    "insert": 2,
+    "texts": [
+     "ALL CONTROLS BELOW ARE DISABLED",
+     "v"
+    ]
+   },
+   {
+    "src": "807:8613",
+    "name": "note/locked lede",
+    "abs": {
+     "x": 16,
+     "y": 560,
+     "width": 268
+    },
+    "text": "This element is locked. Unlock it to edit. Every control below renders disabled — ink-muted labels, border #E5E7EB, no accent. The banner is border ink-muted, not accent; [ Unlock ] clears data.locked in place.",
+    "color": "#4B5563"
+   },
+   {
+    "src": "807:8613",
+    "name": "note/locked mechanism",
+    "abs": {
+     "x": 16,
+     "y": 632,
+     "width": 268
+    },
+    "text": "The canvas refuses a locked element and toasts “This element is locked. Unlock it in the Layers panel.” (useSelectionBehavior.ts:88,106,134). Layers does not check (useLayerSelection.ts:67-75) and neither does canvas pick mode (Canvas.tsx:608-617) — two back doors into a panel that today renders every control enabled. Half of a three-part defect: UX-H-15 and UX-H-14 belong to the Layers lane and are NOT drawn as fixed here.",
+    "color": "#6B7280"
+   }
+  ]
+ },
+ {
+  "board": "2865:12493",
+  "why": "UX-D-20 — ten overrides is twenty stacked blocks in a 300px column",
+  "hideIdx": [
+   3
+  ],
+  "hideFrom": 14,
+  "ops": [
+   {
+    "src": "2067:20296",
+    "name": "row/Override summary",
+    "insert": 2,
+    "texts": [
+     "⚠ 6 tablet overrides   ⌄",
+     "Revert all"
+    ]
+   },
+   {
+    "src": "807:8613",
+    "name": "note/override rationale",
+    "abs": {
+     "x": 16,
+     "y": 640,
+     "width": 268
+    },
+    "text": "One row where the strip was. Expanded beneath it the per-property rows keep their cobalt left bar and their ↺, but the full-width tinted banner per override is gone — the Base value moves into the row as a secondary value. Ten overrides is twenty stacked blocks in a 300px column, mounted above the scroll container (ProInspector.tsx:501-505 vs the body at :539-567). PHASE4-QA restates acceptance #12 as: the first style control sits above y=900 at 1440×900.",
+    "color": "#6B7280"
+   }
+  ]
+ },
+ {
+  "board": "2865:21984",
+  "why": "UX-D-12 / UX-D-13 — a control the user can see and cannot use teaches; a missing control does not",
+  "hideFrom": 10,
+  "ops": [
+   {
+    "src": "2067:20295",
+    "name": "section/Disabled with reason",
+    "insert": 2,
+    "texts": [
+     "DISABLED, WITH THE REASON SHOWN",
+     "v"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Margin",
+    "insert": 3,
+    "texts": [
+     "Margin ↕",
+     "inline ignores it"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Padding",
+    "insert": 4,
+    "texts": [
+     "Padding ↕",
+     "inline ignores it"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Gap",
+    "insert": 5,
+    "texts": [
+     "Gap",
+     "enable flex/grid"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Flex item",
+    "insert": 6,
+    "texts": [
+     "Grow / Shrink / Basis",
+     "flex items only"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Enable flex",
+    "insert": 7,
+    "texts": [
+     "Enable flex",
+     "→"
+    ]
+   },
+   {
+    "src": "807:8613",
+    "name": "note/disabled reason",
+    "abs": {
+     "x": 16,
+     "y": 552,
+     "width": 268
+    },
+    "text": "Every blocked control stays PRESENT and disabled with its reason visible beneath it. Today the Gap row is not rendered at all — it sits inside {isFlexContainer && …} (flexbox/index.tsx:100-166) — and the flex-item row likewise, inside {isFlexItem && …} (:169-176). Where the cause is one click the reason becomes a button; the pattern already in the tree is EnableFlexPrompt. [not-implemented] getPropertyStates builds { disabled, reason } for every blocked property (cssContext.ts:150-197), but Spacing forwards only ?.disabled (SpacingSection.tsx:248-259), and Position and FlexItem put the reason in a native title= on a DISABLED input (PositionControls.tsx:150-184; FlexItemControls.tsx:61,75,89) — browsers suppress pointer events on disabled form controls, so that tooltip never opens.",
+    "color": "#4B5563"
+   }
+  ]
+ },
+ {
+  "board": "2865:22079",
+  "why": "UX-D-10, UX-D-11, UX-D-25, UX-D-26 — three hooks, zero new logic, one header row",
+  "hideFrom": 12,
+  "ops": [
+   {
+    "src": "2067:20296",
+    "name": "row/Search",
+    "insert": 2,
+    "texts": [
+     "⌕  Search properties",
+     "⌫"
+    ]
+   },
+   {
+    "src": "2067:20301",
+    "name": "section/MOTION",
+    "insert": 3,
+    "texts": [
+     "MOTION · 2 triggers",
+     ">"
+    ]
+   },
+   {
+    "src": "2067:20301",
+    "name": "section/CSS CLASSES",
+    "insert": 4,
+    "texts": [
+     "CSS CLASSES · 4 classes",
+     ">"
+    ]
+   },
+   {
+    "src": "2067:20301",
+    "name": "section/LINK",
+    "insert": 5,
+    "texts": [
+     "LINK · /pricing",
+     ">"
+    ]
+   },
+   {
+    "src": "2067:20301",
+    "name": "section/ADVANCED HTML",
+    "insert": 6,
+    "texts": [
+     "ADVANCED HTML · ID, Title, Tab Index",
+     ">"
+    ]
+   },
+   {
+    "src": "2067:20301",
+    "name": "section/CUSTOM CSS",
+    "insert": 7,
+    "texts": [
+     "CUSTOM CSS",
+     ">"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Expand all",
+    "insert": 8,
+    "texts": [
+     "Expand all",
+     "Collapse all"
+    ]
+   },
+   {
+    "src": "807:8613",
+    "name": "note/findability",
+    "abs": {
+     "x": 16,
+     "y": 624,
+     "width": 268
+    },
+    "text": "Typing “radius” filters rows across every section and opens Corner radius. Every collapsed section carries a summary pill — including the four that carry none today — and a non-zero count auto-opens the section the way a CSS value does. Authored values are marked distinctly from defaults and each carries a one-click clear. “Element properties” is renamed Advanced HTML; “All CSS” is renamed Custom CSS and is an ordinary collapsed section, not dev-mode-gated. The “N of M sections apply” line is REMOVED, not restated: six sections declare styleKeys: [] and cannot count (registry/element.tsx:16,34,52,64; registry/effects.tsx:23,81). searchQuery is already written (useAdvancedSettings.ts:88-105) but ProInspector.tsx:193 passes the literal empty string, so the auto-expand effect can never fire; Expand all / Collapse all are implemented, profile-scoped, persisted and destructured by nobody (useInspectorSections.ts:227-249,274-280 vs ProInspector.tsx:181).",
+    "color": "#6B7280"
+   }
+  ]
+ },
+ {
+  "board": "2865:22206",
+  "why": "UX-D-14, UX-D-15, UX-D-16, UX-D-28 — one MOTION section replacing the Interactions + Animation pair",
+  "hideFrom": 14,
+  "setText": [
+   {
+    "idx": 0,
+    "text": "MOTION"
+   },
+   {
+    "idx": 3,
+    "text": "Fade In Up · Entrances"
+   },
+   {
+    "idx": 5,
+    "text": "👁 When it scrolls into view"
+   },
+   {
+    "idx": 6,
+    "text": "Slide In Up · Entrances"
+   }
+  ],
+  "ops": [
+   {
+    "src": "2430:11941",
+    "name": "section/Triggers",
+    "abs": {
+     "x": 16,
+     "y": 200,
+     "width": 268
+    },
+    "text": "TRIGGERS THAT APPLY TO THIS ELEMENT"
+   },
+   {
+    "src": "2430:11945",
+    "name": "note/Triggers",
+    "abs": {
+     "x": 16,
+     "y": 224,
+     "width": 268
+    },
+    "text": "On click · On hover · When it scrolls into view · On page load — each with a one-line description. The three scroll near-synonyms collapse to one; “Animation” becomes the trigger “On page load”.",
+    "color": "#4B5563"
+   },
+   {
+    "src": "2430:11941",
+    "name": "section/Presets",
+    "abs": {
+     "x": 16,
+     "y": 300,
+     "width": 268
+    },
+    "text": "PRESETS — SIX GROUPS, NOT A FLAT LIST"
+   },
+   {
+    "src": "2430:11945",
+    "name": "note/Presets",
+    "abs": {
+     "x": 16,
+     "y": 324,
+     "width": 268
+    },
+    "text": "Entrances · Exits · Emphasis · Attention · Motion paths · Transforms — the six families the constants already declare (ANIMATION_PRESET_GROUPS, types.ts:95-147), not the flat 39-item select that flattening ANIMATION_PRESETS produces (InteractionEditor.tsx:112-117).",
+    "color": "#4B5563"
+   },
+   {
+    "src": "2430:11945",
+    "name": "note/Undo",
+    "abs": {
+     "x": 16,
+     "y": 416,
+     "width": 268
+    },
+    "text": "Delete an interaction → toast with Undo, matching the element delete's own promise (DeleteConfirmModal.tsx:28-63 already says Ctrl+Z). No bare red button.",
+    "color": "#4B5563"
+   },
+   {
+    "src": "2430:11945",
+    "name": "note/18 duplicates",
+    "abs": {
+     "x": 16,
+     "y": 480,
+     "width": 268
+    },
+    "text": "18 preset labels are identical across the two lists, not 16 — Bounce, Fade In, Fade In Down/Left/Right/Up, Fade Out, Flash, Pulse, Rotate In, Rubber Band, Shake, Slide In Down, Slide In Up, Swing, Wobble, Zoom In, Zoom Out — plus three near-misses (Heartbeat/Heart Beat, Flip X/Flip In X, Flip Y/Flip In Y). Nothing in either section says which one runs on the published page. NOT this: no new preset catalogue and no new trigger types — presetCoverage.test.ts passes, all 39 GSAP presets have a timeline, a canvas keyframe and an export keyframe. Merging removes a list; it writes none.",
+    "color": "#6B7280"
+   }
+  ]
+ },
+ {
+  "board": "2865:22227",
+  "why": "UX-D-03 — the one state where a write hits many elements never says which breakpoint it lands on",
+  "ops": [
+   {
+    "src": "956:6867",
+    "name": "row/Pills",
+    "insert": 1,
+    "texts": [
+     "This ▾",
+     "Tablet ▾",
+     "Base ▾"
+    ]
+   },
+   {
+    "src": "2067:20295",
+    "name": "section/Selection",
+    "insert": 2,
+    "texts": [
+     "3 ELEMENTS SELECTED   [not-implemented]",
+     "v"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Sel 1",
+    "insert": 3,
+    "texts": [
+     "▭  Hero button",
+     "✕"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Sel 2",
+    "insert": 4,
+    "texts": [
+     "T  Card title",
+     "✕"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Sel 3",
+    "insert": 5,
+    "texts": [
+     "↗  Nav link",
+     "✕"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Sel actions",
+    "insert": 6,
+    "texts": [
+     "Delete",
+     "Group"
+    ]
+   },
+   {
+    "src": "807:8613",
+    "name": "note/multi-select",
+    "abs": {
+     "x": 16,
+     "y": 592,
+     "width": 268
+    },
+    "text": "The pill row is unconditional. ProInspector.tsx:298-310 short-circuits BEFORE the bdi-bpr pill row at :420-444, so today this state shows no breakpoint at all. The five shared fields keep their “Mixed” placeholders; MixedValueBadge is deliberately NOT drawn — COVER-1-47: it cannot render at 2+ selected because this branch returns before its only consumer.",
+    "color": "#6B7280"
+   }
+  ]
+ },
+ {
+  "board": "2865:22266",
+  "why": "UX-D-24, UX-D-27 — a control that reads as broken, and a mode change that reloads the app",
+  "hideFrom": 12,
+  "ops": [
+   {
+    "src": "2067:20295",
+    "name": "section/CSS CLASSES",
+    "insert": 2,
+    "texts": [
+     "CSS CLASSES",
+     "v"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Chips",
+    "insert": 3,
+    "texts": [
+     "btn   btn-primary   is-active",
+     "✕"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Duplicate",
+    "insert": 4,
+    "texts": [
+     "btn-primary",
+     "already applied"
+    ]
+   },
+   {
+    "src": "2067:20295",
+    "name": "section/DENSITY",
+    "insert": 5,
+    "texts": [
+     "SIMPLIFIED DENSITY",
+     "v"
+    ]
+   },
+   {
+    "src": "2067:20296",
+    "name": "row/Show all",
+    "insert": 6,
+    "texts": [
+     "Show all controls",
+     "On"
+    ]
+   },
+   {
+    "src": "807:8613",
+    "name": "note/duplicate class",
+    "abs": {
+     "x": 16,
+     "y": 584,
+     "width": 268
+    },
+    "text": "Typing an already-applied class flashes the existing chip and says “already applied”; the field clears. Today the early return skips the clear at CSSClassesSection.tsx:88 and the only report is a dev-console warning, so the text sits in the field and the control reads as broken.",
+    "color": "#4B5563"
+   },
+   {
+    "src": "807:8613",
+    "name": "note/density",
+    "abs": {
+     "x": 16,
+     "y": 692,
+     "width": 268
+    },
+    "text": "The density toggle lives IN the panel and is kept in state — no reload. Today “Show all controls” rewrites the URL and calls window.location.assign (InspectorTabContent.tsx:230-247), and the mode is read once per mount (ProInspector.tsx:188). The trim is curated per element type, not renderIds = visibleIds.slice(0, 3) — a text element currently keeps Typography, Spacing and Size and hides ten sections the message calls “controls”.",
+    "color": "#6B7280"
+   }
+  ]
+ },
+ {
+  "why": "UX-D-04, UX-D-05, UX-D-06, UX-D-07, UX-D-19 plus the SPEC conflicts — recorded, not silently resolved",
+  "create": {
+   "section": "1776:8381",
+   "x": 2600,
+   "y": 4101,
+   "w": 720,
+   "h": 812,
+   "name": "Inspector · OPEN DECISIONS (V2 → V1)",
+   "fill": "#FFFFFF"
+  },
+  "ops": [
+   {
+    "src": "807:8570",
+    "name": "title/OPEN DECISIONS",
+    "abs": {
+     "x": 24,
+     "y": 24,
+     "width": 540
+    },
+    "text": "Inspector · OPEN DECISIONS (V2 → V1) — recorded, not resolved"
+   },
+   {
+    "src": "807:8613",
+    "name": "body/decisions",
+    "abs": {
+     "x": 24,
+     "y": 56,
+     "width": 672
+    },
+    "text": "1. PANEL WIDTH — drawn at 300 (--bk-size-inspector), never collapsed. SPEC-INSPECTOR §6 says “No new panel width. 300” and never contemplates being collapsed; SPEC-NAVIGATION proposes that the wide drawer collapses the inspector; SPEC-PUBLISH-PANEL says the expanded state changes “nothing else”. Three specs, one layout, three answers (PHASE4-QA §2.1). V1 already answers it — all 30 panel boards in this section are 300. OPEN, not silently adopted.\n\n2. EXPANDED DRAWER — drawn at 700, which is what LeftSidebar.tsx:586-587 does today. SPEC-NAVIGATION's 560 proposal is filed, not applied (shared brief).\n\n3. AI HOME — SPEC-NAVIGATION §2.5 puts AI IN the inspector column with a “‹ Inspector” way back; SPEC-INSPECTOR §6 says it is docked BESIDE the inspector rather than over it, and calls that an inheritance. Not the same decision, and “beside” needs horizontal room neither spec allocates at 300 (PHASE4-QA §2.2). OPEN. UX-D-01 is only closed by whichever answer wins.\n\n4. “ALL LIKE THIS” SCOPE — either scope the peer set to the active page, and the existing copy becomes true, or keep it project-wide and say so (“also changes 9 buttons on 3 other pages”) with a way to see them first. The peer set is getAllElements() — every registered element across all loaded pages (ElementManager.ts:151-158), cleared only by a full project reset (:530-533) — while the dropdown says “on this page” (ScopeDropdown.tsx:153,159). OPEN (UX-D-04). Either way the reach is a working MODE: it survives a selection change to another element of the same type and ends explicitly, rather than being reset by useEffect([selectedElement?.id]) (ProInspector.tsx:110-114) (UX-D-05).\n\n5. “WHOLE SITE” — leaves the reach dropdown. It is navigation to Brand, has no controls behind it, and renders a takeover card while the pill above still reads “This” (SPEC-INSPECTOR §2.4, UX-D-06). OPEN — a Navigation-lane move, not an Inspector-lane drawing.\n\n6. THE PROPERTIES REGISTRY — 185 definitions across 31 families, exported at config/index.ts:19-22 and imported by nothing. Two acceptable outcomes, no third: make it the source the sections render from, or delete it. Leaving it is what has now cost two audits (UX-D-07). OPEN.\n\n7. LAYERS BREAKPOINT BADGE — NOT drawn as working anywhere in this section. UX-D-19 and UX-H-16 are ONE defect: useLayerTree.ts:88-95 never populates breakpointOverrides, so the T/M badges at LayerTreeItem.tsx:276-281 can never render. It is the Layers lane's to fix; this section only requires that what the inspector hides per breakpoint has an echo somewhere.\n\n8. VISIBILITY KEYS — the section writes --hide-${breakpointId} (VisibilitySection.tsx:36-45) while its registry entry declares display / visibility / opacity / pointer-events (registry/effects.tsx:128-132). The write itself is honoured end to end (Canvas.css:763-767, ExportEngine.ts:126-128), so this is a labelling defect: declare --hide-desktop / tablet / mobile and “applies”, auto-expand and the footer count all describe what the section does (UX-D-18).\n\n9. NOT DRAWN, BY DESIGN — five code fixes this design cannot paper over: composite types need real profiles and “tabs” is not even a key in PROFILE_MAP; FormSettingsSection must be rebuilt on chrome-ui before it can be mounted (it is finished and exported at shared/forms/index.ts:16, mounted nowhere, and its raw <select>/<input> with inline styles fail Gate 24 inside editor/); the peer set is getAllElements(); no forced-state mechanism exists anywhere in the package; the lock is enforced in useSelectionBehavior only. Until they land, the panel cannot tell the truth about what it is editing (SPEC-INSPECTOR §7).",
+    "color": "#4B5563"
+   }
+  ]
+ }
+]

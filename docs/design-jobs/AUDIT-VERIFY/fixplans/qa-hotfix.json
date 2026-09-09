@@ -1,0 +1,13 @@
+{
+ "slug": "qa-hotfix",
+ "page": "1:3",
+ "note": "Two rows the coherence QA earned. Row 1-2 repair a regression THIS ARC caused; row 3 fixes wiring the copy rewrite left behind.",
+ "rows": [
+  {"op": "move", "id": "2850:22385", "y": 76, "expect": "6820,21299,320,34",
+   "why": "QA-COHERENCE regression repair. M01 hid 85px of in-flow content on 2850:22371 and the modal hugs, so the board read back 440x117 and its bottom moved from abs 21336 to 21251. This hotspot is an ABSOLUTE child at abs y21299, so it did not ride up with the flow — it now sits 48px past a clipsContent=true edge: not painted, not hit-testable. It carries one of the board's only two NAVIGATE edges (-> 145:300), so the single-file delete modal became a prototype dead end. move writes PARENT-relative y and the parent is the board at abs 21134, so rel 76 puts it at abs 21210-21244, inside the new 21251 bottom, on the foot row where this family already places its back-hotspots (1175:4827 does exactly that). x is left unset so the move builder preserves it."},
+  {"op": "move", "id": "2850:22386", "y": 76, "expect": "6820,21295,280,34",
+   "why": "QA-COHERENCE regression repair, the second of the pair — same board, same cause, 44px past the clip edge, same NAVIGATE target 145:300. Same rel-76 landing. Note this node is itself a clone artefact: it is still named 'hotspot/back · Media · bulk-select' and still points at the bulk-select screen from what is now a single-file dialog. Repositioning it restores the edge; renaming and repointing it is a separate prototype-wiring question and is NOT done here."},
+  {"op": "rewire", "id": "2898:22183", "from": "302:1978", "to": "140:2",
+   "why": "QA-COHERENCE wiring miss. c1-clones relabelled this button 'Cancel' (it was 'Keep editing') as part of turning 2898:22178 into a real delete-page confirm, but the copy rewrite could not touch its reaction, which still navigates to 302:1978 — the page-settings destination the SOURCE modal used. Its sibling 2898:22185, now 'Delete page', already goes to 140:2 'Pages · tree'. Cancel belongs at the same place: the modal is opened from the tree and dismissing it returns there. rewire guards itself — it emits NOEDGE unless the current destination really is 302:1978, so a wrong premise costs nothing."}
+ ]
+}

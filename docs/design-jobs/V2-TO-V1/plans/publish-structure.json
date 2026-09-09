@@ -1,0 +1,67 @@
+{
+ "_tool": "scripts/figma/apply-publish-v2.mjs --apply  (one Figma call; every node it creates is named v2/<key> and removed-then-recreated on a re-run, so it cannot stack duplicates)",
+ "_page": "1:3",
+ "_ids_note": "Every board id and every child id in this file was READ from the live file before the quota cap (full node dumps of 641:2652, 784:4326, 784:4250, 784:4403, 784:4480, 781:4489, 778:4238, 833:4518, 893:4518, 914:4507, 1172:4825, 912:4520, 1168:4732, 1168:4713). None are inferred.",
+ "_placement_note": "The 280x812 panel boards clip. y=740 is the one free band on them: the footer frame starts at 764 and the 'spacer' frame above it is empty from y=352 down. The 520-wide wizard boards get their new row by shifting every child at or below y=321 down 36px and growing the board 439 → 475.",
+ "adds": [
+  { "key": "reason-nothing-to-send", "board": "784:4326", "board_name": "Publish · live",
+    "node": "TEXT 10/Regular #6B7280 width 248", "at": "x=16 y=740",
+    "text": "Disabled: no changes since v15. Edit a page, or republish anyway.",
+    "why": "UX-E-27 — the disabled primary explains itself in two of its three cases; the 'nothing to send' case prints nothing (PublishTab.tsx:710 disables, :748 and :755 are the only reasons rendered)." },
+
+  { "key": "reason-load-error", "board": "781:4489", "board_name": "Publish · load-error",
+    "node": "TEXT 10/Regular #6B7280 width 248", "at": "x=16 y=740",
+    "text": "Disabled because the deploy service did not answer — not because there is nothing to send.",
+    "why": "UX-E-27" },
+
+  { "key": "reason-loading", "board": "778:4238", "board_name": "Publish · loading",
+    "node": "TEXT 10/Regular #6B7280 width 248", "at": "x=16 y=740",
+    "text": "Checks still loading. The shipping panel leaves this button LIVE (PublishTab.tsx:710 does not gate on loading).",
+    "why": "UX-E-27 + QA-C-17 (the caption's :698 citation is stale at this HEAD; the expression is at :710)." },
+
+  { "key": "cancel", "board": "784:4250", "board_name": "Publish · publishing",
+    "node": "TEXT 11/Medium #1A56DB", "at": "x=208 y=150",
+    "text": "Cancel",
+    "why": "UX-E-09 — the in-progress state's only interactive element today is the disabled CTA. Placed inside the Status frame (44..170), right of the progress track (24..256 at y=138)." },
+
+  { "key": "cancel-scope", "board": "784:4250", "board_name": "Publish · publishing",
+    "node": "TEXT 10/Regular #C27803 width 248", "at": "x=16 y=280",
+    "text": "Cancel is scoped: publish.service.ts:414 permits QUEUED and BUILDING only, and no worker step re-checks across runVercelDeploy (route.ts:374-387) — a late cancel does not stop the deploy. No UI calls usePublishJob.cancel today (UX-E-09).",
+    "why": "UX-E-09 + PHASE4-QA-REPORT §1.2. Placed in the 'spacer' frame (262..764)." },
+
+  { "key": "all-versions", "board": "641:2652", "board_name": "Publish · panel",
+    "node": "TEXT 11/Medium #1A56DB", "at": "x=16 y=360",
+    "text": "All versions ›",
+    "why": "UX-E-29 — LAST DEPLOY answers 'what is live' and offers no route to 'how do I go back'. Placed in the 'spacer' frame 641:2705 (352..696), NOT on row 641:2701, whose timestamp 641:2704 occupies x=204..264." },
+
+  { "key": "hide-connect-vercel", "board": "784:4480", "board_name": "Publish · unavailable (feature off)",
+    "node": "set visible=false on the child of frame 'Panel footer' (784:4516) whose name starts with 'Button' — 784:4517 'Button · primary'",
+    "why": "UX-E-04 — when publishing is off for the workspace there is no door here that turns it on. MUST run AFTER the Publish · no Vercel connection clone." },
+
+  { "key": "no-door", "board": "784:4480", "board_name": "Publish · unavailable (feature off)",
+    "node": "TEXT 11/Regular #6B7280 width 248", "at": "x=16 y=776",
+    "text": "Nothing on this screen can turn it on.",
+    "why": "UX-E-04" },
+
+  { "key": "already-publishing", "board": "784:4403", "board_name": "Publish · failed",
+    "node": "TEXT 10/Regular #C27803 width 248", "at": "x=16 y=300",
+    "text": "ALREADY_PUBLISHING must not reach this board: it means another deploy is running, and \"Try again\" hits the same conflict (sites.ts:339-345). It needs the in-flight state, not a red block.",
+    "why": "UX-E-25. Placed in the 'spacer' frame 784:4438 (274..764)." },
+
+  { "key": "row-approval", "board": "833:4518", "board_name": "Publish · pre-checks",
+    "node": "FRAME 520x36 at y=321 containing: ✕ 10/Medium #E02424 in a 20x20 box at x=24 y=8 · 'Client approval' 12/Regular #111827 at x=54 y=10 · 'Waiting on Sara' 10/Regular #4B5563 right-aligned to x=463 · 'Open' 10/Medium #1A56DB right-aligned to x=496",
+    "shift": "every child with y >= 321 moves +36 (833:4577 divider, 833:4579 band, 833:4581 divider, 833:4582 footer); board 520x439 → 520x475",
+    "why": "UX-E-06 — the checklist measures six things and the server refuses on a seventh. Row shape copies the six existing rows exactly (icon box x=24 w=20, label x=54, detail right-aligned to 463, action right-aligned to 496)." },
+
+  { "key": "row-approval", "board": "893:4518", "board_name": "Publish · pre-checks · blocked",
+    "node": "same as above",
+    "shift": "children with y >= 321: 893:4569, 893:4570, 893:4573, 893:4574; board 520x439 → 520x475",
+    "why": "UX-E-06" },
+
+  { "key": "manifest", "board": "914:4507", "board_name": "Publish · Confirm",
+    "node": "EDIT existing TEXT 914:4526 (currently \"3 pages\", x=446 w=50)",
+    "text": "3 pages + 12 generated from Blog",
+    "at": "textAutoResize WIDTH_AND_HEIGHT, then x = 496 - width  (right edge stays on the board's 496 gutter, so the longer string grows LEFT and cannot escape the 520 board)",
+    "why": "UX-E-23 — the number the user approves is not the number that deploys; publish.service.ts:329 appends one page per published CMS entry after this count is taken." }
+ ]
+}

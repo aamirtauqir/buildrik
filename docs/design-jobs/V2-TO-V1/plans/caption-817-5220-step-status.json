@@ -1,0 +1,9 @@
+[
+ {
+  "board": "817:5220",
+  "donor": "807:8786",
+  "name": "caption/S6.4 · step-status vocabulary",
+  "why": "verified 2026-09-07 against HEAD",
+  "text": "Two more mismatches on the same vocabulary, verified 2026-09-07. STEP_WORD (PublishTab.tsx:862) maps pending|running|done|failed and has no key for either status the worker actually sends mid-run, so the in-flight step renders with no word and a step the worker deliberately marked skipped (images, Lighthouse) renders blank too. The worker’s own comment says a green check for work that did not happen is a false signal; the guard fires and the editor drops it. No editor file references “active” at all. Durable fix is one shared status union imported by worker and tab."
+ }
+]

@@ -1,0 +1,160 @@
+{
+ "section": "1776:8374",
+ "howToApply": "Resolve every `over.selector` to a TEXT node id (history-resolve-ids.mjs understands the same selector shape) and every `to.newBoardName` to the id add-state-board.mjs printed, then run: node scripts/figma/add-hotspots.mjs <this file> --apply. add-hotspots.mjs expects rows {over,to,name,pad,why} with plain ids — flatten before running.",
+ "convention": "'hotspot/state · X' is this file's convention for a prototype jump to a sibling state (386 instances measured section-wide, per COVER-2-11); 'hotspot/back · X' is a real back path. These are all forward jumps.",
+ "rows": [
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:2",
+     "boardName": "History · Saves · changes",
+     "contains": "14:32",
+     "hint": "the clickable timestamp in a change row; ActivityView.tsx:600-612 renders it as .entry-time inside .entry-meta"
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "History · Saves · changes · restore-confirm",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · changes-restore-confirm",
+   "pad": 8,
+   "why": "UX-I-01 — the timestamp is the control that produces the confirm. A board-level reaction would make the whole change list clickable, which is the defect add-hotspots.mjs exists to avoid (wire-edges.mjs walks a TEXT node up to its nearest frame ancestor, and here that IS the board)."
+  },
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:2",
+     "boardName": "History · Saves · changes",
+     "contains": "Clear",
+     "hint": "the header action; ActivityView.tsx:491-500 renders 'Clear' beside the 'Undo History' label. If AMBIG against 'Clear all', take the one whose characters are exactly 'Clear'."
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "[design-ahead] History · Saves · changes · clear-confirm",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · changes-clear-confirm",
+   "pad": 8,
+   "why": "UX-I-07"
+  },
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:113",
+     "boardName": "History · Saves · time-travel",
+     "contains": "Restore this point",
+     "hint": "TimeTravelScrubber.tsx:379"
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "[design-ahead] History · Saves · time-travel · restore-confirm",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · tt-restore-confirm",
+   "pad": 8,
+   "why": "UX-I-02"
+  },
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:113",
+     "boardName": "History · Saves · time-travel",
+     "contains": "Previewing",
+     "hint": "the preview label; TimeTravelScrubber.tsx:343. It is the node that lies when there is no frame, so it is the door onto the no-preview board."
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "[design-ahead] History · Saves · time-travel · no-preview",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · tt-no-preview",
+   "pad": 8,
+   "why": "UX-I-12"
+  },
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:2",
+     "boardName": "History · Saves · changes",
+     "contains": "Undo History",
+     "hint": "the list header; ActivityView.tsx:467. The boundary is the END of this list, so the door onto it is the header, not a control."
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "[design-ahead] History · Saves · changes · start-of-history",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · start-of-history",
+   "pad": 8,
+   "why": "UX-I-05"
+  },
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:2",
+     "boardName": "History · Saves · changes",
+     "contains": "No undo history",
+     "hint": "the empty-state title; ActivityView.tsx:766. Only present on a board drawn in the empty state — if NOMATCH on 163:2, retarget to 163:64 History · Saves · empty."
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "[design-ahead] History · Saves · changes · load-error",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · changes-load-error",
+   "pad": 8,
+   "why": "UX-I-06 — the two states this pairs are the pair the finding is about: 'nothing happened' vs 'I could not read it'. Putting the edge between them is what makes the difference visible in the prototype."
+  },
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "162:2",
+     "boardName": "History · Saves",
+     "contains": "Save a version",
+     "hint": "VersionHistoryPanel.tsx:471-482 '+ Save a version' at the foot of the panel"
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "[design-ahead] History · Saves · overflow — Export / Import",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · saves-overflow",
+   "pad": 8,
+   "why": "UX-I-08 — the overflow belongs beside the one control that already writes to the version store."
+  },
+  {
+   "over": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:2",
+     "boardName": "History · Saves · changes",
+     "contains": "Undo",
+     "hint": "a disabled-undo affordance if the board draws one; expect NOMATCH — recorded so the applier knows the door for undo-unavailable was looked for and not found, and must be placed by hand or the board left as a terminal state."
+    }
+   },
+   "unresolved-id": true,
+   "to": {
+    "newBoardName": "[design-ahead] History · Saves · changes · undo-unavailable",
+    "note": "id printed by add-state-board.mjs"
+   },
+   "name": "hotspot/state · undo-unavailable",
+   "pad": 8,
+   "why": "UX-I-15",
+   "expectMayNotResolve": true
+  }
+ ]
+}

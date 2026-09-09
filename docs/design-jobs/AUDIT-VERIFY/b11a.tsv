@@ -1,0 +1,26 @@
+N	165:2	Notifications · unread — UX-F-26 / UX-F-25: drawn 360 as of 2026-09-07, matching the shipp	FRAME	900,95409,360,812	true	VERTICAL	9	true
+K	165:3	FRAME	900,95409,360,48	true	true	Header
+K	220:903	INSTANCE	900,95457,360,28	true	false	Section header
+K	165:8	FRAME	900,95485,360,44	true	true	Note · Site published
+K	165:13	FRAME	900,95529,360,44	true	true	Note · Form submission
+K	220:907	INSTANCE	900,95573,360,28	true	false	Section header
+K	165:20	FRAME	900,95601,360,44	true	true	Note · Publish failed
+K	444:2374	FRAME	900,95645,360,34	true	true	hotspot/state · Notifications · loading
+K	444:2376	FRAME	900,95679,360,34	true	true	hotspot/state · Notifications · jump-target-delete
+K	881:4542	FRAME	900,95713,360,32	true	true	hotspot/alt · S1 · Editor — ASSEMBLED (1
+C	165:2	texts=10
+T	165:23	1212,95610,14,16	11	Medium	true	WIDTH_AND_HEIGHT	Note · Publish failed	1d
+T	165:22	932,95609,268,18	12	Regular	true	HEIGHT	Note · Publish failed	Site “Osteria” didn’t publish: build failed
+T	I220:907;16:17	916,95579,328,16	11	Medium	true	HEIGHT	Section header	YESTERDAY
+T	165:17	1212,95538,14,16	11	Medium	true	WIDTH_AND_HEIGHT	Note · Form submission	4h
+T	165:16	932,95537,268,18	12	Regular	true	HEIGHT	Note · Form submission	New form submission on “Bella Cucina”
+T	165:12	1212,95494,14,16	11	Medium	true	WIDTH_AND_HEIGHT	Note · Site published	2h
+T	165:11	932,95493,268,36	12	Regular	true	HEIGHT	Note · Site published	Site “Bella Cucina” is live at bella-cucina.vercel.app
+T	I220:903;16:17	916,95463,328,16	11	Medium	true	HEIGHT	Section header	TODAY
+T	165:5	1232,95423,13,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	✕
+T	165:4	916,95423,86,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	Notifications
+R	165:2	165:24	NAVIGATE	Notifications · unread — UX-F-26 / UX-F-25: drawn 360 as of 2026-09-07, matching the shipp
+R	881:4542	52:2	NAVIGATE	hotspot/alt · S1 · Editor — ASSEMBLED (1
+R	444:2376	165:71	NAVIGATE	hotspot/state · Notifications · jump-target-delete
+R	444:2374	165:51	NAVIGATE	hotspot/state · Notifications · loading
+END	done=165:2	stopped=false	bytes=2017

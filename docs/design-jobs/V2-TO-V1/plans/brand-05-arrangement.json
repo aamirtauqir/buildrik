@@ -1,0 +1,88 @@
+{
+  "slug": "brand",
+  "covers": ["ARR-A-25", "ARR-A-26", "ARR-A-27", "ARR-A-28", "ARR-A-29", "ARR-A-30", "ARR-A-31", "ARR-A-32", "ARR-A-33", "ARR-B-16", "ARR-B-17", "ARR-B-18", "ARR-B-19", "ARR-B-20", "ARR-B-21", "ARR-B-22", "ARR-A-18", "ARR-C-33"],
+
+  "why_not_replaying_the_lane_coordinates": "The ARRANGE lane names target rows y=1226, y=2681, y=3723 and y=4079 for section 1776:8373. I MEASURED that section at 05:07 today and its rows are y=220, 1052, 1316, 2148, 2358, 2714, 3646, 4578, 5410, 5602, 5961, 6793, 7093, 7321, 7459. The section has been re-laid since ARR was written, so every explicit coordinate in ARR-A-26 through ARR-A-33 is STALE. Replaying them would move boards to slots that no longer mean what the lane meant. The tool the brief sanctions for arrangement re-derives the grid from the section's own boards — run it, then check the lane's INTENTS as acceptance criteria.",
+
+  "step_1_reflow": {
+    "run_after": "brand-04-boards.json — create the new boards first, so the re-flow places them among their family instead of leaving them in whatever slot the clone landed in",
+    "commands": [
+      "node scripts/figma/layout-section.mjs 1776:8373",
+      "node scripts/figma/layout-section.mjs 1084:4527",
+      "node scripts/figma/layout-section.mjs 1938:8372",
+      "node scripts/figma/layout-section.mjs 1779:6"
+    ],
+    "note": "no --apply flag in this script's signature; run it dry first and read the printed grid before letting it write."
+  },
+
+  "step_2_acceptance_checks": {
+    "1776:8373": [
+      "ARR-A-33 — the twelve Brand sub-tab boards read in PRODUCT order, not alphabetical: 152:52 tokens, 152:83 token-detail, 153:57 typography, 153:92 colour-mode, 153:2 classes, 153:29 components, 152:112 presets, 152:137 starters, 154:78 dirty, 154:2 lint, 154:26 lint-warnings, 153:120 import-export — with captions 155:56-155:68 carried alongside",
+      "ARR-A-26 — 1333:7162 (the CURRENT root) is the first board of the section, not 5,280px down a row of its own",
+      "ARR-A-31 — 154:132 (root · Beginner mode) sits immediately beside 1333:7162",
+      "ARR-A-27 + ARR-A-28 — the four AI-prompt modals 1706:8467 idle, 1706:8476 generating, 1706:8483 success, 1706:8492 error sit together IN THAT ORDER. Measured today they are already on one row (y=2358) but out of order: idle@100, error@940, generating@1780, success@2620.",
+      "ARR-A-30 + ARR-A-32 — the four unbuildable/retired boards 306:2111, 306:2136, 306:2161 and 1138:13376 sit in a trailing band, not sandwiched between live boards",
+      "ARR-A-29 — sub-states sit under the parents they belong to"
+    ],
+    "1084:4527": [
+      "ARR-B-20 — 641:2487 gallery heads its own states row, adjacent to 782:4402 no-results and 781:4372 load-error",
+      "ARR-B-19 — 778:4102 (RETIRED 2026-09-02) and its caption 788:4311 sit in a trailing retired band, not in the middle of the live states row",
+      "ARR-B-21 — the four S1.x journey boards read in number order: 807:4299 S1.1b, 807:6694 S1.1d, 813:4489 S1.1e, 807:7252 S1.3b (with caption 807:7297), before the panel boards begin",
+      "ARR-B-22 — no 4,300px right-hand void; rows run to a similar width"
+    ],
+    "1938:8372": [
+      "ARR-B-17 — three short rows instead of one 4,380px row: panel states (641:2546 library, 641:2599 detail, 1138:13394 empty, 778:4173 loading, 781:4433 load-error), create flow (642:3112, 1170:4777), modals/confirms (1170:4792, 2476:12064, 2476:12081)",
+      "ARR-B-16 — 641:2546 library is adjacent to its own detail/empty/loading/load-error, not separated by a 1440x900 shell and a 720 modal",
+      "ARR-B-18 — 1170:4792 sits beside 1170:4777 on the modals row"
+    ]
+  },
+
+  "step_3_explicit_moves_layout_section_cannot_make": [
+    {
+      "ref": "M1",
+      "finding": "ARR-C-33",
+      "section": "1779:6",
+      "confidence": "HIGH — my 05:07 measurement agrees with the lane's premises exactly, so these coordinates are safe to replay",
+      "measured_now": [
+        "1719:8391 collection-setup (modal) @ 100,220 · 720x400",
+        "1719:8443 bind · popover · collections @ 100,740 · 240x132",
+        "1719:8450 bind · popover · fields @ 460,740 · 240x300",
+        "1719:8421 bound · inspector @ 820,740 · 300x243",
+        "1719:8414 collection-created · toast @ 100,1160 · 280x812"
+      ],
+      "moves": [
+        { "id": "1719:8414", "to": { "x": 100, "y": 740 } },
+        { "id": "1719:8443", "to": { "x": 500, "y": 740 } },
+        { "id": "1719:8450", "to": { "x": 860, "y": 740 } },
+        { "id": "1719:8421", "to": { "x": 1220, "y": 740 } }
+      ],
+      "then": "shrink-wrap the section — it drops from 3 rows to 2, from 1220x2112 to about 1620x1770",
+      "why": "the toast is the direct outcome of the setup modal and is currently placed last, with the three binding boards that FOLLOW it in the flow sitting between the two"
+    },
+    {
+      "ref": "M2",
+      "finding": "ARR-A-25",
+      "section": "1776:8373",
+      "node": "155:69",
+      "node_name": "caption/Brand · pro-locked",
+      "measured_now": "@ 100,7093 · 280x108, sitting alone on a row near the bottom of the section",
+      "lane_fix": "move 155:69 into section 1776:8389 '24 · Notes · captions & annotations', whose stated purpose is unmatched captions",
+      "my_recommendation": "RE-AIM IT INSTEAD, and here is why the lane's fix is now the wrong one. ARR-A-25's premise is that 155:69 captions a board that does not exist — true, my census confirms no board named 'Brand · pro-locked' anywhere in the section. But its TEXT was rewritten since, by FIG-F-01 via the applied plan-text-B.json, and now reads 'Beginner is a display density, not a plan — it is a per-user localStorage flag, and no row is ever gated by billing…'. That is a precise and correct description of 154:132 'Brand · root · Beginner mode', which DOES exist and which my census measured at 280x812, 37 TEXT nodes. Exiling an accurate caption to the orphan bin because its old name is stale loses the one caption that explains the Beginner/Pro model.",
+      "moves": [
+        { "id": "155:69", "rename_to": "caption/Brand · root · Beginner mode", "place": "immediately below 154:132 after the step-1 re-flow" }
+      ],
+      "escalate_if": "the founder prefers the lane's original disposition — then move 155:69 to 1776:8389 unchanged and file the Beginner/Pro explanation as a caption that needs writing for 154:132."
+    },
+    {
+      "ref": "M3",
+      "finding": "ARR-A-18",
+      "unresolved-id": true,
+      "node": "1138:13413",
+      "node_name": "Templates · empty",
+      "currently_in": "1776:8379 (02 · Insert) — NOT my section, so I did not read this node and cannot confirm its id or position",
+      "move_to": "1084:4527, adjacent to 782:4402 Templates · no-results",
+      "why": "it is the only Templates board filed under Insert, stranded four sections from the rest of its async family — which my census confirms already sits together in 1084:4527 (782:4402 no-results, 781:4372 load-error, 778:4102 loading·RETIRED)",
+      "coordination": "cross-section move out of another agent's section. Confirm with whoever owns 1776:8379 (insert) before moving, and re-run layout-section.mjs on BOTH sections after."
+    }
+  ]
+}

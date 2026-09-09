@@ -1,0 +1,127 @@
+[
+ {
+  "op": "advisory",
+  "why": "UX-D-08 inspector-boards receipt",
+  "detail": "UX-D-08 \u2014 IMPLEMENTED. Board 2864:12415 'Inspector \u00b7 profile \u00b7 SLIDER \u00b7 component editor' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-09 inspector-boards receipt",
+  "detail": "UX-D-09 \u2014 IMPLEMENTED. Board 2864:21821 'Inspector \u00b7 profile \u00b7 FORM destination' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-02 inspector-boards receipt",
+  "detail": "UX-D-02 \u2014 IMPLEMENTED. Board 2865:12419 'Inspector \u00b7 locked element' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-20 inspector-boards receipt",
+  "detail": "UX-D-20 \u2014 IMPLEMENTED. Board 2865:12493 'Inspector \u00b7 breakpoint-override summary' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-12 inspector-boards receipt",
+  "detail": "UX-D-12 \u2014 IMPLEMENTED. Board 2865:21984 'Inspector \u00b7 disabled control + reason' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-13 inspector-boards receipt",
+  "detail": "UX-D-13 \u2014 IMPLEMENTED. Board 2865:21984 'Inspector \u00b7 disabled control + reason' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-10 inspector-boards receipt",
+  "detail": "UX-D-10 \u2014 IMPLEMENTED. Board 2865:22079 'Inspector \u00b7 findability' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-11 inspector-boards receipt",
+  "detail": "UX-D-11 \u2014 IMPLEMENTED. Board 2865:22079 'Inspector \u00b7 findability' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-25 inspector-boards receipt",
+  "detail": "UX-D-25 \u2014 IMPLEMENTED. Board 2865:22079 'Inspector \u00b7 findability' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-26 inspector-boards receipt",
+  "detail": "UX-D-26 \u2014 IMPLEMENTED. Board 2865:22079 'Inspector \u00b7 findability' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-14 inspector-boards receipt",
+  "detail": "UX-D-14 \u2014 IMPLEMENTED. Board 2865:22206 'Inspector \u00b7 MOTION' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-15 inspector-boards receipt",
+  "detail": "UX-D-15 \u2014 IMPLEMENTED. Board 2865:22206 'Inspector \u00b7 MOTION' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-16 inspector-boards receipt",
+  "detail": "UX-D-16 \u2014 IMPLEMENTED. Board 2865:22206 'Inspector \u00b7 MOTION' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-28 inspector-boards receipt",
+  "detail": "UX-D-28 \u2014 IMPLEMENTED. Board 2865:22206 'Inspector \u00b7 MOTION' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-03 inspector-boards receipt",
+  "detail": "UX-D-03 \u2014 IMPLEMENTED. Board 2865:22227 'Inspector \u00b7 multi-select' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-24 inspector-boards receipt",
+  "detail": "UX-D-24 \u2014 IMPLEMENTED. Board 2865:22266 'Inspector \u00b7 duplicate class + density' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-D-27 inspector-boards receipt",
+  "detail": "UX-D-27 \u2014 IMPLEMENTED. Board 2865:22266 'Inspector \u00b7 duplicate class + density' built in section 1776:8381 by build-inspector-states.mjs and read back by that pass (interiors drawn, 73 nodes, each new TEXT cloned from an existing sibling). It leaves no row in queue-state because apply-queue refuses add-board rows by design."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-40 gap-settings receipt",
+  "detail": "UX-I-40 \u2014 IMPLEMENTED. 2876:12433/12437/12441/12445/12449/12453. six warning bands, read back 1192x52@32,24 Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-34 gap-settings receipt",
+  "detail": "UX-I-34 \u2014 IMPLEMENTED. 2877:12431. new board Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-35 gap-settings receipt",
+  "detail": "UX-I-35 \u2014 IMPLEMENTED. 2877:21890. new board; dialog 2879:12616 440x184@500,358 FITS Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-32 gap-settings receipt",
+  "detail": "UX-I-32 \u2014 IMPLEMENTED. 1703:8069 and 1703:7605. in-body Save headers / Save locales removed; getNodeByIdAsync returned null for both; the other 7 boards read NOT-DRAWN Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-36 gap-settings receipt",
+  "detail": "UX-I-36 \u2014 IMPLEMENTED. three 'saves immediately' bands. the savebar half is ALREADY-CORRECT \u2014 no savebar frame exists on 639:3092 / 640:3135 / 640:3849, measured Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-37 gap-settings receipt",
+  "detail": "UX-I-37 \u2014 IMPLEMENTED. 2876:12467 filter field + 2876:12469 decision band.  Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-41 gap-settings receipt",
+  "detail": "UX-I-41 \u2014 IMPLEMENTED. 2876:12473. band on 638:3070; the unbuilt half marked [design-ahead] Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-39 gap-settings receipt",
+  "detail": "UX-I-39 \u2014 IMPLEMENTED. 2876:12475. drawn as an open decision; 2041:19572 not read and not written, 0 of ~600 instances touched Applied by the settings gap pass with a read-back; it leaves no row in queue-state because that pass used bespoke scripts, which do not write it."
+ }
+]

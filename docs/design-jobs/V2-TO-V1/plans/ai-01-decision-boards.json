@@ -1,0 +1,121 @@
+{
+  "module": "AI experience",
+  "slug": "ai",
+  "applyWith": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=<A|B|C>",
+  "target": { "page": "1:3", "section": "1776:8380" },
+  "state": "NOT APPLIED — quota. Payloads verified locally: A 7741, B 11761, C 10935 chars, all under the 19000 cap.",
+
+  "why": "Twenty of the twenty-three V2 AI findings are not 'this screen is wrong', they are 'this layer has no system'. A per-board copy fix cannot state that AI has two homes, five glyphs and no apply contract. Three decision boards can, and every screen-level row in this module then hangs off one of them. UX-G-24, the module-summary row, asks for exactly this: adopt one AI interaction system BEFORE redrawing any of these screens.",
+
+  "boards": [
+    {
+      "key": "A",
+      "name": "AI · one home — every door, one destination",
+      "size": "1380x796",
+      "slot": { "x": 100, "y": 5220, "basis": "free per the 2026-09-07 read; collision-tested again at write time, returns BLOCKED rather than overlapping" },
+      "findings": ["UX-G-02 (Critical)", "UX-G-15 (Minor)", "UX-G-16 (Minor)"],
+      "decision": "The AI panel lives in the INSPECTOR column (300 wide). One thread, lifted out of the panel's local React state so closing the panel, pressing '‹ Inspector' or selecting another element does not destroy the conversation. One shortcut: ⌘J. One ⌘K row: 'Ask AI', always present.",
+      "content": {
+        "title": "AI · one home",
+        "stamp": "DECISION — applies UX-G-02, UX-G-15, UX-G-16",
+        "intro": "The same AI panel opens in two columns depending on which door you used: the inspector chips and ⌘J route it RIGHT with a “‹ Inspector” back row; the bare I shortcut and the ⌘K “Open AI panel” command route it LEFT with a close ×. Both can be open at once and each mount holds its own message list, so the thread you started from the inspector is invisible from the drawer. That is an IA decision nobody made, and it reaches the user as a bug.",
+        "decisionBand": "One home — the inspector column, 300 wide.   ·   One thread — lifted out of the panel’s local state, so closing the panel, pressing “‹ Inspector” or selecting another element does not destroy the conversation.   ·   One shortcut — ⌘J.   ·   One palette row — “Ask AI”, always present.",
+        "doorTable": [
+          ["⌘J", "Inspector column", "KEEP — the one shortcut. Taught on the sheet beside the chip.", "success"],
+          ["Inspector header chip “✦ AI”", "Inspector column", "KEEP — relabel “Ask AI”, Sparkles mark.", "success"],
+          ["Inspector empty state “✦ Ask AI ›”", "Inspector column", "KEEP — same label, same mark.", "success"],
+          ["Multi-select toolbar “✦ AI”", "Inspector column, then refuses", "KEEP — state the refusal BEFORE the prompt (UX-G-03).", "warning"],
+          ["Canvas toolbar “Edit with AI”", "In-canvas popover", "KEEP — relabel “Ask AI”; the popover shares the panel’s state machine (UX-G-11).", "warning"],
+          ["⌘K “✨ Ask AI instead ›” (no-results only)", "Inspector column", "KEEP as a shortcut into the row below — not a second destination.", "warning"],
+          ["⌘K “Open AI panel” (Navigation group)", "LEFT drawer", "RETIRE the destination. One palette row, always present, routing to the inspector column (UX-G-16).", "error"],
+          ["Bare I", "LEFT drawer", "RETIRE. The Panels group of the shortcut sheet drops “I — Open AI panel” in the same change (UX-G-15).", "error"],
+          ["Topbar “Ask AI” (four-tool rail only)", "Dead in the shipping rail", "RETIRE.", "error"]
+        ],
+        "footnote": "The rail keeps no AI button — AI is an inspector-column tool and RAIL_FIGMA is right to omit it. The keyboard sheet builds its Panels group from every tab that has a shortcut, so it will keep teaching “I — Open AI panel” until the ai tab’s shortcut is removed with the drawer mount: the sheet is an index of the decision, not a separate surface.",
+        "notDrawn": "Deliberately NOT drawn: the left-drawer variant of this panel. A board for it would preserve the thing this decision removes. What replaces it is the row above — one destination, reached nine ways."
+      },
+      "supersedes": "FIG-K-12 proposed building an 'AI · left-panel variant' board. This plan deliberately does NOT build it: UX-G-02's fix is to delete the left-drawer case, and drawing it would preserve the thing being removed. FIG-K-12's own text already flags the founder call ('whether the left route should be removed instead') — this is that call, made.",
+      "codeEvidence": "⌘J → composer.emit('ui:switch-tab',{tab:'ai'}) at useEditorShortcuts.ts:168-172, whose own comment reads 'AI is one surface now — open the AITab rail panel'; the code contradicts the comment because tabsConfig.ts:87-97 still registers ai with shortcut 'I' and TabRouter.tsx:141-142 still mounts it in the drawer."
+    },
+    {
+      "key": "B",
+      "name": "AI · one mark, one verb, one contract",
+      "size": "1380x1360",
+      "slot": { "x": 1580, "y": 5220 },
+      "findings": ["UX-G-10 (Major)", "UX-G-04", "UX-G-05", "UX-G-07", "UX-G-11", "UX-G-12", "UX-G-13", "UX-G-14", "UX-G-19", "UX-G-06", "UX-G-20"],
+      "content": {
+        "mark": "One glyph everywhere: the lucide Sparkles icon, at the tier's own size — already the rail icon, the canvas-toolbar icon and the full-library alt-text icon. RETIRE ✨, ✦, the play triangle and the clock from every AI context: an emoji is not a design-system icon and does not respond to state, size or theme.",
+        "tiers": [
+          ["Primary", "AI produces something that does not exist yet", "Filled accent button. Opens a brief, then a review — never a one-click generate.", "“Draft …” / “Generate <noun>”", "“Ask AI”, “AI Magic”, “Let AI…”"],
+          ["Secondary", "AI changes what is already here, and you see the diff", "Bordered button carrying the mark. Ends in a diff card with Discard / Apply.", "“Ask AI”", "“Edit with AI”, “AI assistant”, “Chat”"],
+          ["Inline", "AI fills this one field. Nothing else can change.", "Text-weight control in the field’s own row. Fills an editable draft; the field’s own commit is the Apply.", "“Generate” / “Regenerate”", "“Write with AI”, “✨ Generate”, “Suggest”"]
+        ],
+        "contract": ["IDLE — the brief", "GENERATING — Stop required. The user’s content stays on screen and stays valid.", "PROPOSED — the diff. Nothing lands without this step.", "APPLIED — one undo step per Apply, and an Undo button.", "FAILED — Try again re-uses the brief, never an empty prompt. Discard and Stop leave the page provably untouched and say “Nothing was changed”."],
+        "typedFailures": [
+          ["not available", "“AI isn’t available on this workspace.” Exit: a route that can actually change that, or none at all. Never a settings page that cannot.", "UX-G-01"],
+          ["out of credit", "The server’s own limit and reset sentence, plus “Nothing was changed”, plus See plans AND “Continue by hand”.", "UX-G-23"],
+          ["didn’t respond", "“This is usually the model provider, not your site.” Exit: Try again, with the same brief.", "UX-G-11"],
+          ["nothing to apply", "The model answered with something this editor cannot map. Say that — never report success over an unchanged page.", "—"]
+        ],
+        "rules": [
+          ["Quota is visible before the wall", "A quiet “7 left today” beside the send control, amber near zero. ai.getQuotaStatus already exists and has no caller.", "UX-G-04"],
+          ["Undo is a button, not folk knowledge", "The applied chat message carries Undo until the next edit displaces it — today only the agent run has one.", "UX-G-13"],
+          ["Auto-apply states the stakes, not the mechanic", "“Steps change the page without asking. You can undo the whole run.” Privileged actions still stop for an explicit dialog, and the toggle says so.", "UX-G-14"],
+          ["AI never evicts the surface that judges it", "The diff card carries the live current value of every property it proposes to overwrite, so the inspector does not have to be off screen.", "UX-G-12"],
+          ["Suggestions carry their own scope", "A page-wide starter sets the scope to the page when clicked and says so in the band, or is hidden when the scope cannot serve it.", "UX-G-19"],
+          ["Provenance survives the apply", "Anything AI wrote is marked until the user edits it; the edit clears the mark.", "UX-G-06"],
+          ["AI edits are findable an hour later", "The transaction is already labelled ai-edit. Carry that label into the visible history, not only into a transient toast.", "UX-G-20"]
+        ],
+        "flagFootnote": "An affordance and the capability behind it share one switch. Brand’s “Generate with AI” renders unconditionally while its client is built only when the dsAi flag is on — and that flag is set in no env file, so the button is live for every user and the failure is the only reachable outcome (UX-G-07)."
+      }
+    },
+    {
+      "key": "C",
+      "name": "AI · placement — what earns a door, and what must never have one",
+      "size": "1380x1000",
+      "slot": { "x": 3060, "y": 5220 },
+      "findings": ["UX-G-06", "UX-G-08", "UX-G-09 (Critical)", "UX-G-17", "UX-G-18", "UX-G-20", "UX-G-21", "UX-G-22"],
+      "content": {
+        "rule": "A surface earns an AI affordance when (1) the task is repetitive typing or a first draft, not a decision; (2) the result can be shown as a reversible diff before it lands; (3) the surface can name the exact scope AI will touch; and (4) doing it by hand is measurably slower than reading and approving AI’s answer. Clause 2 disqualifies most bad placements. Clause 3 disqualifies the rest: if the user cannot be told WHAT is about to change, they cannot consent to it.",
+        "earnsADoor": [
+          ["Canvas · selected element", "Secondary — prompt popover on the selection toolbar", "ships"],
+          ["Canvas · page scope", "Secondary — the panel: conversation and agent run", "ships"],
+          ["Inspector · one property", "Secondary — “Ask AI” on Typography, Colour, Spacing", "not built"],
+          ["Content / CMS · records and fields", "Primary “Draft with AI”; bulk “Fill this column for 12 records”", "not built — highest-value gap"],
+          ["Content / CMS · collection schema", "Secondary — “Suggest fields” when creating a collection", "not built"],
+          ["Insert / Layouts", "Primary — “Describe a section”", "not built — the command ships, the door does not"],
+          ["Media · alt text", "Inline Generate / Regenerate, with provenance", "ships twice — unify on the vision path"],
+          ["Pages · SEO title and description", "Inline Generate", "title only, and silent on failure"],
+          ["Brand · component generation", "Primary — modal", "built, dead-ended: no Accept destination"],
+          ["Dashboard · site draft", "Primary — one brief form, reached from both doors", "ships as two wizards, one weaker"]
+        ],
+        "mustNever": [
+          ["Publish", "AI may PROPOSE it — the propose → confirm-token → domain gate is exactly right. There must never be a “Publish with AI” button: a deploy is not a reversible diff."],
+          ["Version history · AI diff summary", "Fails clause 4 — the diff is already rendered, structured and readable. RETIRE rather than repair. (Its procedure is NOT doorless: ai.summarize has an editor caller at useAISummary.ts:109. Retire it on placement grounds.)"],
+          ["Milestone / version naming", "Fails clause 1 — naming a checkpoint is three words the user types. A model call and a banner on a non-problem. RETIRE."],
+          ["Settings · Domains · Redirects · Headers · Webhooks · Analytics", "Fails clauses 2 and 4 — configuration with external side effects. A wrong DNS record is not undone by ⌘Z."],
+          ["Forms · submission data", "Customer data. AI must not read, summarise or rewrite it inside the editor."],
+          ["Any affordance whose PURPOSE is deletion", "delete-element stays in the vocabulary — a user can ask for it and see it in the diff. No “clean this up with AI”, no “remove unused”."],
+          ["Layers tree", "Fails clause 3 — a structural rename or re-parent across a tree cannot be scoped in a sentence the user can check before it runs."],
+          ["Client review / sign-off", "The value of a client’s approval is that a human gave it."]
+        ],
+        "owedFooter": [
+          "1 · “What AI can change”, in plain words, reachable from the panel. The command vocabulary includes deleting elements, moving them, rewriting design tokens, changing page settings, saving components and proposing a publish — and the user’s only view of it is whatever a given diff happens to contain. Plus an owner-level AI off switch at site level. Neither exists (UX-G-20).",
+          "2 · The onboarding brief — industry, description, location, tone, visual style, colour, reference sites — is used once at generation time and handed to nothing. Persist it on the site, give the editor’s AI read access to it, and put “Regenerate this page” in the Pages panel rather than on a wizard screen the user leaves once (UX-G-22).",
+          "3 · One honest index of what AI does. The dashboard’s AI-credits page advertises Content Generation, Design Suggestions and SEO Optimization as coming soon on the same page that meters the prompts those shipping features spend (UX-G-17); and one AI brief form serves both site-creation doors instead of a second, weaker wizard (UX-G-18)."
+        ]
+      },
+      "carriesTheCorrection": "D-F-38 claimed ai.summarize has no editor caller. It HAS one (useAISummary.ts:109). That refutation is recorded at findings/VERDICTS.jsonl:199 and is still being carried wrongly at DESIGN-AUDIT-SUMMARY.md:99. This board retires the version-diff summary on PLACEMENT grounds and says so in the row, so no future pass reads its retirement as 'it was doorless'."
+    }
+  ],
+
+  "designSystem": {
+    "accent": "#1A56DB", "accentTint": "#EBF5FF (--bk-accent-tint, tokens.generated.css:85)",
+    "ink": "#111827", "inkSoft": "#4B5563", "inkMuted": "#6B7280",
+    "border": "#E5E7EB", "borderMedium": "#D1D5DB", "bgApp": "#F3F4F6", "panel": "#FFFFFF",
+    "success": "#0E9F6E", "warning": "#C27803", "error": "#E02424",
+    "type": "11 / 12 / 13 / 20 only; leading 16 / 18 / 20 / 30",
+    "weights": "Inter Regular / Medium / Semi Bold — nothing above 600",
+    "note": "#1A264D is not a token (CONF-1-01) and is not used anywhere in these boards, even though the file's older doc boards were drawn with it before normalise-doc-boards.mjs remapped them."
+  }
+}

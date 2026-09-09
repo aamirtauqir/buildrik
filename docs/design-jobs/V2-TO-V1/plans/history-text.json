@@ -1,0 +1,319 @@
+[
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "162:2",
+   "boardName": "History · Saves",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "162:2",
+   "boardName": "History · Saves",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:2",
+   "boardName": "History · Saves · changes",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:2",
+   "boardName": "History · Saves · changes",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:64",
+   "boardName": "History · Saves · empty",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:64",
+   "boardName": "History · Saves · empty",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:113",
+   "boardName": "History · Saves · time-travel",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:113",
+   "boardName": "History · Saves · time-travel",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:167",
+   "boardName": "History · Saves · restore-confirm",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:167",
+   "boardName": "History · Saves · restore-confirm",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:220",
+   "boardName": "History · Saves · restoring",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:220",
+   "boardName": "History · Saves · restoring",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:269",
+   "boardName": "History · Saves · pruned-notice",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:269",
+   "boardName": "History · Saves · pruned-notice",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "453:4031",
+   "boardName": "History · Saves · load-error",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "453:4031",
+   "boardName": "History · Saves · load-error",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "1138:4573",
+   "boardName": "History · Saves · loading",
+   "contains": "Milestones"
+  },
+  "unresolved-id": true,
+  "text": "Saved versions",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "1138:4573",
+   "boardName": "History · Saves · loading",
+   "contains": "All changes"
+  },
+  "unresolved-id": true,
+  "text": "This session",
+  "why": "UX-I-09 — 'Milestones' and 'All changes' present two different STORES as two filters of one list: persistent named versions (VersionHistoryPanel, useVersionHistory, 50 kept, named ones never prune) vs the in-memory undo stack (ActivityView -> useHistoryState.ts:46 -> composer.history.getHistoryStack, capped at 100 by config.ts:108 and reset to one baseline on every PROJECT_LOADED by HistoryManager.ts:136-157). A user reads the second as a superset of the first, saves nothing, reloads, and the afternoon is gone. Name them for what SURVIVES."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:2",
+   "boardName": "History · Saves · changes",
+   "contains": "versions kept"
+  },
+  "unresolved-id": true,
+  "text": "This session only — the last 100 steps, cleared when you reload. Save a version to keep a point.",
+  "width": 328,
+  "why": "UX-I-09 — SavesChrome.tsx:161-169 prints the retention rule ('N versions kept. Auto-saves prune oldest first; named ones never prune.') under BOTH filters, which is what makes the session list read as durable. Under the session list it has to say what is true of the session list. Cap source: config.ts:108 HISTORY_MAX_SIZE 100; wipe source: HistoryManager.ts:136-157."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "162:2",
+   "boardName": "History · Saves",
+   "contains": "changes since approval"
+  },
+  "unresolved-id": true,
+  "text": "Now — edited since approval",
+  "width": 240,
+  "why": "UX-I-16 — SavesChrome.tsx:89-107 counts composer.history.getHistoryStack() filtered by timestamp > approvedAt, and HistoryManager.ts:136-157 resets both stacks to a single 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days and the summary line beneath it empties out. A number that resets to zero on refresh is a claim about approval drift that nothing backs — say the thing that is true."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:2",
+   "boardName": "History · Saves · changes",
+   "contains": "changes since approval"
+  },
+  "unresolved-id": true,
+  "text": "Now — edited since approval",
+  "width": 240,
+  "why": "UX-I-16 — SavesChrome.tsx:89-107 counts composer.history.getHistoryStack() filtered by timestamp > approvedAt, and HistoryManager.ts:136-157 resets both stacks to a single 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days and the summary line beneath it empties out. A number that resets to zero on refresh is a claim about approval drift that nothing backs — say the thing that is true."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:167",
+   "boardName": "History · Saves · restore-confirm",
+   "contains": "changes since approval"
+  },
+  "unresolved-id": true,
+  "text": "Now — edited since approval",
+  "width": 240,
+  "why": "UX-I-16 — SavesChrome.tsx:89-107 counts composer.history.getHistoryStack() filtered by timestamp > approvedAt, and HistoryManager.ts:136-157 resets both stacks to a single 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days and the summary line beneath it empties out. A number that resets to zero on refresh is a claim about approval drift that nothing backs — say the thing that is true."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:220",
+   "boardName": "History · Saves · restoring",
+   "contains": "changes since approval"
+  },
+  "unresolved-id": true,
+  "text": "Now — edited since approval",
+  "width": 240,
+  "why": "UX-I-16 — SavesChrome.tsx:89-107 counts composer.history.getHistoryStack() filtered by timestamp > approvedAt, and HistoryManager.ts:136-157 resets both stacks to a single 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days and the summary line beneath it empties out. A number that resets to zero on refresh is a claim about approval drift that nothing backs — say the thing that is true."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:269",
+   "boardName": "History · Saves · pruned-notice",
+   "contains": "changes since approval"
+  },
+  "unresolved-id": true,
+  "text": "Now — edited since approval",
+  "width": 240,
+  "why": "UX-I-16 — SavesChrome.tsx:89-107 counts composer.history.getHistoryStack() filtered by timestamp > approvedAt, and HistoryManager.ts:136-157 resets both stacks to a single 'loaded' checkpoint on PROJECT_LOADED. After a reload the band reads 0 changes on a site that has drifted for days and the summary line beneath it empties out. A number that resets to zero on refresh is a claim about approval drift that nothing backs — say the thing that is true."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:113",
+   "boardName": "History · Saves · time-travel",
+   "contains": "Exit time-travel"
+  },
+  "unresolved-id": true,
+  "text": "Exit time-travel  (Esc)",
+  "why": "UX-I-10 — TimeTravelScrubber.tsx:315-318 declares role='dialog' aria-modal='true' and :270-286 implements ArrowLeft/ArrowRight/Enter/Ctrl+Shift+T and no 'Escape' case. Escape is the reflex key for a modal; the board is where that promise is made."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "163:113",
+   "boardName": "History · Saves · time-travel",
+   "contains": "Ctrl+Shift+T"
+  },
+  "unresolved-id": true,
+  "mode": "splice",
+  "splice": "Esc",
+  "why": "UX-I-10 — Ctrl+Shift+T is the browser's reopen-closed-tab chord and the panel's own list handler does not implement it as an exit either (ActivityView.tsx:305-310 only clears expandedGroupId/showAllIds/confirmingClear). Do not print a chord the browser takes first."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "172:3",
+   "boardName": "caption/Versions · activity",
+   "contains": "the only thing that survives a long session"
+  },
+  "unresolved-id": true,
+  "mode": "splice",
+  "splice": "the only thing guaranteed to survive a long session",
+  "why": "QA-C-14 — auto-saves persist identically to named ones (VersionHistoryStorage.ts:57-82 writes every version to IndexedDB 'aquibra-versions' regardless of isAutoCheckpoint, plus versionSync.ts mirrorVersionCreate). What a named version uniquely survives is the PRUNE, not the session."
+ },
+ {
+  "selector": {
+   "section": "1776:8374",
+   "board": "172:6",
+   "boardName": "caption/Versions · restore",
+   "contains": "Restore always confirms"
+  },
+  "unresolved-id": true,
+  "text": "Restore from the Saves list always confirms and always saves the current state as a version first — if that save fails, the restore is abandoned. It replaces pages, styles, every project setting (brand tokens, SEO, analytics, custom code) and the element→content bindings; the content records themselves, media and saved components are untouched. Restoring from the activity list confirms too, and names how many later changes it discards; the Time-Travel scrubber still does neither.",
+  "width": 600,
+  "why": "QA-C-09 + UX-I-01 + UX-I-02. QA-C-09's own replacement text ends '(Restoring from the activity list or the scrubber does neither.)' and that half is now FALSE: ActivityView.tsx:400-462 routes the timestamp through a ConfirmDialog naming the discard count. HistoryTab.tsx:197 (the scrubber) still calls composer.history.restoreEntry directly. Scope per QA-C-09: Composer.ts:576 applyProjectSettings over ProjectSettings (shared/types/project.ts:258-279) and Composer.ts:571-575 cms.bindings.import; the three untouched stores are separate DBs (ComponentStorage.ts:15, CollectionStorage.ts:13, IndexedDBAdapter.ts:14) and exportProject hardcodes assets: [] (Composer.ts:616). Safety save + abort-on-throw: VersionTimelineManager.ts:290-299."
+ }
+]

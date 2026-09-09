@@ -1,0 +1,100 @@
+{
+ "why": "The two MEASURED render defects inside section 1776:8374. Both are geometry, not copy, so apply-text-fixes cannot carry them.",
+ "provenance": "Every id and every number below comes from a prior lane's own file read, NOT from a read taken in this session — see reports/history.md §Provenance.",
+ "ops": [
+  {
+   "id": "VIS-1-01",
+   "severity": "Major",
+   "kind": "frame-resize+reseat",
+   "board": "163:167",
+   "boardName": "History · Saves · restore-confirm",
+   "target": {
+    "selector": {
+     "section": "1776:8374",
+     "board": "163:167",
+     "frameAncestorOfText": [
+      "Named milestones",
+      "What's live",
+      "What’s live"
+     ]
+    },
+    "unresolved-id": true,
+    "note": "VIS-1-01 names the target only as '163:167 tab row'. The board id is exact; the tab-row FRAME id was never recorded by any lane, so it is selected by shape: the nearest FRAME ancestor of the sub-label TEXT nodes."
+   },
+   "from": {
+    "height": 44
+   },
+   "to": {
+    "height": 60
+   },
+   "reseatChildren": {
+    "rule": "each sub-label sits 4px below the bottom of the TEXT node above it whose horizontal centre is within 40px; if none, 8px above the row's new bottom edge",
+    "gap": 4,
+    "fallbackBottomInset": 8
+   },
+   "sweepSiblings": true,
+   "sweepReason": "HistoryTab.tsx:225-236 draws the same VIEW_LABEL ('Saves','Published') + HELPER_TEXT ('Named milestones',\"What's live\") header on EVERY Saves and Published board, so a clipping defect measured on one board of the family is a fact about the family until a sibling is measured and cleared. The sweep is by shape over sec.children and reports ALREADY for boards already at >=60 with their sub-labels inside.",
+   "readBack": [
+    "frame.height === 60",
+    "max(subLabel.y + subLabel.height) <= 60"
+   ]
+  },
+  {
+   "id": "QA-C-01",
+   "severity": "Critical",
+   "kind": "frame-grow+button-restack",
+   "board": "163:167",
+   "boardName": "History · Saves · restore-confirm",
+   "target": {
+    "id": "163:213",
+    "what": "the restore-confirm band frame",
+    "unresolved-id": false,
+    "source": "QA-C-01 evidence: 'Frame 163:213 is 280x96, layoutMode NONE, clipsContent true'"
+   },
+   "body": {
+    "id": "163:215",
+    "what": "the confirm body paragraph",
+    "unresolved-id": false,
+    "source": "QA-C-01 evidence: '163:215 sits at y=32 h=64 (bottom 96)'"
+   },
+   "buttons": [
+    {
+     "id": "229:1144",
+     "label": "Cancel",
+     "from": {
+      "x": 16,
+      "y": 58,
+      "w": 67,
+      "h": 28
+     }
+    },
+    {
+     "id": "229:1146",
+     "label": "Restore",
+     "from": {
+      "x": 192,
+      "y": 58,
+      "w": 72,
+      "h": 28
+     }
+    }
+   ],
+   "from": {
+    "width": 280,
+    "height": 96
+   },
+   "to": {
+    "width": 280,
+    "height": 136
+   },
+   "buttonY": 98,
+   "rejectedAlternative": "QA-C-01 also offers 'or shorten to two lines: Your current work is saved as a version first. Pages, styles and settings are replaced — content, media and components are not.' REJECTED: that shortening drops exactly the scope correction QA-C-09 asked for (every project setting, and the element→content bindings). Grow the frame, keep the corrected copy.",
+   "readBack": [
+    "163:213.height === 136",
+    "229:1144.y === 98",
+    "229:1146.y === 98",
+    "163:215.y + 163:215.height <= 98"
+   ]
+  }
+ ]
+}

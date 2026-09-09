@@ -1,0 +1,386 @@
+{
+ "slug": "m-missed",
+ "page": "1:3",
+ "rows": [
+  {
+   "op": "resize",
+   "id": "1706:8433",
+   "w": 640,
+   "h": 132,
+   "expect": "940,36074,720,80",
+   "why": "M14+M11 — b04: board [940,36074,720,80] layout=NONE clips=false. The 640 default 1170:4749 carries the code citation ('Width stays 640: F15 adds the matching kind to Modal.tsx KIND_WIDTH'), so the four 720 variants are the ones that are wrong. 720->640 = -80 on the right; every right-anchored child moves -80 below. HEIGHT 80->132 = +52, the exact footer band its three siblings use (1706:8441/8448/8455 are all 720x52), to seat the M11 action. Vertical slack: new bottom 36074+132=36206, still SHORTER than the tallest board already on this row (1706:8444 ends 36074+188=36262), so the row's vertical footprint does not grow at all. Parent is the page, layout=NONE, so nothing is pushed."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8434",
+   "w": 572,
+   "expect": "960,36090,652,17",
+   "why": "M14 — title, ar=HEIGHT so resize sets width. b04: [960,36090,652,17], board x=940 -> rel x 20; 20+652=672 and the Close sits at rel 676, i.e. a 4px gap. 652-80=572 keeps that exact 4px gap at 640 (20+572=592 vs the Close's new rel 596)."
+  },
+  {
+   "op": "move",
+   "id": "1706:8435",
+   "x": 596,
+   "y": 12,
+   "expect": "1616,36086,32,32",
+   "why": "M14 — Close frame. b04: [1616,36086,32,32]; board x=940,y=36074 -> parent-relative (676,12), right margin 720-(676+32)=12. At 640 the same 12px margin puts it at 640-12-32=596. move writes PARENT-relative x/y and the parent (1706:8433) is layout=NONE, so these are honoured."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8394",
+   "w": 608,
+   "expect": "956,36122,688,16",
+   "why": "M14 — body frame 'p'. b04: [956,36122,688,16] -> rel x 16, 16+688+16=720. The 640 shell's content column is 608 (1170:4749's thead/rows/foot are all [116,...,608] against a board at x=100: 16+608+16=640). 688-80=608."
+  },
+  {
+   "op": "text",
+   "id": "1706:8395",
+   "width": 608,
+   "text": "No collections yet. Create one to start adding records.",
+   "expect": "No collections yet. Create one from an element's CMS binding first.",
+   "why": "M11+M14 — the current sentence sends the user through an unrelated element-selection workflow ('Create one from an element's CMS binding first.') for a prerequisite this modal can now offer directly. Code: CMSRecordsModal.tsx:264-266 renders exactly that sentence with no action; CMSCollectionSetupModal is already mounted beside it (StudioModals.tsx:269-273) and its opener already exists (useDomainModals.ts:105 openCMSCollectionSetup, wired at AquibraStudio.tsx:583) — only the prop is unplumbed, which is wiring, not a feature. width 608 for the same reason as its parent frame above."
+  },
+  {
+   "op": "add-text",
+   "parent": "1706:8433",
+   "name": "action/+ Create Collection",
+   "text": "+ Create Collection",
+   "x": 496,
+   "y": 99,
+   "w": 116,
+   "size": 12,
+   "style": "Medium",
+   "color": "#1A56DB",
+   "align": "RIGHT",
+   "expect": "Modal · CMS records · no-collections",
+   "why": "M11 — the 720x80 dialog's entire content is a title, a sentence and a close glyph; it explains a detour and provides no route. This is the direct route, using the product's own label: BindingPopover.tsx:323 renders '+ Create Collection' verbatim, and CMSCollectionSetupModal.tsx:249 uses 'Create Collection' as its primary. Drawn as a link-text, not a filled pill, because that is how the product renders THIS action — BindingPopover.tsx:317 gives it LINK_BTN_CLASS (transparent, accent text), and the file's own specimen 1707:8426 is a bare 12/Regular text at 110px. Geometry: the new footer band is rel y 80..132; 80+(52-15)/2 = 98.5 -> y 99. align RIGHT in a 116 box at x 496 puts its right edge at 612 = 640-28, the same 28px right inset the siblings' '+ Add record' LABEL has (1706:8442 ends 2472 against a 2500 board edge). NOTE: if this row runs before the board resize above, add-text will report OOB (y 99+15 vs the board's current h 80) — the text still lands; the warning clears once the resize applies."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8437",
+   "w": 640,
+   "h": 188,
+   "expect": "1780,36074,720,162",
+   "why": "M14+M10 — b04: [1780,36074,720,162] layout=NONE. 720->640 per M14. HEIGHT 162->188 = +26, which buys the draft row M10 needs (16px row + 10px gap) WITHOUT enlarging the row: 36074+188 = 36262, exactly the bottom of 1706:8444, already the tallest board on this row. So this board grows into space the row already occupies and the page's vertical footprint is unchanged. Layout inside stays: title 16..33, box 48..94, new row 104..120, footer moves 110->136 (136+52=188)."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8438",
+   "w": 572,
+   "expect": "1800,36090,652,17",
+   "why": "M14 — title, same arithmetic as 1706:8434: [1800,36090,652,17] -> rel x 20, 652-80=572, keeping the 4px gap to the Close's new rel x 596."
+  },
+  {
+   "op": "move",
+   "id": "1706:8439",
+   "x": 596,
+   "y": 12,
+   "expect": "2456,36086,32,32",
+   "why": "M14 — Close. b04 [2456,36086,32,32], board x=1780 -> rel (676,12); 640-12-32 = 596."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8396",
+   "w": 608,
+   "expect": "1796,36122,688,46",
+   "why": "M14 — banner frame 'box'. b04 [1796,36122,688,46] -> rel x 16; 688-80 = 608."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8397",
+   "w": 588,
+   "expect": "1806,36130,668,30",
+   "why": "M14 — the banner sentence. b04 [1806,36130,668,30] ar=HEIGHT, sitting 10px inside the 688 box (10+668+10=688), so at 608 it is 608-20 = 588. Wrap check: the full string (the dump truncates at 90 chars; the complete text is on disk in audit2.txt:588 — 'No records published yet. Dynamic pages generate only from published records — and only once a template page is bound.', 117 chars). It is 2 lines at 668 (h=30, 15px leading), so its natural single-line width is between 668 and 1336; at ~6.0px/char for 12px Inter that is ~702px. Two lines at 588 hold 1176px, so it stays 2 lines and the box height does not change. Even at a pessimistic 6.5px/char (760px) it is still 2 lines."
+  },
+  {
+   "op": "add-text",
+   "parent": "1706:8437",
+   "name": "row/Tiramisu (draft)",
+   "text": "Tiramisu          $9          — missing          Aug 2",
+   "x": 28,
+   "y": 104,
+   "w": 340,
+   "size": 13,
+   "style": "Regular",
+   "color": "#111827",
+   "expect": "Modal · CMS records · none-published",
+   "why": "M10 — the board says 'Menu items — 12 records' and 'No records published yet' while its only action is '+ Add record', so the recovery path asks for a thirteenth record. In the CODE this state is banner + the full table, and every row carries a Publish button (CMSRecordsModal.tsx:394-405 — setStatus(item.id,'published')); the board dropped the table, which is what leaves Add record looking like the only move. This is the state's own table excerpt, in the family's idiom (the sibling 1706:8444 draws a header + one line; 1706:8451 draws one row as a single text run with 10-space column gaps, which is the separator copied here from 1706:8402). The record is the 640 default's own draft: 1170:4749 rec/Tiramisu = 'Tiramisu' / '$9' / '— missing' / 'Aug 2' (1170:4767-4770) — the only row there whose action reads 'Publish' rather than 'Unpublish', i.e. the only unpublished one. Geometry: box ends rel 94, +10 gap -> y 104; 13/Regular one line ~16px -> ends 120; footer's new top is 136, so a 16px gap, matching the 16px gap this board has today (94 -> 110). x 28 matches the sibling 1706:8444's table text (abs 128 against a board at x 100)."
+  },
+  {
+   "op": "clone-node",
+   "src": "1744:8410",
+   "parent": "1706:8437",
+   "name": "btn/Publish",
+   "x": 570,
+   "y": 101,
+   "expect": "btn/Publish 54x22 in 1170:4749 rec/Tiramisu",
+   "why": "M10 — the action that satisfies the accept condition ('a user can publish an existing valid record without creating a thirteenth'). Cloned rather than drawn so it cannot drift from the button the same product family already uses: 1744:8410 is the 'Publish' button inside 1170:4749's rec/Tiramisu row. Its id is from docs/design-jobs/findings/DEAD-CONTROLS-V2.txt:401 ('A 1744:8410 Publish 54x22') and is corroborated against the FRESH b02 read: its label 1744:8411 is [604,34813,39,13]; a 54x22 frame centred on that label is [596.5,34808.5,54,22], and 34808.5 = 34799 + (41-22)/2, i.e. exactly vertically centred in its row 1170:4766 [116,34799,608,41]. No text is written, so the clone lands with the correct label and cannot re-hug. Position: x 570 -> right edge 624 = 640-16, the same 16px right inset the shell uses; y 101 centres the 22px button on the 16px row text at y 104 (104+8 = 112 = 101+11). x is order-safe: 570+54 = 624 is inside the board whether the 720->640 resize has run yet or not."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8441",
+   "w": 640,
+   "expect": "1780,36184,720,52",
+   "why": "M14 — ModalFooter is full-bleed: b04 [1780,36184,720,52] against a board at x=1780, so its width IS the board width. 720->640."
+  },
+  {
+   "op": "move",
+   "id": "1706:8441",
+   "x": 0,
+   "y": 136,
+   "expect": "1780,36184,720,52",
+   "why": "M10 — the footer is flush to the board bottom (36184+52 = 36236 = 36074+162). With the board at h=188 the flush position is 188-52 = rel y 136 (was rel 110). Parent 1706:8437 is layout=NONE so x/y are honoured; x stays 0 (full-bleed)."
+  },
+  {
+   "op": "move",
+   "id": "1706:8443",
+   "x": 525,
+   "y": 12,
+   "expect": "btn/+ Add record 99x28 at parent-relative (605,12)",
+   "why": "M14 — the footer's '+ Add record' button is right-anchored and must travel the same -80. Its id is from DEAD-CONTROLS-V2.txt:403 ('A 1706:8443 + Add record 99x28'), corroborated against the FRESH b04 read: label 1706:8442 is [2397,36203,75,15]; a 99x28 frame centred on it is [2385,36196.5,99,28], and 36196.5 = 36184 + (52-28)/2 — exactly centred in the footer — while 2385+99 = 2484 leaves 720-(605+99) = 16px, the shell's own right inset. So rel (605,12) today; at a 640 footer the same 16px inset is 640-16-99 = 525. If the footer turns out to be auto-layout, apply-queue's move guard reports AUTOLAYOUT and no-ops rather than corrupting anything."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8444",
+   "w": 640,
+   "expect": "100,36074,720,188",
+   "why": "M14 — b04 [100,36074,720,188] layout=NONE. Width only: this board already has the row's tallest height and nothing about it needs more."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8445",
+   "w": 572,
+   "expect": "120,36090,652,17",
+   "why": "M14 — title [120,36090,652,17] -> rel x 20; 652-80 = 572, 4px gap to the Close's new rel 596 preserved."
+  },
+  {
+   "op": "move",
+   "id": "1706:8446",
+   "x": 596,
+   "y": 12,
+   "expect": "776,36086,32,32",
+   "why": "M14 — Close [776,36086,32,32], board x=100 -> rel (676,12); 640-12-32 = 596."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8398",
+   "w": 608,
+   "expect": "116,36122,688,72",
+   "why": "M14 — table frame [116,36122,688,72] -> rel x 16; 688-80 = 608."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8400",
+   "w": 608,
+   "expect": "116,36158,688,16",
+   "why": "M14 — the 'No records yet.' line is ar=HEIGHT at the full content width ([116,36158,688,16]), so it must track the frame: 688 -> 608. Its neighbour 1706:8399 (the column header, [128,36130,253,13]) is 253 wide and needs no change — 253 fits inside 608 with 355px to spare."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8448",
+   "w": 640,
+   "expect": "100,36210,720,52",
+   "why": "M14 — full-bleed footer [100,36210,720,52] against a board at x=100. 720->640. No move: 36210+52 = 36262 = the board bottom already, and the board height is unchanged."
+  },
+  {
+   "op": "move",
+   "id": "1706:8450",
+   "x": 525,
+   "y": 12,
+   "expect": "btn/+ Add record 99x28 at parent-relative (605,12)",
+   "why": "M14 — same -80 as 1706:8443. Id from DEAD-CONTROLS-V2.txt:405, corroborated on the fresh b04 read: label 1706:8449 [717,36229,75,15]; a 99x28 frame centred on it is [705,36222,99,28]; 36222 = 36210+(52-28)/2 and 705-100 = rel 605 with 720-(605+99) = 16px right inset. New rel x = 640-16-99 = 525."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8451",
+   "w": 640,
+   "expect": "2620,36074,720,180",
+   "why": "M14 — b04 [2620,36074,720,180] layout=NONE. Width only; M09 is a text change plus one added action that fits the existing rows frame, so the height is untouched."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8452",
+   "w": 572,
+   "expect": "2640,36090,652,17",
+   "why": "M14 — title [2640,36090,652,17] -> rel x 20; 652-80 = 572."
+  },
+  {
+   "op": "move",
+   "id": "1706:8453",
+   "x": 596,
+   "y": 12,
+   "expect": "3296,36086,32,32",
+   "why": "M14 — Close [3296,36086,32,32], board x=2620 -> rel (676,12); 640-12-32 = 596."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8401",
+   "w": 608,
+   "expect": "2636,36122,688,64",
+   "why": "M14 — rows frame [2636,36122,688,64] -> rel x 16; 688-80 = 608. Its two texts fit without change: 1706:8402 is 315 wide and 1706:8403 is 172 wide, both well inside 608 (and 8402 is ar=WIDTH_AND_HEIGHT, so the M09 rewrite below re-hugs it smaller anyway)."
+  },
+  {
+   "op": "text",
+   "id": "1706:8402",
+   "text": "Margherita          —          ✓ photo          today",
+   "expect": "Margherita          €9.00          published          2d ago",
+   "why": "M09 — the row says the record is 'published' and shows the €9.00 price directly above 'Can't publish: Price is required'. Three separate corrections, each from the code: (1) the invalid field is drawn EMPTY as '—', which is literally what the product renders for a missing value (CMSRecordsModal.tsx:64-68 cellText: `if (v == null || v === \"\") return \"—\"`), so the row now agrees with the message; (2) 'published' is dropped — publishing was REFUSED, so the status never changed (CMSRecordsModal.tsx:174-186: setStatus catches CMSValidationError and re-renders without the new status), and the third column in this family is PHOTO anyway, per the sibling header 1706:8399 'TITLE / PRICE / PHOTO / UPDATED' and the 640 default's thead (1170:4752-4755); '✓ photo' is that column's own filled form (MediaCell, CMSRecordsModal.tsx:57-62, drawn on the default at 1170:4759); (3) '2d ago' is a format the product cannot emit — updatedLabel (CMSRecordsModal.tsx:41-52) returns 'today' or 'MMM D' and nothing else, and a row that was just refused a publish is 'today'. The 10-space column separator is copied byte-for-byte from the string being replaced. Currency: the audit asks for currency consistent with the collection example, and the collection example (1170:4749) prices in $ — but the price cell is empty here, so no currency is asserted at all."
+  },
+  {
+   "op": "add-text",
+   "parent": "1706:8451",
+   "name": "action/Edit record",
+   "text": "Edit record",
+   "x": 560,
+   "y": 59,
+   "w": 64,
+   "size": 11,
+   "style": "Medium",
+   "color": "#1A56DB",
+   "align": "RIGHT",
+   "expect": "Modal · CMS records · publish-error",
+   "why": "M09 — the audit's fix asks for an Edit record action on the failed row, and it is the RIGHT action here where Publish is not: the message says a required field is empty, so re-pressing Publish would be refused again, while editing is what clears it. The capability is shipped — CMSRecordsModal.tsx:405 renders a per-row edit control whose handler is startEdit (:130-135), and its Figma twin is the 'btn/Edit record' pencil on the 640 default (label 1744:8413). Drawn as a bare accent label rather than a cloned pill because the pencil is icon-only (22px) and this board's rows are text runs, not row frames. Geometry: the row text 1706:8402 is at [2648,36132,315,16] -> parent-relative (28,58), so y 59 centres a 13px label on a 16px line; align RIGHT in a 64 box at x 560 puts its right edge at 624 = 640-16, the shell's right inset, and 560 clears the row text's right edge (28+315 = 343) by 217px. x is order-safe (560+64 = 624 fits both the 720 and the 640 board)."
+  },
+  {
+   "op": "resize",
+   "id": "1706:8455",
+   "w": 640,
+   "expect": "2620,36202,720,52",
+   "why": "M14 — full-bleed footer [2620,36202,720,52] against a board at x=2620. 720->640. No move: 36202+52 = 36254 = the board bottom, and the height is unchanged."
+  },
+  {
+   "op": "move",
+   "id": "1706:8457",
+   "x": 525,
+   "y": 12,
+   "expect": "btn/+ Add record 99x28 at parent-relative (605,12)",
+   "why": "M14 — same -80. Id from DEAD-CONTROLS-V2.txt:407, corroborated on the fresh b04 read: label 1706:8456 [3237,36221,75,15]; a 99x28 frame centred on it is [3225,36214,99,28]; 36214 = 36202+(52-28)/2 and 3225-2620 = rel 605 with a 16px right inset. New rel x = 640-16-99 = 525."
+  },
+  {
+   "op": "text",
+   "id": "1173:4830",
+   "text": "Slug pattern — /menu/{title} · Template — menu/_template · SEO title — {title} — Menu",
+   "expect": "Slug pattern — /blog/{slug} · Template — blog/_template · SEO title — {title} — Blog",
+   "why": "M15 — b02: 1170:4713 is 'Fields for Menu items' with Title/Price/Photo/Description (1753:8393/8401/8409/8417) while this line prices the example in /blog/{slug}, blog/_template and '{title} — Blog'. Two fixes in one string. (a) The content type: blog -> menu, matching the collection above it and the product's own placeholder, ContentViews.tsx:645 `placeholder=\"/menu/{slug}\"`. (b) {slug} -> {title}, which is the part the audit filed as 'make the required Slug field visible or explain which field supplies it': there is no Slug field, and a brace key is a FIELD SLUG reference, not a magic value — applyPattern (server/services/cms.service.ts:121-128) substitutes \"\" for a key naming no field, so '/menu/{slug}' on this collection resolves EVERY record to '/menu/' and they collide instead of generating; the editor flags the same thing at ContentViews.tsx:633-634 (`unknownKeys`). {title} is a field this collection actually has, and slug patterns are slugified on substitution (cms.service.ts:125,171), so it yields /menu/margherita. Scope stops there deliberately: the parent frame 1173:4825 is already named '[not-implemented] dynamic-pages — a typed template path can never match an exported page…', and CODE-TRUTH F12 confirms pageTemplatePath is a write-once free-text path with no editor writer, so the audit's 'expose editable template/URL fields' would be drawing a control the product does not have. Width: unchanged at ar=WIDTH_AND_HEIGHT — the new string is one character longer ({title} vs {slug}), ~437px against a 468 clipping parent with the text 10px inside it (10+437 = 447 < 468)."
+  },
+  {
+   "op": "text",
+   "id": "1707:8426",
+   "text": "+ Add record",
+   "expect": "+ Create Collection",
+   "why": "M16 — the state's only action is '+ Create Collection', which is the wrong prerequisite: a collection IS selected here (b05 shows the popover at Record level, with '←  Price' as the back row), so what is missing is a record, not a collection. The replacement is a real route, not an invention: composer.emit(EVENTS.CMS_MANAGE_RECORDS) opens CMSRecordsModal (shared/constants/events.ts:622; listener at useEditorEventListeners.ts:90-98; existing caller at useCanvasCommandPalette.ts:171), and BindingPopover already holds both `composer` and `EVENTS` (BindingPopover.tsx:16,105-109) — this is an onClick, the same shape CODE-TRUTH called a one-line fix for F11. In code the footer button is rendered at every level (BindingPopover.tsx:312-324); making its label depend on the level is the change this board is specifying. Width: ar=WIDTH_AND_HEIGHT and 12 chars replacing 19, so it re-hugs from 110px to ~70px inside a 240 popover — no overflow possible."
+  },
+  {
+   "op": "text",
+   "id": "1707:8424",
+   "width": 216,
+   "text": "No records yet. Add the first one to bind it here.",
+   "expect": "No records yet. Open Content › this collection to add the first one.",
+   "why": "M16 — with a direct action on the popover the sentence must stop naming a detour; today it sends the user to 'Open Content › this collection' while the button offers something else entirely, which is the contradiction the finding is about. It is also not the product's own route — BindingPopover.tsx:294 says 'Add records via the command palette → \"Manage CMS Records\"' — so neither the old copy nor a Content path is worth preserving once the button does the job. width 216 keeps the existing wrap box exactly ([532,50030,216,30], ar=HEIGHT, 2 lines): 49 chars at ~6.0px/char for 12px Inter is ~294px, and two 216px lines hold 432px, so the height stays 30 and the popover's fixed 158px stack (back 30 / sep 1 / label 26 / block 69 / footer 32) is undisturbed."
+  },
+  {
+   "op": "resize",
+   "id": "1707:8455",
+   "h": 66,
+   "expect": "1665,55401,248,40",
+   "why": "M18 — b06: [1665,55401,248,40] layout=NONE clips=false, whose entire content is one sentence and no control. 40 -> 66 = +26, the minimum that seats a 24px action row: message at rel (8,10) ends 23, +11 gap -> actions 34..58, +8 bottom padding (matching the pad's own 8px sides) = 66. Vertical room: this is a page-level board with a layout=NONE parent, so nothing is pushed and nothing clips — the only risk is overlapping a neighbour, and the fresh b06 read puts the previous AI-popover row's origin at y 54851 against this one's 55401, a 550px pitch for boards no taller than 96px. 26px of a ~450px gutter. NOT PROVEN for the specific neighbour below: b06 dumped only these boards, so the one read that would settle it is a kids dump of this board's parent section."
+  },
+  {
+   "op": "resize",
+   "id": "1707:8453",
+   "h": 66,
+   "expect": "1665,55401,248,40",
+   "why": "M18 — the 'pad' child is coincident with the board ([1665,55401,248,40] = the board's own box), so it takes the same height or the new action row sits outside the padded surface."
+  },
+  {
+   "op": "clone-node",
+   "src": "1707:8431",
+   "parent": "1707:8453",
+   "name": "btn/Retry",
+   "text": "Retry",
+   "textIndex": 0,
+   "x": 168,
+   "y": 34,
+   "expect": "btn/Generate 72x24 in 1707:8433 (the prompt popover)",
+   "why": "M18 — Retry is real and it preserves the prompt, which is exactly the accept condition. start() clears the error before re-subscribing (useStreamPrompt.ts:104-111 sets setError(null) on entry) and AiPromptPopover keeps the user's text in its OWN state, untouched by the failure (AiPromptPopover.tsx:34, submit at :39-47) — so a Retry button is `onClick={submit}` and the typed prompt is still there. Cloned from the same surface's own primary so the scale cannot drift: 1707:8431 is the 'Generate' button in the sibling prompt popover 1707:8433 (id from DEAD-CONTROLS-V2.txt:1304, 'A 1707:8431 Generate 72x24'; its label 1707:8432 is at [646,54920,49,13] in the fresh b06 read). Geometry: x 168 -> right edge 240 = 248-8, matching the pad's 8px side padding; y 34 -> bottom 58, 8px above the new 66px floor. RESIDUAL RISK, stated: if that button frame is an auto-layout HUG, replacing 'Generate' (49px) with 'Retry' (~28px at 11/Medium) shrinks it and its right edge lands ~21px short of flush — a cosmetic misalignment, not a broken control, and correctable with one move once the post-write box is read back."
+  },
+  {
+   "op": "add-text",
+   "parent": "1707:8453",
+   "name": "action/Edit prompt",
+   "text": "Edit prompt",
+   "x": 86,
+   "y": 40,
+   "w": 70,
+   "size": 11,
+   "style": "Regular",
+   "color": "#1A56DB",
+   "align": "RIGHT",
+   "expect": "Popover · Canvas · AI · error",
+   "why": "M18 — the secondary route back, and the reason the state is no longer a dead end even if the service stays down. reset() exists on the hook and clears error/edit/streaming (useStreamPrompt.ts:95-102), after which AiPromptPopover falls through to its prompt branch with `text` intact — so 'Edit prompt' is `onClick={stream.reset}` and the user gets their words back. Labelled 'Edit prompt' rather than the audit's suggested 'Keep editing' because on this surface 'keep editing' would read as 'go back to the canvas' (that is what Esc/onClose already does, AiPromptPopover.tsx:63-70) whereas reset() returns to the PROMPT — and this file already spends 'Keep editing' on the other meaning (2898:22184). Drawn as a bare text because that is how this popover family draws its secondary: DEAD-CONTROLS-V2.txt:1307 records the diff popover's pair as 'A 1707:8450 Apply 56x24' plus 'B 1707:8449 Discard (bare text)'. Geometry: right edge 86+70 = 156, a 12px gap to the button at 168; y 40 centres a 13px label on the 24px button (34+12 = 46 = 40+6.5). Like the clone above it may report OOB if it runs before the pad resize; the node still lands."
+  },
+  {
+   "op": "text",
+   "id": "2850:22372",
+   "text": "Delete 34 files?",
+   "expect": "Delete 34 files?",
+   "hold": true,
+   "holdWhy": "no font-size op exists in apply-queue.mjs OPS — this row records the target, it cannot apply it",
+   "why": "M19 — HELD, NOT EXECUTABLE. apply-queue.mjs's OPS set is {text, rename, resize, fill, hotspot, move, delete, add-text, add-rect, add-caption, append-text, rewire, clone-node} (apply-queue.mjs:67-68). None of them writes fontSize on an EXISTING node: `resize` sets width and explicitly preserves height on a TEXT (apply-queue.mjs:170-176 — it forces textAutoResize=HEIGHT and passes n.height), and `size` is accepted only by add-text, i.e. only for text this plan creates. So every row below is authored as a NO-OP (text == the node's current string) and held: if the hold were ever ignored the applier would report SAME and change nothing. THE ONE THING THAT WOULD UNBLOCK IT: a fontSize op in apply-queue.mjs (load the node's fonts, set fontSize, read it back) — or one use_figma script doing the same. SCOPE, separately: the verdict is CONFIRMED-AND-GENERALISED — the kit's 16/13 scale is used by exactly ONE of the 26 modal/popover boards read this pass (1170:4777), so adopting it is a re-scale of the whole family, a founder decision, not a defect repair. Only the three nodes the finding itself cites (46:2 · 2850:22371 · 1172:4840) are enumerated here. || THIS ROW: 2850:22372 is currently 'Delete 34 files?' at box 6836,21148,106,17 — title 14/Semi Bold h17 -> 16/Semi Bold h24 (kit: 46:6, 46:18, 46:39, 46:64, 46:77, 46:90, 46:107 are all 16/Semi Bold at h24)"
+  },
+  {
+   "op": "text",
+   "id": "2850:22381",
+   "text": "Cancel",
+   "expect": "Cancel",
+   "hold": true,
+   "holdWhy": "no font-size op exists in apply-queue.mjs OPS — this row records the target, it cannot apply it",
+   "why": "M19 — HELD, NOT EXECUTABLE. apply-queue.mjs's OPS set is {text, rename, resize, fill, hotspot, move, delete, add-text, add-rect, add-caption, append-text, rewire, clone-node} (apply-queue.mjs:67-68). None of them writes fontSize on an EXISTING node: `resize` sets width and explicitly preserves height on a TEXT (apply-queue.mjs:170-176 — it forces textAutoResize=HEIGHT and passes n.height), and `size` is accepted only by add-text, i.e. only for text this plan creates. So every row below is authored as a NO-OP (text == the node's current string) and held: if the hold were ever ignored the applier would report SAME and change nothing. THE ONE THING THAT WOULD UNBLOCK IT: a fontSize op in apply-queue.mjs (load the node's fonts, set fontSize, read it back) — or one use_figma script doing the same. SCOPE, separately: the verdict is CONFIRMED-AND-GENERALISED — the kit's 16/13 scale is used by exactly ONE of the 26 modal/popover boards read this pass (1170:4777), so adopting it is a re-scale of the whole family, a founder decision, not a defect repair. Only the three nodes the finding itself cites (46:2 · 2850:22371 · 1172:4840) are enumerated here. || THIS ROW: 2850:22381 is currently 'Cancel' at box 7086,21279,37,13 — action 11/Medium h13 -> 13/Medium h20 (kit: 46:13 'Cancel' 13/Medium h20)"
+  },
+  {
+   "op": "text",
+   "id": "2850:22383",
+   "text": "Delete 34 files",
+   "expect": "Delete 34 files",
+   "hold": true,
+   "holdWhy": "no font-size op exists in apply-queue.mjs OPS — this row records the target, it cannot apply it",
+   "why": "M19 — HELD, NOT EXECUTABLE. apply-queue.mjs's OPS set is {text, rename, resize, fill, hotspot, move, delete, add-text, add-rect, add-caption, append-text, rewire, clone-node} (apply-queue.mjs:67-68). None of them writes fontSize on an EXISTING node: `resize` sets width and explicitly preserves height on a TEXT (apply-queue.mjs:170-176 — it forces textAutoResize=HEIGHT and passes n.height), and `size` is accepted only by add-text, i.e. only for text this plan creates. So every row below is authored as a NO-OP (text == the node's current string) and held: if the hold were ever ignored the applier would report SAME and change nothing. THE ONE THING THAT WOULD UNBLOCK IT: a fontSize op in apply-queue.mjs (load the node's fonts, set fontSize, read it back) — or one use_figma script doing the same. SCOPE, separately: the verdict is CONFIRMED-AND-GENERALISED — the kit's 16/13 scale is used by exactly ONE of the 26 modal/popover boards read this pass (1170:4777), so adopting it is a re-scale of the whole family, a founder decision, not a defect repair. Only the three nodes the finding itself cites (46:2 · 2850:22371 · 1172:4840) are enumerated here. || THIS ROW: 2850:22383 is currently 'Delete 34 files' at box 7155,21279,77,13 — action 11/Medium h13 -> 13/Medium h20 (kit: 46:15 'Delete 3 pages' 13/Medium h20)"
+  },
+  {
+   "op": "text",
+   "id": "1172:4841",
+   "text": "Review 3 staged changes",
+   "expect": "Review 3 staged changes",
+   "hold": true,
+   "holdWhy": "no font-size op exists in apply-queue.mjs OPS — this row records the target, it cannot apply it",
+   "why": "M19 — HELD, NOT EXECUTABLE. apply-queue.mjs's OPS set is {text, rename, resize, fill, hotspot, move, delete, add-text, add-rect, add-caption, append-text, rewire, clone-node} (apply-queue.mjs:67-68). None of them writes fontSize on an EXISTING node: `resize` sets width and explicitly preserves height on a TEXT (apply-queue.mjs:170-176 — it forces textAutoResize=HEIGHT and passes n.height), and `size` is accepted only by add-text, i.e. only for text this plan creates. So every row below is authored as a NO-OP (text == the node's current string) and held: if the hold were ever ignored the applier would report SAME and change nothing. THE ONE THING THAT WOULD UNBLOCK IT: a fontSize op in apply-queue.mjs (load the node's fonts, set fontSize, read it back) — or one use_figma script doing the same. SCOPE, separately: the verdict is CONFIRMED-AND-GENERALISED — the kit's 16/13 scale is used by exactly ONE of the 26 modal/popover boards read this pass (1170:4777), so adopting it is a re-scale of the whole family, a founder decision, not a defect repair. Only the three nodes the finding itself cites (46:2 · 2850:22371 · 1172:4840) are enumerated here. || THIS ROW: 1172:4841 is currently 'Review 3 staged changes' at box 116,43798,161,16 — title 13/Semi Bold h16 -> 16/Semi Bold h24. NOTE this node is already being REWRITTEN by fixplans/c3-c4-counts-annotations.json (M07, to 'Review 3 staged changes · 1 not supported'); this row is a size requirement only and is a no-op by construction, so it cannot collide with that row"
+  },
+  {
+   "op": "text",
+   "id": "1172:4860",
+   "text": "Discard all",
+   "expect": "Discard all",
+   "hold": true,
+   "holdWhy": "no font-size op exists in apply-queue.mjs OPS — this row records the target, it cannot apply it",
+   "why": "M19 — HELD, NOT EXECUTABLE. apply-queue.mjs's OPS set is {text, rename, resize, fill, hotspot, move, delete, add-text, add-rect, add-caption, append-text, rewire, clone-node} (apply-queue.mjs:67-68). None of them writes fontSize on an EXISTING node: `resize` sets width and explicitly preserves height on a TEXT (apply-queue.mjs:170-176 — it forces textAutoResize=HEIGHT and passes n.height), and `size` is accepted only by add-text, i.e. only for text this plan creates. So every row below is authored as a NO-OP (text == the node's current string) and held: if the hold were ever ignored the applier would report SAME and change nothing. THE ONE THING THAT WOULD UNBLOCK IT: a fontSize op in apply-queue.mjs (load the node's fonts, set fontSize, read it back) — or one use_figma script doing the same. SCOPE, separately: the verdict is CONFIRMED-AND-GENERALISED — the kit's 16/13 scale is used by exactly ONE of the 26 modal/popover boards read this pass (1170:4777), so adopting it is a re-scale of the whole family, a founder decision, not a defect repair. Only the three nodes the finding itself cites (46:2 · 2850:22371 · 1172:4840) are enumerated here. || THIS ROW: 1172:4860 is currently 'Discard all' at box 319,44009,55,13 — action 11/Medium h13 -> 13/Medium h20"
+  },
+  {
+   "op": "text",
+   "id": "1172:4862",
+   "text": "Keep editing",
+   "expect": "Keep editing",
+   "hold": true,
+   "holdWhy": "no font-size op exists in apply-queue.mjs OPS — this row records the target, it cannot apply it",
+   "why": "M19 — HELD, NOT EXECUTABLE. apply-queue.mjs's OPS set is {text, rename, resize, fill, hotspot, move, delete, add-text, add-rect, add-caption, append-text, rewire, clone-node} (apply-queue.mjs:67-68). None of them writes fontSize on an EXISTING node: `resize` sets width and explicitly preserves height on a TEXT (apply-queue.mjs:170-176 — it forces textAutoResize=HEIGHT and passes n.height), and `size` is accepted only by add-text, i.e. only for text this plan creates. So every row below is authored as a NO-OP (text == the node's current string) and held: if the hold were ever ignored the applier would report SAME and change nothing. THE ONE THING THAT WOULD UNBLOCK IT: a fontSize op in apply-queue.mjs (load the node's fonts, set fontSize, read it back) — or one use_figma script doing the same. SCOPE, separately: the verdict is CONFIRMED-AND-GENERALISED — the kit's 16/13 scale is used by exactly ONE of the 26 modal/popover boards read this pass (1170:4777), so adopting it is a re-scale of the whole family, a founder decision, not a defect repair. Only the three nodes the finding itself cites (46:2 · 2850:22371 · 1172:4840) are enumerated here. || THIS ROW: 1172:4862 is currently 'Keep editing' at box 406,44009,66,13 — action 11/Medium h13 -> 13/Medium h20"
+  },
+  {
+   "op": "text",
+   "id": "1172:4864",
+   "text": "Apply 3 changes",
+   "expect": "Apply 3 changes",
+   "hold": true,
+   "holdWhy": "no font-size op exists in apply-queue.mjs OPS — this row records the target, it cannot apply it",
+   "why": "M19 — HELD, NOT EXECUTABLE. apply-queue.mjs's OPS set is {text, rename, resize, fill, hotspot, move, delete, add-text, add-rect, add-caption, append-text, rewire, clone-node} (apply-queue.mjs:67-68). None of them writes fontSize on an EXISTING node: `resize` sets width and explicitly preserves height on a TEXT (apply-queue.mjs:170-176 — it forces textAutoResize=HEIGHT and passes n.height), and `size` is accepted only by add-text, i.e. only for text this plan creates. So every row below is authored as a NO-OP (text == the node's current string) and held: if the hold were ever ignored the applier would report SAME and change nothing. THE ONE THING THAT WOULD UNBLOCK IT: a fontSize op in apply-queue.mjs (load the node's fonts, set fontSize, read it back) — or one use_figma script doing the same. SCOPE, separately: the verdict is CONFIRMED-AND-GENERALISED — the kit's 16/13 scale is used by exactly ONE of the 26 modal/popover boards read this pass (1170:4777), so adopting it is a re-scale of the whole family, a founder decision, not a defect repair. Only the three nodes the finding itself cites (46:2 · 2850:22371 · 1172:4840) are enumerated here. || THIS ROW: 1172:4864 is currently 'Apply 3 changes' at box 504,44009,88,13 — action 11/Medium h13 -> 13/Medium h20"
+  }
+ ]
+}

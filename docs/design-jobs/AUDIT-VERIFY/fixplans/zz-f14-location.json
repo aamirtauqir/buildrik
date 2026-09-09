@@ -1,0 +1,9 @@
+{
+ "slug": "zz-f14-location",
+ "page": "1:3",
+ "note": "F14, first increment: the location line, applied to the assembled board rather than left on a spec board beside it.",
+ "rows": [
+  {"op": "text", "id": "I682:2570;681:31", "text": "Bella Cucina › Home › Layers", "expect": "Bella Cucina", "width": 224,
+   "why": "F14 · THE LOCATION LINE, ON THE ASSEMBLED SCREEN. The correction exists only as spec board 2844:12121, whose own name says 'one location line' and whose body is annotation — 'No surface states site / page…', 'The canvas breadcrumb (board…' — so it cannot be cloned in; it has to be APPLIED. Its shape is site › page › panel. On 52:2 the topbar title I682:2570;681:31 carries only 'Bella Cucina' at [180,111065,200,20], 14/Medium. The page is Home (the canvas tab strip's active tab) and the panel is LAYERS — read from the drawer's own header I2102:11013;2100:10961, not assumed, because the rail's highlighted seat is Insert and taking the crumb from the rail would have written the wrong panel. WIDTH: the next element is the 'Saved 2m ago' pill at x412, so 180→412 leaves 232; 224 keeps an 8px gap. The spec board double-spaces its separators, but it was drawn 420-600px wide and this slot is 224, so single spaces are the honest adaptation — 28 characters at 14/Medium sets to roughly 200px, inside the box with room. Verified by screenshot after."}
+ ]
+}

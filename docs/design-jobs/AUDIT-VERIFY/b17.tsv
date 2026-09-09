@@ -1,0 +1,184 @@
+N	1776:8374	16 · History · 43	SECTION	0,77134,8280,4996			49	true
+K	162:2	FRAME	2320,77354,280,812	true	true	History · Saves
+K	163:2	FRAME	1300,79452,280,812	true	true	History · Saves · changes
+K	163:64	FRAME	100,79452,280,812	true	true	History · Saves · empty
+K	163:113	FRAME	500,80566,280,812	true	true	History · Saves · time-travel
+K	163:167	FRAME	2100,79452,280,812	true	true	History · Saves · restore-confirm
+K	163:220	FRAME	100,80566,280,812	true	true	History · Saves · restoring
+K	163:269	FRAME	1700,79452,280,812	true	true	History · Saves · pruned-notice
+K	184:2	FRAME	6740,78382,1440,900	true	true	History · Published · roll-back confirm
+K	184:24	FRAME	3620,78382,1440,900	true	true	History · Published · restore-confirm
+K	184:37	FRAME	2060,78382,1440,900	true	true	History · Published · redeploying
+K	184:45	FRAME	5180,78382,1440,900	true	true	History · Published · restored
+K	433:2348	FRAME	1120,77354,680,402	true	true	History · milestone suggestion banner (code: MilestoneSugges
+K	453:4031	FRAME	900,79452,280,812	true	true	History · Saves · load-error
+K	453:4064	FRAME	100,78382,1440,900	true	true	History · Published · failed
+K	949:4474	FRAME	1920,77354,280,812	true	true	History · Published (tab)
+K	950:4474	FRAME	900,80566,280,812	true	true	[not-implemented] History · Backups (tab) — no backup servic
+K	1138:4573	FRAME	500,79452,280,812	true	true	History · Saves · loading
+K	1156:4620	FRAME	1300,80566,280,812	true	true	[not-implemented] History · Backups · empty — no backup serv
+K	1704:8205	FRAME	3120,77354,280,812	true	true	History · Published · loading
+K	1704:8256	FRAME	1660,78382,280,812	true	true	History · Published · load-error
+K	1704:8309	FRAME	2720,77354,280,812	true	true	History · Published · empty
+K	879:4518	FRAME	660,81608,520,185	true	true	[not-implemented] History · Backups · restore-confirm — no b
+K	879:4526	FRAME	2420,81608,440,141	true	true	[not-implemented] History · Backups · restoring — no backup 
+K	879:4531	FRAME	1860,81608,440,169	true	true	[not-implemented] History · Backups · restored — no backup s
+K	879:4536	FRAME	100,81608,440,121	true	true	[not-implemented] History · Backups · creating — no backup s
+K	1156:4665	FRAME	1300,81608,440,169	true	true	[not-implemented] History · Backups · restore-failed — no ba
+K	172:3	TEXT	1300,80284,280,126	true		caption/Versions · changes
+K	172:4	TEXT	100,80284,280,18	true		caption/Versions · empty
+K	172:5	TEXT	500,81398,280,90	true		caption/Versions · time-travel
+K	172:6	TEXT	2100,80284,280,162	true		caption/Versions · restore-confirm
+C	1776:8374	texts=616
+T	2894:12612	5140,78178,280,180	12	Regular	true	HEIGHT	16 · History · 43	Annotate the undo control the moment history stops covering 
+T	2894:12611	4860,78178,280,162	12	Regular	true	HEIGHT	16 · History · 43	State the cost: “Undo will stop working for the 47 steps bef
+T	2894:12610	4300,78178,280,160	11	Regular	true	HEIGHT	16 · History · 43	History starts here — earlier steps were dropped. Undo is ca
+T	2894:12609	3740,78178,280,162	12	Regular	true	HEIGHT	16 · History · 43	One restore contract across the module: preview → confirm th
+R	2854:21894	163:2	NAVIGATE	[design-ahead] History · Saves · overflow — Export / Import
+R	2854:21934	2474:12093	NAVIGATE	hotspot/state · Editor · reopened with unsaved work
+R	2854:21933	163:167	NAVIGATE	hotspot/state · History · restore-confirm
+R	2854:21932	1138:4573	NAVIGATE	hotspot/state · History · Saves · loading
+R	2854:21931	950:4474	NAVIGATE	hotspot/tab · History · Backups
+R	2854:21930	168:2	NAVIGATE	hotspot/state · Compare · side-by-side
+R	2854:21929	163:269	NAVIGATE	hotspot/state · Versions · pruned-notice
+R	2854:21928	163:64	NAVIGATE	hotspot/state · Versions · empty
+R	2854:21854	163:113	NAVIGATE	[design-ahead] History · Saves · changes · undo-unavailable
+R	2854:21892	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	2854:21891	163:113	NAVIGATE	hotspot/state · History · time-travel
+R	2854:21814	163:113	NAVIGATE	[design-ahead] History · Saves · changes · clear-confirm
+R	2854:21852	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	2854:21851	163:113	NAVIGATE	hotspot/state · History · time-travel
+R	2854:21779	162:2	NAVIGATE	[design-ahead] History · Saves · changes · load-error
+R	2854:21804	162:2	NAVIGATE	hotspot/alt · Versions · saves
+R	2854:21803	163:64	NAVIGATE	hotspot/back · Versions · empty
+R	2854:21739	163:113	NAVIGATE	[design-ahead] History · Saves · changes · start-of-history
+R	2854:21777	162:2	NAVIGATE	hotspot/back · History · Saves (Milestones)
+R	2854:21776	163:113	NAVIGATE	hotspot/state · History · time-travel
+R	2854:21676	163:167	NAVIGATE	[design-ahead] History · Saves · time-travel · no-preview
+R	2854:21707	162:2	NAVIGATE	hotspot/back · History · Saves
+R	2854:21613	163:167	NAVIGATE	[design-ahead] History · Saves · time-travel · restore-confi
+R	2854:21644	162:2	NAVIGATE	hotspot/back · History · Saves
+R	2854:12294	163:113	NAVIGATE	History · Saves · changes · restore-confirm
+N	1776:8381	08 · Inspector · 51	SECTION	0,46149,3420,6220			56	true
+K	807:8342	FRAME	1780,51182,300,812	true	true	Inspector · profile · TEXT
+K	807:8412	FRAME	2200,50250,300,812	true	true	Inspector · profile · FLEX
+K	807:8475	FRAME	520,51182,300,812	true	true	Inspector · profile · GRID
+K	807:8521	FRAME	1360,51182,300,812	true	true	Inspector · profile · MEDIA
+K	807:8567	FRAME	1360,50250,300,812	true	true	Inspector · profile · BUTTON
+K	807:8614	FRAME	940,51182,300,812	true	true	Inspector · profile · INPUT
+K	824:5095	FRAME	2200,51182,300,552	true	true	[not-implemented] Inspector · flat scroll body — the tab bar
+K	32:2	FRAME	1780,50250,300,812	true	true	Inspector · profile · CONTAINER (fallback)
+K	1707:8456	FRAME	520,48973,300,812	true	true	Inspector · error-boundary
+K	429:2350	FRAME	520,46369,1120,715	true	true	B9.1 · Animation editor — Entrance · Attention · Exit
+K	159:99	FRAME	100,46369,300,812	true	true	Inspector · no-selection
+K	159:102	FRAME	100,48973,300,812	true	true	Inspector · loading
+K	159:123	FRAME	100,47495,300,812	true	true	Inspector · multi-select
+K	160:2	FRAME	3020,46369,300,812	true	true	Inspector · instance-selected
+K	160:105	FRAME	2180,46369,300,812	true	true	Inspector · bound-to-CMS
+K	160:208	FRAME	2600,46369,300,812	true	true	Inspector · breakpoint-override
+K	160:313	FRAME	520,47495,300,812	true	true	Inspector · pseudo-state
+K	160:412	FRAME	940,47495,300,812	true	true	Inspector · reach-all-like-this
+K	160:512	FRAME	1760,46369,300,812	true	true	[unreachable] Inspector · ai-agent-run — entering the AI tab
+K	189:2	FRAME	1360,47495,300,812	true	true	Inspector · reach-whole-site
+K	161:13	TEXT	100,47201,300,54	true		caption/Inspector · no-selection
+K	161:15	TEXT	100,48327,300,378	true		caption/Inspector · multi-select
+K	161:16	TEXT	3020,47201,300,126	true		caption/Inspector · instance-selected
+K	161:17	TEXT	2180,47201,300,234	true		caption/Inspector · bound-to-CMS
+K	161:18	TEXT	2600,47201,300,270	true		caption/Inspector · breakpoint-override
+K	161:19	TEXT	520,48327,300,360	true		caption/Inspector · pseudo-state
+K	161:20	TEXT	940,48327,300,252	true		caption/Inspector · reach-all-like-this
+K	161:21	TEXT	1760,47201,300,216	true		caption/Inspector · ai-agent-run
+K	161:22	TEXT	100,49805,300,108	true		caption/Inspector · loading
+K	189:104	TEXT	1360,48327,300,342	true		caption/Inspector · reach-whole-site
+C	1776:8381	texts=1295
+T	2914:12658	940,52014,300,72	12	Regular	true	HEIGHT	08 · Inspector · 51	Locked changes nothing here — zero reads of isLocked under e
+T	2914:12657	1360,52014,300,72	12	Regular	true	HEIGHT	08 · Inspector · 51	Locked changes nothing here — zero reads of isLocked under e
+T	2914:12656	520,52014,300,72	12	Regular	true	HEIGHT	08 · Inspector · 51	Locked changes nothing here — zero reads of isLocked under e
+T	2914:12655	1780,52014,300,72	12	Regular	true	HEIGHT	08 · Inspector · 51	Locked changes nothing here — zero reads of isLocked under e
+R	2865:22266	807:8412	NAVIGATE	Inspector · CSS classes duplicate · simplified density
+R	2865:22375	1719:8443	NAVIGATE	hotspot/state · popover · collections
+R	2865:22373	1707:8456	NAVIGATE	hotspot/state · Inspector · error-boundary
+R	2865:22371	1707:8427	NAVIGATE	hotspot/state · binding · no-records
+R	2865:22369	1706:8458	NAVIGATE	hotspot/state · Inspector · delete-confirm
+R	2865:22367	429:2350	NAVIGATE	hotspot/state · Attention · Exit
+R	2865:22363	32:2	NAVIGATE	hotspot/select · Inspector · CONTAINER (fallback)
+R	2865:22362	1176:4804	NAVIGATE	hotspot/state · token-picker
+R	2865:22347	2430:11940	NAVIGATE	row
+R	2865:22270	170:17	NAVIGATE	btn/ai
+R	2865:22227	160:2	NAVIGATE	Inspector · multi-select · with context header
+R	2865:22230	170:17	NAVIGATE	btn/ai
+R	2865:22226	2430:11996	NAVIGATE	hotspot/open interaction · On Hover
+R	2865:22225	2430:11959	NAVIGATE	hotspot/+ Add interaction
+R	2865:22079	876:4532	NAVIGATE	Inspector · findability — search · pills · expand-all
+R	2865:22192	2474:11972	NAVIGATE	hotspot/state · Inspector · profile · FORM
+R	2865:22191	807:8614	NAVIGATE	hotspot/select · Inspector · INPUT
+R	2865:22190	807:8567	NAVIGATE	hotspot/select · Inspector · BUTTON
+R	2865:22189	807:8521	NAVIGATE	hotspot/select · Inspector · MEDIA
+R	2865:22188	807:8475	NAVIGATE	hotspot/select · Inspector · GRID
+R	2865:22187	807:8412	NAVIGATE	hotspot/select · Inspector · FLEX
+R	2865:22186	807:8342	NAVIGATE	hotspot/select · Inspector · TEXT
+R	2865:22185	1176:4804	NAVIGATE	hotspot/state · Inspector · token-picker
+R	2865:22083	170:17	NAVIGATE	btn/ai
+R	2865:21984	807:8475	NAVIGATE	Inspector · disabled control · reason and fix
+N	1776:8385	01 · Shell · 34	SECTION	0,0,7880,7020			56	true
+K	65:2	FRAME	100,220,1440,900	true	true	Shell state 1 · First run — ENTRY POINT: opening the editor 
+K	65:211	FRAME	1660,1278,1440,900	true	true	Shell state 7 · Preview — the shipped overlay is the ACTIVE 
+K	65:412	FRAME	1660,2354,1440,900	true	true	Shell state 12 · Loading
+K	66:4	FRAME	4780,220,1440,900	true	true	Shell state 4 · Multi-select
+K	66:225	FRAME	4780,1278,1440,900	true	true	Shell state 9 · AI agent run — AI has ONE home: the inspecto
+K	66:441	FRAME	6340,1278,1440,900	true	true	Shell state 10 · Offline
+K	66:640	FRAME	100,2354,1440,900	true	true	Shell state 11 · Saving → conflict
+K	199:2	FRAME	1660,220,1440,900	true	true	Shell state 2 · Returning (default)
+K	199:205	FRAME	3220,220,1440,900	true	true	Shell state 3 · Element selected
+K	199:409	FRAME	6340,220,1440,900	true	true	Shell state 5 · Drawer closed
+K	200:2	FRAME	100,1278,1440,900	true	true	Shell state 6 · Comment mode
+K	200:213	FRAME	3220,1278,1440,900	true	true	Shell state 8 · Review active
+K	202:2	FRAME	1660,5113,1280,720	true	true	Shell · 1280 · pin auto-released (overlay) — RETIRED 2026-09
+K	642:3696	FRAME	100,5113,1440,900	true	true	Shell state 13 · Presence (multiplayer) — BUILT AND FLAG-GAT
+K	963:4474	FRAME	100,3748,1440,900	true	true	Shell · 360 overlay panel (slot proof) — ONE right-hand clas
+K	927:4474	FRAME	2168,3412,520,216	true	true	Exit · Workspace (leaves the editor)
+K	1175:4804	FRAME	100,4768,420,225	true	true	Upgrade modal (403 gate)
+K	201:2	TEXT	1660,1140,1200,18	true		caption/Shell state 2 · Returning (default)
+K	201:3	TEXT	3220,1140,1200,18	true		caption/Shell state 3 · Element selected
+K	201:4	TEXT	6340,1140,1200,18	true		caption/Shell state 5 · Drawer closed
+K	201:5	TEXT	100,2198,1200,36	true		caption/Shell state 6 · Comment mode
+K	201:6	TEXT	3220,2198,1200,18	true		caption/Shell state 8 · Review active
+K	202:204	TEXT	1660,5853,1200,36	true		caption/Shell · 1280 · pin auto-released (overlay)
+K	204:2	TEXT	100,1140,1200,18	true		caption/Shell state 1 · First run
+K	204:3	TEXT	4780,1140,1200,18	true		caption/Shell state 4 · Multi-select
+K	204:4	TEXT	1660,2198,1200,54	true		caption/Shell state 7 · Preview
+K	204:5	TEXT	4780,2198,1200,18	true		caption/Shell state 9 · AI agent run
+K	204:6	TEXT	6340,2198,1200,18	true		caption/Shell state 10 · Offline
+K	204:7	TEXT	100,3274,1200,18	true		caption/Shell state 11 · Saving → conflict
+K	204:8	TEXT	1660,3274,1200,18	true		caption/Shell state 12 · Loading
+C	1776:8385	texts=1526
+T	2875:12493	3180,6956,1000,36	12	Regular	true	HEIGHT	01 · Shell · 34	caption/Drawer · width steps and the drag handle — the drawe
+T	2875:12492	3700,6872,464,48	11	Regular	true	HEIGHT	Drawer · width steps and the drag handle (280 ↔ 700) — UX-F-	SPEC-NAVIGATION §5.2 proposes 560; SPEC-PAGES-PANEL and SPEC
+T	2875:12491	3700,6854,464,16	12	Medium	true	HEIGHT	Drawer · width steps and the drag handle (280 ↔ 700) — UX-F-	The step in between is filed, not drawn
+T	2875:12490	3700,6810,464,32	11	Regular	true	HEIGHT	Drawer · width steps and the drag handle (280 ↔ 700) — UX-F-	Media sets 560 and Templates 700 from runtime events (LeftSi
+R	2865:21980	2844:12092	NAVIGATE	hotspot/unpublish-confirm
+R	2865:21982	2844:12104	NAVIGATE	hotspot/unpublish-cancel
+R	2272:11915	1172:4804	NAVIGATE	hotspot/state · Exit · guard
+R	2272:11914	199:2	NAVIGATE	← Back to the editor
+R	2162:11838	199:205	NAVIGATE	Shell state 15 · Save failed
+R	2162:11935	817:4723	NAVIGATE	hotspot/state · Canvas · zoom levels
+R	2162:11934	52:2	NAVIGATE	hotspot/back · S1 · Editor — ASSEMBLED
+R	I2162:11841;2034:8431	1333:7162	NAVIGATE	rail/Brand
+R	I2162:11841;2034:8428	148:2	NAVIGATE	rail/Content
+R	I2162:11841;2034:8425	144:2	NAVIGATE	rail/Media
+R	I2162:11841;2034:8422	140:2	NAVIGATE	rail/Pages
+R	I2162:11841;2034:8418	142:2	NAVIGATE	rail/Layers
+R	I2162:11841;2034:8415	137:2	NAVIGATE	rail/Insert
+R	I2162:11839;698:458	642:3401	NAVIGATE	btn/more
+R	I2162:11839;698:450	165:2	NAVIGATE	btn/notifications
+R	I2162:11839;698:465	2162:11660	NAVIGATE	pill/saved
+R	I2162:11839;698:448	1172:4804	NAVIGATE	btn/exit
+R	2162:11660	199:205	NAVIGATE	Shell state 14 · Saving
+R	2205:11820	2162:11838	NAVIGATE	hotspot/alt · Save · failed
+R	2205:11818	199:2	NAVIGATE	hotspot/alt · Save · saved
+R	2162:11757	817:4723	NAVIGATE	hotspot/state · Canvas · zoom levels
+R	2162:11756	52:2	NAVIGATE	hotspot/back · S1 · Editor — ASSEMBLED
+R	I2162:11663;2034:8431	1333:7162	NAVIGATE	rail/Brand
+R	I2162:11663;2034:8428	148:2	NAVIGATE	rail/Content
+R	I2162:11663;2034:8425	144:2	NAVIGATE	rail/Media
+END	done=1776:8374|1776:8381|1776:8385	stopped=false	bytes=14002

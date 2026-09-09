@@ -1,0 +1,34 @@
+{
+ "slug": "zz-f14-back2",
+ "page": "1:3",
+ "rows": [
+  {
+   "op": "text",
+   "id": "I682:5201;698:448;9:55",
+   "text": "‹ Back to canvas",
+   "expect": "‹ Exit",
+   "why": "F14 · Back to canvas on the remaining full-page Settings boards, after the shape was proven on one. The trial on 1703:9208 rendered correctly — btn/exit hugs, so the label grew and pushed the title right with no overflow — and the same screenshot independently confirmed F15 closed on that board (no canvas footer) and the new rail More seat propagating to its rail instance. Same node path on every board (…;698:448;9:55 inside btn/exit), same expect, so a board whose control has moved reports REFUSED rather than being overwritten."
+  },
+  {
+   "op": "text",
+   "id": "I682:5480;698:448;9:55",
+   "text": "‹ Back to canvas",
+   "expect": "‹ Exit",
+   "why": "F14 · Back to canvas on the remaining full-page Settings boards, after the shape was proven on one. The trial on 1703:9208 rendered correctly — btn/exit hugs, so the label grew and pushed the title right with no overflow — and the same screenshot independently confirmed F15 closed on that board (no canvas footer) and the new rail More seat propagating to its rail instance. Same node path on every board (…;698:448;9:55 inside btn/exit), same expect, so a board whose control has moved reports REFUSED rather than being overwritten."
+  },
+  {
+   "op": "text",
+   "id": "I682:5542;698:448;9:55",
+   "text": "‹ Back to canvas",
+   "expect": "‹ Exit",
+   "why": "F14 · Back to canvas on the remaining full-page Settings boards, after the shape was proven on one. The trial on 1703:9208 rendered correctly — btn/exit hugs, so the label grew and pushed the title right with no overflow — and the same screenshot independently confirmed F15 closed on that board (no canvas footer) and the new rail More seat propagating to its rail instance. Same node path on every board (…;698:448;9:55 inside btn/exit), same expect, so a board whose control has moved reports REFUSED rather than being overwritten."
+  },
+  {
+   "op": "text",
+   "id": "I1703:9047;698:448;9:55",
+   "text": "‹ Back to canvas",
+   "expect": "‹ Exit",
+   "why": "F14 · Back to canvas on the remaining full-page Settings boards, after the shape was proven on one. The trial on 1703:9208 rendered correctly — btn/exit hugs, so the label grew and pushed the title right with no overflow — and the same screenshot independently confirmed F15 closed on that board (no canvas footer) and the new rail More seat propagating to its rail instance. Same node path on every board (…;698:448;9:55 inside btn/exit), same expect, so a board whose control has moved reports REFUSED rather than being overwritten."
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "rows": [],
+ "note": "STRUCTURAL — three clones then one dialog draw. Order: (1) node scripts/figma/add-state-board.mjs <cloneFrom> \"<cloneName>\" --apply, three times, one call each; (2) paste each printed board id into that row's \"board\"; (3) node scripts/figma/draw-settings-confirm.mjs docs/design-jobs/V2-TO-V1/plans/gap-a-settings-confirms.json --apply — one call for all three. Row 1 is UX-I-33 (already has a queue hotspot row waiting on this board), row 2 is UX-I-34, row 3 is UX-I-35. 2026-09-07: rows 2 and 3 cloned and drawn; row 1 (UX-I-33) deliberately not cloned — see its deferred field.",
+ "structural": [
+  {
+   "board": "2877:12431",
+   "cloneFrom": "640:3135",
+   "cloneName": "S7 · Settings · Forms · delete-submission-confirm",
+   "title": "Delete this submission?",
+   "message": "“maria@bellacucina.com” is a visitor's own message to you. Deleting removes it from the server for good — no copy is kept anywhere and it can't be recovered. Export CSV first if you might need it.",
+   "confirmLabel": "Delete submission",
+   "why": "UX-I-34 (Critical) — an irreversible delete of a third party's data sat one click deep, at the same visual weight as the reversible 'mark read' / 'mark spam' beside it. Copy is verbatim from FormsScreen.tsx:413-420, also shipped during this pass.",
+   "provenance": "carried from plans/settings-confirms.json; straight double quotes replaced with typographic ones — a straight quote inside the sandbox template collapses and kills the payload (RUNBOOK, measured 2026-09-07).",
+   "clone_readback": "add-state-board.mjs --apply printed: created 2877:12431 'S7 · Settings · Forms · delete-submission-confirm'; no overlap; no inbound edge yet",
+   "applied": {
+    "status": "OK",
+    "board": "2877:12431",
+    "dialog": "2879:12609",
+    "read_back": "440x204@500,348 FITS  ['Delete this submission?' | '“maria@bellacucina.com” is' | 'Cancel' | 'Delete submission']",
+    "placement_correction": "draw-settings-confirm.mjs appended the scrim and card into a VERTICAL auto-layout board, which owns x/y: the first read-back was 440x204@0,1800 on a 900-tall board and still said OK, because it checked the TEXT and not the geometry. fix-confirm-placement.mjs set layoutPositioning=ABSOLUTE and re-centred; both now read FITS against the board's absoluteBoundingBox. The source script is patched so it cannot recur."
+   }
+  },
+  {
+   "board": "2877:21890",
+   "cloneFrom": "639:3092",
+   "cloneName": "S7 · Settings · Domains · remove-confirm",
+   "title": "Remove this domain?",
+   "message": "bellastudio.com stops pointing at this site. Visitors following that address get nothing until you reconnect it or change your DNS; the site keeps serving on its buildrick.app address.",
+   "confirmLabel": "Remove domain",
+   "why": "UX-I-35 (Major) — Domains is the one Settings delete that asks, and it asks with the browser's native window.confirm (DomainsScreen.tsx:154), which the editor cannot style and which reads as a page-level alert. Drawn in the SAME chrome ConfirmDialog shape as the other two so 'delete' means one thing across the tab instead of five.",
+   "provenance": "carried from plans/settings-confirms.json; straight double quotes replaced with typographic ones — a straight quote inside the sandbox template collapses and kills the payload (RUNBOOK, measured 2026-09-07).",
+   "clone_readback": "add-state-board.mjs --apply printed: created 2877:21890 'S7 · Settings · Domains · remove-confirm'; no overlap; no inbound edge yet",
+   "applied": {
+    "status": "OK",
+    "board": "2877:21890",
+    "dialog": "2879:12616",
+    "read_back": "440x184@500,358 FITS  ['Remove this domain?' | 'bellastudio.com stops poin' | 'Cancel' | 'Remove domain']",
+    "placement_correction": "draw-settings-confirm.mjs appended the scrim and card into a VERTICAL auto-layout board, which owns x/y: the first read-back was 440x204@0,1800 on a 900-tall board and still said OK, because it checked the TEXT and not the geometry. fix-confirm-placement.mjs set layoutPositioning=ABSOLUTE and re-centred; both now read FITS against the board's absoluteBoundingBox. The source script is patched so it cannot recur."
+   }
+  },
+  {
+   "board": "__NOT_CLONED__",
+   "cloneFrom": "640:2440",
+   "cloneName": "S7 · Settings · Redirects · delete-confirm",
+   "title": "Delete this redirect?",
+   "message": "/old-pricing → /pricing is removed for good. Nothing will forward /old-pricing once redirects go live — anyone following that URL lands on a 404. This can't be undone.",
+   "confirmLabel": "Delete redirect",
+   "why": "UX-I-33 (Critical) — deleting a redirect fired the server mutation on the first click: no confirm, no undo, no toast, on a live routing rule search engines and inbound links depend on. Copy is verbatim from RedirectsScreen.tsx:277-284, which shipped the confirm in the founder's working tree while this pass ran — so the board is catching up to the code, not leading it.",
+   "provenance": "carried from plans/settings-confirms.json; straight double quotes replaced with typographic ones — a straight quote inside the sandbox template collapses and kills the payload (RUNBOOK, measured 2026-09-07).",
+   "deferred": "UX-I-33 is NOT one of this pass's 17 gap findings (it already carries a queue row, settings-hotspots#0, waiting on this board). Left uncloned to keep the pass inside its 15-call budget; the row is kept so the next window has the clone source, the copy and the wiring target in one place."
+  }
+ ]
+}

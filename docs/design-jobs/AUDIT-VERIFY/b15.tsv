@@ -1,0 +1,204 @@
+N	640:3135	S7 · Settings · Forms	FRAME	3220,99595,1440,900	true	VERTICAL	10	true
+K	682:5542	INSTANCE	3220,99595,1440,56	true	true	Topbar
+K	640:3154	FRAME	3220,99651,1440,812	true	true	Middle band
+K	640:3370	FRAME	3220,100463,1440,32	true	true	Footer
+K	1688:16225	FRAME	3220,100415,200,34	true	true	hotspot/back · S7 · Settings · root
+K	1720:17312	FRAME	3220,100467,150,28	true	false	hotspot/state · Forms · loading
+K	1720:17316	FRAME	3374,100467,150,28	true	false	hotspot/state · Forms · empty
+K	1720:17320	FRAME	3528,100467,150,28	true	false	hotspot/state · Forms · error
+K	1720:17324	FRAME	3682,100467,150,28	true	false	hotspot/state · Forms · action-error
+K	1720:17328	FRAME	3836,100467,150,28	true	false	hotspot/state · Forms · inbox-loading
+K	1720:17332	FRAME	3990,100467,150,28	true	false	hotspot/state · Forms · inbox-empty
+C	640:3135	texts=66
+T	1720:17333	3996,100475,138,12	10	Medium	false	HEIGHT	hotspot/state · Forms · inbox-empty	Forms · inbox-empty
+T	1720:17329	3842,100475,138,12	10	Medium	false	HEIGHT	hotspot/state · Forms · inbox-loading	Forms · inbox-loading
+T	1720:17325	3688,100475,138,12	10	Medium	false	HEIGHT	hotspot/state · Forms · action-error	Forms · action-error
+T	1720:17321	3534,100475,138,12	10	Medium	false	HEIGHT	hotspot/state · Forms · error	Forms · error
+T	1720:17317	3380,100475,138,12	10	Medium	false	HEIGHT	hotspot/state · Forms · empty	Forms · empty
+T	1720:17313	3226,100475,138,12	10	Medium	false	HEIGHT	hotspot/state · Forms · loading	Forms · loading
+T	640:3374	4563,100471,81,16	11	Regular	true	WIDTH_AND_HEIGHT	Footer	Desktop · 100%
+T	640:3372	3326,100471,55,16	11	Regular	true	WIDTH_AND_HEIGHT	Footer	680 × 250
+T	640:3371	3236,100471,74,16	11	Regular	true	WIDTH_AND_HEIGHT	Footer	Section · Hero
+T	I640:3486;12:9	4134,100241,66,16	12	Medium	true	WIDTH_AND_HEIGHT	Badge	DELIVERED
+T	640:3485	3932,100239,180,20	13	Regular	true	HEIGHT	row	1 Jul, 16:55
+T	640:3484	3660,100239,260,20	13	Regular	true	HEIGHT	row	events@zeeshan.co
+T	640:3483	3468,100239,180,20	13	Regular	true	HEIGHT	row	Catering
+T	I640:3480;12:7	4134,100197,28,16	12	Medium	true	WIDTH_AND_HEIGHT	Badge	NEW
+T	640:3479	3932,100195,180,20	13	Regular	true	HEIGHT	row	2 Jul, 12:08
+T	640:3478	3660,100195,260,20	13	Regular	true	HEIGHT	row	k.mahmood@outlook.com
+T	640:3477	3468,100195,180,20	13	Regular	true	HEIGHT	row	Contact
+T	I640:3474;12:7	4134,100153,28,16	12	Medium	true	WIDTH_AND_HEIGHT	Badge	NEW
+T	640:3473	3932,100151,180,20	13	Regular	true	HEIGHT	row	2 Jul, 19:41
+T	640:3472	3660,100151,260,20	13	Regular	true	HEIGHT	row	hina.raza@gmail.com
+T	640:3471	3468,100151,180,20	13	Regular	true	HEIGHT	row	Reservation
+T	640:3469	4124,100113,110,16	11	Medium	true	HEIGHT	thead	STATUS
+T	640:3468	3932,100113,180,16	11	Medium	true	HEIGHT	thead	RECEIVED
+T	640:3467	3660,100113,260,16	11	Medium	true	HEIGHT	thead	FROM
+T	640:3466	3468,100113,180,16	11	Medium	true	HEIGHT	thead	FORM
+T	640:3464	3468,100085,85,16	11	Medium	true	WIDTH_AND_HEIGHT	Card · SUBMISSIONS	SUBMISSIONS
+T	640:3460	3468,100015,180,20	13	Regular	true	HEIGHT	Field · Spam protection	Spam protection
+T	I640:3457;10:11	3676,99969,296,22	14	Regular	true	NONE	Input	https://formspree.io/f/mzbqwerty
+T	640:3456	3468,99970,180,20	13	Regular	true	HEIGHT	Field · Endpoint URL	Endpoint URL
+T	I640:3451;14:22	3674,99911,178,36	13	Regular	true	NONE	Select	Formspree
+T	640:3450	3468,99919,180,20	13	Regular	true	HEIGHT	Field · Form provider	Form provider
+T	640:3448	3468,99883,61,16	11	Medium	true	WIDTH_AND_HEIGHT	Card · PROVIDER	PROVIDER
+T	2876:12450	3464,99807,1168,36	12	Regular	true	HEIGHT	Notice · not in version history	Not covered by version history. Form submissions are stored on the server, not in the proj
+T	2876:12462	3464,99739,1168,18	12	Regular	true	HEIGHT	Notice · saves immediately	Saved as you go. Every action on this screen writes to the server the moment you press it 
+T	640:3442	3452,99693,156,18	12	Regular	false	WIDTH_AND_HEIGHT	titles	Submissions inbox + config
+T	640:3441	3452,99667,147,24	16	Semi Bold	true	WIDTH_AND_HEIGHT	titles	PLUMBING / Forms
+T	I2041:19871;2041:19567	3292,100204,54,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Billing ↗	Billing ↗
+T	I2041:19869;2041:19567	3292,100174,75,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Members ↗	Members ↗
+T	640:3433	3292,100149,76,16	11	Medium	true	WIDTH_AND_HEIGHT	Group · WORKSPACE	WORKSPACE
+T	I2041:19867;2041:19567	3292,100114,66,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Webhooks	Webhooks
+T	I2041:19865;2041:19567	3292,100084,75,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Integrations	Integrations
+T	I2041:19863;2041:19570	3292,100054,39,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Forms	Forms
+T	I2041:19861;2041:19567	3292,100024,53,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Headers	Headers
+T	I2041:19859;2041:19567	3292,99994,59,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Redirects	Redirects
+T	I2041:19857;2041:19567	3292,99964,83,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Custom code	Custom code
+T	640:3419	3292,99939,65,16	11	Medium	true	WIDTH_AND_HEIGHT	Group · PLUMBING	PLUMBING
+T	I2041:19855;2041:19567	3292,99904,75,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Localization	Localization
+T	I2041:19853;2041:19567	3292,99874,58,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Analytics	Analytics
+T	I2041:19851;2041:19567	3292,99844,55,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Domains	Domains
+T	I2041:19849;2041:19567	3292,99814,42,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Export	Export
+T	640:3407	3292,99789,87,16	11	Medium	true	WIDTH_AND_HEIGHT	Group · DISTRIBUTION	DISTRIBUTION
+T	I2041:19847;2041:19567	3292,99754,27,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · SEO	SEO
+T	I2041:19845;2041:19567	3292,99724,56,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · Branding	Branding
+T	I2041:19843;2041:19567	3292,99694,49,20	13	Medium	true	WIDTH_AND_HEIGHT	Nav · General	General
+T	640:3399	3292,99669,27,16	11	Medium	true	WIDTH_AND_HEIGHT	Group · SITE	SITE
+T	I2040:19359;2034:8391	3235,99925,31,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Brand	Brand
+T	I2040:19359;2034:8388	3229,99877,42,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Content	Content
+T	I2040:19359;2034:8385	3234,99829,32,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Media	Media
+T	I2040:19359;2034:8382	3234,99781,33,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Pages	Pages
+T	I2040:19359;2034:8378	3233,99733,35,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Layers	Layers
+T	I2040:19359;2034:8375	3235,99685,30,16	11	Regular	true	WIDTH_AND_HEIGHT	rail/Insert	Insert
+T	I682:5542;681:42;9:25	4539,99613,49,20	14	Medium	true	WIDTH_AND_HEIGHT	btn/publish	Publish
+T	I682:5542;681:37	3653,99614,101,18	12	Regular	true	WIDTH_AND_HEIGHT	pill/in	In review · 3 open
+T	I682:5542;698:465;697:443	3532,99614,81,18	12	Regular	true	WIDTH_AND_HEIGHT	pill/saved	Saved 2m ago
+T	I682:5542;681:31	3300,99613,200,20	14	Medium	true	HEIGHT	Topbar	Bella Cucina
+T	I682:5542;698:448;9:55	3244,99614,32,18	13	Medium	true	WIDTH_AND_HEIGHT	btn/exit	‹ Exit
+R	1720:17332	1703:9532	NAVIGATE	hotspot/state · Forms · inbox-empty
+R	1720:17328	1703:9370	NAVIGATE	hotspot/state · Forms · inbox-loading
+R	1720:17324	1703:9208	NAVIGATE	hotspot/state · Forms · action-error
+R	1720:17320	1703:9046	NAVIGATE	hotspot/state · Forms · error
+R	1720:17316	1703:8882	NAVIGATE	hotspot/state · Forms · empty
+R	1720:17312	1703:8720	NAVIGATE	hotspot/state · Forms · loading
+R	1688:16225	1688:7195	NAVIGATE	hotspot/back · S7 · Settings · root
+R	640:3370	164:2	NAVIGATE	Footer
+R	2041:19871	927:4474	NAVIGATE	Nav · Billing ↗
+R	2041:19869	927:4474	NAVIGATE	Nav · Members ↗
+R	2041:19867	640:3849	NAVIGATE	Nav · Webhooks
+R	2041:19865	640:3488	NAVIGATE	Nav · Integrations
+R	2041:19861	640:2789	NAVIGATE	Nav · Headers
+R	2041:19859	640:2440	NAVIGATE	Nav · Redirects
+R	2041:19857	639:4144	NAVIGATE	Nav · Custom code
+R	2041:19855	639:3795	NAVIGATE	Nav · Localization
+R	2041:19853	639:3443	NAVIGATE	Nav · Analytics
+R	2041:19851	639:3092	NAVIGATE	Nav · Domains
+R	2041:19849	639:2754	NAVIGATE	Nav · Export
+R	2041:19847	638:3070	NAVIGATE	Nav · SEO
+R	2041:19845	1344:7165	NAVIGATE	Nav · Branding
+R	2041:19843	638:2378	NAVIGATE	Nav · General
+R	I2040:19359;2034:8389	1333:7162	NAVIGATE	rail/Brand
+R	I2040:19359;2034:8386	148:2	NAVIGATE	rail/Content
+R	I2040:19359;2034:8383	144:2	NAVIGATE	rail/Media
+N	641:2487	Templates · gallery	FRAME	100,60601,280,812	true	VERTICAL	20	true
+K	641:2488	INSTANCE	100,60601,280,44	true	false	Panel header
+K	641:2498	FRAME	100,60645,280,54	true	true	Search
+K	641:2501	INSTANCE	100,60699,280,28	true	false	Section header
+K	641:2505	FRAME	100,60727,280,130	true	true	Card · Restaurant — one page
+K	641:2511	FRAME	100,60857,280,130	true	true	Card · Menu + reservations
+K	641:2517	FRAME	100,60987,280,130	true	true	Card · Landing — offer
+K	641:2523	INSTANCE	100,61117,280,28	true	false	[not-implemented] Section header · SECTION TEMPLATES — every catalogue entry is a page tem
+K	641:2527	FRAME	100,61145,280,32	true	true	[not-implemented] Row · Hero · image left — no section templates exist in the catalogue
+K	641:2532	FRAME	100,61177,280,32	true	true	[not-implemented] Row · Menu grid · 3-up — no section templates exist in the catalogue
+K	641:2537	FRAME	100,61209,280,32	true	true	[not-implemented] Row · Testimonials · slider — no section templates exist in the catalogu
+K	641:2542	FRAME	100,61241,280,92	true	true	spacer
+K	641:2543	FRAME	100,61333,280,48	true	true	Panel footer
+K	787:4347	FRAME	100,61343,106,34	true	false	hotspot/state · Templates · loading — CUT 2026-09-02 (Templates · loading RETIRED, no prod
+K	787:4351	FRAME	206,61343,66,34	true	false	hotspot/state · Templates · load-error
+K	787:4355	FRAME	272,61343,106,34	true	false	hotspot/state · Templates · no-results
+K	881:4572	FRAME	100,61381,220,32	true	true	hotspot/alt · S1.1e · template-preview ·
+K	1138:13550	FRAME	100,61375,280,34	true	false	hotspot/state · Templates · empty
+K	1169:4777	FRAME	100,61375,280,34	true	false	hotspot/state · Templates · create-page
+K	1169:4779	FRAME	100,61375,280,34	true	false	hotspot/state · Templates · save-as-template
+K	1175:4864	FRAME	100,61375,280,34	true	false	hotspot/state · Templates · premium → Upgrade modal
+C	641:2487	texts=22
+T	I641:2544;9:31	128,61348,129,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	Browse all templates
+T	641:2541	359,61215,5,20	13	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Testimonials · slider — no section templates exist in the catalogu	›
+T	641:2540	333,61217,18,16	11	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Testimonials · slider — no section templates exist in the catalogu	Pro
+T	641:2538	116,61215,121,20	13	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Testimonials · slider — no section templates exist in the catalogu	Testimonials · slider
+T	641:2536	359,61183,5,20	13	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Menu grid · 3-up — no section templates exist in the catalogue	›
+T	641:2535	327,61185,24,16	11	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Menu grid · 3-up — no section templates exist in the catalogue	Free
+T	641:2533	116,61183,103,20	13	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Menu grid · 3-up — no section templates exist in the catalogue	Menu grid · 3-up
+T	641:2531	359,61151,5,20	13	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Hero · image left — no section templates exist in the catalogue	›
+T	641:2530	327,61153,24,16	11	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Hero · image left — no section templates exist in the catalogue	Free
+T	641:2528	116,61151,102,20	13	Regular	true	WIDTH_AND_HEIGHT	[not-implemented] Row · Hero · image left — no section templates exist in the catalogue	Hero · image left
+T	I641:2523;16:18	364,61123,0,16	11	Medium	true	WIDTH_AND_HEIGHT	[not-implemented] Section header · SECTION TEMPLATES — every catalogue entry is a page tem	
+T	I641:2523;16:17	116,61123,240,16	11	Medium	true	HEIGHT	[not-implemented] Section header · SECTION TEMPLATES — every catalogue entry is a page tem	SECTION TEMPLATES
+T	641:2522	310,61091,54,16	11	Regular	true	WIDTH_AND_HEIGHT	meta	5 sections
+T	641:2520	116,61089,100,20	13	Medium	true	WIDTH_AND_HEIGHT	meta	Landing — offer
+T	641:2516	310,60961,54,16	11	Regular	true	WIDTH_AND_HEIGHT	meta	9 sections
+T	641:2514	116,60959,128,20	13	Medium	true	WIDTH_AND_HEIGHT	meta	Menu + reservations
+T	641:2510	310,60831,54,16	11	Regular	true	WIDTH_AND_HEIGHT	meta	6 sections
+T	641:2508	116,60829,146,20	13	Medium	true	WIDTH_AND_HEIGHT	meta	Restaurant — one page
+T	I641:2501;16:18	364,60705,0,16	11	Medium	true	WIDTH_AND_HEIGHT	Section header	
+T	I641:2501;16:17	116,60705,240,16	11	Medium	true	HEIGHT	Section header	PAGE TEMPLATES
+T	I641:2499;10:7	120,60661,240,22	14	Regular	true	NONE	Input	Search templates…
+T	I641:2488;16:7	116,60615,204,16	11	Medium	true	HEIGHT	Panel header	Templates
+R	641:2487	52:2	NAVIGATE	Templates · gallery
+R	1175:4864	1175:4804	NAVIGATE	hotspot/state · Templates · premium → Upgrade modal
+R	1169:4779	1169:4753	NAVIGATE	hotspot/state · Templates · save-as-template
+R	1169:4777	1169:4725	NAVIGATE	hotspot/state · Templates · create-page
+R	1138:13550	1138:13413	NAVIGATE	hotspot/state · Templates · empty
+R	881:4572	813:4489	NAVIGATE	hotspot/alt · S1.1e · template-preview ·
+R	787:4355	782:4402	NAVIGATE	hotspot/state · Templates · no-results
+R	787:4351	781:4372	NAVIGATE	hotspot/state · Templates · load-error
+R	641:2543	642:2556	NAVIGATE	Panel footer
+R	641:2505	642:2556	NAVIGATE	Card · Restaurant — one page
+N	641:2546	Components · library	FRAME	100,55919,280,812	true	VERTICAL	14	true
+K	641:2547	INSTANCE	100,55919,280,44	true	false	Panel header
+K	641:2557	INSTANCE	100,55963,280,28	true	false	Section header
+K	641:2561	FRAME	100,55991,280,32	true	true	Row · Site header
+K	641:2566	FRAME	100,56023,280,32	true	true	Row · Footer
+K	641:2571	FRAME	100,56055,280,32	true	true	Row · Menu card
+K	641:2576	FRAME	100,56087,280,32	true	true	Row · CTA band
+K	641:2581	INSTANCE	100,56119,280,28	true	false	Section header
+K	641:2585	FRAME	100,56147,280,32	true	true	Row · Button / primary
+K	641:2590	FRAME	100,56179,280,32	true	true	Row · Price row
+K	641:2595	FRAME	100,56211,280,472	true	true	spacer
+K	641:2596	FRAME	100,56683,280,48	true	true	Panel footer
+K	787:4359	FRAME	100,56661,160,34	true	false	hotspot/state · Components · loading
+K	787:4363	FRAME	220,56661,160,34	true	false	hotspot/state · Components · load-error
+K	1138:13548	FRAME	100,56693,280,34	true	false	hotspot/state · Components · empty
+C	641:2546	texts=24
+T	I641:2597;9:7	128,56698,128,18	13	Medium	true	WIDTH_AND_HEIGHT	Button	+ Create component
+T	641:2594	359,56185,5,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Price row	›
+T	641:2593	320,56187,31,16	11	Regular	true	WIDTH_AND_HEIGHT	Row · Price row	linked
+T	641:2591	116,56185,58,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Price row	Price row
+T	641:2589	359,56153,5,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Button / primary	›
+T	641:2588	320,56155,31,16	11	Regular	true	WIDTH_AND_HEIGHT	Row · Button / primary	linked
+T	641:2586	116,56153,100,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Button / primary	Button / primary
+T	I641:2581;16:18	364,56125,0,16	11	Medium	true	WIDTH_AND_HEIGHT	Section header	
+T	I641:2581;16:17	116,56125,240,16	11	Medium	true	HEIGHT	Section header	FROM BRAND · NOT IMPLEMENTED
+T	641:2580	359,56093,5,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · CTA band	›
+T	641:2579	284,56095,67,16	11	Regular	true	WIDTH_AND_HEIGHT	Row · CTA band	3 on this site
+T	641:2577	116,56093,61,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · CTA band	CTA band
+T	641:2575	359,56061,5,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Menu card	›
+T	641:2574	279,56063,72,16	11	Regular	true	WIDTH_AND_HEIGHT	Row · Menu card	18 on this site
+T	641:2572	116,56061,66,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Menu card	Menu card
+T	641:2570	359,56029,5,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Footer	›
+T	641:2569	284,56031,67,16	11	Regular	true	WIDTH_AND_HEIGHT	Row · Footer	6 on this site
+T	641:2567	116,56029,40,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Footer	Footer
+T	641:2565	359,55997,5,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Site header	›
+T	641:2564	284,55999,67,16	11	Regular	true	WIDTH_AND_HEIGHT	Row · Site header	6 on this site
+T	641:2562	116,55997,71,20	13	Regular	true	WIDTH_AND_HEIGHT	Row · Site header	Site header
+T	I641:2557;16:18	364,55969,0,16	11	Medium	true	WIDTH_AND_HEIGHT	Section header	
+T	I641:2557;16:17	116,55969,240,16	11	Medium	true	HEIGHT	Section header	YOUR COMPONENTS
+T	I641:2547;16:7	116,55933,204,16	11	Medium	true	HEIGHT	Panel header	Components
+R	641:2546	52:2	NAVIGATE	Components · library
+R	1138:13548	1138:13394	NAVIGATE	hotspot/state · Components · empty
+R	787:4363	781:4433	NAVIGATE	hotspot/state · Components · load-error
+R	787:4359	778:4173	NAVIGATE	hotspot/state · Components · loading
+R	641:2596	642:3112	NAVIGATE	Panel footer
+R	641:2571	641:2599	NAVIGATE	Row · Menu card
+END	done=640:3135|641:2487|641:2546	stopped=false	bytes=16726

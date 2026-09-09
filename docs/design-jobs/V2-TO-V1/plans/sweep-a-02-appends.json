@@ -1,0 +1,60 @@
+{
+ "page": "1:3",
+ "why": "Sibling sweep A — the same clause the module passes wrote onto one board, appended to the sibling captions that describe a board showing the identical defect. maxHeight is the measured room to the row below, enforced by the applier.",
+ "rows": [
+  {
+   "id": "155:26",
+   "add": "The eye and the lock on every row here are the two controls corrected on 143:179 and 143:237: the eye only dims in the editor (data-hidden on the canvas node, useLayerActions.ts:140-146) and the element still publishes; the lock is written to BOTH localStorage and ElementData.locked while the panel re-reads only the first. UX-H-14, UX-H-17.",
+   "maxHeight": 396,
+   "why": "UX-H-14 / UX-H-17 sibling sweep — Layers · filtered draws the same rows"
+  },
+  {
+   "id": "155:27",
+   "add": "The eye and the lock on every row here are the two controls corrected on 143:179 and 143:237: the eye only dims in the editor and the element still publishes; the lock is written to BOTH localStorage and ElementData.locked while the panel re-reads only the first. UX-H-14, UX-H-17.",
+   "maxHeight": 378,
+   "why": "UX-H-14 / UX-H-17 sibling sweep — Layers · dragging draws the same rows"
+  },
+  {
+   "id": "155:31",
+   "add": "The eye and the lock on every row here are the two controls corrected on 143:179 and 143:237: the eye only dims in the editor and the element still publishes; the lock is written to BOTH localStorage and ElementData.locked while the panel re-reads only the first. And Layers selects a locked row the canvas refuses (useLayerSelection.ts:68-74). UX-H-14, UX-H-15, UX-H-17.",
+   "maxHeight": 396,
+   "why": "UX-H-14/15/17 sibling sweep — Layers · multi-select draws the same rows"
+  },
+  {
+   "id": "161:15",
+   "add": "Lock changes nothing on this board either: the inspector reads no lock flag at all (zero hits for isLocked under editor/inspector/), so every control stays live for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "maxHeight": 620,
+   "why": "UX-D-02 sibling sweep — multi-select draws a control stack and is silent about lock"
+  },
+  {
+   "id": "161:16",
+   "add": "Lock changes nothing on this board either: the inspector reads no lock flag at all (zero hits for isLocked under editor/inspector/), so every control stays live for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "maxHeight": 270,
+   "why": "UX-D-02 sibling sweep — instance-selected draws a control stack and is silent about lock"
+  },
+  {
+   "id": "161:17",
+   "add": "Lock changes nothing on this board either: the inspector reads no lock flag at all (zero hits for isLocked under editor/inspector/), so every control stays live for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "maxHeight": 270,
+   "why": "UX-D-02 sibling sweep — bound-to-CMS draws a control stack and is silent about lock"
+  },
+  {
+   "id": "161:19",
+   "add": "Lock changes nothing on this board either: the inspector reads no lock flag at all (zero hits for isLocked under editor/inspector/), so every control stays live for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "maxHeight": 620,
+   "why": "UX-D-02 sibling sweep — pseudo-state draws a control stack and is silent about lock"
+  },
+  {
+   "id": "161:20",
+   "add": "Lock changes nothing on this board either: the inspector reads no lock flag at all (zero hits for isLocked under editor/inspector/), so every control stays live for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "maxHeight": 620,
+   "why": "UX-D-02 sibling sweep — reach-all-like-this draws a control stack and is silent about lock"
+  },
+  {
+   "id": "189:104",
+   "add": "Lock changes nothing on this board either: the inspector reads no lock flag at all (zero hits for isLocked under editor/inspector/), so every control stays live for a locked element. UX-D-02, and the drawn answer is 2865:12419.",
+   "maxHeight": 620,
+   "why": "UX-D-02 sibling sweep — reach-whole-site draws a control stack and is silent about lock"
+  }
+ ]
+}

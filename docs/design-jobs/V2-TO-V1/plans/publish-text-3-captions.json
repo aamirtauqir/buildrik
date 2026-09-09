@@ -1,0 +1,32 @@
+[
+ {
+  "id": "788:4319",
+  "expect": "Done. Confirms the version and offers the live site.",
+  "text": "Done — and only for a publish that ran in THIS session. Gated on publishJob.jobId != null (PublishTab.tsx:233); before 11541dc35 this board was what every reload of a published site showed, with the CTA greyed and the topbar offering \"Publish changes\" beside it (UX-E-01, UX-E-02). \"Compare v14 → v15\" still emits a bare tab id (:498) and lands on History › Saves, not the Published list (UX-E-26). LAST DEPLOY has no route to the version list at all (UX-E-29). A SIMULATED deploy reaches this same board with a .dev-simulated.invalid URL (UX-E-24).",
+  "why": "UX-E-01, UX-E-02, UX-E-24, UX-E-26, UX-E-29"
+ },
+ {
+  "id": "788:4318",
+  "expect": "In flight.",
+  "text": "In flight. Five steps; two never run (Optimizing images, Performance check) and report skipped. The step line never renders — the panel reads \"running\", the worker writes \"active\" — so it degrades to a bare percentage (UX-E-08). There is NO cancel: usePublishJob exposes it (usePublishJob.ts:97, :228-236) and no UI calls it (UX-E-09), and a dropped poll leaves uiState at \"publishing\" forever with the CTA disabled and no way out (UX-E-03 — see Publish · lost contact).",
+  "why": "UX-E-03, UX-E-08, UX-E-09"
+ },
+ {
+  "id": "788:4320",
+  "expect": "Nothing was deployed.",
+  "text": "Nothing was deployed. The board now draws the TRANSLATED sentence; the shipping panel prints the job's raw error code, and WORKER_DISPATCH_FAILED is never translated by the router (sites.ts bare throw) — UX-E-25. The step named here is also proposed: the worker's catch writes buildSteps(0, true), so the log blames \"Generating pages\" whatever actually failed (UX-E-07). ALREADY_PUBLISHING must not reach this board at all — it means another deploy is running.",
+  "why": "UX-E-07, UX-E-25"
+ },
+ {
+  "id": "788:4316",
+  "expect": "Deploy state unknown.",
+  "text": "Deploy state unknown. The button should be disabled here; the shipping panel leaves it live (PublishTab.tsx:710 does not gate on loading). Every disabled state must name its reason under the control — the \"nothing to send\" case prints nothing today (UX-E-27).",
+  "why": "QA-C-17 line correction + UX-E-27"
+ },
+ {
+  "id": "788:4321",
+  "expect": "Publishing is not wired in this build",
+  "text": "Publishing is not wired in this build (NEXT_PUBLIC_FEATURE_PUBLISH off), and this is what PublishTab renders then — noPublishPath at PublishTab.tsx:336. In a production bundle without that flag it is the panel EVERY user sees, and its “Connect Vercel” CTA cannot unblock anything: a workspace that IS connected reads “connected” on the integrations page and the panel still refuses. The topbar, from the same state, says something else again — “Publishing isn’t switched on for this workspace yet” (lifecycle.ts:104-109). The board now draws the honest feature-off sentence; the missing-connection state has its own board (UX-E-04).",
+  "why": "QA-C-08 (the second rewrite never landed — both rows carried the same expect guard and the first consumed it) + UX-E-04. Citation corrected: noPublishPath is PublishTab.tsx:336 at this HEAD, not :312-318 and not :324."
+ }
+]

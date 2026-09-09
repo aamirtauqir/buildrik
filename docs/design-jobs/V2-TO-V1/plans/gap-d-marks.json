@@ -1,0 +1,89 @@
+[
+  {
+    "op": "rename",
+    "id": "2844:12046",
+    "expect": "Rail · selected vs open (two signals)",
+    "name": "Rail · selected vs open (two signals) — UX-F-02: selected and open are two signals, not one. aria-selected and the accent bar are both bound to “active AND drawer open” (LeftSidebar.tsx:137-160), so with the drawer shut the rail reports a tablist with nothing chosen. The selected item stays marked whether the drawer is open or shut, and rail arrow-keys either move focus only (manual activation) or open the panel they select. Specimen still owed: 199:409 Shell state 5 · Drawer closed draws a fully neutral rail, so the file agrees with the code's bug rather than with this board.",
+    "why": "UX-F-02 — the board that answers it was built 2026-09-07 and carried no finding id, so the register read PENDING while the drawing existed."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-D-04",
+    "detail": "UX-D-04 — OPEN-DECISION. Already drawn, not re-drawn. Board 2866:21879 “Inspector · OPEN DECISIONS (V2 → V1)”, body TEXT 2866:21881 (672x533 @24,56, parents 2866:21879:FRAME > 1776:8381:SECTION), decision 4 read back verbatim this pass: “OPEN (UX-D-04). Either way the reach is a working MODE…”. It states both admissible answers — scope the peer set to the active page so the existing copy becomes true, or keep it project-wide and say so with a way to see the peers first — and names the code: getAllElements() is every registered element across all loaded pages (ElementManager.ts:151-158), cleared only by a full project reset (:530-533), while ScopeDropdown.tsx:153,159 says “on this page”. A second board restating this would fork it."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-D-05",
+    "detail": "UX-D-05 — OPEN-DECISION. Already drawn on the same board. Read back this pass from 2866:21881: “…(ProInspector.tsx:110-114) (UX-D-05)”, closing decision 4 with the rule that the reach is a working MODE — it survives a selection change to another element of the same type and ends explicitly, rather than being reset by useEffect([selectedElement?.id]). Nothing added: the decision is on the page with its code citation."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-D-07",
+    "detail": "UX-D-07 — OPEN-DECISION. Already drawn. 2866:21881 decision 6, read back this pass: “…audits (UX-D-07). OPEN.” — 185 property definitions across 31 families, exported at config/index.ts:19-22 and imported by nothing, with the two acceptable outcomes and no third stated on the board: make it the source the sections render from, or delete it. The finding's own point (leaving it guarantees every future audit re-discovers features that do not exist) is what the board records."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-D-19",
+    "detail": "UX-D-19 — IMPLEMENTED-AS-RULE. Drawn as NOT WORKING, which is the correct drawing. 2866:21881 decision 7, read back verbatim this pass: “LAYERS BREAKPOINT BADGE — NOT drawn as working anywhere in this section. UX-D-19 and UX-H-16 are ONE defect: useLayerTree.ts:88-95 never populates breakpointOverrides, so the T/M badges at LayerTreeItem.tsx:276-281 can never render.” The Layers half is another lane's and the board says so; this section only requires that what the inspector hides per breakpoint has an echo somewhere. No board in 08 · Inspector draws the badge as functional, so nothing on the page asserts a capability that does not exist."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-C-13",
+    "detail": "UX-C-13 — IMPLEMENTED-AS-RULE, and it is in the right section. The binding popover is an Inspector board, and the specification note that carries this finding is parented into 08 · Inspector, confirmed by read-back this pass: 2876:12479 TEXT 2800x144 @100,5953, parents 1776:8381:SECTION > 1:3:PAGE. Its text reads “…UX-C-13 (the popover must ask WHICH property to bind, defaulted from element type and field type, and offer only fields that can drive the selected element…”, with the original content kept as the unbind fallback. Not drawn as boards: a property picker with its compatible-field filtering is a board family, not an annotation, and drawing one state of it would assert a screen that does not exist."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-C-26",
+    "detail": "UX-C-26 — IMPLEMENTED-AS-RULE, in the Inspector section where the popover lives. Same node, read back this pass: 2876:12479 carries “…UX-C-26 (+ Create Collection must return the created collection to whoever asked, reopen the popover on it and let the first record be created in the same flow…” and the rule that a success the user has to act on is never auto-dismissed. The hand-off is a three-screen flow; the contract is stated rather than a single screen drawn."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-E-05",
+    "detail": "UX-E-05 — IMPLEMENTED-AS-RULE. The note already carried the correction; this pass added the FIX. Appended to 2876:12480 note/Publish (section 1776:8378) and read back OK, 108 -> 144px: replace the generated page's head identity rather than appending to it — one <title>, one meta description, one og:title / og:description / twitter:* derived from the entry, template head removed first (cms.service.ts:206-215) — and the collection's page-generation settings show one real entry's rendered head before publish. The canonical / og:url half is REFUTED and is explicitly marked not-to-be-drawn on the note, because publish-html.ts:88-97 already injects a correct per-path pair. The head-preview card is NOT drawn, and that is now a measurement rather than a guess. publish-crosssection#10 carried this arc's last unresolved selector; it resolves to 2429:12111 “Content · dynamic-pages” (280x812 @2320,220 in 1776:8376), read this pass: layoutMode=VERTICAL and contentExtent=812 of 812 — the board is FULL, so a head-preview section can only be added by hiding rows that carry other findings' content. Its three sibling states (2429:21243 no-pattern, 2429:21262 none-published, 2429:21281 no-template) are all 280x812 and equally full, as are 2850:12042 unknown-key and 2850:21351 no-records. A new board is no cheaper: section 06 · Content measures 3440x5957 with maxBottom=5927, a free strip of THIRTY pixels, and the section already computes as a pre-existing overlap against 07 · Brand — growing it makes that overlap worse. So the card wants a section re-space (order-sections.mjs), which is the arrangement lane's job and not something to start while other passes write into the same file. The contract is on 2876:12480 so nothing is lost; the geometry is recorded here so the next pass inherits the measurement."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-E-18",
+    "detail": "UX-E-18 — IMPLEMENTED, in two halves and neither was visible from the queue. Half one was already on the page despite queue-state recording publish-text-4-preview#0..3 as NOTTEXT/FRAME: board 2429:11904 “Preview · what the sandbox drops (reference)” reads back 2429:11934 “One external stylesheet — and no url() in CSS” (484x17 @564,478) and 2429:11935 “fonts.googleapis.com is the only sheet kept; any <style> containing url( or expression is dropped WH…” (484x34 @564,497) — the applier matched a FRAME, the content landed by another route, and the failure row was misleading. Half two was genuinely missing and this pass added it to 204:4 caption/Shell state 7 · Preview (section 1776:8385), read back OK 18 -> 54px: the drop must be reported once at the top of the overlay rather than silently changing the design, filtering declarations and not whole attributes and sheets (ExportUtils.ts:12, 56-61, 71-76)."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-E-19",
+    "detail": "UX-E-19 — NOT-APPLICABLE for this pass, owned elsewhere and recorded rather than handed on silently. The Google-preview card lives on the page-settings SEO tab in 04 · Pages (1776:8377), which is not one of this pass's sections; drawing a Pages screen from the Publish lane would pre-empt that section the way SPEC-NAVIGATION was told not to pre-empt SPEC-PAGES-PANEL. The requirement is now on the page instead of only in a plan: appended to 2876:12480 note/Publish and read back OK — render the card from the same resolver the export uses and print the URL the deploy serves, not domain > slug (SeoTab.tsx:78 prints domain > slug, :81 prints s.seoTitle || page.name raw with no resolvePageTitle import)."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-E-20",
+    "detail": "UX-E-20 — NOT-APPLICABLE for this pass, owned elsewhere, recorded on the page. The three SEO surfaces sit in 04 · Pages (1776:8377) and 21 · Settings (1776:8387); neither is this pass's. Appended to 2876:12480 note/Publish and read back OK: one SEO destination per page with the site-level defaults shown inline as the greyed, overridable fallback, or a live link and a sentence naming which wins — and the precedence that sentence must state is real and locatable at SEOInjector.ts:110-128. Not resolved here, because choosing the single destination is an IA decision across two sections this pass does not own."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-F-02",
+    "detail": "UX-F-02 — IMPLEMENTED. The board that answers it already existed and carried no finding id, which is why the register read PENDING: 2844:12046 “Rail · selected vs open (two signals)”, built 2026-09-07 by build-spec-boards.mjs and reconciled SAME by exact name. This pass appended the claim and the code citation to its name so the finding is credited where it is drawn. The half NOT applied is the instance override on 199:409 “Shell state 5 · Drawer closed” (read back this pass: FRAME 1440x900 @6340,220, kids=3) — its rail is still drawn neutral, so the file still agrees with the code's bug on that one specimen. Stated on the board rather than overridden: the rail instance id inside 199:409 was not reached (the interior walk hit its node cap in the inspector column) and an override written against an unread instance is a guess."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-F-06",
+    "detail": "UX-F-06 — NOT-APPLICABLE as a board edit, and the four queued rows against it must NOT be run. Measured this pass across the whole of 13 · Command palette (1779:3), not one board: all six shell CmdK boards read — 166:2 (9 TEXT), 166:18 (5), 166:27 (10), 166:45 (3), 166:51 (4), 166:58 (9) — and NONE prints “Ctrl+0”, “Ctrl+Y”, “Fit to view” or “Undo last action”. The only chord-pattern hit across all six was 166:56, prose about AI diffs. So shell-text-fixes#0/#1/#2 would every one return NOMATCH and shell-deletions#0 has nothing to delete. Where the chords ARE drawn they are already right: the canvas palette 1177:4804 reads 1177:4827 “Zoom to fit” beside 1177:4829 “⌘1”, which is the chord the finding says is correct, and 2875:12449 “Shortcuts · one screen” prints the whole correct VIEW column at 2875:12463 (“⌘0 ⌘1 ⌘2 / ⌘= / ⌘- / ⌘; / ⌘⇧; / ⌘' / ⌘B / ⌘R / ⌘⇧X”). The defect is code-only — three hand-typed lists in shell/modals/CommandPalette.tsx:68-88, :83, :139-148 — and no board on this page tells the lie."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-F-12",
+    "detail": "UX-F-12 — IMPLEMENTED. Already answered and already credited; found by reading rather than by a plan. Caption 2844:12120 (280x72 @2820,6536, section 1776:8385) reads back verbatim: “Site menu (⋯) · regrouped — in-editor rows move to More; ↗ marks a new browser tab; “Site settings” points at the full-page Settings (UX-F-29, F-12)”. Its board 2844:12104 draws the regrouped menu with 2844:12107 “Site settings” at @12,32 in THIS SITE and 2844:12117 “Account settings ↗” at @12,236 under the leaves-the-editor group. Nothing added: the destination decision is on the page with this finding's id already on it."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-F-21",
+    "detail": "UX-F-21 — IMPLEMENTED. Drawn and credited before this pass; the register read PENDING because the credit is on the caption, not on a queue row. Board 2844:12066 “Topbar · Publish CTA states (five verbs · settled · refused)” carries TEXT 2844:12085 “Up to date” at @16,256 — the settled-state label the finding asks for instead of a CTA that leaves the bar — alongside 2844:12071 “nothing published yet”. Its caption 2844:12091 (1000x18 @1140,6536) reads back: “Topbar · Publish CTA states — the settled state stays put; a refused CTA looks refused (UX-F-20, UX-F-21, SH-A-01)”. Nothing added."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-G-03",
+    "detail": "UX-G-03 — IMPLEMENTED. The board exists and its interior carries the fix; both facts needed a read, because add-board rows never reach queue-state and the previous AI pass asserted existence without opening it. Board 2846:21654 “AI · scoped-multi” (280x812 @940,220 in 1776:8380, rx=1 so it is reachable) reads back five TEXT nodes: 2846:21660 “Scope: 3 selected”, 2846:21665 “AI edits ONE element at a time in v1. The composer is disabled while more than one element is select…”, and 2846:21663 “Select one element to use AI here” as the disabled composer placeholder. That is the finding's preferred fix exactly — the refusal stated up front, before the prompt, by the scope band that already knows the answer — rather than the shipped behaviour of refusing after the user types (toServerScope returns null for “multi”, useStreamPrompt.ts:47-51; AITab.tsx:82-93 pushes the refusal without calling the server)."
+  },
+  {
+    "op": "advisory",
+    "why": "UX-G-23",
+    "detail": "UX-G-23 — IMPLEMENTED. Read back on all three blocked states this pass, which is what the previous AI pass could not do (build-ai-v2-boards step D returned SKIP-EXISTS, a string match carrying no node id and therefore not evidence). The manual route is present as the second action on each: 171:105 “AI · error-quota” carries 2846:21651 “Continue by hand in the inspector” at @16,104 beside 171:135 “See plans”; 171:136 “AI · not-configured” carries 2846:21649 at @16,138; and 2846:21667 “AI · error-provider” carries 2846:21681 at @16,104 beside 2846:21680 “Try again”. The finding's other half is stated on the same board at 2846:21682: “The thread and the prompt you typed stay on screen behind this state. Losing the user's words is a s…”. The one sliver NOT drawn is “open billing in-place with a return”: 171:135 “See plans” carries no in-place statement, and adding one would re-layout a 280x812 board whose child ids were never read."
+  }
+]

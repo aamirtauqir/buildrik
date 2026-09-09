@@ -1,0 +1,24 @@
+[
+  {
+    "id": "171:164",
+    "expect": "AI drafting",
+    "text": "AI isn’t available on this workspace.",
+    "why": "UX-G-01 (Critical) — the old title named a workspace configuration step. There is no such step: assertProviderConfigured reads process.env.OLLAMA_BASE_URL / OPENAI_API_KEY (server/services/ai.service.ts:481-490), and a grep for OPENAI_API_KEY|apiKey|'API key' across app/dashboard/settings and components/settings hits only integrations-tab.tsx:20 (Mailchimp).",
+    "idSource": "inferred — findings/FIG-K.jsonl FIG-K-20 quotes node 171:164 as 'AI drafting isn’t configured yet.'. NOT read by this agent. The expect prefix is deliberately short so a typographic apostrophe cannot make a correct row refuse."
+  },
+  {
+    "id": "171:165",
+    "expect": "No API key is set",
+    "width": 248,
+    "text": "No AI provider is configured for this deployment. It is a server setting — OPENAI_API_KEY, or OLLAMA_BASE_URL for a local model — not a workspace setting, so no screen in this product can change it. Nothing was changed.",
+    "why": "UX-G-01 — the old body misnamed a deployment fact as a workspace setting, which is exactly what sent the user to a 16-card settings index that cannot act on the message. `width` is passed because the node is 280-board-relative and the new string is longer: without it a WIDTH_AND_HEIGHT text node grows sideways off the board instead of wrapping.",
+    "idSource": "inferred — FIG-K-20 quotes 171:165 as 'No API key is set for this workspace, so nothing here will run. This is the real message — not a silent fallback that pretends to work.'. NOT read by this agent."
+  },
+  {
+    "id": "171:166",
+    "expect": "Open workspace settings",
+    "text": "Contact your workspace owner",
+    "why": "UX-G-01 — never point at a settings page that cannot change the thing. For a workspace member the owner is the only route that can; for an owner on a self-hosted deploy the environment variable is now named in the body above. The SECOND action, 'Continue by hand in the inspector', is added by build-ai-v2-boards.mjs --only=D (plan ai-04) because apply-text-fixes cannot create a node.",
+    "idSource": "inferred — findings/W-K.jsonl W-K-14 names 171:166 as 'Open workspace settings', drawn as paragraph text where the code renders an accent link button. NOT read by this agent."
+  }
+]

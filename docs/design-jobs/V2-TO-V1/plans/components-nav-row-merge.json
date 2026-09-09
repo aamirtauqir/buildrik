@@ -1,0 +1,99 @@
+{
+  "slug": "components",
+  "plan": "components-nav-row-merge",
+  "written": "2026-09-07",
+  "state": "PLANNED — NOT APPLIED. Blocked on the Figma MCP seat quota, which was exhausted account-wide by fifteen concurrent agents. No Figma write of any kind was made by this job.",
+  "script": "scripts/figma/apply-merged-nav-row.mjs",
+  "commands": {
+    "dry_run": "node scripts/figma/apply-merged-nav-row.mjs",
+    "apply": "node scripts/figma/apply-merged-nav-row.mjs --apply",
+    "verify_structure": "node scripts/figma/verify-invariants.mjs",
+    "verify_instances": "node scripts/figma/instance-map.mjs 2041:19572 --page=1:3 --ids=6",
+    "verify_out_of_scope_half": "node scripts/figma/instance-map.mjs 16:26 --page=all --ids=6"
+  },
+
+  "decision_being_applied": {
+    "source_board": "2797:491 — '8 · Component Library', page 2668:2 (V2, read-only). Two boards: the census, and 'Decided · Nav row (merged) — active is FILL'.",
+    "founder_decision": "MERGE. DECISIONS-OPEN.md section 5, artifact thread 2026-09-06. One base row component; size and label carried by variants and props, not by three separate designs. The tightest case — Editor Settings at 140x30 — is the baseline variant and the others derive from it, because deriving the other way round overflows the compact case.",
+    "load_bearing_exception": "A row whose INTERACTION MODEL genuinely differs is not merged. Gating this required measuring both masters, which is what scripts/figma/compare-nav-rows.mjs exists for and which THIS JOB COULD NOT RUN. See blocked_preconditions below — the merge must not be applied until that read succeeds.",
+    "drawn_default": "ACTIVE = FILL, not a bar. accent tint background + accent label + weight 600.",
+    "still_open": "Bar vs fill for the merged nav row's active state. Recorded verbatim in docs/design-jobs/applied/2026-09-06-proposal-page.json: 'Bar vs fill for the merged nav row's active state — 600 instances either way. Asked in the artifact thread; the proposed default is drawn and marked.' This plan applies the drawn default and marks it open in three places (component description, a note beside the set, DECISIONS-OPEN.md). It does not close it."
+  },
+
+  "colour_correction_inside_the_decision": {
+    "board_draws": "#EBF1FE for the active fill (build-proposal-page.mjs:412, board 2797:491).",
+    "applied_instead": "#EBF5FF",
+    "why": "#EBF1FE is not a token. --bk-accent-tint is #EBF5FF (tokens.generated.css:85), the shipping rule uses it (settings.css:93-97), and the existing V1 master 2041:19572 was already built with #ebf5ff. The brief's precedence gives the board the VISUAL call between two designs; it does not license a colour outside the generated set, and this arc has a running near-miss drain (scripts/figma/fix-accent-near-miss.mjs) for exactly this shape of value.",
+    "status": "a correction, recorded, not a silent substitution"
+  },
+
+  "code_contract_the_default_rests_on": {
+    "file": "packages/editor/src/editor/sidebar/tabs/settings/settings.css",
+    "rest": ":75-88  background transparent, color var(--bk-ink-soft) #4B5563, font 500 12px, radius 5px",
+    "hover": ":89-92  background var(--bk-bg-subtle) #F3F4F6, color var(--bk-ink) #111827",
+    "active": ":93-97  background var(--bk-accent-tint) #EBF5FF, color var(--bk-accent) #1A56DB, font-weight 600",
+    "read_first_hand": true,
+    "consequence": "The weight-600 bump is the part NEITHER master drew and the product does. The hover state is the part the compact master has no variant for at all. Both are in this plan.",
+    "counter_evidence_for_the_bar": "None found in code. Nav item expresses active as a 3px rectangle; the dashboard's own nav uses a third treatment again, a 2px bottom underline (top-nav.tsx:60). 'Keep the bar because Nav item has more instances' is an argument from instance count, not from evidence — the same reasoning the V2 board says it overturned."
+  },
+
+  "targets": {
+    "master_edited": {
+      "id": "2041:19572",
+      "name_before": "Settings nav row",
+      "name_after": "Nav row",
+      "lives_in": "section 2040:8372 '28 · Library · shared chrome' on page 1:3 — inside this job's write scope",
+      "measured_first_hand_2026_09_07": "COMPONENT_SET 2041:19572 'Settings nav row' 140x30 @100,1152 kids=2 — COMPONENT 2041:19568 'Active=Off' 140x30, COMPONENT 2041:19571 'Active=On' 140x30",
+      "variant_axes_before": "Active[Off|On]",
+      "variant_axes_after": "Size[compact|default] x State[rest|hover|active]"
+    },
+    "master_described_only": {
+      "id": "16:26",
+      "name": "Nav item",
+      "lives_in": "page 1:2 '🧩 Components' — inside this job's write scope",
+      "action": "description only: name Nav row as its successor and state that its instances are NOT migrated",
+      "why_not_migrated": "Its instances sit on the Site, Portfolio and Dashboard pages. Brief hard rule 1 forbids writing to any page but 1:3 (extended for this job to 1:2 and section 2040:8372). Re-pointing them would be a write to three out-of-scope pages."
+    }
+  },
+
+  "variant_table_to_be_written": [
+    { "name": "Size=compact, State=rest",   "from": "existing 2041:19568 renamed", "size": "140x30", "fill": "none",    "label": "#4B5563", "weight": "Medium" },
+    { "name": "Size=compact, State=hover",  "from": "clone of the rest variant",   "size": "140x30", "fill": "#F3F4F6", "label": "#111827", "weight": "Medium" },
+    { "name": "Size=compact, State=active", "from": "existing 2041:19571 renamed", "size": "140x30", "fill": "#EBF5FF", "label": "#1A56DB", "weight": "Semi Bold" },
+    { "name": "Size=default, State=rest",   "from": "clone of Nav item State=rest",   "size": "240x32", "fill": "none",    "label": "#4B5563", "weight": "Medium" },
+    { "name": "Size=default, State=hover",  "from": "clone of Nav item State=hover",  "size": "240x32", "fill": "#F3F4F6", "label": "#111827", "weight": "Medium" },
+    { "name": "Size=default, State=active", "from": "clone of Nav item State=active", "size": "240x32", "fill": "#EBF5FF", "label": "#1A56DB", "weight": "Semi Bold", "note": "the 3px 'active bar' RECTANGLE is removed here — this is the one node the decision deletes" }
+  ],
+
+  "how_the_600_instances_get_checked": {
+    "principle": "None of them is edited. Every one is an INSTANCE of 2041:19568 or 2041:19571, and both node ids survive the rename — a variant rename changes the property vocabulary the set reports, not the node an instance points at. So all 600 inherit the corrected active treatment from one master edit, and zero board edits land inside sections 01-27 that twelve other agents are holding.",
+    "why_not_a_new_set": "Building a better set beside the old one and swapping 600 instances would be both a duplicate master (the thing this job exists to prevent) and 600 edits inside other agents' write scope.",
+    "the_check": "node scripts/figma/instance-map.mjs 2041:19572 --page=1:3 --ids=6 — written for this plan, not yet run. It matches on the SET id AND every variant id under it, because an instance resolves to a variant and never to the set; asking a set for its own instance count returns zero for every set in the file. Output is per-section counts (complete) plus a bounded sample of node ids per section (capped, and it says so) — 600 ids do not fit in one MCP result, and a truncated list has already been read as a short list once in this arc.",
+    "acceptance": [
+      "instance-map total on page 1:3 equals the pre-merge total for the same master (no instance detached or orphaned)",
+      "every returned instance resolves to 2041:19568 or 2041:19571 — no instance points at one of the four NEW variants, because nothing was swapped",
+      "verify-invariants.mjs reports no new board overlap in section 2040:8372 (the set grows from 140x30 to 792x112 and the plan restacks the three sets vertically off the Rail to prevent exactly that)",
+      "a render of any one Settings board shows the active row at weight 600 where it previously drew Medium — this is the only visible change to the 600, and it is the intended one"
+    ],
+    "risk_accepted": "Between the two renames the set briefly holds two property vocabularies. Both renames happen in the same synchronous tick, so no render observes the intermediate state. If Figma nonetheless rejects the rename, the script fails before any variant is added and the set is left as it was — the dry run must be read before --apply."
+  },
+
+  "blocked_preconditions": [
+    "node scripts/figma/compare-nav-rows.mjs — MUST run and pass before --apply. The founder's exception says a row whose interaction model genuinely differs is not merged, and this plan assumes both masters are a label row with a selected state. That assumption is UNMEASURED by this job. If Nav item turns out to carry a nested control or its own keyboard behaviour, the default-size half of this plan is withdrawn and only the compact half (rename + hover + weight 600) is applied.",
+    "node scripts/figma/apply-merged-nav-row.mjs (dry run) — prints both masters' variant lists and child anatomy. If Nav item's variants are not named State=rest|hover|active the clone selectors miss and the script falls back to cloning the compact variant, which would silently produce six compact rows at two sizes. Read the DRY RUN output; do not run --apply on an unread dry run.",
+    "node scripts/figma/instance-map.mjs 2041:19572 --page=1:3 — take the BEFORE count. Without it the after-count proves nothing."
+  ],
+
+  "marking_the_open_decision": {
+    "on_the_component": "set.description records the merge, the sources, the fill decision, and the sentence 'OPEN: bar vs fill was never settled in the artifact thread.' Written by the script.",
+    "on_the_board": "NOT YET WRITTEN — a visible note beside the set in section 2040:8372 is still owed, so a reader looking at the library sees the open decision without opening the component description. Use scripts/figma/apply-truth-marks.mjs, which never deletes a design.",
+    "in_the_record": "DECISIONS-OPEN.md section 5 needs a dated line saying the merge was applied to the master, that fill is the applied default, and that bar-vs-fill remains the founder's to close. NOT YET WRITTEN — the file is shared with twelve live agents and this job made no edit to it while its own half was unapplied."
+  },
+
+  "section_layout_change_this_forces": {
+    "why": "2041:19572 grows from 140x30 to 792x112. The List row set sits at @360,1152, 280x28 — directly in the path. verify-invariants.mjs counts two boards in one section covering the same pixels as a failure, and correctly.",
+    "plan": "restack the three sets vertically off the Rail: Nav row at rail.x, rail.y + rail.height + 48; List row at rail.x, navrow.y + navrow.height + 32; grow the section height if the stack outruns it.",
+    "coordinates": "derived from the Rail set at run time, never typed — a section child's coordinate space is not something this script should assume.",
+    "side_benefit": "The six variants are laid out so the library SHOWS them. Every set in this section currently stacks every variant at one point — measured 2026-09-07: Rail 2034:8519 is seven 60x812 variants inside a 60x812 box, List row 2142:11082 is twelve 280x28 variants inside a 280x28 box. The library page therefore displays one variant per component and the states it exists to document are invisible. Only the Nav row set is laid out by this plan; the Rail and List row sets are left stacked and filed as owed."
+  }
+}

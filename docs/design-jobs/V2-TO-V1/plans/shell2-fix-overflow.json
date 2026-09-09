@@ -1,0 +1,14 @@
+{
+ "note": "Measured correction, not a rewrite. The read-back of 2855:12407 (dump-board-interiors, 2026-09-07) showed the UX-F-28 body at y=430 with height 64 — four lines inside a 480-tall board, so its last line was clipped. The board cannot grow: its own caption sits at y=2188 and the board floor is 2176, and a caption a board overlaps is counted as a board overlap by verify-invariants. So the string shortens instead. shell2-canvas-board.json carries the same string now.",
+ "page": "1:3",
+ "rows": [
+  {
+   "op": "text",
+   "id": "2875:12448",
+   "text": "chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site — delete both. (UX-F-28)",
+   "expect": "The shipped one is chrome-ui",
+   "width": 430,
+   "why": "UX-F-28 — the block landed 14px past the board floor. Height is content-driven, so the fix is the copy, not the geometry."
+  }
+ ]
+}

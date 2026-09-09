@@ -1,0 +1,9 @@
+--- 1938:8372  (6)
+TEXTOVER	641:2599	Components · detail	2483:11991	by 12
+TEXTOVER	641:2599	Components · detail	2483:11988	by 12
+CONTAINER	642:3112	Components · create	642:3322 "control"	right +4
+CONTAINER	642:3112	Components · create	642:3208 "Canvas toolbar (floa"	bottom +8, top +8
+TEXTOVER	1138:13394	Components · empty	1720:17245	by 12
+OVERPRINT	1170:4777	Components · create (modal)	1712:8430 x 1712:8431	by 15
+
+render defects >= 4px: 6 (across 1 of 1 sections)

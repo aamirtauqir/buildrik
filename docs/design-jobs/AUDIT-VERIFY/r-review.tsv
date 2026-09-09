@@ -1,0 +1,8 @@
+B	1339:7162	FRAME	1500,92589,1280,720	#F9FAFB	FIXED/FIXED	NONE	true	Client sign-off · A0 · identify · 1280 — echo of 1:6 at the 	kids=6
+  K	1339:7163	FRAME	1500,92589,1280,56	#FFFFFF	FIXED/FIXED	NONE	true	Agency header
+  K	1339:7166	FRAME	1920,92765,440,583	#FFFFFF	FIXED/FIXED	NONE	true	Card
+  K	1671:7307	FRAME	1500,93351,150,34	#000000@0	FIXED/FIXED	NONE	true	hotspot/state · Client · A viewing (identify)
+  K	1672:7195	FRAME	1500,93153,200,34	#000000@0	FIXED/FIXED	NONE	true	hotspot/state · Client · F expired
+  K	1672:7197	FRAME	1700,93191,200,34	#000000@0	FIXED/FIXED	NONE	true	hotspot/state · Client · F revoked
+  K	1672:7199	FRAME	1900,93229,200,34	#000000@0	FIXED/FIXED	NONE	true	hotspot/state · Client · F not-found
+END	pairs=0	boards=1

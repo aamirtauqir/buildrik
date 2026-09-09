@@ -1,0 +1,23 @@
+[
+  {
+    "id": "INS-DEF-01",
+    "board": "137:2",
+    "severity": "Major",
+    "kind": "hotspot-stack",
+    "measured": "Seven hotspot frames overlap on Insert · default. 787:4303 'hotspot/state · Insert · load-error' at (120,778 160x34) spans x120-280 / y778-812, and SIX more sit entirely inside it at exactly (130,784 150x28): 1720:17220 Templates · empty, 1720:17224 Templates · replace-confirm (modal, 1720:17228 success · error, 1720:17232 Templates · save-as-template (moda, 1720:17236 Templates · usage-drawer, 1720:17541 Ecommerce · collection-setup (moda. Only the topmost is clickable; the other six are unreachable edges.",
+    "id_source": "read from file — FULL node tree of 137:2, 2026-09-07",
+    "fix": "The board has 36 free px (y776-812) and 280 of width — seven 150px labels cannot share it. Either (a) move the six state hotspots onto the boards they belong to (Templates · * belong on Templates boards, Ecommerce · collection-setup on the block that opens it), or (b) build a 2-column index strip: x=8 and x=144, w=132, h=16, rows at y=744/764/784, which fits six labels at 11px in the free band. Option (a) is correct — five of the six name boards in other modules and have no reason to hang off Insert · default.",
+    "in_my_slice": false,
+    "note": "Board-level, not one of my 32 UX findings. Recorded because I measured it and nobody else has this read."
+  },
+  {
+    "id": "INS-DEF-02",
+    "board": "1776:8379",
+    "severity": "Minor",
+    "kind": "count-convention",
+    "measured": "Section name '02 · Insert · 22' counts 13 FRAMEs + 9 TEXT captions = 22 children. Section '26 · REVIEW · Insert · 3' counts 2 FRAMEs + 1 TEXT = 3. Both count children.",
+    "id_source": "read from file, 2026-09-07",
+    "note": "ARR-D-28 asserts 'every other section in my set counts frames only' and asks for 26 · REVIEW · Insert to be renamed to · 2. Both of my sections count CHILDREN, consistently. Whoever owns the rename convention should settle it once; do not renumber 1776:8379 to 13 on ARR-D-28's authority without checking the other 27 sections.",
+    "in_my_slice": false
+  }
+]

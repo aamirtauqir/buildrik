@@ -1,0 +1,66 @@
+{
+ "rows": [],
+ "note": "STRUCTURAL — the six savebar rows of gap-a-settings-duplicates.json, split out for a one-call retry. The first attempt returned ERROR on all six: the scope search read .findAll off a TEXT node named for the savebar, and in the Figma plugin API that THROWS rather than returning undefined, so even a typeof guard crashes the callback. The scope search now selects by node TYPE. Rows 1-9 of the parent plan already ran: 1703:7914 and 1703:7445 OK (deleted, read back null), the other seven NOT-DRAWN.",
+ "structural": [
+  {
+   "board": "639:3092",
+   "boardName": "S7 · Settings · Domains",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Domains writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run)."
+  },
+  {
+   "board": "639:3092",
+   "boardName": "S7 · Settings · Domains",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Domains writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run)."
+  },
+  {
+   "board": "640:3135",
+   "boardName": "S7 · Settings · Forms",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Forms writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run)."
+  },
+  {
+   "board": "640:3135",
+   "boardName": "S7 · Settings · Forms",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Forms writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run)."
+  },
+  {
+   "board": "640:3849",
+   "boardName": "S7 · Settings · Webhooks",
+   "text": "Discard",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Webhooks writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run)."
+  },
+  {
+   "board": "640:3849",
+   "boardName": "S7 · Settings · Webhooks",
+   "text": "Save",
+   "within": "savebar|save bar|bd-set-savebar",
+   "take": "parent",
+   "idProvenance": "board id from the committed section dump; node unresolved-id, found by exact string inside the savebar frame at apply time",
+   "why": "UX-I-36 (Major, missing-feedback) — Webhooks writes IMMEDIATELY on its own buttons and never makes the savebar dirty, so the bar reads '0 unsaved' over a screen that has already committed to the server. V2's fix is that a section which writes immediately says so and does not render the bar; the saying-so half is the info band in settings-notices.json, this is the not-rendering half.",
+   "provenance": "carried verbatim from plans/settings-duplicates.json (settings module, written and never run)."
+  }
+ ]
+}

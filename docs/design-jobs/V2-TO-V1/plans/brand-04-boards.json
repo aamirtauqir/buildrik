@@ -1,0 +1,174 @@
+{
+  "slug": "brand",
+  "order_of_operations": [
+    "1. create the new boards (add-state-board.mjs) — they land in a measured free slot",
+    "2. author their content (apply-text-fixes.mjs against the cloned node ids, plus the new nodes named in each content spec)",
+    "3. wire them (add-hotspots.mjs — never wire-edges.mjs, which makes the whole board clickable)",
+    "4. ONLY THEN run brand-05-arrangement.json, so layout-section.mjs re-flows the section with the new boards already in it"
+  ],
+  "free_slots_measured_2026-09-07T05:07Z": {
+    "1776:8373": "grid pitch 400 (280 board + 120 gutter). Row y=1316 is free at x=1700 and x=2100 (occupied: 152:137@100, 152:83@500, 152:52@900, 781:4311@1300). Row y=5961 is free at x=1700+ beyond 306:2136@1700 — i.e. x=2100. Rows y=220, y=2714 and y=3646 are full to x=2100."
+  },
+
+  "new_boards": [
+    {
+      "ref": "N1",
+      "cmd": "node scripts/figma/add-state-board.mjs 153:120 \"Brand · import · resolve conflicts (per-token)\" --at 1700,1316 --apply",
+      "clone_of": "153:120",
+      "clone_of_name": "Brand · import-export",
+      "section": "1776:8373",
+      "closes": ["UX-H-26", "UX-H-27", "UX-H-29"],
+      "wire_from": { "unresolved-id": true, "selector": "the TEXT node on 153:120 whose characters begin 'Drop ' — a hotspot over the drop zone, name 'hotspot/state · Brand · import · conflicts'" },
+      "content": {
+        "keep_from_clone": "the IMPORT caps header, the export rows above it, and the RECENT label — this is the same screen one step on",
+        "detail_block": [
+          ["Detected", "tokens.json"],
+          ["Valid tokens", "52"],
+          ["Errors", "3 — heading-xl, radius-pill, shadow-soft"],
+          ["Conflicts", "12 ID collisions"]
+        ],
+        "resolve_box": {
+          "title": "Resolve conflicts",
+          "help": "12 tokens already exist with the same ID. Choose what happens to them — nothing is applied until you choose.",
+          "bulk_chips": ["Replace all", "Keep mine"],
+          "chip_state": "NEITHER SELECTED — both drawn in the light/unselected treatment. This is the whole point of UX-H-26: ImportCard.tsx:126 and :188 pre-answer with 'replace', the destructive one.",
+          "per_token_list": {
+            "why": "UX-H-27 — diffTokens already computes parsed.diff.modified (imported at ImportCard.tsx:26, used at :180, counted at :239). The per-token data exists and is never displayed.",
+            "columns": ["token id", "your value", "their value", "keep | take"],
+            "rows_to_draw": 5,
+            "sample_rows": [
+              ["color/accent", "#1A56DB", "#2D6DFF", "keep"],
+              ["color/ink", "#111827", "#0B1220", "take"],
+              ["type/heading", "Inter 600", "Satoshi 700", "keep"],
+              ["space/lg", "24", "32", "take"],
+              ["radius/card", "8", "12", "keep"]
+            ],
+            "overflow_row": "+ 7 more",
+            "note": "Board sample data. The SHAPE — id, mine, theirs, a per-row two-state control, and the bulk chips reading as shortcuts OVER the list — is the contract."
+          }
+        },
+        "footer": {
+          "primary": { "label": "Apply", "state": "disabled", "why": "UX-H-26 — no strategy chosen yet. When one is chosen the label names the outcome, never 'valid only': 'Apply — 40 new, 12 replaced' or 'Apply — 40 new, 12 kept'." },
+          "secondary": { "label": "Cancel" }
+        }
+      }
+    },
+    {
+      "ref": "N2",
+      "cmd": "node scripts/figma/add-state-board.mjs 306:2298 \"Brand · import · unsupported format (refused at drop)\" --at 2100,1316 --apply",
+      "clone_of": "306:2298",
+      "clone_of_name": "Brand · export · error",
+      "section": "1776:8373",
+      "closes": ["UX-H-28"],
+      "content": {
+        "drop_zone": "Drop tokens.json — JSON only",
+        "refusal_block": {
+          "headline": "Tailwind configs aren't supported yet",
+          "body": "tailwind.config.ts can't be read. Export your tokens as JSON and drop that instead.",
+          "tone": "warning, not error — nothing failed, the file was refused",
+          "timing": "AT DROP, before any parse. UX-H-28's whole finding is that ImportCard.tsx:98-104 already identifies the file as 'Tailwind config (AST)' and then hands it to parseImportJSON anyway, so the user gets a parse error about a file the screen invited."
+        },
+        "remove": "the post-parse error copy inherited from 306:2298 — this board is the refusal, not the failure"
+      }
+    },
+    {
+      "ref": "N3",
+      "cmd": "node scripts/figma/add-state-board.mjs 1172:4840 \"Modal · Brand · rename token ID\" --apply",
+      "clone_of": "1172:4840",
+      "clone_of_name": "Brand · review-changes (modal), 520x239 — the right size class for a Brand modal",
+      "section": "1776:8373",
+      "closes": ["UX-H-31"],
+      "content": {
+        "title": "Rename token ID",
+        "field": { "label": "Token ID", "value": "color-primary", "state": "focused, text selected" },
+        "rules_line": "Lowercase letters, digits and dashes. No spaces.",
+        "validation_line": { "text": "An ID with that name already exists.", "tone": "error", "why": "window.prompt validates nothing — an empty name, a duplicate id and a name with spaces all come back as-is (TokenDetailView.tsx:250-259)" },
+        "impact_line": { "text": "34 elements are bound to this token and will be re-pointed.", "why": "UX-H-31 — the usage breakdown is already loaded on the screen that opens this modal (TokenDetailView.tsx:134-155). The rename must show it." },
+        "kind_guard": { "text": "Renaming isn't available for type and spacing tokens yet.", "why": "FIG-F-09 — rename is dispatched by kind; for TYPE and SPACING the call lands on `undefined?.()` and returns silently. A modal that pretends otherwise is the same lie window.prompt told, in a nicer box." },
+        "footer": { "primary": { "label": "Rename", "state": "disabled while invalid" }, "secondary": { "label": "Cancel" } }
+      }
+    },
+    {
+      "ref": "N4",
+      "cmd": "node scripts/figma/add-state-board.mjs 152:137 \"Brand · starters · confirm apply\" --apply",
+      "clone_of": "152:137",
+      "clone_of_name": "Brand · starters",
+      "section": "1776:8373",
+      "closes": ["UX-H-30", "UX-H-35"],
+      "content": {
+        "sheet_title": "Apply Linear Dark?",
+        "what_it_replaces": "Replaces 34 colour, type and spacing tokens. Radius, shadow, motion, border, opacity, z-index, breakpoint, grid, sizing, icon and imagery keep their current values.",
+        "what_it_costs": "6 staged brand edits will be discarded, and per-token undo is cleared for colour, spacing and type. The only way back is the footer's Discard, which drops every staged change.",
+        "why": "UX-H-30 + UX-H-35 — DesignSystemTab.tsx:562-578 handleDiscard calls discardAll() on every token AND preset registry, so 'let me just look at Linear Dark' costs whatever else was staged. This board is the what-will-change step UX-H-35 asks for in front of every whole-brand write.",
+        "footer": { "primary": { "label": "Apply Linear Dark" }, "secondary": { "label": "Cancel" } }
+      }
+    }
+  ],
+
+  "board_edits": [
+    {
+      "ref": "E3",
+      "board": "152:137",
+      "board_name": "Brand · starters",
+      "closes": ["UX-H-30"],
+      "changes": [
+        "the second card in the grid gains a SELECTED treatment (2px accent ring, no fill change) — selection is now a preview, not a commit",
+        "a 48h footer bar appears at the board's bottom: primary 'Apply Linear Dark' + secondary 'Cancel'. NEW NODES — StartersSection.tsx:8-12 states in as many words that no Apply button exists on either board.",
+        "the warning band text is rewritten by brand-01-text.json row 152:145"
+      ],
+      "note": "This board will LEAD the code. FIG-F-24 recorded the current board as faithful to the shipped one-click interaction; that faithfulness is exactly what UX-H-30 files as the defect. Precedence rule 4 puts the visual with the board, so the board changes and the code follows."
+    },
+    {
+      "ref": "E3b",
+      "board": "306:2186",
+      "board_name": "Brand · starters · applied",
+      "closes": ["UX-H-30"],
+      "changes": [
+        "keep the 'Starter applied' pill — it is correct (StartersSection.tsx:46-56)",
+        "the warning band text is rewritten by brand-01-text.json row 306:2191",
+        "the footer bar from E3 appears here too, with the applied starter's card selected"
+      ]
+    },
+    {
+      "ref": "E5",
+      "board": "1333:7162",
+      "board_name": "Brand · root — NEW 2026-08-27 (CURRENT)",
+      "closes": ["UX-H-32"],
+      "measured": "280x812, 47 TEXT nodes, 0 of them bound to a text style",
+      "changes": [
+        "KEEP the 10-swatch palette row and the two type specimens — they are correct and are what BrandPreview.tsx renders today",
+        "ADD below them a 280-wide SPECIMEN BLOCK, ~104px tall, that puts the brand on an actual component: a card drawn at the brand's radius, border, shadow and spacing tokens, holding a heading in the heading font, two lines of body copy in the body font, a primary button in the brand accent at the brand radius, and a ghost button beside it",
+        "ADD a 11px caption under it: 'Radius · spacing · shadow · border · type — every kind at once.'",
+        "the nine destination rows below scroll; the panel is 812 tall and the block costs ~104"
+      ],
+      "why": "UX-H-32 — BrandPreviewProps is `{ colors }` and nothing else (BrandPreview.tsx:27-30); MAX_SWATCHES is 10 (:34); SPECIMENS is exactly Heading and Body (:36-39). Twelve of the fourteen kinds DesignSystemTab.tsx:134-148 manages have no preview anywhere, so a shadow or radius edit can only be verified by leaving Brand and hunting the canvas. A specimen answers every kind at once, which a swatch row cannot."
+    },
+    {
+      "ref": "E5b",
+      "board": "154:132",
+      "board_name": "Brand · root · Beginner mode",
+      "closes": ["UX-H-32"],
+      "measured": "280x812, 37 TEXT, 1 bound",
+      "changes": ["the same specimen block as E5 — it is the same screen in the other display mode, and the preview is not one of the things Beginner hides (DSModeContext: mode is display-only, per-user localStorage 'buildrik:ds-mode')"]
+    },
+    {
+      "ref": "E6",
+      "board": "1706:8483",
+      "board_name": "Modal · Brand · AI prompt · success",
+      "closes": ["UX-H-35"],
+      "action": "NO CHANGE — verify only",
+      "why": "UX-H-35 names three doors that write the whole brand without showing what they replace: starters, import and AI. Starters is N4, import is N1. The AI door already has the right shape: FIG-F-32 read all four AI-prompt boards and found the success board correctly draws a schema PREVIEW and NO Accept button, because the modal's onAccept is optional and its only mount omits it. The propose → diff → apply → single-undo contract V2 §5 calls 'the one contract worth keeping' is already drawn here. The remaining AI gap is the FEATURE_DS_AI flag (useComposerInit.ts:132 gates the client, DesignSystemTab.tsx:890 does not gate the button) and that is carried by the AI lane, not this one."
+    }
+  ],
+
+  "hotspots": {
+    "apply_with": "node scripts/figma/add-hotspots.mjs <rows> --apply",
+    "note": "every row's `over` is unresolved — the label ids were never read. Resolve each by matching characters inside the named board first. A board with no inbound edge is not a screen, it is a picture (add-state-board.mjs's own docblock).",
+    "rows": [
+      { "unresolved-id": true, "over_board": "153:120", "over_match": "Drop ", "to": "N1", "name": "hotspot/state · Brand · import · conflicts", "pad": 8, "why": "UX-H-26" },
+      { "unresolved-id": true, "over_board": "153:120", "over_match": "Drop ", "to": "N2", "name": "hotspot/state · Brand · import · unsupported", "pad": 8, "why": "UX-H-28" },
+      { "unresolved-id": true, "over_board": "152:83", "over_match": "Rename ID", "to": "N3", "name": "hotspot/state · Brand · rename-token", "pad": 8, "why": "UX-H-31 — 152:83 Brand · token-detail draws the three action buttons (FIG-F-08); Rename ID is the middle one" },
+      { "unresolved-id": true, "over_board": "152:137", "over_match": "Linear Dark", "to": "N4", "name": "hotspot/state · Brand · starter-confirm", "pad": 8, "why": "UX-H-30 — the card is the selector; the confirm is what the click now opens. Card label ids are known from the applied plan-text-B.json: 152:150 Buildrik Default, 152:153 Stripe Blue, 152:157 Notion Warm, 152:160 Apple Minimal, 152:164 Linear Dark, 152:167 Vercel Mono." }
+    ]
+  }
+}

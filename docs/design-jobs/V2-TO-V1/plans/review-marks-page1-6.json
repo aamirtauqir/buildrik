@@ -1,0 +1,13 @@
+[
+  {
+    "id": "1736:8397",
+    "why": "UX-I-18 — the same cross-link as the 1:3 echo, applied on the CANONICAL board. 1339:7214's own name states that 1736:8397 is the canonical of this state on page 1:6; editing only the echo would leave the canonical silent.",
+    "page": "1:6",
+    "id_source": "UNVERIFIED — quoted from the name of 1339:7214 on page 1:3, never read on 1:6. Confirm before apply: the board must be the client-review dead-link/not-found state, 1280x720.",
+    "unresolved-id": true,
+    "selector": "page 1:6, board whose name matches /dead-link/ and /not-found/ (client-review family); expected 1280x720",
+    "current_name": "UNKNOWN — read before apply",
+    "name": "APPEND to whatever the current name is: \" UX-I-18: this is also the screen a ReviewBar Re-send produces — it calls the shell with no client email, so the new round ships token: null, the old link is already revoked, and the editor reports success while the client's link resolves to nothing.\"",
+    "apply_with": "node scripts/figma/apply-truth-marks.mjs docs/design-jobs/V2-TO-V1/plans/review-marks-page1-6.json --page=1:6 --apply  (after resolving current_name; apply-truth-marks sets the FULL name, it does not append)"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "slug": "sweep-b",
+  "section": "2040:8372",
+  "finding": "V2-8-I / gap-audit — every component set in the shared-chrome library stacks EVERY variant at one point, so the library displays one variant per component and the states these sets exist to document cannot be seen.",
+  "measured": "read 2026-09-07 (sweep-b-read.mjs): 2034:8519 Rail 60x812 kids=7, every variant at 0,0, all 60x812 · 2041:19572 Settings nav row 140x30 kids=2, both at 0,0 · 2142:11082 List row · indented 280x28 kids=12, all at 0,0. layoutMode=NONE on all three, so child x/y writes take (the auto-layout trap does not apply here).",
+  "layout": {
+    "why_not_ARR-D-34": "ARR-D-34 asked for all three sets on one row at y=220. That was computed against the STACKED widths (60 + 140 + 280). Laid out, the sets are 564 + 304 + 584 wide and one row needs 1500px in a 1200-wide section. The three are stacked vertically instead, entirely inside the existing 1200x1322 section box, so the section never grows and cannot collide with its neighbour.",
+    "rows": [
+      { "set": "2034:8519", "at": [100, 220], "grid": "7 x 1, gapX 24", "size": [564, 812] },
+      { "set": "2041:19572", "at": [100, 1064], "grid": "2 x 1, gapX 24", "size": [304, 30] },
+      { "set": "2142:11082", "at": [100, 1110], "grid": "2 cols (State) x 6 rows (Depth), gapX 24 gapY 8", "size": [584, 208] }
+    ],
+    "no_overlap": "100..664 x 220..1032 · 100..404 x 1064..1094 · 100..684 x 1110..1318 — pairwise disjoint, all inside 0..1200 x 0..1322.",
+    "safe_for_instances": "an instance references its main component by id, never by position. Moving a variant inside its set changes no instance; the 387 List-row and ~600 nav-row consumers are untouched."
+  },
+  "not_done": "ARR-D-34 also asks for a caption under each set naming the surfaces that instance it. Not written: a caption placed as a direct section child counts as a BOARD in verify-invariants.mjs, so three captions would move the page's board count and need their own overlap budget. Filed, not applied.",
+  "already_correct": "ARR-D-33 (the section name still called 2142:11082 'the Rail component set'). The name read back on 2026-09-07 already carries the corrected three-set list AND the 'this is NOT the Layers tree row' note. Nothing to do."
+}

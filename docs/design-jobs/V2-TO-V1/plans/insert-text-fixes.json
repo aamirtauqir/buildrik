@@ -1,0 +1,92 @@
+[
+  {
+    "id": "137:44",
+    "text": "💡  Tip 2/4",
+    "expect": "💡  Tip 2/4",
+    "width": 60,
+    "why": "UX-A-14 — unchanged string; the row exists only to pin the node whose Y moves to 28 in insert-geometry.json. apply-text-fixes will report SAME. Kept so the applier can confirm the node id before the geometry step.",
+    "id_source": "read from file — full node tree of 137:2, 2026-09-07",
+    "current_text_read_back": "💡  Tip 2/4"
+  },
+  {
+    "id": "155:11",
+    "text": "ELEMENTS open, BLOCKS · COMPONENTS · MINE closed — founder-final taxonomy (blocks/groups.ts:1-19, BuildTab.tsx:48). That open set is component-local state and TabRouter unmounts the tab, so leaving Insert and coming back re-collapses all three and resets the scroll to the top of 53 rows (BuildTab.tsx:49-51, TabRouter.tsx:124-126) — UX-A-08. The counts are live, and they count the same things twice: 40 of the 50 BLOCKS and 13 of the 14 COMPONENTS also have an ELEMENTS row (UX-A-04). Clicking Image / Video / Audio / Icon / SVG / Lottie replaces this panel with Media and never brings you back if you cancel (useBlockInsertion.ts:144-153, MediaTab.tsx:378) — UX-A-17. A click is locked out for 150ms with no visible busy state, so a fast second click vanishes (useBlockInsertion.ts:25,30,179) — UX-A-23.",
+    "width": 280,
+    "why": "UX-A-04 / UX-A-08 / UX-A-17 / UX-A-23",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 155:11 @100,1052 280x54)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard: the caption's CURRENT characters were never read (quota stop). Read 155:11 first; if it already carries these facts, skip the row rather than overwrite a newer caption."
+  },
+  {
+    "id": "155:12",
+    "text": "A second group open. Reaching it with the keyboard costs 53 tab stops — every ELEMENTS row is a focusable role=button, there is no arrow-key navigation, no skip and no role=group / aria-labelledby tying rows to the header above them (GroupSection.tsx:95-193) — UX-A-29. Only ELEMENTS rows carry draggable: BLOCKS cards, COMPONENTS rows and MINE rows do not (GroupSection.tsx:189 vs :206-262) — UX-A-06, which is backwards from the need: a 12-row Pricing block is the thing you most want to aim.",
+    "width": 280,
+    "why": "UX-A-06 / UX-A-29",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 155:12 @1700,1052 280x90)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read. Read first, merge rather than clobber."
+  },
+  {
+    "id": "155:13",
+    "text": "Search covers ELEMENTS, BLOCKS and COMPONENTS. It does NOT cover MINE — searchInsert is passed catalog + blockRows + componentRows only and InsertSearchHit has no MINE case (useBuildTab.ts:235-238, utils/search.ts:16-26) — UX-A-11; the MINE-tagged hit drawn on this board is the target, not the code. The ✕ replaces the ⌘F hint whenever the field holds text: today nothing clears a search that returned wrong hits — the field draws no ✕ by design, Escape is bound to .bld-search-wrap and dies once focus leaves it, and “Clear search” renders only in the zero-results branch (SearchBar.tsx:76-101, BuildTab.tsx:155-163, SearchResults.tsx:34-58) — UX-A-12. The count line is new: results are one flat run with no count and no source headers, wrapped in a single role=status aria-live region, so every keystroke re-announces the whole set (SearchResults.tsx:64-91) — UX-A-13.",
+    "width": 280,
+    "why": "UX-A-11 / UX-A-12 / UX-A-13",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 155:13 @2100,1052 280x54)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read."
+  },
+  {
+    "id": "155:14",
+    "text": "“Clear search” renders only in this zero-results branch. A search that matched three wrong things leaves the user with no control to press — UX-A-12. The ✕ added to the field on Insert · searching is the fix; this link stays.",
+    "width": 280,
+    "why": "UX-A-12",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 155:14 @100,3517 280x18)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read. Node is 18px tall today; `width` switches it to HEIGHT autoresize so it can grow."
+  },
+  {
+    "id": "155:15",
+    "text": "The drag is drawn; the drop is not honoured. handleBlockDrop re-reads e.dataTransfer past an await and gets \"\", returns false, and useDropExecution.ts:302-303 sets dropSucceeded = true regardless — nothing lands, no error, and DragManager is told it worked (UX-A-01). The green line is computed by asking whether a generic container could nest in the hovered target, not the dragged type, so it promises placements the drop then refuses with “Cannot place X inside Y” (dragCalculations.ts:145-156, dropOperations.tsx:481-489) — UX-A-19. A dragged Image lands with no src because the drop path has no needs-asset branch, while a clicked Image opens Media — UX-A-18. And a click toasts “Inserted: Heading” where a drop only announces into a visually-hidden live region — one affordance, two feedback contracts (Canvas.tsx:149-162) — UX-A-20. Nothing on any insert path consults isLocked or isComponentInstance, so an insert into a component instance succeeds, toasts, and is discarded by the next syncInstance (useBlockInsertion.ts:77-115, dropOperations.tsx:409-489, cf. insertActions.ts:68-69) — UX-A-22. Refusal state: Insert · drop-refused.",
+    "width": 280,
+    "why": "UX-A-01 / UX-A-18 / UX-A-19 / UX-A-20 / UX-A-22",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 155:15 @900,1052 280x72)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read."
+  },
+  {
+    "id": "155:16",
+    "text": "BUILT, MOUNTED NOWHERE. Disabled, never hidden: a “Soon” badge beside the label, no drag, and a tooltip carrying the element’s own description. The 45% dim was never built — a disabled Row gets only tw:cursor-not-allowed (GroupSection.tsx:98, 105, 158, 167-170, 186-187). Unreachable because no catalog entry sets disabled (catalog.ts:4). Eleven registry blocks have no ELEMENTS row and no marker at all — hero, features, text, row, column, columns3, contact-form, product-card, product-grid, product-detail, cart-button — which is exactly the gap this state exists to fill (UX-A-10).",
+    "width": 280,
+    "why": "UX-A-10 (+ QA-C-12 correction)",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 155:16 @900,3517 280x108)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read. QA-C-12 previously prescribed the first two sentences; if they are already there, this row only adds the 11-block list."
+  },
+  {
+    "id": "155:17",
+    "text": "One click and the panel’s only guidance is gone for good. The ✕’s own tooltip says “Hide tips for this session — bring them back from Help”; the flag goes to localStorage not session storage, nothing anywhere clears it, and Insert is never given an onHelpClick so PanelHeader draws no Help button (TipsFooter.tsx:118-130, useBuildTab.ts:170-173, LeftSidebar.tsx:590-594, PanelHeader.tsx:75) — UX-A-15. OPEN DECISION: give Insert the Help entry and let it restore tips, or make the dismissal genuinely per-session and rewrite the tooltip. The strip itself now draws the tip body — it drew only “💡 Tip n/N” with the text riding on a title attribute, so “next” changed a number and nothing else (TipsFooter.tsx:101-110) — UX-A-14. Four tips exist, not five (catalog/tips.ts:11-28; W-J-12 is stale), and two describe a panel that no longer exists. As they must read: 1 “Drag to canvas — drag an ELEMENTS row onto the canvas to place it” (cards and component rows do not drag); 2 “Press / to search. Esc or ✕ clears”; 3 “Save any element as a component from the right-click menu — it appears under MINE” (the shipped text says “Once available”; MINE ships today); 4 “Four source groups — ELEMENTS, BLOCKS, COMPONENTS, MINE. Click a header to open one in place” (the shipped text says “Click any category row”; there are no categories).",
+    "width": 280,
+    "why": "UX-A-14 / UX-A-15",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 155:17 @100,2094 280x126)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read."
+  },
+  {
+    "id": "788:4299",
+    "text": "BUILT, MOUNTED NOWHERE — InsertStateBlocks.tsx:55 InsertLoadingSkeleton ships and is unit-tested; BuildTab.tsx never imports InsertStateBlocks. The 2026-09-02 “RETIRED (no producer)” was withdrawn: this is finished code with zero mounts, not deleted work (QA-B-22).",
+    "width": 280,
+    "why": "QA-B-22 — caption still carries a claim its board name has already withdrawn",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 788:4299 @1700,3517 280x72)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read."
+  },
+  {
+    "id": "788:4300",
+    "text": "BUILT, MOUNTED NOWHERE — InsertStateBlocks.tsx:79 InsertLoadError ships and is unit-tested with zero mounts. Same withdrawn RETIRED claim as Insert · loading (QA-B-22).",
+    "width": 280,
+    "why": "QA-B-22",
+    "id_source": "read from file — section 1776:8379 child list, 2026-09-07 (TEXT 788:4300 @1300,3517 280x72)",
+    "unresolved-expect": true,
+    "applier-note": "No `expect` guard — current characters never read."
+  }
+]

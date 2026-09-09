@@ -1,0 +1,7 @@
+{
+  "page": "1:3",
+  "from": 280,
+  "to": 360,
+  "why": "UX-F-25 / UX-F-26 — the shipped dropdown is 360 (.bk-notifications, header.css:39, the only consumer of --bk-size-panel-right at HEAD). All six boards are drawn 280. An earlier pass recorded the debt on every board and declined the resize because a frame grown alone leaves a 280 interior in a 360 box; this re-lays the interior with it.",
+  "boards": ["165:2", "165:24", "165:44", "165:51", "165:71", "453:4051"]
+}

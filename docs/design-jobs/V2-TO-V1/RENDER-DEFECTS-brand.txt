@@ -1,0 +1,15 @@
+--- 1776:8373  (12)
+CONTAINER	152:137	Brand · starters	152:162 "Card / starter"	right +20
+CONTAINER	152:137	Brand · starters	152:155 "Card / starter"	right +20
+CONTAINER	152:137	Brand · starters	152:148 "Card / starter"	right +20
+TEXTOVER	153:29	Brand · components	1720:17388	by 12
+CLIPPED	153:120	Brand · import-export	153:149	needs 32px, has 28
+CLIPPED	154:2	Brand · lint — [not-implemented] t	154:25	needs 48px, has 28
+CLIPPED	154:132	Brand · root · Beginner mode	154:186	needs 32px, has 28
+ESCAPES	306:2080	Brand · tokens · replace	I333:2350;12:7	by 30 past 333:2350
+ESCAPES	306:2217	Brand · lint · suppressed	I333:2360;12:11	by 30 past 333:2360
+CLIPPED	306:2232	Brand · export · exported	306:2257	needs 32px, has 28
+CLIPPED	306:2265	Brand · export · imported	306:2290	needs 32px, has 28
+CLIPPED	306:2298	Brand · export · error	306:2323	needs 32px, has 28
+
+render defects >= 4px: 12 (across 1 of 1 sections)

@@ -1,0 +1,15 @@
+{
+  "slug": "sweep-b",
+  "finding": "NEW, measured 2026-09-07 — text-style adoption in these sections is not blocked by binding. It is blocked by LEADING.",
+  "how_measured": "scripts/figma/sweep-b-bind-sections.mjs --apply walked all four sections and bound every TEXT node whose family, weight, size, leading, tracking, case and decoration ALL equal a local text style's, skipping nodes inside instances and nodes that already carry a style.",
+  "result": {
+    "1776:8373 Brand": { "TEXT": 629, "boundAfter": 302, "newlyBound": 0, "skipped_inInstance": 50, "skipped_noExactStyle": 276 },
+    "1084:4527 Templates": { "TEXT": 479, "boundAfter": 302, "newlyBound": 0, "skipped_inInstance": 31, "skipped_noExactStyle": 146 },
+    "1938:8372 Components": { "TEXT": 228, "boundAfter": 127, "newlyBound": 1, "skipped_inInstance": 27, "skipped_noExactStyle": 74 },
+    "2040:8372 Library": { "TEXT": 56, "boundAfter": 56, "newlyBound": 0, "skipped_inInstance": 0, "skipped_noExactStyle": 0 }
+  },
+  "read_back": "BOUND 2476:12066 asked 'ui/11 · caption' — file says 'ui/11 · caption' — OK",
+  "what_it_means": "496 unbound nodes across the three product sections have NO exact style to bind to. The reason is on the same read: offLead=161 in Templates and offLead=72 in Components, overwhelmingly AUTO. A node at Inter Regular 13 with AUTO leading matches no style in a ramp whose every entry has a pixel leading. CONF-1-14's ordering — 'correct the leading FIRST, or there is nothing on the ramp to bind to' — is now measured rather than asserted, and it is the single largest lever left on these sections.",
+  "why_not_done_here": "Setting AUTO leading to a ramp value changes every affected node's HEIGHT. verify-invariants.mjs treats vertical overflow inside a clipping frame as a scroll region, so it cannot see the damage that would cause, and the founder's acceptance for this file is a board screenshot beside a live screenshot. A ~400-node vertical-rhythm change fired blind, on the last calls of an exhausted quota, is the shape of edit this arc has already had to repair twice. It is measured and filed, not fired.",
+  "how_to_do_it_safely": "One section at a time, AUTO-leading nodes only, whose fontSize is already on the ramp, outside instances; set the paired leading (11->16, 12->18, 13->20, 14->21 or 20, 16->24, 20->30, 24->32); read back each node's height delta AND its parent's box; then re-run sweep-b-bind-sections.mjs, which will then find the exact matches. The binder is written, proved and idempotent — it costs one call per pass."
+}

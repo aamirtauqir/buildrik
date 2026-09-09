@@ -1,0 +1,632 @@
+[
+ {
+  "op": "move",
+  "id": "52:2",
+  "y": 380,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=379 is off the page's 4px geometry (5 boards on it). Snapped UP to 380 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "55:2",
+  "y": 380,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=379 is off the page's 4px geometry (5 boards on it). Snapped UP to 380 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "58:2",
+  "y": 380,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=379 is off the page's 4px geometry (5 boards on it). Snapped UP to 380 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "297:1972",
+  "y": 380,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=379 is off the page's 4px geometry (5 boards on it). Snapped UP to 380 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:6558",
+  "y": 380,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=379 is off the page's 4px geometry (5 boards on it). Snapped UP to 380 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "297:2027",
+  "y": 1496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=1495 is off the page's 4px geometry (5 boards on it). Snapped UP to 1496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "297:2139",
+  "y": 1496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=1495 is off the page's 4px geometry (5 boards on it). Snapped UP to 1496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:7000",
+  "y": 1496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=1495 is off the page's 4px geometry (5 boards on it). Snapped UP to 1496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "813:4836",
+  "y": 1496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=1495 is off the page's 4px geometry (5 boards on it). Snapped UP to 1496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "813:4888",
+  "y": 1496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=1495 is off the page's 4px geometry (5 boards on it). Snapped UP to 1496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "295:1972",
+  "y": 2516,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=2515 is off the page's 4px geometry (5 boards on it). Snapped UP to 2516 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "295:1989",
+  "y": 2516,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=2515 is off the page's 4px geometry (5 boards on it). Snapped UP to 2516 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "295:1994",
+  "y": 2516,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=2515 is off the page's 4px geometry (5 boards on it). Snapped UP to 2516 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "296:1972",
+  "y": 2516,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=2515 is off the page's 4px geometry (5 boards on it). Snapped UP to 2516 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "296:1999",
+  "y": 2516,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=2515 is off the page's 4px geometry (5 boards on it). Snapped UP to 2516 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "294:1976",
+  "y": 3536,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=3535 is off the page's 4px geometry (6 boards on it). Snapped UP to 3536 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "294:1984",
+  "y": 3536,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=3535 is off the page's 4px geometry (6 boards on it). Snapped UP to 3536 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "294:1992",
+  "y": 3536,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=3535 is off the page's 4px geometry (6 boards on it). Snapped UP to 3536 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "296:2030",
+  "y": 3536,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=3535 is off the page's 4px geometry (6 boards on it). Snapped UP to 3536 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1342:7162",
+  "y": 3536,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=3535 is off the page's 4px geometry (6 boards on it). Snapped UP to 3536 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1347:7162",
+  "y": 3536,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=3535 is off the page's 4px geometry (6 boards on it). Snapped UP to 3536 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1343:7162",
+  "y": 4556,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=4555 is off the page's 4px geometry (1 boards on it). Snapped UP to 4556 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1345:7162",
+  "y": 5736,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=5734 is off the page's 4px geometry (1 boards on it). Snapped UP to 5736 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "301:1979",
+  "y": 6496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=6493 is off the page's 4px geometry (5 boards on it). Snapped UP to 6496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "301:2186",
+  "y": 6496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=6493 is off the page's 4px geometry (5 boards on it). Snapped UP to 6496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "301:2393",
+  "y": 6496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=6493 is off the page's 4px geometry (5 boards on it). Snapped UP to 6496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:7301",
+  "y": 6496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=6493 is off the page's 4px geometry (5 boards on it). Snapped UP to 6496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:7775",
+  "y": 6496,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=6493 is off the page's 4px geometry (5 boards on it). Snapped UP to 6496 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "302:2026",
+  "y": 7588,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=7587 is off the page's 4px geometry (6 boards on it). Snapped UP to 7588 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "303:1997",
+  "y": 7588,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=7587 is off the page's 4px geometry (6 boards on it). Snapped UP to 7588 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "303:2032",
+  "y": 7588,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=7587 is off the page's 4px geometry (6 boards on it). Snapped UP to 7588 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:8069",
+  "y": 7588,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=7587 is off the page's 4px geometry (6 boards on it). Snapped UP to 7588 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1124:4527",
+  "y": 7588,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=7587 is off the page's 4px geometry (6 boards on it). Snapped UP to 7588 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1124:4562",
+  "y": 7588,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=7587 is off the page's 4px geometry (6 boards on it). Snapped UP to 7588 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "302:1978",
+  "y": 8684,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=8681 is off the page's 4px geometry (6 boards on it). Snapped UP to 8684 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "302:2004",
+  "y": 8684,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=8681 is off the page's 4px geometry (6 boards on it). Snapped UP to 8684 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:8663",
+  "y": 8684,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=8681 is off the page's 4px geometry (6 boards on it). Snapped UP to 8684 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "814:7027",
+  "y": 8684,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=8681 is off the page's 4px geometry (6 boards on it). Snapped UP to 8684 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "815:4518",
+  "y": 8684,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=8681 is off the page's 4px geometry (6 boards on it). Snapped UP to 8684 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1306:2",
+  "y": 8684,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=8681 is off the page's 4px geometry (6 boards on it). Snapped UP to 8684 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "815:4608",
+  "y": 9848,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=9845 is off the page's 4px geometry (1 boards on it). Snapped UP to 9848 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "128:2",
+  "y": 10964,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=10963 is off the page's 4px geometry (4 boards on it). Snapped UP to 10964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "129:451",
+  "y": 10964,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=10963 is off the page's 4px geometry (4 boards on it). Snapped UP to 10964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "817:5006",
+  "y": 10964,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=10963 is off the page's 4px geometry (4 boards on it). Snapped UP to 10964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "817:5195",
+  "y": 10964,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=10963 is off the page's 4px geometry (4 boards on it). Snapped UP to 10964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "129:2",
+  "y": 12024,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=12021 is off the page's 4px geometry (5 boards on it). Snapped UP to 12024 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "129:223",
+  "y": 12024,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=12021 is off the page's 4px geometry (5 boards on it). Snapped UP to 12024 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "130:599",
+  "y": 12024,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=12021 is off the page's 4px geometry (5 boards on it). Snapped UP to 12024 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "130:798",
+  "y": 12024,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=12021 is off the page's 4px geometry (5 boards on it). Snapped UP to 12024 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "130:997",
+  "y": 12024,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=12021 is off the page's 4px geometry (5 boards on it). Snapped UP to 12024 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "130:2",
+  "y": 13080,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=13079 is off the page's 4px geometry (5 boards on it). Snapped UP to 13080 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "130:201",
+  "y": 13080,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=13079 is off the page's 4px geometry (5 boards on it). Snapped UP to 13080 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "130:400",
+  "y": 13080,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=13079 is off the page's 4px geometry (5 boards on it). Snapped UP to 13080 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "132:2",
+  "y": 13080,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=13079 is off the page's 4px geometry (5 boards on it). Snapped UP to 13080 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "133:2",
+  "y": 13080,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=13079 is off the page's 4px geometry (5 boards on it). Snapped UP to 13080 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "133:212",
+  "y": 14140,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=14137 is off the page's 4px geometry (5 boards on it). Snapped UP to 14140 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "133:422",
+  "y": 14140,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=14137 is off the page's 4px geometry (5 boards on it). Snapped UP to 14140 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "133:630",
+  "y": 14140,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=14137 is off the page's 4px geometry (5 boards on it). Snapped UP to 14140 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "307:2203",
+  "y": 14140,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=14137 is off the page's 4px geometry (5 boards on it). Snapped UP to 14140 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "307:2213",
+  "y": 14140,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=14137 is off the page's 4px geometry (5 boards on it). Snapped UP to 14140 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "131:2",
+  "y": 15196,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=15195 is off the page's 4px geometry (6 boards on it). Snapped UP to 15196 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "131:201",
+  "y": 15196,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=15195 is off the page's 4px geometry (6 boards on it). Snapped UP to 15196 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "131:415",
+  "y": 15196,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=15195 is off the page's 4px geometry (6 boards on it). Snapped UP to 15196 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "307:2193",
+  "y": 15196,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=15195 is off the page's 4px geometry (6 boards on it). Snapped UP to 15196 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:8723",
+  "y": 15196,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=15195 is off the page's 4px geometry (6 boards on it). Snapped UP to 15196 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "817:5114",
+  "y": 15196,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=15195 is off the page's 4px geometry (6 boards on it). Snapped UP to 15196 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:8787",
+  "y": 16596,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=16594 is off the page's 4px geometry (5 boards on it). Snapped UP to 16596 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "817:5220",
+  "y": 16596,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=16594 is off the page's 4px geometry (5 boards on it). Snapped UP to 16596 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "817:5262",
+  "y": 16596,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=16594 is off the page's 4px geometry (5 boards on it). Snapped UP to 16596 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "878:4518",
+  "y": 16596,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=16594 is off the page's 4px geometry (5 boards on it). Snapped UP to 16596 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1156:4593",
+  "y": 16596,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=16594 is off the page's 4px geometry (5 boards on it). Snapped UP to 16596 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "807:8756",
+  "y": 17616,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=17614 is off the page's 4px geometry (1 boards on it). Snapped UP to 17616 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "430:2348",
+  "y": 18868,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=18867 is off the page's 4px geometry (2 boards on it). Snapped UP to 18868 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "430:2375",
+  "y": 18868,
+  "why": "4px grid \u2014 23 \u00b7 Journeys row y=18867 is off the page's 4px geometry (2 boards on it). Snapped UP to 18868 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1706:8467",
+  "y": 2360,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2358 is off the page's 4px geometry (4 boards on it). Snapped UP to 2360 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1706:8476",
+  "y": 2360,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2358 is off the page's 4px geometry (4 boards on it). Snapped UP to 2360 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1706:8483",
+  "y": 2360,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2358 is off the page's 4px geometry (4 boards on it). Snapped UP to 2360 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1706:8492",
+  "y": 2360,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2358 is off the page's 4px geometry (4 boards on it). Snapped UP to 2360 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2217",
+  "y": 2716,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2714 is off the page's 4px geometry (6 boards on it). Snapped UP to 2716 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2232",
+  "y": 2716,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2714 is off the page's 4px geometry (6 boards on it). Snapped UP to 2716 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2265",
+  "y": 2716,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2714 is off the page's 4px geometry (6 boards on it). Snapped UP to 2716 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2298",
+  "y": 2716,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2714 is off the page's 4px geometry (6 boards on it). Snapped UP to 2716 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1704:8575",
+  "y": 2716,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2714 is off the page's 4px geometry (6 boards on it). Snapped UP to 2716 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1704:8607",
+  "y": 2716,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=2714 is off the page's 4px geometry (6 boards on it). Snapped UP to 2716 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "152:112",
+  "y": 3648,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=3646 is off the page's 4px geometry (6 boards on it). Snapped UP to 3648 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "154:132",
+  "y": 3648,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=3646 is off the page's 4px geometry (6 boards on it). Snapped UP to 3648 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2049",
+  "y": 3648,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=3646 is off the page's 4px geometry (6 boards on it). Snapped UP to 3648 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2080",
+  "y": 3648,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=3646 is off the page's 4px geometry (6 boards on it). Snapped UP to 3648 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2186",
+  "y": 3648,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=3646 is off the page's 4px geometry (6 boards on it). Snapped UP to 3648 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "775:4305",
+  "y": 3648,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=3646 is off the page's 4px geometry (6 boards on it). Snapped UP to 3648 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "154:2",
+  "y": 4580,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=4578 is off the page's 4px geometry (3 boards on it). Snapped UP to 4580 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1138:13376",
+  "y": 4580,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=4578 is off the page's 4px geometry (3 boards on it). Snapped UP to 4580 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "433:2391",
+  "y": 4580,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=4578 is off the page's 4px geometry (3 boards on it). Snapped UP to 4580 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1172:4840",
+  "y": 5604,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=5602 is off the page's 4px geometry (1 boards on it). Snapped UP to 5604 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "153:57",
+  "y": 5964,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=5961 is off the page's 4px geometry (5 boards on it). Snapped UP to 5964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2111",
+  "y": 5964,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=5961 is off the page's 4px geometry (5 boards on it). Snapped UP to 5964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2136",
+  "y": 5964,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=5961 is off the page's 4px geometry (5 boards on it). Snapped UP to 5964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "306:2161",
+  "y": 5964,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=5961 is off the page's 4px geometry (5 boards on it). Snapped UP to 5964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "1333:7162",
+  "y": 5964,
+  "why": "4px grid \u2014 07 \u00b7 Brand row y=5961 is off the page's 4px geometry (5 boards on it). Snapped UP to 5964 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "156:2",
+  "y": 1312,
+  "why": "4px grid \u2014 18 \u00b7 Review row y=1310 is off the page's 4px geometry (6 boards on it). Snapped UP to 1312 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "157:109",
+  "y": 1312,
+  "why": "4px grid \u2014 18 \u00b7 Review row y=1310 is off the page's 4px geometry (6 boards on it). Snapped UP to 1312 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "158:2",
+  "y": 1312,
+  "why": "4px grid \u2014 18 \u00b7 Review row y=1310 is off the page's 4px geometry (6 boards on it). Snapped UP to 1312 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "158:57",
+  "y": 1312,
+  "why": "4px grid \u2014 18 \u00b7 Review row y=1310 is off the page's 4px geometry (6 boards on it). Snapped UP to 1312 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "158:105",
+  "y": 1312,
+  "why": "4px grid \u2014 18 \u00b7 Review row y=1310 is off the page's 4px geometry (6 boards on it). Snapped UP to 1312 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ },
+ {
+  "op": "move",
+  "id": "158:162",
+  "y": 1312,
+  "why": "4px grid \u2014 18 \u00b7 Review row y=1310 is off the page's 4px geometry (6 boards on it). Snapped UP to 1312 so the row keeps its clearance from the row above. Columns are already on-grid everywhere; the drift is vertical only, and reflow-caption-overflow.mjs was moving rows by a raw shortfall until this pass made it round to 4."
+ }
+]

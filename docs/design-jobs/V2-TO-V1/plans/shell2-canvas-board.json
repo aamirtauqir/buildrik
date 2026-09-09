@@ -1,0 +1,200 @@
+{
+ "note": "Rebuild of the board build-spec-boards already made at 2855:12407 (read back 2026-09-07: 900x480 @2480,1696 in section 1779:5). Identical to shell-canvas-board.json plus one block: UX-F-28, the two viewport controls with no call site, which the first pass closed as code-only. The finding's own fix is half a naming decision — 'name one component as the viewport control for the whole shell' — and that is a board statement. build-spec-boards finds the board by name and rebuilds its children, so this is idempotent and costs one call. SUPERSEDES shell-canvas-board.json; do not run both.",
+ "page": "1:3",
+ "section": "1779:5",
+ "boards": [
+  {
+   "name": "Canvas · keyboard, zoom and viewport (one owner each)",
+   "x": 2480,
+   "y": 1696,
+   "w": 900,
+   "h": 480,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "text",
+     "x": 16,
+     "y": 16,
+     "w": 868,
+     "v": "Canvas · keyboard, zoom and viewport — one owner each",
+     "s": 14,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 44,
+     "w": 868,
+     "h": 1,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 60,
+     "w": 430,
+     "v": "Tab cannot leave the canvas",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 78,
+     "w": 430,
+     "v": "Tab is captured to cycle elements and preventDefault is called (Canvas.tsx:660, useCanvasKeyboard.ts:87-107); Escape only clears the selection. The documented exit, F6, is printed in neither help screen, and the skip link is called “Skip to Canvas”. Either let Tab leave — the arrow keys already traverse elements — or print the escape chord on the region and in both help screens. (UX-F-18)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 180,
+     "w": 430,
+     "v": "One zoom owner · one step · one clamp",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 198,
+     "w": 430,
+     "v": "The footer flyout adds a fixed 10 (Canvas.tsx:408-414); the floating bar walks the presets 10/25/50/75/100/150/200/400 (CanvasFooterToolbar.tsx:258-264); the command registry is a third. From 100%, a control labelled “Zoom in” gives 110% or 150% depending on which one you found. The clamp disagrees too: 400 in the presets and ZOOM_LIMITS, 500 in THRESHOLDS.ZOOM_MAX. (UX-F-22)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 308,
+     "w": 430,
+     "v": "Choosing a breakpoint shows that breakpoint",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 326,
+     "w": 430,
+     "v": "onDeviceChange sets the device and never touches zoom (AquibraStudio.tsx:545-548), so Wide 1920 or Tablet 768 in a ~750px lane leaves the frame overflowing and horizontally scrolled, and nothing hints that “Zoom to fit” — behind the footer’s percentage flyout — is a second, required step. Fit on device change. (UX-F-24)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 60,
+     "w": 414,
+     "v": "⌘R is not ours",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 78,
+     "w": 414,
+     "v": "Six overlay chords bind globally and plain ⌘R toggles Rulers (CanvasFooterToolbar.tsx:271); ⌘B and ⌘' sit on the same footing. They are printed only inside hover tooltips on a floating bar, so everyone pays the cost and only the people who hovered get the benefit. Move them off keys the browser owns. (UX-F-32)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 180,
+     "w": 414,
+     "v": "Two built surfaces with no door",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 198,
+     "w": 414,
+     "v": "useInspectorMode is read and persisted and the component that sets it renders nowhere — the mode is stuck at its stored value and the orphan also binds bare “I”, the AI panel’s key (UX-F-19). The Structure popover’s footer trigger renders only in the legacy four-tool rail, so a whole 400px surface is unreachable (UX-F-27). Give each a control or delete it.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 320,
+     "w": 414,
+     "v": "The status footer is a door",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 338,
+     "w": 414,
+     "v": "The selection readout is read-only (StudioFooter.tsx:210-224). Clicking it reveals the element and opens Layers; and when elementDims returns null it says “not visible” instead of dropping the size with no explanation. (UX-F-34)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 412,
+     "w": 414,
+     "v": "What the session remembers",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 470,
+     "y": 430,
+     "w": 414,
+     "v": "Tab, sub-tab and five overlay toggles persist; device and zoom are plain state and reset to Desktop / 100% on every reload, across three storage mechanisms. One rule, one store. (UX-F-23)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 412,
+     "w": 430,
+     "v": "One viewport control",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 430,
+     "w": 430,
+     "v": "chrome-ui BreakpointSwitcher is the one (CanvasFooterToolbar.tsx:318-331). DeviceSelector and useDeviceZoom have no call site — delete both. (UX-F-28)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 2188,
+    "w": 900,
+    "text": "Canvas · keyboard, zoom and viewport — the six controls the canvas owns twice or not at all (UX-F-18, F-19, F-22, F-23, F-24, F-27, F-32, F-34)"
+   }
+  }
+ ]
+}

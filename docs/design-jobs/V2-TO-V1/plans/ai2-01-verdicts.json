@@ -1,0 +1,100 @@
+{
+ "module": "AI experience — gap pass",
+ "slug": "ai2",
+ "written": "2026-09-07",
+ "page": "1:3",
+ "section": "1776:8380",
+ "note": "One row per finding for the eighteen UX-G findings that reached the end of the 2026-09-07 apply with no queue row. They are advisory by construction: seventeen of the eighteen were already ANSWERED on the three decision boards that landed in the same session, so the work was to PROVE it by read-back and quote the node, not to draw a second board saying the same thing. Every node id below was read back from Figma on 2026-09-07 by scripts/figma/ai-gap-close.mjs and scripts/figma/ai-gap-evidence.mjs. The two executable rows are in ai2-02-board-additions.json.",
+ "rows": [
+  {
+   "action": "UX-G-02 — IMPLEMENTED. Board 2846:21441 'AI · one home' @100,5220 1380x836. Subtitle 2846:21443 = 'DECISION — applies UX-G-02, UX-G-15, UX-G-16'; band 2846:21447 names one home (inspector column, 300), one thread, one shortcut, one palette row; nine-door table rows 2846:21467/21471/21479/21483. The left-drawer variant board is deliberately NOT drawn.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-02 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-04 — IMPLEMENTED. Rule: board B 2846:21490, id cell 2846:21555 = 'UX-G-04' beside 'Quota is visible before the wall'. Meter: TEXT 2846:21653 '7 left today' on 170:2, moved out of the auto-layout flow (where step D's write was a silent no-op at @0,596) to ABSOLUTE @154,148 100x16, the composer input's bottom-right — 0 siblings moved, fits=true.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-04 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-06 — IMPLEMENTED. Board C 2846:21575 rows 2846:21613 'Media · alt text' / 21614 'Inline Generate / Regenerate, with provenance' / 21615 'ships twice — unify on the vision path'; board B rule id cell 2846:21570 beside 'Provenance survives the apply'. The two per-surface relabels are owed to Media (146:2 + the full-library details panel).",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-06 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-07 — IMPLEMENTED. Board B footer 2846:21574: 'An affordance and the capability behind it share one switch. Brand's Generate with AI renders unconditionally while its client is built only when the dsAi flag is on…'. The board it indicts already carries the mark: 2476:12029 re-read as '[not-implemented] Brand · generate component with AI — the schema has nowhere to go'.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-07 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-08 — IMPLEMENTED. Board C EARNS row 2846:21621 'Brand · component generation' / 21622 'Primary — modal' / 21623 'built, dead-ended: no Accept destination'; plus 2476:12029's own [not-implemented] name, re-read this pass. Nothing further to draw in this section.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-08 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-09 — IMPLEMENTED. Board C MUST-NEVER rows 2846:21630/21631 (version-diff summary, 'Fails clause 4 … RETIRE rather than repair') and 21632/21633 (milestone naming, 'Fails clause 1'). Retired on PLACEMENT grounds, never as doorless: ai.summarize HAS an editor caller at useAISummary.ts:109. DESIGN-AUDIT-SUMMARY.md:99 still carried refuted D-F-38 and was corrected here.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-09 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-10 — IMPLEMENTED. Board B 2846:21490 is the finding's whole answer: subtitle 2846:21492 'DECISION — applies UX-G-10, and the controls UX-G-04 / -05 / -11 / -12 / -13 / -14 / -19 each ask for', the MARK band (one lucide Sparkles; emoji, character, play triangle and clock retired) and a three-tier verb table with a 'never' column. Relabels owed to six modules.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-10 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-12 — IMPLEMENTED-AS-RULE. Board B rule row, id cell 2846:21564 = 'UX-G-12', beside 'AI never evicts the surface that judges it — the diff card carries the live current value of every property it proposes to overwrite'. The board-level change is owed to Inspector (32:2); no board in section 1776:8380 draws the inspector being replaced.",
+   "severity": "IMPLEMENTED-AS-RULE",
+   "why": "UX-G-12 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-13 — IMPLEMENTED-AS-RULE. Board B rule row, id cell 2846:21558 = 'UX-G-13', beside 'Undo is a button, not folk knowledge'. NOT drawn on a state board because its host does not exist: W-K-01's 'AI · proposal' (the applied chat message) was never built, recorded in ai-02-state-boards.json -> notInThisPlan. Build the board and the Undo together.",
+   "severity": "IMPLEMENTED-AS-RULE",
+   "why": "UX-G-13 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-14 — IMPLEMENTED-AS-RULE. Board B rule row, id cell 2846:21561 = 'UX-G-14', carrying the consequence sentence and the statement that privileged actions stay gated under auto-apply. The toggle itself is drawn on NO board (W-K-15); the draw is owed to Inspector board 160:512, where the agent-run panel lives.",
+   "severity": "IMPLEMENTED-AS-RULE",
+   "why": "UX-G-14 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-16 — IMPLEMENTED. Board A: subtitle 2846:21443 names UX-G-16, and door row 2846:21479 reads 'RETIRE the destination. One palette row, always present, routing to the inspector column (UX-G-16).' The palette-side edit is owed to Command palette (1779:3): delete the Navigation 'Open AI panel' destination, keep the no-results offer as a shortcut.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-16 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-17 — NOT-APPLICABLE-AS-BOARD-EDIT. Subject is the dashboard's Settings -> AI credits page. Page 1:3 is the EDITOR and its 29-section ground truth has no dashboard family, so there is no V1 board to change. Recorded instead on board C footer item 3, TEXT 2846:21648, which names the three shipping capabilities that page advertises as coming soon. Owed to the dashboard.",
+   "severity": "NOT-APPLICABLE-AS-BOARD-EDIT",
+   "why": "UX-G-17 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-18 — NOT-APPLICABLE-AS-BOARD-EDIT. Same reason as UX-G-17: two dashboard site-creation wizards, no dashboard family on page 1:3. Recorded on board C twice — EARNS row 2846:21625/21626/21627 'Dashboard · site draft' / 'Primary — one brief form, reached from both doors' / 'ships as two wizards, one weaker', and footer item 3 (2846:21648).",
+   "severity": "NOT-APPLICABLE-AS-BOARD-EDIT",
+   "why": "UX-G-18 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-19 — IMPLEMENTED. Board B rule row, id cell 2846:21567 = 'UX-G-19' beside 'Suggestions carry their own scope'; and appended to caption 172:33 (caption/AI · idle — the caption of the board that draws the three TRY rows), read back at h=144 inside the 174px gap to the row below at y=1226. The three TRY rows are not annotated one by one; their child ids have never been read.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-19 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-20 — IMPLEMENTED. Two boards. Board C footer item 1 (2846:21646) is the 'What AI can change' disclosure plus the owner-level site AI off switch; board B rule id cell 2846:21573 beside 'AI edits are findable an hour later'. Board C puts Settings under MUST NEVER HAVE ONE (2846:21634/21635), so the disclosure is a page ABOUT AI, not a surface where AI acts.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-20 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-21 — IMPLEMENTED. Board C EARNS rows 2846:21601/21602/21603 'Content / CMS · records and fields' / 'Primary Draft with AI; bulk Fill this column for 12 records' / 'not built — highest-value gap', and 21609/21610/21611 'Insert / Layouts' / 'Primary — Describe a section' / 'not built — the command ships, the door does not'. Doors owed to Content and Insert.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-21 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-22 — IMPLEMENTED. Board C footer item 2, TEXT 2846:21647: persist the onboarding brief on the site, give the editor's AI read access to it, and put 'Regenerate this page' in the Pages panel rather than on a wizard screen the user leaves once. The Pages-panel door is owed to Pages (1776:8377).",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-22 gap-pass verdict"
+  },
+  {
+   "action": "UX-G-24 — IMPLEMENTED. The one finding of the eighteen that NO board asserted — proved by a MISS in the same read that produced every other row's evidence. Closed by TEXT 2872:12431 on board A @32,780 1316x32, naming the three decision boards as the system UX-G-24 asks to adopt before any screen is redrawn. Board A grew 796 -> 836, inside its own row; the section box is unchanged.",
+   "severity": "IMPLEMENTED",
+   "why": "UX-G-24 gap-pass verdict"
+  }
+ ]
+}

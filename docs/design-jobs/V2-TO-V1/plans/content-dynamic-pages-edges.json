@@ -1,0 +1,11 @@
+[
+  { "id": "2429:12111", "from": "149:84", "to": "149:50", "section": "1776:8376",
+    "why": "QA-A-12 — the crumb returns to the COLLECTION view (ContentTab.tsx:305 onBack -> {kind:'collection'}), not to a record. BOARD ID READ this session; `from` 149:84 is UNRESOLVED-ID — taken from QA-A-12's own use_figma read, not re-read here. The applier REFUSES a row whose edge does not currently point at `from`, so a stale `from` fails loudly instead of rewriting somebody else's wiring." },
+  { "id": "2429:21243", "from": "149:84", "to": "149:50", "section": "1776:8376", "why": "QA-A-12 — same; board id read, `from` unresolved-id." },
+  { "id": "2429:21262", "from": "149:84", "to": "149:50", "section": "1776:8376", "why": "QA-A-12 — same; board id read, `from` unresolved-id." },
+  { "id": "2429:21281", "from": "149:84", "to": "149:50", "section": "1776:8376", "why": "QA-A-12 — same; board id read, `from` unresolved-id." },
+  { "id": "2850:12042", "from": "", "to": "149:50", "section": "1776:8376",
+    "why": "QA-A-13 — created by content-new-boards.json as a clone of 2429:12111, so it inherits that board's frame-level edge. Resolved by NAME (unresolved-id until created); `from` left empty because the clone's edge is whatever 2429:12111 carried at clone time." },
+  { "id": "2850:21351", "from": "", "to": "149:50", "section": "1776:8376",
+    "why": "QA-A-13 — same as the row above." }
+]

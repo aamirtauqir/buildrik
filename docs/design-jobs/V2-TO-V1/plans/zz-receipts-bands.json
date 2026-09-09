@@ -1,0 +1,27 @@
+[
+ {
+  "op": "advisory",
+  "why": "UX-I-01 gap-e band receipt",
+  "detail": "UX-I-01 \u2014 IMPLEMENTED. Contract band 2894:12608 placed under board 2854:12294 'History \u00b7 Saves \u00b7 changes \u00b7 restore-confirm' in section 1776:8374, styled from a sibling TEXT on that board so no type was hand-picked. Read back 280x160-180 inside the section. It sits BELOW the board because the panel boards are full VERTICAL auto-layout at a canonical 812 height \u2014 appending inside pushed the band to y=812 and out of bounds, which the read-back caught before it shipped."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-02 gap-e band receipt",
+  "detail": "UX-I-02 \u2014 IMPLEMENTED. Contract band 2894:12609 placed under board 2854:21613 'History \u00b7 Saves \u00b7 time-travel \u00b7 restore-confirm' in section 1776:8374, styled from a sibling TEXT on that board so no type was hand-picked. Read back 280x160-180 inside the section. It sits BELOW the board because the panel boards are full VERTICAL auto-layout at a canonical 812 height \u2014 appending inside pushed the band to y=812 and out of bounds, which the read-back caught before it shipped."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-05 gap-e band receipt",
+  "detail": "UX-I-05 \u2014 IMPLEMENTED. Contract band 2894:12610 placed under board 2854:21739 'History \u00b7 Saves \u00b7 changes \u00b7 start-of-history' in section 1776:8374, styled from a sibling TEXT on that board so no type was hand-picked. Read back 280x160-180 inside the section. It sits BELOW the board because the panel boards are full VERTICAL auto-layout at a canonical 812 height \u2014 appending inside pushed the band to y=812 and out of bounds, which the read-back caught before it shipped."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-07 gap-e band receipt",
+  "detail": "UX-I-07 \u2014 IMPLEMENTED. Contract band 2894:12611 placed under board 2854:21814 'History \u00b7 Saves \u00b7 changes \u00b7 clear-confirm' in section 1776:8374, styled from a sibling TEXT on that board so no type was hand-picked. Read back 280x160-180 inside the section. It sits BELOW the board because the panel boards are full VERTICAL auto-layout at a canonical 812 height \u2014 appending inside pushed the band to y=812 and out of bounds, which the read-back caught before it shipped."
+ },
+ {
+  "op": "advisory",
+  "why": "UX-I-15 gap-e band receipt",
+  "detail": "UX-I-15 \u2014 IMPLEMENTED. Contract band 2894:12612 placed under board 2854:21854 'History \u00b7 Saves \u00b7 changes \u00b7 undo-unavailable' in section 1776:8374, styled from a sibling TEXT on that board so no type was hand-picked. Read back 280x160-180 inside the section. It sits BELOW the board because the panel boards are full VERTICAL auto-layout at a canonical 812 height \u2014 appending inside pushed the band to y=812 and out of bounds, which the read-back caught before it shipped."
+ }
+]

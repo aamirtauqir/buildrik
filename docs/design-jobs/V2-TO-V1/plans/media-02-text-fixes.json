@@ -1,0 +1,275 @@
+[
+ {
+  "id": "144:12",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 144:2 Media · grid"
+ },
+ {
+  "id": "145:12",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:2 Media · filtered"
+ },
+ {
+  "id": "145:59",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:49 Media · folder-scoped"
+ },
+ {
+  "id": "145:106",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:96 Media · uploading"
+ },
+ {
+  "id": "145:158",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:148 Media · upload-failed"
+ },
+ {
+  "id": "145:209",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:199 Media · quota-warn"
+ },
+ {
+  "id": "145:260",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:250 Media · quota-full"
+ },
+ {
+  "id": "145:310",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:300 Media · bulk-select"
+ },
+ {
+  "id": "145:369",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 145:359 Media · empty"
+ },
+ {
+  "id": "453:3938",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 453:3931 Media · load-error"
+ },
+ {
+  "id": "777:4100",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 777:4093 Media · loading"
+ },
+ {
+  "id": "782:4360",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 782:4353 Media · no-results"
+ },
+ {
+  "id": "2430:21372",
+  "text": "☑ Select",
+  "expect": "⊞ ⊟ ↑",
+  "width": 64,
+  "why": "UX-H-08 + UX-H-01 — Grid/List/Sort render permanently disabled with no tooltip (SlimLauncher.tsx:285-293, 'They light up with the folder work (T12)'), and bulk selection has no visible entry at all (SlimLauncher.tsx:469-476 steals right-click). Drop the two inert glyphs and the one-option view toggle; put the Select the drawer actually needs in their place. List view and sort stay where they work — the fullpage manager. Board 2430:21365 Media · local-only assets"
+ },
+ {
+  "id": "144:48",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "145:48",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "145:95",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "145:142",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "145:194",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "145:245",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "145:296",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "145:405",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "453:3959",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "777:4124",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "782:4384",
+  "text": "☁ Stock",
+  "expect": "☁ Browse stock",
+  "width": 54,
+  "why": "UX-H-05 — the footer is where Upload and Browse stock live and where Icons and Fonts must join them; 'Browse stock' at 104 leaves no room for four doors on a 280 panel. Also the VIS-1-11/12 one-character-per-line wrap, already fixed this way on 2430:21399 (QA-A-34)."
+ },
+ {
+  "id": "1163:14202",
+  "text": "PNG · JPG · GIF · WebP · AVIF · SVG · MP4 · WebM · MOV · TTF · OTF · WOFF · WOFF2 — up to 50 MB per file",
+  "expect": "Images, video, audio, SVG and fonts — up to 500 MB total",
+  "width": 302,
+  "why": "UX-H-06 + W-A-18 + W-A-20 — the server allow-list is a closed set of eight media formats plus fonts and has NO audio type (app/api/asset-upload/route.ts:31-50); LibraryItem['type'] is img|vid|ico|fnt (mediaTypes.ts:48). The enforced ceiling is 50 MB PER FILE (UploadZone.tsx:16, asset-upload/route.ts:52); '500 MB total' is the storage quota, checked server-side, and no code checks a per-drop total."
+ },
+ {
+  "id": "1163:14190",
+  "text": "terrace-night.jpg → uploading…",
+  "expect": "patio-photos.zip → extracting 3 images…",
+  "width": 214,
+  "why": "W-A-19 — archive extraction exists nowhere in the editor, the upload route or the type model. The queue row must draw a file the product can actually take."
+ },
+ {
+  "id": "145:197",
+  "text": "Upload failed — file is 62 MB, the limit is 50 MB per file",
+  "expect": "Upload failed — file is 24 MB, your plan’s limit is 10 MB",
+  "width": 184,
+  "why": "UX-H-06 — the drawer's upload runs through UploadZone, whose ceiling is 50 MB (UploadZone.tsx:16, rejection at :64-67), matched by asset-upload/route.ts:52. The 10 MB figure belongs to the picker modal (MediaLibraryPanel.tsx:272) and is a separate, unreconciled cap — see the report's open decisions."
+ },
+ {
+  "id": "1173:4814",
+  "text": "Upload tab accepts image/video/audio · max 10 MB each",
+  "expect": "Upload tab accepts image/video/audio · max 10 MB each · From URL launches soon",
+  "width": 434,
+  "why": "W-A-17 — the board draws a From URL tab and the code imports through it; MediaLibraryPanel.tsx:360-369 deliberately deleted that clause with the comment 'the tab imports now (board 1205:4804)'."
+ },
+ {
+  "id": "1738:8406",
+  "text": "Couldn’t reach the stock provider.",
+  "expect": "No photos found for",
+  "width": 248,
+  "why": "UX-H-02 — today the failed board draws the SAME sentence as the no-results board (1716:8540), which is exactly the defect: StockService.ts:80-83/:94-97 swallow every non-abort error and return [], so failure and emptiness are one screen. A failure is the only one of the three worth a retry."
+ },
+ {
+  "id": "1738:8411",
+  "text": "This is the only signal today and it auto-dismisses. The grid must say it too, and only this arm gets Try again.",
+  "expect": "The grid behind still reads",
+  "width": 300,
+  "why": "UX-H-02 — the note described the defect; with the grid copy fixed it must describe the design."
+ },
+ {
+  "id": "1738:8412",
+  "text": "Needs a configured-ness signal from the server. StockService.ts:54-57 admits it: 'A real configured-ness signal needs a server capability endpoint.' Until then 'no Pexels/Unsplash key', 'key expired', 'network dropped' and 'no photos of that' are one screen. V2 UX-H-02.",
+  "expect": "useDiscoveryState.ts:110 catches and toasts",
+  "width": 680,
+  "why": "UX-H-02 — record the fix the finding asks for, not only the defect."
+ },
+ {
+  "id": "2430:21547",
+  "text": "localOnly is set whenever the server mirror fails — no blob token, offline, or a plan size rejection. The only PERSISTENT signal is a workspace-wide count pill in the fullpage manager (LibraryManager.tsx:449-455, 'N not on the server'). The drawer says it per asset only as a transient toast, at upload and at insert/replace (useUploadState.ts:128, useMediaState.ts:235/268) — nothing in the grid, and nothing on the asset's own detail screen.",
+  "width": 256,
+  "why": "UX-H-11 / QA-A-37 — the board's justification understates what ships (the drawer DOES warn, twice, by name) and overstates the gap. No `expect` given: this node's Figma NAME is 'lo/note', so its characters were never read; the applier must confirm the current string starts with 'localOnly is set whenever the server mirror fails' before writing. `expect` recovered from the script that authored the node (scripts/figma/build-structure-and-localonly.mjs:121), not from a live read.",
+  "expect": "localOnly is set whenever the server mirror fails"
+ },
+ {
+  "id": "1160:61",
+  "text": "⚠ 2 not on the server",
+  "expect": "⚠ This device only",
+  "width": 105,
+  "why": "UX-H-11 / COVER-1-21 — 'This device only' was a hardcoded UNCONDITIONAL string, deleted from the code as a defect (LibraryManager.tsx:441-448) because in production, where assets DO sync, it told every user the opposite of the truth. The shipped pill is {localOnlyCount} not on the server and renders only when at least one asset failed to mirror (:449-455). Board 1159:4593 fullpage · library. COVER-1-21 named three boards; 1159:4593 and 1163:13948 carry the same pill and were missed."
+ },
+ {
+  "id": "1163:4850",
+  "text": "⚠ 2 not on the server",
+  "expect": "⚠ This device only",
+  "width": 105,
+  "why": "UX-H-11 / COVER-1-21 — 'This device only' was a hardcoded UNCONDITIONAL string, deleted from the code as a defect (LibraryManager.tsx:441-448) because in production, where assets DO sync, it told every user the opposite of the truth. The shipped pill is {localOnlyCount} not on the server and renders only when at least one asset failed to mirror (:449-455). Board 1163:4641 fullpage · list-view · bulk-select. COVER-1-21 named three boards; 1159:4593 and 1163:13948 carry the same pill and were missed."
+ },
+ {
+  "id": "1163:13904",
+  "text": "⚠ 2 not on the server",
+  "expect": "⚠ This device only",
+  "width": 105,
+  "why": "UX-H-11 / COVER-1-21 — 'This device only' was a hardcoded UNCONDITIONAL string, deleted from the code as a defect (LibraryManager.tsx:441-448) because in production, where assets DO sync, it told every user the opposite of the truth. The shipped pill is {localOnlyCount} not on the server and renders only when at least one asset failed to mirror (:449-455). Board 1163:13695 fullpage · unused-scope · context-menu. COVER-1-21 named three boards; 1159:4593 and 1163:13948 carry the same pill and were missed."
+ },
+ {
+  "id": "1163:14157",
+  "text": "⚠ 2 not on the server",
+  "expect": "⚠ This device only",
+  "width": 105,
+  "why": "UX-H-11 / COVER-1-21 — 'This device only' was a hardcoded UNCONDITIONAL string, deleted from the code as a defect (LibraryManager.tsx:441-448) because in production, where assets DO sync, it told every user the opposite of the truth. The shipped pill is {localOnlyCount} not on the server and renders only when at least one asset failed to mirror (:449-455). Board 1163:13948 fullpage · drag-over · uploading. COVER-1-21 named three boards; 1159:4593 and 1163:13948 carry the same pill and were missed."
+ },
+ {
+  "id": "1716:8440",
+  "text": "J. Lin · Unsplash",
+  "expect": "J. Lin · Pexels",
+  "width": 110,
+  "why": "COVER-1-23 (board-level row inside 1776:8372) — the server photo path pins source:'unsplash' on every row (stock.service.ts:20,:55); Pexels is the VIDEO provider (:29,:102) and Pixabay has no server implementation. searchStockPhotos' input schema has no source parameter (media.ts:301-308), so one photo search cannot return mixed credits. Supports UX-H-04's 'one stock browser' by making the drawn one honest."
+ },
+ {
+  "id": "1716:8446",
+  "text": "S. Patel · Unsplash",
+  "expect": "S. Patel · Pixabay",
+  "width": 110,
+  "why": "COVER-1-23 (board-level row inside 1776:8372) — the server photo path pins source:'unsplash' on every row (stock.service.ts:20,:55); Pexels is the VIDEO provider (:29,:102) and Pixabay has no server implementation. searchStockPhotos' input schema has no source parameter (media.ts:301-308), so one photo search cannot return mixed credits. Supports UX-H-04's 'one stock browser' by making the drawn one honest."
+ },
+ {
+  "id": "1716:8452",
+  "text": "K. Mori · Unsplash",
+  "expect": "K. Mori · Pexels",
+  "width": 110,
+  "why": "COVER-1-23 (board-level row inside 1776:8372) — the server photo path pins source:'unsplash' on every row (stock.service.ts:20,:55); Pexels is the VIDEO provider (:29,:102) and Pixabay has no server implementation. searchStockPhotos' input schema has no source parameter (media.ts:301-308), so one photo search cannot return mixed credits. Supports UX-H-04's 'one stock browser' by making the drawn one honest."
+ }
+]

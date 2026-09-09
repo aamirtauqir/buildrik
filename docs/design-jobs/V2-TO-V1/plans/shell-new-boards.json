@@ -1,0 +1,1650 @@
+{
+ "page": "1:3",
+ "section": "1776:8385",
+ "sectionResize": {
+  "w": 7880,
+  "h": 7020
+ },
+ "boards": [
+  {
+   "name": "Rail · More index (popover · 240)",
+   "x": 100,
+   "y": 6200,
+   "w": 240,
+   "h": 320,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 0,
+     "w": 240,
+     "h": 320,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB",
+     "r": 8
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 12,
+     "w": 208,
+     "v": "More",
+     "s": 13,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 40,
+     "w": 208,
+     "v": "BUILD",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 60,
+     "w": 150,
+     "v": "Templates",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 180,
+     "y": 60,
+     "w": 44,
+     "v": "T",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 88,
+     "w": 150,
+     "v": "Components",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 180,
+     "y": 88,
+     "w": 44,
+     "v": "⇧A",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 120,
+     "w": 208,
+     "v": "SHIP",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 140,
+     "w": 150,
+     "v": "Publish",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 180,
+     "y": 140,
+     "w": 44,
+     "v": "U",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 168,
+     "w": 150,
+     "v": "History",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 180,
+     "y": 168,
+     "w": 44,
+     "v": "H",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 196,
+     "w": 150,
+     "v": "Review",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 180,
+     "y": 196,
+     "w": 44,
+     "v": "R",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 224,
+     "w": 208,
+     "v": "CONFIGURE",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 244,
+     "w": 150,
+     "v": "Settings",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 180,
+     "y": 244,
+     "w": 44,
+     "v": "S",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 276,
+     "w": 208,
+     "h": 1,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 284,
+     "w": 208,
+     "v": "Bare letters — no modifier. AI is not here: it opens in the inspector column.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6536,
+    "w": 240,
+    "text": "Rail · More index — the 7th rail seat (UX-F-01)"
+   }
+  },
+  {
+   "name": "Rail · selected vs open (two signals)",
+   "x": 460,
+   "y": 6200,
+   "w": 560,
+   "h": 320,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "text",
+     "x": 16,
+     "y": 16,
+     "w": 528,
+     "v": "Rail · selected vs open",
+     "s": 14,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 40,
+     "w": 528,
+     "v": "aria-selected is bound to “active AND drawer open” and the 3px accent bar renders under the same condition (LeftSidebar.tsx:137-160), so a shut drawer reports a tablist with nothing chosen. Selected and open are two facts.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 104,
+     "w": 60,
+     "h": 120,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "rect",
+     "x": 24,
+     "y": 112,
+     "w": 44,
+     "h": 44,
+     "fill": "#1A56DB",
+     "r": 6,
+     "o": 0.08
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 112,
+     "w": 3,
+     "h": 44,
+     "fill": "#1A56DB"
+    },
+    {
+     "t": "rect",
+     "x": 36,
+     "y": 120,
+     "w": 16,
+     "h": 16,
+     "fill": "#1A56DB",
+     "r": 4
+    },
+    {
+     "t": "text",
+     "x": 24,
+     "y": 140,
+     "w": 44,
+     "v": "Insert",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#1A56DB",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 196,
+     "y": 104,
+     "w": 60,
+     "h": 120,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "rect",
+     "x": 204,
+     "y": 112,
+     "w": 44,
+     "h": 44,
+     "fill": "#1A56DB",
+     "r": 6,
+     "o": 0.08
+    },
+    {
+     "t": "rect",
+     "x": 216,
+     "y": 120,
+     "w": 16,
+     "h": 16,
+     "fill": "#1A56DB",
+     "r": 4
+    },
+    {
+     "t": "text",
+     "x": 204,
+     "y": 140,
+     "w": 44,
+     "v": "Insert",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#1A56DB",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 376,
+     "y": 104,
+     "w": 60,
+     "h": 120,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "rect",
+     "x": 396,
+     "y": 120,
+     "w": 16,
+     "h": 16,
+     "fill": "#6B7280",
+     "r": 4
+    },
+    {
+     "t": "text",
+     "x": 384,
+     "y": 140,
+     "w": 44,
+     "v": "Insert",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 236,
+     "w": 168,
+     "v": "selected · drawer OPEN\ntinted pill + 3px bar · aria-selected=true",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "text",
+     "x": 196,
+     "y": 236,
+     "w": 168,
+     "v": "selected · drawer CLOSED\ntinted pill, no bar · aria-selected stays true",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "text",
+     "x": 376,
+     "y": 236,
+     "w": 168,
+     "v": "not selected\nno pill, no bar · aria-selected=false",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 288,
+     "w": 528,
+     "v": "The middle specimen is the state the code cannot express today; ls-btn--last already carries the pill and no accessible state.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6536,
+    "w": 560,
+    "text": "Rail · selected vs open — selected survives a closed drawer (UX-F-02)"
+   }
+  },
+  {
+   "name": "Topbar · Publish CTA states (five verbs · settled · refused)",
+   "x": 1140,
+   "y": 6200,
+   "w": 1000,
+   "h": 320,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "text",
+     "x": 16,
+     "y": 16,
+     "w": 968,
+     "v": "Topbar · Publish CTA — one slot, always present",
+     "s": 14,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 40,
+     "w": 968,
+     "v": "deriveLifecycleState returns null when the site is live with nothing waiting and the button is not rendered at all (lifecycle.ts:246, StudioHeader.tsx:801). A CTA that leaves the bar teaches the user the bar moved.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 88,
+     "w": 140,
+     "h": 28,
+     "fill": "#1A56DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 96,
+     "w": 140,
+     "v": "Publish",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#FFFFFF",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 176,
+     "y": 96,
+     "w": 560,
+     "v": "nothing published yet",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 120,
+     "w": 140,
+     "h": 28,
+     "fill": "#1A56DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 128,
+     "w": 140,
+     "v": "Publish changes",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#FFFFFF",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 176,
+     "y": 128,
+     "w": 560,
+     "v": "live · edits waiting",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 152,
+     "w": 140,
+     "h": 28,
+     "fill": "#1A56DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 160,
+     "w": 140,
+     "v": "Publish anyway",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#FFFFFF",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 176,
+     "y": 160,
+     "w": 560,
+     "v": "live · edits waiting · design-system issues open",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 184,
+     "w": 140,
+     "h": 28,
+     "fill": "#1A56DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 192,
+     "w": 140,
+     "v": "Send for review",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#FFFFFF",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 176,
+     "y": 192,
+     "w": 560,
+     "v": "review workflow on · nothing pending",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 216,
+     "w": 140,
+     "h": 28,
+     "fill": "#1A56DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 224,
+     "w": 140,
+     "v": "Open feedback",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#FFFFFF",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 176,
+     "y": 224,
+     "w": 560,
+     "v": "changes requested",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 248,
+     "w": 140,
+     "h": 28,
+     "fill": "#F3F4F6",
+     "stroke": "#D1D5DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 256,
+     "w": 140,
+     "v": "Up to date",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 176,
+     "y": 256,
+     "w": 560,
+     "v": "live · nothing waiting — NEW: the slot keeps its control instead of emptying",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 280,
+     "w": 140,
+     "h": 28,
+     "fill": "#F3F4F6",
+     "stroke": "#D1D5DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 288,
+     "w": 140,
+     "v": "Publish",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 176,
+     "y": 288,
+     "w": 560,
+     "v": "refused · the reason is printed beside the button, not held in a tooltip",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "text",
+     "x": 756,
+     "y": 288,
+     "w": 228,
+     "v": "Publishing isn’t switched on for this workspace yet.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#C27803"
+    }
+   ],
+   "caption": {
+    "y": 6536,
+    "w": 1000,
+    "text": "Topbar · Publish CTA states — the settled state stays put; a refused CTA looks refused (UX-F-20, UX-F-21, SH-A-01)"
+   }
+  },
+  {
+   "name": "Site menu · Unpublish confirm (modal · 440)",
+   "x": 2260,
+   "y": 6200,
+   "w": 440,
+   "h": 320,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 16,
+     "w": 440,
+     "h": 200,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB",
+     "r": 8
+    },
+    {
+     "t": "text",
+     "x": 24,
+     "y": 40,
+     "w": 392,
+     "v": "Unpublish bellacucina.com?",
+     "s": 16,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 24,
+     "y": 72,
+     "w": 392,
+     "v": "Visitors get a 404 until you publish again. Your pages, content and history stay in the editor.",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 24,
+     "y": 116,
+     "w": 392,
+     "h": 32,
+     "fill": "#E02424",
+     "r": 6,
+     "o": 0.06
+    },
+    {
+     "t": "text",
+     "x": 36,
+     "y": 124,
+     "w": 368,
+     "v": "This changes the live site immediately.",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#E02424"
+    },
+    {
+     "t": "rect",
+     "x": 232,
+     "y": 164,
+     "w": 80,
+     "h": 32,
+     "fill": "#FFFFFF",
+     "stroke": "#D1D5DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 232,
+     "y": 172,
+     "w": 80,
+     "v": "Cancel",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#4B5563",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 320,
+     "y": 164,
+     "w": 96,
+     "h": 32,
+     "fill": "#E02424",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 320,
+     "y": 172,
+     "w": 96,
+     "v": "Unpublish",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#FFFFFF",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 0,
+     "y": 232,
+     "w": 440,
+     "v": "Today the ⋯ row calls onOpenPublish() and emits UI_UNPUBLISH_REQUEST in the same synchronous body (StudioHeader.tsx:809-812). PublishTab is React.lazy (TabRouter.tsx:42) and its listener has not mounted, so the confirm never appears and the user has been moved to a panel they did not ask for.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6536,
+    "w": 440,
+    "text": "Site menu · Unpublish confirm — a destructive row owns its own confirmation (UX-F-30)"
+   }
+  },
+  {
+   "name": "Site menu (⋯) · regrouped — in-editor rows moved to More",
+   "x": 2820,
+   "y": 6200,
+   "w": 280,
+   "h": 320,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 0,
+     "w": 280,
+     "h": 320,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB",
+     "r": 8
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 12,
+     "w": 256,
+     "v": "THIS SITE",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 32,
+     "w": 180,
+     "v": "Site settings",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 196,
+     "y": 32,
+     "w": 72,
+     "v": "⌘,",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "RIGHT"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 56,
+     "w": 180,
+     "v": "Export site…",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 80,
+     "w": 180,
+     "v": "Duplicate site",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 104,
+     "w": 180,
+     "v": "Unpublish site…",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#E02424"
+    },
+    {
+     "t": "rect",
+     "x": 12,
+     "y": 132,
+     "w": 256,
+     "h": 1,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 144,
+     "w": 256,
+     "v": "LEAVES THE EDITOR ↗",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 164,
+     "w": 180,
+     "v": "View live site ↗",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 188,
+     "w": 180,
+     "v": "Share preview link ↗",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 212,
+     "w": 180,
+     "v": "Invite teammates ↗",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 236,
+     "w": 180,
+     "v": "Account settings ↗",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 260,
+     "w": 180,
+     "v": "Site health ↗",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 12,
+     "y": 284,
+     "w": 180,
+     "v": "Activity log ↗",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    }
+   ],
+   "caption": {
+    "y": 6536,
+    "w": 280,
+    "text": "Site menu (⋯) · regrouped — in-editor rows move to More; ↗ marks a new browser tab; “Site settings” points at the full-page Settings (UX-F-29, F-12)"
+   }
+  },
+  {
+   "name": "Topbar · location line — site › page › panel",
+   "x": 3220,
+   "y": 6200,
+   "w": 1440,
+   "h": 320,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 16,
+     "w": 1440,
+     "h": 56,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 36,
+     "w": 180,
+     "v": "‹ Exit to dashboard",
+     "s": 13,
+     "wt": "Medium",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 208,
+     "y": 28,
+     "w": 1,
+     "h": 32,
+     "fill": "#E5E7EB"
+    },
+    {
+     "t": "text",
+     "x": 228,
+     "y": 36,
+     "w": 420,
+     "v": "Bella Cucina  ›  Home  ›  Insert",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 96,
+     "w": 180,
+     "v": "on canvas",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 228,
+     "y": 96,
+     "w": 600,
+     "v": "Bella Cucina  ›  Home  ›  Insert",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 128,
+     "w": 180,
+     "v": "in full-page mode",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 228,
+     "y": 128,
+     "w": 600,
+     "v": "Bella Cucina  ›  —  ›  Settings · Domains",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 160,
+     "w": 180,
+     "v": "in preview",
+     "s": 11,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 228,
+     "y": 160,
+     "w": 600,
+     "v": "Bella Cucina  ›  Home  ›  Preview",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 204,
+     "w": 1408,
+     "v": "No surface states site / page / panel together: the site name is in the top bar, the page is a tab at the foot of the canvas, and the panel is implied by a rail highlight that disappears when the drawer closes. In full-page mode all three signals are absent or wrong at once.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 244,
+     "w": 1408,
+     "v": "The canvas breadcrumb (board 1175:4849) describes the selected ELEMENT’s ancestry and keeps its own place — it is a different question.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 276,
+     "w": 1408,
+     "v": "Two tab strips, two names: the rail is “Editor sections”, the page bar at the canvas foot is “Site pages”. Identical role=tablist markup made a live accessibility snapshot read them as one list ending in “Home”, and there is no rail item named Home. (UX-F-16)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6536,
+    "w": 1440,
+    "text": "Topbar · location line — one line that survives every mode, including full page and preview (UX-F-36, UX-F-03, UX-F-16)"
+   }
+  },
+  {
+   "name": "Shell · full-page mode — Back to canvas",
+   "x": 4780,
+   "y": 6200,
+   "w": 1440,
+   "h": 320,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 16,
+     "w": 1440,
+     "h": 56,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 28,
+     "w": 160,
+     "h": 32,
+     "fill": "#F3F4F6",
+     "stroke": "#D1D5DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 36,
+     "w": 160,
+     "v": "‹ Back to canvas",
+     "s": 13,
+     "wt": "Medium",
+     "c": "#111827",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 200,
+     "y": 36,
+     "w": 480,
+     "v": "Bella Cucina  ›  —  ›  Settings · Domains",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 72,
+     "w": 1440,
+     "h": 152,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 72,
+     "w": 60,
+     "h": 152,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "text",
+     "x": 4,
+     "y": 80,
+     "w": 52,
+     "v": "rail\nnothing\nlit",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 84,
+     "y": 104,
+     "w": 1200,
+     "v": "Settings — full page. The canvas and the inspector are gone and one full-width surface has replaced them; the rail is still on screen with none of its six items selected, because Settings has no rail seat.",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "text",
+     "x": 84,
+     "y": 152,
+     "w": 1200,
+     "v": "After the More index, Settings has a persistent seat — printed with its key, S — and the rail can show it selected while full-page mode is open.",
+     "s": 12,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 244,
+     "w": 1408,
+     "v": "There is no shell-level way out today, and closing hard-codes a jump to the Insert tab (StudioPanels.tsx:370) rather than returning the user to the panel they came from. “Back to canvas” is shell chrome and returns to that panel. (UX-F-13)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 284,
+     "w": 1408,
+     "v": "Media library in library mode is the second full-page surface and takes the same control.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6536,
+    "w": 1440,
+    "text": "Shell · full-page mode — a persistent Back to canvas that returns to the panel you came from, not to Insert (UX-F-13)"
+   }
+  },
+  {
+   "name": "Shell · below 1024 — desktop-only",
+   "x": 100,
+   "y": 6640,
+   "w": 1000,
+   "h": 300,
+   "bg": "#F3F4F6",
+   "nodes": [
+    {
+     "t": "rect",
+     "x": 0,
+     "y": 0,
+     "w": 1000,
+     "h": 300,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "rect",
+     "x": 200,
+     "y": 44,
+     "w": 600,
+     "h": 180,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB",
+     "r": 8
+    },
+    {
+     "t": "text",
+     "x": 232,
+     "y": 72,
+     "w": 536,
+     "v": "This window is too narrow to edit in",
+     "s": 20,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 232,
+     "y": 112,
+     "w": 536,
+     "v": "The Buildrik editor is desktop-only. Give it at least 1024px of width — the page frame alone is floored at 1024 (canvasStyles.ts:57).",
+     "s": 13,
+     "wt": "Regular",
+     "c": "#4B5563"
+    },
+    {
+     "t": "rect",
+     "x": 232,
+     "y": 164,
+     "w": 180,
+     "h": 28,
+     "fill": "#F3F4F6",
+     "stroke": "#D1D5DB",
+     "r": 6
+    },
+    {
+     "t": "text",
+     "x": 244,
+     "y": 172,
+     "w": 156,
+     "v": "Now: 986 px wide",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 240,
+     "w": 968,
+     "v": "LayoutShell.css:354-359 reserves @media (max-width: 1024px) and its only content is the comment “Show warning overlay - handled by component”. No such component exists, so rail 60 + drawer 280 + inspector 300 leaves under 400px of canvas and the shell silently squeezes. Build this state or delete the promise. (UX-F-14)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6956,
+    "w": 1000,
+    "text": "Shell · below 1024 — the state LayoutShell.css has promised in a comment since it was written (UX-F-14)"
+   }
+  },
+  {
+   "name": "Shell · Issues joins the grid (right column, not a slab)",
+   "x": 1220,
+   "y": 6640,
+   "w": 1000,
+   "h": 300,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "text",
+     "x": 16,
+     "y": 16,
+     "w": 968,
+     "v": "Issues joins the grid — a column, not a slab",
+     "s": 14,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 40,
+     "w": 968,
+     "v": "Today: position:absolute; top:56; right:0; z-index:45, 360 wide (AquibraStudio.tsx:604-616). It covers the whole 300px inspector plus 60px of canvas, the hand-computed top:56 is wrong whenever the recovery banner, the load-error banner or the 48px review bar sits above it, and nothing dismisses it on click-outside.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 96,
+     "w": 460,
+     "v": "today — absolute overlay",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 116,
+     "w": 460,
+     "h": 104,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "rect",
+     "x": 16,
+     "y": 116,
+     "w": 20,
+     "h": 104,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "text",
+     "x": 18,
+     "y": 160,
+     "w": 16,
+     "v": "60",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 36,
+     "y": 116,
+     "w": 90,
+     "h": 104,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "text",
+     "x": 38,
+     "y": 160,
+     "w": 86,
+     "v": "drawer 280",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 166,
+     "y": 160,
+     "w": 120,
+     "v": "canvas",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 376,
+     "y": 116,
+     "w": 100,
+     "h": 104,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "text",
+     "x": 378,
+     "y": 160,
+     "w": 96,
+     "v": "inspector 300",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 356,
+     "y": 124,
+     "w": 120,
+     "h": 88,
+     "fill": "#FFFFFF",
+     "stroke": "#E02424",
+     "r": 4
+    },
+    {
+     "t": "text",
+     "x": 360,
+     "y": 140,
+     "w": 112,
+     "v": "Issues 360\nover both",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#E02424",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 524,
+     "y": 96,
+     "w": 460,
+     "v": "proposed — shares the inspector slot",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "rect",
+     "x": 524,
+     "y": 116,
+     "w": 460,
+     "h": 104,
+     "fill": "#FFFFFF",
+     "stroke": "#E5E7EB"
+    },
+    {
+     "t": "rect",
+     "x": 524,
+     "y": 116,
+     "w": 20,
+     "h": 104,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "text",
+     "x": 526,
+     "y": 160,
+     "w": 16,
+     "v": "60",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 544,
+     "y": 116,
+     "w": 90,
+     "h": 104,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "text",
+     "x": 546,
+     "y": 160,
+     "w": 86,
+     "v": "drawer 280",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 674,
+     "y": 160,
+     "w": 120,
+     "v": "canvas",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 884,
+     "y": 116,
+     "w": 100,
+     "h": 104,
+     "fill": "#F3F4F6"
+    },
+    {
+     "t": "text",
+     "x": 886,
+     "y": 160,
+     "w": 96,
+     "v": "inspector 300",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280",
+     "al": "CENTER"
+    },
+    {
+     "t": "rect",
+     "x": 884,
+     "y": 116,
+     "w": 100,
+     "h": 104,
+     "fill": "#FFFFFF",
+     "stroke": "#1A56DB"
+    },
+    {
+     "t": "text",
+     "x": 886,
+     "y": 132,
+     "w": 96,
+     "v": "‹ Inspector",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#1A56DB",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 886,
+     "y": 160,
+     "w": 96,
+     "v": "Issues 360\nin the slot",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#4B5563",
+     "al": "CENTER"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 240,
+     "w": 968,
+     "v": "And the rows must lead somewhere. Every issue row’s only handler is onSelectElement, bound to () => setIssuesOpen(false) with the comment “v1 just closes” (AquibraStudio.tsx:625) — so clicking one of the 17 warnings the chip counts dismisses the panel and changes nothing. The Fix › beside a fixable row IS live (IssuesPanel.tsx:252-261); it is the issue TEXT that is not a navigation target. Give each issue an element and a page, or stop drawing the row as clickable. (UX-F-07)",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6956,
+    "w": 1000,
+    "text": "Shell · Issues joins the grid — the element an issue is about stays visible, and the row leads to it. One right-hand class: --bk-size-inspector 300 for the column, --bk-size-panel-right 360 for notifications, Issues and Structure; --bk-size-nav (240) has zero consumers and becomes --bk-size-popover. The Structure popover is the third of the three and its footer trigger renders only in the legacy four-tool rail, so it is unreachable in the shipped rail (UX-F-07, F-08, F-25, F-26, F-27)."
+   }
+  },
+  {
+   "name": "Shell · open decisions (700 vs 560 · two palettes · unpublish confirm)",
+   "x": 2340,
+   "y": 6640,
+   "w": 720,
+   "h": 300,
+   "bg": "#FFFFFF",
+   "nodes": [
+    {
+     "t": "text",
+     "x": 16,
+     "y": 16,
+     "w": 688,
+     "v": "Open decisions · shell — not resolved by this pass",
+     "s": 14,
+     "wt": "Semi Bold",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 48,
+     "w": 688,
+     "v": "1 · The expanded drawer is 700 here and 560 in SPEC-NAVIGATION §5.2.",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 66,
+     "w": 688,
+     "v": "Drawn at 700, because that is what LeftSidebar.tsx:586-587 does today and SPEC-PAGES-PANEL and SPEC-PUBLISH-PANEL are both drawn against it. §5.2 additionally collapses the inspector while wide; SPEC-PUBLISH-PANEL says the expanded state changes “nothing else”. Filed, not applied.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 132,
+     "w": 688,
+     "v": "2 · Two command palettes ship: ⌘K (shell) and ⌘⇧P (canvas).",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 150,
+     "w": 688,
+     "v": "Section 13 keeps a board for each. SPEC-NAVIGATION §2.5 proposes merging the canvas commands into ⌘K and retiring ⌘⇧P; nothing here retires either surface.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 204,
+     "w": 688,
+     "v": "3 · Where the unpublish confirm lives.",
+     "s": 12,
+     "wt": "Medium",
+     "c": "#111827"
+    },
+    {
+     "t": "text",
+     "x": 16,
+     "y": 222,
+     "w": 688,
+     "v": "SPEC-NAVIGATION §6 gives it to the ⋯ menu’s own flow. PublishTab.tsx:179-183 records the opposite decision in as many words — “this panel hosts the ONE confirm … rather than hosting a second dialog with drifting words”. The confirm is drawn on the menu’s board; the Publish panel’s row is untouched, and the two fixes cannot both ship.",
+     "s": 11,
+     "wt": "Regular",
+     "c": "#6B7280"
+    }
+   ],
+   "caption": {
+    "y": 6956,
+    "w": 720,
+    "text": "Shell · open decisions — three conflicts recorded rather than silently resolved"
+   }
+  }
+ ]
+}

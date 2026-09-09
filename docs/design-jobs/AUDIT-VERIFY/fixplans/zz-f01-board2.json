@@ -1,0 +1,11 @@
+{
+ "slug": "zz-f01-board2",
+ "page": "1:3",
+ "note": "F01 on the second board the finding cites.",
+ "rows": [
+  {"op": "set-prop", "id": "2143:20497", "prop": "State", "value": "rest",
+   "why": "F01 · 199:205 'Shell state 3 · Element selected' carries the identical contradiction: this row is Depth=5;State=selected (fill #E1EFFE) and holds 'heading-that-is-long', while the inspector header reads '⬚ Section', the canvas labels read 'Section · Hero' and 'Section', the footer reads 'Section · Hero', and the outlined frame is named 'Hero — SELECTED'."},
+  {"op": "set-prop", "id": "2143:20489", "prop": "State", "value": "selected",
+   "why": "F01 · the section row on this board, identified by the same positional read rather than by analogy with the first: Panel — Layers 199:246 runs y356 (Depth=0), 384 (Depth=1), 412, 440, 468, 496, 524, 552, 580 — note the depths start at 0 here where board one starts at 1, so copying the sibling board's id would have been wrong. y384 is section. It matches the id the c8 author named while holding this row."}
+ ]
+}

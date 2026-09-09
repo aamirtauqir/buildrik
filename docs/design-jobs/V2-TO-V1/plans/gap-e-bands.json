@@ -1,0 +1,21 @@
+[
+ { "section": "1776:8374", "boardMatch": "changes · restore-confirm", "name": "band/UX-I-01",
+   "text": "The timestamp PREVIEWS. It enters the same preview band the scrubber uses — “Previewing v3 · Nothing is written until Restore.” Restore stays a separate, confirmed action that names what it discards, and saves the current state as a version first. Today the label says “Jump to 14:32” and the click truncates history: everything after that point is deleted and redo is emptied, with no confirm.",
+   "why": "UX-I-01 (Critical, destructive-confirm)" },
+
+ { "section": "1776:8374", "boardMatch": "time-travel · restore-confi", "name": "band/UX-I-02",
+   "text": "One restore contract across the module: preview → confirm that names the cost → restore, with the current state auto-saved as a version first. This drawer’s primary fires straight into the same truncating restore with no confirmation, while the identical operation on a named version two clicks away shows a confirm band. The panel already says “Nothing is written until Restore” — the button must honour it.",
+   "why": "UX-I-02 (Critical, destructive-confirm)" },
+
+ { "section": "1776:8374", "boardMatch": "start-of-history", "name": "band/UX-I-05",
+   "text": "History starts here — earlier steps were dropped. Undo is capped at 100 steps and the oldest are discarded silently; the list simply stops going back. Say so at the boundary, and say it once when the cap is first hit, with “Save a version” beside it — the named-version path is the durable answer and nothing points at it at the moment it becomes relevant. HISTORY_CAPACITY_WARNING was declared and never wired: zero emitters, zero listeners.",
+   "why": "UX-I-05 (Major, missing-feedback)" },
+
+ { "section": "1776:8374", "boardMatch": "clear-confirm", "name": "band/UX-I-07",
+   "text": "State the cost: “Undo will stop working for the 47 steps before now. Saved versions are not affected.” Today the confirm is the same button re-labelled “Clear all” with a Cancel beside it, naming no consequence — and it lives only inside the “All changes” filter. Its only reachable outcome is data loss, so the alternative is to drop the control: nothing about a session’s undo stack needs manual clearing.",
+   "why": "UX-I-07 (Major, destructive-confirm)" },
+
+ { "section": "1776:8374", "boardMatch": "undo-unavailable", "name": "band/UX-I-15",
+   "text": "Annotate the undo control the moment history stops covering the last action, and name the action — “Binding a field isn’t undoable.” Do not wait for the user to press ⌘Z and read a toast. Half of this is already built: useComposerInit.ts:705-716 has listened to HISTORY_UNRECORDED since de36af334 and already disables Undo. What is missing is the NAME — the switch-off is no longer silent, only anonymous.",
+   "why": "UX-I-15 (Major, missing-feedback) — the stale half of this finding is not drawn" }
+]

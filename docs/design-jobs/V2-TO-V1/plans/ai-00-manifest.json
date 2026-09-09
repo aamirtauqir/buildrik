@@ -1,0 +1,74 @@
+{
+  "module": "AI experience",
+  "slug": "ai",
+  "written": "2026-09-07",
+  "state": "PLAN-ONLY — the Figma MCP seat quota was exhausted account-wide before any write landed. NOTHING in this plan set has been applied. Nothing was read back. Every row is marked with where its node id came from.",
+  "target": { "page": "1:3", "section": "1776:8380", "sectionNameAtRead": "12 · AI · 25" },
+
+  "provenance": {
+    "READ-BY-THIS-AGENT": "Exactly one use_figma call succeeded: a listing of section 1776:8380. It returned the section's name, bounds (@0,63897 · 2480x5200) and all 25 children with id, type, x/y, w/h, reaction count and name. Every id, size and coordinate in `sectionAtRead` below is from that call and is trustworthy as of 2026-09-07.",
+    "INFERRED-NOT-READ": "Every CHILD node id inside a board (170:16, 170:22, 170:27, 170:28, 171:132, 171:133, 171:134, 171:135, 171:164, 171:165, 171:166) comes from local finding files — findings/FIG-K.jsonl, findings/W-K.jsonl and docs/design-jobs/applied/plan-text*.json — not from a read in this session. They were correct on 2026-09-06. Rows that depend on them carry `idSource: \"inferred\"` and an `expect` guard, so a stale id fails loudly instead of overwriting the wrong node.",
+    "UNRESOLVED": "Rows marked `unresolved-id` have no node id at all and are written against a SELECTOR — section id + board name + a text prefix to match. Every such row is resolvable by the applier in the same call that writes it."
+  },
+
+  "sectionAtRead": {
+    "takenBy": "AI-module agent, 2026-09-07, single successful use_figma call",
+    "children": 25,
+    "boards": [
+      { "id": "170:2", "at": "100,220", "size": "280x812", "reactions": 2, "name": "AI · idle" },
+      { "id": "171:67", "at": "500,220", "size": "280x812", "reactions": 1, "name": "AI · done" },
+      { "id": "2476:12001", "at": "100,1226", "size": "1380x320", "reactions": 0, "name": "AI · in-canvas popover — 4 states" },
+      { "id": "171:136", "at": "100,1666", "size": "280x812", "reactions": 1, "name": "AI · not-configured" },
+      { "id": "170:41", "at": "500,1666", "size": "280x812", "reactions": 1, "name": "AI · planning" },
+      { "id": "2476:12044", "at": "100,2690", "size": "1120x340", "reactions": 0, "name": "AI · publish confirm — idle · busy" },
+      { "id": "170:70", "at": "100,3150", "size": "280x812", "reactions": 1, "name": "AI · running" },
+      { "id": "170:17", "at": "500,3150", "size": "280x812", "reactions": 1, "name": "AI · scoped" },
+      { "id": "170:97", "at": "900,3150", "size": "280x812", "reactions": 1, "name": "AI · step-gate" },
+      { "id": "171:36", "at": "1300,3150", "size": "280x812", "reactions": 1, "name": "AI · stopped" },
+      { "id": "170:29", "at": "1700,3150", "size": "280x812", "reactions": 1, "name": "AI · thinking" },
+      { "id": "171:105", "at": "2100,3150", "size": "280x812", "reactions": 1, "name": "AI · error-quota" },
+      { "id": "171:2", "at": "100,4174", "size": "280x812", "reactions": 1, "name": "AI · step-failed" },
+      { "id": "2476:12029", "at": "500,4174", "size": "700x470", "reactions": 0, "name": "[not-implemented] Brand · generate component with AI — the schema has nowhere to go" }
+    ],
+    "captions": [
+      { "id": "172:33", "at": "100,1052", "size": "280x54", "name": "caption/AI · idle" },
+      { "id": "172:41", "at": "500,1052", "size": "280x36", "name": "caption/AI · done" },
+      { "id": "172:43", "at": "100,2498", "size": "280x72", "name": "caption/AI · not-configured" },
+      { "id": "172:36", "at": "500,2498", "size": "280x54", "name": "caption/AI · planning" },
+      { "id": "172:37", "at": "100,3982", "size": "280x54", "name": "caption/AI · running" },
+      { "id": "172:34", "at": "500,3982", "size": "280x54", "name": "caption/AI · scoped" },
+      { "id": "172:38", "at": "900,3982", "size": "280x72", "name": "caption/AI · step-gate" },
+      { "id": "172:40", "at": "1300,3982", "size": "280x36", "name": "caption/AI · stopped" },
+      { "id": "172:35", "at": "1700,3982", "size": "280x18", "name": "caption/AI · thinking" },
+      { "id": "172:42", "at": "2100,3982", "size": "280x72", "name": "caption/AI · error-quota" },
+      { "id": "172:39", "at": "100,5006", "size": "280x54", "name": "caption/AI · step-failed" }
+    ],
+    "freeSlotsComputedFromThisRead": {
+      "row-220": "x=900 and x=1300 are free (the row holds only 170:2 at 100 and 171:67 at 500)",
+      "row-4174": "x=1300 onward is free (the row holds 171:2 at 100..380 and 2476:12029 at 500..1200)",
+      "newRow-5220": "the section's lowest content bottom is 5060 (caption 172:39 at y=5006 h=54); y=5220 opens a clean new row with a 160 gutter"
+    }
+  },
+
+  "runOrder": [
+    { "n": 1, "plan": "ai-02-state-boards.json", "cmd": "node scripts/figma/add-state-board.mjs 170:17 \"AI · scoped-multi\" --apply" },
+    { "n": 2, "plan": "ai-02-state-boards.json", "cmd": "node scripts/figma/add-state-board.mjs 171:105 \"AI · error-provider\" --apply" },
+    { "n": 3, "plan": "ai-02-state-boards.json", "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=E" },
+    { "n": 4, "plan": "ai-02-state-boards.json", "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=F" },
+    { "n": 5, "plan": "ai-03-text-not-configured.json", "cmd": "node scripts/figma/apply-text-fixes.mjs docs/design-jobs/V2-TO-V1/plans/ai-03-text-not-configured.json --apply" },
+    { "n": 6, "plan": "ai-04-blocked-state-actions.json", "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=D" },
+    { "n": 7, "plan": "ai-01-decision-boards.json", "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=A" },
+    { "n": 8, "plan": "ai-01-decision-boards.json", "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=B" },
+    { "n": 9, "plan": "ai-01-decision-boards.json", "cmd": "node scripts/figma/build-ai-v2-boards.mjs --apply --only=C" },
+    { "n": 10, "plan": "—", "cmd": "node scripts/figma/verify-invariants.mjs" },
+    { "n": 11, "plan": "—", "cmd": "node scripts/figma/order-sections.mjs", "onlyIf": "step 10 reports a SECTION OVERLAP. Adding the three decision boards grows section 1776:8380 from 5200 to ~6620 tall, and this page stacks its sections vertically with a 900px gutter, so the section below can be collided with. order-sections.mjs re-stacks every section and re-numbers the name (12 · AI · 25 → 12 · AI · 28+); it has no dry run and always applies." }
+  ],
+
+  "callBudget": "11 use_figma calls if nothing has to be retried. Steps 1-4 are 4 calls, 5 is 1 call (5 rows, one chunk of 6), 6-9 are 4 calls, 10-11 are 2. Every step is independently re-runnable: the builder skips a board whose exact name already exists and skips a text whose characters already match, so a partial run is resumable rather than duplicative.",
+
+  "safetyRules": [
+    "Nothing here removes a node. The builder's board() helper returns EXISTS and skips rather than replacing, which is a deliberate departure from build-batch-two.mjs's board() (that one calls old.remove()).",
+    "Every write is re-fetched with getNodeByIdAsync in the same call and its id / parent / position / size / characters are returned — a write is not verified by the write.",
+    "Every apply-text-fixes row carries an `expect` prefix, so a node whose copy moved on since 2026-09-06 REFUSES rather than being overwritten."
+  ]
+}

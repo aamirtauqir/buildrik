@@ -1,0 +1,48 @@
+{
+ "slug": "zz-f10-resolved",
+ "page": "1:3",
+ "rows": [
+  {
+   "op": "hug-width",
+   "id": "229:1088",
+   "padH": 12,
+   "why": "F10 · the durable fix, on all seven instances rather than one. READ FIRST: 229:1088 is an INSTANCE, 119x32, layoutMode HORIZONTAL, layoutSizingHorizontal FIXED, variants Kind=primary;Size=md;State=rest, and its label I229:1088;9:19 is 127px wide and HUG — so the string needs 127 in a 119 box and overflows 4px on each side, which is exactly what the 18:19 detector logged as 'ESCAPES … by 4 past 229:1088'. WHY NOT RESIZE THE LABEL: it already needs its 127px; shrinking it clips the word. WHY NOT A FIXED WIDTH: the same 119x32 button carries the same 127px label on six more boards (DEAD-CONTROLS-V2.txt:686-711), so a hand-set width repairs one and leaves the rest. HUG plus the family's own 12px horizontal padding — measured from the sibling button on this board, whose label starts 12px inside its 16px-inset column — lets each button size to its own text, which is the fix that does not need repeating. SAFE BY CONSTRUCTION: hug-width reports NOAUTOLAYOUT if a node is not an auto-layout frame and MISSING if an id is wrong, so the six ids taken from a file the F10 author flagged as partly stale cannot damage anything — they either apply or report. Growth is bounded: 116 + 151 = 267 inside a 280-wide panel."
+  },
+  {
+   "op": "hug-width",
+   "id": "229:1092",
+   "padH": 12,
+   "why": "F10 · instance 2 of 7, same defect and same repair. Id from DEAD-CONTROLS-V2.txt:686-711; hug-width reports MISSING or NOAUTOLAYOUT rather than damaging anything if that id has moved."
+  },
+  {
+   "op": "hug-width",
+   "id": "229:1096",
+   "padH": 12,
+   "why": "F10 · instance 3 of 7, same defect and same repair. Id from DEAD-CONTROLS-V2.txt:686-711; hug-width reports MISSING or NOAUTOLAYOUT rather than damaging anything if that id has moved."
+  },
+  {
+   "op": "hug-width",
+   "id": "229:1100",
+   "padH": 12,
+   "why": "F10 · instance 4 of 7, same defect and same repair. Id from DEAD-CONTROLS-V2.txt:686-711; hug-width reports MISSING or NOAUTOLAYOUT rather than damaging anything if that id has moved."
+  },
+  {
+   "op": "hug-width",
+   "id": "229:1104",
+   "padH": 12,
+   "why": "F10 · instance 5 of 7, same defect and same repair. Id from DEAD-CONTROLS-V2.txt:686-711; hug-width reports MISSING or NOAUTOLAYOUT rather than damaging anything if that id has moved."
+  },
+  {
+   "op": "hug-width",
+   "id": "229:1108",
+   "padH": 12,
+   "why": "F10 · instance 6 of 7, same defect and same repair. Id from DEAD-CONTROLS-V2.txt:686-711; hug-width reports MISSING or NOAUTOLAYOUT rather than damaging anything if that id has moved."
+  },
+  {
+   "op": "hug-width",
+   "id": "229:1128",
+   "padH": 12,
+   "why": "F10 · instance 7 of 7, same defect and same repair. Id from DEAD-CONTROLS-V2.txt:686-711; hug-width reports MISSING or NOAUTOLAYOUT rather than damaging anything if that id has moved."
+  }
+ ]
+}

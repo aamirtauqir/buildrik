@@ -1,0 +1,11 @@
+{
+ "slug": "zz-m13-resolved",
+ "page": "1:3",
+ "note": "M13's second half, unblocked by the named read. The held row's stated blocker was that hiding the label alone would leave empty pill chrome; the read supplies the frame.",
+ "rows": [
+  {"op": "delete", "id": "1706:8498", "expect": "Button · Retry",
+   "why": "M13 · REMOVE THE DEAD RETRY. The read landed: ModalFooter 1706:8496 (720x52, layoutMode NONE) holds exactly two children — 'Button · Retry' 1706:8498, a 55x28 pill filled #1A56DB at (1589,40647), and 'Button · Cancel' 1706:8500, 64x28 at (1517,40647). That frame id was the held row's only blocker: hiding the LABEL 1706:8497 alone would have left an empty accent pill behind, which is worse than the defect. THE DEFECT: AIPromptModal.tsx:227-236 wires Retry to onClick={handleGenerate} — the identical function that just failed at :73-77 — and 'AI service not configured' is a server env var (ai.service.ts:487-490) that no amount of retrying changes. THE SHIPPED SHAPE: AITab.tsx:266-281 gives a named state, an explanation and a door, with no Retry. Hiding the pill leaves Cancel as the single dismiss, which is that shape. delete is visible=false, so it is reversible and the node keeps its geometry. The audit's own accept criterion — 'the recovery action addresses the actual failure category instead of repeating an unchanged request' — is met by the removal: nothing on the modal now offers an action that cannot work."},
+  {"op": "move", "id": "1706:8500", "x": 640, "expect": "Button · Cancel",
+   "why": "M13 · keep the footer balanced after the removal. The footer is layoutMode NONE, so hiding Retry does not reflow anything — Cancel would stay at abs x1517 and leave a 79px gap against the footer's right edge (1660), which reads as a missing control rather than a deliberate single action. Retry's right edge was 1589+55=1644, i.e. the family's 16px footer padding against 1660. Putting Cancel's right edge there means x = 1644-64 = 1580 absolute; move writes PARENT-relative x and the parent ModalFooter sits at 940, so rel 640. y is left unset so the builder preserves it."}
+ ]
+}

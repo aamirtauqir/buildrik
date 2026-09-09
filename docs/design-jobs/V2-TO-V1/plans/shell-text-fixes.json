@@ -1,0 +1,56 @@
+[
+ {
+  "id": null,
+  "unresolved-id": true,
+  "selector": { "board": "166:27", "type": "TEXT", "matches": "Ctrl+0" },
+  "text": "⌘1",
+  "expect": "Ctrl+0",
+  "why": "UX-F-06 — the ⌘K palette prints 'Fit to view — Ctrl+0'. ⌘0 sets 100% and ⌘1 is the fit (CanvasFooterToolbar.tsx:241-262). The same wrong-chord defect was found and fixed in the canvas palette and in the shortcuts panel; this third copy was left. CONDITIONAL: if the chord is drawn as part of a longer string, the sibling row below matches instead and this one reports NOMATCH.",
+  "board-name": "CmdK · results",
+  "sibling-of": "row 1"
+ },
+ {
+  "id": null,
+  "unresolved-id": true,
+  "selector": { "board": "166:27", "type": "TEXT", "matches": "Fit to view" },
+  "text": "Fit to view                                   ⌘1",
+  "expect": "Fit to view",
+  "why": "UX-F-06 — same defect, for the case where the row label and its chord are one TEXT node. Apply EITHER this row OR the 'Ctrl+0' row above, whichever the resolver matches; applying both is a no-op for the second because apply-text-fixes refuses a row whose node no longer holds `expect`.",
+  "board-name": "CmdK · results"
+ },
+ {
+  "id": null,
+  "unresolved-id": true,
+  "selector": { "board": "166:27", "type": "TEXT", "matches": "Ctrl+Y" },
+  "text": "⌘⇧Z",
+  "expect": "Ctrl+Y",
+  "why": "UX-F-06 — the palette prints 'Redo — Ctrl+Y'. The product advertises ⌘⇧Z everywhere else (shell/modals/CommandPalette.tsx:83).",
+  "board-name": "CmdK · results"
+ },
+ {
+  "id": null,
+  "unresolved-id": true,
+  "selector": { "board": "963:4474", "type": "TEXT", "matches": "320" },
+  "text": "280",
+  "expect": "320",
+  "why": "SH-C-10 / SH-E-23, in support of UX-F-25 — the slot-proof board, whose whole job is documenting the region contract, states a drawer slot of 320. All fifteen shell state boards and --bk-size-drawer say 280. If the 320 is embedded in a sentence the resolver returns the whole node and this row is REFUSED by the expect guard rather than truncating it; re-author it against the full string in that case."
+ },
+ {
+  "id": null,
+  "unresolved-id": true,
+  "selector": { "board": "2476:11987", "type": "TEXT", "matches": "Drop an element from the Insert panel" },
+  "text": "Drop an element from the Insert panel, or drag a section.\nOpen Insert · Browse templates",
+  "expect": "Drop an element",
+  "width": 420,
+  "why": "UX-F-33 — pressing Start blank sets a session flag that removes BOTH buttons permanently (CanvasEmptyCTA.tsx:44-60). Close the drawer (a second click on the active rail icon) and the canvas is instructing the user to use a panel that is not on screen, with no route back to the template choice. The instruction has to point at something the user can see."
+ },
+ {
+  "id": null,
+  "unresolved-id": true,
+  "selector": { "section": "2040:8372", "boardName": "Topbar", "type": "TEXT", "equals": "Exit" },
+  "text": "Exit to dashboard",
+  "expect": "Exit",
+  "why": "UX-F-03 + UX-F-35 — the loudest control on the left is a chevron and the word 'Exit' and it never says where it goes; it navigates to DASHBOARD_URL + /dashboard/projects while every ⋯ deep link goes to /dashboard/sites/<id>. BLAST RADIUS: this is a shared component string. The applier MUST read the instance census back before and after and quote both numbers. The selector is a GUESS about where the Topbar component set lives — section 2040:8372 holds Rail, the Settings nav row and the List row, and the Topbar set was never read. If it returns NOROOT, resolve it from the topbar INSTANCE on board 199:2 instead (its main component's parent).",
+  "risk": "high — shared component, ~105 instances by SH-B-14's census"
+ }
+]

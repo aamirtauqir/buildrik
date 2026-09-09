@@ -1,0 +1,23 @@
+[
+  {
+    "id": "306:2261",
+    "expect": "Drop .json",
+    "text": "Drop tokens.json — JSON only",
+    "width": 216,
+    "why": "UX-H-28 · the zone invites a format the parser cannot read. ImportCard.tsx:391-393 accepts .ts/.js, :98-104 names the file back as 'Tailwind config (AST)', and the only parser is parseImportJSON. Board on 306:2232 Brand · export · exported. [sweep-b: applied — this row IS the visual fix and needs no board that does not exist yet.]"
+  },
+  {
+    "id": "306:2294",
+    "expect": "Drop .json",
+    "text": "Drop tokens.json — JSON only",
+    "width": 216,
+    "why": "UX-H-28 · same string on 306:2265 Brand · export · imported. [sweep-b: applied — this row IS the visual fix and needs no board that does not exist yet.]"
+  },
+  {
+    "id": "306:2327",
+    "expect": "Drop .json",
+    "text": "Drop tokens.json — JSON only",
+    "width": 216,
+    "why": "UX-H-28 · same string on 306:2298 Brand · export · error. [sweep-b: applied — this row IS the visual fix and needs no board that does not exist yet.]"
+  }
+]

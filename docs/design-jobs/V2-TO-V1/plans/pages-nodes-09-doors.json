@@ -1,0 +1,74 @@
+[
+  {
+    "op": "clone-row",
+    "src": "1720:17466",
+    "parent": "140:2",
+    "name": "hotspot/state · Pages · delete-confirm",
+    "text": "Pages · delete-confirm",
+    "x": 16,
+    "y": 400,
+    "why": "UX-B-04 — a board with no inbound edge is not a screen, it is a picture.",
+    "_style_source": "Cloned from 1720:17466, the labelled hotspot chip this board already carries (150x28 with its own label text child), rather than the older invisible rects.",
+    "_geometry_source": "READ — 140:2 dumped with absolute boxes at abs 100,15970: spacer rel 272..712, this arc's own notes at rel 512 and 592, first existing hotspot (1668:7356) at rel 672. Six 150x28 chips in ONE column at a 36px pitch run 400..608. NOTE that collides with note/UX-B-13 at rel 512 and note/UX-B-32 at rel 592 from pages-nodes-02-tree.json — move those two notes to rel 640 and 700 when this file runs, or column the chips at x 16 and the notes at x 176. Child-child overlap is not something verify-invariants checks, so it will not be caught for you."
+  },
+  {
+    "op": "clone-row",
+    "src": "1720:17466",
+    "parent": "140:2",
+    "name": "hotspot/state · Pages · drag",
+    "text": "Pages · drag",
+    "x": 16,
+    "y": 436,
+    "why": "UX-B-06 / UX-B-07 — a drag is not a click, so the state needs an explicit door.",
+    "_style_source": "Cloned from 1720:17466, the labelled hotspot chip this board already carries (150x28 with its own label text child), rather than the older invisible rects.",
+    "_geometry_source": "READ — 140:2 dumped with absolute boxes at abs 100,15970: spacer rel 272..712, this arc's own notes at rel 512 and 592, first existing hotspot (1668:7356) at rel 672. Six 150x28 chips in ONE column at a 36px pitch run 400..608. NOTE that collides with note/UX-B-13 at rel 512 and note/UX-B-32 at rel 592 from pages-nodes-02-tree.json — move those two notes to rel 640 and 700 when this file runs, or column the chips at x 16 and the notes at x 176. Child-child overlap is not something verify-invariants checks, so it will not be caught for you."
+  },
+  {
+    "op": "clone-row",
+    "src": "1720:17466",
+    "parent": "140:2",
+    "name": "hotspot/state · Pages · home-by-position",
+    "text": "Pages · home by position",
+    "x": 16,
+    "y": 472,
+    "why": "UX-B-05",
+    "_style_source": "Cloned from 1720:17466, the labelled hotspot chip this board already carries (150x28 with its own label text child), rather than the older invisible rects.",
+    "_geometry_source": "READ — 140:2 dumped with absolute boxes at abs 100,15970: spacer rel 272..712, this arc's own notes at rel 512 and 592, first existing hotspot (1668:7356) at rel 672. Six 150x28 chips in ONE column at a 36px pitch run 400..608. NOTE that collides with note/UX-B-13 at rel 512 and note/UX-B-32 at rel 592 from pages-nodes-02-tree.json — move those two notes to rel 640 and 700 when this file runs, or column the chips at x 16 and the notes at x 176. Child-child overlap is not something verify-invariants checks, so it will not be caught for you."
+  },
+  {
+    "op": "clone-row",
+    "src": "1720:17466",
+    "parent": "140:2",
+    "name": "hotspot/state · Pages · local-only",
+    "text": "Pages · local-only",
+    "x": 16,
+    "y": 508,
+    "why": "UX-B-27",
+    "_style_source": "Cloned from 1720:17466, the labelled hotspot chip this board already carries (150x28 with its own label text child), rather than the older invisible rects.",
+    "_geometry_source": "READ — 140:2 dumped with absolute boxes at abs 100,15970: spacer rel 272..712, this arc's own notes at rel 512 and 592, first existing hotspot (1668:7356) at rel 672. Six 150x28 chips in ONE column at a 36px pitch run 400..608. NOTE that collides with note/UX-B-13 at rel 512 and note/UX-B-32 at rel 592 from pages-nodes-02-tree.json — move those two notes to rel 640 and 700 when this file runs, or column the chips at x 16 and the notes at x 176. Child-child overlap is not something verify-invariants checks, so it will not be caught for you."
+  },
+  {
+    "op": "clone-row",
+    "src": "1720:17466",
+    "parent": "140:2",
+    "name": "hotspot/state · Pages · bulk-toast",
+    "text": "Pages · bulk · one toast",
+    "x": 16,
+    "y": 544,
+    "why": "UX-B-11 / UX-B-12",
+    "_style_source": "Cloned from 1720:17466, the labelled hotspot chip this board already carries (150x28 with its own label text child), rather than the older invisible rects.",
+    "_geometry_source": "READ — 140:2 dumped with absolute boxes at abs 100,15970: spacer rel 272..712, this arc's own notes at rel 512 and 592, first existing hotspot (1668:7356) at rel 672. Six 150x28 chips in ONE column at a 36px pitch run 400..608. NOTE that collides with note/UX-B-13 at rel 512 and note/UX-B-32 at rel 592 from pages-nodes-02-tree.json — move those two notes to rel 640 and 700 when this file runs, or column the chips at x 16 and the notes at x 176. Child-child overlap is not something verify-invariants checks, so it will not be caught for you."
+  },
+  {
+    "op": "clone-row",
+    "src": "1720:17466",
+    "parent": "140:2",
+    "name": "hotspot/state · Pages · rename-url-offer",
+    "text": "Pages · rename · URL offer",
+    "x": 16,
+    "y": 580,
+    "why": "UX-B-08 / UX-B-09",
+    "_style_source": "Cloned from 1720:17466, the labelled hotspot chip this board already carries (150x28 with its own label text child), rather than the older invisible rects.",
+    "_geometry_source": "READ — 140:2 dumped with absolute boxes at abs 100,15970: spacer rel 272..712, this arc's own notes at rel 512 and 592, first existing hotspot (1668:7356) at rel 672. Six 150x28 chips in ONE column at a 36px pitch run 400..608. NOTE that collides with note/UX-B-13 at rel 512 and note/UX-B-32 at rel 592 from pages-nodes-02-tree.json — move those two notes to rel 640 and 700 when this file runs, or column the chips at x 16 and the notes at x 176. Child-child overlap is not something verify-invariants checks, so it will not be caught for you."
+  }
+]

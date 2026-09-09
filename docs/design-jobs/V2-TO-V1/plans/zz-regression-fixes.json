@@ -1,0 +1,4 @@
+[
+ { "op": "resize", "id": "163:45", "w": 248,
+   "why": "REGRESSION from this arc's own apply. The history plan set width 328 on a TEXT inside board 163:2, which is 280 wide — 16px padding leaves 248. verify-invariants went OOB 2 -> 3 on exactly this node. Measured: x=16 y=8 w=328 h=32, parent 163:44, board 163:2 at 280x812." }
+]

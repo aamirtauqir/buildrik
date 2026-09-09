@@ -1,0 +1,60 @@
+N	171:105	AI · error-quota	FRAME	2100,67047,280,812	true	VERTICAL	5	true
+K	171:106	FRAME	2100,67047,280,36	true	true	Back row
+K	171:108	FRAME	2100,67083,280,44	true	true	Header
+K	171:110	FRAME	2100,67127,280,32	true	true	Scope
+K	171:112	FRAME	2100,67159,280,72	true	true	Prompt
+K	171:132	FRAME	2100,67231,280,108	true	true	Error
+C	171:105	texts=9
+T	2846:21652	2116,67379,160,80	11	Regular	true	HEIGHT	Error	The thread and the prompt you typed stay on screen behind this state. Losing the user's wo
+T	2846:21651	2116,67335,160,36	12	Medium	true	HEIGHT	Error	Continue by hand in the inspector
+T	171:135	2116,67305,56,18	12	Regular	true	WIDTH_AND_HEIGHT	Error	See plans
+T	171:134	2116,67263,248,32	11	Regular	true	HEIGHT	Error	Nothing was changed. Daily limit reached (10). Resets at midnight UTC.
+T	171:133	2116,67241,100,18	12	Regular	true	WIDTH_AND_HEIGHT	Error	AI is out of credit.
+T	171:114	2126,67175,128,18	12	Regular	true	WIDTH_AND_HEIGHT	input	Make the hero warmer
+T	171:111	2116,67135,105,16	11	Regular	true	WIDTH_AND_HEIGHT	Scope	Scope: Hero section
+T	171:109	2116,67095,14,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	AI
+T	171:107	2116,67055,76,20	14	Medium	true	WIDTH_AND_HEIGHT	Back row	‹  Inspector
+R	171:105	170:2	NAVIGATE	AI · error-quota
+N	171:136	AI · not-configured	FRAME	100,65563,280,812	true	VERTICAL	4	true
+K	171:137	FRAME	100,65563,280,36	true	true	Back row
+K	171:139	FRAME	100,65599,280,44	true	true	Header
+K	171:141	FRAME	100,65643,280,32	true	true	Scope
+K	171:163	FRAME	100,65675,280,140	true	true	Not configured
+C	171:136	texts=8
+T	2846:21650	116,65857,178,64	11	Regular	true	HEIGHT	Not configured	The thread and the prompt you typed stay on screen behind this state. Losing the user's wo
+T	2846:21649	116,65813,178,36	12	Medium	true	HEIGHT	Not configured	Continue by hand in the inspector
+T	171:166	116,65783,178,18	12	Regular	true	WIDTH_AND_HEIGHT	Not configured	Contact your workspace owner
+T	171:165	116,65719,248,96	11	Regular	true	HEIGHT	Not configured	No AI provider is configured for this deployment. It is a server setting — OPENAI_API_KEY,
+T	171:164	116,65691,218,20	13	Regular	true	WIDTH_AND_HEIGHT	Not configured	AI isn’t available on this workspace.
+T	171:142	116,65651,105,16	11	Regular	true	WIDTH_AND_HEIGHT	Scope	Scope: Hero section
+T	171:140	116,65611,14,20	14	Medium	true	WIDTH_AND_HEIGHT	Header	AI
+T	171:138	116,65571,76,20	14	Medium	true	WIDTH_AND_HEIGHT	Back row	‹  Inspector
+R	171:136	170:2	NAVIGATE	AI · not-configured
+N	138:53	Insert · searching	FRAME	2100,7273,280,812	true	VERTICAL	10	true
+K	208:71	INSTANCE	2108,7279,264,44	true	false	Panel header
+K	138:58	FRAME	2108,7323,264,36	true	true	Search
+K	138:97	FRAME	2108,7359,264,32	true	true	Result · Button
+K	138:100	FRAME	2108,7391,264,32	true	true	Result · Button group
+K	138:103	FRAME	2108,7423,264,32	true	true	Result · CTA button
+K	138:91	FRAME	2108,7455,264,552	true	true	spacer
+K	233:1152	INSTANCE	2108,8007,264,32	true	false	List row
+K	138:94	FRAME	2108,8039,264,40	true	true	TipsFooter
+K	1668:7213	FRAME	2100,8049,36,36	true	true	hotspot/back · Insert · default
+K	1668:7354	FRAME	2230,8015,150,34	true	true	hotspot/state · Insert · no-results
+C	138:53	texts=12
+T	138:96	2320,8051,33,18	11	Regular	true	WIDTH_AND_HEIGHT	TipsFooter	‹  ›  ✕
+T	138:95	2124,8051,60,18	12	Regular	true	WIDTH_AND_HEIGHT	TipsFooter	💡  Tip 2/4
+T	I233:1152;232:8	2124,8013,232,20	13	Regular	true	NONE	List row	⌥  Paste HTML…
+T	138:105	2298,7431,66,32	11	Regular	true	HEIGHT	Result · CTA button	COMPONENTS
+T	138:104	2124,7429,70,20	13	Regular	true	WIDTH_AND_HEIGHT	Result · CTA button	CTA button
+T	138:102	2298,7399,49,16	11	Regular	true	WIDTH_AND_HEIGHT	Result · Button group	BLOCKS
+T	138:101	2124,7397,81,20	13	Regular	true	WIDTH_AND_HEIGHT	Result · Button group	Button group
+T	138:99	2298,7367,65,16	11	Regular	true	WIDTH_AND_HEIGHT	Result · Button	ELEMENTS
+T	138:98	2124,7365,41,20	13	Regular	true	WIDTH_AND_HEIGHT	Result · Button	Button
+T	138:61	2342,7334,16,16	11	Medium	true	WIDTH_AND_HEIGHT	search box	⌘F
+T	138:60	2134,7332,41,20	13	Regular	true	WIDTH_AND_HEIGHT	search box	button
+T	I208:71;16:7	2124,7293,188,16	11	Medium	true	HEIGHT	Panel header	Insert
+R	138:53	138:106	NAVIGATE	Insert · searching
+R	1668:7354	138:106	NAVIGATE	hotspot/state · Insert · no-results
+R	1668:7213	137:2	NAVIGATE	hotspot/back · Insert · default
+END	done=171:105|171:136|138:53	stopped=false	bytes=4312

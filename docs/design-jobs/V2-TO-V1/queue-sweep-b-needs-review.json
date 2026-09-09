@@ -1,0 +1,253 @@
+[
+ {
+  "file": "ai-00-manifest.json",
+  "why": "object with no row array; keys: module, slug, written, state, target, provenance, sectionAtRead, runOrder, callBudget, safetyRules"
+ },
+ {
+  "file": "ai-04-blocked-state-actions.json",
+  "why": "object with no row array; keys: module, slug, findings, applyWith, target, state, purelyAdditive, idempotent, changes"
+ },
+ {
+  "file": "ai-05-owed-by-other-modules.json",
+  "why": "object with no row array; keys: module, slug, purpose, rule, owed"
+ },
+ {
+  "file": "brand-00-census-raw.json",
+  "why": "object with no row array; keys: _what, _script, _watchlist, _legend, sections, hits, heavy, tiny"
+ },
+ {
+  "file": "brand-00-measured-baseline.json",
+  "why": "object with no row array; keys: slug, taken, how, sections, totals, conformance_measured_in_these_four_sections, zero_bound_boards_over_4_text, corroborations"
+ },
+ {
+  "file": "brand-02-text-unresolved.json",
+  "row": 4,
+  "why": "unclassified",
+  "keys": "unresolved-id,section,board,board_name,match,read_first,text,width,why",
+  "sample": "{\"unresolved-id\":true,\"section\":\"1776:8373\",\"board\":\"155:65\",\"board_name\":\"caption/Brand · import-export\",\"match\":null,\"read_first\":true,\"text\":\"Export rows first (CSS / JSON / Tailwind, Figma disable"
+ },
+ {
+  "file": "brand-02-text-unresolved.json",
+  "row": 5,
+  "why": "unclassified",
+  "keys": "unresolved-id,section,board,board_name,match,read_first,new_nodes,text,why",
+  "sample": "{\"unresolved-id\":true,\"section\":\"1776:8373\",\"board\":\"152:137\",\"board_name\":\"Brand · starters\",\"match\":null,\"read_first\":true,\"new_nodes\":true,\"text\":\"Apply Linear Dark\",\"why\":\"UX-H-30 · a footer commi"
+ },
+ {
+  "file": "brand-03-conformance.json",
+  "why": "object with no row array; keys: slug, applies_with, scope, provenance, repaint, promote, weight, hex_1A264D, pure_black, bind_text_styles"
+ },
+ {
+  "file": "brand-04-boards.json",
+  "why": "object with no row array; keys: slug, order_of_operations, free_slots_measured_2026-09-07T05:07Z, new_boards, board_edits, hotspots"
+ },
+ {
+  "file": "brand-05-arrangement.json",
+  "why": "object with no row array; keys: slug, covers, why_not_replaying_the_lane_coordinates, step_1_reflow, step_2_acceptance_checks, step_3_explicit_moves_layout_section_cannot_make"
+ },
+ {
+  "file": "brand-07-ecommerce.json",
+  "why": "object with no row array; keys: slug, section, covers, section_name_as_read_2026-09-07T05:07Z, qa_b_13_status, qa_b_13_evidence, code_re_verification_2026-09-07, board_truth_checks, arrangement, conformance"
+ },
+ {
+  "file": "brand-08-templates-components.json",
+  "why": "object with no row array; keys: slug, sections, why_here, v2_section_8_component_library, v2_section_4_async_coverage, identified_not_covered"
+ },
+ {
+  "file": "components-duplicates.json",
+  "why": "object with no row array; keys: slug, plan, written, state, provenance_warning, how_these_were_found, definite_duplicates_pending_verification, candidates_that_need_judgement, zero_use_masters_that_need_a_verdict, library_legibility_defect"
+ },
+ {
+  "file": "components-nav-row-merge.json",
+  "why": "object with no row array; keys: slug, plan, written, state, script, commands, decision_being_applied, colour_correction_inside_the_decision, code_contract_the_default_rests_on, targets, variant_table_to_be_written, how_the_600_instances_get_checked, blocked_preconditions, marking_the_open_decision, section_layout_change_this_forces"
+ },
+ {
+  "file": "content-section-read-2026-09-07.json",
+  "why": "object with no row array; keys: _, section, alsoRead, children"
+ },
+ {
+  "file": "gap-e-bands.json",
+  "row": 0,
+  "why": "unclassified",
+  "keys": "section,boardMatch,name,text,why",
+  "sample": "{\"section\":\"1776:8374\",\"boardMatch\":\"changes · restore-confirm\",\"name\":\"band/UX-I-01\",\"text\":\"The timestamp PREVIEWS. It enters the same preview band the scrubber uses — “Previewing v3 · Nothing is wr"
+ },
+ {
+  "file": "gap-e-bands.json",
+  "row": 1,
+  "why": "unclassified",
+  "keys": "section,boardMatch,name,text,why",
+  "sample": "{\"section\":\"1776:8374\",\"boardMatch\":\"time-travel · restore-confi\",\"name\":\"band/UX-I-02\",\"text\":\"One restore contract across the module: preview → confirm that names the cost → restore, with the curren"
+ },
+ {
+  "file": "gap-e-bands.json",
+  "row": 2,
+  "why": "unclassified",
+  "keys": "section,boardMatch,name,text,why",
+  "sample": "{\"section\":\"1776:8374\",\"boardMatch\":\"start-of-history\",\"name\":\"band/UX-I-05\",\"text\":\"History starts here — earlier steps were dropped. Undo is capped at 100 steps and the oldest are discarded silently"
+ },
+ {
+  "file": "gap-e-bands.json",
+  "row": 3,
+  "why": "unclassified",
+  "keys": "section,boardMatch,name,text,why",
+  "sample": "{\"section\":\"1776:8374\",\"boardMatch\":\"clear-confirm\",\"name\":\"band/UX-I-07\",\"text\":\"State the cost: “Undo will stop working for the 47 steps before now. Saved versions are not affected.” Today the confi"
+ },
+ {
+  "file": "gap-e-bands.json",
+  "row": 4,
+  "why": "unclassified",
+  "keys": "section,boardMatch,name,text,why",
+  "sample": "{\"section\":\"1776:8374\",\"boardMatch\":\"undo-unavailable\",\"name\":\"band/UX-I-15\",\"text\":\"Annotate the undo control the moment history stops covering the last action, and name the action — “Binding a field"
+ },
+ {
+  "file": "history-geometry-and-arrangement.json",
+  "why": "object with no row array; keys: section, sectionName, howToApply, geometry, verification, arrangement"
+ },
+ {
+  "file": "history-render-defects.json",
+  "row": 0,
+  "why": "unclassified",
+  "keys": "id,severity,kind,board,boardName,target,from,to,reseatChildren,sweepSiblings,sweepReason,readBack",
+  "sample": "{\"id\":\"VIS-1-01\",\"severity\":\"Major\",\"kind\":\"frame-resize+reseat\",\"board\":\"163:167\",\"boardName\":\"History · Saves · restore-confirm\",\"target\":{\"selector\":{\"section\":\"1776:8374\",\"board\":\"163:167\",\"frameA"
+ },
+ {
+  "file": "history-render-defects.json",
+  "row": 1,
+  "why": "unclassified",
+  "keys": "id,severity,kind,board,boardName,target,body,buttons,from,to,buttonY,rejectedAlternative,readBack",
+  "sample": "{\"id\":\"QA-C-01\",\"severity\":\"Critical\",\"kind\":\"frame-grow+button-restack\",\"board\":\"163:167\",\"boardName\":\"History · Saves · restore-confirm\",\"target\":{\"id\":\"163:213\",\"what\":\"the restore-confirm band fra"
+ },
+ {
+  "file": "history-text.json",
+  "row": 25,
+  "why": "unclassified",
+  "keys": "selector,unresolved-id,mode,splice,why",
+  "sample": "{\"selector\":{\"section\":\"1776:8374\",\"board\":\"163:113\",\"boardName\":\"History · Saves · time-travel\",\"contains\":\"Ctrl+Shift+T\"},\"unresolved-id\":true,\"mode\":\"splice\",\"splice\":\"Esc\",\"why\":\"UX-I-10 — Ctrl+Sh"
+ },
+ {
+  "file": "history-text.json",
+  "row": 26,
+  "why": "unclassified",
+  "keys": "selector,unresolved-id,mode,splice,why",
+  "sample": "{\"selector\":{\"section\":\"1776:8374\",\"board\":\"172:3\",\"boardName\":\"caption/Versions · activity\",\"contains\":\"the only thing that survives a long session\"},\"unresolved-id\":true,\"mode\":\"splice\",\"splice\":\"th"
+ },
+ {
+  "file": "insert-decision-note.json",
+  "why": "object with no row array; keys: op, section, section_id_source, name, geometry, typeSpec, why, title, subtitle, entries, footer"
+ },
+ {
+  "file": "insert-layout.json",
+  "why": "object with no row array; keys: task, why, read_from_file_2026-09-07, steps, not_done_here"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 0,
+  "why": "unclassified",
+  "keys": "board,why,hideFrom,ops",
+  "sample": "{\"board\":\"2864:12415\",\"why\":\"UX-D-08 — the one row where the user cannot finish the job at all\",\"hideFrom\":11,\"ops\":[{\"src\":\"2067:20295\",\"name\":\"section/SLIDER\",\"insert\":2,\"texts\":[\"SLIDER   [not-impl"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 1,
+  "why": "unclassified",
+  "keys": "board,why,resize,shift,ops",
+  "sample": "{\"board\":\"2864:21821\",\"why\":\"UX-D-09 — the panel never asks where a submission goes\",\"resize\":{\"w\":300,\"h\":960},\"shift\":{\"fromY\":44,\"dy\":320},\"ops\":[{\"src\":\"2474:11974\",\"name\":\"rule/where-top\",\"abs\":{"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 2,
+  "why": "unclassified",
+  "keys": "board,why,hideFrom,ops",
+  "sample": "{\"board\":\"2865:12419\",\"why\":\"UX-D-02 — the inspector renders every control enabled for a locked element\",\"hideFrom\":14,\"ops\":[{\"src\":\"2067:20296\",\"name\":\"row/Locked banner\",\"insert\":1,\"texts\":[\"🔒  Lo"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 3,
+  "why": "unclassified",
+  "keys": "board,why,hideIdx,hideFrom,ops",
+  "sample": "{\"board\":\"2865:12493\",\"why\":\"UX-D-20 — ten overrides is twenty stacked blocks in a 300px column\",\"hideIdx\":[3],\"hideFrom\":14,\"ops\":[{\"src\":\"2067:20296\",\"name\":\"row/Override summary\",\"insert\":2,\"texts\""
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 4,
+  "why": "unclassified",
+  "keys": "board,why,hideFrom,ops",
+  "sample": "{\"board\":\"2865:21984\",\"why\":\"UX-D-12 / UX-D-13 — a control the user can see and cannot use teaches; a missing control does not\",\"hideFrom\":10,\"ops\":[{\"src\":\"2067:20295\",\"name\":\"section/Disabled with r"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 5,
+  "why": "unclassified",
+  "keys": "board,why,hideFrom,ops",
+  "sample": "{\"board\":\"2865:22079\",\"why\":\"UX-D-10, UX-D-11, UX-D-25, UX-D-26 — three hooks, zero new logic, one header row\",\"hideFrom\":12,\"ops\":[{\"src\":\"2067:20296\",\"name\":\"row/Search\",\"insert\":2,\"texts\":[\"⌕  Sear"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 6,
+  "why": "unclassified",
+  "keys": "board,why,hideFrom,setText,ops",
+  "sample": "{\"board\":\"2865:22206\",\"why\":\"UX-D-14, UX-D-15, UX-D-16, UX-D-28 — one MOTION section replacing the Interactions + Animation pair\",\"hideFrom\":14,\"setText\":[{\"idx\":0,\"text\":\"MOTION\"},{\"idx\":3,\"text\":\"Fa"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 7,
+  "why": "unclassified",
+  "keys": "board,why,ops",
+  "sample": "{\"board\":\"2865:22227\",\"why\":\"UX-D-03 — the one state where a write hits many elements never says which breakpoint it lands on\",\"ops\":[{\"src\":\"956:6867\",\"name\":\"row/Pills\",\"insert\":1,\"texts\":[\"This ▾\","
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 8,
+  "why": "unclassified",
+  "keys": "board,why,hideFrom,ops",
+  "sample": "{\"board\":\"2865:22266\",\"why\":\"UX-D-24, UX-D-27 — a control that reads as broken, and a mode change that reloads the app\",\"hideFrom\":12,\"ops\":[{\"src\":\"2067:20295\",\"name\":\"section/CSS CLASSES\",\"insert\":2"
+ },
+ {
+  "file": "inspector-state-interiors.json",
+  "row": 9,
+  "why": "unclassified",
+  "keys": "why,create,ops",
+  "sample": "{\"why\":\"UX-D-04, UX-D-05, UX-D-06, UX-D-07, UX-D-19 plus the SPEC conflicts — recorded, not silently resolved\",\"create\":{\"section\":\"1776:8381\",\"x\":2600,\"y\":4101,\"w\":720,\"h\":812,\"name\":\"Inspector · OPE"
+ },
+ {
+  "file": "media-00-manifest.json",
+  "why": "object with no row array; keys: module, slug, section, sectionName, page, file, authored, status, readLive, readOffline, runOrder, estimatedFigmaCalls, boardsTouched, boardsNotTouched"
+ },
+ {
+  "file": "media-06-post-clone-unresolved.json",
+  "why": "object with no row array; keys: _note, _status, groups"
+ },
+ {
+  "file": "review-compare-decision-footer.json",
+  "why": "object with no row array; keys: finding, page, section, script, written, apply_with, targets, deliberately_excluded, draws, wires, refusal_path_EXPECTED, mechanics_verified, why, conflict_half_NOT_drawn"
+ },
+ {
+  "file": "shell-rail-more-seat.json",
+  "why": "object with no row array; keys: note, page, componentSet, variants-read, variants-not-read, existing-item-geometry-read, add, why, blast-radius, fits"
+ },
+ {
+  "file": "sweep-b-00-manifest.json",
+  "why": "object with no row array; keys: slug, date, scope, budget, calls, scripts_added, script_modified"
+ },
+ {
+  "file": "sweep-b-01-brand-text-HELD.json",
+  "why": "object with no row array; keys: slug, status, source, held, why, unblocks_when"
+ },
+ {
+  "file": "sweep-b-02-library-variants.json",
+  "why": "object with no row array; keys: slug, section, finding, measured, layout, not_done, already_correct"
+ },
+ {
+  "file": "sweep-b-03-audit-templates-components.json",
+  "why": "object with no row array; keys: slug, sections, why, applied, examined_and_conforms, filed_not_fixed"
+ },
+ {
+  "file": "sweep-b-04-leading-blocks-binding.json",
+  "why": "object with no row array; keys: slug, finding, how_measured, result, read_back, what_it_means, why_not_done_here, how_to_do_it_safely"
+ },
+ {
+  "file": "sweep-c-appends.json",
+  "why": "object with no row array; keys: slug, applier, why_this_shape, sweep, examined_and_cleared_by_the_dry_run, examined_and_cleared_note, first_pass_rows_already_applied, applied"
+ }
+]

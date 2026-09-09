@@ -1,0 +1,34 @@
+{
+ "_tool": "the preview block inside scripts/figma/apply-publish-v2-states.mjs --apply (it matches TEXT by characters, which is what an unresolved id needs), or apply-text-fixes.mjs once the ids are read",
+ "_page": "1:3",
+ "_section": "1779:4  (14 · Preview · 8)",
+ "_board": "2429:11904  'Preview · what the sandbox drops (reference)'  1080x659, clipsContent",
+ "_unresolved_id_note": "The BOARD id was read from the live file. Its CHILD text-node ids were NOT read — the quota capped before the dump. Every row below is therefore a SELECTOR row: match on the exact current characters, which are known exactly because scripts/figma/build-preview-reference.mjs is the file that wrote them (IS / IS_NOT arrays, lines 24-37).",
+ "_length_note": "The cards on this board are absolutely positioned — a body that grows by a line lands on the card beneath it. Every replacement below is length-matched to its original to within one line at the 484px column width (11px Inter Regular ≈ 86 chars/line, 12px Semi Bold ≈ 73).",
+ "rows": [
+  { "unresolved-id": true,
+    "selector": { "board": "2429:11904", "match": "The overlay renders the ACTIVE page and nothing else. There is no page navigation inside the preview, so an internal link goes nowhere." },
+    "text": "The overlay renders the ACTIVE page only. There is no page switcher, so internal links go nowhere and multi-page navigation cannot be checked before launch.",
+    "chars": "133 → 154 (both 2 lines)",
+    "why": "UX-E-17 — multi-page navigation is the single most common thing to check before going live and preview cannot check it (PreviewOverlay.tsx:99-114, Composer.ts:707-719 combined = the ACTIVE page)." },
+
+  { "unresolved-id": true,
+    "selector": { "board": "2429:11904", "match": "Every <script> is stripped (ExportUtils.ts:36-42) and the iframe is sandbox=\"\". All 14 interaction triggers work on the PUBLISHED page and none of them fire here." },
+    "text": "Every <script> is stripped (ExportUtils.ts:38-43) and the overlay's iframe is sandbox=\"\" (PreviewOverlay.tsx:106). Interactions work on the PUBLISHED page, none here.",
+    "chars": "162 → 165 (both 2 lines)",
+    "why": "QA-A-17 — the sandbox=\"\" is PreviewOverlay.tsx:106's, not ExportUtils'; ExportUtils' own preview window (:110) and PreviewFrame.tsx:147 are sandboxed differently, so the claim has to be scoped to the overlay. Script citation corrected to :38-43. Carries UX-E-17." },
+
+  { "unresolved-id": true,
+    "selector": { "board": "2429:11904", "match": "One external stylesheet" },
+    "text": "One external stylesheet — and no url() in CSS",
+    "chars": "23 → 44 (both 1 line at 12px Semi Bold)",
+    "why": "QA-A-18 / UX-E-18 — heading half of the missing card." },
+
+  { "unresolved-id": true,
+    "selector": { "board": "2429:11904", "match": "fonts.googleapis.com is the only external sheet kept. Anything else the page pulls is not there." },
+    "text": "fonts.googleapis.com is the only sheet kept; any <style> containing url( or expression is dropped WHOLE (ExportUtils.ts:12, 71-76) — background images go with it.",
+    "chars": "96 → 160 (both 2 lines)",
+    "why": "QA-A-18 / UX-E-18 — the single largest thing the sandbox drops was missing from the board whose stated job is the drop list. A style ATTRIBUTE containing url( is removed wholesale (ExportUtils.ts:56-61), and a whole <style> block is filtered out on the same match (:71-76), so a hero with a background image loses its size, colour, spacing and typography too." }
+ ],
+ "_not_done": "UX-E-18's second half — 'whatever is dropped for safety should be reported once at the top of the preview' — needs a new banner ON the preview overlay board, which is 65:211 in section 01 · Shell, not in my two sections. Filed under cross-section below."
+}

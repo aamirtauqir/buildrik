@@ -1,0 +1,7 @@
+[
+ { "op": "rename", "id": "2894:12608", "name": "caption/UX-I-01 · the timestamp must preview, not restore", "why": "UX-I-01 — named caption/* so reflow-caption-overflow.mjs recognises it; band/* is invisible to that tool" },
+ { "op": "rename", "id": "2894:12609", "name": "caption/UX-I-02 · one restore contract across the module", "why": "UX-I-02" },
+ { "op": "rename", "id": "2894:12610", "name": "caption/UX-I-05 · state where history begins", "why": "UX-I-05" },
+ { "op": "rename", "id": "2894:12611", "name": "caption/UX-I-07 · the clear confirm must state its cost", "why": "UX-I-07" },
+ { "op": "rename", "id": "2894:12612", "name": "caption/UX-I-15 · name the action that switched undo off", "why": "UX-I-15" }
+]
