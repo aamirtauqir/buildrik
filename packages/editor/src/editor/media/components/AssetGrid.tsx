@@ -44,6 +44,7 @@ import {
   CheckSquare,
   ChevronDown,
   FolderOpen,
+  MoreHorizontal,
   Search,
   Trash2,
   Upload,
@@ -58,7 +59,7 @@ import type {
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { Button } from "@/editor/chrome-ui";
+import { Button, IconButton } from "@/editor/chrome-ui";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
@@ -125,6 +126,14 @@ const GHOST_ROW =
 const GHOST_BADGE =
   "tw:absolute tw:-top-2 tw:-right-2 tw:whitespace-nowrap tw:rounded-full tw:bg-[var(--bk-accent)] tw:px-2 tw:py-0.5 " +
   "tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:font-semibold tw:text-[var(--bk-accent-on)]";
+
+/* Clone 3721:43552 — the card's `···`: a 24 white square top-right of the
+   thumb, drawn while the card is hovered or anything in it has focus. The
+   button is always in the tree (Tab reaches it, then it shows itself); only
+   its opacity waits for the pointer. */
+const CARD_MENU_BTN =
+  "tw:absolute tw:top-1.5 tw:right-1.5 tw:z-[1] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:shadow-[var(--bk-shadow-raised)] " +
+  "tw:opacity-0 tw:group-hover:opacity-100 tw:group-focus-within:opacity-100 tw:enabled:hover:bg-[var(--bk-bg-card)]";
 
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
@@ -506,16 +515,15 @@ export function AssetGrid({
       )}
 
       {/*
-        Board 1163:13695 — a smart scope says what it is showing AND what that
-        means. "Unused" is the one worth spelling out: the whole reason to open
-        it is to delete, and the safety claim belongs next to the assets, not
-        in a tooltip on the folder row.
+        Clone 3721:43552 — the Unused scope's note band under the toolbar:
+        `N unused assets · No current site references.` Only this scope draws
+        one: the whole reason to open it is to delete, and the safety claim
+        belongs next to the assets. It re-draws V1 1163:13695's "Showing N
+        unused assets — safe to delete, nothing on the site references them."
       */}
-      {smartFolder === "unused" && visibleItems.length > 0 && (
+      {smartFolder === "unused" && n > 0 && (
         <div className="mgr-scope-note" role="status" data-testid="mgr-scope-note">
-          Showing {visibleItems.length} unused{" "}
-          {visibleItems.length === 1 ? "asset" : "assets"} — safe to delete, nothing on
-          the site references them.
+          {n} unused {n === 1 ? "asset" : "assets"} · No current site references.
         </div>
       )}
 
@@ -690,7 +698,7 @@ export function AssetGrid({
             return (
               <div
                 key={item.key}
-                className={`mgr-asset${isSelected ? " selected" : ""}`}
+                className={`mgr-asset tw:group${isSelected ? " selected" : ""}`}
                 data-testid={`mgr-asset-${item.key}`}
                 onClick={onClick}
                 onDoubleClick={() => onInsert(item.key)}
@@ -701,6 +709,26 @@ export function AssetGrid({
               >
                 <div className="mgr-asset-thumb" data-testid={`mgr-thumb-${item.key}`}>
                   {thumbContent}
+                  {/* Clone 3721:43552 — `···` opens the same menu a right-click
+                      does, anchored under the button (a keyboard click has no
+                      pointer to anchor to). It neither selects the card nor
+                      starts a drag. */}
+                  <IconButton
+                    size="sm"
+                    label={`More actions for ${item.displayName ?? item.name}`}
+                    className={CARD_MENU_BTN}
+                    data-testid={`mgr-asset-menu-${item.key}`}
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
+                    onDoubleClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const box = e.currentTarget.getBoundingClientRect();
+                      state.openCtxMenu(e, item, { x: box.left, y: box.bottom + 4 });
+                    }}
+                  >
+                    <MoreHorizontal size={14} />
+                  </IconButton>
                   {/*
                     Board 1161:66/80/111 — the only badge on a card says what
                     KIND of file it is (▶ video, ◆ vector, Aa font); an image

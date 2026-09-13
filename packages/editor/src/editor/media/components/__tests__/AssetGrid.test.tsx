@@ -439,3 +439,56 @@ describe("AssetGrid — the toolbar over an empty folder (Clone 3700:20353)", ()
     expect(screen.getByTestId("mgr-subbar")).toBeInTheDocument();
   });
 });
+
+/* ─── Clone Phase 3 · P3-T (section 3721:43517 "Media · Menu and tag
+   completion") ─────────────────────────────────────────────────────────── */
+
+// Clone 3721:43552 — every card carries a `···` button top-right; it opens the
+// same menu a right-click opens, anchored to the button rather than to the
+// pointer, and it is a real button so Tab reaches it.
+describe("AssetGrid — the card ··· menu (Clone 3721:43552)", () => {
+  it("names the button after the file and opens the context menu anchored to the button", () => {
+    const state = makeState({ libraryItems: [makeItem({ key: "team", name: "team-photo.jpg" })] });
+    const { props } = mount(state);
+    const more = screen.getByRole("button", { name: "More actions for team-photo.jpg" });
+    expect(more).toHaveAttribute("data-testid", "mgr-asset-menu-team");
+    fireEvent.click(more);
+    expect(state.openCtxMenu).toHaveBeenCalledTimes(1);
+    const [, item, anchor] = (state.openCtxMenu as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(item.key).toBe("team");
+    expect(anchor).toEqual({ x: expect.any(Number), y: expect.any(Number) });
+    // Opening the menu is not selecting the card.
+    expect(props.onSelectAsset).not.toHaveBeenCalled();
+  });
+
+  it("the list rows keep the right-click door and draw no ··· button", () => {
+    const state = makeState({ libraryItems: [makeItem({ key: "team", name: "team-photo.jpg" })] });
+    mount(state);
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    expect(screen.queryByRole("button", { name: "More actions for team-photo.jpg" })).toBeNull();
+    fireEvent.contextMenu(screen.getByTestId("mgr-list-row-team"));
+    expect(state.openCtxMenu).toHaveBeenCalledTimes(1);
+  });
+});
+
+// Clone 3721:43552 — the Unused scope's note band: `N unused assets · No
+// current site references.` It displaces V1 1163:13695's "Showing N unused
+// assets — safe to delete, nothing on the site references them."
+describe("AssetGrid — the Unused note band (Clone 3721:43552)", () => {
+  it("reads '<N> unused assets · No current site references.' only in the Unused scope", () => {
+    const three = [makeItem({ key: "a" }), makeItem({ key: "b" }), makeItem({ key: "c" })];
+    const state = makeState({ libraryItems: three });
+    const { unmount } = mount(state, { smartFolder: "unused" });
+    expect(screen.getByTestId("mgr-scope-note")).toHaveTextContent("3 unused assets · No current site references.");
+    expect(screen.queryByText(/safe to delete/)).toBeNull();
+    unmount();
+    mount(state, { smartFolder: "in-use" });
+    expect(screen.queryByTestId("mgr-scope-note")).toBeNull();
+  });
+
+  it("counts one file in the singular", () => {
+    const state = makeState({ libraryItems: [makeItem({ key: "a" })] });
+    mount(state, { smartFolder: "unused" });
+    expect(screen.getByTestId("mgr-scope-note")).toHaveTextContent("1 unused asset · No current site references.");
+  });
+});

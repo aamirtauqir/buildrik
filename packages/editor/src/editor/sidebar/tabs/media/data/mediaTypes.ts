@@ -386,7 +386,9 @@ export interface MediaStateResult {
 
   // Overlays
   ctxMenu: CtxMenuState | null;
-  openCtxMenu(e: React.MouseEvent, item: LibraryItem): void;
+  /** Opens the asset menu at the pointer, or at `anchor` when a control (the
+   *  card's `···`, Clone 3721:43552) rather than a right-click opened it. */
+  openCtxMenu(e: React.MouseEvent, item: LibraryItem, anchor?: { x: number; y: number }): void;
   closeCtxMenu(): void;
   detailItem: LibraryItem | null;
   openDetail(item: LibraryItem): void;
