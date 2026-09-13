@@ -225,6 +225,12 @@ export function AssetGrid({
      on document.body (Gate 22). */
   const [ghost, setGhost] = React.useState<{ item: LibraryItem; names: string[] } | null>(null);
   const ghostRef = React.useRef<HTMLDivElement>(null);
+  /* A drop into another folder unmounts the dragged card before its dragend
+     fires, and dragend on a detached node never reaches React — so the list
+     no longer holding the item is what ends the ghost. */
+  React.useEffect(() => {
+    if (ghost && !state.libraryItems.some((i) => i.key === ghost.item.key)) setGhost(null);
+  }, [ghost, state.libraryItems]);
 
   /* Board 1174:4867 — the format strip lists the formats THIS library
      actually holds, not a fixed JPG/PNG/SVG/MP4 row. A chip for a format

@@ -401,6 +401,21 @@ describe("AssetGrid — dragging a card or a row (Clone 4207:26629 / 4215:26635 
     expect(screen.queryByTestId("mgr-drag-ghost")).toBeNull();
     expect(props.onAssetDragEnd).toHaveBeenCalledTimes(1);
   });
+
+  /* A drop from a folder scope into another folder unmounts the dragged
+     card before Chrome fires dragend on it — and dragend on a detached node
+     never reaches React's root listener, so the ghost outlived the drag
+     (seen live, 2026-09-13). The list no longer holding the item is the
+     signal the drag is over. */
+  it("the ghost goes with its card when the list drops the item", () => {
+    const state = two();
+    const { rerender, props } = mount(state);
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-a"), { dataTransfer: dragTransfer() });
+    expect(screen.getByTestId("mgr-drag-ghost")).toBeInTheDocument();
+    const moved = makeState({ ...state, libraryItems: state.libraryItems.filter((i) => i.key !== "a") });
+    rerender(<AssetGrid {...props} state={moved} visibleItems={moved.libraryItems} />);
+    expect(screen.queryByTestId("mgr-drag-ghost")).toBeNull();
+  });
 });
 
 // Clone 3700:20353 draws NOTHING above the empty folder's heading — no count
