@@ -203,6 +203,16 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 
   const onCropComplete = React.useCallback((_: Area, pixels: Area) => setCropPixels(pixels), []);
 
+  /* `Free` is the whole frame. react-easy-crop takes an undefined `aspect`
+     as 4/3 — so a 1800 × 1200 file opened on Free read `1600 × 1200` and
+     Save would have cropped it (walked live 2026-09-14; a 4:3 source hid
+     it). The file's own ratio, turned with the rotation, is the free box. */
+  const freeAspect = intrinsic
+    ? draft.rotation % 180 === 0
+      ? intrinsic.width / intrinsic.height
+      : intrinsic.height / intrinsic.width
+    : undefined;
+
   /* One save path for the button and the failure dialog's Retry: the retry
      re-sends the bytes that failed, never a re-render of a draft that may
      have moved. */
@@ -311,7 +321,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   crop={draft.crop}
                   zoom={draft.zoom}
                   rotation={draft.rotation}
-                  aspect={ASPECT_CHIPS.find((a) => a.id === draft.aspect)?.ratio}
+                  aspect={ASPECT_CHIPS.find((a) => a.id === draft.aspect)?.ratio ?? freeAspect}
                   showGrid={false}
                   onCropChange={(crop: Point) => patch({ crop })}
                   onZoomChange={(zoom: number) => patch({ zoom })}

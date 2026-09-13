@@ -200,6 +200,18 @@ describe("Clone 3695:43236 · Crop", () => {
     expect(screen.getByTestId("image-editor-rotate-value")).toHaveTextContent("45°");
   });
 
+  /* Walked live 2026-09-14: a 1800 × 1200 file opened on Free read
+     `1600 × 1200` — react-easy-crop takes an undefined aspect as 4/3. */
+  it("Free is the file's own frame, turned with the rotation — not the cropper's 4/3 default", async () => {
+    mount();
+    await waitFor(() => expect(screen.getByTestId("image-editor-subtitle")).toHaveTextContent("2400 × 1600"));
+    expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(2400 / 1600));
+    fireEvent.click(screen.getByTestId("image-editor-rotate-cw"));
+    expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(1600 / 2400));
+    fireEvent.click(screen.getByTestId("image-editor-aspect-16-9"));
+    expect(screen.getByTestId("cropper")).toHaveAttribute("data-aspect", String(16 / 9));
+  });
+
   it("Flip Horizontal / Vertical are pressed toggles that mirror the media (3695:43705)", () => {
     mount();
     const h = screen.getByTestId("image-editor-flip-h");
