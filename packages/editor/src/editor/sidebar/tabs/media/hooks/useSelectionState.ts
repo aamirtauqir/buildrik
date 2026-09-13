@@ -157,7 +157,7 @@ export function useSelectionState(
       const item = libraryItems.find((i) => i.key === key);
       if (!item) return;
       const inUse = checkInUse([key]);
-      setConfirmDelete({ keys: [key], names: [item.name], inUseCount: inUse.length, inUse, isBulk: false });
+      setConfirmDelete({ keys: [key], names: [item.displayName ?? item.name], inUseCount: inUse.length, inUse, isBulk: false });
     },
     [libraryItems, checkInUse]
   );
@@ -165,7 +165,7 @@ export function useSelectionState(
   const requestBulkDelete = useCallback(
     (items: LibraryItem[]) => {
       const keys = items.map((i) => i.key);
-      const names = items.map((i) => i.name);
+      const names = items.map((i) => i.displayName ?? i.name);
       const inUse = checkInUse(keys);
       setConfirmDelete({ keys, names, inUseCount: inUse.length, inUse, isBulk: true });
     },

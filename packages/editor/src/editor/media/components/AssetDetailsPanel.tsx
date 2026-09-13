@@ -336,7 +336,7 @@ export function AssetDetailsPanel({
       <ModalRoot open={replaceAllPickerOpen} onOpenChange={setReplaceAllPickerOpen}>
         <ModalContent size="lg">
           <ModalTitle>
-            Replace "{selectedItem.name}" across {usageCount} use
+            Replace "{selectedItem.displayName ?? selectedItem.name}" across {usageCount} use
             {usageCount !== 1 ? "s" : ""}
           </ModalTitle>
           <ModalClose aria-label="Close replace picker">
