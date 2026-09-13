@@ -20,7 +20,6 @@
 packages/editor/src/editor/canvas/hooks/useCanvasElementDrag.ts
 packages/editor/src/editor/sidebar/tabs/elements/useElementsState.ts
 packages/editor/src/editor/sidebar/tabs/elements/ElementCard.tsx
-packages/editor/src/editor/media/AssetCard.tsx
 # ── Download anchors — the createObjectURL + <a> + click() + remove()
 # pattern for triggering a browser file download. Never rendered, never a
 # UI surface, so the overlay-root/portal discipline doesn't apply.

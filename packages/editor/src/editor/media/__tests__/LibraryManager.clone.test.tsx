@@ -9,13 +9,13 @@
  * @license BSD-3-Clause
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { UploadResult } from "../../../shared/types/media";
-import { TEN, makeAsset, makeComposer, makeFile, makeFolder, makeMediaState } from "./libraryFixture";
+import { TEN, makeAsset, makeComposer, makeFile, makeFolder, makeItem, makeMediaState } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
   state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
@@ -30,7 +30,23 @@ vi.mock("@/editor/chrome-ui", async () => {
   return { ...actual, useToast: () => ({ addToast: vi.fn() }) };
 });
 
-vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({ StockSourceModal: () => null }));
+/* A stub with a door: the wiring tests below need to drive `onSave` and to
+   see which props the orchestrator hands the stock dialog. */
+const stockStub = vi.hoisted(() => ({ props: null as null | Record<string, unknown> }));
+vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({
+  StockSourceModal: (props: { open: boolean; onSave: (t: string, item: unknown) => unknown }) => {
+    stockStub.props = props;
+    return props.open ? (
+      <button
+        type="button"
+        data-testid="stub-stock-save"
+        onClick={() => void props.onSave("img", { id: "p1", alt: "Restaurant interior", url: "https://images.example.com/p1.jpg" })}
+      >
+        stub save
+      </button>
+    ) : null;
+  },
+}));
 vi.mock("../../sidebar/tabs/media/components/ConfirmDeleteModal", () => ({ ConfirmDeleteModal: () => null }));
 vi.mock("../../sidebar/tabs/media/components/MediaContextMenu", () => ({ MediaContextMenu: () => null }));
 vi.mock("../../sidebar/tabs/media/components/AssetDetailOverlay", () => ({ AssetDetailOverlay: () => null }));
@@ -787,5 +803,113 @@ describe("Clone 3585:23337 · Manage in full library — the drawer hands the fi
     await mountLibrary({}, {}, { getSelectedAssets: () => [makeAsset({ id: "menu", originalName: "menu-cover.png" })], selectAssets });
     expect(within(screen.getByTestId("mgr-details")).getByText("menu-cover.png")).toBeInTheDocument();
     expect(selectAssets).toHaveBeenCalledWith([]);
+  });
+});
+
+/* ─── P3-I Import URL · Stock ───────────────────────────────────────────── */
+
+const IMPORTED = makeItem({ key: "imported", name: "hero-imported.jpg", src: "blob:imported", mimeType: "image/jpeg" });
+const STOCK = makeItem({ key: "stock1", name: "restaurant-interior.jpg", src: "blob:stock1", mimeType: "image/jpeg", assetSource: "stock" });
+
+type UploadCall = [File, { folderId?: string } | undefined];
+
+async function mountWithUpload(over: Partial<MediaStateResult>, uploadFile: ReturnType<typeof vi.fn>) {
+  const composer = makeComposer();
+  composer.media.uploadFile = uploadFile as unknown as typeof composer.media.uploadFile;
+  mocks.state.mediaState = makeMediaState({ libraryItems: TEN, counts: { all: TEN.length, img: 5, vid: 2, ico: 2, fnt: 1 }, ...over });
+  const { LibraryManager } = await import("../LibraryManager");
+  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
+  return { composer };
+}
+
+const landsAs = (id: string) =>
+  vi.fn(async (file: File) => ({ success: true, asset: { id, name: file.name }, fileName: file.name }));
+
+const importUrl = (url: string) => {
+  fireEvent.click(screen.getByTestId("mgr-btn-import"));
+  fireEvent.change(screen.getByTestId("import-url-input"), { target: { value: url } });
+  fireEvent.click(screen.getByTestId("import-url-go"));
+};
+
+describe("Clone 3397:18835 → 3695:43873 / 3695:43876 · Import image from URL, from the library", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("Import URL opens the Clone dialog; an image URL lands through the engine into the current scope and reads `Image imported`", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(["x"], { type: "image/jpeg" }) }));
+    const uploadFile = landsAs("imported");
+    await mountWithUpload({ libraryItems: [...TEN, IMPORTED], currentFolderId: "f1", allFolders: [makeFolder()] }, uploadFile);
+
+    fireEvent.click(screen.getByTestId("mgr-btn-import"));
+    expect(screen.getByRole("heading", { name: "Import image from URL" })).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("import-url-input"), { target: { value: "https://cdn.example.com/hero-imported.jpg" } });
+    fireEvent.click(screen.getByTestId("import-url-go"));
+
+    await screen.findByRole("heading", { name: "Image imported" });
+    expect(uploadFile).toHaveBeenCalledTimes(1);
+    const [file, opts] = uploadFile.mock.calls[0] as unknown as UploadCall;
+    expect(file.name).toBe("hero-imported.jpg");
+    expect(opts).toEqual({ folderId: "f1" });
+    expect(screen.getByTestId("import-result-body")).toHaveTextContent("hero-imported.jpg · Image");
+    expect(screen.queryByRole("heading", { name: "Import image from URL" })).toBeNull();
+  });
+
+  it("View asset selects the imported file in the details rail and closes the dialog", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(["x"], { type: "image/jpeg" }) }));
+    await mountWithUpload({ libraryItems: [...TEN, IMPORTED] }, landsAs("imported"));
+    importUrl("https://cdn.example.com/hero-imported.jpg");
+    await screen.findByRole("heading", { name: "Image imported" });
+    fireEvent.click(screen.getByTestId("import-result-view"));
+    expect(screen.queryByRole("heading", { name: "Image imported" })).toBeNull();
+    expect(rail().getByText("hero-imported.jpg")).toBeInTheDocument();
+  });
+
+  it("a URL that is not a file the library takes reads `Image could not be imported`; Edit URL reopens the dialog with the URL", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(["<html>"], { type: "text/html" }) }));
+    const uploadFile = vi.fn();
+    await mountWithUpload({}, uploadFile);
+    importUrl("https://cdn.example.com/page.html");
+    await screen.findByRole("heading", { name: "Image could not be imported" });
+    expect(uploadFile).not.toHaveBeenCalled();
+    expect(screen.getByTestId("import-result-body")).toHaveTextContent(/does not return a supported file/);
+    fireEvent.click(screen.getByTestId("import-result-edit"));
+    await screen.findByRole("heading", { name: "Import image from URL" });
+    expect(screen.getByTestId("import-url-input")).toHaveValue("https://cdn.example.com/page.html");
+  });
+
+  it("a file the engine refused reads the engine's reason, not the type sentence", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, blob: async () => new Blob(["x"], { type: "image/jpeg" }) }));
+    const uploadFile = vi.fn(async (file: File) => ({ success: false, error: "Upload failed — file is 24 MB, limit is 10 MB", fileName: file.name }));
+    await mountWithUpload({}, uploadFile);
+    importUrl("https://cdn.example.com/huge.jpg");
+    await screen.findByRole("heading", { name: "Image could not be imported" });
+    expect(screen.getByTestId("import-result-body")).toHaveTextContent("Upload failed — file is 24 MB, limit is 10 MB");
+  });
+});
+
+describe("Clone 3695:45569 → 3695:45573 · Stock assets, from the library", () => {
+  it("Add from stock opens the dialog with no Insert door; Save to library resolves into `Stock image saved`, and View asset selects it in the rail", async () => {
+    const saveToLibrary = vi.fn(() => Promise.resolve({ key: "stock1", name: "restaurant-interior.jpg" }));
+    await mountLibrary({ libraryItems: [...TEN, STOCK], saveToLibrary });
+    fireEvent.click(screen.getByTestId("mgr-btn-stock"));
+    expect(stockStub.props?.open).toBe(true);
+    expect(stockStub.props).not.toHaveProperty("onInsert");
+    fireEvent.click(screen.getByTestId("stub-stock-save"));
+    expect(saveToLibrary).toHaveBeenCalledWith("img", expect.objectContaining({ id: "p1" }));
+    await screen.findByRole("heading", { name: "Stock image saved" });
+    expect(stockStub.props?.open).toBe(false);
+    expect(screen.getByTestId("stock-saved-body")).toHaveTextContent("restaurant-interior.jpg is now in your asset library.");
+    fireEvent.click(screen.getByTestId("stock-saved-view"));
+    expect(screen.queryByRole("heading", { name: "Stock image saved" })).toBeNull();
+    expect(rail().getByText("restaurant-interior.jpg")).toBeInTheDocument();
+  });
+
+  it("a save the engine refused keeps the stock dialog open and shows no result", async () => {
+    const saveToLibrary = vi.fn(() => Promise.resolve(null));
+    await mountLibrary({ saveToLibrary });
+    fireEvent.click(screen.getByTestId("mgr-btn-stock"));
+    fireEvent.click(screen.getByTestId("stub-stock-save"));
+    await vi.waitFor(() => expect(saveToLibrary).toHaveBeenCalledTimes(1));
+    expect(stockStub.props?.open).toBe(true);
+    expect(screen.queryByRole("heading", { name: "Stock image saved" })).toBeNull();
   });
 });

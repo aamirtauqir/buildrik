@@ -94,6 +94,25 @@ describe("Modal", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  /* Clone 3397:18835 opens Import image from URL OVER the picker (edge
+     `Action / From URL|CLIC|OVE>`). Both traps listen on the document, and
+     `stopPropagation` does not stop a sibling listener on the same node, so
+     one Escape closed the top dialog AND the one beneath it. The topmost open
+     dialog is the only one that answers. */
+  it("Escape closes only the topmost of two stacked dialogs", () => {
+    const closeUnder = vi.fn();
+    const closeOver = vi.fn();
+    render(
+      <>
+        <Modal open onClose={closeUnder} title="Under" footer={<Button>Under</Button>} />
+        <Modal open onClose={closeOver} title="Over" footer={<Button>Over</Button>} />
+      </>,
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(closeOver).toHaveBeenCalledTimes(1);
+    expect(closeUnder).not.toHaveBeenCalled();
+  });
+
   it("returns focus to the trigger when it closes", () => {
     function Harness() {
       const [open, setOpen] = React.useState(false);

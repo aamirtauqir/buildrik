@@ -195,6 +195,9 @@ export function makeComposer(
          file over through the engine's selection; the manager consumes it. */
       getSelectedAssets: media.getSelectedAssets ?? (() => []),
       selectAssets: media.selectAssets ?? vi.fn(),
+      /* Real shape: `UploadResult` — the import-from-URL path reads `.asset`
+         for the Image imported dialog and View asset. */
+      uploadFile: vi.fn(async (file: File) => ({ success: true, asset: { id: file.name, name: file.name }, fileName: file.name })),
     },
   } as unknown as Parameters<typeof LibraryManager>[0]["composer"];
 }

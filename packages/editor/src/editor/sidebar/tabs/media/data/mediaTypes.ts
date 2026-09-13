@@ -272,7 +272,10 @@ export interface DiscoveryStateResult {
   setDiscColor(c: DiscColor): void;
   setDiscSource(s: DiscSource): void;
   loadMoreDisc(type: "img" | "vid"): Promise<void>;
-  saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): Promise<void>;
+  /** Resolves with the asset the library now holds (Clone 3695:45573 names it and
+      View asset selects it), null when the engine refused. Icons save too —
+      their SVG data URL goes through the same upload gate. */
+  saveToLibrary(type: "img" | "vid" | "ico", item: StockPhoto | StockVideo | DiscIcon): Promise<{ key: string; name: string } | null>;
 }
 
 // --- Full state result (returned by useMediaState) ---
@@ -367,7 +370,7 @@ export interface MediaStateResult {
   setDiscOrientation(o: DiscOrientation): void;
   setDiscColor(c: DiscColor): void;
   loadMoreDisc(type: "img" | "vid"): Promise<void>;
-  saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): Promise<void>;
+  saveToLibrary: DiscoveryStateResult["saveToLibrary"];
 
   // Panel drag
   panelDragOver: boolean;
@@ -476,34 +479,6 @@ export type DiscColor =
   | "green"
   | "teal"
   | "blue";
-
-export interface DiscoveryViewProps {
-  activeType: MediaTypeFilter;
-  photos: StockPhoto[];
-  videos: StockVideo[];
-  icons: DiscIcon[];
-  fonts: DiscFont[];
-  loading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
-  searchQuery: string;
-  /** WHY the last search failed, or null/absent when it did not. Without it
-      this surface renders a failed request as "No photos found for …" — see
-      blocker A-STOCK. */
-  searchFailed?: StockFailureReason | null;
-  orientation: DiscOrientation;
-  color: DiscColor;
-  /** S19: current source provider (Unsplash / Pexels / Pixabay). */
-  source?: DiscSource;
-  /** S19: monthly stock-search quota strip; hidden when omitted. */
-  quota?: { used: number; limit: number; upgradeHref?: string };
-  onSearch(q: string, orientation?: DiscOrientation, color?: DiscColor): void;
-  onSetOrientation(o: DiscOrientation): void;
-  onSetColor(c: DiscColor): void;
-  /** S19: switch the active stock provider; triggers a re-search. */
-  onSetSource?(s: DiscSource): void;
-  onLoadMore(type: "img" | "vid"): void;
-  onSave(type: "img" | "vid", item: StockPhoto | StockVideo): void;
-  onInsert(filename: string): void;
-}
 
 export interface UploadZoneProps {
   /** Lets a caller (the drawer footer's Upload link) open this zone's file dialog. */
