@@ -218,10 +218,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     }
   }, [state, addToast]);
 
+  /* Clone 3700:20353 — "Upload files or move existing assets into this
+     folder": files picked while a folder is the scope land IN that folder,
+     the rule the drop path below already followed. The picker used to file
+     everything at the root, so uploading from an empty folder's own CTA left
+     that folder empty. */
   const handleFileChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files?.length) {
-        state.upload(Array.from(e.target.files));
+        state.upload(Array.from(e.target.files), { folderId: state.currentFolderId });
         e.target.value = "";
       }
     },

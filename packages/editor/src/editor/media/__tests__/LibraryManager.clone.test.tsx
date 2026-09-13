@@ -262,6 +262,64 @@ describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
   });
 });
 
+describe("Clone 3700:20353 · Assets · Campaign images · empty folder created — P2-A", () => {
+  const emptyFolder = () => ({
+    libraryItems: [],
+    currentFolderId: "f-new",
+    allFolders: [makeFolder({ id: "f1", name: "Products" }), makeFolder({ id: "f-new", name: "Campaign images" })],
+    folderCounts: new Map([["f1", 8]]),
+  });
+
+  it("an empty FOLDER scope reads the folder's own state, not the library's empty hero", async () => {
+    await mountLibrary(emptyFolder());
+    const empty = within(screen.getByTestId("mgr-empty-folder"));
+    expect(empty.getByRole("heading", { name: "Campaign images" })).toBeInTheDocument();
+    expect(empty.getByText("Folder created · No assets yet")).toBeInTheDocument();
+    expect(empty.getByText("Upload files or move existing assets into this folder.")).toBeInTheDocument();
+    expect(empty.getByRole("button", { name: "Upload files" })).toBeInTheDocument();
+    expect(screen.queryByText("No images or files yet.")).toBeNull();
+    expect(screen.queryByTestId("mgr-empty")).toBeNull();
+    // Its row lights in FOLDERS at 0 while the folder it was made beside keeps its count.
+    expect(screen.getByTestId("mgr-row-folder-f-new")).toHaveClass("active");
+    expect(screen.getByTestId("mgr-row-folder-f-new").querySelector(".mgr-node-count")).toHaveTextContent("0");
+  });
+
+  it("'Upload files' is the library's own upload picker", async () => {
+    const click = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(() => {});
+    await mountLibrary(emptyFolder());
+    fireEvent.click(within(screen.getByTestId("mgr-empty-folder")).getByRole("button", { name: "Upload files" }));
+    expect(click).toHaveBeenCalledTimes(1);
+    click.mockRestore();
+  });
+
+  it("files picked while a folder is the scope land IN that folder, the way a drop already did", async () => {
+    const upload = vi.fn(() => Promise.resolve(true));
+    await mountLibrary({ ...emptyFolder(), upload });
+    const input = document.querySelector<HTMLInputElement>("input[type='file']")!;
+    const file = new File(["x"], "campaign.png", { type: "image/png" });
+    fireEvent.change(input, { target: { files: [file] } });
+    expect(upload).toHaveBeenCalledWith([file], { folderId: "f-new" });
+  });
+
+  it("the library-empty hero stays for the root and for smart scopes", async () => {
+    await mountLibrary({ libraryItems: [], currentFolderId: null });
+    expect(screen.getByText("No images or files yet.")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-empty-folder")).toBeNull();
+  });
+
+  it("a search or a format filter that empties a folder is 'No results', not 'Folder created'", async () => {
+    await mountLibrary({ ...emptyFolder(), folderCounts: new Map([["f-new", 3]]), librarySearch: "zzz" });
+    expect(screen.getByText("No results")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-empty-folder")).toBeNull();
+  });
+
+  it("a folder that holds assets the filters hide is not 'empty'", async () => {
+    await mountLibrary({ ...emptyFolder(), folderCounts: new Map([["f-new", 3]]), fmtFilter: "png" });
+    expect(screen.queryByTestId("mgr-empty-folder")).toBeNull();
+    expect(screen.getByTestId("mgr-empty")).toBeInTheDocument();
+  });
+});
+
 describe("Clone 3695:20614 / 44165 · Insert to canvas returns to the canvas", () => {
   it("inserts, then closes the library", async () => {
     const insertToCanvas = vi.fn(() => Promise.resolve());
