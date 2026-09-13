@@ -417,25 +417,38 @@ export class Composer extends EventEmitter {
     });
     this.on(EVENTS.PROJECT_LOADED, () => this.repairLocalMediaUrls());
 
-    /* Site fonts. A font file in the library is a family the pickers offer,
-       so every font asset is registered with the FontManager — at init for
-       what is already stored, then on add / update (a device-only upload
-       reaching the server changes its url) / delete. Registration failures
-       (a file the browser cannot decode) are the FontManager's own event;
-       nothing here should stop the library from loading over one bad file. */
+    /* Site fonts. A font file in the library is UPLOADED; it becomes a
+       family the pickers offer once it is ADDED — `Add font` in the Site
+       fonts dialog sets `MediaAsset.siteFont` (Clone 3686:42317: "Existing
+       text is unchanged until you choose this font"). Only flagged fonts are
+       registered with the FontManager: at init for what is already stored,
+       then on add / update (the flag turning on, or a device-only upload
+       reaching the server with a new url); the flag turning off or the
+       asset's deletion unregisters. `fonts.getAllFonts({ source: "custom" })`
+       is therefore the added set, and the pickers and the export read
+       nothing else. Registration failures (a file the browser cannot decode)
+       are the FontManager's own event; nothing here should stop the library
+       from loading over one bad file. */
     /* The delete event carries only the id and fires after the asset has
        left the media state, so the file each id provided is remembered here. */
     const fontFileById = new Map<string, string>();
-    const registerLibraryFont = (asset: unknown) => {
-      const a = asset as { id?: string; type?: string; originalName?: string; src?: string } | undefined;
+    const syncLibraryFont = (asset: unknown) => {
+      const a = asset as
+        | { id?: string; type?: string; originalName?: string; src?: string; siteFont?: boolean }
+        | undefined;
       if (a?.type !== "font" || !a.originalName || !a.src) return;
-      if (a.id) fontFileById.set(a.id, a.originalName);
-      void this.fonts.registerLibraryFont({ filename: a.originalName, url: a.src }).catch(() => {});
+      if (a.siteFont === true) {
+        if (a.id) fontFileById.set(a.id, a.originalName);
+        void this.fonts.registerLibraryFont({ filename: a.originalName, url: a.src }).catch(() => {});
+        return;
+      }
+      if (a.id) fontFileById.delete(a.id);
+      this.fonts.unregisterLibraryFont(a.originalName);
     };
-    this.media.on(MEDIA_EVENTS.MEDIA_ADDED, registerLibraryFont);
+    this.media.on(MEDIA_EVENTS.MEDIA_ADDED, syncLibraryFont);
     this.media.on(MEDIA_EVENTS.MEDIA_UPDATED, (payload: unknown) => {
       const p = payload as { asset?: unknown } | undefined;
-      registerLibraryFont(p && "asset" in p ? p.asset : payload);
+      syncLibraryFont(p && "asset" in p ? p.asset : payload);
     });
     this.media.on(MEDIA_EVENTS.MEDIA_DELETED, (payload: unknown) => {
       const id = (payload as { id?: string } | undefined)?.id;
@@ -447,7 +460,7 @@ export class Composer extends EventEmitter {
 
     // Initialize async managers
     await this.media.init();
-    for (const asset of this.media.getAssets()) registerLibraryFont(asset);
+    for (const asset of this.media.getAssets()) syncLibraryFont(asset);
 
     // Load project if configured
     if (this.config.project?.autoLoad) {

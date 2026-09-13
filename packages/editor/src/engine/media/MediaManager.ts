@@ -79,6 +79,16 @@ function tagsFromUserMetadata(meta: unknown): string[] {
   const tags: unknown = meta.tags;
   return Array.isArray(tags) ? tags.filter((t): t is string => typeof t === "string") : [];
 }
+
+/**
+ * Clone 3686:42317 (Site fonts): the ADDED flag a server row carries at
+ * `userMetadata.siteFont`, beside the tags. Only a literal `true` counts —
+ * anything else is "uploaded, not added", which is also what a row written
+ * before Phase 5 means.
+ */
+function siteFontFromUserMetadata(meta: unknown): boolean {
+  return typeof meta === "object" && meta !== null && "siteFont" in meta && meta.siteFont === true;
+}
 // only via dashboard.media.searchStock tRPC. Engine no longer touches I/O for stock.
 
 // --- Discovery stub types ---
@@ -511,7 +521,8 @@ export class MediaManager extends MediaEventEmitter {
       folderId: string | null;
       createdAt: string | Date;
       updatedAt: string | Date;
-      /** The row's JSON column; `tags` lives at `userMetadata.tags` (C3). */
+      /** The row's JSON column; `tags` lives at `userMetadata.tags` (C3),
+       *  `siteFont` beside it (3686:42317). */
       userMetadata?: unknown;
     }>,
     serverFolders: ReadonlyArray<{
@@ -560,6 +571,7 @@ export class MediaManager extends MediaEventEmitter {
         altText: sa.altText ?? undefined,
         folderId: sa.folderId ?? undefined,
         tags: tagsFromUserMetadata(sa.userMetadata),
+        ...(siteFontFromUserMetadata(sa.userMetadata) ? { siteFont: true } : {}),
         createdAt: typeof sa.createdAt === "string" ? sa.createdAt : sa.createdAt.toISOString(),
         updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
         assetSource: "uploaded",
@@ -1253,6 +1265,12 @@ export class MediaManager extends MediaEventEmitter {
     // `media.updateAsset` already took and `importServerAssets` reads back.
     // Sent only when the list actually changed, so a name edit's patch is
     // still exactly `{ filename, altText }`.
+    //
+    // Clone 3686:42317 (Phase 5): `siteFont` shares that column. The server
+    // REPLACES the column with what is sent, so the patch is the whole
+    // column — the tags AND the flag, from the asset as it now is — whichever
+    // of the two changed. A flag that was never set stays out of it: an image
+    // has nothing to preserve.
     if (this.remoteSync && asset.serverId) {
       const patch: Parameters<RemoteAssetSync["updateAsset"]>[1] = {};
       if (
@@ -1262,11 +1280,16 @@ export class MediaManager extends MediaEventEmitter {
         patch.filename = updated.name;
         patch.altText = updated.altText ?? null;
       }
-      if (
+      const tagsChanged =
         Object.prototype.hasOwnProperty.call(updates, "tags") &&
-        (asset.tags.length !== updated.tags.length || asset.tags.some((t, i) => t !== updated.tags[i]))
-      ) {
-        patch.userMetadata = { tags: updated.tags };
+        (asset.tags.length !== updated.tags.length || asset.tags.some((t, i) => t !== updated.tags[i]));
+      const siteFontChanged =
+        Object.prototype.hasOwnProperty.call(updates, "siteFont") && asset.siteFont !== updated.siteFont;
+      if (tagsChanged || siteFontChanged) {
+        patch.userMetadata = {
+          tags: updated.tags,
+          ...(updated.siteFont !== undefined ? { siteFont: updated.siteFont } : {}),
+        };
       }
       if (Object.keys(patch).length > 0) {
         await this.remoteSync.updateAsset(asset.serverId, patch);

@@ -33,6 +33,7 @@ import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
 import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal";
+import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 // ============================================================================
@@ -564,6 +565,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         composer={composer}
         onClose={() => publishJob?.dismissBlock()}
       />
+
+      {/* Clone 3686:42317 — Site fonts. Mounted once, here, and opened by
+          `ui:site-fonts` from every door (the rail's Manage font, the
+          drawer's Aa Fonts, the Typography picker's Manage site fonts row),
+          so no door owns a dialog and nothing threads through AquibraStudio. */}
+      {composer ? <SiteFontsModal composer={composer} /> : null}
     </StylePresetRegistryProvider>
     </TokenRegistryProvider>
     </DSModeProvider>

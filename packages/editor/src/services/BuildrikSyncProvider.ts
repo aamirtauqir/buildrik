@@ -447,7 +447,7 @@ export async function loadServerMedia(
     createdAt: string | Date;
     updatedAt: string | Date;
     /** The row's JSON column, passed through whole — `importServerAssets`
-     *  reads `tags` out of it (BLOCKERS C3). */
+     *  reads `tags` (BLOCKERS C3) and `siteFont` (3686:42317) out of it. */
     userMetadata?: unknown;
   }>;
   folders: ReadonlyArray<{

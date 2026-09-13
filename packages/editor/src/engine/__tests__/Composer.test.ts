@@ -159,15 +159,21 @@ describe("Composer listener hygiene", () => {
     expect((composer as any).viewport.getDevice()).toBe("tablet");
   });
 
-  /* Site fonts — a font file in the media library becomes a family the
-     pickers offer (Clone 3696:21550 / 3721:43423). The Composer is the one
-     place that hears the media events and knows the FontManager. */
+  /* Site fonts — Clone 3686:42317 (Site fonts) / 3721:43423 (Fonts round
+     trip): a font file in the library is UPLOADED; it becomes a family the
+     pickers offer only once it is ADDED (`Add font` sets `siteFont`). The
+     Composer is the one place that hears the media events and knows the
+     FontManager, so the gate lives here: registered on the flag, never on
+     the upload; unregistered when the flag turns off or the file is deleted.
+     (Until Phase 5 every font asset was registered on add — the model the
+     Clone's "Existing text is unchanged until you choose this font" step
+     replaces.) */
   class MockFontFace {
     constructor(public family: string, public source: string) {}
     load = vi.fn(async () => this);
   }
 
-  it("registers a font asset on add, swaps its url on update, and drops it on delete", async () => {
+  function stubFontFaces() {
     vi.stubGlobal("FontFace", MockFontFace);
     const faces = new Set<unknown>();
     Object.defineProperty(document, "fonts", {
@@ -180,27 +186,62 @@ describe("Composer listener hygiene", () => {
         ready: Promise.resolve(),
       },
     });
+  }
+
+  const interVar = (over: Record<string, unknown>) => ({
+    id: "local-1", type: "font", originalName: "Inter-Var.woff2", src: "blob:http://x/1", ...over,
+  });
+
+  it("3686:42317 · an uploaded font is NOT registered until it is added; Remove and Delete unregister it", async () => {
+    stubFontFaces();
     const composer = new Composer({} as any);
     await composer.whenReady();
+    const added = () => composer.fonts.getAllFonts({ source: "custom" });
 
-    composer.media.emitEvent("media:added", {
-      id: "local-1", type: "font", originalName: "Inter-Var.woff2", src: "blob:http://x/1",
+    // Uploaded (the file lands in the library) — the pickers offer nothing yet.
+    composer.media.emitEvent("media:added", interVar({}));
+    await Promise.resolve();
+    expect(added()).toHaveLength(0);
+
+    // Added — registered under the file's family.
+    composer.media.emitEvent("media:updated", { asset: interVar({ siteFont: true }), changes: { siteFont: true } });
+    await vi.waitFor(() => expect(added().map((f) => f.family)).toEqual(["Inter Var"]));
+
+    // The device-only upload reaches the server: new id, new url, same file — the face swaps in place.
+    composer.media.emitEvent("media:updated", {
+      asset: interVar({ id: "srv-1", src: "https://cdn/inter.woff2", siteFont: true }),
+      changes: {},
     });
+    await vi.waitFor(() => expect(added()[0].variants[0].url).toBe("https://cdn/inter.woff2"));
+    expect(added()).toHaveLength(1);
+
+    // Removed — the flag turns off and the family leaves the pickers.
+    composer.media.emitEvent("media:updated", {
+      asset: interVar({ id: "srv-1", src: "https://cdn/inter.woff2", siteFont: false }),
+      changes: { siteFont: false },
+    });
+    expect(added()).toHaveLength(0);
+
+    // Added again, then the file is deleted from the library.
+    composer.media.emitEvent("media:updated", {
+      asset: interVar({ id: "srv-1", src: "https://cdn/inter.woff2", siteFont: true }),
+      changes: { siteFont: true },
+    });
+    await vi.waitFor(() => expect(added()).toHaveLength(1));
+    composer.media.emitEvent("media:deleted", { id: "srv-1" });
+    expect(added()).toHaveLength(0);
+    vi.unstubAllGlobals();
+  });
+
+  it("3686:42317 · a font added on another device is registered when the library imports it", async () => {
+    stubFontFaces();
+    const composer = new Composer({} as any);
+    await composer.whenReady();
+    // `importServerAssets` announces each row as media:added, carrying the flag it read back.
+    composer.media.emitEvent("media:added", interVar({ id: "srv-2", src: "https://cdn/inter.woff2", siteFont: true }));
     await vi.waitFor(() =>
       expect(composer.fonts.getAllFonts({ source: "custom" }).map((f) => f.family)).toEqual(["Inter Var"]),
     );
-
-    composer.media.emitEvent("media:updated", {
-      asset: { id: "srv-1", type: "font", originalName: "Inter-Var.woff2", src: "https://cdn/inter.woff2" },
-      changes: {},
-    });
-    await vi.waitFor(() =>
-      expect(composer.fonts.getAllFonts({ source: "custom" })[0].variants[0].url).toBe("https://cdn/inter.woff2"),
-    );
-    expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(1);
-
-    composer.media.emitEvent("media:deleted", { id: "srv-1" });
-    expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(0);
     vi.unstubAllGlobals();
   });
 });
