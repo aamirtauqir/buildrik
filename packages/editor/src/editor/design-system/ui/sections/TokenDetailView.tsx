@@ -34,6 +34,7 @@ import type { UsageRef } from "../../../../engine/designSystem/TokenUsageTracker
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
+import { FontFamilyPicker } from "./FontFamilyPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
 import { Button, FieldRow, TextInput } from "@/editor/chrome-ui";
 
@@ -409,13 +410,27 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               )}
             </>
           ) : (
-            <TextInput
-              type="text"
-              value={token.value}
-              onChange={(e) => onValueChange?.(token.id, e.target.value)}
-              className={MONO}
-              aria-label="Light value"
-            />
+            <>
+              {/* Clone 3721:44821 — a font-family token is picked, not only
+                  typed: presets, the ADDED site fonts, `Manage site fonts`.
+                  The field below stays for a hand-typed stack. */}
+              {token.type === "font-family" && (
+                <div className="tw:mb-1.5">
+                  <FontFamilyPicker
+                    value={token.value}
+                    onChange={(family) => onValueChange?.(token.id, family)}
+                    composer={composer}
+                  />
+                </div>
+              )}
+              <TextInput
+                type="text"
+                value={token.value}
+                onChange={(e) => onValueChange?.(token.id, e.target.value)}
+                className={MONO}
+                aria-label="Light value"
+              />
+            </>
           )}
         </div>
       </FieldRow>
