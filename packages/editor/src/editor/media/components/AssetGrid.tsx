@@ -94,6 +94,15 @@ const SORT_OPTIONS: ReadonlyArray<{ value: MediaSortBy; label: string }> = [
   { value: "type", label: "Type" },
 ];
 
+/* Clone 3695:19968 — the Type column prints the format a person would say:
+   IMG · VID · SVG · FONT. The bucket keys ("ico", "fnt") are internal. */
+const LIST_TYPE_LABEL: Record<LibraryItem["type"], string> = {
+  img: "IMG",
+  vid: "VID",
+  ico: "SVG",
+  fnt: "FONT",
+};
+
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
   return SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Date added";
@@ -583,8 +592,8 @@ export function AssetGrid({
                     ) : null}
                   </span>
                   <div className="mgr-list-name">{item.displayName ?? item.name}</div>
-                  <div className="mgr-list-type" data-testid={`mgr-list-type-${item.key}`}>{item.type.toUpperCase()}</div>
-                  <div className="mgr-list-size">{formatBytes(item.size)}</div>
+                  <div className="mgr-list-type" data-testid={`mgr-list-type-${item.key}`}>{LIST_TYPE_LABEL[item.type]}</div>
+                  <div className="mgr-list-size">{formatBytes(item.size, item.size >= 1024 * 1024 ? 1 : 0)}</div>
                   <div className={`mgr-list-use${(usageMap.get(item.key) ?? 0) > 0 ? "" : " unused"}`}>
                     {(usageMap.get(item.key) ?? 0) > 0
                       ? `used ×${usageMap.get(item.key)}`

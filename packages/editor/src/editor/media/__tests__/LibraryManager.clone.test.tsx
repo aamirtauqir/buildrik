@@ -97,3 +97,35 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
     expect(chef.querySelector("img")).toBeNull();
   });
 });
+
+describe("Clone 3695:44543 / 44747 / 20154 · view switch preserves selection (audit A01)", () => {
+  it("keeps menu-cover.png in the rail across a List switch and back, and creates no bulk selection", async () => {
+    await mountLibrary();
+    fireEvent.click(screen.getByTestId("mgr-asset-menu"));
+    const rail = () => within(screen.getByTestId("mgr-details"));
+    expect(rail().getByText("menu-cover.png")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    expect(rail().getByText("menu-cover.png")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-bulk-bar")).toBeNull();
+    fireEvent.click(within(screen.getByTestId("mgr-gridn")).getByRole("button", { name: "3" }));
+    expect(rail().getByText("menu-cover.png")).toBeInTheDocument();
+  });
+});
+
+describe("Clone 3695:44339 · Assets · Search menu", () => {
+  it("counts the results for the query and keeps the matching selection", async () => {
+    await mountLibrary({ librarySearch: "menu", libraryItems: TEN.filter((i) => i.name.includes("menu")) });
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent('1 result for "menu"');
+    fireEvent.click(screen.getByTestId("mgr-asset-menu"));
+    expect(within(screen.getByTestId("mgr-details")).getByText("menu-cover.png")).toBeInTheDocument();
+  });
+
+  it("routes the field to the library-only query, never the stock discovery search", async () => {
+    const setLibraryQuery = vi.fn();
+    const setLibrarySearch = vi.fn();
+    await mountLibrary({ setLibraryQuery, setLibrarySearch });
+    fireEvent.change(screen.getByPlaceholderText("Search across all folders…"), { target: { value: "menu" } });
+    expect(setLibraryQuery).toHaveBeenCalledWith("menu");
+    expect(setLibrarySearch).not.toHaveBeenCalled();
+  });
+});

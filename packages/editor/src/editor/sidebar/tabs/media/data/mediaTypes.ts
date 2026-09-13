@@ -336,6 +336,12 @@ export interface MediaStateResult {
   // Shared
   librarySearch: string;
   setLibrarySearch(q: string): void;
+  /** Library-only search — the fullpage Asset library's field (Clone
+   *  3695:44339, "Search across all folders…"). `setLibrarySearch` is the
+   *  drawer's unified search and also fires stock discovery, which toasts
+   *  "Stock search isn't set up" on every third keystroke when no provider
+   *  key is configured. */
+  setLibraryQuery(q: string): void;
   storage: { used: number; total: number };
 
   // Clipboard

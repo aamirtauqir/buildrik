@@ -420,6 +420,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     // Shared
     librarySearch: library.librarySearch,
     setLibrarySearch: setUnifiedSearch,
+    setLibraryQuery: library.setLibrarySearch,
     storage: { used: upload.storageUsed, total: upload.storageTotal },
 
     // Clipboard

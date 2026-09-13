@@ -299,7 +299,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               type="text"
               placeholder="Search across all folders…"
               value={state.librarySearch}
-              onChange={(e) => state.setLibrarySearch(e.target.value)}
+              onChange={(e) => state.setLibraryQuery(e.target.value)}
             />
             <span className="mgr-kbd">⌘K</span>
           </div>

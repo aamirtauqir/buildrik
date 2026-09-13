@@ -108,6 +108,7 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
     handlePanelDrop: noop,
     librarySearch: "",
     setLibrarySearch: noop,
+    setLibraryQuery: noop,
     storage: { used: 0, total: 1024 * 1024 * 1024 },
     copyUrl: noop,
     ctxMenu: null,

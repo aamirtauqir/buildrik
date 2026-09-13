@@ -72,11 +72,20 @@
 
 .mgr-search svg { width: 14px; height: 14px; flex-shrink: 0; }
 
+/* flowbite's TextInput wraps the <input> in two divs and neither grows, so
+   the field used 168px of its own 560 (Clone walk 2026-09-13, measured). */
+.mgr-search > div {
+  flex: 1;
+  min-width: 0;
+}
+
 .mgr-search input {
   border: none;
   background: transparent;
   outline: none;
-  flex: 1;
+  box-shadow: none;
+  padding: 0;
+  width: 100%;
   font-size: 13px;
   color: var(--bk-ink);
 }
