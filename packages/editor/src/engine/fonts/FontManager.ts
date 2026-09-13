@@ -49,6 +49,14 @@ const fileStem = (filename: string): string => filename.replace(/\.[^/.]+$/, "")
 const libraryFontId = (filename: string): string =>
   `library-${fileStem(filename).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 
+/** The family a library FILE registers as — "Inter-Var.woff2" → "Inter Var".
+ *  Exported so the Site fonts dialog (3686:42317) prints the same name for a
+ *  file that is not added yet, instead of deriving its own. */
+export const libraryFontFamily = (filename: string): string => {
+  const stem = fileStem(filename);
+  return stem.replace(/[-_]+/g, " ").trim() || stem;
+};
+
 export class FontManager extends EventEmitter {
   private fonts: Map<string, Font> = new Map();
   private loadedFonts: Set<string> = new Set();
@@ -404,8 +412,7 @@ export class FontManager extends EventEmitter {
    * the picker.
    */
   async registerLibraryFont(asset: { filename: string; url: string }): Promise<CustomFont> {
-    const stem = fileStem(asset.filename);
-    const family = stem.replace(/[-_]+/g, " ").trim() || stem;
+    const family = libraryFontFamily(asset.filename);
     const fontId = libraryFontId(asset.filename);
     const previous = this.fonts.get(fontId);
     /* Re-registering (new url, a second file with the same stem) replaces the

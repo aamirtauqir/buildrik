@@ -206,6 +206,18 @@ describe("Clone 3437:36027 · drawer baseline", () => {
     expect(screen.queryByTestId("media-footer-hint")).toBeNull();
   });
 
+  /* The footer row is `↑ Upload · Stock · Icons · Aa Fonts`. The fourth door
+     is Phase 5's (3686:42317): it opens the Site fonts dialog through the
+     one composer event the dialog listens for, with no file to highlight. */
+  it("'Aa Fonts' closes the footer row and opens Site fonts through ui:site-fonts", () => {
+    const composer = mockComposer();
+    render(<SlimLauncher {...baseProps()} composer={composer} onOpenIconPicker={vi.fn()} />);
+    const links = within(screen.getByTestId("media-footer-links"));
+    expect(links.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Upload", "Stock", "Icons", "Aa Fonts"]);
+    fireEvent.click(screen.getByTestId("media-fonts-action"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:site-fonts", {});
+  });
+
   it("'Manage assets ↗' sits under the header and opens the full library", async () => {
     const onOpenLibrary = vi.fn();
     const user = userEvent.setup();

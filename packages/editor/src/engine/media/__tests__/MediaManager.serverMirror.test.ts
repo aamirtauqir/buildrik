@@ -42,14 +42,15 @@ function makeManager(remoteSync?: RemoteAssetSync) {
 function seedAsset(manager: MediaManager, partial: Partial<MediaAsset> & { id: string }) {
   const asset: MediaAsset = {
     id: partial.id,
-    type: "image",
+    type: partial.type ?? "image",
     name: partial.name ?? "old.png",
     altText: partial.altText,
-    originalName: "old.png",
+    originalName: partial.originalName ?? "old.png",
     src: "https://x/old.png",
-    mimeType: "image/png",
+    mimeType: partial.mimeType ?? "image/png",
     size: 10,
-    tags: [],
+    tags: partial.tags ?? [],
+    siteFont: partial.siteFont,
     folderId: partial.folderId,
     serverId: partial.serverId,
     localOnly: partial.localOnly,
@@ -232,5 +233,120 @@ describe("MediaManager server mirror — tags ↔ userMetadata.tags (C3)", () =>
     expect(tags("bare")).toEqual([]);
     expect(tags("nulled")).toEqual([]);
     expect(tags("wrong")).toEqual([]);
+  });
+});
+
+/* Clone 3686:42317 (Assets · Site fonts, Phase 5): `Add font` turns an
+   UPLOADED font file into an ADDED site font. The flag rides the same JSON
+   column as the tags — `userMetadata.siteFont` — and the server REPLACES that
+   column with whatever is sent, so a patch that carries one of the two must
+   carry the other or it erases it. */
+describe("MediaManager server mirror — siteFont ↔ userMetadata.siteFont (3686:42317)", () => {
+  const font = (over: Partial<MediaAsset> = {}) => ({
+    id: "f1",
+    type: "font" as const,
+    name: "Inter-Var",
+    originalName: "Inter-Var.woff2",
+    mimeType: "font/woff2",
+    serverId: "srv-f1",
+    ...over,
+  });
+
+  it("Add font mirrors { tags, siteFont: true } — the current tags ride along, since the server replaces the column", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, font({ tags: ["brand"] }));
+
+    const updated = await manager.updateAsset("f1", { siteFont: true });
+
+    expect(updated?.siteFont).toBe(true);
+    expect(remote.updateAsset).toHaveBeenCalledTimes(1);
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-f1", { userMetadata: { tags: ["brand"], siteFont: true } });
+  });
+
+  it("a tags edit on an ADDED font keeps siteFont in the patch", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, font({ siteFont: true }));
+
+    await manager.updateAsset("f1", { tags: ["heading"] });
+
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-f1", { userMetadata: { tags: ["heading"], siteFont: true } });
+  });
+
+  it("Remove mirrors siteFont: false with the tags intact", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, font({ siteFont: true, tags: ["brand"] }));
+
+    const updated = await manager.updateAsset("f1", { siteFont: false });
+
+    expect(updated?.siteFont).toBe(false);
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-f1", { userMetadata: { tags: ["brand"], siteFont: false } });
+  });
+
+  it("an unchanged flag does not round-trip to the server", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, font({ siteFont: true }));
+
+    await manager.updateAsset("f1", { siteFont: true });
+
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+  });
+
+  it("a device-only font is added locally and mirrors nothing until it syncs", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, font({ serverId: undefined }));
+
+    await manager.updateAsset("f1", { siteFont: true });
+
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+    expect(manager.getAsset("f1")?.siteFont).toBe(true);
+  });
+
+  it("a tags edit on an image sends { tags } alone — no flag was ever set, so there is nothing to preserve", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "a1", serverId: "srv-a1" });
+
+    await manager.updateAsset("a1", { tags: ["menu"] });
+
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-a1", { userMetadata: { tags: ["menu"] } });
+  });
+
+  const fontRow = (id: string, userMetadata?: unknown) => ({
+    id,
+    url: `https://cdn/${id}.woff2`,
+    bytes: 10,
+    type: "font" as const,
+    mimeType: "font/woff2",
+    filename: `${id}.woff2`,
+    altText: null,
+    folderId: null,
+    createdAt: "2026-09-13T00:00:00.000Z",
+    updatedAt: "2026-09-13T00:00:00.000Z",
+    ...(userMetadata !== undefined ? { userMetadata } : {}),
+  });
+
+  it("importServerAssets reads userMetadata.siteFont back — literally true, or not added", async () => {
+    const manager = makeManager(makeRemoteSync());
+
+    await manager.importServerAssets(
+      [
+        fontRow("added", { tags: ["brand"], siteFont: true }),
+        fontRow("stringy", { siteFont: "true" }),
+        fontRow("off", { siteFont: false }),
+        fontRow("bare"),
+      ],
+      [],
+    );
+
+    expect(manager.getAsset("added")?.siteFont).toBe(true);
+    expect(manager.getAsset("added")?.tags).toEqual(["brand"]);
+    expect(manager.getAsset("stringy")?.siteFont).toBeFalsy();
+    expect(manager.getAsset("off")?.siteFont).toBeFalsy();
+    expect(manager.getAsset("bare")?.siteFont).toBeFalsy();
   });
 });

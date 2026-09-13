@@ -15,7 +15,7 @@
  *   img/png  Insert to canvas · Edit image | Rename · Replace across site… · Delete
  *   svg      same as img
  *   mp4      Insert to canvas · Rename · Replace across site… · Delete   (no Edit image)
- *   woff2    Rename · Delete                       (no Insert, no Replace; Manage font is Phase 5)
+ *   woff2    Manage font · Rename · Delete         (no Insert, no Replace; Phase 5 opened the door)
  *
  * Insert to canvas is the PRIMARY (accent) button: 3705:20396 and
  * 4207:26629 draw it filled, and the later section wins over 3695:20340's
@@ -146,12 +146,37 @@ describe("Clone 3696:20734 · Selected · logo-mark.svg", () => {
   });
 });
 
+/* Phase 5 (Site fonts, 3686:42317) opened the door Phase 1 left drift-open:
+   the rail's actions read `Manage font · Rename · Delete`, and the meta line
+   says which of the model's two states the file is in. A font is still
+   neither inserted nor replaced across the site. */
 describe("Clone 3696:21550 · Selected · Inter-Var.woff2", () => {
-  it("offers Rename and Delete only — a font is not inserted or replaced across the site", () => {
-    mount(byName("Inter-Var.woff2"), { usageCount: 1 });
-    expect(actionNames()).toEqual(["Rename", "Delete"]);
-    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Selected asset · WOFF2");
+  it("offers Manage font · Rename · Delete — no Insert, no Replace, no alt text", () => {
+    mount(byName("Inter-Var.woff2"), { usageCount: 1, onManageFont: vi.fn() });
+    expect(actionNames()).toEqual(["Manage font", "Rename", "Delete"]);
     expect(screen.queryByTestId("alt-text-section")).toBeNull();
+  });
+
+  it("the meta line reads the file's state — uploaded, not added — with its format", () => {
+    mount(byName("Inter-Var.woff2"), { onManageFont: vi.fn() });
+    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Uploaded · not added · WOFF2");
+  });
+
+  it("an added font's meta line reads Site font · added", () => {
+    mount({ ...byName("Inter-Var.woff2"), siteFont: true }, { onManageFont: vi.fn() });
+    expect(screen.getByTestId("mgr-det-meta")).toHaveTextContent("Site font · added · WOFF2");
+  });
+
+  it("Manage font hands THIS file to the door — the Site fonts dialog opens on it", () => {
+    const onManageFont = vi.fn();
+    mount(byName("Inter-Var.woff2"), { onManageFont });
+    fireEvent.click(screen.getByTestId("mgr-det-manage-font"));
+    expect(onManageFont).toHaveBeenCalledWith(byName("Inter-Var.woff2"));
+  });
+
+  it("Manage font is not offered for an image", () => {
+    mount(byName("menu-cover.png"), { onManageFont: vi.fn() });
+    expect(screen.queryByTestId("mgr-det-manage-font")).toBeNull();
   });
 });
 
@@ -181,9 +206,9 @@ describe("Clone 3705:20396 · List · chef-intro.mp4 selected (the one checked r
     expect(actions.getByRole("button", { name: "Rename" })).toHaveClass("mgr-btn");
   });
 
-  it("3705:21059 · a checked font offers Rename · Delete only", () => {
-    mount(byName("Inter-Var.woff2"), { usageCount: 1 });
-    expect(actionNames()).toEqual(["Rename", "Delete"]);
+  it("3705:21059 · a checked font offers Manage font · Rename · Delete", () => {
+    mount(byName("Inter-Var.woff2"), { usageCount: 1, onManageFont: vi.fn() });
+    expect(actionNames()).toEqual(["Manage font", "Rename", "Delete"]);
   });
 });
 

@@ -162,6 +162,13 @@ export interface AssetDetailsPanelProps {
    * renders when the orchestrator hands it this writer.
    */
   onUpdateTags?(key: string, tags: string[]): void;
+  /**
+   * Clone 3696:21550 / 3705:21059 — a font's `Manage font` opens the Site
+   * fonts dialog (3686:42317) on THIS file. The orchestrator answers it
+   * with the composer event the dialog listens for; the row is drawn only
+   * when it does.
+   */
+  onManageFont?(item: LibraryItem): void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -188,6 +195,7 @@ export function AssetDetailsPanel({
   onUpdateAltText,
   onRegenerateAltText,
   onUpdateTags,
+  onManageFont,
 }: AssetDetailsPanelProps) {
   const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
@@ -292,18 +300,23 @@ export function AssetDetailsPanel({
      says the same in one row ("1600 × 1200 · 220 KB · PNG · added Aug 4"),
      and a version or a usage is on screen without a tab click first. */
   const ext = fileExt(selectedItem);
+  const isImage = selectedItem.type === "img" || selectedItem.type === "ico";
+  const isFont = selectedItem.type === "fnt";
+  /* 3696:21550 (Phase 5): a font's line says which of the model's two states
+     it is in — uploaded (in the library) or added (a site font the pickers
+     offer) — since the two look identical in the grid. */
   const metaLine =
     selectedItem.width && selectedItem.height
       ? `${selectedItem.width} × ${selectedItem.height} · ${shortBytes(selectedItem.size)} · ${ext} · added ${shortDate(selectedItem.createdAt)}`
-      : `Selected asset · ${ext}`;
+      : isFont
+        ? `${selectedItem.siteFont ? "Site font · added" : "Uploaded · not added"} · ${ext}`
+        : `Selected asset · ${ext}`;
   const usedLine =
     usageCount === 0
       ? "Not used on this site"
       : usedIn.length > 0
         ? `${usageCount} ${usageCount === 1 ? "place" : "places"} — ${usedIn.join(", ")}`
         : `Used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`;
-  const isImage = selectedItem.type === "img" || selectedItem.type === "ico";
-  const isFont = selectedItem.type === "fnt";
 
   return (
     <>
@@ -391,15 +404,27 @@ export function AssetDetailsPanel({
 
         {/* Per type (phase1-journeys.md, J-B table): images and SVGs get the
             full set; a video has no Edit image; a font is neither inserted
-            nor replaced across the site — Rename and Delete only. The Clone's
-            "Manage font" needs the Site fonts overlay (Phase 5) and is not
-            drawn until that door exists. Insert to canvas is the PRIMARY:
-            3705:20396 and 4207:26629 (the later section) draw it filled,
-            over 3695:20340's outlined one. */}
+            nor replaced across the site — Manage font · Rename · Delete
+            (3696:21550 / 3705:21059; Manage font opens the Site fonts
+            dialog, 3686:42317, on this file, and is drawn in the board's
+            quiet fill). Insert to canvas is the PRIMARY: 3705:20396 and
+            4207:26629 (the later section) draw it filled, over
+            3695:20340's outlined one. */}
         <div className="mgr-det-actions" data-testid="mgr-det-actions">
           {!isFont && (
             <Button size="xs" className={RAIL_PRIMARY} onClick={() => onInsert(selectedItem.key)}>
               Insert to canvas
+            </Button>
+          )}
+          {isFont && onManageFont && (
+            <Button
+              size="xs"
+              variant="secondary"
+              className={RAIL_QUIET}
+              onClick={() => onManageFont(selectedItem)}
+              data-testid="mgr-det-manage-font"
+            >
+              Manage font
             </Button>
           )}
           {isImage ? (

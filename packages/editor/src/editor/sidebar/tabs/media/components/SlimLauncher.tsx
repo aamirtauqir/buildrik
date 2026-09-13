@@ -783,8 +783,13 @@ export function SlimLauncher(props: SlimLauncherProps) {
           className={`tw:pb-7.5 tw:text-[13px] tw:leading-5 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
           data-testid="media-footer"
         >
+        {/* Four doors in 248px. Board 3437:36027 draws them spanning the row's
+            full width at ~14px gaps; at the code's 13px type a fixed 16 gap
+            overflows the drawer by ~20px (the same trap that wrapped "Browse
+            stock" here), so the gap is distributed instead — the board's
+            spread, and it cannot overflow while the labels fit. */}
         <div
-          className="tw:flex tw:h-11 tw:items-center tw:gap-4 tw:whitespace-nowrap tw:px-4 tw:text-[var(--bk-accent-text)]"
+          className="tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-2 tw:whitespace-nowrap tw:px-4 tw:text-[var(--bk-accent-text)]"
           data-testid="media-footer-links"
         >
           <Button
@@ -828,6 +833,22 @@ export function SlimLauncher(props: SlimLauncherProps) {
               Icons
             </Button>
           ) : null}
+          {/* Clone 3437:36027's fourth door, `Aa Fonts` — the Site fonts
+              dialog (3686:42317), mounted once in the shell and opened by
+              the composer event every door emits. No file to highlight
+              from here. The glyph is the board's own "Aa", the same mark
+              the rail's font preview uses. */}
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
+            data-testid="media-fonts-action"
+            onClick={() => props.composer.emit("ui:site-fonts", {})}
+          >
+            <span aria-hidden="true" className="tw:text-[11px] tw:font-semibold tw:leading-none">Aa</span>{" "}
+            Fonts
+          </Button>
         </div>
           {/* The limits are the engine's (`MEDIA_SIZE_LIMITS`), written once
               in `MEDIA_SIZE_LIMITS_LABEL`. This line used to carry its own

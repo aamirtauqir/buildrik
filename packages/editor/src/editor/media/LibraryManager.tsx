@@ -735,6 +735,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           composer={composer}
           addToast={addToast}
           onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
+          /* Clone 3696:21550 — Site fonts is mounted once in the shell and
+             opens on the composer event, with this file highlighted. */
+          onManageFont={(item) => composer.emit("ui:site-fonts", { assetId: item.key })}
           onUpdateAltText={(key, altText) => {
             // User-typed edit — clear AI provenance so the chip disappears.
             // Empty user edit also counts as "no longer AI's text."

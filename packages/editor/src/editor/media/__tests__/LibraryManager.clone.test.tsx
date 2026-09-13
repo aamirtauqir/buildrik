@@ -195,10 +195,16 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     expect(requestDelete).toHaveBeenCalledWith("chef");
   });
 
-  it("3705:21059 · one checked font: Rename · Delete, no Insert, no Replace", async () => {
-    await mountLibrary({ selMode: true, selectedKeys: new Set(["inter"]) });
+  /* Phase 5 (3686:42317) opened the door this row was left drift-open for:
+     Manage font opens the Site fonts dialog on THIS file, through the one
+     composer event the dialog listens for. */
+  it("3705:21059 · one checked font: Manage font · Rename · Delete, no Insert, no Replace — and Manage font names the file", async () => {
+    const emit = vi.fn();
+    await mountLibrary({ selMode: true, selectedKeys: new Set(["inter"]) }, {}, { emit });
     const actions = within(screen.getByTestId("mgr-det-actions"));
-    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Rename", "Delete"]);
+    expect(actions.getAllByRole("button").map((b) => b.textContent?.trim())).toEqual(["Manage font", "Rename", "Delete"]);
+    fireEvent.click(actions.getByRole("button", { name: "Manage font" }));
+    expect(emit).toHaveBeenCalledWith("ui:site-fonts", { assetId: "inter" });
   });
 
   it("the checked file's rail wins over a card the person clicked before entering select mode", async () => {

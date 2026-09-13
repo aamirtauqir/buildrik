@@ -90,6 +90,10 @@ export interface LibraryItem {
   /** The file's tags — the rail's TAGS chips (Clone 3695:45155) and the tag
    *  filter (3721:43697) read them; the rail's TAGS block writes them. */
   tags?: string[];
+  /** A font file ADDED as a site font (Clone 3686:42317) — the rail's meta
+   *  line reads it (`Site font · added` / `Uploaded · not added`). Written
+   *  by the Site fonts dialog only, through the engine. */
+  siteFont?: boolean;
 }
 
 // --- Delete confirmation ---

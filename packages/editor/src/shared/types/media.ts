@@ -155,6 +155,16 @@ export interface MediaAsset {
   /** User-defined tags for organization */
   tags: string[];
 
+  /**
+   * Clone 3686:42317 (Site fonts): a font file is UPLOADED when it lands in
+   * the library and ADDED once `Add font` sets this — only then does the
+   * Composer register its family with the FontManager and the pickers offer
+   * it ("Existing text is unchanged until you choose this font"). Meaningful
+   * on `type: "font"` only. Mirrored as `userMetadata.siteFont` beside the
+   * tags, and read back from there on import.
+   */
+  siteFont?: boolean;
+
   /** Folder ID for organization */
   folderId?: string;
 
@@ -252,7 +262,9 @@ export interface RemoteAssetSync {
    * tolerated (local stays ahead until the next edit / full sync).
    *
    * `userMetadata` (BLOCKERS C3, 2026-09-13) carries the tag list as
-   * `{ tags }` — the server REPLACES the JSON column with what is sent.
+   * `{ tags }` — the server REPLACES the JSON column with what is sent —
+   * and, since Phase 5, `siteFont` beside it (3686:42317). A patch that
+   * carries either key carries both, or it erases the other.
    */
   updateAsset(
     serverId: string,
