@@ -7,6 +7,7 @@
  */
 
 import { formatBytes } from "../utils/helpers/number";
+import type { MediaAssetType } from "../types/media";
 
 // ============================================
 // File Size Limits
@@ -85,34 +86,121 @@ export const MEDIA_EXTENSIONS = {
 } as const;
 
 /**
- * The formats the library takes, spelled for a person — Clone 3397:18137's
- * drop-zone line and 3437:36027's drawer footer both read it. Derived from
- * `MEDIA_EXTENSIONS`, so a format added there reaches every line that names
- * the list; the drawer used to carry its own hand-typed copy. Audio is left
- * out on purpose: the library has no audio bucket and the server has no
- * schema for it (`toServerAssetType` → null), so naming it would promise a
- * kind the UI cannot show.
+ * The upload gate's accept contract, spelled for a person.
+ *
+ * Clone 3397:18325 footnotes the picker with "PNG, JPG, GIF, WebP, AVIF or
+ * SVG · up to 10 MB for this image field.", 3695:43876 refuses a URL with
+ * "Use a direct JPG, PNG, WebP or SVG image URL.", 3397:18137's drop zone and
+ * 3437:36027's drawer footer list the whole library — sample lists, the SHAPE
+ * being "the formats and the limit the code really enforces". Every one of
+ * them reads the tables `validateFile` reads (`ALLOWED_MIME_TYPES`,
+ * `getMaxFileSize`), so the sentence on screen cannot drift from the refusal
+ * behind it. The picker's `allowedTypes` are `MediaAssetType`s, where an SVG
+ * is its own kind (`getAssetTypeFromMime`), so an image-only field lists no
+ * SVG: that is what the picker's own filter admits. Audio is left off the
+ * library-wide lines on purpose: the library has no audio bucket and the
+ * server no schema for it (`toServerAssetType` → null).
  */
-const FORMAT_LABEL: Record<string, string> = { webp: "WebP", webm: "WebM" };
-export const MEDIA_ACCEPTED_FORMATS_LABEL = [
-  ...MEDIA_EXTENSIONS.IMAGE,
-  ...MEDIA_EXTENSIONS.VIDEO,
-  ...MEDIA_EXTENSIONS.FONT,
-]
-  .map((ext) => ext.slice(1))
-  .filter((ext) => ext !== "jpeg")
-  .map((ext) => FORMAT_LABEL[ext] ?? ext.toUpperCase())
-  .join(" · ");
+const FORMAT_LABEL: Record<string, string> = {
+  "image/jpeg": "JPG",
+  "image/png": "PNG",
+  "image/gif": "GIF",
+  "image/webp": "WebP",
+  "image/svg+xml": "SVG",
+  "image/avif": "AVIF",
+  "video/mp4": "MP4",
+  "video/webm": "WebM",
+  "video/ogg": "OGV",
+  "video/quicktime": "MOV",
+  "audio/mpeg": "MP3",
+  "audio/wav": "WAV",
+  "audio/ogg": "OGG",
+  "audio/webm": "WebM",
+  "audio/aac": "AAC",
+  "font/woff2": "WOFF2",
+  "font/woff": "WOFF",
+  "font/ttf": "TTF",
+  "font/otf": "OTF",
+};
+
+const SVG = "image/svg+xml";
+
+/** The MIME types the gate admits for these kinds, in the gate's own order. */
+export function acceptedMimes(kinds: readonly MediaAssetType[]): string[] {
+  const out: string[] = [];
+  const push = (list: readonly string[]) => {
+    for (const m of list) if (!out.includes(m)) out.push(m);
+  };
+  for (const kind of kinds) {
+    if (kind === "image") push(ALLOWED_MIME_TYPES.IMAGE.filter((m) => m !== SVG));
+    else if (kind === "svg" || kind === "icon") push([SVG]);
+    else if (kind === "video") push(ALLOWED_MIME_TYPES.VIDEO);
+    else if (kind === "audio") push(ALLOWED_MIME_TYPES.AUDIO);
+    else if (kind === "font") push(ALLOWED_MIME_TYPES.FONT);
+  }
+  return out;
+}
+
+export function acceptsMime(kinds: readonly MediaAssetType[], mime: string): boolean {
+  return acceptedMimes(kinds).includes(mime);
+}
+
+/** "JPG, PNG, GIF, WebP or AVIF" */
+export function acceptedFormats(kinds: readonly MediaAssetType[]): string {
+  const labels = acceptedMimes(kinds).map((m) => FORMAT_LABEL[m] ?? m.split("/")[1].toUpperCase());
+  const unique = labels.filter((l, i) => labels.indexOf(l) === i);
+  if (unique.length <= 1) return unique.join("");
+  return `${unique.slice(0, -1).join(", ")} or ${unique[unique.length - 1]}`;
+}
 
 /**
- * The code's own per-type limits, one line — the Clone's "up to 50 MB per
- * file" is the board's sample, not a number this code has.
+ * "up to 10 MB" — or, when the kinds carry different ceilings, every one of
+ * them: "up to 10 MB per image, 1 MB per SVG, 100 MB per video".
  */
-export const MEDIA_SIZE_LIMITS_LABEL =
-  `up to ${formatBytes(MEDIA_SIZE_LIMITS.MAX_IMAGE_SIZE, 0)} per image · ` +
-  `${formatBytes(MEDIA_SIZE_LIMITS.MAX_SVG_SIZE, 0)} per SVG · ` +
-  `${formatBytes(MEDIA_SIZE_LIMITS.MAX_VIDEO_SIZE, 0)} per video · ` +
-  `${formatBytes(MEDIA_SIZE_LIMITS.MAX_FONT_SIZE, 0)} per font`;
+export function acceptedLimit(kinds: readonly MediaAssetType[]): string {
+  const perKind = new Map<string, number>();
+  for (const kind of kinds) {
+    const [mime] = acceptedMimes([kind]);
+    if (mime && !perKind.has(kindNoun(kind))) perKind.set(kindNoun(kind), getMaxFileSize(mime));
+  }
+  const limits = [...perKind.values()];
+  if (limits.length === 0) return "";
+  if (new Set(limits).size === 1) return `up to ${formatBytes(limits[0], 0)}`;
+  return `up to ${[...perKind].map(([noun, bytes]) => `${formatBytes(bytes, 0)} per ${noun}`).join(", ")}`;
+}
+
+/** "image" / "video" / "SVG" … — the word a sentence uses for the kind. */
+export function kindNoun(kind: MediaAssetType): string {
+  switch (kind) {
+    case "svg":
+      return "SVG";
+    case "icon":
+      return "icon";
+    default:
+      return kind;
+  }
+}
+
+/** "Image" / "Video" / "Media" — the kind as the Clone's `· Image` reads it. */
+export function kindLabel(kinds: readonly MediaAssetType[]): string {
+  if (kinds.length === 1) {
+    const noun = kindNoun(kinds[0]);
+    return noun === "SVG" ? noun : noun.charAt(0).toUpperCase() + noun.slice(1);
+  }
+  return "Media";
+}
+
+/** The kinds the library itself takes — the drop zone and the drawer footer name them all. */
+const LIBRARY_KINDS: readonly MediaAssetType[] = ["image", "svg", "video", "font"];
+
+/** "JPG · PNG · GIF · WebP · AVIF · SVG · MP4 · …" — Clone 3397:18137 / 3437:36027. */
+export const MEDIA_ACCEPTED_FORMATS_LABEL = acceptedMimes(LIBRARY_KINDS)
+  .map((m) => FORMAT_LABEL[m] ?? m.split("/")[1].toUpperCase())
+  .filter((l, i, all) => all.indexOf(l) === i)
+  .join(" · ");
+
+/** "up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font" — the code's own limits. */
+export const MEDIA_SIZE_LIMITS_LABEL = acceptedLimit(LIBRARY_KINDS).replace(/, /g, " · ");
 
 /** "pasta-2-small.jpg" → "JPG": the file's own extension, the way the Clone's lines spell it. */
 export function fileExtensionLabel(fileName: string): string {

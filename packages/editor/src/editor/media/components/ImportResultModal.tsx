@@ -24,7 +24,7 @@
 
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import type { MediaAssetType } from "../../../shared/types/media";
-import { acceptedFormats, kindLabel } from "../acceptedMedia";
+import { acceptedFormats, kindLabel } from "@shared/constants/media";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,

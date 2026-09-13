@@ -17,7 +17,7 @@
  */
 
 import type { MediaAssetType } from "../../shared/types/media";
-import { acceptsMime } from "./acceptedMedia";
+import { acceptsMime } from "@shared/constants/media";
 
 /**
  * http/https only — a data: or blob: URL is already local, and file:// cannot

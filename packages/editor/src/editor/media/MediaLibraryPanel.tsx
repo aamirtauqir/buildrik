@@ -35,7 +35,7 @@ import type { Composer } from "../../engine";
 import type { MediaAsset, MediaAssetType } from "../../shared/types/media";
 import { Button, ModalBody, ModalContent, ModalRoot, Spinner, TextInput } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
-import { acceptedFormats, acceptedLimit, acceptedMimes, kindLabel, kindNoun } from "./acceptedMedia";
+import { acceptedFormats, acceptedLimit, acceptedMimes, kindLabel, kindNoun } from "@shared/constants/media";
 import { ImportUrlModal } from "./components/ImportUrlModal";
 import { ImportResultModal, type ImportResult } from "./components/ImportResultModal";
 import {

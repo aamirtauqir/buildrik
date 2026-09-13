@@ -691,7 +691,7 @@ describe("Clone 3397:18137 · fullpage · drag-over (re-draws V1 1163:13948)", (
     expect(screen.getByTestId("mgr-dropzone-title")).toHaveTextContent("Drop files to upload");
     // The code's formats and the code's limits — not the board's "50 MB per file".
     expect(screen.getByTestId("mgr-dropzone-sub")).toHaveTextContent(
-      "JPG · PNG · GIF · WebP · SVG · AVIF · MP4 · WebM · OGV · MOV · WOFF2 · WOFF · TTF · OTF — up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font",
+      "JPG · PNG · GIF · WebP · AVIF · SVG · MP4 · WebM · OGV · MOV · WOFF2 · WOFF · TTF · OTF — up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font",
     );
     expect(screen.getByTestId("mgr-top")).toBeInTheDocument();
     expect(screen.getByTestId("mgr-details")).toBeInTheDocument();
