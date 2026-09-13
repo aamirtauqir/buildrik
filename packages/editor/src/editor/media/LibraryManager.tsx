@@ -19,7 +19,7 @@ import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceMo
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
-import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
+import { RenameAssetModal } from "./components/RenameAssetModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
@@ -185,6 +185,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      was being mid-way through choosing an image for an element. It belongs
      beside Edit, on the asset you are looking at. */
   const [optimizeItem, setOptimizeItem] = React.useState<LibraryItem | null>(null);
+  /* Clone 3701:20353 — Rename is a modal of its own. It used to open the
+     drawer's asset drill-in hub (`AssetDetailOverlay`, board 146:2), which has
+     no name field at all. */
+  const [renameTarget, setRenameTarget] = React.useState<LibraryItem | null>(null);
   /* Clone 3708:20650 — "Replace instead" on the delete confirm opens the
      rail's replace-across picker for that asset, so the picker's open state
      lives here rather than in the rail. */
@@ -439,7 +443,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onInsert={insertAndReturn}
           onEditImage={handleEditImage}
           onOptimizeImage={setOptimizeItem}
-          onOpenRename={state.openDetail}
+          onOpenRename={setRenameTarget}
           onRequestDelete={state.requestDelete}
           replacePickerOpen={replacePickerOpen}
           onReplacePickerOpenChange={setReplacePickerOpen}
@@ -542,7 +546,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           allFolders={state.allFolders}
           onInsert={(item) => insertAndReturn(item.key)}
           onSelect={(item) => state.enterSelectModeWith(item.key)}
-          onRename={state.openDetail}
+          onRename={setRenameTarget}
           onMove={(item, fid) => state.moveAsset(item.key, fid)}
           onDelete={(item) => state.requestDelete(item.key)}
           onCopyUrl={state.copyUrl}
@@ -569,13 +573,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onImport={handleImportFromUrl}
       />
 
-      {/* Bug #2 fix: mount AssetDetailOverlay so rename from context menu actually shows */}
-      {state.detailItem && (
-        <AssetDetailOverlay
-          item={state.detailItem}
-          onUpdate={state.updateItem}
-          onClose={state.closeDetail}
-          onEditImage={handleEditImage}
+      {renameTarget && (
+        <RenameAssetModal
+          item={renameTarget}
+          libraryItems={state.libraryItems}
+          onRename={state.renameItem}
+          onClose={() => setRenameTarget(null)}
         />
       )}
       {/* Replace-all picker now lives inside <AssetDetailsPanel> — see

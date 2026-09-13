@@ -56,13 +56,21 @@ const MIME_EXT: Record<string, string> = {
   "font/woff2": ".woff2",
 };
 
+/** The on-screen filename for a stored `name` — the extension restored from
+ * the MIME type unless the name already carries it. The rename modal runs the
+ * same rule on a candidate name, so "a file with that name exists" is judged
+ * on what the library would actually print. */
+export function displayNameFor(name: string, mimeType: string | undefined): string {
+  const ext = MIME_EXT[mimeType ?? ""] ?? "";
+  return ext && !name.toLowerCase().endsWith(ext) ? name + ext : name;
+}
+
 /** Map MediaAsset to LibraryItem (display-ready) */
 export function toLibraryItem(asset: MediaAsset): LibraryItem {
-  const ext = MIME_EXT[asset.mimeType ?? ""] ?? "";
   return {
     key: asset.id,
     name: asset.name,
-    displayName: ext && !asset.name.toLowerCase().endsWith(ext) ? asset.name + ext : asset.name,
+    displayName: displayNameFor(asset.name, asset.mimeType),
     type: assetTypeToFilter(asset.type),
     src: asset.src,
     thumb: asset.thumbnailSrc,

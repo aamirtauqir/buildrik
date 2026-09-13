@@ -36,7 +36,6 @@ vi.mock("@/editor/chrome-ui", async () => {
 
 vi.mock("../../sidebar/tabs/media/components/StockSourceModal", () => ({ StockSourceModal: () => null }));
 vi.mock("../../sidebar/tabs/media/components/MediaContextMenu", () => ({ MediaContextMenu: () => null }));
-vi.mock("../../sidebar/tabs/media/components/AssetDetailOverlay", () => ({ AssetDetailOverlay: () => null }));
 
 /* `hero` is placed three times, `menu` once — the counts the Clone prints. */
 const USAGES = { "blob:hero": 3, "blob:menu": 1 };
@@ -103,5 +102,26 @@ describe("Clone 3708:20650 / 20446 · Delete from the rail", () => {
     expect(cancelDelete).toHaveBeenCalledTimes(1);
     expect(rail().getByText("menu-cover.png")).toBeInTheDocument();
     expect(screen.getByText(/Replace "menu-cover.png" across 1 use/)).toBeInTheDocument();
+  });
+});
+
+describe("Clone 3701:20353 · Rename from the rail", () => {
+  it("opens the rename modal pre-filled with the full filename and saves through renameItem", async () => {
+    const renameItem = vi.fn(() => Promise.resolve());
+    await mountLibrary({ renameItem });
+    fireEvent.click(screen.getByTestId("mgr-asset-menu"));
+    fireEvent.click(rail().getByRole("button", { name: "Rename" }));
+    expect(screen.getByTestId("mgr-rename-title")).toHaveTextContent("Rename menu-cover.png");
+    const input = screen.getByTestId("mgr-rename-input") as HTMLInputElement;
+    expect(input.value).toBe("menu-cover.png");
+    fireEvent.change(input, { target: { value: "menu-front.png" } });
+    fireEvent.click(screen.getByTestId("mgr-rename-save"));
+    expect(renameItem).toHaveBeenCalledWith("menu", "menu-front.png");
+    await vi.waitFor(() => expect(screen.queryByTestId("mgr-rename")).toBeNull());
+  });
+
+  it("no longer mounts the drawer's asset drill-in in the library", async () => {
+    await mountLibrary({ detailItem: TEN[0] });
+    expect(screen.queryByTestId("media-detail-panel")).toBeNull();
   });
 });
