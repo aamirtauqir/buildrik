@@ -1160,3 +1160,66 @@ describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved version across site", () => {
+  it("confirms with the real count and pages, applies through replaceAcross, reports per page, and View versions shows v2 applied", async () => {
+    const { composer, placements } = await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    expect(screen.getByTestId("apply-version-title")).toHaveTextContent("Apply saved version across site");
+    expect(screen.getByTestId("apply-version-body")).toHaveTextContent(
+      "Update 3 uses on Home and Menu to the latest saved version. The original and prior saved version remain available.",
+    );
+    fireEvent.click(screen.getByTestId("apply-version-confirm"));
+    expect(screen.getByTestId("apply-version-applying-line")).toHaveTextContent("Updating 3 uses across Home and Menu. Please wait.");
+    expect(screen.queryByTestId("versions-modal")).toBeNull();
+    const result = await screen.findByTestId("replace-result-modal");
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:hero-v2");
+    expect(placements.src).toBe("blob:hero-v2");
+    expect(within(result).getByTestId("replace-result-title")).toHaveTextContent("Saved version applied");
+    expect(within(result).getByTestId("replace-result-count")).toHaveTextContent("3 of 3 uses updated");
+    expect(within(result).getByTestId("replace-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
+    expect(within(result).getByTestId("replace-result-note")).toHaveTextContent("Other elements are unchanged.");
+    fireEvent.click(screen.getByTestId("replace-result-view-versions"));
+    expect(screen.queryByTestId("replace-result-modal")).toBeNull();
+    expect(screen.getByTestId("versions-card-state-hero-v2")).toHaveTextContent("Applied to site · 3 placements");
+    expect(screen.getByTestId("versions-card-state-hero")).toHaveTextContent("Not on site");
+    expect(screen.getByTestId("versions-apply-latest")).toBeDisabled();
+    /* And the rail's marker moved with the placements. */
+    fireEvent.click(screen.getByTestId("versions-close"));
+    expect(within(screen.getByTestId("mgr-det-version-hero-v2")).getByText("APPLIED")).toBeInTheDocument();
+  });
+
+  it("Done closes the result and the library stands as it was", async () => {
+    await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    fireEvent.click(screen.getByTestId("apply-version-confirm"));
+    fireEvent.click(within(await screen.findByTestId("replace-result-modal")).getByTestId("replace-result-done"));
+    expect(screen.queryByTestId("replace-result-modal")).toBeNull();
+    expect(screen.queryByTestId("versions-modal")).toBeNull();
+    expect(rail().getByText("hero-dark.jpg")).toBeInTheDocument();
+  });
+
+  it("Cancel on the confirm returns to Asset versions", async () => {
+    await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    fireEvent.click(screen.getByTestId("apply-version-cancel"));
+    expect(screen.queryByTestId("apply-version-modal")).toBeNull();
+    expect(screen.getByTestId("versions-modal")).toBeInTheDocument();
+  });
+
+  it("nothing on the site: the confirm's primary is disabled with the reason, and nothing is replaced", async () => {
+    const { composer } = await mountVersions({ family: [HERO, HERO_V2], on: "blob:elsewhere" });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    expect(screen.getByTestId("apply-version-confirm")).toBeDisabled();
+    expect(screen.getByTestId("apply-version-body")).toHaveTextContent("Nothing on the site uses hero-dark.jpg yet");
+    expect(composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
+  });
+});
