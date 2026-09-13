@@ -1,0 +1,2255 @@
+{
+ "screens": [
+  "Assets · List · no selection",
+  "Assets · List · hero selected",
+  "Assets · Menu cover selected",
+  "Canvas · Menu preview image replaced",
+  "Canvas · uploaded image applied",
+  "Canvas · team image applied",
+  "Assets · Search menu",
+  "Assets · Grid 2 columns",
+  "Assets · Grid 4 columns",
+  "Assets · Name ascending",
+  "Assets · No selection",
+  "Assets · Selected · chef-intro.mp4",
+  "Assets · Selected · team-photo.jpg",
+  "Assets · Selected · logo-mark.svg",
+  "Assets · Selected · pasta-closeup.jpg",
+  "Assets · Selected · grand-opening.mp4",
+  "Assets · Selected · star-icon.svg",
+  "Assets · Selected · Inter-Var.woff2",
+  "Assets · Selected · terrace-night.jpg"
+ ],
+ "sigs": [
+  [
+   "btn/⭳ Import URL |CLICK| OVERLAY>CURRENT DESIGN · Assets · Import image f",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "btn/↑ Upload |CLICK| OVERLAY>Upload files",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "btn/+ Add from stock |CLICK| OVERLAY>CURRENT DESIGN · Assets · Stock assets",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "Close |CLICK| CLOSE",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/🕐  Recent |CLICK| SWAP>Assets · Recent · folder/scope",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/●  In use |CLICK| SWAP>Assets · In use · folder/scope",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/○  Unused |CLICK| SWAP>Assets · Unused · browse",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/🏠  All assets |CLICK| SWAP>Assets · No selection",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/📁  Products |CLICK| SWAP>Assets · Products · folder/scope",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/📁  Hero shots |CLICK| SWAP>Assets · Hero shots · folder/scope",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/📁  Icons |CLICK| SWAP>Assets · Icons · folder/scope",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "row/＋  New folder |CLICK| OVERLAY>Assets · Create folder",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "tag/menu |CLICK| SWAP>Assets · Tag menu",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "tag/team |CLICK| SWAP>Assets · Tag team",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "tag/food |CLICK| SWAP>Assets · Tag food",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "Grid · 3 columns |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · libr",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "Action / pasta-2-small.jpg |CLICK| OVERLAY>Asset details",
+   [
+    0,
+    1,
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "Action / hero-imported.jpg |CLICK| OVERLAY>Asset details",
+   [
+    0,
+    1,
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "Action / restaurant-interior.jpg |CLICK| OVERLAY>Asset details",
+   [
+    0,
+    1,
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "Move to folder… |CLICK| OVERLAY>CURRENT DESIGN · Assets · Move selected ",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "Download |CLICK| OVERLAY>Assets · Download ready",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "Delete |CLICK| OVERLAY>Assets · Delete selected files confirmat",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/hero-kitchen.jpg |CLICK| SWAP>Assets · List · hero selected",
+   [
+    0
+   ]
+  ],
+  [
+   "list-row/hero-kitchen.jpg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/chef-intro.mp4 |CLICK| SWAP>Assets · List · chef-intro.mp4 selected",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/chef-intro.mp4 |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/menu-cover.png |CLICK| SWAP>Assets · List · menu-cover.png selected",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/menu-cover.png |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/logo-mark.svg |CLICK| SWAP>Assets · List · logo-mark.svg selected",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/logo-mark.svg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/Inter-Var.woff2 |CLICK| SWAP>Assets · List · Inter-Var.woff2 selected",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/Inter-Var.woff2 |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/terrace-night.jpg |CLICK| SWAP>Assets · List · terrace-night.jpg select",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "list-row/terrace-night.jpg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Assets / Editing context={\"value\":\"hero-dark.jpg · 2400",
+   [
+    0,
+    1,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| COND",
+   [
+    0,
+    1,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Width={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Height={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Crop={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Preset={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Format={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Transform={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Lock={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Warm preview={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / BW preview={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Brightness={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Contrast={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Saturation={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Blur={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Sepia preview={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Cool preview={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Vibrant preview={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Entry / Adjustments summary={\"value\":{\"type\":\"VARIABLE_ALI",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| OVERLAY>CURRENT DESIGN · S3.6 · media · image-ed",
+   [
+    0,
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · hero-dark.jpg",
+   [
+    0,
+    1,
+    6,
+    7,
+    8,
+    9
+   ]
+  ],
+  [
+   "Action / Move to folder |CLICK| OVERLAY>CURRENT DESIGN · Assets · Move selected ",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "Action / Clear selection |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · libr",
+   [
+    0,
+    1
+   ]
+  ],
+  [
+   "✕ Clear |CLICK| SWAP>Assets · List · no selection",
+   [
+    1
+   ]
+  ],
+  [
+   "☐ |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · list",
+   [
+    1
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · hero-dark.jpg",
+   [
+    1,
+    6,
+    7,
+    8,
+    9
+   ]
+  ],
+  [
+   "search |CLICK| SWAP>Assets · Search menu",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Selected view / width={\"value\":378,\"type\":\"FLOAT\",\"r",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Selected view / height={\"value\":198,\"type\":\"FLOAT\",\"r",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Selected view / thumbs={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Selected view / view={\"value\":\"Grid · 2 columns\",\"t",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Selected view / width={\"value\":246.6666717529297,\"ty",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Selected view / height={\"value\":198,\"type\":\"FLOAT\",\"r",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Selected view / thumbs={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Selected view / view={\"value\":\"Grid · 3 columns\",\"t",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Selected view / width={\"value\":181,\"type\":\"FLOAT\",\"r",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Selected view / height={\"value\":198,\"type\":\"FLOAT\",\"r",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Selected view / thumbs={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Selected view / view={\"value\":\"Grid · 4 columns\",\"t",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Selected view / width={\"value\":772,\"type\":\"FLOAT\",\"r",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Selected view / height={\"value\":70,\"type\":\"FLOAT\",\"re",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Selected view / thumbs={\"value\":false,\"type\":\"BOOLEAN",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Selected view / view={\"value\":\"List\",\"type\":\"STRING",
+   [
+    2,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "sort |CLICK| SWAP>Assets · Name ascending",
+   [
+    2,
+    7,
+    8,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "select-mode |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · list",
+   [
+    2
+   ]
+  ],
+  [
+   "asset/hero-dark.jpg |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · libr",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/hero-dark.jpg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/menu-cover.png |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/chef-intro.mp4 |CLICK| SWAP>Assets · Selected · chef-intro.mp4",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/chef-intro.mp4 |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/team-photo.jpg |CLICK| SWAP>Assets · Selected · team-photo.jpg",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/team-photo.jpg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/logo-mark.svg |CLICK| SWAP>Assets · Selected · logo-mark.svg",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/logo-mark.svg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/pasta-closeup.jpg |CLICK| SWAP>Assets · Selected · pasta-closeup.jpg",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/pasta-closeup.jpg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/grand-opening.mp4 |CLICK| SWAP>Assets · Selected · grand-opening.mp4",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/grand-opening.mp4 |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/star-icon.svg |CLICK| SWAP>Assets · Selected · star-icon.svg",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/star-icon.svg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/Inter-Var.woff2 |CLICK| SWAP>Assets · Selected · Inter-Var.woff2",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    18
+   ]
+  ],
+  [
+   "asset/Inter-Var.woff2 |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/terrace-night.jpg |CLICK| SWAP>Assets · Selected · terrace-night.jpg",
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ]
+  ],
+  [
+   "asset/terrace-night.jpg |DRAG| NAVIGATE>CURRENT DESIGN · Assets · dragging hero-",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| NAVIGATE>Canvas · Menu preview image replaced",
+   [
+    2
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Assets / Editing context={\"value\":\"menu-cover.png · 160",
+   [
+    2,
+    6
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · menu-cover.png",
+   [
+    2
+   ]
+  ],
+  [
+   "act/Replace across site… |CLICK| OVERLAY>CURRENT DESIGN · Media · modal · replace",
+   [
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    18
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · menu-cover.png",
+   [
+    2
+   ]
+  ],
+  [
+   "btn/exit |CLICK| NAVIGATE>CURRENT DESIGN · Exit · Editor (leaves t",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "pill/saved |CLICK| NAVIGATE>CURRENT DESIGN · Recover · Browse page s",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "pill/in |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "btn/notifications |CLICK| OVERLAY>CURRENT DESIGN · Notifications · unread",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "btn/publish |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "btn/more |CLICK| OVERLAY>CURRENT DESIGN · Site menu · Current sit",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "rail/Insert |CLICK| NAVIGATE>CURRENT DESIGN · Build · Insert elements",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "rail/Layers |CLICK| NAVIGATE>CURRENT DESIGN · Build · Organize layers",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "rail/Pages |CLICK| NAVIGATE>CURRENT DESIGN · Build · Manage pages",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "rail/Media |CLICK| NAVIGATE>CURRENT DESIGN · Build · Choose media",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "rail/Content |CLICK| NAVIGATE>CURRENT DESIGN · Content · Choose a coll",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "rail/Brand |CLICK| NAVIGATE>CURRENT DESIGN · Design · Set fonts and ",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "rail/More |CLICK| OVERLAY>CURRENT DESIGN · Navigate · Editor tools",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "Home |CLICK| NAVIGATE>CURRENT DESIGN · Editor · Bella Cucina /",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "Menu |CLICK| NAVIGATE>CURRENT DESIGN · Editor · Menu / dynamic",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "Wood-fired pizza, five minutes from home |CLICK| NAVIGATE>CURRENT DESIGN · Home Heading · Desktop",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/W |CLICK| NAVIGATE>CURRENT DESIGN · S3.4 · responsive-viewp",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/T |CLICK| NAVIGATE>CURRENT DESIGN · S3.4 · responsive-viewp",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/M |CLICK| NAVIGATE>CURRENT DESIGN · Preview · Home · mobile",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/Snap Guides (active) |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/Spacing |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/Grid |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/Rulers |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/Badges |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/X-Ray |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/− |CLICK| SET zoomFull={\"value\":false,\"type\":\"BOOLEAN",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/− |CLICK| SET zoomHalf={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/− |CLICK| SET zoomLabel={\"value\":\"50%\",\"type\":\"STRING\"",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/100% |CLICK| COND",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/+ |CLICK| SET zoomFull={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/+ |CLICK| SET zoomHalf={\"value\":false,\"type\":\"BOOLEAN",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "chip/+ |CLICK| SET zoomLabel={\"value\":\"100%\",\"type\":\"STRING",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "group/help |CLICK| OVERLAY>CURRENT DESIGN · Commands · navigation a",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "btn/ai |CLICK| NAVIGATE>CURRENT DESIGN · AI · Hero › Draft",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "Choose image |CLICK| OVERLAY>CURRENT DESIGN · Media · modal · picker ",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "row |CLICK| OVERLAY>CURRENT DESIGN · Motion · list · preserv",
+   [
+    3,
+    4,
+    5
+   ]
+  ],
+  [
+   "search |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · libr",
+   [
+    6
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Scope search / width={\"value\":378,\"type\":\"FLOAT\",\"r",
+   [
+    6
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Scope search / height={\"value\":198,\"type\":\"FLOAT\",\"r",
+   [
+    6
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Scope search / thumbs={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    6
+   ]
+  ],
+  [
+   "g/2 |CLICK| SET Assets / Scope search / view={\"value\":\"Grid · 2 columns\",\"t",
+   [
+    6
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Scope search / width={\"value\":246.6666717529297,\"ty",
+   [
+    6
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Scope search / height={\"value\":198,\"type\":\"FLOAT\",\"r",
+   [
+    6
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Scope search / thumbs={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    6
+   ]
+  ],
+  [
+   "g/3 |CLICK| SET Assets / Scope search / view={\"value\":\"Grid · 3 columns\",\"t",
+   [
+    6
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Scope search / width={\"value\":181,\"type\":\"FLOAT\",\"r",
+   [
+    6
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Scope search / height={\"value\":198,\"type\":\"FLOAT\",\"r",
+   [
+    6
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Scope search / thumbs={\"value\":true,\"type\":\"BOOLEAN\"",
+   [
+    6
+   ]
+  ],
+  [
+   "g/4 |CLICK| SET Assets / Scope search / view={\"value\":\"Grid · 4 columns\",\"t",
+   [
+    6
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Scope search / width={\"value\":772,\"type\":\"FLOAT\",\"r",
+   [
+    6
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Scope search / height={\"value\":70,\"type\":\"FLOAT\",\"re",
+   [
+    6
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Scope search / thumbs={\"value\":false,\"type\":\"BOOLEAN",
+   [
+    6
+   ]
+  ],
+  [
+   "List |CLICK| SET Assets / Scope search / view={\"value\":\"List\",\"type\":\"STRING",
+   [
+    6
+   ]
+  ],
+  [
+   "sort |CLICK| COND",
+   [
+    6
+   ]
+  ],
+  [
+   "select-mode |CLICK| SWAP>Assets · List · no selection",
+   [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "asset/menu-cover.png |CLICK| SWAP>Assets · Menu cover selected",
+   [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Delete asset confirmation",
+   [
+    6
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| SET Assets / Inserted filename={\"value\":\"menu-cover.png\",\"typ",
+   [
+    6
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| NAVIGATE>Canvas · New image inserted into Home",
+   [
+    6,
+    7,
+    8,
+    9,
+    14,
+    18
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename asset",
+   [
+    6,
+    10
+   ]
+  ],
+  [
+   "g/3 |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · libr",
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  [
+   "g/4 |CLICK| SWAP>Assets · Grid 4 columns",
+   [
+    7,
+    9
+   ]
+  ],
+  [
+   "List |CLICK| SWAP>Assets · List · hero selected",
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  [
+   "ver/hero-kitchen_v2210 |CLICK| OVERLAY>CURRENT DESIGN · Assets · versions",
+   [
+    7,
+    8,
+    9
+   ]
+  ],
+  [
+   "g/2 |CLICK| SWAP>Assets · Grid 2 columns",
+   [
+    8,
+    9
+   ]
+  ],
+  [
+   "sort |CLICK| SWAP>CURRENT DESIGN · Media · fullpage · libr",
+   [
+    9
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| SET Assets / Inserted filename={\"value\":\"hero-dark.jpg\",\"type",
+   [
+    9
+   ]
+  ],
+  [
+   "g/2 |CLICK| SWAP>Assets · 2 columns · no selection",
+   [
+    10
+   ]
+  ],
+  [
+   "g/4 |CLICK| SWAP>Assets · 4 columns · no selection",
+   [
+    10
+   ]
+  ],
+  [
+   "List |CLICK| SWAP>Assets · List · no selection",
+   [
+    10
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| NAVIGATE>Canvas · New Video inserted · chef-intro",
+   [
+    11
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · chef-intro.mp4",
+   [
+    11
+   ]
+  ],
+  [
+   "act/Replace across site… |CLICK| COND",
+   [
+    11,
+    15
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · chef-intro.mp4",
+   [
+    11
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| NAVIGATE>Canvas · team image applied",
+   [
+    12
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Assets / Editing context={\"value\":\"team-photo.jpg · Ima",
+   [
+    12
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · team-photo.jpg",
+   [
+    12
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · team-photo.jpg",
+   [
+    12
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| NAVIGATE>Canvas · New SVG image inserted · logo-m",
+   [
+    13
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Assets / Editing context={\"value\":\"logo-mark.svg · SVG ",
+   [
+    13
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · logo-mark.svg",
+   [
+    13
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · logo-mark.svg",
+   [
+    13
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Assets / Editing context={\"value\":\"pasta-closeup.jpg · ",
+   [
+    14
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · pasta-closeup.jpg",
+   [
+    14
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · pasta-closeup.",
+   [
+    14
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| NAVIGATE>Canvas · New Video inserted · grand-open",
+   [
+    15
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · grand-opening.mp4",
+   [
+    15
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · grand-opening.",
+   [
+    15
+   ]
+  ],
+  [
+   "act/Insert to canvas |CLICK| NAVIGATE>Canvas · New SVG image inserted · star-i",
+   [
+    16
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Assets / Editing context={\"value\":\"star-icon.svg · SVG ",
+   [
+    16
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · star-icon.svg",
+   [
+    16
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · star-icon.svg",
+   [
+    16
+   ]
+  ],
+  [
+   "act/Manage font |CLICK| OVERLAY>CURRENT DESIGN · Assets · Site fonts",
+   [
+    17
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · Inter-Var.woff2",
+   [
+    17
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · Inter-Var.woff",
+   [
+    17
+   ]
+  ],
+  [
+   "act/Edit image |CLICK| SET Assets / Editing context={\"value\":\"terrace-night.jpg · ",
+   [
+    18
+   ]
+  ],
+  [
+   "act/Rename |CLICK| OVERLAY>Assets · Rename · terrace-night.jpg",
+   [
+    18
+   ]
+  ],
+  [
+   "act/Delete |CLICK| OVERLAY>Assets · Confirm delete · terrace-night.",
+   [
+    18
+   ]
+  ]
+ ]
+}
