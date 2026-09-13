@@ -33,6 +33,7 @@ import {
   validateResize,
   type ImageDraft,
   type OutputSize,
+  type ResizeVerdict,
 } from "./imageEdits";
 
 export interface TabProps {
@@ -270,10 +271,16 @@ export interface ResizeProps extends TabProps {
 const INPUT_CLASS = "tw:[&_input]:tabular-nums";
 
 export function ResizeControls({ draft, patch, crop, intrinsic }: ResizeProps) {
-  const verdict = validateResize(draft.width || String(crop.width), draft.height || String(crop.height));
+  /* Until the cropper has reported (the media is still decoding) the crop is
+     0 × 0: the fields stay empty and nothing is judged yet. */
+  const untouched = draft.width === "" && draft.height === "";
+  const verdict: ResizeVerdict =
+    untouched && crop.width === 0
+      ? { ok: true, width: 0, height: 0 }
+      : validateResize(draft.width || String(crop.width), draft.height || String(crop.height));
   const out = outputSize(draft, crop);
-  const shownWidth = draft.width === "" ? String(crop.width) : draft.width;
-  const shownHeight = draft.height === "" ? String(crop.height) : draft.height;
+  const shownWidth = draft.width === "" ? (crop.width ? String(crop.width) : "") : draft.width;
+  const shownHeight = draft.height === "" ? (crop.height ? String(crop.height) : "") : draft.height;
   const ratio = crop.height > 0 ? crop.width / crop.height : 1;
 
   /* Locked: the other field follows at the crop's ratio, but only from a
