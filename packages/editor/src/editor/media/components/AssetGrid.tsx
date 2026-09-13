@@ -3,8 +3,9 @@
  *
  * The MIDDLE asset grid + subbar + bulk-toolbar + grid-foot all live
  * here, lifted out of LibraryManager. Owns its own viewMode (grid
- * vs list), sort menu open state, and bulk-move picker open state —
- * those are pure UI toggles that have no readers outside this panel.
+ * vs list), sort menu open state, and the drag ghost — pure UI state
+ * with no readers outside this panel. (The bulk-move picker it also
+ * owned is gone: Clone 3683:19950 made Move a modal of the orchestrator.)
  *
  * Pre-extraction: lines 332-608 of LibraryManager.tsx (~276 LOC).
  *
@@ -107,6 +108,23 @@ const LIST_TYPE_LABEL: Record<LibraryItem["type"], string> = {
 /* Clone 3700:20353 — the empty folder's two 13 lines in ink-soft. */
 const EMPTY_FOLDER_LINE_CLASS =
   "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+
+/* Clone 4207:26629 / 4215:26635 / 4220:26643 — the native drag image: the
+   thumb (grid) or the row(s) (list) with an "N items" badge. Rendered
+   offscreen inside the column so setDragImage has a laid-out element to
+   snapshot; never in the flow, never on document.body. */
+const GHOST =
+  "tw:pointer-events-none tw:fixed tw:-top-[1000px] tw:-left-[1000px] tw:flex tw:flex-col tw:gap-1 " +
+  "tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-bg-card)] tw:p-1";
+const GHOST_THUMB =
+  "tw:flex tw:h-21 tw:w-30 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-[var(--bk-radius-sm)] " +
+  "tw:bg-[var(--bk-bg-subtle)] tw:[&>img]:size-full tw:[&>img]:object-cover";
+const GHOST_ROW =
+  "tw:flex tw:h-7 tw:w-50 tw:items-center tw:gap-3 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-card)] tw:px-2 " +
+  "tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
+const GHOST_BADGE =
+  "tw:absolute tw:-top-2 tw:-right-2 tw:whitespace-nowrap tw:rounded-full tw:bg-[var(--bk-accent)] tw:px-2 tw:py-0.5 " +
+  "tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:font-semibold tw:text-[var(--bk-accent-on)]";
 
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
@@ -271,19 +289,19 @@ export function AssetGrid({
         </div>
       )}
       {ghost && (
-        <div className="mgr-drag-ghost" ref={ghostRef} aria-hidden="true" data-testid="mgr-drag-ghost">
+        <div className={GHOST} ref={ghostRef} aria-hidden="true" data-testid="mgr-drag-ghost">
           {viewMode === "grid" ? (
-            <div className="mgr-drag-ghost-thumb">{thumbFor(ghost.item, "grid")}</div>
+            <div className={GHOST_THUMB}>{thumbFor(ghost.item, "grid")}</div>
           ) : (
             /* 4215:26635 stacks the rows; two is enough to read as a stack. */
             ghost.names.slice(0, 2).map((name) => (
-              <div key={name} className="mgr-drag-ghost-row">
+              <div key={name} className={GHOST_ROW}>
                 <span className="mgr-list-check on" aria-hidden="true" />
-                <span className="mgr-drag-ghost-name">{name}</span>
+                <span className="tw:truncate">{name}</span>
               </div>
             ))
           )}
-          <span className="mgr-drag-ghost-badge" data-testid="mgr-drag-ghost-badge">
+          <span className={GHOST_BADGE} data-testid="mgr-drag-ghost-badge">
             {ghost.names.length} {ghost.names.length === 1 ? "item" : "items"}
           </span>
         </div>

@@ -562,11 +562,11 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
     await mountLibrary(twoChecked());
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-chef"), { dataTransfer: dragTransfer("chef") });
-    expect(screen.getByTestId("mgr-row-all-assets")).toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-row-folder-f1")).toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-row-folder-f2")).toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-details")).toHaveClass("dimmed");
+    expect(screen.getByTestId("mgr-row-all-assets")).toHaveAttribute("data-drop-target", "true");
+    expect(screen.getByTestId("mgr-row-folder-f1")).toHaveAttribute("data-drop-target", "true");
+    expect(screen.getByTestId("mgr-row-folder-f2")).toHaveAttribute("data-drop-target", "true");
+    expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-details")).toHaveAttribute("data-dimmed", "true");
     expect(screen.getByTestId("mgr-status-drag-hint")).toHaveTextContent(
       "Drop 2 files on a folder to move them · release outside to cancel",
     );
@@ -582,8 +582,8 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-chef"), { dataTransfer: dragTransfer("chef") });
     fireEvent.dragEnd(screen.getByTestId("mgr-list-row-chef"));
-    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-details")).not.toHaveClass("dimmed");
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-details")).not.toHaveAttribute("data-dimmed");
     expect(screen.queryByTestId("mgr-status-drag-hint")).toBeNull();
     expect(screen.queryByTestId("mgr-drag-ghost")).toBeNull();
   });
@@ -611,7 +611,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
     expect(rail().getByRole("heading", { name: "Moved to Products" })).toBeInTheDocument();
     // The drop ends the drag even before dragend reaches the source row.
     expect(screen.queryByTestId("mgr-status-drag-hint")).toBeNull();
-    expect(screen.getByTestId("mgr-details")).not.toHaveClass("dimmed");
+    expect(screen.getByTestId("mgr-details")).not.toHaveAttribute("data-dimmed");
   });
 
   it("dropping an unchecked card moves only that card, even while others are checked", async () => {

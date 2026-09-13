@@ -101,18 +101,18 @@ describe("FolderTree — drag an asset onto a folder", () => {
 describe("FolderTree — every folder is a target while an asset is dragged (Clone 4215:26635)", () => {
   it("outlines All assets and each folder, and nothing else", () => {
     mount(vi.fn(), true);
-    expect(screen.getByTestId("mgr-row-all-assets")).toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-row-folder-f1")).toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-row-recent")).not.toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveClass("drop-target");
-    expect(screen.getByTestId("mgr-row-trash")).not.toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-all-assets")).toHaveAttribute("data-drop-target", "true");
+    expect(screen.getByTestId("mgr-row-folder-f1")).toHaveAttribute("data-drop-target", "true");
+    expect(screen.getByTestId("mgr-row-recent")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveAttribute("data-drop-target");
+    expect(screen.getByTestId("mgr-row-trash")).not.toHaveAttribute("data-drop-target");
   });
 
   it("outlines nothing at rest, or without a move handler", () => {
     const { unmount } = mount(vi.fn(), false);
-    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveAttribute("data-drop-target");
     unmount();
     mount(undefined, true);
-    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveAttribute("data-drop-target");
   });
 });

@@ -609,7 +609,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             footer leads with what a drop does; the board keeps the count and
             the quota after it. */}
         {assetDrag && (
-          <span className="mgr-status-drag-hint" role="status" data-testid="mgr-status-drag-hint">
+          <span className="tw:mr-2 tw:font-semibold tw:text-[var(--bk-accent-text)]" role="status" data-testid="mgr-status-drag-hint">
             {assetDrag.keys.length === 1
               ? "Drop on a folder to move · release outside to cancel"
               : `Drop ${assetDrag.keys.length} files on a folder to move them · release outside to cancel`}

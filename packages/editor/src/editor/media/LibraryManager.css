@@ -801,11 +801,8 @@
 
 /* `flex: none`, not `flex: 1`: in this column a basis of 0 overrides the
    height and the buttons collapsed to 19px of text (measured). Only the
-   two-up row shares its width. The primary (Insert to canvas, Move to
-   folder, View destination — 3705:20396 / 4215:26635 / 3699:20381) is the
-   same block in the accent fill. */
-.mgr-det-actions .mgr-btn,
-.mgr-det-actions .mgr-btn-primary {
+   two-up row shares its width. */
+.mgr-det-actions .mgr-btn {
   flex: none;
   width: 100%;
   min-width: 0;
@@ -814,41 +811,6 @@
   font-size: 12px;
   padding: 0 var(--bk-space-12);
   justify-content: center;
-}
-
-/* Clear selection (4215:26635 / 3699:20381) — the quiet grey fill, no edge. */
-.mgr-det-actions .mgr-btn.quiet {
-  background: var(--bk-bg-subtle);
-  border-color: transparent;
-  color: var(--bk-ink);
-}
-
-.mgr-det-actions .mgr-btn.quiet:hover { background: var(--bk-gray-200); }
-
-/* 4215:26635 / 3699:20381 — the checked files, one 12 line each, between
-   the hint and the buttons. */
-.mgr-det-files {
-  margin: var(--bk-space-8) 0 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-8);
-  font-size: var(--bk-text-12);
-  color: var(--bk-ink);
-}
-
-.mgr-det-files li {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* 4207:26629 — the rail is dimmed and inert while an asset is dragged over
-   the folders: the drop is the only thing the pointer is doing. */
-.mgr-details.dimmed {
-  opacity: 0.45;
-  pointer-events: none;
 }
 
 .mgr-det-actions-row .mgr-btn {
@@ -886,15 +848,6 @@
   width: 3px; height: 3px;
   border-radius: var(--bk-radius-full);
   background: var(--bk-ink-muted);
-}
-
-/* 4215:26635 — "Drop 2 files on a folder to move them · release outside to
-   cancel" leads the footer in the accent while an asset is in flight; the
-   count and quota follow it, as the board draws. */
-.mgr-status-drag-hint {
-  font-weight: 600;
-  color: var(--bk-accent-text);
-  margin-right: var(--bk-space-8);
 }
 
 .mgr-status-right {
@@ -1036,83 +989,6 @@
 .mgr-node.dragover {
   background: var(--bk-accent-tint);
   box-shadow: inset 0 0 0 1px var(--bk-accent);
-}
-
-/* Clone 4215:26635 — while an asset is in flight EVERY folder row is
-   outlined dashed as a place it can land; the one under the pointer keeps
-   the tint above. Outline follows the row's radius and adds no box. */
-.mgr-node.drop-target {
-  outline: 1px dashed var(--bk-accent);
-  outline-offset: -1px;
-}
-
-/* ─── Clone 4207:26629 / 4215:26635 / 4220:26643 drag ghost ─────────── */
-/* The native drag image: the thumb (grid) or the row(s) (list) with an
-   "N items" badge. Rendered offscreen inside the column so setDragImage
-   has a laid-out element to snapshot; never in the flow, never on body. */
-.mgr-drag-ghost {
-  position: fixed;
-  top: -1000px;
-  left: -1000px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-4);
-  padding: var(--bk-space-4);
-  border: 1px solid var(--bk-accent);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-bg-card);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.mgr-drag-ghost-thumb {
-  width: 120px;
-  height: 84px;
-  border-radius: var(--bk-radius-sm);
-  background: var(--bk-bg-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.mgr-drag-ghost-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mgr-drag-ghost-row {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-12);
-  width: 200px;
-  height: 28px;
-  padding: 0 var(--bk-space-8);
-  border-radius: var(--bk-radius-sm);
-  background: var(--bk-bg-card);
-  font-size: var(--bk-text-12);
-  color: var(--bk-ink);
-}
-
-.mgr-drag-ghost-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mgr-drag-ghost-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  padding: 2px var(--bk-space-8);
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-accent);
-  color: var(--bk-accent-on);
-  font-size: var(--bk-text-11);
-  font-weight: 600;
-  line-height: 14px;
-  white-space: nowrap;
 }
 
 /* ─── Board 1159:4593 card + toolbar ─────────────────────────────────── */

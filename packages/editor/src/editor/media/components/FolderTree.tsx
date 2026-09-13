@@ -124,7 +124,13 @@ function TreeNode({
 }: TreeNodeProps) {
   const depthClass = depth === 1 ? " depth-1" : depth === 2 ? " depth-2" : "";
   const droppable = onAssetDrop !== undefined;
-  const dropClass = `${droppable && dragActive ? " drop-target" : ""}${isDropTarget ? " dragover" : ""}`;
+  const isTarget = droppable && dragActive;
+  /* Clone 4215:26635 — while an asset is in flight every droppable row is
+     outlined dashed as a place it can land; the one under the pointer keeps
+     the `dragover` tint. Outline follows the row's radius and adds no box. */
+  const dropClass = `${
+    isTarget ? " tw:outline-1 tw:outline-dashed tw:-outline-offset-1 tw:outline-[var(--bk-accent)]" : ""
+  }${isDropTarget ? " dragover" : ""}`;
   return (
     /* Every row in this rail — the smart folders, Trash, and each user folder —
        carried an onClick on a bare div, so none of them was reachable by Tab or
@@ -133,6 +139,7 @@ function TreeNode({
     <div
       className={`mgr-node${active ? " active" : ""}${depthClass}${dropClass}`}
       data-testid={testId}
+      data-drop-target={isTarget || undefined}
       role="button"
       tabIndex={0}
       aria-current={active ? "true" : undefined}

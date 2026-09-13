@@ -32,10 +32,18 @@ import {
   Textarea,
   VersionRow,
 } from "@/editor/chrome-ui";
+import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
 const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
 const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
+/* The rail's full-width 32 buttons (3705:20396 / 4215:26635 / 3699:20381):
+   flowbite `xs` IS h-8; the accent fill is `.mgr-btn-primary`'s own, and the
+   quiet grey Clear selection is the same fill as the dialogs' Cancel. */
+const RAIL_PRIMARY = "mgr-btn-primary tw:w-full tw:shrink-0 tw:justify-center";
+const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
+/* 4215:26635 / 3699:20381 — the checked files, one 12 line each. */
+const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
 
@@ -166,7 +174,9 @@ export function AssetDetailsPanel({
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
   const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
   const [regenerating, setRegenerating] = React.useState(false);
-  const railClass = `mgr-details${dimmed ? " dimmed" : ""}`;
+  /* 4207:26629 — dimmed and inert while an asset is dragged over the folders:
+     the drop is the only thing the pointer is doing. */
+  const railClass = `mgr-details${dimmed ? " tw:pointer-events-none tw:opacity-50" : ""}`;
 
   if (moveResult) {
     const { moved, alreadyThere } = moveResult;
@@ -187,16 +197,16 @@ export function AssetDetailsPanel({
           <p className="mgr-det-hint" data-testid="mgr-det-move-result-body">
             {body}
           </p>
-          <ul className="mgr-det-files" data-testid="mgr-det-files">
+          <ul className={FILE_LIST} data-testid="mgr-det-files">
             {moveResult.names.map((name) => (
-              <li key={name}>{name}</li>
+              <li key={name} className="tw:truncate">{name}</li>
             ))}
           </ul>
           <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
-            <Button className="mgr-btn-primary" data-testid="mgr-det-view-destination" onClick={moveResult.onView}>
+            <Button size="xs" className={RAIL_PRIMARY} data-testid="mgr-det-view-destination" onClick={moveResult.onView}>
               View destination
             </Button>
-            <Button className="mgr-btn quiet" data-testid="mgr-det-clear-selection" onClick={moveResult.onClear}>
+            <Button size="xs" variant="secondary" className={RAIL_QUIET} data-testid="mgr-det-clear-selection" onClick={moveResult.onClear}>
               Clear selection
             </Button>
           </div>
@@ -220,16 +230,16 @@ export function AssetDetailsPanel({
               selection, right under the hint. Delete stays in the bar. */}
           {n > 0 && (
             <>
-              <ul className="mgr-det-files" data-testid="mgr-det-files">
+              <ul className={FILE_LIST} data-testid="mgr-det-files">
                 {bulk.names.map((name) => (
-                  <li key={name}>{name}</li>
+                  <li key={name} className="tw:truncate">{name}</li>
                 ))}
               </ul>
               <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
-                <Button className="mgr-btn-primary" data-testid="mgr-det-move-to-folder" onClick={bulk.onMove}>
+                <Button size="xs" className={RAIL_PRIMARY} data-testid="mgr-det-move-to-folder" onClick={bulk.onMove}>
                   Move to folder
                 </Button>
-                <Button className="mgr-btn quiet" data-testid="mgr-det-clear-selection" onClick={bulk.onClear}>
+                <Button size="xs" variant="secondary" className={RAIL_QUIET} data-testid="mgr-det-clear-selection" onClick={bulk.onClear}>
                   Clear selection
                 </Button>
               </div>
@@ -367,7 +377,7 @@ export function AssetDetailsPanel({
             over 3695:20340's outlined one. */}
         <div className="mgr-det-actions" data-testid="mgr-det-actions">
           {!isFont && (
-            <Button className="mgr-btn-primary" onClick={() => onInsert(selectedItem.key)}>
+            <Button size="xs" className={RAIL_PRIMARY} onClick={() => onInsert(selectedItem.key)}>
               Insert to canvas
             </Button>
           )}
