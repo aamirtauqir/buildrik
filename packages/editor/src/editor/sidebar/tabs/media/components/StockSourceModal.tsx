@@ -282,7 +282,10 @@ export function StockSourceModal({
             {/* A failed request is not an empty result, and the three failures
                 are not each other. Until the service carried a reason, all four
                 rendered "No photos found for …" (blocker A-STOCK). */}
-            {!isLoading && searchFailed && searchQuery.length > 0 ? (
+            {/* The failure belongs to the provider sources: icons are the
+                engine's own list, filtered client-side, so an unconfigured
+                photo key must not blank them (seen live 2026-09-13). */}
+            {!isLoading && needsQuery && searchFailed && searchQuery.length > 0 ? (
               <p className={STATE} role="alert" data-testid="stock-failed">
                 {FAILURE_COPY[searchFailed].message}
                 {FAILURE_COPY[searchFailed].retryable ? (
@@ -302,7 +305,7 @@ export function StockSourceModal({
               </p>
             ) : null}
 
-            {!isLoading && !searchFailed && results.length === 0 && (!needsQuery || searchQuery.length > 0) ? (
+            {!isLoading && (!needsQuery || !searchFailed) && results.length === 0 && (!needsQuery || searchQuery.length > 0) ? (
               <p className={STATE} data-testid="stock-empty">
                 {needsQuery ? `No ${noun} found for "${searchQuery}"` : "No icons found."}
               </p>

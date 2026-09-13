@@ -28,11 +28,12 @@ import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
 import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
-import { EVERY_MEDIA_KIND, UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
-import { STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
+import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
+import { LIBRARY_KINDS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
 import { useToast, Button, IconButton, TextInput, OverlayMount } from "@/editor/chrome-ui";
 import { OptimizationPanel } from "./OptimizationPanel";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
+import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import type { IconConfig, MediaAsset } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
@@ -393,7 +394,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       try {
         file = await fetchUrlAsFile(url);
       } catch {
-        setImportResult({ kind: "failed", url, accepts: EVERY_MEDIA_KIND });
+        setImportResult({ kind: "failed", url, accepts: LIBRARY_KINDS });
         return;
       }
       try {
@@ -402,20 +403,22 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           state.currentFolderId != null ? { folderId: state.currentFolderId } : undefined,
         );
         if (!result.success || !result.asset) {
-          setImportResult({ kind: "failed", url, accepts: EVERY_MEDIA_KIND, reason: result.error });
+          setImportResult({ kind: "failed", url, accepts: LIBRARY_KINDS, reason: result.error });
           return;
         }
         setImportResult({
           kind: "imported",
           key: result.asset.id,
-          name: result.asset.name,
-          type: getAssetTypeFromMime(file.type) ?? "image",
+          /* The name the library prints — the engine stores the stem and
+             the pipeline may have landed a WebP (code:auto-webp). */
+          name: displayNameFor(result.asset.name, result.asset.mimeType),
+          type: getAssetTypeFromMime(result.asset.mimeType) ?? getAssetTypeFromMime(file.type) ?? "image",
         });
       } catch (err) {
         setImportResult({
           kind: "failed",
           url,
-          accepts: EVERY_MEDIA_KIND,
+          accepts: LIBRARY_KINDS,
           reason: err instanceof UrlImportError || !(err instanceof Error) ? undefined : err.message,
         });
       }

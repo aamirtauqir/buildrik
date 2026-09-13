@@ -201,6 +201,17 @@ describe("Clone 3695:45569 · Assets · Stock assets", () => {
     expect(onOpenIconPicker).toHaveBeenCalledTimes(1);
   });
 
+  /* Seen live: with no provider key the photo search fails "not configured",
+     and the Icons source — the engine's own list, filtered client-side —
+     showed that failure instead of its icons. */
+  it("a provider failure never blanks the Icons source", () => {
+    mount({ searchQuery: "star", searchFailed: "not-configured", icons: [icon] });
+    expect(screen.getByTestId("stock-failed")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Icons" }));
+    expect(screen.queryByTestId("stock-failed")).toBeNull();
+    expect(screen.getByTestId("stock-card-ico_1")).toBeInTheDocument();
+  });
+
   it("switching the source drops the selection — the primary cannot save a photo from the Videos view", () => {
     mount({ searchQuery: "kitchen", photos: [photo()], videos: [video()] });
     fireEvent.click(screen.getByTestId("stock-card-p1"));

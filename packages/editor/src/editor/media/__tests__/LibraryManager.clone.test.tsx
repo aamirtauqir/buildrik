@@ -822,8 +822,13 @@ async function mountWithUpload(over: Partial<MediaStateResult>, uploadFile: Retu
   return { composer };
 }
 
+/* The engine stores the stem and the MIME; the dialog prints the library's name. */
 const landsAs = (id: string) =>
-  vi.fn(async (file: File) => ({ success: true, asset: { id, name: file.name }, fileName: file.name }));
+  vi.fn(async (file: File) => ({
+    success: true,
+    asset: { id, name: file.name.replace(/\.[a-z0-9]+$/i, ""), mimeType: file.type },
+    fileName: file.name,
+  }));
 
 const importUrl = (url: string) => {
   fireEvent.click(screen.getByTestId("mgr-btn-import"));

@@ -190,8 +190,12 @@ export function kindLabel(kinds: readonly MediaAssetType[]): string {
   return "Media";
 }
 
-/** The kinds the library itself takes — the drop zone and the drawer footer name them all. */
-const LIBRARY_KINDS: readonly MediaAssetType[] = ["image", "svg", "video", "font"];
+/** The kinds the LIBRARY takes — what the drop zone, the drawer footer and
+ *  an Import-URL refusal name, and what a URL import admits. Audio is off the
+ *  list on purpose: the library has no audio bucket and the server no schema
+ *  for it (`toServerAssetType` → null), so an audio file could only ever be
+ *  a local-only row nobody can browse to. */
+export const LIBRARY_KINDS: readonly MediaAssetType[] = ["image", "svg", "video", "font"];
 
 /** "JPG · PNG · GIF · WebP · AVIF · SVG · MP4 · …" — Clone 3397:18137 / 3437:36027. */
 export const MEDIA_ACCEPTED_FORMATS_LABEL = acceptedMimes(LIBRARY_KINDS)

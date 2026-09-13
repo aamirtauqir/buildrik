@@ -17,7 +17,7 @@
  */
 
 import type { MediaAssetType } from "../../shared/types/media";
-import { acceptsMime } from "@shared/constants/media";
+import { LIBRARY_KINDS, acceptsMime } from "@shared/constants/media";
 
 /**
  * http/https only — a data: or blob: URL is already local, and file:// cannot
@@ -33,8 +33,6 @@ export function isFetchableUrl(raw: string): boolean {
   }
 }
 
-/** Every kind the upload gate admits — the fullpage library's accept set. */
-export const EVERY_MEDIA_KIND: readonly MediaAssetType[] = ["image", "svg", "video", "audio", "font"];
 
 export class UrlImportError extends Error {
   constructor(readonly reason: "unreachable" | "unsupported") {
@@ -43,7 +41,7 @@ export class UrlImportError extends Error {
   }
 }
 
-export async function fetchUrlAsFile(url: string, accepts: readonly MediaAssetType[] = EVERY_MEDIA_KIND): Promise<File> {
+export async function fetchUrlAsFile(url: string, accepts: readonly MediaAssetType[] = LIBRARY_KINDS): Promise<File> {
   let res: Response;
   try {
     res = await fetch(url);

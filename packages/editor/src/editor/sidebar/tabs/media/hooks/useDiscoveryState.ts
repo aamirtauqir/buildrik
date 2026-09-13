@@ -5,6 +5,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { displayNameFor } from "../data/mediaUtils";
 import type { Composer } from "../../../../../engine/Composer";
 import {
   stockService,
@@ -264,7 +265,8 @@ export function useDiscoveryState(
         const result = await composer.media.uploadFile(file);
         if (!result.success || !result.asset) throw new Error(result.error ?? "Upload failed");
         await composer.media.updateAsset(result.asset.id, { assetSource: "stock" });
-        return { key: result.asset.id, name: result.asset.name };
+        /* The name the library prints — the engine stores the stem. */
+        return { key: result.asset.id, name: displayNameFor(result.asset.name, result.asset.mimeType) };
       } catch (err) {
         showToast("Failed to save to library", "error");
         return null;
