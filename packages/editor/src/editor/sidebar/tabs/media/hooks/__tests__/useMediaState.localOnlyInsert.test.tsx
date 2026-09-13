@@ -81,10 +81,64 @@ function composerWith(asset: Record<string, unknown>) {
       getAllPages: vi.fn(() => []),
       getElement: vi.fn(() => ({ id: "el-1" })),
     },
-    selection: { select: vi.fn() },
+    selection: { select: vi.fn(), getSelected: vi.fn(() => null), getCount: vi.fn(() => 0) },
     mediaOps: { insertMediaAt: vi.fn(() => ({ elementId: "el-1", kind: "inserted" })) },
   };
 }
+
+/* Clone 3695:20614 — "Canvas · Menu preview image replaced": with an Image
+   element selected on the canvas, Insert to canvas REPLACES its src rather
+   than adding a second image beside it (audit A03: Apply must differ from
+   Cancel). A selection of some other type still inserts. */
+describe("insertToCanvas — an image element selected on the canvas", () => {
+  function withSelection(type: string) {
+    const composer = composerWith({ src: "https://cdn/menu.png", type: "img", name: "menu-cover.png" });
+    const c = composer as unknown as {
+      selection: { getSelected: ReturnType<typeof vi.fn>; getCount: ReturnType<typeof vi.fn> };
+      mediaOps: Record<string, ReturnType<typeof vi.fn>>;
+    };
+    c.selection.getSelected = vi.fn(() => ({ getId: () => "menu-preview", getType: () => type }));
+    c.selection.getCount = vi.fn(() => 1);
+    c.mediaOps.replaceMedia = vi.fn(() => ({ elementId: "menu-preview", previousSrc: "old" }));
+    return { composer, c };
+  }
+
+  it("replaces the selected image's src and inserts nothing", async () => {
+    toasts.length = 0;
+    const { composer, c } = withSelection("image");
+    const { result } = renderHook(() => useMediaState(composer as never));
+    await act(async () => {
+      await result.current.insertToCanvas("a1");
+    });
+    expect(c.mediaOps.replaceMedia).toHaveBeenCalledWith("menu-preview", "https://cdn/menu.png");
+    expect(c.mediaOps.insertMediaAt).not.toHaveBeenCalled();
+    expect(toasts[toasts.length - 1].description).toContain("applied");
+  });
+
+  it("inserts a new element when the selection is not a media element", async () => {
+    const { composer, c } = withSelection("heading");
+    const { result } = renderHook(() => useMediaState(composer as never));
+    await act(async () => {
+      await result.current.insertToCanvas("a1");
+    });
+    expect(c.mediaOps.replaceMedia).not.toHaveBeenCalled();
+    expect(c.mediaOps.insertMediaAt).toHaveBeenCalled();
+  });
+
+  it("does not put a video into a selected image element", async () => {
+    const composer = composerWith({ src: "https://cdn/chef.mp4", type: "vid", name: "chef-intro.mp4" });
+    const c = composer as unknown as { selection: Record<string, ReturnType<typeof vi.fn>>; mediaOps: Record<string, ReturnType<typeof vi.fn>> };
+    c.selection.getSelected = vi.fn(() => ({ getId: () => "menu-preview", getType: () => "image" }));
+    c.selection.getCount = vi.fn(() => 1);
+    c.mediaOps.replaceMedia = vi.fn();
+    const { result } = renderHook(() => useMediaState(composer as never));
+    await act(async () => {
+      await result.current.insertToCanvas("a1");
+    });
+    expect(c.mediaOps.replaceMedia).not.toHaveBeenCalled();
+    expect(c.mediaOps.insertMediaAt).toHaveBeenCalled();
+  });
+});
 
 describe("insertToCanvas — a local-only asset", () => {
   it("warns instead of claiming it was added to the page", async () => {

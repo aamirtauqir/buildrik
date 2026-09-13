@@ -127,6 +127,8 @@ export interface AssetGridProps {
   /** Selected item highlight + click target. */
   selectedAssetId: string | null;
   onSelectAsset(key: string): void;
+  /** Double-click on a card or row — the orchestrator's insert-and-return. */
+  onInsert(key: string): void;
   /** Empty-state hero buttons. */
   onUploadClick(): void;
   onOpenStockModal(): void;
@@ -146,6 +148,7 @@ export function AssetGrid({
   isDragOver = false,
   selectedAssetId,
   onSelectAsset,
+  onInsert,
   onUploadClick,
   onOpenStockModal,
   addToast,
@@ -588,7 +591,7 @@ export function AssetGrid({
                   className={`mgr-list-row${isSelected || checked ? " selected" : ""}`}
                   data-testid={`mgr-list-row-${item.key}`}
                   onClick={onClick}
-                  onDoubleClick={() => state.insertToCanvas(item.key)}
+                  onDoubleClick={() => onInsert(item.key)}
                   onContextMenu={(e) => state.openCtxMenu(e, item)}
                   draggable
                   onDragStart={onDragStart}
@@ -632,7 +635,7 @@ export function AssetGrid({
                 className={`mgr-asset${isSelected ? " selected" : ""}`}
                 data-testid={`mgr-asset-${item.key}`}
                 onClick={onClick}
-                onDoubleClick={() => state.insertToCanvas(item.key)}
+                onDoubleClick={() => onInsert(item.key)}
                 onContextMenu={(e) => state.openCtxMenu(e, item)}
                 draggable
                 onDragStart={onDragStart}

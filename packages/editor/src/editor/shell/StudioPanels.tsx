@@ -521,7 +521,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Inspector>
         )}
 
-        {/* FullPage View — Templates, Settings, History, Design (replaces canvas area) */}
+        {/* FullPage View — Templates, Settings, History, Design (replaces canvas area).
+            Mounted ONLY in fullpage mode. It used to render on every tab and
+            rely on the slot's display:none, so the Media DRAWER kept a whole
+            second LibraryManager (and its media state) mounted invisibly —
+            and once the library became a portaled overlay (Clone
+            3695:45155) that invisible copy was on screen at boot. */}
+        {effectiveFullPageMode && (
         <LayoutShell.FullPage>
           <FullPageView
             activeTab={activeTabId}
@@ -541,6 +547,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onOpenIconPicker={onOpenIconPicker}
           />
         </LayoutShell.FullPage>
+        )}
       </LayoutShell>
 
       {/* S5.4's three approval gates (307:2193 · 307:2203 · 307:2213). They are

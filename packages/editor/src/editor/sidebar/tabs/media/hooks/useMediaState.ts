@@ -221,11 +221,23 @@ export function useMediaState(composer: Composer): MediaStateResult {
         return;
       }
 
+      /* Clone 3695:20614 — "Canvas · Menu preview image replaced". With an
+         image (or video) element selected on the canvas, Insert to canvas
+         REPLACES that element's src; it used to add a second image beside
+         it while the selected one kept its old src, so applying looked
+         exactly like cancelling (audit A03). An explicit selection context
+         (the inspector's Choose image, a dropped empty Image) still wins. */
+      const selectedEl = composer.selection.getCount() === 1 ? composer.selection.getSelected() : null;
+      const assetKind = asset.type === "vid" || asset.type === "video" ? "video" : asset.type === "img" || asset.type === "image" ? "image" : null;
+      const replaceTarget =
+        selectionContext?.elementId ??
+        (selectedEl && assetKind && selectedEl.getType() === assetKind ? selectedEl.getId() : null);
+
       try {
-        if (selectionContext) {
+        if (replaceTarget) {
           // SELECTION MODE: Replace existing element's media via command layer
           const result = composer.mediaOps.replaceMedia(
-            selectionContext.elementId,
+            replaceTarget,
             asset.src
           );
           if (result) {

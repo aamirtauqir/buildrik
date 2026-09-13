@@ -47,6 +47,7 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
     smartFolder: null,
     selectedAssetId: null,
     onSelectAsset: vi.fn(),
+    onInsert: vi.fn(),
     onUploadClick: vi.fn(),
     onOpenStockModal: vi.fn(),
     onDownload: vi.fn(() => 0),
@@ -193,10 +194,12 @@ describe("AssetGrid — selection semantics", () => {
 
   it("double-click inserts to canvas; context-menu opens the ctx menu", () => {
     const state = makeState({ libraryItems: [makeItem({ key: "a" })] });
-    const { container } = mount(state);
+    const { container, props } = mount(state);
     const card = container.querySelector(".mgr-asset")!;
     fireEvent.doubleClick(card);
-    expect(state.insertToCanvas).toHaveBeenCalledWith("a");
+    // Through the orchestrator's insert-and-return, so the library closes
+    // onto the canvas (Clone 3695:20614) — not the raw state call.
+    expect(props.onInsert).toHaveBeenCalledWith("a");
     fireEvent.contextMenu(card);
     expect(state.openCtxMenu).toHaveBeenCalled();
   });

@@ -176,3 +176,15 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     expect(selectAll).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("Clone 3695:20614 / 44165 · Insert to canvas returns to the canvas", () => {
+  it("inserts, then closes the library", async () => {
+    const insertToCanvas = vi.fn(() => Promise.resolve());
+    const { onClose } = await mountLibrary({ insertToCanvas });
+    fireEvent.click(screen.getByTestId("mgr-asset-menu"));
+    fireEvent.click(within(screen.getByTestId("mgr-det-actions")).getByRole("button", { name: "Insert to canvas" }));
+    await screen.findByTestId("mgr-details");
+    expect(insertToCanvas).toHaveBeenCalledWith("menu");
+    await vi.waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+  });
+});

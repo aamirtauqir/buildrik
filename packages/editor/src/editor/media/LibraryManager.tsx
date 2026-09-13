@@ -160,6 +160,18 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     fileInputRef.current?.click();
   }, []);
 
+  /* Clone 3695:20614 / 44165 — every Insert to canvas lands on a "Canvas ·"
+     screen: the library closes and the person sees what they placed. It
+     used to stay open over the canvas, so the applied image was invisible
+     until Close (audit A03 — "demonstrate a distinct applied-image result"). */
+  const insertAndReturn = React.useCallback(
+    async (key: string) => {
+      await state.insertToCanvas(key);
+      onClose();
+    },
+    [state, onClose],
+  );
+
   /* Assets that never reached the server. Their src is a session Object URL,
      so they will not render on a published page — which is what the status
      pill below exists to say. */
@@ -375,6 +387,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           smartFolder={smartFolder}
           selectedAssetId={selectedAssetId}
           onSelectAsset={setSelectedAssetId}
+          onInsert={insertAndReturn}
           onUploadClick={handleUploadClick}
           onOpenStockModal={() => setStockModalOpen(true)}
           addToast={addToast}
@@ -401,7 +414,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           usedIn={usedIn}
           libraryItems={state.libraryItems}
           onSelectAsset={setSelectedAssetId}
-          onInsert={state.insertToCanvas}
+          onInsert={insertAndReturn}
           onEditImage={handleEditImage}
           onOptimizeImage={setOptimizeItem}
           onOpenRename={state.openDetail}
@@ -485,7 +498,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onSetColor={state.setDiscColor}
         onLoadMore={state.loadMoreDisc}
         onSave={state.saveToLibrary}
-        onInsert={state.insertToCanvas}
+        onInsert={insertAndReturn}
         onOpenIconPicker={handleOpenIconPicker}
       />
       {state.confirmDelete && (
@@ -502,7 +515,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           item={state.ctxMenu.item}
           folders={state.folders}
           allFolders={state.allFolders}
-          onInsert={(item) => state.insertToCanvas(item.key)}
+          onInsert={(item) => insertAndReturn(item.key)}
           onSelect={(item) => state.enterSelectModeWith(item.key)}
           onRename={state.openDetail}
           onMove={(item, fid) => state.moveAsset(item.key, fid)}
