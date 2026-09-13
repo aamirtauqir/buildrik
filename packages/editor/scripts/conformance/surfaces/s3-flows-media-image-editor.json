@@ -32,19 +32,19 @@
     },
     {
       "name": "tab-crop",
-      "testId": "image-editor-tab-crop",
+      "testId": "image-editor-tabs-crop",
       "spec": "s3-flows-media-image-editor",
       "nodeId": "1124:4530"
     },
     {
       "name": "tab-adjust",
-      "testId": "image-editor-tab-adjust",
+      "testId": "image-editor-tabs-adjust",
       "spec": "s3-flows-media-image-editor",
       "nodeId": "1124:4531"
     },
     {
       "name": "tab-resize",
-      "testId": "image-editor-tab-resize",
+      "testId": "image-editor-tabs-resize",
       "spec": "s3-flows-media-image-editor",
       "nodeId": "1124:4532"
     },

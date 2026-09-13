@@ -44,9 +44,12 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
      * the trap would see an empty list and give up. Filter on what actually
      * makes an element unreachable instead.
      */
+    /* `tabIndex -1` is out of the tab order by the author's own hand — a
+       roving tablist's unselected tabs (Tabs.tsx). Landing the opening focus
+       on one put the ring on `Crop` while `Optimise` was the selected tab. */
     const focusables = () =>
       Array.from(container?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []).filter(
-        (el) => !el.hasAttribute("hidden") && el.getAttribute("aria-hidden") !== "true",
+        (el) => !el.hasAttribute("hidden") && el.getAttribute("aria-hidden") !== "true" && el.tabIndex !== -1,
       );
 
     focusables()[0]?.focus();

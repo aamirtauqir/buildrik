@@ -39,7 +39,7 @@ import * as React from "react";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import { AlertTriangle, ChevronLeft } from "lucide-react";
-import { Button, OverlayMount } from "@/editor/chrome-ui";
+import { Button, OverlayMount, Tabs } from "@/editor/chrome-ui";
 import { estimateSize, loadImage } from "@/engine/media/MediaOptimizerHelpers";
 import { DiscardEditsModal } from "./components/DiscardEditsModal";
 import { SaveFailedModal } from "./components/SaveFailedModal";
@@ -104,11 +104,12 @@ const FRAME =
 const TITLE = "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]";
 const SUBTITLE = "tw:m-0 tw:mt-1 tw:text-[length:var(--bk-text-13)] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
 /* The tab chips: 32 high, equal width, the selected one on the accent TINT
-   (3397:39917 `Crop`, 3695:43319 `Adjust`), the rest on the quiet grey. */
-const TAB_REST = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-28 tw:px-0`;
-const TAB_ON =
-  `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-28 tw:px-0 tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] ` +
-  "tw:enabled:hover:bg-[var(--bk-accent-tint)]";
+   (3397:39917 `Crop`, 3695:43319 `Adjust`), the rest on the quiet grey —
+   over chrome-ui's Tabs, whose roving tabindex puts the SELECTED tab in the
+   tab order: opened on Optimise from the rail, the focus ring sat on Crop
+   (walked live 2026-09-14). Tabs tints the selected chip itself. */
+const TAB_CHIP =
+  "tw:w-28 tw:px-0 tw:font-medium tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-200)]";
 const PREVIEW_CARD =
   "tw:flex tw:min-h-0 tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-4";
 const WELL =
@@ -280,22 +281,15 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
             </p>
           )}
           {!saved && (
-            <div className="tw:mt-4 tw:flex tw:gap-2" role="tablist" aria-label="Editor sections" data-testid="image-editor-tabs">
-              {EDITOR_TABS.map((t) => (
-                <Button
-                  key={t.id}
-                  size="xs"
-                  variant="secondary"
-                  role="tab"
-                  aria-selected={tab === t.id}
-                  className={tab === t.id ? TAB_ON : TAB_REST}
-                  data-testid={`image-editor-tab-${t.id}`}
-                  onClick={() => setTab(t.id)}
-                >
-                  {t.label}
-                </Button>
-              ))}
-            </div>
+            <Tabs
+              tabs={EDITOR_TABS}
+              value={tab}
+              onChange={(id) => setTab(id as ImageEditorTab)}
+              label="Editor sections"
+              className="tw:mt-4 tw:gap-2 tw:p-0"
+              tabClassName={TAB_CHIP}
+              data-testid="image-editor-tabs"
+            />
           )}
         </div>
 

@@ -48,6 +48,7 @@ vi.mock("react-easy-crop", () => ({
 }));
 
 import { ImageEditorModal, type EditsSnapshot } from "../ImageEditorModal";
+import { EDITOR_TABS } from "../image-editor/imageEdits";
 
 const SRC = "data:image/png;base64,iVBORw0KGgo="; // 9 bytes
 const EDITED = "data:image/webp;base64,ZWRpdGVk"; // 6 bytes
@@ -96,7 +97,8 @@ function mount(over: Partial<React.ComponentProps<typeof ImageEditorModal>> = {}
   return { ...utils, props };
 }
 
-const tab = (id: string) => screen.getByTestId(`image-editor-tab-${id}`);
+const tab = (id: string) =>
+  within(screen.getByTestId("image-editor-tabs")).getByRole("tab", { name: EDITOR_TABS.find((t) => t.id === id)!.label });
 const slider = (row: string) => within(screen.getByTestId(row)).getByRole("slider");
 const status = () => screen.getByTestId("image-editor-status");
 
@@ -125,10 +127,14 @@ describe("Clone 3397:39917 · Edit image — head, tabs, preview, foot", () => {
     expect(tab("crop")).toHaveAttribute("aria-selected", "false");
   });
 
-  it("opens on the tab the host asks for (the library's Optimize door)", () => {
+  it("opens on the tab the host asks for (the library's Optimize door), with the focus ring on THAT tab", () => {
     mount({ initialTab: "optimise" });
     expect(tab("optimise")).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("image-editor-format-webp")).toBeInTheDocument();
+    /* Walked live 2026-09-14: the trap focused the first button — Crop —
+       while Optimise was selected. Roving tabindex + the trap skipping -1. */
+    expect(tab("optimise")).toHaveFocus();
+    expect(tab("crop")).toHaveAttribute("tabindex", "-1");
   });
 
   it("the preview's mono status is `<out W × H> · <crop preset> · <format>` with Reset all beside it", () => {

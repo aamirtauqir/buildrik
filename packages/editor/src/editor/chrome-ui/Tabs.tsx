@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 export interface Tab {
   id: string;
@@ -20,10 +21,14 @@ export interface Tab {
 }
 
 export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
-  tabs: Tab[];
+  tabs: readonly Tab[];
   value: string;
   onChange: (id: string) => void;
   label?: string;
+  /** Merged over every tab's classes — a host whose board draws the chips
+   *  differently (the image editor's 112-wide grey chips, 3397:39917) keeps
+   *  the roving-tabindex + arrow-key contract and restyles the buttons. */
+  tabClassName?: string;
 }
 
 /**
@@ -43,7 +48,16 @@ const TAB_CLASS =
   "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:hover:bg-transparent " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
-export function Tabs({ tabs, value, onChange, label = "Sections", className, ...rest }: TabsProps) {
+export function Tabs({
+  tabs,
+  value,
+  onChange,
+  label = "Sections",
+  className,
+  tabClassName,
+  "data-testid": testId,
+  ...rest
+}: TabsProps & { "data-testid"?: string }) {
   const enabled = tabs.filter((t) => !t.disabled);
   const nodes = React.useRef(new Map<string, HTMLButtonElement>());
 
@@ -79,13 +93,11 @@ export function Tabs({ tabs, value, onChange, label = "Sections", className, ...
     <div
       role="tablist"
       aria-label={label}
-      className={[
-        "tw:flex tw:items-center tw:gap-1 tw:py-1 tw:px-3",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      /* twMerge, not a join: the row is a plain element, so a host's
+         `tw:p-0` has to REPLACE the default padding, not sit beside it. */
+      className={twMerge("tw:flex tw:items-center tw:gap-1 tw:py-1 tw:px-3", className)}
       onKeyDown={onKeyDown}
+      data-testid={testId}
       {...rest}
     >
       {tabs.map((t) => (
@@ -97,7 +109,9 @@ export function Tabs({ tabs, value, onChange, label = "Sections", className, ...
           }}
           type="button"
           role="tab"
-          className={TAB_CLASS}
+          className={tabClassName ? twMerge(TAB_CLASS, tabClassName) : TAB_CLASS}
+          /* `<row testid>-<tab id>` — the conformance recipes measure one tab. */
+          data-testid={testId ? `${testId}-${t.id}` : undefined}
           aria-selected={t.id === value}
           aria-disabled={t.disabled || undefined}
           tabIndex={t.id === value ? 0 : -1}
