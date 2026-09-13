@@ -16,6 +16,7 @@ import {
 } from "../../shared/constants/media";
 import { MediaQuotaError } from "./MediaStorageTypes";
 import type {
+  EditsSnapshot,
   MediaAsset,
   MediaAssetType,
   MediaFolder,
@@ -89,6 +90,50 @@ function tagsFromUserMetadata(meta: unknown): string[] {
 function siteFontFromUserMetadata(meta: unknown): boolean {
   return typeof meta === "object" && meta !== null && "siteFont" in meta && meta.siteFont === true;
 }
+
+/**
+ * Clone 3695:45529 (Asset versions): the parent a server row names at
+ * `userMetadata.versionOf`. Only a string counts — anything else is a plain
+ * asset, which is also what every row written before Phase 6 is.
+ */
+function versionOfFromUserMetadata(meta: unknown): string | undefined {
+  if (typeof meta !== "object" || meta === null || !("versionOf" in meta)) return undefined;
+  return typeof meta.versionOf === "string" && meta.versionOf ? meta.versionOf : undefined;
+}
+
+const isNumber = (v: unknown): v is number => typeof v === "number";
+const isString = (v: unknown): v is string => typeof v === "string";
+
+/**
+ * The edits snapshot a server row carries at `userMetadata.edits`. The whole
+ * shape or nothing: a partial snapshot would print "Crop: Free" beside an
+ * invented "Brightness: undefined", so it reads as no snapshot at all.
+ */
+function editsFromUserMetadata(meta: unknown): EditsSnapshot | undefined {
+  if (typeof meta !== "object" || meta === null || !("edits" in meta)) return undefined;
+  if (typeof meta.edits !== "object" || meta.edits === null) return undefined;
+  const record: Record<string, unknown> = { ...meta.edits };
+  const { width, height, crop, preset, format, transform, brightness, contrast, saturation, blur } = record;
+  if (!isNumber(width) || !isNumber(height) || !isNumber(brightness) || !isNumber(contrast)) return undefined;
+  if (!isNumber(saturation) || !isNumber(blur)) return undefined;
+  if (!isString(crop) || !isString(preset) || !isString(format) || !isString(transform)) return undefined;
+  return { width, height, crop, preset, format, transform, brightness, contrast, saturation, blur };
+}
+
+/**
+ * The server row's JSON column, whole, from the asset as it now is. The
+ * server REPLACES the column with what is sent, so every writer sends every
+ * key the asset carries — the tags always, the flags only once set (an image
+ * that was never a font or a version has nothing to preserve).
+ */
+function userMetadataOf(asset: MediaAsset): Record<string, unknown> {
+  return {
+    tags: asset.tags,
+    ...(asset.siteFont !== undefined ? { siteFont: asset.siteFont } : {}),
+    ...(asset.versionOf !== undefined ? { versionOf: asset.versionOf } : {}),
+    ...(asset.edits !== undefined ? { edits: asset.edits } : {}),
+  };
+}
 // only via dashboard.media.searchStock tRPC. Engine no longer touches I/O for stock.
 
 // --- Discovery stub types ---
@@ -135,6 +180,15 @@ interface UploadOptions {
   readonly tags?: string[];
   readonly generateThumbnail?: boolean;
   readonly autoOptimize?: boolean;
+  /**
+   * Clone 3695:45529: the file is a saved VERSION of this asset. The row is
+   * born flagged — flagging it after the upload would let the grid draw it
+   * as a library card for the whole round trip, since the row is in state
+   * and `MEDIA_UPDATED` fires before `uploadFile` resolves.
+   */
+  readonly versionOf?: string;
+  /** The edits the version was saved with; meaningful with `versionOf`. */
+  readonly edits?: EditsSnapshot;
 }
 
 /**
@@ -522,7 +576,8 @@ export class MediaManager extends MediaEventEmitter {
       createdAt: string | Date;
       updatedAt: string | Date;
       /** The row's JSON column; `tags` lives at `userMetadata.tags` (C3),
-       *  `siteFont` beside it (3686:42317). */
+       *  `siteFont` beside it (3686:42317), `versionOf` / `edits` too
+       *  (3695:45529). */
       userMetadata?: unknown;
     }>,
     serverFolders: ReadonlyArray<{
@@ -557,6 +612,8 @@ export class MediaManager extends MediaEventEmitter {
       if (existingAssetIds.has(sa.id)) continue;
       const engineType: MediaAssetType =
         sa.type === "image" && sa.mimeType === "image/svg+xml" ? "svg" : sa.type;
+      const versionOf = versionOfFromUserMetadata(sa.userMetadata);
+      const edits = editsFromUserMetadata(sa.userMetadata);
       const asset: MediaAsset = {
         id: sa.id,
         serverId: sa.id,
@@ -572,6 +629,8 @@ export class MediaManager extends MediaEventEmitter {
         folderId: sa.folderId ?? undefined,
         tags: tagsFromUserMetadata(sa.userMetadata),
         ...(siteFontFromUserMetadata(sa.userMetadata) ? { siteFont: true } : {}),
+        ...(versionOf !== undefined ? { versionOf } : {}),
+        ...(edits !== undefined ? { edits } : {}),
         createdAt: typeof sa.createdAt === "string" ? sa.createdAt : sa.createdAt.toISOString(),
         updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
         assetSource: "uploaded",
@@ -1021,6 +1080,8 @@ export class MediaManager extends MediaEventEmitter {
         width: finalDimensions?.width,
         height: finalDimensions?.height,
         tags: options.tags || [],
+        ...(options.versionOf !== undefined ? { versionOf: options.versionOf } : {}),
+        ...(options.edits !== undefined ? { edits: options.edits } : {}),
         folderId: options.folderId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -1073,6 +1134,13 @@ export class MediaManager extends MediaEventEmitter {
           }
           await this.replaceAssetId(assetId, remote.serverId, remote.url);
           finalAsset = this.state.assets.find((a) => a.id === remote.serverId) ?? asset;
+          // Clone 3695:45529: the server row is created without its JSON
+          // column (`onUploadCompleted` may win the create race and the
+          // upsert's update branch never writes it), so a row born a version
+          // mirrors the column explicitly. Failure tolerated — local ahead.
+          if (finalAsset.versionOf !== undefined) {
+            await this.remoteSync.updateAsset(remote.serverId, { userMetadata: userMetadataOf(finalAsset) });
+          }
           // P2 fix: chain retry on success so other queued localOnly assets
           // get a fresh attempt without waiting for an 'online' event.
           if (this.retryQueue.size > 0 || this.folderRetryQueue.size > 0) {
@@ -1266,11 +1334,12 @@ export class MediaManager extends MediaEventEmitter {
     // Sent only when the list actually changed, so a name edit's patch is
     // still exactly `{ filename, altText }`.
     //
-    // Clone 3686:42317 (Phase 5): `siteFont` shares that column. The server
+    // Clone 3686:42317 (Phase 5): `siteFont` shares that column, and since
+    // Phase 6 (3695:45529) so do `versionOf` and `edits`. The server
     // REPLACES the column with what is sent, so the patch is the whole
-    // column — the tags AND the flag, from the asset as it now is — whichever
-    // of the two changed. A flag that was never set stays out of it: an image
-    // has nothing to preserve.
+    // column — the tags AND every flag, from the asset as it now is —
+    // whichever of them changed (`userMetadataOf`). A flag that was never
+    // set stays out of it: an image has nothing to preserve.
     if (this.remoteSync && asset.serverId) {
       const patch: Parameters<RemoteAssetSync["updateAsset"]>[1] = {};
       if (
@@ -1285,11 +1354,13 @@ export class MediaManager extends MediaEventEmitter {
         (asset.tags.length !== updated.tags.length || asset.tags.some((t, i) => t !== updated.tags[i]));
       const siteFontChanged =
         Object.prototype.hasOwnProperty.call(updates, "siteFont") && asset.siteFont !== updated.siteFont;
-      if (tagsChanged || siteFontChanged) {
-        patch.userMetadata = {
-          tags: updated.tags,
-          ...(updated.siteFont !== undefined ? { siteFont: updated.siteFont } : {}),
-        };
+      const versionOfChanged =
+        Object.prototype.hasOwnProperty.call(updates, "versionOf") && asset.versionOf !== updated.versionOf;
+      const editsChanged =
+        Object.prototype.hasOwnProperty.call(updates, "edits") &&
+        JSON.stringify(asset.edits) !== JSON.stringify(updated.edits);
+      if (tagsChanged || siteFontChanged || versionOfChanged || editsChanged) {
+        patch.userMetadata = userMetadataOf(updated);
       }
       if (Object.keys(patch).length > 0) {
         await this.remoteSync.updateAsset(asset.serverId, patch);

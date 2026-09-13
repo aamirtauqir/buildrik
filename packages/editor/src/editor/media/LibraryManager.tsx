@@ -28,19 +28,20 @@ import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
 import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
+import { VersionsModal } from "./components/VersionsModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
-import { LIBRARY_KINDS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
-import { useToast, Button, IconButton, TextInput, OverlayMount } from "@/editor/chrome-ui";
-import { OptimizationPanel } from "./OptimizationPanel";
-import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
+import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
+import { useToast, Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
-import type { IconConfig, MediaAsset } from "../../shared/types/media";
+import type { EditsSnapshot, IconConfig, MediaAsset } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
 import { generateAltTextRemote } from "../../services/AltTextService";
+import { createAssetVersion } from "../../services/MediaVersionService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
 
@@ -50,10 +51,30 @@ const SEARCH_TAG_TOKEN =
   "tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:whitespace-nowrap tw:text-[13px] tw:text-[var(--bk-ink-soft)]";
 const SEARCH_TAG_CLEAR = "tw:h-5 tw:w-5 tw:text-[var(--bk-ink-soft)]";
 
+/** The editor's tabs (P6-X); the rail's Optimize opens on `optimise`. */
+export type ImageEditorTab = "crop" | "adjust" | "resize" | "optimise";
+
+/**
+ * What the library tells the image editor beyond the file (P6-X contract):
+ * the name its head prints, the tab to open on, and the door its Saved
+ * screen's Done leads through. Handed as the third argument so a host still
+ * on `openImageEditor(src, onSave)` type-checks and simply ignores it — the
+ * shell forwards it once the editor's new props land.
+ */
+export interface ImageEditorDoor {
+  fileName: string;
+  initialTab?: ImageEditorTab;
+  onDone?(): void;
+}
+
 interface LibraryManagerProps {
   composer: Composer;
   onClose: () => void;
-  onOpenImageEditor?: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
+  onOpenImageEditor?: (
+    imageSrc: string,
+    onSave: (editedSrc: string, edits?: EditsSnapshot) => void | Promise<void>,
+    door?: ImageEditorDoor,
+  ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
@@ -123,14 +144,36 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   // N² on every render). The smart filters and the SMART row counts both
   // read it, and the counts are library-wide even inside a folder scope
   // (Clone 3698:20337 keeps them while Products is the scope).
+  //
+  // Clone 3695:45529 (Phase 6): a file's usage is its FAMILY's — the
+  // original's placements plus every saved version's. Applying v2 across
+  // the site moves the placements to v2's src, and the card must go on
+  // reading `used ×3`, not flip to "unused" while the image is on three
+  // pages. The rail's USED IN reads the same aggregate below.
+  //
+  // A replace changes no library row, so nothing above re-renders on its
+  // own; the engine's replace events are the tick that re-reads the counts.
+  const [placementsTick, setPlacementsTick] = React.useState(0);
+  React.useEffect(() => {
+    const bump = () => setPlacementsTick((t) => t + 1);
+    composer.media.on(MEDIA_EVENTS.REPLACE_COMMITTED, bump);
+    composer.media.on(MEDIA_EVENTS.REPLACE_PARTIAL, bump);
+    return () => {
+      composer.media.off(MEDIA_EVENTS.REPLACE_COMMITTED, bump);
+      composer.media.off(MEDIA_EVENTS.REPLACE_PARTIAL, bump);
+    };
+  }, [composer]);
   const usageMap = React.useMemo(() => {
     const map = new Map<string, number>();
     for (const item of state.allLibraryItems) {
-      const count = composer.mediaOps.getUsages(item.src).count;
+      const family = state.versionsOf(item.key);
+      const members = family.length > 0 ? family : [item];
+      const count = members.reduce((n, member) => n + composer.mediaOps.getUsages(member.src).count, 0);
       if (count > 0) map.set(item.key, count);
     }
     return map;
-  }, [state.allLibraryItems, composer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- placementsTick is the re-read trigger
+  }, [state.allLibraryItems, state.versionsOf, composer, placementsTick]);
 
   // Apply smart folder filter on top of state.libraryItems
   const visibleItems = React.useMemo(() => {
@@ -173,30 +216,31 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     return state.libraryItems.find((item) => item.key === selectedAssetId) || null;
   }, [state.selMode, checkedItems, selectedAssetId, state.libraryItems]);
 
-  const usageCount = React.useMemo(() => {
-    if (!selectedItem) return 0;
-    return composer.mediaOps.getUsages(selectedItem.src).count;
-  }, [selectedItem, composer]);
-
-  /* Clone 3695:20340 — USED IN names the pages ("1 place — Menu preview").
-     Same trace the delete confirm runs, so the two never disagree. */
-  const usedIn = React.useMemo(
-    () => (selectedItem ? (state.checkInUse([selectedItem.key])[0]?.pages ?? []) : []),
-    [selectedItem, state],
+  /* Clone 3695:45529 — a file's family with where each member stands on the
+     site: the original first, then the saved versions oldest to newest,
+     each with the placements carrying its src and the pages they sit on.
+     The count is `getUsages`, the pages the join the delete confirm runs
+     (`checkInUse`), so the rail, the dialog and the confirm never disagree. */
+  const familyOf = React.useCallback(
+    (key: string): VersionEntry[] =>
+      state.versionsOf(key).map((item, i) => ({
+        item,
+        index: i + 1,
+        placements: composer.mediaOps.getUsages(item.src).count,
+        pages: state.checkInUse([item.key])[0]?.pages ?? [],
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- placementsTick is the re-read trigger
+    [state.versionsOf, state.checkInUse, composer, placementsTick],
   );
 
-  // Version history: group _v1234 files by base name
-  const versions = React.useMemo(() => {
-    if (!selectedItem) return [];
-    // Strip _v1234 suffix to find base name
-    const baseName = selectedItem.name.replace(/_v\d+$/, "");
-    return state.libraryItems
-      .filter((item) => {
-        const itemBase = item.name.replace(/_v\d+$/, "");
-        return itemBase === baseName && item.type === selectedItem.type;
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [selectedItem, state.libraryItems]);
+  const versions = React.useMemo(() => (selectedItem ? familyOf(selectedItem.key) : []), [selectedItem, familyOf]);
+
+  /* The family's placements — USED IN follows them to whichever version
+     the site carries (the aggregate `usageMap` reads). */
+  const usageCount = React.useMemo(() => versions.reduce((n, v) => n + v.placements, 0), [versions]);
+
+  /* Clone 3695:20340 — USED IN names the pages ("1 place — Menu preview"). */
+  const usedIn = React.useMemo(() => [...new Set(versions.flatMap((v) => v.pages))], [versions]);
 
   const handleUploadClick = React.useCallback(() => {
     fileInputRef.current?.click();
@@ -243,10 +287,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     },
     [state],
   );
-  /* The optimizer shipped as a tab on the PICKER modal, so the only door to it
-     was being mid-way through choosing an image for an element. It belongs
-     beside Edit, on the asset you are looking at. */
-  const [optimizeItem, setOptimizeItem] = React.useState<LibraryItem | null>(null);
   /* Clone 3701:20353 — Rename is a modal of its own. It used to open the
      drawer's asset drill-in hub (`AssetDetailOverlay`, board 146:2), which has
      no name field at all. */
@@ -501,10 +541,30 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     });
   }, [onOpenIconPicker, composer, addToast]);
 
-  // Bug #1 fix: Edit button → open image editor, save as new version
-  // Resolves fresh blob URL via getAssetSrc (item.src may be stale after page reload)
+  /* ─── P6-V Versions ────────────────────────────────────────────────── */
+  /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
+     (its parent's key: a version's own key resolves to the same family). */
+  const [versionsFor, setVersionsFor] = React.useState<string | null>(null);
+  const versionsFamily = React.useMemo(() => (versionsFor ? familyOf(versionsFor) : []), [versionsFor, familyOf]);
+
+  /* The family at SAVE time, not at open time: a second save from the same
+     editor session numbers itself after the version the first one made. */
+  const versionsOfRef = React.useRef(state.versionsOf);
+  versionsOfRef.current = state.versionsOf;
+
+  /* Clone 3681:20026 → 3695:45529 — Edit image opens the editor on the file
+     (a fresh blob URL: the stored src may be dead across sessions), with the
+     name its head prints and the tab to open on. Its Save lands the edited
+     file through the upload pipeline AS A VERSION of the family's parent —
+     `<stem>-v<N>.<ext>`, N the next index, in the parent's folder, born
+     flagged with the parent's key and the edits it was saved with — never
+     as a library card of its own. The parent's src stays the original;
+     applying is the dialog's explicit step. A refused upload rethrows so the
+     editor shows its failure dialog and keeps the draft. The server's
+     version history is written best-effort once both rows are synced —
+     never awaited into the save. Done opens Asset versions on the family. */
   const handleEditImage = React.useCallback(
-    async (item: LibraryItem) => {
+    async (item: LibraryItem, initialTab?: ImageEditorTab) => {
       if (!onOpenImageEditor) {
         addToast({ description: "Image editor unavailable", tone: "error" });
         return;
@@ -513,25 +573,35 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         addToast({ description: "Only images can be edited", tone: "info" });
         return;
       }
-      // Resolve to a fresh blob URL — the stored src may be dead across sessions
+      const parentKey = item.versionOf ?? item.key;
       const freshSrc = (await composer.media.getAssetSrc(item.key)) || item.src;
-      onOpenImageEditor(freshSrc, async (editedSrc) => {
-        try {
-          const res = await fetch(editedSrc);
-          const blob = await res.blob();
-          const timestamp = Date.now();
-          const cleanName = item.name.replace(/_v\d+$/, "");
-          const ext = (blob.type.split("/")[1] || "webp").replace("+xml", "");
-          const fileName = `${cleanName}_v${timestamp % 10000}.${ext}`;
-          const file = new File([blob], fileName, { type: blob.type });
-          state.upload([file]);
-          addToast({ description: `New version of ${item.name} saved`, tone: "success" });
-        } catch {
-          addToast({ description: "Could not save edited version", tone: "error" });
+      const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
+        const family = versionsOfRef.current(parentKey);
+        const parent = family[0] ?? item;
+        const res = await fetch(editedSrc);
+        const blob = await res.blob();
+        const stem = parent.name.replace(/\.[^/.]+$/, "");
+        const file = new File([blob], displayNameFor(`${stem}-v${Math.max(family.length, 1) + 1}`, blob.type), { type: blob.type });
+        const result = await composer.media.uploadFile(file, {
+          ...(parent.folderId ? { folderId: parent.folderId } : {}),
+          versionOf: parentKey,
+          ...(edits ? { edits } : {}),
+        });
+        if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
+        const saved = result.asset;
+        if (parent.assetId && saved.serverId && !saved.localOnly) {
+          void createAssetVersion({ assetId: parent.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
+            /* History is a convenience; the version itself has landed. */
+          });
         }
+      };
+      onOpenImageEditor(freshSrc, onSave, {
+        fileName: item.displayName ?? item.name,
+        initialTab,
+        onDone: () => setVersionsFor(parentKey),
       });
     },
-    [onOpenImageEditor, state, addToast, composer]
+    [onOpenImageEditor, addToast, composer],
   );
 
   /* Clone 3721:43697 — TAGS lists the LIBRARY's tags (`menu · team · food`
@@ -724,10 +794,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           usageCount={usageCount}
           usedIn={usedIn}
           libraryItems={state.libraryItems}
-          onSelectAsset={setSelectedAssetId}
+          onOpenVersions={() => {
+            if (selectedItem) setVersionsFor(selectedItem.versionOf ?? selectedItem.key);
+          }}
           onInsert={insertAndReturn}
           onEditImage={handleEditImage}
-          onOptimizeImage={setOptimizeItem}
+          /* Clone 3695:43480 — Optimise is a tab of the editor now; the rail's
+             Optimize opens the editor on it. */
+          onOptimizeImage={(item) => void handleEditImage(item, "optimise")}
           onOpenRename={setRenameTarget}
           onRequestDelete={state.requestDelete}
           replacePickerOpen={replacePickerOpen}
@@ -861,19 +935,20 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onEditImage={handleEditImage}
         />
       )}
-      {optimizeItem && (
-        <OverlayMount open onClose={() => setOptimizeItem(null)}>
-          <OptimizationPanel
-            imageSrc={optimizeItem.src}
-            onOptimized={async (src) => {
-              await state.updateItem(optimizeItem.key, { src });
-              setOptimizeItem(null);
-              addToast({ description: `${optimizeItem.name} optimized`, tone: "success" });
-            }}
-            onClose={() => setOptimizeItem(null)}
-          />
-        </OverlayMount>
-      )}
+      {/* ─── P6-V Versions ──────────────────────────────────────────────── */}
+      {/* Clone 3695:45529 — Asset versions, from the editor's Done or a rail
+          row. Edit latest saved version gives way to the editor (its Done
+          brings the dialog back). Apply is the next journey's (3695:45615). */}
+      <VersionsModal
+        open={versionsFor !== null}
+        versions={versionsFamily}
+        onClose={() => setVersionsFor(null)}
+        onEditLatest={(latest) => {
+          setVersionsFor(null);
+          void handleEditImage(latest);
+        }}
+        onApplyLatest={() => undefined}
+      />
       <ImportUrlModal
         open={importUrlOpen}
         initialUrl={importDraft}

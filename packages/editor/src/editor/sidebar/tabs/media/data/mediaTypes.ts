@@ -10,7 +10,7 @@ import type {
   DiscIcon,
   DiscFont,
 } from "../../../../../engine/media/MediaManager";
-import type { MediaSortBy, SortDirection, UploadProgress, UploadResult } from "../../../../../shared/types/media";
+import type { EditsSnapshot, MediaSortBy, SortDirection, UploadProgress, UploadResult } from "../../../../../shared/types/media";
 import type { MediaAsset } from "../../../../../shared/types/media";
 import type { StockFailureReason } from "../../../../../services/stock/StockService";
 
@@ -94,6 +94,25 @@ export interface LibraryItem {
    *  line reads it (`Site font · added` / `Uploaded · not added`). Written
    *  by the Site fonts dialog only, through the engine. */
   siteFont?: boolean;
+  /** Clone 3695:45529 — a saved version of the asset with this key. Such a
+   *  row is never a card, a count or a search hit; `versionsOf(parent)` is
+   *  the only way to it. */
+  versionOf?: string;
+  /** The edits a version was saved with — the Asset versions cards print
+   *  them. Absent on originals and on versions saved without a snapshot. */
+  edits?: EditsSnapshot;
+}
+
+/** One member of an asset's family, as the rail's VERSIONS block and the
+ *  Asset versions dialog draw it (Clone 3695:45529). `index` is 1-based —
+ *  v1 is the original; the highest is the latest saved. "Applied" is a fact
+ *  about the site, not the row: `placements` counts the elements carrying
+ *  this version's src, on `pages`. */
+export interface VersionEntry {
+  item: LibraryItem;
+  index: number;
+  placements: number;
+  pages: string[];
 }
 
 // --- Delete confirmation ---
@@ -172,8 +191,14 @@ export interface LibraryStateResult {
   rawAssets: MediaAsset[];
   /** The scoped, filtered, sorted list the grid draws. */
   libraryItems: LibraryItem[];
-  /** Every asset, unscoped — the SMART rows count the library, not a folder. */
+  /** Every asset, unscoped — the SMART rows count the library, not a folder.
+   *  Saved versions (`versionOf`) are not in it: they are not library cards. */
   allLibraryItems: LibraryItem[];
+  /** Clone 3695:45529 — an asset's family: the original first, then its
+   *  saved versions oldest to newest. A version's key resolves to its
+   *  parent's family; an unknown key is empty; a file with no versions is
+   *  a family of one. */
+  versionsOf(key: string): LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
   /** Direct-child asset count per folder id; a folder with none is absent. */
@@ -309,6 +334,8 @@ export interface MediaStateResult {
   libraryItems: LibraryItem[];
   /** See `LibraryStateResult.allLibraryItems`. */
   allLibraryItems: LibraryItem[];
+  /** See `LibraryStateResult.versionsOf`. */
+  versionsOf(key: string): LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
   /** See `LibraryStateResult.folderCounts`. */

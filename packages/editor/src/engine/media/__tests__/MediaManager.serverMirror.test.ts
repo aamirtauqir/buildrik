@@ -51,6 +51,8 @@ function seedAsset(manager: MediaManager, partial: Partial<MediaAsset> & { id: s
     size: 10,
     tags: partial.tags ?? [],
     siteFont: partial.siteFont,
+    versionOf: partial.versionOf,
+    edits: partial.edits,
     folderId: partial.folderId,
     serverId: partial.serverId,
     localOnly: partial.localOnly,
@@ -348,5 +350,106 @@ describe("MediaManager server mirror — siteFont ↔ userMetadata.siteFont (368
     expect(manager.getAsset("stringy")?.siteFont).toBeFalsy();
     expect(manager.getAsset("off")?.siteFont).toBeFalsy();
     expect(manager.getAsset("bare")?.siteFont).toBeFalsy();
+  });
+});
+
+/* Clone 3695:45529 (Asset versions, Phase 6): a saved edit is a library row
+   of its own, flagged `versionOf = <parent id>` and carrying the edits it was
+   saved with. Both ride the same JSON column as the tags and the site-font
+   flag — `userMetadata.versionOf` / `userMetadata.edits` — so a patch that
+   carries any of the four carries them all, and the import reads them back. */
+describe("MediaManager server mirror — versionOf / edits ↔ userMetadata (3695:45529)", () => {
+  const EDITS = {
+    width: 2400,
+    height: 1600,
+    crop: "Free",
+    preset: "None",
+    format: "Original",
+    transform: "Original",
+    brightness: 0,
+    contrast: 0,
+    saturation: 0,
+    blur: 0,
+  };
+
+  it("flagging a synced row as a version mirrors { tags, versionOf }", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "v2", serverId: "srv-v2" });
+
+    const updated = await manager.updateAsset("v2", { versionOf: "hero" });
+
+    expect(updated?.versionOf).toBe("hero");
+    expect(remote.updateAsset).toHaveBeenCalledTimes(1);
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-v2", { userMetadata: { tags: [], versionOf: "hero" } });
+  });
+
+  it("the edits snapshot rides the same column, beside the flag", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "v2", serverId: "srv-v2", versionOf: "hero" });
+
+    await manager.updateAsset("v2", { edits: EDITS });
+
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-v2", {
+      userMetadata: { tags: [], versionOf: "hero", edits: EDITS },
+    });
+  });
+
+  it("a tags edit on a version row keeps versionOf and edits in the patch — the server replaces the column", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "v2", serverId: "srv-v2", versionOf: "hero", edits: EDITS });
+
+    await manager.updateAsset("v2", { tags: ["menu"] });
+
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-v2", {
+      userMetadata: { tags: ["menu"], versionOf: "hero", edits: EDITS },
+    });
+  });
+
+  it("an unchanged flag does not round-trip to the server", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "v2", serverId: "srv-v2", versionOf: "hero" });
+
+    await manager.updateAsset("v2", { versionOf: "hero" });
+
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+  });
+
+  const row = (id: string, userMetadata?: unknown) => ({
+    id,
+    url: `https://cdn/${id}.jpg`,
+    bytes: 10,
+    type: "image" as const,
+    mimeType: "image/jpeg",
+    filename: `${id}.jpg`,
+    altText: null,
+    folderId: null,
+    createdAt: "2026-09-13T00:00:00.000Z",
+    updatedAt: "2026-09-13T00:00:00.000Z",
+    ...(userMetadata !== undefined ? { userMetadata } : {}),
+  });
+
+  it("importServerAssets reads versionOf (a string) and edits (the whole snapshot) back — anything else is a plain asset", async () => {
+    const manager = makeManager(makeRemoteSync());
+
+    await manager.importServerAssets(
+      [
+        row("hero"),
+        row("v2", { tags: [], versionOf: "hero", edits: EDITS }),
+        row("v3", { versionOf: 42 }),
+        row("v4", { versionOf: "hero", edits: { crop: "Free" } }),
+      ],
+      [],
+    );
+
+    expect(manager.getAsset("hero")?.versionOf).toBeUndefined();
+    expect(manager.getAsset("v2")?.versionOf).toBe("hero");
+    expect(manager.getAsset("v2")?.edits).toEqual(EDITS);
+    expect(manager.getAsset("v3")?.versionOf).toBeUndefined();
+    expect(manager.getAsset("v4")?.versionOf).toBe("hero");
+    expect(manager.getAsset("v4")?.edits).toBeUndefined();
   });
 });

@@ -95,7 +95,18 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     assetSource: asset.assetSource,
     tags: asset.tags,
     siteFont: asset.siteFont,
+    versionOf: asset.versionOf,
+    edits: asset.edits,
   };
+}
+
+/** "Home and Menu" / "Home" / "Home, Menu and Contact" — the pages a
+ * placement set sits on, the way the Clone's dialogs read them
+ * (3695:45615 "Update 3 uses on Home and Menu", 3695:45529 "Currently used
+ * on Home and Menu"). Empty when none could be traced. */
+export function namePages(pages: string[]): string {
+  if (pages.length <= 1) return pages[0] ?? "";
+  return `${pages.slice(0, -1).join(", ")} and ${pages[pages.length - 1]}`;
 }
 
 /** Clone 3721:43697 — the TAGS chip filter: the files carrying exactly this tag. */

@@ -168,6 +168,12 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
     setSelectionContext: noop(),
     checkInUse: vi.fn(() => []),
     clearSelection: noop(),
+    /* Clone 3695:45529 — every file is its own one-member family until a
+       test hands a saved version in. */
+    versionsOf: vi.fn((key: string) => {
+      const item = (over.libraryItems ?? []).find((i) => i.key === key);
+      return item ? [item] : [];
+    }),
     ...over,
   } as MediaStateResult;
 }
@@ -179,20 +185,37 @@ export function makeComposer(
     selectAssets?: (ids: string[]) => void;
     /** The composer's own bus — the rail's Manage font emits `ui:site-fonts` on it (3686:42317). */
     emit?: (event: string, payload?: unknown) => void;
+    uploadFile?: (file: File, options?: unknown) => Promise<unknown>;
   } = {},
+  /* The page graph the per-page result lines read (3720:43316). Empty by
+     default: a test that wants "Home: 2 updated" hands its own. */
+  elements: { getAllPages(): unknown[]; getElement(id: string): unknown } = {
+    getAllPages: () => [],
+    getElement: () => undefined,
+  },
+  /* Read at call time, so a test can move the placements from one src to
+     another (3720:43316 → 3697:20341) and the rail follows. */
+  replaceAcross?: (oldSrc: string, newSrc: string) => unknown,
 ) {
   return {
     emit: media.emit ?? vi.fn(),
+    elements,
     mediaOps: {
-      getUsages: (src: string) => ({ count: usages[src] ?? 0, usages: [] }),
+      getUsages: (src: string) => ({ count: usages[src] ?? 0, elements: [] }),
       insertMedia: vi.fn(),
-      // Real shape: `{ replaced: ElementId[]; failed: ElementId[] }`.
-      // The replace-all picker reads `result.replaced.length` and
-      // `result.failed.length` — returning a number here would crash the
-      // first test that exercises the picker click path.
-      replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
+      // Real shape: `{ replaced: ReplaceResult[]; failed: { elementId,
+      // error }[]; clean }`. The replace-all picker reads
+      // `result.replaced.length` and `result.failed.length` — returning a
+      // number here would crash the first test that exercises the picker
+      // click path.
+      replaceAcross: vi.fn(replaceAcross ?? (() => ({ replaced: [], failed: [], clean: true }))),
     },
     media: {
+      /* The engine's replace events (the manager re-reads placements on
+         them); nothing is emitted here — a test that moves placements sees
+         them through the apply flow's own re-read. */
+      on: vi.fn(),
+      off: vi.fn(),
       getAssets: () => [] as Array<{ key: string; tags?: string[] }>,
       getAssetSrc: vi.fn(() => Promise.resolve(null)),
       /* Real shape: how many of the given assets it handed to the browser. */
@@ -203,7 +226,10 @@ export function makeComposer(
       selectAssets: media.selectAssets ?? vi.fn(),
       /* Real shape: `UploadResult` — the import-from-URL path reads `.asset`
          for the Image imported dialog and View asset. */
-      uploadFile: vi.fn(async (file: File) => ({ success: true, asset: { id: file.name, name: file.name }, fileName: file.name })),
+      uploadFile: vi.fn(
+        media.uploadFile ??
+          (async (file: File) => ({ success: true, asset: { id: file.name, name: file.name }, fileName: file.name })),
+      ),
     },
   } as unknown as Parameters<typeof LibraryManager>[0]["composer"];
 }

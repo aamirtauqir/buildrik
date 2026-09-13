@@ -1,15 +1,16 @@
 /**
- * AssetDetailsPanel — tabs, version history + revert, used-in counts,
- * replace-all picker, action row routing. Complements the existing
- * AssetDetailsPanel.altText.test.tsx (P7 alt-text coverage).
+ * AssetDetailsPanel — the VERSIONS block (Clone 3695:45529 / 3697:20326,
+ * Phase 6), used-in counts, replace-all picker, action row routing.
+ * Complements the existing AssetDetailsPanel.altText.test.tsx (P7 alt-text
+ * coverage).
  *
  * @license BSD-3-Clause
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import type { LibraryItem } from "../../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem, VersionEntry } from "../../../sidebar/tabs/media/data/mediaTypes";
 import { AssetDetailsPanel, type AssetDetailsPanelProps } from "../AssetDetailsPanel";
 
 function makeItem(over: Partial<LibraryItem> = {}): LibraryItem {
@@ -42,7 +43,7 @@ function mount(over: Partial<AssetDetailsPanelProps> = {}) {
     usageCount: 0,
     usedIn: [],
     libraryItems: [],
-    onSelectAsset: vi.fn(),
+    onOpenVersions: vi.fn(),
     onInsert: vi.fn(),
     onEditImage: vi.fn(),
     onOpenRename: vi.fn(),
@@ -53,6 +54,10 @@ function mount(over: Partial<AssetDetailsPanelProps> = {}) {
   };
   const utils = render(<AssetDetailsPanel {...props} />);
   return { ...utils, props };
+}
+
+function entry(item: LibraryItem, index: number, placements = 0, pages: string[] = []): VersionEntry {
+  return { item, index, placements, pages };
 }
 
 describe("AssetDetailsPanel — empty + details", () => {
@@ -69,50 +74,50 @@ describe("AssetDetailsPanel — empty + details", () => {
   });
 });
 
-describe("AssetDetailsPanel — versions tab", () => {
-  const current = makeItem({ key: "v2", name: "logo_v2222" });
-  const older = makeItem({
-    key: "v1",
-    name: "logo_v1111",
-    src: "https://example.com/logo-old.png",
-    createdAt: "2026-06-01T10:00:00.000Z",
+/* Clone 3695:45529 / 3697:20326 (Phase 6): the rail's VERSIONS block lists
+   `versionsOf(selected)` — `v2 · Latest saved` over `v1 · Original`, the one
+   the site's placements carry marked APPLIED — and a row opens Asset
+   versions. The `_v1234` stem heuristic and the row's Revert are gone:
+   applying a version is the dialog's explicit step. */
+describe("AssetDetailsPanel — VERSIONS block (Clone 3695:45529)", () => {
+  const original = makeItem({ key: "hero", name: "hero-dark", displayName: "hero-dark.jpg", src: "https://example.com/hero.jpg" });
+  const saved = makeItem({
+    key: "hero-v2",
+    name: "hero-dark-v2",
+    src: "https://example.com/hero-v2.jpg",
+    versionOf: "hero",
+    createdAt: "2026-09-02T10:00:00.000Z",
   });
 
-  it("hides the VERSIONS section when there is a single version", () => {
-    mount({ versions: [current] });
+  it("is hidden while only the original exists", () => {
+    mount({ selectedItem: original, versions: [entry(original, 1, 3, ["Home"])] });
     expect(screen.queryByTestId("mgr-det-versions")).not.toBeInTheDocument();
   });
 
-  it("lists the versions inline and marks the newest row CURRENT", () => {
-    mount({ selectedItem: current, versions: [current, older] });
-    expect(screen.getByText("CURRENT")).toBeInTheDocument();
-    expect(screen.getByText(/logo_v1111/)).toBeInTheDocument();
+  it("lists v2 · Latest saved over v1 · Original, marking the one on the site APPLIED", () => {
+    mount({ selectedItem: original, versions: [entry(original, 1, 3, ["Home"]), entry(saved, 2)] });
+    const block = within(screen.getByTestId("mgr-det-versions"));
+    const rows = block.getAllByTestId(/^mgr-det-version-/);
+    expect(rows.map((r) => r.getAttribute("data-testid"))).toEqual(["mgr-det-version-hero-v2", "mgr-det-version-hero"]);
+    expect(rows[0]).toHaveTextContent("v2 · Latest saved");
+    expect(rows[1]).toHaveTextContent("v1 · Original");
+    expect(within(rows[1]).getByText("APPLIED")).toBeInTheDocument();
+    expect(within(rows[0]).queryByText("APPLIED")).toBeNull();
   });
 
-  it("clicking an older version row selects that asset", () => {
-    const { props } = mount({ selectedItem: current, versions: [current, older] });
-    fireEvent.click(screen.getByText(/logo_v1111/));
-    expect(props.onSelectAsset).toHaveBeenCalledWith("v1");
+  it("the marker follows the placements: once v2 is applied, it is the marked row", () => {
+    mount({ selectedItem: original, versions: [entry(original, 1), entry(saved, 2, 3, ["Home"])] });
+    const block = within(screen.getByTestId("mgr-det-versions"));
+    expect(within(block.getByTestId("mgr-det-version-hero-v2")).getByText("APPLIED")).toBeInTheDocument();
+    expect(within(block.getByTestId("mgr-det-version-hero")).queryByText("APPLIED")).toBeNull();
   });
 
-  it("Revert replaces all usages of the current src with the older src + toasts", () => {
-    const { props } = mount({ selectedItem: current, versions: [current, older] });
-    fireEvent.click(screen.getByText("Revert"));
-    expect(props.composer.mediaOps.replaceAcross).toHaveBeenCalledWith(
-      current.src,
-      older.src,
-    );
-    expect(props.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: "Reverted to logo_v1111", tone: "success" }),
-    );
-    // stopPropagation: the row click handler must not also fire
-    expect(props.onSelectAsset).not.toHaveBeenCalled();
-  });
-
-  it("no Revert button on the current (first) row", () => {
-    mount({ selectedItem: current, versions: [current, older] });
-    // exactly one Revert for the single older version
-    expect(screen.getAllByText("Revert")).toHaveLength(1);
+  it("a row opens Asset versions; nothing on the row swaps the site's placements", () => {
+    const { props } = mount({ selectedItem: original, versions: [entry(original, 1, 3, ["Home"]), entry(saved, 2)] });
+    fireEvent.click(screen.getByTestId("mgr-det-version-hero-v2"));
+    expect(props.onOpenVersions).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Revert")).toBeNull();
+    expect(props.composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
   });
 });
 
