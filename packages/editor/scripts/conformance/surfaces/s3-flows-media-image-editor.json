@@ -16,7 +16,7 @@
   "targets": [
     {
       "name": "scrim",
-      "testId": "image-editor-scrim",
+      "testId": "overlay-scrim",
       "spec": "s3-flows-media-image-editor",
       "nodeId": "1124:4527"
     },
@@ -56,23 +56,23 @@
     },
     {
       "name": "dims",
-      "testId": "image-editor-dims",
+      "testId": "image-editor-status",
       "spec": "s3-flows-media-image-editor",
       "nodeId": "1124:4535"
     },
     {
       "name": "crop-free",
-      "testId": "image-editor-crop-0"
+      "testId": "image-editor-aspect-free"
     },
     {
       "name": "crop-free-label",
-      "testId": "image-editor-crop-0",
+      "testId": "image-editor-aspect-free",
       "spec": "s3-flows-media-image-editor",
       "nodeId": "1124:4537"
     },
     {
       "name": "crop-11-label",
-      "testId": "image-editor-crop-1",
+      "testId": "image-editor-aspect-1-1",
       "spec": "s3-flows-media-image-editor",
       "nodeId": "1124:4539"
     },
@@ -130,6 +130,7 @@
     }
   ],
   "_note": [
+    "2026-09-14 (Assets · Clone Phase 6, P6-X): board 1124:4527 is RE-DRAWN by Clone 3397:39917 (960 x 740, four tabs, Saved / discard / failure states). The six anchors below were re-pointed at the Clone build so check-anchors sees real elements; the property expectations are still 1124:4527's and will mismatch until this board row is redone against the Clone frame. The dialog now mounts through OverlayMount (portal), so the probe's [data-probe] contrast scope no longer contains it.",
     "Board 1124:4527 is the image editor as a 720 CARD on an ink scrim. It is NOT",
     "the surface `media-drill-ins-the-five-destinations` declined: that recipe read",
     "the FIFTH destination off board 75:113 — 'a 1000-wide full-bleed takeover … a",
