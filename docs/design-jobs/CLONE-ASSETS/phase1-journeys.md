@@ -46,9 +46,28 @@ _(filled in Task 3)_
 - **J-H Drag start** (every card / row `DRAG` → "Assets · dragging hero-…").
 - **J-I Overlays return to caller** (audit A06): Cancel in any overlay opened from the library returns with folder / search / selection UNCHANGED and no second overlay.
 
-## J-B per-type action table
+## J-B per-type action table (read off the shots, Task 2 Step 3)
 
-_(filled in Task 2 Step 3 from the shots)_
+Rail order top→bottom: preview · filename · meta line · ALT TEXT · VERSIONS · USED IN · actions.
+
+| type | meta line | ALT TEXT | VERSIONS | USED IN | actions (top→bottom) |
+|---|---|---|---|---|---|
+| jpg / png (img) | `1600 × 1200 · 220 KB · PNG · added Aug 4` when measured; else `Selected asset · JPG` | field + `AI Generate` (or `Regenerate` when filled) | list (`name_vNNNN current` / older `Aug 2`) only when versions exist | `1 place — Menu preview` / `3 places — Home hero, Home banner, Menu card` / `Not used on this site` | Insert to canvas · [Edit image \| Rename] · Replace across site… · Delete (danger outline) |
+| svg (ico) | `Selected asset · SVG` | `Not provided` + `AI Regenerate` | — | `Used in 5 places` | Insert to canvas · [Edit image \| Rename] · Replace across site… · Delete |
+| mp4 (vid) | `Selected asset · MP4` | `Not provided` + `AI Regenerate` | — | `Used in 1 places` | Insert to canvas · Rename (full width, NO Edit image) · Replace across site… · Delete |
+| woff2 (fnt) | `Selected asset · WOFF2` | — (none) | — | `Used in 1 places` | Manage font · Rename · Delete (NO Insert, NO Replace across) |
+| none | rail reads `Select an asset to see details.` | | | | |
+| bulk mode, 0 checked | heading `No assets selected` + `Select a file to inspect it. Select checkboxes to manage multiple assets.` | | | | |
+| bulk mode, 1 checked | heading `1 asset selected` + `hero-dark.jpg · Select another file to use bulk actions.` | | | | Delete (danger outline) |
+
+Other shape facts from the shots:
+- Header: `Asset library` · search field `Search across all folders… ⌘K` · `⭳ Import URL` · `↑ Upload` (primary) · `+ Add from stock` · `Close`.
+- Toolbar: `24 files · All assets` · type chips `JPG PNG SVG MP4` · `Grid · 3 columns` `2 3 4` · `List` · sort select `Date added ▾` / `Name A–Z ▾` · select-mode checkbox icon.
+- Grid card: thumb (type glyph top-left for vid/svg/font) · filename · `● used ×3` / `○ Unused` (dot + text).
+- List (bulk) table: ☐ · Name · Type (`IMG VID SVG FONT`) · Size · Usage (`used ×3` / `unused`). Bulk bar above the table when ≥1 checked: `1 selected` · `Move to folder…` · `Download` · `Delete` · `✕ Clear`.
+- Search active: field reads `Search: menu · Clear × · ⌘K`; count reads `1 result for "menu"`; the previously selected asset stays selected.
+- Footer: `24 assets · 84 MB / 500 MB` left; quota bar + `⚠ 2 not on the server` pill right.
+- Canvas after Insert (3695:20614): the selected Image element's src changes; inspector `Image source` block reads `Menu preview · Image · menu-cover.png` with a `Choose image` button.
 
 ## Drift table (filled during Tasks 3–9)
 
