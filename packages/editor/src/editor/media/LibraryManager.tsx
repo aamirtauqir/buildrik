@@ -247,6 +247,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   /* Clone 3699:20347 — the move the engine refused, held so Retry can run
      exactly it again. */
   const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null } | null>(null);
+  /* Clone 4207:26629 / 4215:26635 — the keys in flight while a card or row
+     is dragged: the folders outline, the rail dims, the footer says what a
+     drop does. React state, so every surface reads the one fact. */
+  const [assetDrag, setAssetDrag] = React.useState<{ keys: string[] } | null>(null);
 
   React.useEffect(() => {
     setMoveResult(null);
@@ -254,6 +258,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
 
   const runMove = React.useCallback(
     async (keys: string[], folderId: string | null) => {
+      setAssetDrag(null);
       const items = keys
         .map((k) => state.libraryItems.find((i) => i.key === k))
         .filter((i): i is LibraryItem => i !== undefined);
@@ -277,16 +282,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     [state],
   );
 
-  /* A dropped asset carries the whole checked set when it is part of it;
-     an unchecked one moves alone even beside a selection. Same rule the
-     retired 560 panel used; the result now reads in the rail. */
+  /* A dropped asset carries the whole checked set when it is part of it
+     (4215:26635); an unchecked one moves alone even beside a selection. */
   const handleDropOnFolder = React.useCallback(
     (assetKey: string, folderId: string | null) => {
-      const keys =
-        state.selMode && state.selectedKeys.has(assetKey) ? Array.from(state.selectedKeys) : [assetKey];
+      const keys = assetDrag?.keys.includes(assetKey) ? assetDrag.keys : [assetKey];
       void runMove(keys, folderId);
     },
-    [state.selMode, state.selectedKeys, runMove],
+    [assetDrag, runMove],
   );
 
   /* Clone 3699:20381's View destination — edge `Action / Move to folder|CLIC|
@@ -518,6 +521,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             addToast({ description: "Trash coming soon", tone: "info" })
           }
           onMoveAssetToFolder={handleDropOnFolder}
+          assetDragActive={assetDrag !== null}
         />
 
         {/* ─── MIDDLE: Asset grid ─── */}
@@ -539,6 +543,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onUploadClick={handleUploadClick}
           onOpenStockModal={() => setStockModalOpen(true)}
           onMoveSelected={() => setMoveModalOpen(true)}
+          onAssetDragStart={(keys) => setAssetDrag({ keys })}
+          onAssetDragEnd={() => setAssetDrag(null)}
           addToast={addToast}
         />
         {/* ─── RIGHT: Details rail ─── */}
@@ -557,6 +563,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               : null
           }
           moveResult={moveResult ? { ...moveResult, onView: viewMoveDestination, onClear: clearRailSelection } : null}
+          dimmed={assetDrag !== null}
           versions={versions}
           usageCount={usageCount}
           usedIn={usedIn}
@@ -598,6 +605,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       </div>
       {/* ═══ STATUS BAR ═══ */}
       <div className="mgr-status" data-testid="mgr-status">
+        {/* Clone 4215:26635 / 4207:26629 — while an asset is in flight the
+            footer leads with what a drop does; the board keeps the count and
+            the quota after it. */}
+        {assetDrag && (
+          <span className="mgr-status-drag-hint" role="status" data-testid="mgr-status-drag-hint">
+            {assetDrag.keys.length === 1
+              ? "Drop on a folder to move · release outside to cancel"
+              : `Drop ${assetDrag.keys.length} files on a folder to move them · release outside to cancel`}
+          </span>
+        )}
         <span><strong style={{ color: "var(--bk-ink-soft)" }}>{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
         <span>{formatQuotaSize(state.storage.used)} / {formatQuotaSize(state.storage.total)}</span>

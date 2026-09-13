@@ -17,9 +17,10 @@ const folders: MediaFolder[] = [
   { id: "f1", name: "Products", parentId: null } as MediaFolder,
 ];
 
-function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void) {
+function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void, assetDragActive = false) {
   return render(
     <FolderTree
+      assetDragActive={assetDragActive}
       folders={folders}
       currentFolderId={null}
       setCurrentFolderId={vi.fn()}
@@ -91,5 +92,27 @@ describe("FolderTree — drag an asset onto a folder", () => {
     const row = screen.getByText("Products").closest(".mgr-node")!;
     fireEvent.dragOver(row, { dataTransfer: dataTransfer("a1") });
     expect(row.className).not.toContain("dragover");
+  });
+});
+
+// Clone 4215:26635 — while an asset is in flight EVERY folder row (All assets
+// and each user folder) is outlined as a target; the smart rows, New folder
+// and Trash are not places a file can land.
+describe("FolderTree — every folder is a target while an asset is dragged (Clone 4215:26635)", () => {
+  it("outlines All assets and each folder, and nothing else", () => {
+    mount(vi.fn(), true);
+    expect(screen.getByTestId("mgr-row-all-assets")).toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-folder-f1")).toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-recent")).not.toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-trash")).not.toHaveClass("drop-target");
+  });
+
+  it("outlines nothing at rest, or without a move handler", () => {
+    const { unmount } = mount(vi.fn(), false);
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveClass("drop-target");
+    unmount();
+    mount(undefined, true);
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveClass("drop-target");
   });
 });

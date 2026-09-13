@@ -90,6 +90,9 @@ export interface AssetDetailsPanelProps {
     onView(): void;
     onClear(): void;
   } | null;
+  /** Clone 4207:26629 — the rail is dimmed and inert while an asset is
+   *  being dragged over the folders. */
+  dimmed?: boolean;
   versions: LibraryItem[];
   usageCount: number;
   /** Page names the asset is placed on — the USED IN line names them
@@ -141,6 +144,7 @@ export function AssetDetailsPanel({
   selectedItem,
   bulk = null,
   moveResult = null,
+  dimmed = false,
   versions,
   usageCount,
   usedIn,
@@ -162,6 +166,7 @@ export function AssetDetailsPanel({
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
   const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
   const [regenerating, setRegenerating] = React.useState(false);
+  const railClass = `mgr-details${dimmed ? " dimmed" : ""}`;
 
   if (moveResult) {
     const { moved, alreadyThere } = moveResult;
@@ -174,7 +179,7 @@ export function AssetDetailsPanel({
             alreadyThere.length === 1 ? "was" : "were"
           } already here. Site placements are unchanged.`;
     return (
-      <div className="mgr-details" data-testid="mgr-details">
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         <div className="mgr-det-body" data-testid="mgr-det-move-result">
           <h3 className="mgr-det-heading" data-testid="mgr-det-move-result-title">
             Moved to {moveResult.folderName}
@@ -203,7 +208,7 @@ export function AssetDetailsPanel({
   if (bulk) {
     const n = bulk.names.length;
     return (
-      <div className="mgr-details" data-testid="mgr-details">
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         <div className="mgr-det-body" data-testid="mgr-det-bulk">
           <h3 className="mgr-det-heading">{n === 0 ? "No assets selected" : `${n} ${n === 1 ? "asset" : "assets"} selected`}</h3>
           <p className="mgr-det-hint">
@@ -237,7 +242,7 @@ export function AssetDetailsPanel({
 
   if (!selectedItem) {
     return (
-      <div className="mgr-details" data-testid="mgr-details">
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         {/* Clone 3695:45155 — one line at the rail's top, no icon, where the
             details will appear. --bk-ink-disabled on white is 1.47:1, so the
             line is ink-soft. */}
@@ -273,7 +278,7 @@ export function AssetDetailsPanel({
 
   return (
     <>
-      <div className="mgr-details" data-testid="mgr-details">
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         <div className="mgr-det-body">
           <div className="mgr-det-preview">
             {selectedItem.type === "img" ? (

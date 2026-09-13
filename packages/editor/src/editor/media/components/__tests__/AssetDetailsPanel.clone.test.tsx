@@ -290,3 +290,15 @@ describe("Clone 3699:20381 / 3683:19964 · Moved to <Folder>", () => {
     expect(screen.getByTestId("mgr-det-move-result")).toBeInTheDocument();
   });
 });
+
+describe("Clone 4207:26629 · the rail dims while an asset is dragged", () => {
+  it("carries the dimmed marker", () => {
+    mount(byName("hero-dark.jpg"), { dimmed: true });
+    expect(screen.getByTestId("mgr-details")).toHaveClass("dimmed");
+  });
+
+  it("is not dimmed at rest", () => {
+    mount(byName("hero-dark.jpg"));
+    expect(screen.getByTestId("mgr-details")).not.toHaveClass("dimmed");
+  });
+});

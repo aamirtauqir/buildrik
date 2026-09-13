@@ -394,6 +394,8 @@ const twoChecked = (over: Partial<MediaStateResult> = {}) => ({
 });
 
 const rail = () => within(screen.getByTestId("mgr-details"));
+/* The list is where the checked rows live (4215:26635); the grid is the mount default. */
+const toList = () => fireEvent.click(screen.getByRole("button", { name: "List" }));
 const openMoveModal = () =>
   fireEvent.click(within(screen.getByTestId("mgr-bulk-bar")).getByRole("button", { name: "Move to folder…" }));
 
@@ -542,5 +544,94 @@ describe("Clone 3699:20347 · Files could not be moved", () => {
     expect(bulkMoveAssets).toHaveBeenCalledTimes(1);
     expect(clearSelection).not.toHaveBeenCalled();
     expect(rail().getByRole("heading", { name: "2 assets selected" })).toBeInTheDocument();
+  });
+});
+
+/** The drag payload jsdom hands React; `types` is empty so the file-drop zone stays out of it. */
+const dragTransfer = (key: string) => ({
+  setData: vi.fn(),
+  setDragImage: vi.fn(),
+  getData: (type: string) => (type === "application/x-buildrik-media-asset-key" ? key : ""),
+  effectAllowed: "",
+  dropEffect: "",
+  types: [] as string[],
+});
+
+describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the folders", () => {
+  it("two checked rows in flight: every folder is a target, the rail dims, the footer says what a drop does", async () => {
+    await mountLibrary(twoChecked());
+    toList();
+    fireEvent.dragStart(screen.getByTestId("mgr-list-row-chef"), { dataTransfer: dragTransfer("chef") });
+    expect(screen.getByTestId("mgr-row-all-assets")).toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-folder-f1")).toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-row-folder-f2")).toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-details")).toHaveClass("dimmed");
+    expect(screen.getByTestId("mgr-status-drag-hint")).toHaveTextContent(
+      "Drop 2 files on a folder to move them · release outside to cancel",
+    );
+    // The board keeps the count line after the hint.
+    expect(screen.getByTestId("mgr-status")).toHaveTextContent(/10 assets/);
+    expect(screen.getByTestId("mgr-drag-ghost-badge")).toHaveTextContent("2 items");
+    // Nothing moved yet, and the file-upload drop zone did not wake.
+    expect(screen.queryByTestId("mgr-dropzone")).toBeNull();
+  });
+
+  it("releasing outside restores everything", async () => {
+    await mountLibrary(twoChecked());
+    toList();
+    fireEvent.dragStart(screen.getByTestId("mgr-list-row-chef"), { dataTransfer: dragTransfer("chef") });
+    fireEvent.dragEnd(screen.getByTestId("mgr-list-row-chef"));
+    expect(screen.getByTestId("mgr-row-folder-f1")).not.toHaveClass("drop-target");
+    expect(screen.getByTestId("mgr-details")).not.toHaveClass("dimmed");
+    expect(screen.queryByTestId("mgr-status-drag-hint")).toBeNull();
+    expect(screen.queryByTestId("mgr-drag-ghost")).toBeNull();
+  });
+
+  it("4207:26629 · one grid card in flight reads the singular hint", async () => {
+    await mountLibrary({ libraryItems: FILED, allFolders: [PRODUCTS, HERO_SHOTS] });
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-hero"), { dataTransfer: dragTransfer("hero") });
+    expect(screen.getByTestId("mgr-status-drag-hint")).toHaveTextContent(
+      "Drop on a folder to move · release outside to cancel",
+    );
+    expect(screen.getByTestId("mgr-drag-ghost-badge")).toHaveTextContent("1 item");
+  });
+
+  it("dropping the checked pair on Products moves both and the rail reports it", async () => {
+    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    await mountLibrary(twoChecked({ bulkMoveAssets }));
+    toList();
+    fireEvent.dragStart(screen.getByTestId("mgr-list-row-chef"), { dataTransfer: dragTransfer("chef") });
+    const target = screen.getByTestId("mgr-row-folder-f1");
+    fireEvent.dragOver(target, { dataTransfer: dragTransfer("chef") });
+    expect(target).toHaveClass("dragover");
+    fireEvent.drop(target, { dataTransfer: dragTransfer("chef") });
+    expect(bulkMoveAssets).toHaveBeenCalledWith(["hero", "chef"], "f1");
+    await screen.findByTestId("mgr-det-move-result");
+    expect(rail().getByRole("heading", { name: "Moved to Products" })).toBeInTheDocument();
+    // The drop ends the drag even before dragend reaches the source row.
+    expect(screen.queryByTestId("mgr-status-drag-hint")).toBeNull();
+    expect(screen.getByTestId("mgr-details")).not.toHaveClass("dimmed");
+  });
+
+  it("dropping an unchecked card moves only that card, even while others are checked", async () => {
+    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    await mountLibrary(twoChecked({ bulkMoveAssets }));
+    toList();
+    fireEvent.dragStart(screen.getByTestId("mgr-list-row-menu"), { dataTransfer: dragTransfer("menu") });
+    expect(screen.getByTestId("mgr-status-drag-hint")).toHaveTextContent("Drop on a folder to move");
+    fireEvent.drop(screen.getByTestId("mgr-row-folder-f2"), { dataTransfer: dragTransfer("menu") });
+    expect(bulkMoveAssets).toHaveBeenCalledWith(["menu"], "f2");
+  });
+
+  it("a drop on All assets unfiles, and the rail names the destination", async () => {
+    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    await mountLibrary(twoChecked({ bulkMoveAssets }));
+    toList();
+    fireEvent.dragStart(screen.getByTestId("mgr-list-row-hero"), { dataTransfer: dragTransfer("hero") });
+    fireEvent.drop(screen.getByTestId("mgr-row-all-assets"), { dataTransfer: dragTransfer("hero") });
+    expect(bulkMoveAssets).toHaveBeenCalledWith(["hero", "chef"], null);
+    await screen.findByTestId("mgr-det-move-result");
+    expect(rail().getByRole("heading", { name: "Moved to All assets" })).toBeInTheDocument();
   });
 });

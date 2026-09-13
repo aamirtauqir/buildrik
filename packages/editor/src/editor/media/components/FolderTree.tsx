@@ -61,7 +61,10 @@ interface TreeNodeProps {
   onDelete?: () => void;
   /** Drop target: assets dragged from the grid land in this folder. */
   dropFolderId?: string | null;
+  /** The pointer is over THIS row with an asset. */
   isDropTarget?: boolean;
+  /** An asset is in flight somewhere — every droppable row is outlined. */
+  dragActive?: boolean;
   onAssetDragOver?: (e: React.DragEvent<HTMLElement>, id: string | null) => void;
   onAssetDragLeave?: (id: string | null) => void;
   onAssetDrop?: (e: React.DragEvent<HTMLElement>, id: string | null) => void;
@@ -93,6 +96,9 @@ export interface FolderTreeProps {
    * drag-to-folder with it.
    */
   onMoveAssetToFolder?(assetKey: string, folderId: string | null): void;
+  /** Clone 4215:26635 — while an asset is in flight every folder row (All
+   *  assets and each user folder) is outlined as a place it can land. */
+  assetDragActive?: boolean;
 }
 
 // ─── TreeNode (leaf, internal) ────────────────────────────────────────────
@@ -111,19 +117,21 @@ function TreeNode({
   onDelete,
   dropFolderId,
   isDropTarget = false,
+  dragActive = false,
   onAssetDragOver,
   onAssetDragLeave,
   onAssetDrop,
 }: TreeNodeProps) {
   const depthClass = depth === 1 ? " depth-1" : depth === 2 ? " depth-2" : "";
   const droppable = onAssetDrop !== undefined;
+  const dropClass = `${droppable && dragActive ? " drop-target" : ""}${isDropTarget ? " dragover" : ""}`;
   return (
     /* Every row in this rail — the smart folders, Trash, and each user folder —
        carried an onClick on a bare div, so none of them was reachable by Tab or
        actionable by Enter. Gate 24 owns native elements in chrome, so the row
        stays a div and gets the semantics instead of becoming a <button>. */
     <div
-      className={`mgr-node${active ? " active" : ""}${depthClass}${isDropTarget ? " dragover" : ""}`}
+      className={`mgr-node${active ? " active" : ""}${depthClass}${dropClass}`}
       data-testid={testId}
       role="button"
       tabIndex={0}
@@ -193,6 +201,7 @@ export function FolderTree({
   deleteFolder,
   onTrashClick,
   onMoveAssetToFolder,
+  assetDragActive = false,
 }: FolderTreeProps) {
   const [collapsedFolders, setCollapsedFolders] = React.useState<Set<string>>(new Set());
 
@@ -240,6 +249,7 @@ export function FolderTree({
   );
   const dropProps = onMoveAssetToFolder
     ? {
+        dragActive: assetDragActive,
         onAssetDragOver: handleAssetDragOver,
         onAssetDragLeave: handleAssetDragLeave,
         onAssetDrop: handleAssetDrop,
@@ -283,7 +293,7 @@ export function FolderTree({
         );
       });
     },
-    [folders, folderCounts, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder]
+    [folders, folderCounts, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder, assetDragActive]
   );
 
   return (

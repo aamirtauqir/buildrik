@@ -48,6 +48,7 @@ import {
   Upload,
 } from "lucide-react";
 import * as React from "react";
+import { flushSync } from "react-dom";
 import type {
   LibraryItem,
   MediaSortBy,
@@ -114,7 +115,8 @@ function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
 
 /* Clone 3696:20326 — a video with no poster is a neutral tile under its play
    glyph. It used to fall through to <img src={videoBlob}>, which the browser
-   renders as a broken image with the filename as its alt. */
+   renders as a broken image with the filename as its alt. The same tile is
+   the drag ghost's face (4207:26629), so it is drawn once. */
 function thumbFor(item: LibraryItem, viewMode: "grid" | "list"): React.ReactNode {
   if ((item.type === "img" || item.type === "vid") && item.thumb) {
     return <img src={item.thumb || item.src} alt={item.name} loading="lazy" />;
@@ -166,6 +168,12 @@ export interface AssetGridProps {
   /** Clone 3683:19950 — the bulk bar's `Move to folder…` opens the
    *  orchestrator's Move modal; the grid moves nothing itself. */
   onMoveSelected(): void;
+  /** Clone 4207:26629 / 4215:26635 / 4220:26643 — a card or row is in
+   *  flight with these keys (the whole checked set when the dragged one is
+   *  checked, else itself); and it is over. The orchestrator outlines the
+   *  folders, dims the rail and writes the footer hint from these. */
+  onAssetDragStart(keys: string[]): void;
+  onAssetDragEnd(): void;
   /** Bulk-download toast trigger. */
   addToast(t: ToastInput): void;
 }
@@ -186,9 +194,19 @@ export function AssetGrid({
   onUploadClick,
   onOpenStockModal,
   onMoveSelected,
+  onAssetDragStart,
+  onAssetDragEnd,
   addToast,
 }: AssetGridProps) {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  /* Clone 4207:26629 / 4215:26635 — the drag image is the library's own
+     ghost: the thumb (grid) or the row(s) (list) with an "N items" badge.
+     `setDragImage` reads the element the moment dragstart fires, so the
+     ghost is rendered synchronously (flushSync) from this state and handed
+     over in the same handler; it lives offscreen inside the column, never
+     on document.body (Gate 22). */
+  const [ghost, setGhost] = React.useState<{ item: LibraryItem; names: string[] } | null>(null);
+  const ghostRef = React.useRef<HTMLDivElement>(null);
 
   /* Board 1174:4867 — the format strip lists the formats THIS library
      actually holds, not a fixed JPG/PNG/SVG/MP4 row. A chip for a format
@@ -249,6 +267,24 @@ export function AssetGrid({
           <span className="mgr-dropzone-title" data-testid="mgr-dropzone-title">Drop files to upload</span>
           <span className="mgr-dropzone-sub" data-testid="mgr-dropzone-sub">
             Images, video, audio, SVG and fonts — up to {formatBytes(state.storage.total)} total
+          </span>
+        </div>
+      )}
+      {ghost && (
+        <div className="mgr-drag-ghost" ref={ghostRef} aria-hidden="true" data-testid="mgr-drag-ghost">
+          {viewMode === "grid" ? (
+            <div className="mgr-drag-ghost-thumb">{thumbFor(ghost.item, "grid")}</div>
+          ) : (
+            /* 4215:26635 stacks the rows; two is enough to read as a stack. */
+            ghost.names.slice(0, 2).map((name) => (
+              <div key={name} className="mgr-drag-ghost-row">
+                <span className="mgr-list-check on" aria-hidden="true" />
+                <span className="mgr-drag-ghost-name">{name}</span>
+              </div>
+            ))
+          )}
+          <span className="mgr-drag-ghost-badge" data-testid="mgr-drag-ghost-badge">
+            {ghost.names.length} {ghost.names.length === 1 ? "item" : "items"}
           </span>
         </div>
       )}
@@ -542,6 +578,24 @@ export function AssetGrid({
               e.dataTransfer.setData("application/x-buildrik-media-asset-key", item.key);
               e.dataTransfer.setData("text/plain", item.key);
               e.dataTransfer.effectAllowed = "copyMove";
+              /* 4215:26635 — a checked card carries the whole checked set;
+                 an unchecked one, even beside a selection, carries itself. */
+              const keys =
+                state.selMode && state.selectedKeys.has(item.key) ? Array.from(state.selectedKeys) : [item.key];
+              const names = keys.map((k) => {
+                const i = state.libraryItems.find((x) => x.key === k);
+                return i ? (i.displayName ?? i.name) : k;
+              });
+              flushSync(() => setGhost({ item, names }));
+              /* Test harnesses hand-build the payload without setDragImage. */
+              if (ghostRef.current && typeof e.dataTransfer.setDragImage === "function") {
+                e.dataTransfer.setDragImage(ghostRef.current, 24, 24);
+              }
+              onAssetDragStart(keys);
+            };
+            const onDragEnd = () => {
+              setGhost(null);
+              onAssetDragEnd();
             };
 
             // Bug #10 fix: Cmd/Ctrl enters multi-select; in selMode, regular click toggles.
@@ -568,6 +622,7 @@ export function AssetGrid({
                   onContextMenu={(e) => state.openCtxMenu(e, item)}
                   draggable
                   onDragStart={onDragStart}
+                  onDragEnd={onDragEnd}
                 >
                   {/* Board 1163:4641 leads every row with its checkbox — list
                       view IS the bulk view, and dims left with it: the column
@@ -612,6 +667,7 @@ export function AssetGrid({
                 onContextMenu={(e) => state.openCtxMenu(e, item)}
                 draggable
                 onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
               >
                 <div className="mgr-asset-thumb" data-testid={`mgr-thumb-${item.key}`}>
                   {thumbContent}

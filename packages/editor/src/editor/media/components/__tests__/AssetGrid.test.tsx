@@ -52,11 +52,18 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
     onOpenStockModal: vi.fn(),
     onDownload: vi.fn(() => 0),
     onMoveSelected: vi.fn(),
+    onAssetDragStart: vi.fn(),
+    onAssetDragEnd: vi.fn(),
     addToast: vi.fn(),
     ...over,
   };
   const utils = render(<AssetGrid {...props} />);
   return { ...utils, props };
+}
+
+/** A drag payload the way jsdom hands it to React: setData records, setDragImage is spied. */
+function dragTransfer() {
+  return { setData: vi.fn(), setDragImage: vi.fn(), effectAllowed: "", types: [] as string[] };
 }
 
 // Board 1161:35 files the manager by FORMAT, not by the drawer's type pills:
@@ -342,6 +349,57 @@ describe("AssetGrid — badges + footer", () => {
     });
     mount(state, { smartFolder: "unused" });
     expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · Unused");
+  });
+});
+
+// Clone 4207:26629 (one grid card) · 4215:26635 (two checked) · 4220:26643
+// (one list row): dragging draws a custom ghost — the thumb or the row with an
+// "N items" badge — and tells the orchestrator which keys are in flight.
+describe("AssetGrid — dragging a card or a row (Clone 4207:26629 / 4215:26635 / 4220:26643)", () => {
+  const two = () =>
+    makeState({
+      libraryItems: [makeItem({ key: "a", name: "hero-dark.jpg" }), makeItem({ key: "b", name: "chef-intro.mp4", type: "vid" })],
+      counts: { all: 2, img: 1, vid: 1, ico: 0, fnt: 0 },
+    });
+
+  it("a plain card drag carries just that asset and a '1 item' ghost", () => {
+    const state = two();
+    const { props } = mount(state);
+    const dt = dragTransfer();
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-a"), { dataTransfer: dt });
+    expect(props.onAssetDragStart).toHaveBeenCalledWith(["a"]);
+    expect(dt.setData).toHaveBeenCalledWith("application/x-buildrik-media-asset-key", "a");
+    const ghost = screen.getByTestId("mgr-drag-ghost");
+    expect(dt.setDragImage).toHaveBeenCalledWith(ghost, expect.any(Number), expect.any(Number));
+    expect(screen.getByTestId("mgr-drag-ghost-badge")).toHaveTextContent("1 item");
+    // 4207:26629 — the grid ghost is the card's thumb.
+    expect(ghost.querySelector("img")?.getAttribute("alt")).toBe("hero-dark.jpg");
+  });
+
+  it("dragging a CHECKED card carries the whole checked set and badges the count", () => {
+    const state = makeState({ ...two(), selMode: true, selectedKeys: new Set(["a", "b"]) });
+    const { props } = mount(state);
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    fireEvent.dragStart(screen.getByTestId("mgr-list-row-b"), { dataTransfer: dragTransfer() });
+    expect(props.onAssetDragStart).toHaveBeenCalledWith(["a", "b"]);
+    expect(screen.getByTestId("mgr-drag-ghost-badge")).toHaveTextContent("2 items");
+  });
+
+  it("dragging an UNCHECKED card while others are checked carries only itself", () => {
+    const state = makeState({ ...two(), selMode: true, selectedKeys: new Set(["b"]) });
+    const { props } = mount(state);
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-a"), { dataTransfer: dragTransfer() });
+    expect(props.onAssetDragStart).toHaveBeenCalledWith(["a"]);
+  });
+
+  it("dragend drops the ghost and tells the orchestrator", () => {
+    const state = two();
+    const { props } = mount(state);
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-a"), { dataTransfer: dragTransfer() });
+    expect(screen.getByTestId("mgr-drag-ghost")).toBeInTheDocument();
+    fireEvent.dragEnd(screen.getByTestId("mgr-asset-a"));
+    expect(screen.queryByTestId("mgr-drag-ghost")).toBeNull();
+    expect(props.onAssetDragEnd).toHaveBeenCalledTimes(1);
   });
 });
 
