@@ -361,6 +361,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     loadMoreError: library.loadMoreError,
     loadMoreAssets: library.loadMoreAssets,
     libraryItems: library.libraryItems,
+    allLibraryItems: library.allLibraryItems,
     folders: library.folders,
     allFolders: library.allFolders,
     folderCounts: library.folderCounts,

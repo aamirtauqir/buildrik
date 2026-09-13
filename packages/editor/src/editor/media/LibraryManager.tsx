@@ -92,15 +92,18 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  // Usage count map: src → count (memoized to avoid N² on every render)
+  // Usage count map over the WHOLE library: key → count (memoized to avoid
+  // N² on every render). The smart filters and the SMART row counts both
+  // read it, and the counts are library-wide even inside a folder scope
+  // (Clone 3698:20337 keeps them while Products is the scope).
   const usageMap = React.useMemo(() => {
     const map = new Map<string, number>();
-    for (const item of state.libraryItems) {
+    for (const item of state.allLibraryItems) {
       const count = composer.mediaOps.getUsages(item.src).count;
       if (count > 0) map.set(item.key, count);
     }
     return map;
-  }, [state.libraryItems, composer]);
+  }, [state.allLibraryItems, composer]);
 
   // Apply smart folder filter on top of state.libraryItems
   const visibleItems = React.useMemo(() => {
@@ -118,16 +121,13 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     return items;
   }, [state.libraryItems, smartFolder, usageMap]);
 
-  // In-use/unused counts for badges
-  const inUseCount = React.useMemo(
-    () => state.libraryItems.filter((i) => (usageMap.get(i.key) ?? 0) > 0).length,
-    [state.libraryItems, usageMap]
-  );
-  const unusedCount = state.libraryItems.length - inUseCount;
+  // SMART row counts — library-wide, never the scope's
+  const inUseCount = usageMap.size;
+  const unusedCount = state.allLibraryItems.length - inUseCount;
   const recentCount = React.useMemo(() => {
     const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    return state.libraryItems.filter((i) => new Date(i.createdAt).getTime() >= cutoff).length;
-  }, [state.libraryItems]);
+    return state.allLibraryItems.filter((i) => new Date(i.createdAt).getTime() >= cutoff).length;
+  }, [state.allLibraryItems]);
 
   /* The checked set, in list order — what the bulk rail, the Move modal and
      a drag of a checked row are all about. */

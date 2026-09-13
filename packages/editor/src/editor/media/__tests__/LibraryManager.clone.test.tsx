@@ -245,6 +245,26 @@ describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () =
     fireEvent.click(screen.getByTestId("mgr-row-folder-f1"));
     expect(setCurrentFolderId).toHaveBeenCalledWith("f1");
   });
+
+  /* 3698:20337 draws SMART with the library's own counts while Products is
+     the scope — Recent · In use · Unused are library-wide rows, never a
+     folder's. `libraryItems` is the scoped list; the counts read the full
+     one. */
+  it("SMART counts stay library-wide while a folder is the scope", async () => {
+    const inFolder = TEN.slice(0, 2);
+    await mountLibrary(
+      {
+        currentFolderId: "f1",
+        allFolders: [makeFolder({ id: "f1", name: "Products" })],
+        libraryItems: inFolder,
+        allLibraryItems: TEN,
+      },
+      { [TEN[0].src]: 1, [TEN[5].src]: 2, [TEN[7].src]: 1 },
+    );
+    const smart = within(screen.getByTestId("mgr-folders"));
+    expect(smart.getByTestId("mgr-row-in-use").querySelector(".mgr-node-count")).toHaveTextContent("3");
+    expect(smart.getByTestId("mgr-row-unused").querySelector(".mgr-node-count")).toHaveTextContent(String(TEN.length - 3));
+  });
 });
 
 describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {

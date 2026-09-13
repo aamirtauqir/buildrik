@@ -158,7 +158,10 @@ export interface LibraryStateResult {
   libraryError: string | null;
   retryLibraryLoad(): void;
   rawAssets: MediaAsset[];
+  /** The scoped, filtered, sorted list the grid draws. */
   libraryItems: LibraryItem[];
+  /** Every asset, unscoped — the SMART rows count the library, not a folder. */
+  allLibraryItems: LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
   /** Direct-child asset count per folder id; a folder with none is absent. */
@@ -282,6 +285,8 @@ export interface MediaStateResult {
 
   // Library
   libraryItems: LibraryItem[];
+  /** See `LibraryStateResult.allLibraryItems`. */
+  allLibraryItems: LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
   /** See `LibraryStateResult.folderCounts`. */

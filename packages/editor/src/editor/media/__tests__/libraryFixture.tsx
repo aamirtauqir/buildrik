@@ -72,6 +72,9 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
     currentFolderId: null,
     setCurrentFolderId: noop(),
     libraryItems: [],
+    /* The unscoped set — a test that hands only `libraryItems` means the
+       whole library; one that scopes a folder hands both. */
+    allLibraryItems: over.libraryItems ?? [],
     folders: [],
     allFolders: [],
     folderCounts: new Map<string, number>(),

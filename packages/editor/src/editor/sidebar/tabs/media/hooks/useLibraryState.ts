@@ -427,6 +427,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     libraryError,
     retryLibraryLoad,
     libraryItems,
+    allLibraryItems,
     folders,
     allFolders,
     folderCounts,
