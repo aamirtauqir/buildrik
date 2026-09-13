@@ -5,7 +5,7 @@
  */
 
 import type { MediaAsset } from "../../../../../shared/types/media";
-import type { LibraryItem, MediaTypeFilter } from "./mediaTypes";
+import type { LibraryItem, MediaTypeFilter, VersionEntry } from "./mediaTypes";
 
 /** Format bytes to human-readable string e.g. "1.2 MB" */
 export function fmtSize(bytes: number): string {
@@ -95,7 +95,27 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     assetSource: asset.assetSource,
     tags: asset.tags,
     siteFont: asset.siteFont,
+    versionOf: asset.versionOf,
+    edits: asset.edits,
   };
+}
+
+/** "Home and Menu" / "Home" / "Home, Menu and Contact" — the pages a
+ * placement set sits on, the way the Clone's dialogs read them
+ * (3695:45615 "Update 3 uses on Home and Menu", 3695:45529 "Currently used
+ * on Home and Menu"). Empty when none could be traced. */
+export function namePages(pages: string[]): string {
+  if (pages.length <= 1) return pages[0] ?? "";
+  return `${pages.slice(0, -1).join(", ")} and ${pages[pages.length - 1]}`;
+}
+
+/** `v2 · Latest saved` / `v1 · Original` / `v2 · Saved` — a family member's
+ * label, as the rail's VERSIONS rows and the Asset versions cards both print
+ * it (Clone 3695:45529). `total` is the family's size: the highest index is
+ * the latest saved. */
+export function versionLabel(entry: VersionEntry, total: number): string {
+  const kind = entry.index === 1 ? "Original" : entry.index === total ? "Latest saved" : "Saved";
+  return `v${entry.index} · ${kind}`;
 }
 
 /** Clone 3721:43697 — the TAGS chip filter: the files carrying exactly this tag. */

@@ -25,6 +25,7 @@ function asset(over: Partial<MediaAsset> = {}): MediaAsset {
     createdAt: over.createdAt ?? "2026-01-01T00:00:00.000Z",
     folderId: over.folderId,
     tags: over.tags ?? [],
+    versionOf: over.versionOf,
   } as MediaAsset;
 }
 
@@ -210,6 +211,58 @@ describe("useLibraryState — tag filter (Clone 3721:43697)", () => {
       "pasta",
       { tags: ["food"] },
     );
+  });
+});
+
+/* Clone 3695:45529 (Asset versions, Phase 6): a saved edit is a row of its
+   own, flagged `versionOf = <parent id>`. Such rows are reachable only
+   through their parent — never a card, never a count, never a search hit —
+   and `versionsOf(parent)` lists the family, the original first. */
+describe("useLibraryState — versions (Clone 3695:45529)", () => {
+  const family = () => [
+    asset({ id: "hero", name: "hero-dark", folderId: "f1", createdAt: "2026-08-01T00:00:00.000Z" }),
+    asset({ id: "hero-v3", name: "hero-dark-v3", folderId: "f1", versionOf: "hero", createdAt: "2026-09-03T00:00:00.000Z" }),
+    asset({ id: "hero-v2", name: "hero-dark-v2", folderId: "f1", versionOf: "hero", createdAt: "2026-09-02T00:00:00.000Z" }),
+    asset({ id: "menu", name: "menu-cover" }),
+  ];
+
+  it("hides version rows from the grid, the unscoped list, the type counts and the folder counts", () => {
+    const composer = makeComposer(family(), [{ id: "f1" }]);
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.libraryItems.map((i) => i.key).sort()).toEqual(["hero", "menu"]);
+    expect(result.current.allLibraryItems.map((i) => i.key).sort()).toEqual(["hero", "menu"]);
+    expect(result.current.counts).toEqual({ all: 2, img: 2, vid: 0, ico: 0, fnt: 0 });
+    expect(result.current.folderCounts.get("f1")).toBe(1);
+  });
+
+  it("a search never surfaces a version row", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    act(() => result.current.setLibrarySearch("v2"));
+    expect(result.current.libraryItems).toEqual([]);
+  });
+
+  it("versionsOf(parent) is the original first, then the saved versions oldest to newest, each carrying its parent", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    const versions = result.current.versionsOf("hero");
+    expect(versions.map((v) => v.key)).toEqual(["hero", "hero-v2", "hero-v3"]);
+    expect(versions[0].versionOf).toBeUndefined();
+    expect(versions[1].versionOf).toBe("hero");
+  });
+
+  it("versionsOf(a version) resolves to its parent's family; an unknown key is empty; a lone file is itself", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.versionsOf("hero-v2").map((v) => v.key)).toEqual(["hero", "hero-v2", "hero-v3"]);
+    expect(result.current.versionsOf("nope")).toEqual([]);
+    expect(result.current.versionsOf("menu").map((v) => v.key)).toEqual(["menu"]);
+  });
+
+  it("the raw engine list still holds the version rows — the engine's truth is not narrowed", () => {
+    const composer = makeComposer(family());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.rawAssets).toHaveLength(4);
   });
 });
 

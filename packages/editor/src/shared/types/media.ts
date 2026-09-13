@@ -165,6 +165,25 @@ export interface MediaAsset {
    */
   siteFont?: boolean;
 
+  /**
+   * Clone 3695:45529 (Asset versions, Phase 6): a saved edit is a library
+   * row of its own, flagged with its PARENT's id — a Blob upload always makes
+   * a row, so the version model rides the pipeline rather than fighting it.
+   * Rows carrying this are hidden from the grid, the counts, search and the
+   * pickers, and reachable only through their parent's Asset versions. The
+   * parent's own `src` stays the original; applying a version to the site is
+   * `replaceAcross`, a separate step. Mirrored as `userMetadata.versionOf`
+   * beside the tags, and read back from there on import.
+   */
+  versionOf?: string;
+
+  /**
+   * The edits a version was saved with — the image editor's snapshot, which
+   * the Asset versions cards print ("Crop: Free · Preset: None · …"). Set on
+   * version rows only. Mirrored as `userMetadata.edits`, read back on import.
+   */
+  edits?: EditsSnapshot;
+
   /** Folder ID for organization */
   folderId?: string;
 
@@ -263,8 +282,9 @@ export interface RemoteAssetSync {
    *
    * `userMetadata` (BLOCKERS C3, 2026-09-13) carries the tag list as
    * `{ tags }` — the server REPLACES the JSON column with what is sent —
-   * and, since Phase 5, `siteFont` beside it (3686:42317). A patch that
-   * carries either key carries both, or it erases the other.
+   * and, since Phase 5, `siteFont` beside it (3686:42317); since Phase 6,
+   * `versionOf` and `edits` (3695:45529). A patch that carries any of those
+   * keys carries them all, or it erases the others.
    */
   updateAsset(
     serverId: string,
@@ -327,6 +347,28 @@ export interface MediaFolder {
 // ============================================
 // Image Editor Types
 // ============================================
+
+/**
+ * What a saved version was made with — the image editor's summary of its
+ * draft at Save (Clone 3681:20026 "Version saved" list, 3695:45529 cards).
+ * Strings are the editor's own labels ("Free", "16:9", "None", "B&W",
+ * "WebP", "Original"); "Original" means untouched. Stored on the version
+ * row (`MediaAsset.edits`) and in the server history (`createAssetVersion`).
+ * A type alias, not an interface, so it is a `Record<string, unknown>` where
+ * the history service wants one.
+ */
+export type EditsSnapshot = {
+  width: number;
+  height: number;
+  crop: string;
+  preset: string;
+  format: string;
+  transform: string;
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  blur: number;
+};
 
 /**
  * Crop configuration

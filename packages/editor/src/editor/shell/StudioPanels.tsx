@@ -9,6 +9,8 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "./hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import type { Composer } from "../../engine";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
@@ -85,7 +87,8 @@ export interface StudioPanelsProps {
   onResendReview?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   canvasRef?: React.RefObject<CanvasRef | null>;
   composerContainerRef?: React.RefObject<HTMLDivElement | null>;

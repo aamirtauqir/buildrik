@@ -6,6 +6,8 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "../../shared/types/media";
@@ -24,7 +26,8 @@ export interface FullPageCommonProps {
   onClose: () => void;
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,

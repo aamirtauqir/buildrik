@@ -37,7 +37,7 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof AssetDetails
     usageCount: 0,
     usedIn: [],
     libraryItems: [],
-    onSelectAsset: vi.fn(),
+    onOpenVersions: vi.fn(),
     onInsert: vi.fn(),
     onEditImage: vi.fn(),
     onOpenRename: vi.fn(),

@@ -345,6 +345,76 @@ describe("uploadFile — server mirror (Phase B2)", () => {
   });
 });
 
+/* Clone 3695:45529 (Asset versions, Phase 6): the editor's Save lands through
+   this pipeline like any upload — a Blob upload always makes a row — so the
+   row is BORN a version. Flagging it afterwards would let the grid draw the
+   file as a library card for the whole upload (the row is in state and
+   MEDIA_UPDATED fires before uploadFile resolves). The server row is created
+   without its JSON column (`onUploadCompleted` may win the create race), so
+   the column is mirrored explicitly once the row has a server id. */
+describe("uploadFile — a version row is born flagged and its column mirrored (3695:45529)", () => {
+  const EDITS = {
+    width: 1200,
+    height: 800,
+    crop: "16:9",
+    preset: "None",
+    format: "WebP",
+    transform: "Original",
+    brightness: 0,
+    contrast: 0,
+    saturation: 0,
+    blur: 0,
+  };
+
+  it("carries versionOf and edits on the asset from the first persist, then mirrors { tags, versionOf, edits }", async () => {
+    const remote = makeRemoteSync();
+    const manager = new MediaManager(remote);
+    const storage = mockStorage(manager);
+
+    const result = await manager.uploadFile(makeFile("img", "hero-dark-v2.png", "image/png"), {
+      autoOptimize: false,
+      generateThumbnail: false,
+      versionOf: "hero",
+      edits: EDITS,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.asset?.versionOf).toBe("hero");
+    expect(result.asset?.edits).toEqual(EDITS);
+    const firstPersisted = (storage.saveAsset as ReturnType<typeof vi.fn>).mock.calls[0][0] as MediaAsset;
+    expect(firstPersisted.versionOf).toBe("hero");
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-1", {
+      userMetadata: { tags: [], versionOf: "hero", edits: EDITS },
+    });
+  });
+
+  it("a plain upload mirrors nothing extra", async () => {
+    const remote = makeRemoteSync();
+    const manager = new MediaManager(remote);
+    mockStorage(manager);
+
+    await manager.uploadFile(makeFile("img", "a.png", "image/png"), { autoOptimize: false, generateThumbnail: false });
+
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+  });
+
+  it("a version that stays device-only keeps its flag locally and mirrors nothing", async () => {
+    const remote = makeRemoteSync({ uploadAndCreate: vi.fn(async () => null) });
+    const manager = new MediaManager(remote);
+    mockStorage(manager);
+
+    const result = await manager.uploadFile(makeFile("img", "hero-dark-v2.png", "image/png"), {
+      autoOptimize: false,
+      generateThumbnail: false,
+      versionOf: "hero",
+    });
+
+    expect(result.asset?.versionOf).toBe("hero");
+    expect(result.asset?.localOnly).toBe(true);
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+  });
+});
+
 describe("uploadFile — P1C tombstone (delete during in-flight upload)", () => {
   it("deletes the just-created server row when the asset was deleted mid-upload", async () => {
     let resolveUpload!: (v: { serverId: string; url: string } | null) => void;

@@ -7,6 +7,8 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
@@ -84,7 +86,8 @@ export interface LeftSidebarProps {
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   /** §20 — opens IconPickerModal from StockSourceModal "Browse full icon library". */
   onOpenIconPicker?: (

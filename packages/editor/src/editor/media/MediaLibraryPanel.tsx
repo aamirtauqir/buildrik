@@ -124,12 +124,14 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   const noun = single ? kindNoun(allowedTypes[0]) : "file";
   const searchPlaceholder = single && (allowedTypes[0] === "image" || allowedTypes[0] === "video") ? `Search ${noun}s…` : "Search library…";
 
+  /* Clone 3695:45529: a saved version (`versionOf`) is reachable only through
+     its parent's Asset versions — never a picker card. */
   const assets = React.useMemo(
     () =>
       getAssets({
         type: single ? allowedTypes[0] : undefined,
         search: searchQuery || undefined,
-      }).filter((a) => allowedTypes.includes(a.type)),
+      }).filter((a) => allowedTypes.includes(a.type) && !a.versionOf),
     // `allAssets` is the subscription's tick — the same store the getter reads.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [getAssets, allowedTypes, searchQuery, single, allAssets],

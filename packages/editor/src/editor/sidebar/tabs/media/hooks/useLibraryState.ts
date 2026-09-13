@@ -116,15 +116,40 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     };
   }, [composer]);
 
-  const allLibraryItems = useMemo(() => rawAssets.map(toLibraryItem), [rawAssets]);
+  /* Clone 3695:45529 — a saved version is a row flagged with its parent
+     (`versionOf`), and it is NOT a library file: never a card, a count, a
+     search hit or a folder's child. `rawAssets` keeps the engine's whole
+     list; everything the library draws derives from this narrowing, so a
+     version can only be reached through `versionsOf`. */
+  const libraryAssets = useMemo(() => rawAssets.filter((a) => !a.versionOf), [rawAssets]);
+  const allLibraryItems = useMemo(() => libraryAssets.map(toLibraryItem), [libraryAssets]);
+
+  /* The original first, then its saved versions oldest to newest — the
+     latest saved is the last. Asked with a version's own key, it answers for
+     the family that version belongs to, so "Edit latest saved version" can
+     save a v3 of the same parent. */
+  const versionsOf = useCallback(
+    (key: string): LibraryItem[] => {
+      const asked = rawAssets.find((a) => a.id === key);
+      if (!asked) return [];
+      const parentId = asked.versionOf ?? asked.id;
+      const parent = asked.versionOf ? rawAssets.find((a) => a.id === parentId) : asked;
+      if (!parent) return [];
+      const children = rawAssets
+        .filter((a) => a.versionOf === parentId)
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      return [parent, ...children].map(toLibraryItem);
+    },
+    [rawAssets],
+  );
 
   // Folder lookup map — avoids O(n*m) `rawAssets.find` per item per render.
   // Keyed by asset id, value is folderId or null for root.
   const folderByAssetId = useMemo(() => {
     const m = new Map<string, string | null>();
-    for (const a of rawAssets) m.set(a.id, a.folderId || null);
+    for (const a of libraryAssets) m.set(a.id, a.folderId || null);
     return m;
-  }, [rawAssets]);
+  }, [libraryAssets]);
 
   /* Clone 3698:20337 — every FOLDERS row carries its own count ("Products 8"),
      and a folder just created reads 0 (3700:20353). Direct children only —
@@ -442,6 +467,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     retryLibraryLoad,
     libraryItems,
     allLibraryItems,
+    versionsOf,
     folders,
     allFolders,
     folderCounts,

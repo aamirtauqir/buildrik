@@ -147,6 +147,15 @@ describe("Clone 3397:18325 · Choose an image — the picker", () => {
     expect(screen.queryByRole("button", { name: /delete/i })).toBeNull();
   });
 
+  /* Clone 3695:45529 (Phase 6): a saved version is a row flagged with its
+     parent, reachable only through Asset versions — never a picker card. */
+  it("never offers a saved version as a card of its own", () => {
+    managerMock.assets = [...THREE, makeAsset({ id: "hero-v2", name: "hero-dark-v2.jpg", src: "blob:hero-v2", versionOf: "hero" })];
+    mount();
+    expect(screen.queryByTestId("picker-card-hero-v2")).toBeNull();
+    expect(card("hero")).toBeInTheDocument();
+  });
+
   it("a card selects on click and stays open; Use selected image is disabled until one is selected (3695:43921)", () => {
     const { props } = mount();
     expect(use()).toHaveTextContent("Use selected image");

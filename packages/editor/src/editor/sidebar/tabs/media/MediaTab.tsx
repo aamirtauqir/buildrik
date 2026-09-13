@@ -6,6 +6,8 @@
  */
 
 import * as React from "react";
+import type { ImageEditorOptions } from "../../../shell/hooks/useStudioModals";
+import type { EditsSnapshot } from "@shared/types/media";
 import { PanelFrame, useToast, Button } from "@/editor/chrome-ui";
 import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
@@ -26,6 +28,7 @@ import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "../../../../services/MediaVersionService";
+import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
 
 interface MediaTabProps {
@@ -36,7 +39,8 @@ interface MediaTabProps {
   onClose?: () => void;
   onOpenImageEditor?: (
     imageSrc: string,
-    onSave: (editedSrc: string) => void | Promise<void>,
+    onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
+    options?: ImageEditorOptions,
   ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
@@ -101,48 +105,49 @@ function MediaTabWithComposer({
     addToast({ description: msg, tone: type });
   }, [addToast]);
 
+  /* Clone 3681:20026 / 3695:45529 (Phase 6): a saved edit is a VERSION of the
+     same asset — the file lands flagged `versionOf` (hidden from the grid) with
+     the edits it was made with — the way the fullpage library saves one. This
+     used to upload a plain `<stem>_v1234` sibling that the grid showed as a
+     second card once the stem heuristic went. Done opens the fullpage library
+     on the parent, where Asset versions lives. */
   const handleEditImage = React.useCallback(
     (item: LibraryItem) => {
       if (!onOpenImageEditor) return;
+      const parentKey = item.versionOf ?? item.key;
       setStatusPill("Image editor — crop · rotate · adjust");
-      onOpenImageEditor(item.src, async (editedSrc) => {
+      const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
         try {
-          // Convert data URL to Blob
           const res = await fetch(editedSrc);
           const blob = await res.blob();
-          
-          // Non-destructive: Create a new filename with version/timestamp
-          const timestamp = new Date().getTime();
-          const cleanName = item.name.replace(/(_v\d+)?$/, ""); // Remove old version tag if any
-          const fileName = `${cleanName}_v${timestamp % 10000}`;
-          
-          const file = new File([blob], `${fileName}.${blob.type.split('/')[1]}`, { type: blob.type });
-          
-          // Upload new file — await so we only claim success when it lands.
-          const ok = (await state.upload([file])).every((r) => r.success);
-          if (ok) {
-            showToast(`New version of ${item.name} created ✓`, "success");
-            // Record a server-side restore point of the pre-edit asset (synced
-            // assets only). Lets the Versions tab roll the asset back to this
-            // state. Best-effort: never block the edit on a version write.
-            if (item.assetId) {
-              createAssetVersion({
-                assetId: item.assetId,
-                url: item.src,
-                bytes: item.size,
-                edits: { via: "image-editor", newFile: fileName },
-              }).catch(() => {});
-            }
+          const versionCount = composer.media.getAssets().filter((a) => a.versionOf === parentKey).length;
+          const stem = item.name.replace(/\.[^/.]+$/, "");
+          const file = new File([blob], displayNameFor(`${stem}-v${versionCount + 2}`, blob.type), { type: blob.type });
+          const result = await composer.media.uploadFile(file, {
+            ...(item.folderId ? { folderId: item.folderId } : {}),
+            versionOf: parentKey,
+            ...(edits ? { edits } : {}),
+          });
+          if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
+          const saved = result.asset;
+          if (item.assetId && saved.serverId && !saved.localOnly) {
+            createAssetVersion({ assetId: item.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
+              /* History is a convenience; the version itself has landed. */
+            });
           }
-        } catch (err) {
-          console.error("Failed to process edited image:", err);
-          showToast("Could not save edited version", "error");
         } finally {
           setStatusPill(null);
         }
+      };
+      onOpenImageEditor(item.src, onSave, {
+        fileName: item.displayName ?? item.name,
+        onDone: () => {
+          composer.media.selectAssets([parentKey]);
+          onOpenLibrary?.();
+        },
       });
     },
-    [onOpenImageEditor, state, showToast]
+    [onOpenImageEditor, composer, onOpenLibrary]
   );
 
   // §18 — Optimize is now a tab inside the §15 detail drawer. handleOptimized

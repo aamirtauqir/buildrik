@@ -20,8 +20,9 @@
 import { Sparkles, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
-import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem, VersionEntry } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
+import { versionLabel } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   Button,
   IconButton,
@@ -112,15 +113,21 @@ export interface AssetDetailsPanelProps {
   /** Clone 4207:26629 — the rail is dimmed and inert while an asset is
    *  being dragged over the folders. */
   dimmed?: boolean;
-  versions: LibraryItem[];
+  /** Clone 3695:45529 — the selected file's family, the original first,
+   *  each member with the placements it carries. The VERSIONS block draws it
+   *  once a saved version exists; the replace picker moves every member's
+   *  placements, not just the original's. */
+  versions: VersionEntry[];
+  /** Placements across the whole family — the rail's USED IN follows the
+   *  placements, whichever version they carry. */
   usageCount: number;
   /** Page names the asset is placed on — the USED IN line names them
    *  ("1 place — Menu preview"). Empty when the pages cannot be traced. */
   usedIn: string[];
   /** All library items (for the replace-all picker). */
   libraryItems: LibraryItem[];
-  /** Pass-through to set the highlighted version row in versions tab. */
-  onSelectAsset(key: string): void;
+  /** A VERSIONS row opens Asset versions for this file (3695:45529). */
+  onOpenVersions(): void;
   /** Insert into canvas (orchestrator's state.insertToCanvas). */
   onInsert(key: string): void;
   /** "Edit" button on image assets — orchestrator routes to image editor. */
@@ -143,7 +150,7 @@ export interface AssetDetailsPanelProps {
    *  orchestrator, whose result dialogs report the run per page. Omitted,
    *  the panel runs `replaceAcross` itself and toasts the counts. */
   onReplaceAcross?(candidate: LibraryItem): void;
-  /** Composer for replaceAcross + (transitively) the version revert button. */
+  /** Composer for the replace picker's replaceAcross. */
   composer: Composer;
   addToast(t: ToastInput): void;
   /**
@@ -186,7 +193,7 @@ export function AssetDetailsPanel({
   usageCount,
   usedIn,
   libraryItems,
-  onSelectAsset,
+  onOpenVersions,
   onInsert,
   onEditImage,
   onOptimizeImage,
@@ -298,6 +305,11 @@ export function AssetDetailsPanel({
   const replaceCandidates = libraryItems.filter(
     (i) => i.key !== selectedItem.key && i.type === selectedItem.type,
   );
+  /* What the site actually carries for this file: every family member with
+     placements (an applied version is on the elements, the original is
+     not). A rail handed no family replaces the file's own src. */
+  const placedSources = versions.filter((v) => v.placements > 0).map((v) => v.item.src);
+  const replaceSources = placedSources.length > 0 ? placedSources : [selectedItem.src];
 
   /* Clone 3695:20340 — one column, top to bottom: preview · filename · meta
      line · ALT TEXT · VERSIONS · USED IN · stacked actions. The V1 rail's
@@ -357,43 +369,34 @@ export function AssetDetailsPanel({
 
           {onUpdateTags && <TagsSection item={selectedItem} onUpdateTags={onUpdateTags} />}
 
+          {/* Clone 3695:45529 / 3697:20326 (Phase 6): the family, newest
+              first — `v2 · Latest saved` over `v1 · Original` — drawn only
+              once a version has been saved. The member whose src the site's
+              placements carry is marked APPLIED; the marker follows the
+              placements, not a flag on the row. A row is the door to Asset
+              versions, where applying is the explicit step; the `_v1234`
+              stem heuristic and its Revert button are gone with it. */}
           {versions.length > 1 && (
             <section className="mgr-det-section" data-testid="mgr-det-versions">
               <h4 className="mgr-det-label">Versions</h4>
               <div className="mgr-version-list">
-                {versions.map((v, i) => (
+                {[...versions].reverse().map((entry) => (
                   <VersionRow
-                    key={v.key}
-                    title={v.name}
-                    meta={i === 0 ? "" : shortDate(v.createdAt)}
-                    current={i === 0}
-                    selected={v.key === selectedItem.key}
-                    onClick={() => onSelectAsset(v.key)}
+                    key={entry.item.key}
+                    title={versionLabel(entry, versions.length)}
+                    meta={shortDate(entry.item.createdAt)}
+                    current={entry.placements > 0}
+                    currentLabel="APPLIED"
+                    onClick={onOpenVersions}
+                    data-testid={`mgr-det-version-${entry.item.key}`}
                     leading={
                       <span className="mgr-version-thumb">
-                        {v.thumb ? (
-                          <img src={v.thumb || v.src} alt={v.name} />
+                        {entry.item.thumb || entry.item.type === "img" ? (
+                          <img src={entry.item.thumb || entry.item.src} alt={entry.item.name} />
                         ) : (
-                          <span className="tw:text-[length:var(--bk-text-11)]">{v.type.toUpperCase()}</span>
+                          <span className="tw:text-[length:var(--bk-text-11)]">{entry.item.type.toUpperCase()}</span>
                         )}
                       </span>
-                    }
-                    actions={
-                      i > 0 && v.key !== selectedItem.key ? (
-                        <Button
-                          className={`mgr-btn ${MINI_BTN}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Revert: replace all usages of current version with this one.
-                            if (versions[0]) {
-                              composer.mediaOps.replaceAcross(versions[0].src, v.src);
-                              addToast({ description: `Reverted to ${v.name}`, tone: "success" });
-                            }
-                          }}
-                        >
-                          Revert
-                        </Button>
-                      ) : undefined
                     }
                   />
                 ))}
@@ -498,16 +501,18 @@ export function AssetDetailsPanel({
                       onReplaceAcross(i);
                       return;
                     }
-                    const result = composer.mediaOps.replaceAcross(selectedItem.src, i.src);
-                    if (result.replaced.length > 0) {
+                    const results = replaceSources.map((src) => composer.mediaOps.replaceAcross(src, i.src));
+                    const replaced = results.reduce((n, r) => n + r.replaced.length, 0);
+                    const failed = results.reduce((n, r) => n + r.failed.length, 0);
+                    if (replaced > 0) {
                       addToast({
-                        description: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
+                        description: `Replaced in ${replaced} element${replaced > 1 ? "s" : ""}`,
                         tone: "success",
                       });
                     }
-                    if (result.failed.length > 0) {
+                    if (failed > 0) {
                       addToast({
-                        description: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
+                        description: `${failed} replacement${failed > 1 ? "s" : ""} failed`,
                         tone: "error",
                       });
                     }

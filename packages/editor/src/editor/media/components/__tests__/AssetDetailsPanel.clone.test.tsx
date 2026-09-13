@@ -51,7 +51,7 @@ function mount(selectedItem: LibraryItem, over: Partial<AssetDetailsPanelProps> 
     usageCount: 0,
     usedIn: [],
     libraryItems: TEN,
-    onSelectAsset: vi.fn(),
+    onOpenVersions: vi.fn(),
     onInsert: vi.fn(),
     onEditImage: vi.fn(),
     onOpenRename: vi.fn(),
@@ -180,21 +180,36 @@ describe("Clone 3696:21550 · Selected · Inter-Var.woff2", () => {
   });
 });
 
+/* Phase 6 (3695:45529 / 3697:20326): the VERSIONS block lists the family
+   the version model knows — `v2 · Latest saved` over `v1 · Original` — and
+   a row is the door to Asset versions. Phase 1's `menu-cover_v4127 · current`
+   rows (3695:20340) read the `_v1234` stem heuristic, which is gone. */
 describe("Clone rail · versions inline", () => {
-  const current = byName("hero-dark.jpg");
-  const older: LibraryItem = { ...current, key: "hero-v1", name: "hero-dark_v2210", createdAt: "2026-08-02T10:00:00.000Z" };
+  const original = byName("hero-dark.jpg");
+  const saved: LibraryItem = { ...original, key: "hero-v2", name: "hero-dark-v2", src: "blob:hero-v2", versionOf: "hero", createdAt: "2026-09-02T10:00:00.000Z" };
 
-  it("lists versions under a VERSIONS heading with the newest marked current", () => {
-    mount(current, { versions: [current, older] });
-    const versions = screen.getByTestId("mgr-det-versions");
-    expect(within(versions).getByText("hero-dark_v2210")).toBeInTheDocument();
-    expect(within(versions).getByText("CURRENT")).toBeInTheDocument();
+  it("lists v2 · Latest saved over v1 · Original under a VERSIONS heading, without a tab click first", () => {
+    mount(original, {
+      versions: [
+        { item: original, index: 1, placements: 3, pages: ["Home"] },
+        { item: saved, index: 2, placements: 0, pages: [] },
+      ],
+    });
+    const versions = within(screen.getByTestId("mgr-det-versions"));
+    expect(versions.getByRole("heading", { name: "Versions" })).toBeInTheDocument();
+    expect(versions.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("v2 · Latest saved");
+    expect(versions.getByTestId("mgr-det-version-hero")).toHaveTextContent("v1 · Original");
   });
 
-  it("clicking an older row selects it, without a tab click first", () => {
-    const { props } = mount(current, { versions: [current, older] });
-    fireEvent.click(screen.getByText("hero-dark_v2210"));
-    expect(props.onSelectAsset).toHaveBeenCalledWith("hero-v1");
+  it("a row opens Asset versions", () => {
+    const { props } = mount(original, {
+      versions: [
+        { item: original, index: 1, placements: 3, pages: ["Home"] },
+        { item: saved, index: 2, placements: 0, pages: [] },
+      ],
+    });
+    fireEvent.click(screen.getByTestId("mgr-det-version-hero"));
+    expect(props.onOpenVersions).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -9,8 +9,8 @@
  * @license BSD-3-Clause
  */
 
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
@@ -24,6 +24,14 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../../sidebar/tabs/media/hooks/useMediaState", () => ({
   useMediaState: () => mocks.state.mediaState,
 }));
+
+/* The save path's best-effort server history (3695:45529) — a network call
+   the test only wants to see, never make. */
+const versionServiceStub = vi.hoisted(() => ({ createAssetVersion: vi.fn(async () => ({})) }));
+vi.mock("../../../services/MediaVersionService", () => ({
+  createAssetVersion: versionServiceStub.createAssetVersion,
+}));
+beforeEach(() => versionServiceStub.createAssetVersion.mockClear());
 
 vi.mock("@/editor/chrome-ui", async () => {
   const actual: Record<string, unknown> = await vi.importActual("@/editor/chrome-ui");
@@ -1016,5 +1024,299 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
     fireEvent.click(screen.getByTestId("rx-result-close"));
     expect(screen.queryByTestId("rx-result")).toBeNull();
     expect(composer.mediaOps.replaceAcross).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* ─── P6-V Versions ─────────────────────────────────────────────────────── */
+
+/* Clone 3695:45529 (Asset versions), 3697:20326 / 3697:20341 (a card
+   selected / v2 applied), 3695:45615 (Apply saved version across site),
+   3720:43313 (Applying), 3720:43316 (Saved version applied), and the editor's
+   Saved → Done door (3681:20026). The model: Save creates a version of the
+   SAME asset — a library row flagged with its parent, hidden from the grid —
+   and applying it to the site is a separate, explicit `replaceAcross`. */
+
+const EDITS = {
+  width: 2400,
+  height: 1600,
+  crop: "Free",
+  preset: "None",
+  format: "Original",
+  transform: "Original",
+  brightness: 0,
+  contrast: 0,
+  saturation: 0,
+  blur: 0,
+};
+
+const HERO = makeItem({
+  key: "hero",
+  name: "hero-dark",
+  displayName: "hero-dark.jpg",
+  src: "blob:hero",
+  mimeType: "image/jpeg",
+  width: 2400,
+  height: 1600,
+  size: 840_000,
+  folderId: "f1",
+  assetId: "srv-hero",
+});
+const HERO_V2 = makeItem({
+  key: "hero-v2",
+  name: "hero-dark-v2",
+  displayName: "hero-dark-v2.jpg",
+  src: "blob:hero-v2",
+  mimeType: "image/jpeg",
+  width: 2400,
+  height: 1600,
+  versionOf: "hero",
+  edits: EDITS,
+  createdAt: "2026-09-13T12:00:00.000Z",
+});
+const PAGES = ["Home", "Menu"];
+
+/* A two-page site: two placements on Home, one on Menu — the board's shape. */
+type Node = { id: string; parent: Node | null; getId(): string; getParent(): Node | null; getAttribute(n: string): string | undefined; getType(): string };
+function node(id: string, parent: Node | null): Node {
+  return { id, parent, getId: () => id, getParent: () => parent, getAttribute: () => undefined, getType: () => "image" };
+}
+const HOME_ROOT = node("home-root", null);
+const MENU_ROOT = node("menu-root", null);
+const PLACEMENTS = new Map([
+  ["el-1", node("el-1", HOME_ROOT)],
+  ["el-2", node("el-2", HOME_ROOT)],
+  ["el-3", node("el-3", MENU_ROOT)],
+]);
+const SITE = {
+  getAllPages: () => [
+    { id: "p-home", name: "Home", root: { id: "home-root" } },
+    { id: "p-menu", name: "Menu", root: { id: "menu-root" } },
+  ],
+  getElement: (id: string) => PLACEMENTS.get(id),
+  /* The placements carry no src of their own here — `mountVersions` moves
+     them through the mocked replaceAcross, and usage reads `getUsages`. */
+  findByMediaSrc: () => [],
+} as unknown as ReturnType<typeof import("./libraryFixture").makeSitePages>;
+
+type EditorDoor = [string, (dataUrl: string, edits?: typeof EDITS) => Promise<void>, { fileName: string; initialTab?: string; onDone?(): void } | undefined];
+
+/** Mounts the library with hero's family and the site's placements on `on`. */
+async function mountVersions(opts: { family?: typeof HERO[]; on?: string; uploadFile?: (file: File, options?: unknown) => Promise<unknown> } = {}) {
+  const family = opts.family ?? [HERO];
+  /* Which src the three placements carry — mutable, so a replace moves them. */
+  const placements = { src: opts.on ?? "blob:hero" };
+  const usages = new Proxy({} as Record<string, number>, { get: (_t, src) => (src === placements.src ? 3 : 0) });
+  const replaceAcross = (oldSrc: string, newSrc: string) => {
+    if (oldSrc !== placements.src) return { replaced: [], failed: [], clean: true };
+    placements.src = newSrc;
+    return {
+      replaced: [...PLACEMENTS.keys()].map((elementId) => ({ elementId, previousSrc: oldSrc })),
+      failed: [],
+      clean: true,
+    };
+  };
+  const composer = makeComposer(usages, { uploadFile: opts.uploadFile }, SITE, replaceAcross);
+  const srcOf = (key: string) => family.find((i) => i.key === key)?.src;
+  mocks.state.mediaState = makeMediaState({
+    libraryItems: TEN.map((i) => (i.key === "hero" ? HERO : i)),
+    counts: { all: TEN.length, img: 5, vid: 2, ico: 2, fnt: 1 },
+    versionsOf: vi.fn((key: string) => (family.some((i) => i.key === key) ? family : [])),
+    checkInUse: vi.fn((keys: string[]) =>
+      keys.flatMap((key) => (srcOf(key) === placements.src ? [{ key, name: key, count: 3, pages: PAGES }] : [])),
+    ),
+  });
+  const { LibraryManager } = await import("../LibraryManager");
+  const onOpenImageEditor = vi.fn();
+  render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={onOpenImageEditor} onOpenIconPicker={vi.fn()} />);
+  const door = () => onOpenImageEditor.mock.calls.at(-1) as EditorDoor;
+  return { composer, onOpenImageEditor, door, placements };
+}
+
+const selectHero = () => fireEvent.click(screen.getByTestId("mgr-asset-hero"));
+const openVersions = () => fireEvent.click(screen.getByTestId("mgr-det-version-hero-v2"));
+
+describe("Clone 3681:20026 → 3695:45529 · Edit image → Save version → Done — the save path", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("Edit image opens the editor on the file, named, with a Done that leads to Asset versions", async () => {
+    const { onOpenImageEditor, door } = await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    fireEvent.click(rail().getByRole("button", { name: "Edit image" }));
+    await vi.waitFor(() => expect(onOpenImageEditor).toHaveBeenCalledTimes(1));
+    expect(door()[0]).toBe("blob:hero");
+    expect(door()[2]).toEqual(expect.objectContaining({ fileName: "hero-dark.jpg" }));
+    expect(door()[2]?.initialTab).toBeUndefined();
+    expect(screen.queryByTestId("versions-modal")).toBeNull();
+    act(() => door()[2]?.onDone?.());
+    expect(screen.getByTestId("versions-title")).toHaveTextContent("Asset versions");
+    expect(screen.getByTestId("versions-subtitle")).toHaveTextContent("hero-dark.jpg · Original retained");
+  });
+
+  it("Save lands the edited file as hero-dark-v2.<ext> in the parent's folder, born a version of hero with its edits, and records the server history", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ blob: async () => new Blob(["x"], { type: "image/jpeg" }) }));
+    const uploadFile = vi.fn(async (file: File, _options?: unknown) => ({
+      success: true,
+      asset: { id: "hero-v2", serverId: "hero-v2", src: "https://cdn/hero-dark-v2.jpg", size: 512_000, localOnly: false, name: file.name },
+      fileName: file.name,
+    }));
+    const { door } = await mountVersions({ uploadFile });
+    selectHero();
+    fireEvent.click(rail().getByRole("button", { name: "Edit image" }));
+    await vi.waitFor(() => expect(door()).toBeDefined());
+    await door()[1]("data:image/jpeg;base64,AAAA", EDITS);
+    expect(uploadFile).toHaveBeenCalledTimes(1);
+    const [file, options] = uploadFile.mock.calls[0];
+    expect(file.name).toBe("hero-dark-v2.jpg");
+    expect(options).toEqual({ folderId: "f1", versionOf: "hero", edits: EDITS });
+    expect(versionServiceStub.createAssetVersion).toHaveBeenCalledWith({
+      assetId: "srv-hero",
+      url: "https://cdn/hero-dark-v2.jpg",
+      bytes: 512_000,
+      edits: EDITS,
+    });
+  });
+
+  it("a second save numbers itself after the versions that exist by then", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ blob: async () => new Blob(["x"], { type: "image/webp" }) }));
+    const uploadFile = vi.fn(async (file: File, _options?: unknown) => ({ success: true, asset: { id: "hero-v3", src: "blob:hero-v3", size: 1 }, fileName: file.name }));
+    const { door } = await mountVersions({ family: [HERO, HERO_V2], uploadFile });
+    selectHero();
+    fireEvent.click(rail().getByRole("button", { name: "Edit image" }));
+    await vi.waitFor(() => expect(door()).toBeDefined());
+    await door()[1]("data:image/webp;base64,AAAA", EDITS);
+    expect(uploadFile.mock.calls[0][0].name).toBe("hero-dark-v3.webp");
+    /* The parent never synced — no server history to write. */
+    expect(versionServiceStub.createAssetVersion).not.toHaveBeenCalled();
+  });
+
+  it("a refused upload rejects the save — the editor shows its failure dialog and keeps the draft; nothing opens", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ blob: async () => new Blob(["x"], { type: "image/jpeg" }) }));
+    const uploadFile = vi.fn(async (file: File, _options?: unknown) => ({ success: false, error: "Not enough storage", fileName: file.name }));
+    const { door } = await mountVersions({ uploadFile });
+    selectHero();
+    fireEvent.click(rail().getByRole("button", { name: "Edit image" }));
+    await vi.waitFor(() => expect(door()).toBeDefined());
+    await expect(door()[1]("data:image/jpeg;base64,AAAA", EDITS)).rejects.toThrow("Not enough storage");
+    expect(screen.queryByTestId("versions-modal")).toBeNull();
+    expect(versionServiceStub.createAssetVersion).not.toHaveBeenCalled();
+  });
+
+  it("Optimize opens the same editor on its Optimise tab — the standalone optimiser is gone", async () => {
+    const { door } = await mountVersions();
+    selectHero();
+    fireEvent.click(rail().getByRole("button", { name: "Optimize" }));
+    await vi.waitFor(() => expect(door()).toBeDefined());
+    expect(door()[2]).toEqual(expect.objectContaining({ fileName: "hero-dark.jpg", initialTab: "optimise" }));
+    expect(screen.queryByText(/Optimize image/i)).toBeNull();
+  });
+});
+
+describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
+  it("lists v2 · Latest saved over v1 · Original once a version exists, marks the applied one, and a row opens Asset versions", async () => {
+    await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    const block = within(screen.getByTestId("mgr-det-versions"));
+    expect(block.getByTestId("mgr-det-version-hero-v2")).toHaveTextContent("v2 · Latest saved");
+    expect(block.getByTestId("mgr-det-version-hero")).toHaveTextContent("v1 · Original");
+    expect(within(block.getByTestId("mgr-det-version-hero")).getByText("APPLIED")).toBeInTheDocument();
+    openVersions();
+    expect(screen.getByTestId("versions-title")).toHaveTextContent("Asset versions");
+    expect(screen.getByTestId("versions-card-state-hero")).toHaveTextContent("Currently used on Home and Menu · 3 placements");
+    expect(screen.getByTestId("versions-card-state-hero-v2")).toHaveTextContent("Not applied to site");
+  });
+
+  it("is absent while only the original exists, and USED IN still reads the placements", async () => {
+    await mountVersions();
+    selectHero();
+    expect(screen.queryByTestId("mgr-det-versions")).toBeNull();
+    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("3 places — Home, Menu");
+  });
+
+  it("USED IN follows the placements to the applied version", async () => {
+    await mountVersions({ family: [HERO, HERO_V2], on: "blob:hero-v2" });
+    selectHero();
+    expect(screen.getByTestId("mgr-det-used")).toHaveTextContent("3 places — Home, Menu");
+    expect(screen.getByTestId("mgr-use-hero")).toHaveTextContent("used ×3");
+  });
+
+  it("Edit latest saved version opens the editor on v2's file; its save becomes v3 of hero", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ blob: async () => new Blob(["x"], { type: "image/jpeg" }) }));
+    const uploadFile = vi.fn(async (file: File, _options?: unknown) => ({ success: true, asset: { id: "hero-v3", src: "blob:hero-v3", size: 1 }, fileName: file.name }));
+    const { door } = await mountVersions({ family: [HERO, HERO_V2], uploadFile });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-edit-latest"));
+    await vi.waitFor(() => expect(door()).toBeDefined());
+    expect(door()[0]).toBe("blob:hero-v2");
+    expect(door()[2]).toEqual(expect.objectContaining({ fileName: "hero-dark-v2.jpg" }));
+    expect(screen.queryByTestId("versions-modal")).toBeNull();
+    await door()[1]("data:image/jpeg;base64,AAAA", EDITS);
+    const [file, options] = uploadFile.mock.calls[0];
+    expect(file.name).toBe("hero-dark-v3.jpg");
+    expect(options).toEqual({ folderId: "f1", versionOf: "hero", edits: EDITS });
+    vi.unstubAllGlobals();
+  });
+});
+
+describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved version across site", () => {
+  it("confirms with the real count and pages, applies through replaceAcross, reports per page, and View versions shows v2 applied", async () => {
+    const { composer, placements } = await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    expect(screen.getByTestId("apply-version-title")).toHaveTextContent("Apply saved version across site");
+    expect(screen.getByTestId("apply-version-body")).toHaveTextContent(
+      "Update 3 uses on Home and Menu to the latest saved version. The original and prior saved version remain available.",
+    );
+    fireEvent.click(screen.getByTestId("apply-version-confirm"));
+    expect(screen.getByTestId("apply-version-applying-line")).toHaveTextContent("Updating 3 uses across Home and Menu. Please wait.");
+    expect(screen.queryByTestId("versions-modal")).toBeNull();
+    const result = await screen.findByTestId("rx-result");
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:hero-v2");
+    expect(placements.src).toBe("blob:hero-v2");
+    expect(within(result).getByTestId("rx-result-title")).toHaveTextContent("Saved version applied");
+    expect(within(result).getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
+    expect(within(result).getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
+    expect(within(result).getByTestId("rx-result-note")).toHaveTextContent("Other elements are unchanged.");
+    fireEvent.click(screen.getByTestId("rx-result-versions"));
+    expect(screen.queryByTestId("rx-result")).toBeNull();
+    expect(screen.getByTestId("versions-card-state-hero-v2")).toHaveTextContent("Applied to site · 3 placements");
+    expect(screen.getByTestId("versions-card-state-hero")).toHaveTextContent("Not on site");
+    expect(screen.getByTestId("versions-apply-latest")).toBeDisabled();
+    /* And the rail's marker moved with the placements. */
+    fireEvent.click(screen.getByTestId("versions-close"));
+    expect(within(screen.getByTestId("mgr-det-version-hero-v2")).getByText("APPLIED")).toBeInTheDocument();
+  });
+
+  it("Done closes the result and the library stands as it was", async () => {
+    await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    fireEvent.click(screen.getByTestId("apply-version-confirm"));
+    fireEvent.click(within(await screen.findByTestId("rx-result")).getByTestId("rx-result-done"));
+    expect(screen.queryByTestId("rx-result")).toBeNull();
+    expect(screen.queryByTestId("versions-modal")).toBeNull();
+    expect(rail().getByText("hero-dark.jpg")).toBeInTheDocument();
+  });
+
+  it("Cancel on the confirm returns to Asset versions", async () => {
+    await mountVersions({ family: [HERO, HERO_V2] });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    fireEvent.click(screen.getByTestId("apply-version-cancel"));
+    expect(screen.queryByTestId("apply-version-modal")).toBeNull();
+    expect(screen.getByTestId("versions-modal")).toBeInTheDocument();
+  });
+
+  it("nothing on the site: the confirm's primary is disabled with the reason, and nothing is replaced", async () => {
+    const { composer } = await mountVersions({ family: [HERO, HERO_V2], on: "blob:elsewhere" });
+    selectHero();
+    openVersions();
+    fireEvent.click(screen.getByTestId("versions-apply-latest"));
+    expect(screen.getByTestId("apply-version-confirm")).toBeDisabled();
+    expect(screen.getByTestId("apply-version-body")).toHaveTextContent("Nothing on the site uses hero-dark.jpg yet");
+    expect(composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
   });
 });
