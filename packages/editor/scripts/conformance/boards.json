@@ -5,7 +5,7 @@
  "generatedAt": "2026-08-14",
  "counts": {
   "total": 458,
-  "active": 365,
+  "active": 364,
   "designAhead": 41,
   "outOfScope": 43,
   "activeFamilies": 36,
@@ -13,11 +13,11 @@
    "drift-open": 69,
    "match": 58,
    "driven": 116,
-   "drift-fixed": 35,
+   "drift-fixed": 34,
    "no": 67,
    "unreachable": 29
   },
-  "retired": 8
+  "retired": 10
  },
  "activeFamilies": [
   "AI",
@@ -5398,11 +5398,11 @@
    "state": "new-folder inline",
    "width": 240,
    "height": 330,
-   "status": "active",
+   "status": "retired",
    "authority": "board",
-   "recipe": "media-new-folder-inline",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe media-new-folder-inline): 45/45. Measuring 1205:4829 surfaced SEVEN PRE-EXISTING LIVE WCAG FAILURES in the fullpage folder rail (head, section label, 4 counts, hint) — all fixed to ink-soft; that surface now measures 0. NOT conformed: the fullpage rail's SMART/FOLDERS grouping is the fullpage library's IA, drawn identically on unowned boards; this frame's subject is the inline editing row.",
-   "verified": "drift-fixed"
+   "recipe": null,
+   "verifiedNote": "RETIRED 2026-09-13 — displaced by Clone 3700:20347 (Assets · Clone, P2-A): `row/＋ New folder` opens the Create folder MODAL (CreateFolderModal.tsx), so the inline editing row this board draws no longer exists in the product. Row, CSS, probe fixture, recipe and spec deleted in the same commit; the modal is verified by the live walk against the Clone shot, not by a recipe. Earlier history: measured 2026-09-08 at 45/45, and measuring it surfaced seven live WCAG failures in the rail (all fixed to ink-soft, still in place).",
+   "verified": "unreachable"
   },
   {
    "nodeId": "1205:4804",

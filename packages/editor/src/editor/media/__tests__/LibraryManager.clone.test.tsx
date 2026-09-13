@@ -204,6 +204,64 @@ describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () =
   });
 });
 
+describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
+  it("'+ New folder' opens the Create folder modal; Cancel returns with scope and selection unchanged (A06)", async () => {
+    const setCurrentFolderId = vi.fn();
+    await mountLibrary({ setCurrentFolderId });
+    fireEvent.click(screen.getByTestId("mgr-asset-menu"));
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    expect(screen.getByTestId("mgr-create-folder")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "New folder" })).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("mgr-create-folder-cancel"));
+    expect(screen.queryByTestId("mgr-create-folder")).toBeNull();
+    expect(within(screen.getByTestId("mgr-details")).getByText("menu-cover.png")).toBeInTheDocument();
+    expect(setCurrentFolderId).not.toHaveBeenCalled();
+  });
+
+  it("Create folder files the name at the current level and the new folder becomes the scope", async () => {
+    const setCurrentFolderId = vi.fn();
+    const createFolder = vi.fn((name: string) => Promise.resolve(makeFolder({ id: "f-new", name })));
+    await mountLibrary({ createFolder, setCurrentFolderId });
+    fireEvent.click(screen.getByRole("button", { name: /^Unused/ }));
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "Campaign images" } });
+    fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
+    expect(createFolder).toHaveBeenCalledWith("Campaign images");
+    await vi.waitFor(() => expect(setCurrentFolderId).toHaveBeenLastCalledWith("f-new"));
+    // The smart-folder scope it was opened from is released with it.
+    expect(screen.getByTestId("mgr-count")).not.toHaveTextContent(/Unused$/);
+    expect(screen.queryByTestId("mgr-create-folder")).toBeNull();
+  });
+
+  it("a name already at this level is refused with the next free name, which creates that folder", async () => {
+    const createFolder = vi.fn((name: string) => Promise.resolve(makeFolder({ id: "f-new", name })));
+    await mountLibrary({
+      createFolder,
+      allFolders: [makeFolder({ id: "f1", name: "Products" }), makeFolder({ id: "f2", name: "Nested", parentId: "f1" })],
+    });
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "products" } });
+    fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
+    expect(createFolder).not.toHaveBeenCalled();
+    expect(screen.getByRole("heading", { name: "Folder name already exists" })).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("mgr-create-folder-use"));
+    expect(createFolder).toHaveBeenCalledWith("Products 2");
+  });
+
+  it("the duplicate check is against the CURRENT level: a root name is free inside a folder", async () => {
+    const createFolder = vi.fn((name: string) => Promise.resolve(makeFolder({ id: "f-new", name })));
+    await mountLibrary({
+      createFolder,
+      currentFolderId: "f1",
+      allFolders: [makeFolder({ id: "f1", name: "Products" }), makeFolder({ id: "f2", name: "Nested", parentId: "f1" })],
+    });
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "Products" } });
+    fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
+    expect(createFolder).toHaveBeenCalledWith("Products");
+  });
+});
+
 describe("Clone 3695:20614 / 44165 · Insert to canvas returns to the canvas", () => {
   it("inserts, then closes the library", async () => {
     const insertToCanvas = vi.fn(() => Promise.resolve());

@@ -19,6 +19,7 @@ import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceMo
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
+import { CreateFolderModal } from "./components/CreateFolderModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
@@ -181,6 +182,26 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   );
 
   const [importUrlOpen, setImportUrlOpen] = React.useState(false);
+  /* Clone 3700:20347 — `row/＋ New folder` opens a modal. The folder lands
+     under the current scope (the hook's own rule), so the names the modal
+     refuses are that level's siblings — a root name is free inside a folder. */
+  const [createFolderOpen, setCreateFolderOpen] = React.useState(false);
+  const siblingFolderNames = React.useMemo(
+    () => state.allFolders.filter((f) => f.parentId === state.currentFolderId).map((f) => f.name),
+    [state.allFolders, state.currentFolderId],
+  );
+  /* Clone 3700:20353 — the folder just created IS the scope: its row lights
+     in FOLDERS and the grid shows its (empty) contents. A smart-folder scope
+     it was opened from is released with it, the way clicking a folder row
+     releases one. */
+  const handleCreateFolder = React.useCallback(
+    async (name: string) => {
+      const folder = await state.createFolder(name);
+      setSmartFolder(null);
+      state.setCurrentFolderId(folder.id);
+    },
+    [state],
+  );
   /* The optimizer shipped as a tab on the PICKER modal, so the only door to it
      was being mid-way through choosing an image for an element. It belongs
      beside Edit, on the asset you are looking at. */
@@ -361,7 +382,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           allTags={allTags}
           setLibrarySearch={state.setLibrarySearch}
           folderCounts={state.folderCounts}
-          createFolder={state.createFolder}
+          onNewFolder={() => setCreateFolderOpen(true)}
           deleteFolder={state.deleteFolder}
           onTrashClick={() =>
             addToast({ description: "Trash coming soon", tone: "info" })
@@ -548,6 +569,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         open={importUrlOpen}
         onClose={() => setImportUrlOpen(false)}
         onImport={handleImportFromUrl}
+      />
+      <CreateFolderModal
+        open={createFolderOpen}
+        existingNames={siblingFolderNames}
+        onClose={() => setCreateFolderOpen(false)}
+        onCreate={(name) => void handleCreateFolder(name)}
       />
 
       {/* Bug #2 fix: mount AssetDetailOverlay so rename from context menu actually shows */}

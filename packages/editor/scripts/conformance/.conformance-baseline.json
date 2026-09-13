@@ -1087,14 +1087,6 @@
     "skipped": 0,
     "compared": 4
   },
-  "media-new-folder-inline": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 45
-  },
   "inspector-reach-whole-site": {
     "skipped": 4,
     "compared": 35

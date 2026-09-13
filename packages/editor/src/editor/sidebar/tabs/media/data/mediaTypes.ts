@@ -153,7 +153,8 @@ export interface LibraryStateResult {
   folderCounts: ReadonlyMap<string, number>;
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
-  createFolder(name: string): Promise<void>;
+  /** Files `name` under the current folder; resolves with the folder made. */
+  createFolder(name: string): Promise<MediaFolder>;
   inspectFolder(id: string): { assetCount: number; subFolderCount: number };
   deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;
@@ -273,7 +274,8 @@ export interface MediaStateResult {
   allFolders: MediaFolder[];
   /** See `LibraryStateResult.folderCounts`. */
   folderCounts: ReadonlyMap<string, number>;
-  createFolder(name: string): Promise<void>;
+  /** Files `name` under the current folder; resolves with the folder made. */
+  createFolder(name: string): Promise<MediaFolder>;
   inspectFolder(id: string): { assetCount: number; subFolderCount: number };
   deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;

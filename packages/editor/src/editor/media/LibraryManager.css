@@ -251,26 +251,12 @@
   cursor: pointer;
 }
 
-/* One class deeper than `.mgr-node` on purpose. The rail's rows are divs, but
-   the "+ New folder" row is a chrome-ui Button, and `.mgr-node` set no
-   background at all — so flowbite's default accent survived and that row
-   shipped as a blue button with an ink-soft label on it: 1.22:1, measured on
-   board 1159:4593. A single-class rule ties a `tw:` utility on specificity and
-   then loses on source order (CLAUDE.md §Chrome), so the reset needs the
-   ancestor. */
-.mgr-left .mgr-node {
-  background: transparent;
-  border: 0;
-  min-height: var(--bk-size-row);
-  font-weight: 400;
-  text-align: left;
-}
+/* Every row in this rail is a TreeNode div now — Clone 3700:20347 made the
+   "+ New folder" row one too (it opens a modal). The two-class reset that
+   stripped flowbite's Button fill off that row went with the Button. */
+.mgr-node:hover { background: var(--bk-bg-subtle); }
 
-.mgr-node:hover,
-.mgr-left .mgr-node:hover { background: var(--bk-bg-subtle); }
-
-.mgr-node.active,
-.mgr-left .mgr-node.active {
+.mgr-node.active {
   background: var(--bk-accent-tint);
   color: var(--bk-ink);
   font-weight: 600;

@@ -219,9 +219,12 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const setLibrarySearch = useCallback((q: string) => setLibrarySearch_(q), []);
 
-  const createFolder = useCallback(async (name: string) => {
-    await composer.media.createFolder(name, currentFolderId);
-  }, [composer, currentFolderId]);
+  /* Resolves with the folder the engine made: the library scopes to it the
+     moment it exists (Clone 3700:20353), and only the engine knows its id. */
+  const createFolder = useCallback(
+    (name: string) => composer.media.createFolder(name, currentFolderId),
+    [composer, currentFolderId],
+  );
 
   /**
    * Inspect a folder before deleting. Returns counts so the caller (component

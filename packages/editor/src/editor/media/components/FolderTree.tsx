@@ -20,13 +20,14 @@ import {
   MinusCircle,
   Folder,
   FolderOpen,
+  Plus,
   Trash2,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
 import * as React from "react";
 import type { MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
-import { Button, TextField } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 /* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
    this rail drew as unstyled 16px rows anywhere it was mounted on its own (a
    probe, a test, board 1205:4829's own measurement, which read every padding
@@ -80,7 +81,8 @@ export interface FolderTreeProps {
   setLibrarySearch(q: string): void;
   /** Clone 3698:20337 — each folder row prints its own asset count. */
   folderCounts: ReadonlyMap<string, number>;
-  createFolder(name: string): Promise<void>;
+  /** Clone 3700:20347 — `row/＋ New folder` opens the orchestrator's modal. */
+  onNewFolder(): void;
   deleteFolder(id: string): Promise<void>;
   /** Trash placeholder — orchestrator wires this to a toast. */
   onTrashClick(): void;
@@ -187,7 +189,7 @@ export function FolderTree({
   allTags,
   setLibrarySearch,
   folderCounts,
-  createFolder,
+  onNewFolder,
   deleteFolder,
   onTrashClick,
   onMoveAssetToFolder,
@@ -206,13 +208,6 @@ export function FolderTree({
   // Recursive folder tree renderer (Bug #8 fix: expand/collapse).
   // Drop-target state for asset→folder drags (ported with the behaviour).
   const [dropTargetId, setDropTargetId] = React.useState<string | null>(null);
-  /*
-    Naming a folder happens IN the tree, where the folder will appear. It used
-    to be a native prompt() — an OS dialog dropped into a designed product:
-    unstyleable, unable to say why a name was refused, and a hard stop for
-    anything driving the page.
-  */
-  const [newFolderName, setNewFolderName] = React.useState<string | null>(null);
   const readDraggedAssetKey = (e: React.DragEvent<HTMLElement>): string =>
     e.dataTransfer.getData("application/x-buildrik-media-asset-key") ||
     e.dataTransfer.getData("text/plain") ||
@@ -359,59 +354,22 @@ export function FolderTree({
             under `🏠 All assets` — they hang off it, they are not its peers. */}
         {renderFolderTree(null, 1)}
 
-        {/*
-          Board 1205:4829 — the name is typed at the bottom of My folders,
-          where the folder will land, with the two keys spelled out. It
-          replaced a native prompt(), which could not say any of this.
+        {/* Clone 3700:20347 — `row/＋ New folder` is a row IN the list, right
+            after the last folder, and it opens the Create folder OVERLAY. It
+            displaced V1 board 1205:4829's inline editing row (a field that
+            opened here with "Enter to create · Esc to cancel" under it), which
+            had itself displaced a native prompt(). Same row shape as every
+            other row in this rail — a TreeNode, so it is reachable by Tab and
+            fires on Enter — and never a scope: it has no `active` state. */}
+        <TreeNode
+          icon={<Plus size={14} className="mgr-node-ico" />}
+          label="New folder"
+          testId="mgr-new-folder-open"
+          active={false}
+          onClick={onNewFolder}
+        />
 
-          Board 1163:13695's row/＋ New folder (12/400 ink-soft, 8/6 padding,
-          r6) is a row IN the list, right after the last folder — not the
-          18x18 icon-only button that used to sit in the "Folders" header.
-          `.mgr-node`'s own padding/radius/font are that exact spec, so the
-          trigger reuses it rather than carrying a second copy.
-        */}
-        {newFolderName === null ? (
-          <Button
-            className="mgr-node"
-            title="New folder"
-            aria-label="New folder"
-            data-testid="mgr-new-folder-open"
-            onClick={() => setNewFolderName("")}
-          >
-            {"＋  New folder"}
-          </Button>
-        ) : null}
-
-        {newFolderName !== null ? (
-          <div className="mgr-tree-newfolder tw:flex tw:flex-col tw:gap-1 tw:px-2 tw:py-1" data-testid="mgr-new-folder">
-            <TextField
-              autoFocus
-              className="tw:h-[var(--bk-size-row-dense)] tw:rounded-md tw:px-[var(--bk-space-8)] tw:text-[length:var(--bk-text-12)]"
-              value={newFolderName}
-              placeholder="Folder name"
-              aria-label="New folder name"
-              data-testid="mgr-new-folder-input"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)}
-              onBlur={() => setNewFolderName(null)}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === "Enter" && newFolderName.trim()) {
-                  createFolder(newFolderName.trim());
-                  setNewFolderName(null);
-                } else if (e.key === "Escape") {
-                  e.stopPropagation();
-                  setNewFolderName(null);
-                }
-              }}
-            />
-            <p className="tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="mgr-new-folder-hint">
-              Enter to create · Esc to cancel
-            </p>
-          </div>
-        ) : null}
-
-        {/* Not while one is being named — "No folders yet" under a folder the
-            user is in the middle of creating contradicts what they are doing. */}
-        {folders.length === 0 && newFolderName === null && (
+        {folders.length === 0 && (
           <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--bk-ink-disabled)" }}>
             No folders yet
           </div>
