@@ -47,6 +47,30 @@ function reasonOf(err: unknown): StockFailureReason {
   return err instanceof StockSearchError ? err.reason : "request-failed";
 }
 
+const EXT_FOR_MIME: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+  "image/svg+xml": "svg",
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+  "video/quicktime": "mov",
+};
+
+/** "Restaurant interior" · image/jpeg → "restaurant-interior.jpg"; a video has no title, so its provider id names it. */
+function stockFileName(item: StockPhoto | StockVideo | DiscIcon, mime: string): string {
+  const title = "alt" in item ? item.alt : "name" in item ? item.name : "";
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  const ext = EXT_FOR_MIME[mime] ?? (mime.split("/")[1] || "bin");
+  return `${slug || item.id}.${ext}`;
+}
+
 /** One line each, because these are three different things to go and do. */
 const FAILURE_TOAST: Record<StockFailureReason, string> = {
   "not-configured": "Stock search isn't set up on this site",
@@ -222,24 +246,28 @@ export function useDiscoveryState(
     [composer, discoverySearch, discOrientation, discColor, discSource, pageState, showToast]
   );
 
+  /* Clone 3695:45573 reads "restaurant-interior.jpg is now in your asset
+     library" — the file is named from the result's own title, with the
+     extension the body really has, not `<providerId>.jpg`. Resolves with the
+     asset the library now holds so the orchestrator can show that dialog and
+     select it on View asset; null when the engine refused (the toast says so,
+     the stock dialog stays open with its selection). An icon is a real save
+     too: its SVG data URL is fetched and lands through the same upload gate,
+     sanitizer included. */
   const saveToLibrary = useCallback(
-    async (type: "img" | "vid", item: StockPhoto | StockVideo) => {
+    async (type: "img" | "vid" | "ico", item: StockPhoto | StockVideo | DiscIcon): Promise<{ key: string; name: string } | null> => {
       setDiscLoading((prev) => ({ ...prev, [type]: true }));
       try {
-        // Fetch the actual file from URL and upload it to library
-        const response = await fetch(item.url);
+        const response = await fetch("svgDataUrl" in item ? item.svgDataUrl : item.url);
         const blob = await response.blob();
-        const file = new File([blob], `${item.id}.${type === "img" ? "jpg" : "mp4"}`, {
-          type: blob.type,
-        });
+        const file = new File([blob], stockFileName(item, blob.type), { type: blob.type });
         const result = await composer.media.uploadFile(file);
-        // Mark as stock source
-        if (result.success && result.asset) {
-          await composer.media.updateAsset(result.asset.id, { assetSource: "stock" });
-        }
-        showToast("Saved to library ✓", "success");
+        if (!result.success || !result.asset) throw new Error(result.error ?? "Upload failed");
+        await composer.media.updateAsset(result.asset.id, { assetSource: "stock" });
+        return { key: result.asset.id, name: result.asset.name };
       } catch (err) {
         showToast("Failed to save to library", "error");
+        return null;
       } finally {
         setDiscLoading((prev) => ({ ...prev, [type]: false }));
       }

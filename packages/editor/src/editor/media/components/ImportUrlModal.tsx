@@ -1,97 +1,141 @@
 /**
- * ImportUrlModal — the Import URL button's own dialog.
+ * ImportUrlModal — Clone 3397:18835 "Import image from URL".
  *
- * Replaces `window.prompt("Paste image or media URL:")`. A native prompt is an
- * OS chrome dialog dropped into the middle of a designed product: it cannot be
- * styled, cannot say why a URL was rejected, blocks the page while it is up,
- * and in an automated browser it freezes the session outright.
+ * Opened by the library's `⭳ Import URL` and by the picker's `From URL`
+ * (over the picker — edge `Action / From URL|CLIC|OVE>3397:18835`). Title,
+ * one line that says what importing does NOT do, the URL field, Cancel and
+ * `Import image` — primary, disabled until the address is fetchable, with the
+ * field's own error line for a string that is not a web address at all.
  *
- * The boards draw the `⭳ Import URL` button (1163:13726) but no dialog behind
- * it, so the shape here follows the product's own modal contract rather than
- * inventing a screen: chrome-ui Modal, one field, the action disabled with a
- * stated reason until the URL is usable.
+ * Displaces V1 1205:4804 / 1205:4816 (the "Import from URL" dialog with a
+ * MEDIA URL label and an "Import" button), which itself replaced
+ * `window.prompt("Paste image or media URL:")` — a native prompt cannot be
+ * styled, cannot say why a URL was rejected, and freezes an automated walk.
+ *
+ * `onImport` is awaited: the dialog stays open and busy while the fetch runs
+ * (the prototype's `Import image|CLIC|COND` step), then closes. What it
+ * settled into — Image imported, or Image could not be imported — is the
+ * orchestrator's dialog (`ImportResultModal`); the Edit URL door there hands
+ * the address back through `initialUrl`, so nobody retypes it.
+ *
+ * Shape from `libraryModal.ts` (title 16/600, body 13 ink-soft, 32px buttons,
+ * 8 gap) at the Clone's 640.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, Modal, TextField } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalContent, ModalRoot, TextInput } from "@/editor/chrome-ui";
 import { isFetchableUrl } from "../fetchUrlAsFile";
+import {
+  LIBRARY_MODAL_BODY,
+  LIBRARY_MODAL_BTN_PRIMARY,
+  LIBRARY_MODAL_BTN_SECONDARY,
+  LIBRARY_MODAL_FOOT,
+  LIBRARY_MODAL_TITLE,
+} from "./libraryModal";
 
 interface ImportUrlModalProps {
   open: boolean;
+  /** Pre-filled address — 3695:43876's Edit URL reopens on the one that failed. */
+  initialUrl?: string;
   onClose(): void;
-  /** Receives a trimmed, http(s) URL. Fetching and error toasts stay upstream. */
-  onImport(url: string): void;
+  /** Receives a trimmed http(s) URL. Resolves once the import has settled either way. */
+  onImport(url: string): Promise<unknown>;
 }
 
-export function ImportUrlModal({ open, onClose, onImport }: ImportUrlModalProps) {
+export function ImportUrlModal({ open, initialUrl, onClose, onImport }: ImportUrlModalProps) {
   const [url, setUrl] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
 
-  // A reopened dialog starts empty — a stale URL from a previous import is
-  // never what the user means the second time.
+  // A reopened dialog starts on what it was handed — the failed address on
+  // Edit URL, nothing otherwise: a stale URL from a previous import is never
+  // what the user means the second time.
   React.useEffect(() => {
-    if (open) setUrl("");
-  }, [open]);
+    if (open) {
+      setUrl(initialUrl ?? "");
+      setBusy(false);
+    }
+  }, [open, initialUrl]);
 
   const trimmed = url.trim();
   const valid = isFetchableUrl(trimmed);
 
-  const submit = () => {
-    if (!valid) return;
-    onImport(trimmed);
-    onClose();
+  const submit = async () => {
+    if (!valid || busy) return;
+    setBusy(true);
+    try {
+      await onImport(trimmed);
+    } finally {
+      setBusy(false);
+      onClose();
+    }
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      kind="form"
-      title="Import from URL"
-      subtitle="Paste a link to an image or video and it lands in this library."
-      footer={
-        <div className="tw:flex tw:items-center tw:justify-end tw:gap-2" data-testid="import-url-foot">
-          <Button type="button" color="light" onClick={onClose} data-testid="import-url-cancel">
+    <ModalRoot open={open} onClose={onClose}>
+      <ModalContent size="table" srTitle="Import image from URL" data-testid="import-url">
+        <h2 className={LIBRARY_MODAL_TITLE} data-testid="import-url-title">
+          Import image from URL
+        </h2>
+        <ModalBody>
+          <p className={LIBRARY_MODAL_BODY} data-testid="import-url-body">
+            Add an image to your library. Importing does not replace an image on the canvas.
+          </p>
+          {/* chrome-ui's 32 TextInput; `aria-invalid` is what its theme reads
+              for the error border, and it survives focus (textInputTheme's
+              `aria-invalid:focus:` compound). `className` lands on the
+              wrapper — the field's own box is the theme's. */}
+          <TextInput
+            type="url"
+            autoFocus
+            aria-invalid={Boolean(trimmed) && !valid ? true : undefined}
+            value={url}
+            disabled={busy}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") void submit();
+            }}
+            placeholder="https://"
+            aria-label="Image URL"
+            className="tw:mt-3"
+            data-testid="import-url-input"
+          />
+          {/* The Button doc's rule: "disabled without a reason is a bug." */}
+          {trimmed && !valid ? (
+            <p
+              className="tw:m-0 tw:mt-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-error-text)]"
+              role="alert"
+              data-testid="import-url-error"
+            >
+              That is not a web address. It needs to start with http:// or https://.
+            </p>
+          ) : null}
+        </ModalBody>
+        <div className={LIBRARY_MODAL_FOOT} data-testid="import-url-foot">
+          <Button
+            type="button"
+            size="xs"
+            variant="secondary"
+            className={LIBRARY_MODAL_BTN_SECONDARY}
+            onClick={onClose}
+            disabled={busy}
+            data-testid="import-url-cancel"
+          >
             Cancel
           </Button>
-          <Button type="button" onClick={submit} disabled={!valid} data-testid="import-url-go">
-            Import
+          <Button
+            type="button"
+            size="xs"
+            className={LIBRARY_MODAL_BTN_PRIMARY}
+            onClick={() => void submit()}
+            disabled={!valid || busy}
+            data-testid="import-url-go"
+          >
+            {busy ? "Importing…" : "Import image"}
           </Button>
         </div>
-      }
-    >
-      {/* Board 1205:4804 labels the field, the way the family's other
-          modals label their sections ("PAGES" on 1164:4738). */}
-      <p
-        className="tw:mb-1 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]"
-        data-testid="import-url-label"
-      >
-        Media URL
-      </p>
-      <TextField
-        type="url"
-        autoFocus
-        error={Boolean(trimmed) && !valid}
-        value={url}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)}
-        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-          if (e.key === "Enter") submit();
-        }}
-        placeholder="https://…"
-        aria-label="Media URL"
-        data-testid="import-url-input"
-      />
-      {/* The Button doc's rule: "disabled without a reason is a bug." */}
-      {trimmed && !valid ? (
-        <p
-          className="tw:mt-1.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]"
-          role="alert"
-          data-testid="import-url-error"
-        >
-          That is not a web address. It needs to start with http:// or https://.
-        </p>
-      ) : null}
-    </Modal>
+      </ModalContent>
+    </ModalRoot>
   );
 }

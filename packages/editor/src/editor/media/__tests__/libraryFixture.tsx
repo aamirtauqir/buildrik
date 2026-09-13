@@ -161,6 +161,9 @@ export function makeComposer(usages: Record<string, number> = {}) {
       getAssetSrc: vi.fn(() => Promise.resolve(null)),
       /* Real shape: how many of the given assets it handed to the browser. */
       downloadAssets: vi.fn((assets: ReadonlyArray<unknown>) => assets.length),
+      /* Real shape: `UploadResult` — the import-from-URL path reads `.asset`
+         for the Image imported dialog and View asset. */
+      uploadFile: vi.fn(async (file: File) => ({ success: true, asset: { id: file.name, name: file.name }, fileName: file.name })),
     },
   } as unknown as Parameters<typeof LibraryManager>[0]["composer"];
 }

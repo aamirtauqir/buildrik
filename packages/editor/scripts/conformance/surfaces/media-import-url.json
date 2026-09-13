@@ -1,7 +1,7 @@
 {
   "surface": "media-import-url",
   "board": "Media · modal · import-url (Figma 1205:4804)",
-  "_note": "Probe: the dialog is reached from the fullpage library's `⭳ Import URL` button, which needs the manager and a composer behind it; the modal itself takes three props and nothing else.\n\nNOT joined: 1205:4804 the card — MODAL_FRAME_BASE_CLASS is shared by every dialog in the editor and ModalTitle/ModalBody own the insets (the call export-html-modal recorded for 1172:4825). 1205:4808 the field — boards.json holds chrome-ui TextInput at authority=open:input-fill, and THIS BOARD IS ONE OF THE TWO that disagree (it fills #F9FAFB where 1172:4867 fills #F3F4F6), so it is the last board that gets to settle it. 1205:4813 / 1205:4815, the button labels at 11px: those sit inside flowbite's own Button span, a shared primitive measured across the modal family.\n\n1205:4812 / 1205:4814, the two buttons, are NOT joined either — and the reason is board-vs-board, not code-vs-board. They are the bare chrome-ui Button (no call-site override), which ships border --bk-gray-300, 6px of vertical padding and radius 8. This board asks for --color/border, 8 and 6; board 1175:4827, one frame away in the same Media modal family, asks for 7 and 6. Two boards cannot settle a primitive that every dialog in the editor draws from, so it keeps the primitive's values. Where a call site DOES own its buttons — ConfirmDeleteModal, which sets its own fill and border — the board's 12/7/6 was conformed.",
+  "_note": "SUPERSEDED BY THE CLONE 2026-09-13 (Assets Phase 3, P3-I): 3397:18835 'Import image from URL' re-drew this dialog — no MEDIA URL label, body copy 'Add an image to your library. Importing does not replace an image on the canvas.', buttons Cancel · Import image at density-32. The 1205:4807 label target is dropped with the label; the foot target (1205:4810) stays as the regression anchor until the Clone frame is extracted. Original note: Probe: the dialog is reached from the fullpage library's `⭳ Import URL` button, which needs the manager and a composer behind it; the modal itself takes three props and nothing else.\n\nNOT joined: 1205:4804 the card — MODAL_FRAME_BASE_CLASS is shared by every dialog in the editor and ModalTitle/ModalBody own the insets (the call export-html-modal recorded for 1172:4825). 1205:4808 the field — boards.json holds chrome-ui TextInput at authority=open:input-fill, and THIS BOARD IS ONE OF THE TWO that disagree (it fills #F9FAFB where 1172:4867 fills #F3F4F6), so it is the last board that gets to settle it. 1205:4813 / 1205:4815, the button labels at 11px: those sit inside flowbite's own Button span, a shared primitive measured across the modal family.\n\n1205:4812 / 1205:4814, the two buttons, are NOT joined either — and the reason is board-vs-board, not code-vs-board. They are the bare chrome-ui Button (no call-site override), which ships border --bk-gray-300, 6px of vertical padding and radius 8. This board asks for --color/border, 8 and 6; board 1175:4827, one frame away in the same Media modal family, asks for 7 and 6. Two boards cannot settle a primitive that every dialog in the editor draws from, so it keeps the primitive's values. Where a call site DOES own its buttons — ConfirmDeleteModal, which sets its own fill and border — the board's 12/7/6 was conformed.",
   "url": "http://localhost:5051/e2e/probe/probe.html?case=media-import-url",
   "viewport": {
     "width": 1440,
@@ -10,16 +10,10 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "import-url-label"
+      "testId": "import-url-input"
     }
   ],
   "targets": [
-    {
-      "name": "label",
-      "testId": "import-url-label",
-      "spec": "media-import-url",
-      "nodeId": "1205:4807"
-    },
     {
       "name": "foot",
       "testId": "import-url-foot",

@@ -19,13 +19,15 @@ import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceMo
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
+import { ImportResultModal, type ImportResult } from "./components/ImportResultModal";
+import { StockSavedModal } from "./components/StockSavedModal";
 import { RenameAssetModal } from "./components/RenameAssetModal";
 import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
 import { CreateFolderModal } from "./components/CreateFolderModal";
 import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
-import { fetchUrlAsFile } from "./fetchUrlAsFile";
-import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
+import { EVERY_MEDIA_KIND, UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
+import { STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
 import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
 import { OptimizationPanel } from "./OptimizationPanel";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
@@ -335,16 +337,66 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     [state],
   );
 
-  const handleImportFromUrl = React.useCallback(async (url: string) => {
-    try {
-      addToast({ description: "Importing...", tone: "info", duration: 2000 });
-      const file = await fetchUrlAsFile(url);
-      state.upload([file]);
-      addToast({ description: `${file.name} imported`, tone: "success" });
-    } catch {
-      addToast({ description: "Could not import from that URL", tone: "error" });
-    }
-  }, [state, addToast]);
+  /* ─── P3-I Import URL · Stock ──────────────────────────────────────── */
+  /* Clone 3397:18835 → 3695:43873 / 3695:43876: the import's outcome is a
+     dialog, not a toast. The file goes through the engine's own upload gate
+     (the same one a picked file passes) and lands in the current scope, the
+     rule the file picker and the drop path already follow. Its outcome
+     names the asset so View asset can select it. */
+  const [importDraft, setImportDraft] = React.useState("");
+  const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
+  /* Clone 3695:45573 — the stock save's result, with the asset it landed as. */
+  const [stockSaved, setStockSaved] = React.useState<{ key: string; name: string } | null>(null);
+
+  const handleImportFromUrl = React.useCallback(
+    async (url: string) => {
+      let file: File;
+      try {
+        file = await fetchUrlAsFile(url);
+      } catch {
+        setImportResult({ kind: "failed", url, accepts: EVERY_MEDIA_KIND });
+        return;
+      }
+      try {
+        const result = await composer.media.uploadFile(
+          file,
+          state.currentFolderId != null ? { folderId: state.currentFolderId } : undefined,
+        );
+        if (!result.success || !result.asset) {
+          setImportResult({ kind: "failed", url, accepts: EVERY_MEDIA_KIND, reason: result.error });
+          return;
+        }
+        setImportResult({
+          kind: "imported",
+          key: result.asset.id,
+          name: result.asset.name,
+          type: getAssetTypeFromMime(file.type) ?? "image",
+        });
+      } catch (err) {
+        setImportResult({
+          kind: "failed",
+          url,
+          accepts: EVERY_MEDIA_KIND,
+          reason: err instanceof UrlImportError || !(err instanceof Error) ? undefined : err.message,
+        });
+      }
+    },
+    [composer, state.currentFolderId],
+  );
+
+  /* `View asset` (3695:43873 / 3695:45573): the details rail IS the asset's
+     details — the prototype's Asset details dialog (3721:45823) is not built,
+     its sub-dialogs say "Prototype preview only". A smart scope that would
+     hide a file placed nowhere ("In use") is released, and select mode's
+     checked-set rail gives way to the card. */
+  const viewAsset = React.useCallback(
+    (key: string) => {
+      if (state.selMode) state.toggleSelMode();
+      setSmartFolder(null);
+      setSelectedAssetId(key);
+    },
+    [state],
+  );
 
   /* Clone 3700:20353 — "Upload files or move existing assets into this
      folder": files picked while a folder is the scope land IN that folder,
@@ -474,7 +526,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         {/* Upload is the primary — it is the action the library exists for.
             Stock was primary here until the Clone walk. */}
         <div className="mgr-right">
-          <Button className="mgr-btn" data-testid="mgr-btn-import" onClick={() => setImportUrlOpen(true)}>
+          <Button
+            className="mgr-btn"
+            data-testid="mgr-btn-import"
+            onClick={() => {
+              setImportDraft("");
+              setImportUrlOpen(true);
+            }}
+          >
             <Download size={14} />
             Import URL
           </Button>
@@ -647,26 +706,36 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onChange={handleFileChange}
       />
       {/* Modals */}
+      {/* Clone 3695:45569 → 3695:45573: Save to library lands the file and
+          the dialog gives way to the result; a refused save (null, toasted
+          by the hook) keeps the dialog open with its selection. Insert is
+          gone — stock saves to the library, the canvas is untouched. */}
       <StockSourceModal
         open={stockModalOpen}
         onClose={() => setStockModalOpen(false)}
-        activeType={state.activeType}
         photos={state.stockPhotos}
         videos={state.stockVideos}
         icons={state.discIcons}
-        fonts={state.discFonts}
         loading={state.discLoading}
         searchQuery={state.discoverySearch}
         searchFailed={state.searchFailed}
-        orientation={state.discOrientation}
-        color={state.discColor}
         onSearch={state.discSearchAll}
-        onSetOrientation={state.setDiscOrientation}
-        onSetColor={state.setDiscColor}
         onLoadMore={state.loadMoreDisc}
-        onSave={state.saveToLibrary}
-        onInsert={insertAndReturn}
+        onSave={async (type, item) => {
+          const saved = await state.saveToLibrary(type, item);
+          if (saved) {
+            setStockModalOpen(false);
+            setStockSaved(saved);
+          }
+        }}
         onOpenIconPicker={handleOpenIconPicker}
+      />
+      <StockSavedModal
+        saved={stockSaved}
+        onClose={() => setStockSaved(null)}
+        onViewAsset={() => {
+          if (stockSaved) viewAsset(stockSaved.key);
+        }}
       />
       {state.confirmDelete && (
         <ConfirmDeleteModal
@@ -708,8 +777,20 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       )}
       <ImportUrlModal
         open={importUrlOpen}
+        initialUrl={importDraft}
         onClose={() => setImportUrlOpen(false)}
         onImport={handleImportFromUrl}
+      />
+      <ImportResultModal
+        result={importResult}
+        onClose={() => setImportResult(null)}
+        onViewAsset={() => {
+          if (importResult?.kind === "imported") viewAsset(importResult.key);
+        }}
+        onEditUrl={(url) => {
+          setImportDraft(url);
+          setImportUrlOpen(true);
+        }}
       />
       <CreateFolderModal
         open={createFolderOpen}

@@ -51,8 +51,22 @@ export function useFocusTrap(active: boolean, onEscape?: () => void) {
 
     focusables()[0]?.focus();
 
+    /**
+     * Only the TOPMOST open dialog answers Escape. Every trap listens on the
+     * document, and `stopPropagation` does not stop a sibling listener on the
+     * same node — so with one dialog over another (the picker's From URL
+     * opens Import image from URL over the picker, Clone 3397:18835) a
+     * single Escape closed both. The overlay root appends in mount order, so
+     * the last `aria-modal` dialog in the document is the one on top.
+     */
+    const isTopmost = () => {
+      const dialogs = document.querySelectorAll('[role="dialog"][aria-modal="true"]');
+      return dialogs.length === 0 || dialogs[dialogs.length - 1] === container;
+    };
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (!isTopmost()) return;
         e.stopPropagation();
         escapeRef.current?.();
         return;

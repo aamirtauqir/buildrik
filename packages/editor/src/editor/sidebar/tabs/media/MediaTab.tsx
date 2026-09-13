@@ -14,7 +14,6 @@ import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
 import { MediaContextMenu } from "./components/MediaContextMenu";
-import { StockSourceModal } from "./components/StockSourceModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { TypePills } from "./components/TypePills";
@@ -65,12 +64,10 @@ function MediaTabWithComposer({
   composer,
   onClose,
   onOpenImageEditor,
-  onOpenIconPicker,
   onOpenLibrary,
 }: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
   const { addToast } = useToast();
-  const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [iconBrowserOpen, setIconBrowserOpen] = React.useState(false);
   /*
     Boards 303:1997 / 303:2032 draw a status pill over the grid while a
@@ -210,58 +207,14 @@ function MediaTabWithComposer({
     fileInput.click();
   }, [composer, state]);
 
-  // ─── Panel mode: slim launcher (320px) or expanded panel (560px) ────
-  const handleOpenIconPicker = React.useCallback(() => {
-    if (!onOpenIconPicker) return;
-    onOpenIconPicker(undefined, (icon) => {
-      try {
-        const result = composer.mediaOps.insertMedia(icon.name, "icon");
-        if (result) {
-          showToast(`${icon.name} icon added ✓`, "success");
-        }
-      } catch {
-        showToast("Could not add icon", "error");
-      }
-    });
-  }, [onOpenIconPicker, composer, showToast]);
-
-  // Stock modal mounts in EVERY mode — SlimLauncher's "+ Stock" used to set
-  // state that only the fullpage branch rendered (dead button, found in the
-  // P5 live walk).
-  const stockModal = (
-    <StockSourceModal
-      open={stockModalOpen}
-      onClose={() => setStockModalOpen(false)}
-      activeType={state.activeType}
-      photos={state.stockPhotos}
-      videos={state.stockVideos}
-      icons={state.discIcons}
-      fonts={state.discFonts}
-      loading={state.discLoading}
-      searchQuery={state.discoverySearch}
-      searchFailed={state.searchFailed}
-      orientation={state.discOrientation}
-      color={state.discColor}
-      onSearch={state.discSearchAll}
-      onSetOrientation={state.setDiscOrientation}
-      onSetColor={state.setDiscColor}
-      onLoadMore={state.loadMoreDisc}
-      onSave={(type, item) => {
-        state.saveToLibrary(type, item);
-        // Don't close modal — let user save multiple items
-      }}
-      onInsert={state.insertToCanvas}
-      onOpenIconPicker={handleOpenIconPicker}
-    />
-  );
-
   /*
     Mounted by EVERY branch, not just the fullpage one. The detail overlay and
     the delete confirm used to live inside the fullpage return, so the drawer —
     the surface the board's five drill-ins hang off — could not reach
-    asset-detail, versions or used-in at all. Same shape as the `stockModal`
-    note above: a modal that only one of three renderers mounts is a feature
-    that exists for a third of its users.
+    asset-detail, versions or used-in at all. A modal that only one of three
+    renderers mounts is a feature that exists for a third of its users. (A
+    StockSourceModal mount sat here until Clone Phase 3 with nothing that ever
+    opened it — the drawer's Browse stock opens StockBrowserOverlay.)
   */
   const sharedOverlays = (
     <>
@@ -407,7 +360,6 @@ function MediaTabWithComposer({
           }}
         />
       )}
-      {stockModal}
       {sharedOverlays}
       </>
     );

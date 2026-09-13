@@ -2546,7 +2546,7 @@ const CASES: Record<string, () => React.ReactElement> = {
      product cannot reach. */
   "media-import-url": () => (
     <div data-probe="media-import-url">
-      <ImportUrlModal open onClose={() => {}} onImport={() => {}} />
+      <ImportUrlModal open onClose={() => {}} onImport={() => Promise.resolve()} />
     </div>
   ),
   "media-drawer-filtered": () => (
