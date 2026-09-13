@@ -244,7 +244,13 @@ export function SiteFontsModal({ composer }: SiteFontsModalProps) {
             className="tw:mt-3"
             data-testid="site-fonts-search"
           />
-          <h3 className={`${LIBRARY_MODAL_BODY} tw:mt-3 tw:font-normal`} data-testid="site-fonts-section">
+          {/* A heading, so the list has a landmark — sized like the body line
+              above it, since the overlay root's reset leaves the UA's 1.17em
+              on headings. */}
+          <h3
+            className={`${LIBRARY_MODAL_BODY} tw:mt-3 tw:text-[length:var(--bk-text-13)] tw:font-normal`}
+            data-testid="site-fonts-section"
+          >
             Uploaded fonts
           </h3>
           {fonts.length === 0 ? (
