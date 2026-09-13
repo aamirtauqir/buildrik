@@ -302,30 +302,52 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      lives here rather than in the rail. */
   const [replacePickerOpen, setReplacePickerOpen] = React.useState(false);
   /* Clone 3695:43897 → 3695:43900 / 3695:43903 — the run the picker started:
-     its two srcs, the placements it is about to update (the busy line names
-     their pages) and, once the engine has answered, the ids either way. */
+     the srcs it replaces, the new src, the placements it is about to update
+     (the busy line names their pages) and, once the engine has answered,
+     the ids either way. The srcs are the FAMILY's (`familyOf`): the picker's
+     "across 1 use" counts a placement sitting on an applied version, so the
+     run must reach that version's src too, not only the original's — walked
+     live 2026-09-14, a family whose one placement was on v2 reported
+     "0 of 0 uses updated" and the canvas kept v2. */
   const [replaceRun, setReplaceRun] = React.useState<{
-    oldSrc: string;
+    sources: string[];
     newSrc: string;
     targets: string[];
     result: ReplaceOutcome | null;
   } | null>(null);
 
-  const runReplaceAcross = React.useCallback(
-    (oldSrc: string, newSrc: string) => {
-      const targets = composer.elements.findByMediaSrc(oldSrc).map((el) => el.getId());
-      setReplaceRun({ oldSrc, newSrc, targets, result: null });
-      /* A microtask later, so the busy card paints before the synchronous run.
-         A throw is the engine's rollback — nothing changed, so every target
-         is a failed placement the card can offer to retry. */
-      Promise.resolve()
-        .then(() => resultIds(composer.mediaOps.replaceAcross(oldSrc, newSrc)))
-        .catch((): ReplaceOutcome => ({ replaced: [], failed: targets }))
-        .then((result) => {
-          setReplaceRun((prev) => (prev && prev.oldSrc === oldSrc && prev.newSrc === newSrc ? { ...prev, result } : prev));
-        });
+  /* One `replaceAcross` per src, each its own undo step, merged into one
+     outcome. A throw is the engine's rollback of that src's run — nothing
+     changed, so its placements are failed ones the card can offer to retry. */
+  const replaceSources = React.useCallback(
+    (sources: string[], newSrc: string): ReplaceOutcome => {
+      const outcome: ReplaceOutcome = { replaced: [], failed: [] };
+      for (const src of sources) {
+        try {
+          const result = resultIds(composer.mediaOps.replaceAcross(src, newSrc));
+          outcome.replaced.push(...result.replaced);
+          outcome.failed.push(...result.failed);
+        } catch {
+          outcome.failed.push(...composer.elements.findByMediaSrc(src).map((el) => el.getId()));
+        }
+      }
+      return outcome;
     },
     [composer],
+  );
+
+  const runReplaceAcross = React.useCallback(
+    (sources: string[], newSrc: string) => {
+      const targets = sources.flatMap((src) => composer.elements.findByMediaSrc(src).map((el) => el.getId()));
+      setReplaceRun({ sources, newSrc, targets, result: null });
+      /* A microtask later, so the busy card paints before the synchronous run. */
+      Promise.resolve()
+        .then(() => replaceSources(sources, newSrc))
+        .then((result) => {
+          setReplaceRun((prev) => (prev && prev.sources === sources && prev.newSrc === newSrc ? { ...prev, result } : prev));
+        });
+    },
+    [composer, replaceSources],
   );
 
   /* ─── P2-B Move & drag ─────────────────────────────────────────────── */
@@ -904,7 +926,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           replacePickerOpen={replacePickerOpen}
           onReplacePickerOpenChange={setReplacePickerOpen}
           onReplaceAcross={(candidate) => {
-            if (selectedItem) runReplaceAcross(selectedItem.src, candidate.src);
+            if (!selectedItem) return;
+            const sources = versions.length > 0 ? versions.map((v) => v.item.src) : [selectedItem.src];
+            runReplaceAcross(sources, candidate.src);
           }}
           composer={composer}
           addToast={addToast}
@@ -1163,9 +1187,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           replaced={replaceRun.result?.replaced ?? []}
           failed={replaceRun.result?.failed ?? []}
           busy={replaceRun.result ? undefined : { label: replacingLabel(composer, replaceRun.targets) }}
-          /* The updated placements no longer match the old src, so the
-             engine's whole-site run reaches only the ones that failed. */
-          onRetry={async () => resultIds(composer.mediaOps.replaceAcross(replaceRun.oldSrc, replaceRun.newSrc))}
+          /* The updated placements no longer match their old src, so the
+             same sources run again reach only the ones that failed. */
+          onRetry={async () => replaceSources(replaceRun.sources, replaceRun.newSrc)}
           onDone={() => setReplaceRun(null)}
         />
       )}

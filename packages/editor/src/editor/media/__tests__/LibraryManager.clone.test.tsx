@@ -1319,4 +1319,20 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
     expect(screen.getByTestId("apply-version-body")).toHaveTextContent("Nothing on the site uses hero-dark.jpg yet");
     expect(composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
   });
+
+  /* Walked live 2026-09-14: the placements sat on the applied v2, the rail's
+     picker counted them ("across 3 uses"), and the run replaced only the
+     original's src — "0 of 0 uses updated", the canvas kept v2. */
+  it("Replace across site… on a family whose placements sit on an applied version reaches that version's src", async () => {
+    const { composer, placements } = await mountVersions({ family: [HERO, HERO_V2], on: "blob:hero-v2" });
+    selectHero();
+    fireEvent.click(rail().getByRole("button", { name: "Replace across site…" }));
+    const picker = screen.getByText(/across 3 uses/).closest('[role="dialog"]') as HTMLElement;
+    fireEvent.click(within(picker).getByText("menu-cover.png"));
+    await screen.findByText("Replacement complete");
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:menu");
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero-v2", "blob:menu");
+    expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
+    expect(placements.src).toBe("blob:menu");
+  });
 });
