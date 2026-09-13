@@ -9,11 +9,17 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "picker-view-toggle"
+      "testId": "picker-tabs"
     }
   ],
   "contrastScope": "body",
   "_note": [
+    "SUPERSEDED BY THE CLONE 2026-09-13 (Assets Phase 3, P3-I): 3397:18325 'Choose an image' re-drew the picker —",
+    "segmented Library / Upload / From URL (no Optimize tab, no Grid/List toggle), 'Search library' over the field,",
+    "3-column cards with usage, a hint from the upload gate's own tables, Cancel · Use selected image. The 1746:8390",
+    "view-toggle target is dropped with the toggle; title / for-label / tabs stay as regression anchors until the Clone",
+    "frame is extracted. Original note follows.",
+    "",
     "CONTRAST SCOPE IS `body`. ModalRoot PORTALS to the overlay root, so",
     "`[data-probe]` contains none of this dialog and a probe-scoped sweep",
     "reports 0 failures from an empty subtree — the silence measure.mjs now",
@@ -94,12 +100,6 @@
       "testId": "picker-tabs",
       "spec": "media-modal-picker",
       "nodeId": "1173:4804"
-    },
-    {
-      "name": "view-toggle",
-      "testId": "picker-view-toggle",
-      "spec": "media-modal-picker",
-      "nodeId": "1746:8390"
     }
   ]
 }

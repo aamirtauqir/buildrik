@@ -14,6 +14,3 @@ export type { ImageEditorModalProps } from "./ImageEditorModal";
 
 export { IconPickerModal } from "./IconPickerModal";
 export type { IconPickerModalProps } from "./IconPickerModal";
-
-export { VideoPreview } from "./VideoPreview";
-export type { VideoPreviewProps } from "./VideoPreview";
