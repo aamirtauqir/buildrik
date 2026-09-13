@@ -385,6 +385,17 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             ./components/AssetDetailsPanel.tsx now. */}
         <AssetDetailsPanel
           selectedItem={selectedItem}
+          bulk={
+            state.selMode
+              ? {
+                  names: state.libraryItems
+                    .filter((i) => state.selectedKeys.has(i.key))
+                    .map((i) => i.displayName ?? i.name),
+                  onDelete: () =>
+                    state.requestBulkDelete(state.libraryItems.filter((i) => state.selectedKeys.has(i.key))),
+                }
+              : null
+          }
           versions={versions}
           usageCount={usageCount}
           usedIn={usedIn}

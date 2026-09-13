@@ -16,6 +16,7 @@ import type {
   MediaStateResult,
 } from "../../../sidebar/tabs/media/data/mediaTypes";
 import { AssetGrid } from "../AssetGrid";
+import { makeMediaState } from "../../__tests__/libraryFixture";
 
 function makeItem(over: Partial<LibraryItem> = {}): LibraryItem {
   return {
@@ -32,79 +33,10 @@ function makeItem(over: Partial<LibraryItem> = {}): LibraryItem {
   } as LibraryItem;
 }
 
+/* The one typed builder lives in ../../__tests__/libraryFixture.tsx; this file
+   only pins the two defaults its older assertions were written against. */
 function makeState(over: Partial<MediaStateResult> = {}): MediaStateResult {
-  const noop = vi.fn();
-  return {
-    activeType: "all",
-    setType: vi.fn(),
-    currentFolderId: null,
-    setCurrentFolderId: noop,
-    libraryItems: [],
-    folders: [],
-    createFolder: vi.fn(),
-    deleteFolder: vi.fn(),
-    moveAsset: vi.fn(),
-    bulkMoveAssets: vi.fn(),
-    uploadQueue: [],
-    counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
-    sort: "date",
-    sortDir: "desc",
-    gridN: 3,
-    fmtFilter: "",
-    activeTypes: new Set(),
-    toggleType: vi.fn(),
-    setFmtFilter: vi.fn(),
-    setGridN: vi.fn(),
-    selectAll: vi.fn(),
-    toggleSelMode: vi.fn(),
-    selMode: false,
-    selectedKeys: new Set<string>(),
-    setSort: vi.fn(),
-    toggleSelect: vi.fn(),
-    upload: noop,
-    failedUploads: [],
-    dismissFailedUploads: noop,
-    requestDelete: noop,
-    requestBulkDelete: vi.fn(),
-    executeDelete: vi.fn(),
-    cancelDelete: noop,
-    confirmDelete: null,
-    insertToCanvas: vi.fn(),
-    renameItem: vi.fn(),
-    updateItem: vi.fn(),
-    stockPhotos: [],
-    stockVideos: [],
-    discIcons: [],
-    discFonts: [],
-    discLoading: { img: false, vid: false, ico: false, fnt: false },
-    discoverySearch: "",
-    isDiscoveryEmpty: true,
-    discOrientation: "all",
-    discColor: "all",
-    discSearchAll: noop,
-    setDiscOrientation: noop,
-    setDiscColor: noop,
-    loadMoreDisc: vi.fn(),
-    saveToLibrary: vi.fn(),
-    panelDragOver: false,
-    handlePanelDragEnter: noop,
-    handlePanelDragLeave: noop,
-    handlePanelDragOver: noop,
-    handlePanelDrop: noop,
-    librarySearch: "",
-    setLibrarySearch: noop,
-    storage: { used: 0, total: 1024 },
-    copyUrl: noop,
-    ctxMenu: null,
-    openCtxMenu: vi.fn(),
-    closeCtxMenu: noop,
-    detailItem: null,
-    openDetail: noop,
-    closeDetail: noop,
-    selectionContext: null,
-    setSelectionContext: noop,
-    ...over,
-  } as MediaStateResult;
+  return makeMediaState({ fmtFilter: "", storage: { used: 0, total: 1024 }, ...over });
 }
 
 function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGrid>[0]> = {}) {
@@ -188,11 +120,15 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
     expect(state.setGridN).toHaveBeenCalledWith(4);
   });
 
-  it("select-all lives in the toolbar, not only inside the bulk bar", () => {
-    const state = makeState({ selMode: false });
-    mount(state);
-    fireEvent.click(screen.getByLabelText("Select all assets"));
-    expect(state.selectAll).toHaveBeenCalled();
+  // Clone 3695:19968 — the toolbar's ☑ enters select mode as the List with
+  // nothing checked. Select-all moved to the list header's checkbox.
+  it("the toolbar's ☑ enters select mode as the list, and selects nothing", () => {
+    const state = makeState({ selMode: false, libraryItems: [makeItem({ key: "a" })] });
+    const { container } = mount(state);
+    fireEvent.click(screen.getByLabelText("Select files"));
+    expect(state.toggleSelMode).toHaveBeenCalledTimes(1);
+    expect(state.selectAll).not.toHaveBeenCalled();
+    expect(container.querySelector(".mgr-list")).toBeInTheDocument();
   });
 });
 
@@ -320,7 +256,9 @@ describe("AssetGrid — bulk toolbar", () => {
   // Board 1163:4641 bar: count left, then Move to folder… · Download ·
   // Delete · ✕ Clear. Select-all left for the toolbar, where it is reachable
   // before anything is selected.
-  it("the bulk bar carries the board's four actions and Clear exits", () => {
+  // Clone 3695:19968 — ✕ Clear empties the set and STAYS in select mode;
+  // the toolbar's ☑ is the way out.
+  it("the bulk bar carries the board's four actions and Clear empties the set", () => {
     const state = bulkState();
     mount(state);
     expect(screen.getByText("Move to folder…")).toBeInTheDocument();
@@ -328,7 +266,8 @@ describe("AssetGrid — bulk toolbar", () => {
     expect(screen.getByText("Delete")).toBeInTheDocument();
     expect(screen.queryByText("Select all")).toBeNull();
     fireEvent.click(screen.getByText("✕ Clear"));
-    expect(state.toggleSelMode).toHaveBeenCalled();
+    expect(state.clearSelection).toHaveBeenCalled();
+    expect(state.toggleSelMode).not.toHaveBeenCalled();
   });
 });
 

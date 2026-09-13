@@ -323,13 +323,19 @@ export function AssetGrid({
           )}
         </div>
 
-        {/* Board's ☑ — select-all lives in the toolbar, not only in the
-            bulk bar you can't reach until something is already selected. */}
+        {/* Clone 3695:19968 — the toolbar's ☑ ENTERS select mode: the List with
+            its checkbox column and nothing checked ("Assets · List · no
+            selection"). It used to select every file at once (V1 1163:4641's
+            reading); select-all now lives in the list header's checkbox, where
+            a person expects it. Pressing it again leaves select mode. */}
         <Button
           className="mgr-selectall"
-          aria-label={state.selMode ? "Clear selection" : "Select all assets"}
-          title={state.selMode ? "Clear selection" : "Select all"}
-          onClick={() => (state.selMode ? state.toggleSelMode() : state.selectAll())}
+          aria-label={state.selMode ? "Exit select mode" : "Select files"}
+          aria-pressed={state.selMode}
+          onClick={() => {
+            if (!state.selMode) setViewMode("list");
+            state.toggleSelMode();
+          }}
         >
           <CheckSquare size={13} />
         </Button>
@@ -426,7 +432,7 @@ export function AssetGrid({
           >
             Delete
           </Button>
-          <Button variant="link" className={BULK_LINK_MUTED} onClick={state.toggleSelMode}>
+          <Button variant="link" className={BULK_LINK_MUTED} onClick={state.clearSelection}>
             ✕ Clear
           </Button>
         </div>
@@ -476,8 +482,25 @@ export function AssetGrid({
       )}
 
       {visibleItems.length > 0 && viewMode === "list" && (
-        <div className="mgr-list-head" aria-hidden="true" data-testid="mgr-list-head">
-          <span />
+        <div className="mgr-list-head" data-testid="mgr-list-head">
+          {(() => {
+            const all = visibleItems.length > 0 && visibleItems.every((i) => state.selectedKeys.has(i.key));
+            return (
+              <span
+                className={`mgr-list-check${all ? " on" : ""}`}
+                role="checkbox"
+                aria-checked={all}
+                aria-label="Select all files"
+                onClick={() => {
+                  if (!state.selMode) state.toggleSelMode();
+                  if (all) state.toggleSelMode();
+                  else state.selectAll();
+                }}
+              >
+                {all ? <Check size={10} /> : null}
+              </span>
+            );
+          })()}
           <span>Name</span>
           <span>Type</span>
           <span>Size</span>

@@ -776,6 +776,19 @@
   color: var(--bk-ink-muted);
 }
 
+.mgr-det-heading {
+  margin: 0;
+  font-size: var(--bk-text-16);
+  font-weight: 600;
+  color: var(--bk-ink);
+}
+
+.mgr-det-hint {
+  margin: 0;
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink-soft);
+}
+
 .mgr-det-used-line {
   margin: 0;
   font-size: var(--bk-text-12);
@@ -790,6 +803,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-8);
+}
+
+.mgr-det-actions--inline {
+  padding: var(--bk-space-8) 0 0;
+  border-top-width: 0;
 }
 
 .mgr-det-actions-row {

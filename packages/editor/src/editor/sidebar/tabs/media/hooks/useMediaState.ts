@@ -375,6 +375,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     shiftSelect: selection.shiftSelect,
     enterSelectModeWith: selection.enterSelectModeWith,
     checkInUse: selection.checkInUse,
+    clearSelection: selection.clearSelection,
     failedUploads: upload.failedUploads,
     dismissFailedUploads: upload.dismissFailedUploads,
     upload: upload.upload,

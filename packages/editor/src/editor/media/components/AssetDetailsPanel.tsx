@@ -70,6 +70,10 @@ interface ToastInput {
 
 export interface AssetDetailsPanelProps {
   selectedItem: LibraryItem | null;
+  /** Clone 3695:19968 / 20154 — while the library is in select mode the rail
+   *  is about the CHECKED set, not one file: "No assets selected" with its
+   *  hint, or "1 asset selected" with the filename and a Delete. */
+  bulk?: { names: string[]; onDelete(): void } | null;
   versions: LibraryItem[];
   usageCount: number;
   /** Page names the asset is placed on — the USED IN line names them
@@ -114,6 +118,7 @@ export interface AssetDetailsPanelProps {
 
 export function AssetDetailsPanel({
   selectedItem,
+  bulk = null,
   versions,
   usageCount,
   usedIn,
@@ -131,6 +136,32 @@ export function AssetDetailsPanel({
 }: AssetDetailsPanelProps) {
   const [replaceAllPickerOpen, setReplaceAllPickerOpen] = React.useState(false);
   const [regenerating, setRegenerating] = React.useState(false);
+
+  if (bulk) {
+    const n = bulk.names.length;
+    return (
+      <div className="mgr-details" data-testid="mgr-details">
+        <div className="mgr-det-body">
+          <h3 className="mgr-det-heading">{n === 0 ? "No assets selected" : `${n} ${n === 1 ? "asset" : "assets"} selected`}</h3>
+          <p className="mgr-det-hint">
+            {n === 0
+              ? "Select a file to inspect it. Select checkboxes to manage multiple assets."
+              : n === 1
+                ? `${bulk.names[0]} · Select another file to use bulk actions.`
+                : "Move, download or delete them from the bar above."}
+          </p>
+          {/* 3695:20154 draws Delete right under the hint, not at the foot. */}
+          {n > 0 && (
+            <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-actions">
+              <Button className="mgr-btn danger" onClick={bulk.onDelete}>
+                Delete
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (!selectedItem) {
     return (

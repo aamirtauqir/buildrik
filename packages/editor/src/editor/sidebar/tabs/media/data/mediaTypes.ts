@@ -212,6 +212,8 @@ export interface SelectionStateResult {
    *  and the details rail's USED IN (Clone 3695:20340 — "1 place — Menu
    *  preview") read the same answer. */
   checkInUse(keys: string[]): AssetUsage[];
+  /** Empty the checked set without leaving select mode (the bulk bar's ✕ Clear). */
+  clearSelection(): void;
 }
 
 export type DiscSource = "unsplash" | "pexels" | "pixabay";
@@ -289,6 +291,8 @@ export interface MediaStateResult {
   shiftSelect(key: string): void;
   enterSelectModeWith(key: string): void;
   checkInUse(keys: string[]): AssetUsage[];
+  /** Empty the checked set without leaving select mode (the bulk bar's ✕ Clear). */
+  clearSelection(): void;
   upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
   retryUpload(fileName: string): void;
   /** Board 1163:13948 — drop a failed upload row. */

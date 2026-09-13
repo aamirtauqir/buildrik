@@ -79,6 +79,12 @@ export function useSelectionState(
     [composer]
   );
 
+  /* Clone 3695:19968 — the bulk bar's ✕ Clear empties the checked set and
+     STAYS in select mode ("Assets · List · no selection"); leaving the mode
+     is the toolbar's ☑. It used to leave, which threw the person back to the
+     grid one click after they had asked for checkboxes. */
+  const clearSelection = useCallback(() => setSelectedKeys(new Set()), []);
+
   const toggleSelMode = useCallback(() => {
     setSelMode((v) => {
       if (v) setSelectedKeys(new Set());
@@ -213,5 +219,6 @@ export function useSelectionState(
     shiftSelect,
     enterSelectModeWith,
     checkInUse,
+    clearSelection,
   };
 }

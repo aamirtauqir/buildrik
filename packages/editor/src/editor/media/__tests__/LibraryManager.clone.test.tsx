@@ -129,3 +129,50 @@ describe("Clone 3695:44339 · Assets · Search menu", () => {
     expect(setLibrarySearch).not.toHaveBeenCalled();
   });
 });
+
+describe("Clone 3695:19968 / 20154 · bulk mode", () => {
+  it("the toolbar's ☑ enters select mode as the List with nothing checked, and the rail says so", async () => {
+    const toggleSelMode = vi.fn();
+    await mountLibrary({ toggleSelMode });
+    fireEvent.click(screen.getByRole("button", { name: "Select files" }));
+    expect(toggleSelMode).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("mgr-list-head")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-assets").dataset.view).toBe("list");
+  });
+
+  it("in select mode with nothing checked the rail reads 'No assets selected' and its hint", async () => {
+    await mountLibrary({ selMode: true });
+    expect(screen.queryByTestId("mgr-bulk-bar")).toBeNull();
+    const rail = within(screen.getByTestId("mgr-details"));
+    expect(rail.getByRole("heading", { name: "No assets selected" })).toBeInTheDocument();
+    expect(rail.getByText("Select a file to inspect it. Select checkboxes to manage multiple assets.")).toBeInTheDocument();
+  });
+
+  it("with one file checked the bar and the rail both count it, and the rail offers Delete", async () => {
+    const requestBulkDelete = vi.fn();
+    await mountLibrary({ selMode: true, selectedKeys: new Set(["hero"]), requestBulkDelete });
+    expect(screen.getByTestId("mgr-bulk-count")).toHaveTextContent("1 selected");
+    const rail = within(screen.getByTestId("mgr-details"));
+    expect(rail.getByRole("heading", { name: "1 asset selected" })).toBeInTheDocument();
+    expect(rail.getByText("hero-dark.jpg · Select another file to use bulk actions.")).toBeInTheDocument();
+    fireEvent.click(rail.getByRole("button", { name: "Delete" }));
+    expect(requestBulkDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it("✕ Clear empties the checked set but stays in select mode", async () => {
+    const clearSelection = vi.fn();
+    const toggleSelMode = vi.fn();
+    await mountLibrary({ selMode: true, selectedKeys: new Set(["hero"]), clearSelection, toggleSelMode });
+    fireEvent.click(within(screen.getByTestId("mgr-bulk-bar")).getByRole("button", { name: /Clear/ }));
+    expect(clearSelection).toHaveBeenCalledTimes(1);
+    expect(toggleSelMode).not.toHaveBeenCalled();
+  });
+
+  it("the list header's checkbox selects every file", async () => {
+    const selectAll = vi.fn();
+    await mountLibrary({ selMode: true, selectAll });
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select all files" }));
+    expect(selectAll).toHaveBeenCalledTimes(1);
+  });
+});
