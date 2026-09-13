@@ -83,6 +83,20 @@ across rewrites** — a gap (A1, C4, D5 …) is a row that moved to Cleared. Own
 exactly `designer | founder | coordinator-code | coordinator-figma`. `NN:line` =
 `docs/prd/editor/NN-*.md`. `D2` here ≠ jobs.json `D-02`.
 
+## Assets · Clone Phase 1 — 2026-09-13
+
+Walk record: `docs/design-jobs/CLONE-ASSETS/phase1-journeys.md`; rows in
+`packages/editor/scripts/conformance/boards.json`, family `Assets · Clone`.
+Backend-shaped drift was recorded, not built (grilling Q9).
+
+| row | screen | what the Clone draws | why code cannot (yet) | owner |
+|---|---|---|---|---|
+| **C1** storage footer | 3695:45155 | `24 assets · 84 MB / 500 MB` — bytes actually held on the server against the plan's quota | The footer prints `useServerStorageQuota` when the server answers and the local IndexedDB total (`1 MB / 524 MB`) otherwise. With no `BLOB_READ_WRITE_TOKEN` nothing reaches the server, so the real-bytes half cannot be verified here; the shape is right. | env / dashboard |
+| **C2** "N not on the server" pill | every library screen | `⚠ 2 not on the server` | NOT a defect. It is the accepted local-only env (Q5): every upload in this dev tree is `localOnly` because the Blob token is absent. Do not file it. | — |
+| **C3** TAGS rail | 3695:45155 | `menu · team · food` chips under the folders | Tags are editor-local: `MediaAsset.tags` lives in IndexedDB and `server/services/media.service.ts` has no `tags`. The rail renders when tags exist, per browser only. Phase 3 (tag journeys) needs a `tags` column + service field. | server |
+| **C4** Manage font | 3696:21550 | `Manage font` opens the Site fonts overlay; an uploaded font appears in the Typography picker | Font uploads are accepted now (they were refused outright), but nothing calls `FontManager.uploadFont`, so an uploaded font is stored and not usable. The overlay is a Phase 5 board. Editor-side, not backend — parked with the phase that owns the board. | editor, Phase 5 |
+| **C5** uploaded image applied | 3695:43991 | the asset came through a real upload | Same env as C1/C2 — unreachable without the token; the apply path (3695:44165) passed. | env |
+
 ## Counts
 
 | class | blockers (was) | jobs stopped |

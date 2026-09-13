@@ -8,7 +8,10 @@ screen indices each edge appears on).
 
 ## Live env
 
-_(filled in Task 3)_
+- Unified editor `http://localhost:3000/edit/scratchver0000000000000001` (site `scratch-ver`, workspace "E2E Blank WS"; the free plan's 3/3 site cap blocked a fresh site).
+- Login: seeded e2e QA account via the magic-link `auth.setup.ts` path; cookies imported into gstack `/browse`. Viewport 1440×900.
+- Library seeded through the UI's file input with the 10 fixtures in `packages/editor/e2e/fixtures/clone-assets/`. No `BLOB_READ_WRITE_TOKEN`, so all 10 are `localOnly` ("10 not on the server") — accepted env, Q5. Rasters are transcoded to `.webp` by the upload pipeline (code:auto-webp), so the on-screen names read `hero-dark.webp` etc.
+- Figma calls spent today: 29 of the 40 agreed (9 before the plan, 18 screenshots, 1 dragging-frame lookup, 1 dragging-frame shot).
 
 ## The 19 screens
 
@@ -69,28 +72,36 @@ Other shape facts from the shots:
 - Footer: `24 assets · 84 MB / 500 MB` left; quota bar + `⚠ 2 not on the server` pill right.
 - Canvas after Insert (3695:20614): the selected Image element's src changes; inspector `Image source` block reads `Menu preview · Image · menu-cover.png` with a `Choose image` button.
 
-## Drift table (filled during Tasks 3–9)
+## Drift table
 
-Verdict vocabulary = boards.json: `match` · `drift-fixed` · `drift-open` · `unreachable`.
+Verdict vocabulary = boards.json: `match` · `drift-fixed` · `drift-open` · `unreachable`. Every row is also in `packages/editor/scripts/conformance/boards.json` (family `Assets · Clone`, `page: 3397:13062`) with the full note.
 
 | screen | journey | live shot | verdict | note |
 |---|---|---|---|---|
-| 3695:45155 | J-A | shots/live-3695-45155.png | | |
-| 3695:20340 | J-B | shots/live-3695-20340.png | | |
-| 3696:20326 | J-B | shots/live-3696-20326.png | | |
-| 3696:20530 | J-B | shots/live-3696-20530.png | | |
-| 3696:20734 | J-B | shots/live-3696-20734.png | | |
-| 3696:20938 | J-B | shots/live-3696-20938.png | | |
-| 3696:21142 | J-B | shots/live-3696-21142.png | | |
-| 3696:21346 | J-B | shots/live-3696-21346.png | | |
-| 3696:21550 | J-B | shots/live-3696-21550.png | | |
-| 3696:21754 | J-B | shots/live-3696-21754.png | | |
-| 3695:44543 | J-C | shots/live-3695-44543.png | | |
-| 3695:44747 | J-C | shots/live-3695-44747.png | | |
-| 3695:44339 | J-D | shots/live-3695-44339.png | | |
-| 3695:44951 | J-E | shots/live-3695-44951.png | | |
-| 3695:19968 | J-F | shots/live-3695-19968.png | | |
-| 3695:20154 | J-F | shots/live-3695-20154.png | | |
-| 3695:20614 | J-G | shots/live-3695-20614.png | | |
-| 3695:43991 | J-G | shots/live-3695-43991.png | | |
-| 3695:44165 | J-G | shots/live-3695-44165.png | | |
+| 3695:45155 | J-A | shots/live-3695-45155.png | drift-fixed | full-viewport overlay; title/header/count line/view words/sort/cards/video tile/rail 378; 32px controls kept (founder:density-32); Trash row + .webp names + WEBP chip kept (code) |
+| 3695:20340 | J-B | shots/live-3695-20340.png | drift-fixed | one-column rail, per-type actions, USED IN names pages, Replace across disabled at 0 |
+| 3696:20326 | J-B | shots/live-3696-20326.png | drift-fixed | no Edit image for video; `<video>` preview replaces the broken `<img>` |
+| 3696:20530 | J-B | shots/live-3696-20530.png | match | 'Selected asset · JPG' fallback |
+| 3696:20734 | J-B | shots/live-3696-20734.png | match | |
+| 3696:20938 | J-B | shots/live-3696-20938.png | match | |
+| 3696:21142 | J-B | shots/live-3696-21142.png | match | |
+| 3696:21346 | J-B | shots/live-3696-21346.png | match | |
+| 3696:21550 | J-B | shots/live-3696-21550.png | drift-open | reachable now (font uploads were impossible); 'Manage font' waits for the Site fonts overlay (Phase 5) |
+| 3696:21754 | J-B | shots/live-3696-21754.png | match | |
+| 3695:44543 | J-C | shots/live-3695-44543.png | drift-fixed | '2' = two per row; selection preserved (A01) |
+| 3695:44747 | J-C | shots/live-3695-44747.png | drift-fixed | same |
+| 3695:44339 | J-D | shots/live-3695-44339.png | drift-fixed | '1 result for "menu"'; library-only search (no stock toast); input fills the field. Open, minor: the Clone's query chip in the field |
+| 3695:44951 | J-E | shots/live-3695-44951.png | drift-fixed | 'Date added' / 'Name A–Z' |
+| 3695:19968 | J-F | shots/live-3695-19968.png | drift-fixed | ☑ enters select mode; header select-all; rail copy; Clear stays in mode; IMG/VID/SVG/FONT |
+| 3695:20154 | J-F | shots/live-3695-20154.png | drift-fixed | bar + '1 asset selected' rail + Delete |
+| 3695:20614 | J-G | shots/live-3695-20614.png | drift-fixed | Insert replaces the selected image, library closes (A03); usage ×1 after (A04) |
+| 3695:43991 | J-G | — | unreachable | needs a server-synced upload (no Blob token); the apply path is 44165's and passed |
+| 3695:44165 | J-G | shots/live-3695-44165.png | drift-fixed | new Image inserted + selected, library closes; mp4 → Video, svg → Svg |
+| (4207:26629) | J-H | shots/4207-26629.png | drift-open | drag state is "dragging over folders" — a move-to-folder journey, Phase 2 |
+| — | J-I | — | match | Import URL · Stock · Rename · Delete · Edit image · Replace across all cancel back with selection + scope intact, one dialog at a time (A06) |
+
+## Not verified in this phase
+
+- Server-synced usage, stock search results, published-page usage — no `BLOB_READ_WRITE_TOKEN` / `PEXELS_API_KEY` (Q5).
+- Placement of inserted elements on the page (Phase 4 boards).
+- Selection persistence when the search filters the selected asset OUT: the rail empties while the query is active and the selection returns when it clears — left as the code's reading; the Clone only shows a matching selection.

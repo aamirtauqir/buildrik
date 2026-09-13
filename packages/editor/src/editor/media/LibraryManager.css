@@ -58,7 +58,7 @@
   flex: 1;
   max-width: 560px;
   margin-left: auto;
-  height: 32px;
+  height: var(--bk-size-row);
   border: 1px solid var(--bk-border, #D1D9E6);
   border-radius: 4px;
   background: var(--bk-bg-subtle, var(--bk-bg-subtle));
@@ -116,7 +116,7 @@
 .mgr-top .mgr-btn,
 .mgr-top .mgr-btn-primary,
 .mgr-top .mgr-close {
-  height: 32px;
+  height: var(--bk-size-row);
   min-height: 0;
 }
 
@@ -177,7 +177,7 @@
   /* Clone 3695:20340 — 240 rail · grid · 378 details (the V1 board's 320
      details column is displaced; the Clone's rail holds the two-up
      Edit image | Rename row at full width). */
-  grid-template-columns: 240px 1fr 378px;
+  grid-template-columns: var(--bk-size-nav) 1fr 378px;
   min-height: 0;
   overflow: hidden;
 }
@@ -769,7 +769,7 @@
 
 .mgr-det-label {
   margin: 0;
-  font-size: 10px;
+  font-size: var(--bk-text-11);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -822,7 +822,7 @@
   flex: none;
   width: 100%;
   min-width: 0;
-  height: 32px;
+  height: var(--bk-size-row);
   min-height: 0;
   font-size: 12px;
   padding: 0 var(--bk-space-12);

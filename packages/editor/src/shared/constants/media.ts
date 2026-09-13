@@ -235,7 +235,7 @@ export function isAllowedAudioType(mimeType: string): boolean {
 /**
  * Check if a MIME type is allowed for fonts
  */
-export function isAllowedFontType(mimeType: string): boolean {
+function isAllowedFontType(mimeType: string): boolean {
   return (ALLOWED_MIME_TYPES.FONT as readonly string[]).includes(mimeType);
 }
 
