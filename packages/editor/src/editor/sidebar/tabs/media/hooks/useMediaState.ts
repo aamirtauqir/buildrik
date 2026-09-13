@@ -77,7 +77,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
   // Returns null on offline / unconfigured / auth-fail — useUploadState falls back to local.
   const serverQuota = useServerStorageQuota(composer);
   const upload = useUploadState(composer, showToast, serverQuota.quota);
-  const selection = useSelectionState(composer, library.libraryItems, showToast);
+  const selection = useSelectionState(composer, library.libraryItems, showToast, library.versionsOf);
   const discovery = useDiscoveryState(composer, showToast);
 
   // Recompute usageMap when library or page graph changes.

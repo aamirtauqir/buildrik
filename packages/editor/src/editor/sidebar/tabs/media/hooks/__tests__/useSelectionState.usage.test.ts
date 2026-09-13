@@ -110,3 +110,50 @@ describe("executeDelete — the Undo toast", () => {
     expect(showToast).toHaveBeenCalledWith('Deleted "hero-dark.jpg".', "info", expect.anything());
   });
 });
+
+/* Clone 3695:45529 / 3697:20341 — a file's family: the original and its
+   saved versions, one of which may be the one APPLIED on the site. */
+describe("a file's delete is its family's — versions go with the original, and count for the confirm", () => {
+  const TEAM_V2 = { ...makeItem("team-v2", "team-photo-v2", ".webp"), versionOf: "team" };
+  const versionsOf = (key: string) => (key === "team" || key === "team-v2" ? [TEAM, TEAM_V2] : []);
+  /** The site sits on v2 — the original's src is on no page. */
+  function familyComposer() {
+    const home = { id: "root-home", getParent: () => null };
+    const placements: Record<string, unknown[]> = { "blob:team-v2": [{ id: "el-1", getParent: () => home }] };
+    return {
+      elements: { findByMediaSrc: (src: string) => placements[src] ?? [], getAllPages: () => [{ name: "Home", root: home }] },
+      media: { getAsset: (key: string) => [HERO, TEAM, TEAM_V2].find((i) => i.key === key) ?? null },
+      mediaOps: {
+        deleteWithGrace: vi.fn(async (id: string) => ({ name: id, usageCount: id === "team-v2" ? 1 : 0, expiresAt: 0, undo: vi.fn(), commitNow: vi.fn() })),
+      },
+    };
+  }
+
+  it("the confirm counts the placements on the applied version under the file's name", () => {
+    const { result } = renderHook(() => useSelectionState(familyComposer() as never, [HERO, TEAM], vi.fn(), versionsOf));
+    act(() => result.current.requestDelete("team"));
+    expect(result.current.confirmDelete).toEqual({
+      keys: ["team"],
+      names: ["team-photo.jpg"],
+      inUseCount: 1,
+      inUse: [{ key: "team", name: "team-photo", count: 1, pages: ["Home"] }],
+      isBulk: false,
+    });
+  });
+
+  it("deletes the versions first, then the original, and the toast counts ONE file", async () => {
+    const showToast = vi.fn();
+    const composer = familyComposer();
+    const { result } = renderHook(() => useSelectionState(composer as never, [HERO, TEAM], showToast, versionsOf));
+    act(() => result.current.requestDelete("team"));
+    await act(() => result.current.executeDelete());
+    expect(vi.mocked(composer.mediaOps.deleteWithGrace).mock.calls.map((c) => c[0])).toEqual(["team-v2", "team"]);
+    expect(showToast).toHaveBeenCalledWith('Deleted "team-photo.jpg" and cleared it from 1 element.', "info", expect.anything());
+  });
+
+  it("a file without versions is its own family — the payload is unchanged", () => {
+    const { result } = renderHook(() => useSelectionState(familyComposer() as never, [HERO, TEAM], vi.fn(), versionsOf));
+    act(() => result.current.requestDelete("hero"));
+    expect(result.current.confirmDelete?.inUse).toEqual([]);
+  });
+});
