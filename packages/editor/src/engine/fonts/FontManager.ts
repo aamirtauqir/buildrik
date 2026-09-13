@@ -43,6 +43,12 @@ interface GoogleFontsApiResponse {
  * Font Manager
  * Central hub for font management
  */
+const fileStem = (filename: string): string => filename.replace(/\.[^/.]+$/, "");
+
+/** One id per library FILE — see registerLibraryFont. */
+const libraryFontId = (filename: string): string =>
+  `library-${fileStem(filename).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+
 export class FontManager extends EventEmitter {
   private fonts: Map<string, Font> = new Map();
   private loadedFonts: Set<string> = new Set();
@@ -376,6 +382,67 @@ export class FontManager extends EventEmitter {
       this.emit(EVENTS.FONT_ERROR, { font, error });
       throw error;
     }
+  }
+
+  // ============================================
+  // Library (site) fonts
+  // ============================================
+
+  /**
+   * A font file in the media library is a family the pickers can offer — the
+   * "Uploaded" source the Clone's Fonts round-trip describes (3721:43423:
+   * "Enabling Inter-Var.woff2 adds a separate uploaded source; it does not
+   * replace the built-in family"). Keyed by the FILE, not the asset id: the
+   * media id changes when a device-only upload reaches the server, and the
+   * url with it, so re-registering the same file swaps the face in place.
+   * Registration is the Composer's job (it listens to the media events);
+   * before it, nothing in the editor called into this manager and an
+   * uploaded font was stored and usable nowhere.
+   *
+   * Throws when the browser cannot decode the file, and leaves nothing
+   * registered — a family that exists but never renders would be a lie in
+   * the picker.
+   */
+  async registerLibraryFont(asset: { filename: string; url: string }): Promise<CustomFont> {
+    const stem = fileStem(asset.filename);
+    const family = stem.replace(/[-_]+/g, " ").trim() || stem;
+    const fontId = libraryFontId(asset.filename);
+    const previous = this.fonts.get(fontId);
+    /* Re-registering (new url, a second file with the same stem) replaces the
+       faces; document.fonts.add would otherwise stack one FontFace per call. */
+    if (previous && typeof document !== "undefined" && document.fonts) {
+      const stale: FontFace[] = [];
+      document.fonts.forEach((face) => {
+        if (face.family.replace(/^"|"$/g, "") === family) stale.push(face);
+      });
+      for (const face of stale) document.fonts.delete(face);
+    }
+    const font: CustomFont = {
+      id: fontId,
+      family,
+      source: "custom",
+      category: "sans-serif",
+      variants: [{ weight: 400, style: "normal", url: asset.url }],
+      files: { "400-normal": asset.url },
+      loaded: false,
+      uploadedAt: new Date().toISOString(),
+    };
+    this.fonts.set(fontId, font);
+    try {
+      await this.loadCustomFont(fontId);
+    } catch (error) {
+      if (previous) this.fonts.set(fontId, previous);
+      else this.fonts.delete(fontId);
+      this.loadedFonts.delete(fontId);
+      throw error;
+    }
+    if (!previous) this.emit(EVENTS.FONT_UPLOADED, { font });
+    return font;
+  }
+
+  /** Drop the family a library file provided — the asset was deleted. */
+  unregisterLibraryFont(filename: string): void {
+    this.deleteFont(libraryFontId(filename));
   }
 
   /**

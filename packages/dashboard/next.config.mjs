@@ -35,7 +35,11 @@ const contentSecurityPolicy = [
      fell back to default-src 'self' — blocking a locally-added video. */
   "img-src 'self' data: blob: https:",
   "media-src 'self' data: blob: https:",
-  "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net",
+  /* Uploaded fonts are served from the Blob store (Clone 3721:43423 — the
+     Media library's .woff2 is a family the Typography picker offers). Without
+     the host here FontFace.load() failed with "A network error occurred" on
+     every uploaded font, measured 2026-09-13. */
+  "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net https://*.blob.vercel-storage.com",
   /* The editor reads its own local media back through fetch() — the image
      editor loads a blob: source, and the optimizer decodes data: URLs. Neither
      scheme was listed, so the browser refused both with "Fetch API cannot load

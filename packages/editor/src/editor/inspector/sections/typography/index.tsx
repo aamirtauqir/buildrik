@@ -101,7 +101,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       {/* Family — board 807:8342's first row. */}
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="font-family" mixedKeys={mixedKeys} />
-        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} />
+        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} />
       </div>
 
       {/* Font Size, Weight, Line Height, Letter Spacing, Decoration, Style */}

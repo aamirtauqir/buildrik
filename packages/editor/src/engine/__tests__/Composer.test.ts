@@ -158,6 +158,51 @@ describe("Composer listener hygiene", () => {
     expect(composer.getState().device).toBe("tablet");
     expect((composer as any).viewport.getDevice()).toBe("tablet");
   });
+
+  /* Site fonts — a font file in the media library becomes a family the
+     pickers offer (Clone 3696:21550 / 3721:43423). The Composer is the one
+     place that hears the media events and knows the FontManager. */
+  class MockFontFace {
+    constructor(public family: string, public source: string) {}
+    load = vi.fn(async () => this);
+  }
+
+  it("registers a font asset on add, swaps its url on update, and drops it on delete", async () => {
+    vi.stubGlobal("FontFace", MockFontFace);
+    const faces = new Set<unknown>();
+    Object.defineProperty(document, "fonts", {
+      configurable: true,
+      value: {
+        add: (f: unknown) => faces.add(f),
+        delete: (f: unknown) => faces.delete(f),
+        forEach: (fn: (f: unknown) => void) => faces.forEach(fn),
+        load: () => Promise.resolve([]),
+        ready: Promise.resolve(),
+      },
+    });
+    const composer = new Composer({} as any);
+    await composer.whenReady();
+
+    composer.media.emitEvent("media:added", {
+      id: "local-1", type: "font", originalName: "Inter-Var.woff2", src: "blob:http://x/1",
+    });
+    await vi.waitFor(() =>
+      expect(composer.fonts.getAllFonts({ source: "custom" }).map((f) => f.family)).toEqual(["Inter Var"]),
+    );
+
+    composer.media.emitEvent("media:updated", {
+      asset: { id: "srv-1", type: "font", originalName: "Inter-Var.woff2", src: "https://cdn/inter.woff2" },
+      changes: {},
+    });
+    await vi.waitFor(() =>
+      expect(composer.fonts.getAllFonts({ source: "custom" })[0].variants[0].url).toBe("https://cdn/inter.woff2"),
+    );
+    expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(1);
+
+    composer.media.emitEvent("media:deleted", { id: "srv-1" });
+    expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(0);
+    vi.unstubAllGlobals();
+  });
 });
 
 /* A loaded project always has a page, and one of them is active. importPage
@@ -246,3 +291,4 @@ describe("Composer.importProject — the editor always has a page to insert into
     expect(composer.history.getHistoryStack().length).toBe(before);
   });
 });
+

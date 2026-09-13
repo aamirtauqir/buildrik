@@ -5799,7 +5799,7 @@
    "authority": "board:clone-3696:21550",
    "recipe": "",
    "verified": "drift-open",
-   "verifiedNote": "Clone P1 walk 2026-09-13 (unified editor, scratch-ver, 1440×900, local-only assets). REACHABLE NOW: fonts could not be uploaded at all — ALLOWED_MIME_TYPES had no font entry and macOS Chromium hands a .woff2 over with type '' ('Unsupported file type: '). Rail is Rename · Delete with 'Selected asset · WOFF2'. OPEN: the Clone's 'Manage font' opens the Site fonts overlay (Phase 5 board) — not drawn until that door exists; nothing calls FontManager.uploadFont yet, so an uploaded font is stored but not usable in Typography."
+   "verifiedNote": "Clone P1 walk 2026-09-13. REACHABLE NOW: fonts could not be uploaded at all — ALLOWED_MIME_TYPES had no font entry and macOS Chromium hands a .woff2 over with type '' ('Unsupported file type: '). Rail is Rename · Delete with 'Selected asset · WOFF2'. USABLE NOW (second pass, same day): the Composer registers every library font file with the FontManager (at init and on add/update/delete), the Typography Family picker lists them under UPLOADED above System, and the CSP's font-src allows the Blob host — verified live: heading font-family = \"Inter Var\", document.fonts.check true, survives reload. Fonts round-trip note 3721:43423 ('a separate uploaded source; it does not replace the built-in family') holds. OPEN: the rail's 'Manage font' button opens the Site fonts overlay (Phase 5 board) — not drawn until that door exists."
   },
   {
    "nodeId": "3696:21754",

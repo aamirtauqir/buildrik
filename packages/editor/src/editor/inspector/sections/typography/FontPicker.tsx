@@ -17,6 +17,8 @@ import {
 import { FontSearchInput, CategoryTabs, FontList } from "./FontPickerDropdown";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "../../shared/controls";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "../../../../engine";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -48,13 +50,44 @@ export const SYSTEM_FONTS: SystemFont[] = [
 interface FontPickerProps {
   value: string;
   onChange: (value: string) => void;
+  /** Source of the UPLOADED group — the FontManager's custom fonts, which the
+   *  Composer registers from the media library's font files. */
+  composer?: Composer | null;
 }
 
-export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
+/* Clone 3721:43423 — an uploaded font is "a separate uploaded source; it does
+   not replace the built-in family". Read on mount and on every font event, so
+   a file dropped into the Media library shows up here without a reopen. */
+function useUploadedFonts(composer: Composer | null | undefined): SystemFont[] {
+  const read = React.useCallback(
+    (): SystemFont[] =>
+      (composer?.fonts.getAllFonts({ source: "custom" }) ?? []).map((f) => ({
+        value: `'${f.family}', sans-serif`,
+        label: f.family,
+        category: "sans-serif",
+      })),
+    [composer],
+  );
+  const [fonts, setFonts] = React.useState<SystemFont[]>(read);
+  React.useEffect(() => {
+    setFonts(read());
+    if (!composer) return;
+    const refresh = () => setFonts(read());
+    const events = [EVENTS.FONT_UPLOADED, EVENTS.FONT_LOADED, EVENTS.FONT_DELETED];
+    for (const ev of events) composer.fonts.on(ev, refresh);
+    return () => {
+      for (const ev of events) composer.fonts.off(ev, refresh);
+    };
+  }, [composer, read]);
+  return fonts;
+}
+
+export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange, composer }) => {
   const [fontSearch, setFontSearch] = React.useState("");
   const [showFontPicker, setShowFontPicker] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState<FontCategory | "all">("all");
   const fontsService = React.useMemo(() => GoogleFontsService.getInstance(), []);
+  const uploadedFonts = useUploadedFonts(composer);
 
   // Get filtered fonts
   const googleFonts = React.useMemo(() => {
@@ -85,14 +118,14 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
   const currentFontName = React.useMemo(() => {
     if (!value) return "Select font...";
 
-    // Check system fonts
-    const systemFont = SYSTEM_FONTS.find((f) => f.value === value);
+    // Check system + uploaded fonts
+    const systemFont = [...uploadedFonts, ...SYSTEM_FONTS].find((f) => f.value === value);
     if (systemFont) return systemFont.label;
 
     // Extract font name from value
     const match = value.match(/'([^']+)'/);
     return match ? match[1] : value;
-  }, [value]);
+  }, [value, uploadedFonts]);
 
   return (
     /* Board 807:8342 reads "Family  [Inter Tight]" — one row, label left, the
@@ -158,6 +191,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
           <FontList
             googleFonts={googleFonts}
             systemFonts={SYSTEM_FONTS}
+            uploadedFonts={uploadedFonts}
             selectedCategory={selectedCategory}
             fontSearch={fontSearch}
             currentValue={value}

@@ -417,8 +417,37 @@ export class Composer extends EventEmitter {
     });
     this.on(EVENTS.PROJECT_LOADED, () => this.repairLocalMediaUrls());
 
+    /* Site fonts. A font file in the library is a family the pickers offer,
+       so every font asset is registered with the FontManager — at init for
+       what is already stored, then on add / update (a device-only upload
+       reaching the server changes its url) / delete. Registration failures
+       (a file the browser cannot decode) are the FontManager's own event;
+       nothing here should stop the library from loading over one bad file. */
+    /* The delete event carries only the id and fires after the asset has
+       left the media state, so the file each id provided is remembered here. */
+    const fontFileById = new Map<string, string>();
+    const registerLibraryFont = (asset: unknown) => {
+      const a = asset as { id?: string; type?: string; originalName?: string; src?: string } | undefined;
+      if (a?.type !== "font" || !a.originalName || !a.src) return;
+      if (a.id) fontFileById.set(a.id, a.originalName);
+      void this.fonts.registerLibraryFont({ filename: a.originalName, url: a.src }).catch(() => {});
+    };
+    this.media.on(MEDIA_EVENTS.MEDIA_ADDED, registerLibraryFont);
+    this.media.on(MEDIA_EVENTS.MEDIA_UPDATED, (payload: unknown) => {
+      const p = payload as { asset?: unknown } | undefined;
+      registerLibraryFont(p && "asset" in p ? p.asset : payload);
+    });
+    this.media.on(MEDIA_EVENTS.MEDIA_DELETED, (payload: unknown) => {
+      const id = (payload as { id?: string } | undefined)?.id;
+      const filename = id ? fontFileById.get(id) : undefined;
+      if (!filename) return;
+      fontFileById.delete(id!);
+      this.fonts.unregisterLibraryFont(filename);
+    });
+
     // Initialize async managers
     await this.media.init();
+    for (const asset of this.media.getAssets()) registerLibraryFont(asset);
 
     // Load project if configured
     if (this.config.project?.autoLoad) {

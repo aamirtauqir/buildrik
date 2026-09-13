@@ -98,61 +98,78 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ selected, onSelect }
 interface FontListProps {
   googleFonts: GoogleFont[];
   systemFonts: SystemFont[];
+  /** The media library's font files, as the FontManager registered them
+   *  (Clone 3721:43423 — "a separate uploaded source"). Empty = no group. */
+  uploadedFonts: SystemFont[];
   selectedCategory: FontCategory | "all";
   fontSearch: string;
   currentValue: string;
   onSelect: (font: GoogleFont | SystemFont) => void;
 }
 
+/** One labelled group of preset fonts — System and Uploaded share it. */
+const PresetFontGroup: React.FC<{
+  label: string;
+  fonts: SystemFont[];
+  fontSearch: string;
+  currentValue: string;
+  onSelect: (font: SystemFont) => void;
+}> = ({ label, fonts, fontSearch, currentValue, onSelect }) => (
+  <div style={{ padding: "4px 8px" }}>
+    <div
+      style={{
+        fontSize: 12,
+        color: "var(--bk-ink-muted)",
+        textTransform: "uppercase",
+        letterSpacing: "0.5px",
+        padding: "4px 0",
+      }}
+    >
+      {label}
+    </div>
+    {fonts
+      .filter((f) => f.label.toLowerCase().includes(fontSearch.toLowerCase()))
+      .map((font) => (
+        <Button
+          key={font.value}
+          onClick={() => onSelect(font)}
+          role="option"
+          aria-selected={currentValue === font.value}
+          style={{
+            width: "100%",
+            padding: "8px",
+            background:
+              currentValue === font.value ? "var(--bk-accent-tint)" : "transparent",
+            border: "none",
+            borderRadius: 4,
+            color: "var(--bk-ink)",
+            fontSize: 12,
+            textAlign: "left",
+            cursor: "pointer",
+            fontFamily: font.value,
+          }}
+        >
+          {font.label}
+        </Button>
+      ))}
+  </div>
+);
+
 export const FontList: React.FC<FontListProps> = ({
   googleFonts,
   systemFonts,
+  uploadedFonts,
   selectedCategory,
   fontSearch,
   currentValue,
   onSelect,
 }) => (
   <div style={{ flex: 1, overflowY: "auto", maxHeight: 200 }}>
-    {/* System Fonts */}
+    {uploadedFonts.length > 0 && (selectedCategory === "all" || selectedCategory === "sans-serif") && (
+      <PresetFontGroup label="Uploaded" fonts={uploadedFonts} fontSearch={fontSearch} currentValue={currentValue} onSelect={onSelect} />
+    )}
     {(selectedCategory === "all" || selectedCategory === "sans-serif") && (
-      <div style={{ padding: "4px 8px" }}>
-        <div
-          style={{
-            fontSize: 12,
-            color: "var(--bk-ink-muted)",
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-            padding: "4px 0",
-          }}
-        >
-          System
-        </div>
-        {systemFonts
-          .filter((f) => f.label.toLowerCase().includes(fontSearch.toLowerCase()))
-          .map((font) => (
-            <Button
-              key={font.value}
-              onClick={() => onSelect(font)}
-              role="option"
-              aria-selected={currentValue === font.value}
-              style={{
-                width: "100%",
-                padding: "8px",
-                background:
-                  currentValue === font.value ? "var(--bk-accent-tint)" : "transparent",
-                border: "none",
-                borderRadius: 4,
-                color: "var(--bk-ink)",
-                fontSize: 12,
-                textAlign: "left",
-                cursor: "pointer",
-                fontFamily: font.value,
-              }}
-            >
-              {font.label}
-            </Button>
-          ))}
-      </div>
+      <PresetFontGroup label="System" fonts={systemFonts} fontSearch={fontSearch} currentValue={currentValue} onSelect={onSelect} />
     )}
 
     {/* Google Fonts */}
