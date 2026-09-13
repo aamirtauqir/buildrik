@@ -9,8 +9,8 @@
 export { MediaLibraryPanel } from "./MediaLibraryPanel";
 export type { MediaLibraryPanelProps } from "./MediaLibraryPanel";
 
-export { ImageEditorModal } from "./ImageEditorModal";
-export type { ImageEditorModalProps } from "./ImageEditorModal";
+export { ImageEditorModal, describeEdits } from "./ImageEditorModal";
+export type { ImageEditorModalProps, EditsSnapshot, ImageEditorTab } from "./ImageEditorModal";
 
 export { IconPickerModal } from "./IconPickerModal";
 export type { IconPickerModalProps } from "./IconPickerModal";

@@ -78,16 +78,45 @@ describe("useStudioModals", () => {
     expect(result.current.mediaLibraryContext).toBeNull();
   });
 
-  it("openImageEditor stores imageSrc + onSave; close clears context", () => {
+  it("openImageEditor stores imageSrc + onSave and the Clone options; close clears context", () => {
     const { result } = renderHook(() => useStudioModals());
     const onSave = vi.fn();
-    act(() => result.current.openImageEditor("https://img/x.png", onSave));
+    const onDone = vi.fn();
+    const edits = {
+      width: 1,
+      height: 1,
+      crop: "Original",
+      preset: "Original",
+      format: "Original",
+      transform: "Original",
+      brightness: 0,
+      contrast: 0,
+      saturation: 0,
+      blur: 0,
+    };
+    act(() =>
+      result.current.openImageEditor("https://img/x.png", onSave, {
+        fileName: "hero-dark.jpg",
+        initialTab: "optimise",
+        onDone,
+      }),
+    );
     expect(result.current.showImageEditor).toBe(true);
     expect(result.current.imageEditorContext?.imageSrc).toBe("https://img/x.png");
-    result.current.imageEditorContext?.onSave("edited.png");
-    expect(onSave).toHaveBeenCalledWith("edited.png");
+    expect(result.current.imageEditorContext?.fileName).toBe("hero-dark.jpg");
+    expect(result.current.imageEditorContext?.initialTab).toBe("optimise");
+    expect(result.current.imageEditorContext?.onDone).toBe(onDone);
+    result.current.imageEditorContext?.onSave("edited.png", edits);
+    expect(onSave).toHaveBeenCalledWith("edited.png", edits);
     act(() => result.current.closeImageEditor());
     expect(result.current.imageEditorContext).toBeNull();
+  });
+
+  it("openImageEditor without options still opens (the pre-Clone callers)", () => {
+    const { result } = renderHook(() => useStudioModals());
+    act(() => result.current.openImageEditor("https://img/x.png", vi.fn()));
+    expect(result.current.showImageEditor).toBe(true);
+    expect(result.current.imageEditorContext?.fileName).toBeUndefined();
   });
 
   it("openIconPicker stores currentIcon + onSelect", () => {

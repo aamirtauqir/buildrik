@@ -8,6 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
+import type { ImageEditorContext } from "./hooks/useStudioModals";
 import { SaveTemplate } from "../../templates/SaveTemplate";
 import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
@@ -51,11 +52,7 @@ export interface StudioModalsProps {
   } | null;
   showImageEditor: boolean;
   onCloseImageEditor: () => void;
-  imageEditorContext: {
-    imageSrc: string;
-    /** Audit-remediation PR1 [ModalSubmit]: sync OR async accepted. */
-    onSave: (editedSrc: string) => void | Promise<void>;
-  } | null;
+  imageEditorContext: ImageEditorContext | null;
   showIconPicker: boolean;
   onCloseIconPicker: () => void;
   iconPickerContext: {
@@ -178,23 +175,18 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         composer={composer}
       />
 
-      {/* Image Editor */}
+      {/* Image Editor — Clone 3397:39917. The promise is forwarded: a
+          rejection is the dialog's own failure state (3695:45542, with
+          Retry save), so no toast rides beside it. */}
       {showImageEditor && imageEditorContext && (
         <ImageEditorModal
           isOpen={showImageEditor}
           onClose={onCloseImageEditor}
           imageSrc={imageEditorContext.imageSrc}
-          /*
-           * Audit-remediation PR1 [ModalSubmit]: forward the promise.
-           * Pre-fix the bridge wrapped a sync try/catch around an async
-           * onSave call, which couldn't catch rejected promises from
-           * MediaTab's actual handler (fetch → blob → upload). Now
-           * ImageEditorModal's handleSave awaits this and routes any
-           * thrown error through onError to the toast adapter, keeping
-           * the modal open for retry.
-           */
+          fileName={imageEditorContext.fileName}
+          initialTab={imageEditorContext.initialTab}
           onSave={imageEditorContext.onSave}
-          onError={makeModalErrorHandler("Save edited image")}
+          onDone={imageEditorContext.onDone}
         />
       )}
 

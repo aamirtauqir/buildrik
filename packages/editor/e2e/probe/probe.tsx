@@ -2883,7 +2883,7 @@ const CASES: Record<string, () => React.ReactElement> = {
               "<rect width='2400' height='1600' fill='#334155'/></svg>",
           )
         }
-        imageName="hero-dark.jpg"
+        fileName="hero-dark.jpg"
         onSave={() => {}}
       />
     </div>

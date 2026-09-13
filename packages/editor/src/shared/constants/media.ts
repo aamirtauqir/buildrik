@@ -33,6 +33,23 @@ export const MEDIA_SIZE_LIMITS = {
   MAX_IMAGE_DIMENSION: 4096,
 } as const;
 
+/**
+ * The longest side, in px, the image editor will ask a canvas to encode — the
+ * Resize tab's cap (Clone 3695:43624 "Maximum is N × N px", QA contract
+ * 3697:20354: "Limit value must come from backend capability, not be invented
+ * in design" — the board's 8000 is a sample).
+ *
+ * Why 8192: the editor's output goes through `canvas.toDataURL`, and its
+ * default format is WebP, whose container refuses anything over 16383 px per
+ * side; Chrome, Firefox and Safari also cap a 2D canvas at 268,435,456 px of
+ * area (16384²) and past it `toDataURL` fails silently, returning `data:,`.
+ * The encoder holds two full-size RGBA bitmaps (the rotated source and the
+ * output), so halving the ceiling keeps each at ≤ 256 MB instead of 1 GB
+ * apiece, which is where desktop tabs start dying. 8192 is still above any
+ * current camera's long edge (a 48-MP sensor is ~8000).
+ */
+export const MAX_IMAGE_EDIT_DIMENSION = 8192;
+
 // ============================================
 // Allowed MIME Types
 // ============================================
