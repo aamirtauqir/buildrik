@@ -250,6 +250,11 @@ export class ExportEngine {
    * it — the page falls back to the stack's next family rather than naming
    * a url that dies with the tab.
    */
+  /** The families the site's added fonts provide — kept out of the Google lookup. */
+  private siteProvidedFamilies(): string[] {
+    return (this.composer.fonts?.getAllFonts({ source: "custom" }) ?? []).map((f) => f.family);
+  }
+
   private siteFontFaces(css: string): string {
     const { css: faces, skipped } = siteFontFaceCSS(
       css,
@@ -535,7 +540,7 @@ export class ExportEngine {
     // the site's own stylesheet: that is where the faces the site uploaded
     // itself are declared (`@font-face`, at its top), and the page declares
     // its own before it asks Google for the rest.
-    const fontLinks = googleFontsHeadLinks(css ?? "", this.siteFontFamilies());
+    const fontLinks = googleFontsHeadLinks(css ?? "", this.siteFontFamilies(), this.siteProvidedFamilies());
     if (fontLinks) {
       head += fontLinks
         .split("\n")
@@ -872,7 +877,7 @@ export class ExportEngine {
     // Same reason as generateHTML: a named family that is never fetched is the
     // visitor's default sans, not the site's font. After the stylesheet, for
     // the same reason as there: the site's own faces are declared in it.
-    const pageFontLinks = googleFontsHeadLinks(css, this.siteFontFamilies());
+    const pageFontLinks = googleFontsHeadLinks(css, this.siteFontFamilies(), this.siteProvidedFamilies());
     if (pageFontLinks) {
       headParts.push(...pageFontLinks.split("\n").map((l) => `  ${l}`));
     }

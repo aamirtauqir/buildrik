@@ -142,9 +142,15 @@ function usedFontFamilies(css: string, extraFamilies: readonly string[]): Set<st
  */
 export function googleFontsHeadLinks(
   css: string,
-  extraFamilies: readonly string[] = []
+  extraFamilies: readonly string[] = [],
+  /** Families the site's OWN fonts declare (`siteFontFaceCSS`) — never asked of
+   *  Google: `@font-face` is last-wins, so a Google link for the same name would
+   *  silently override the file the site uploaded (3721:43423: an uploaded
+   *  source "does not replace the built-in family" — nor the other way). */
+  siteProvided: readonly string[] = []
 ): string {
   const used = usedFontFamilies(css, extraFamilies);
+  for (const family of siteProvided) used.delete(family.toLowerCase());
 
   const wanted = GOOGLE_FONT_CATALOGUE.filter((f) => used.has(f.family.toLowerCase()));
   if (!wanted.length) return "";

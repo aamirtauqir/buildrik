@@ -56,4 +56,16 @@ describe("googleFontsHeadLinks", () => {
     const out = googleFontsHeadLinks(".a{font-family:Poppins}.b{font-family:'Poppins',sans-serif}");
     expect(out.match(/family=Poppins/g)).toHaveLength(1);
   });
+
+  /* Clone 3721:43423: "Enabling Inter-Var.woff2 adds a separate uploaded
+     source; it does not replace the built-in family." A site font whose family
+     shares a Google-catalogue name (Poppins.woff2 → "Poppins") is the SITE'S
+     Poppins: its @font-face is declared first, and @font-face is last-wins, so
+     a Google link for the same name would silently override the upload. */
+  it("never asks Google for a family the site's own fonts provide", () => {
+    const out = googleFontsHeadLinks(".a{font-family:Poppins}.b{font-family:Lora}", [], ["poppins"]);
+    expect(out).not.toContain("Poppins");
+    expect(out).toContain("family=Lora");
+    expect(googleFontsHeadLinks(".a{font-family:Poppins}", [], ["Poppins"])).toBe("");
+  });
 });
