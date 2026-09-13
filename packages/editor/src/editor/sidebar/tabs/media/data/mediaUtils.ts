@@ -74,6 +74,7 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     type: assetTypeToFilter(asset.type),
     src: asset.src,
     thumb: asset.thumbnailSrc,
+    folderId: asset.folderId || null,
     size: asset.size,
     duration: asset.metadata?.duration,
     width: asset.width,

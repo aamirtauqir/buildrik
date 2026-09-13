@@ -70,10 +70,26 @@ interface ToastInput {
 
 export interface AssetDetailsPanelProps {
   selectedItem: LibraryItem | null;
-  /** Clone 3695:19968 / 20154 — while the library is in select mode the rail
-   *  is about the CHECKED set, not one file: "No assets selected" with its
-   *  hint, or "1 asset selected" with the filename and a Delete. */
-  bulk?: { names: string[]; onDelete(): void } | null;
+  /** Clone 3695:19968 / 4215:26635 — while the library is in select mode the
+   *  rail is about the CHECKED set, not one file: "No assets selected" with
+   *  its hint, or "N assets selected" with the filenames, Move to folder
+   *  (primary) and Clear selection. Exactly one checked file is that file's
+   *  full rail (3705:21059) — the orchestrator passes it as `selectedItem`
+   *  with `bulk` null; Phase 1's "1 asset selected" hint (3695:20154) is
+   *  displaced by the later section. */
+  bulk?: { names: string[]; onMove(): void; onClear(): void } | null;
+  /** Clone 3699:20381 / 3683:19964 — the result of the last move, on top of
+   *  every other state until the selection or the scope changes: "Moved to
+   *  <Folder>", which files moved and which were already there, the file
+   *  list, View destination (primary) and Clear selection. */
+  moveResult?: {
+    folderName: string;
+    names: string[];
+    moved: string[];
+    alreadyThere: string[];
+    onView(): void;
+    onClear(): void;
+  } | null;
   versions: LibraryItem[];
   usageCount: number;
   /** Page names the asset is placed on — the USED IN line names them
@@ -124,6 +140,7 @@ export interface AssetDetailsPanelProps {
 export function AssetDetailsPanel({
   selectedItem,
   bulk = null,
+  moveResult = null,
   versions,
   usageCount,
   usedIn,
@@ -146,26 +163,72 @@ export function AssetDetailsPanel({
   const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
   const [regenerating, setRegenerating] = React.useState(false);
 
+  if (moveResult) {
+    const { moved, alreadyThere } = moveResult;
+    /* 3699:20381 names the files when some were already in the destination;
+       3683:19964 counts them when every one moved. */
+    const body =
+      alreadyThere.length === 0
+        ? `${moved.length} ${moved.length === 1 ? "asset" : "assets"} moved successfully. Their existing site placements are unchanged.`
+        : `${moved.length > 0 ? `${moved.join(", ")} moved; ` : ""}${alreadyThere.join(", ")} ${
+            alreadyThere.length === 1 ? "was" : "were"
+          } already here. Site placements are unchanged.`;
+    return (
+      <div className="mgr-details" data-testid="mgr-details">
+        <div className="mgr-det-body" data-testid="mgr-det-move-result">
+          <h3 className="mgr-det-heading" data-testid="mgr-det-move-result-title">
+            Moved to {moveResult.folderName}
+          </h3>
+          <p className="mgr-det-hint" data-testid="mgr-det-move-result-body">
+            {body}
+          </p>
+          <ul className="mgr-det-files" data-testid="mgr-det-files">
+            {moveResult.names.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+          <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
+            <Button className="mgr-btn-primary" data-testid="mgr-det-view-destination" onClick={moveResult.onView}>
+              View destination
+            </Button>
+            <Button className="mgr-btn quiet" data-testid="mgr-det-clear-selection" onClick={moveResult.onClear}>
+              Clear selection
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (bulk) {
     const n = bulk.names.length;
     return (
       <div className="mgr-details" data-testid="mgr-details">
-        <div className="mgr-det-body">
+        <div className="mgr-det-body" data-testid="mgr-det-bulk">
           <h3 className="mgr-det-heading">{n === 0 ? "No assets selected" : `${n} ${n === 1 ? "asset" : "assets"} selected`}</h3>
           <p className="mgr-det-hint">
             {n === 0
               ? "Select a file to inspect it. Select checkboxes to manage multiple assets."
-              : n === 1
-                ? `${bulk.names[0]} · Select another file to use bulk actions.`
-                : "Move, download or delete them from the bar above."}
+              : `Actions apply to ${n === 2 ? "both" : `all ${n}`} selected files. Moving files only changes library organisation.`}
           </p>
-          {/* 3695:20154 draws Delete right under the hint, not at the foot. */}
+          {/* 4215:26635 — the files, then Move to folder (primary) and Clear
+              selection, right under the hint. Delete stays in the bar. */}
           {n > 0 && (
-            <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-actions">
-              <Button className="mgr-btn danger" onClick={bulk.onDelete}>
-                Delete
-              </Button>
-            </div>
+            <>
+              <ul className="mgr-det-files" data-testid="mgr-det-files">
+                {bulk.names.map((name) => (
+                  <li key={name}>{name}</li>
+                ))}
+              </ul>
+              <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
+                <Button className="mgr-btn-primary" data-testid="mgr-det-move-to-folder" onClick={bulk.onMove}>
+                  Move to folder
+                </Button>
+                <Button className="mgr-btn quiet" data-testid="mgr-det-clear-selection" onClick={bulk.onClear}>
+                  Clear selection
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -294,10 +357,12 @@ export function AssetDetailsPanel({
             full set; a video has no Edit image; a font is neither inserted
             nor replaced across the site — Rename and Delete only. The Clone's
             "Manage font" needs the Site fonts overlay (Phase 5) and is not
-            drawn until that door exists. */}
+            drawn until that door exists. Insert to canvas is the PRIMARY:
+            3705:20396 and 4207:26629 (the later section) draw it filled,
+            over 3695:20340's outlined one. */}
         <div className="mgr-det-actions" data-testid="mgr-det-actions">
           {!isFont && (
-            <Button className="mgr-btn" onClick={() => onInsert(selectedItem.key)}>
+            <Button className="mgr-btn-primary" onClick={() => onInsert(selectedItem.key)}>
               Insert to canvas
             </Button>
           )}

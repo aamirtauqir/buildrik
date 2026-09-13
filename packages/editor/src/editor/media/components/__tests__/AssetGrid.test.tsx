@@ -51,6 +51,7 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
     onUploadClick: vi.fn(),
     onOpenStockModal: vi.fn(),
     onDownload: vi.fn(() => 0),
+    onMoveSelected: vi.fn(),
     addToast: vi.fn(),
     ...over,
   };
@@ -243,24 +244,19 @@ describe("AssetGrid — bulk toolbar", () => {
     expect(screen.getByText("2 selected")).toBeInTheDocument();
   });
 
-  it("Move to → folder calls bulkMoveAssets with keys + folder id, toasts, exits selMode", () => {
+  // Clone 3683:19950 — `Move to folder…` opens the orchestrator's Move
+  // modal (prototype edge `Move to folder…|CLIC|OVE>Assets · Move selected
+  // files`). The inline Root/folder picker it replaces moved on the spot,
+  // toasted, and threw the person out of select mode.
+  it("Move to folder… asks the orchestrator for the Move modal and moves nothing itself", () => {
     const state = bulkState();
     const { props } = mount(state);
-    fireEvent.click(screen.getByText(/Move to/));
-    fireEvent.click(screen.getByText("Brand"));
-    expect(state.bulkMoveAssets).toHaveBeenCalledWith(["a", "b"], "f1");
-    expect(props.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: "Moved 2 to Brand", tone: "success" }),
-    );
-    expect(state.toggleSelMode).toHaveBeenCalled();
-  });
-
-  it("Move to → Root passes folderId=null", () => {
-    const state = bulkState();
-    mount(state);
-    fireEvent.click(screen.getByText(/Move to/));
-    fireEvent.click(screen.getByText("Root"));
-    expect(state.bulkMoveAssets).toHaveBeenCalledWith(["a", "b"], null);
+    fireEvent.click(screen.getByText("Move to folder…"));
+    expect(props.onMoveSelected).toHaveBeenCalledTimes(1);
+    expect(state.bulkMoveAssets).not.toHaveBeenCalled();
+    expect(screen.queryByText("Root")).toBeNull();
+    expect(screen.queryByText("Brand")).toBeNull();
+    expect(state.toggleSelMode).not.toHaveBeenCalled();
   });
 
   it("Delete requests bulk delete with the selected LibraryItems", () => {

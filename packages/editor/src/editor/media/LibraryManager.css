@@ -801,8 +801,11 @@
 
 /* `flex: none`, not `flex: 1`: in this column a basis of 0 overrides the
    height and the buttons collapsed to 19px of text (measured). Only the
-   two-up row shares its width. */
-.mgr-det-actions .mgr-btn {
+   two-up row shares its width. The primary (Insert to canvas, Move to
+   folder, View destination — 3705:20396 / 4215:26635 / 3699:20381) is the
+   same block in the accent fill. */
+.mgr-det-actions .mgr-btn,
+.mgr-det-actions .mgr-btn-primary {
   flex: none;
   width: 100%;
   min-width: 0;
@@ -811,6 +814,34 @@
   font-size: 12px;
   padding: 0 var(--bk-space-12);
   justify-content: center;
+}
+
+/* Clear selection (4215:26635 / 3699:20381) — the quiet grey fill, no edge. */
+.mgr-det-actions .mgr-btn.quiet {
+  background: var(--bk-bg-subtle);
+  border-color: transparent;
+  color: var(--bk-ink);
+}
+
+.mgr-det-actions .mgr-btn.quiet:hover { background: var(--bk-gray-200); }
+
+/* 4215:26635 / 3699:20381 — the checked files, one 12 line each, between
+   the hint and the buttons. */
+.mgr-det-files {
+  margin: var(--bk-space-8) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-8);
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink);
+}
+
+.mgr-det-files li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mgr-det-actions-row .mgr-btn {
@@ -990,7 +1021,6 @@
   background: var(--bk-accent-tint);
   box-shadow: inset 0 0 0 1px var(--bk-accent);
 }
-
 /* ─── Board 1159:4593 card + toolbar ─────────────────────────────────── */
 .mgr-kind {
   position: absolute;
