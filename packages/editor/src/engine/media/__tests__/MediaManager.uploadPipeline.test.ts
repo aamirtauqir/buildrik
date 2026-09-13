@@ -579,3 +579,45 @@ describe("retry queue rebuild (Phase B5 P2 durability)", () => {
     expect((manager as any).pendingRemoteDeletes.size).toBe(0);
   });
 });
+
+/* `download` on a cross-origin href is ignored and the tab navigates to the
+   file — the editor was replaced by the raw asset the first day assets had a
+   Blob-store src. Remote sources are fetched into a same-origin Object URL. */
+describe("downloadAssets", () => {
+  it("fetches a remote asset into an object URL before clicking the download link", async () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    const blob = new Blob(["png"], { type: "image/png" });
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, blob: async () => blob })));
+    const createObjectURL = vi.fn(() => "blob:http://localhost/dl");
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() }));
+    const clicked: { href: string; download: string; target: string }[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push({ href: this.href, download: this.download, target: this.target });
+    });
+
+    const started = manager.downloadAssets([{ src: "https://cdn/hero.jpg", name: "hero-dark.jpg" }]);
+    expect(started).toBe(1);
+    await vi.waitFor(() => expect(clicked).toHaveLength(1));
+    expect(clicked[0].href).toBe("blob:http://localhost/dl");
+    expect(clicked[0].download).toBe("hero-dark.jpg");
+    expect(clicked[0].target).toBe("");
+    click.mockRestore();
+    vi.unstubAllGlobals();
+  });
+
+  it("opens the file in a new tab when the host refuses the fetch, never in this one", async () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("CORS"); }));
+    const clicked: { href: string; target: string }[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push({ href: this.href, target: this.target });
+    });
+    manager.downloadAssets([{ src: "https://cdn/hero.jpg", name: "hero-dark.jpg" }]);
+    await vi.waitFor(() => expect(clicked).toHaveLength(1));
+    expect(clicked[0].target).toBe("_blank");
+    click.mockRestore();
+    vi.unstubAllGlobals();
+  });
+});

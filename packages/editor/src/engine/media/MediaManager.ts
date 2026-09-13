@@ -1541,16 +1541,42 @@ export class MediaManager extends MediaEventEmitter {
     let started = 0;
     for (const asset of assets) {
       if (!asset.src) continue;
-      const a = document.createElement("a");
-      a.href = asset.src;
-      a.download = asset.name;
-      a.rel = "noopener";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      void this.saveToDisk(asset);
       started += 1;
     }
     return started;
+  }
+
+  /**
+   * Browsers ignore `download` on a cross-origin href and NAVIGATE instead —
+   * with assets on the Blob store, the library's Download button replaced the
+   * whole editor with the raw file (measured 2026-09-13, the first day assets
+   * had a remote src). A same-origin Object URL made from the fetched bytes
+   * keeps the attribute honoured; a fetch the host refuses (CORS) falls back
+   * to a new tab rather than losing the editor.
+   */
+  private async saveToDisk(asset: { src: string; name: string }): Promise<void> {
+    const a = document.createElement("a");
+    a.download = asset.name;
+    a.rel = "noopener";
+    let objectUrl: string | null = null;
+    if (/^https?:/.test(asset.src)) {
+      try {
+        const res = await fetch(asset.src);
+        if (!res.ok) throw new Error(String(res.status));
+        objectUrl = URL.createObjectURL(await res.blob());
+        a.href = objectUrl;
+      } catch {
+        a.href = asset.src;
+        a.target = "_blank";
+      }
+    } else {
+      a.href = asset.src;
+    }
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl!), 60_000);
   }
 
   selectAssets(ids: string[]): void {
