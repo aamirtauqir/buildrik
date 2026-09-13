@@ -73,6 +73,22 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
     expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 files · All assets");
   });
 
+  // A folder made inside another is not in the root list; the count line
+  // read "All assets" for a nested scope while the heading read its name.
+  it("names a NESTED folder scope from the full folder list", () => {
+    const state = makeState({
+      libraryItems: [makeItem({ key: "a" })],
+      currentFolderId: "child",
+      folders: [],
+      allFolders: [
+        { id: "parent", name: "Products", parentId: null, createdAt: "", updatedAt: "" },
+        { id: "child", name: "Campaign images", parentId: "parent", createdAt: "", updatedAt: "" },
+      ],
+    });
+    mount(state);
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · Campaign images");
+  });
+
   it("reads '<N> results for \"q\"' while a search is active (3695:44339)", () => {
     const state = makeState({ libraryItems: [makeItem({ key: "a" })], librarySearch: "menu" });
     mount(state);

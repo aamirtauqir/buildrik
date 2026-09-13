@@ -189,10 +189,10 @@ export function AssetGrid({
     if (smartFolder === "in-use") return "In use";
     if (smartFolder === "unused") return "Unused";
     if (state.currentFolderId) {
-      return state.folders.find((f) => f.id === state.currentFolderId)?.name ?? "All assets";
+      return state.allFolders.find((f) => f.id === state.currentFolderId)?.name ?? "All assets";
     }
     return "All assets";
-  }, [smartFolder, state.currentFolderId, state.folders]);
+  }, [smartFolder, state.currentFolderId, state.allFolders]);
   const searchQuery = state.librarySearch.trim();
   const countLabel = searchQuery
     ? `${visibleItems.length} ${visibleItems.length === 1 ? "result" : "results"} for "${searchQuery}"`
