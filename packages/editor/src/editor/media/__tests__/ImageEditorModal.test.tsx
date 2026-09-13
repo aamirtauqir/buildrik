@@ -4,8 +4,8 @@
  * 3695:43319 adjust · 3695:43403 resize · 3695:43480 optimise), the crop
  * chips and transforms (3707:20431 16:9 · 3707:20501 rotate 90° · 3695:43705
  * flipped · 3707:20536 zoom 150%), the resize lock (3695:43547) and its
- * INVALID state (3695:43624). The Saved state (3681:20026), discard
- * (3695:45549) and failure (3695:45542) are J-3681:20026's.
+ * INVALID state (3695:43624), the Saved state (3681:20026), discard
+ * (3695:45549) and failure (3695:45542).
  *
  * react-easy-crop is stubbed: it measures the DOM and decodes the image,
  * neither of which jsdom does. The stub reports a 1600 × 1200 crop of the
@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 
@@ -388,8 +388,8 @@ describe("Clone 3695:43480 · Optimise", () => {
   });
 });
 
-describe("Save version — J-3397:39917 (the Clone's Saved state lands with J-3681:20026)", () => {
-  it("awaits onSave(dataUrl, edits) with the snapshot and closes", async () => {
+describe("Clone 3681:20026 · Saved", () => {
+  it("Save version awaits onSave(dataUrl, edits) and shows Version saved with the edits summary", async () => {
     const onSave = vi.fn(async (_url: string, _edits: EditsSnapshot) => {});
     const { props } = mount({ onSave });
     fireEvent.click(tab("adjust"));
@@ -409,7 +409,50 @@ describe("Save version — J-3397:39917 (the Clone's Saved state lands with J-36
       saturation: 0,
       blur: 0,
     });
-    await waitFor(() => expect(props.onClose).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByTestId("image-editor-saved-title")).toHaveTextContent("Version saved"));
+    expect(screen.getByTestId("image-editor-saved-body")).toHaveTextContent(
+      "Version saved. Original retained. Not yet applied to site.",
+    );
+    const summary = within(screen.getByTestId("image-editor-saved-summary"))
+      .getAllByRole("listitem")
+      .map((li) => li.textContent);
+    expect(summary).toEqual([
+      "Width: 1600",
+      "Height: 1200",
+      "Crop: Original",
+      "Preset: Sepia",
+      "Format: WebP",
+      "Transform: Original",
+      "Brightness: 0 · Contrast: 0 · Saturation: 0 · Blur: 0",
+    ]);
+    expect(screen.queryByTestId("image-editor-tabs")).toBeNull();
+    expect(screen.getByTestId("image-editor-foot-note")).toHaveTextContent(
+      "To update site placements, use Replace across site from asset details.",
+    );
+    expect(screen.getByTestId("image-editor-well").querySelector("img")).toHaveAttribute("src", EDITED);
+    expect(props.onClose).not.toHaveBeenCalled();
+  });
+
+  it("Done hands off to the host's onDone and closes", async () => {
+    const { props } = mount();
+    fireEvent.click(screen.getByTestId("image-editor-save"));
+    await waitFor(() => screen.getByTestId("image-editor-done"));
+    fireEvent.click(screen.getByTestId("image-editor-done"));
+    expect(props.onDone).toHaveBeenCalledTimes(1);
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("‹ Back to editor returns to the tabs with the draft intact", async () => {
+    mount();
+    fireEvent.click(tab("adjust"));
+    fireEvent.click(screen.getByTestId("image-editor-preset-cool"));
+    fireEvent.click(screen.getByTestId("image-editor-save"));
+    await waitFor(() => screen.getByTestId("image-editor-back"));
+    expect(screen.getByTestId("image-editor-back")).toHaveTextContent("Back to editor");
+    fireEvent.click(screen.getByTestId("image-editor-back"));
+    expect(screen.getByTestId("image-editor-tabs")).toBeInTheDocument();
+    expect(tab("adjust")).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("image-editor-preset-cool")).toHaveAttribute("aria-pressed", "true");
   });
 
   it("a legacy one-argument onSave still receives the data URL", async () => {
@@ -419,9 +462,52 @@ describe("Save version — J-3397:39917 (the Clone's Saved state lands with J-36
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls[0][0]).toBe(EDITED);
   });
+});
 
-  it("a rejected onSave keeps the dialog and the draft", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => {});
+describe("Clone 3695:45549 · Discard", () => {
+  it("Cancel on a clean draft closes at once", () => {
+    const { props } = mount();
+    fireEvent.click(screen.getByTestId("image-editor-cancel"));
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("image-editor-discard")).toBeNull();
+  });
+
+  it("Cancel on a dirty draft asks; Keep editing returns, Discard changes closes", () => {
+    const { props } = mount();
+    fireEvent.click(screen.getByTestId("image-editor-flip-v"));
+    fireEvent.click(screen.getByTestId("image-editor-cancel"));
+    expect(props.onClose).not.toHaveBeenCalled();
+    expect(screen.getByTestId("image-editor-discard-title")).toHaveTextContent("Discard unsaved changes?");
+    fireEvent.click(screen.getByTestId("image-editor-discard-keep"));
+    expect(screen.queryByTestId("image-editor-discard")).toBeNull();
+    expect(screen.getByTestId("image-editor-flip-v")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("image-editor-cancel"));
+    fireEvent.click(screen.getByTestId("image-editor-discard-confirm"));
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("Escape is Cancel — it asks on a dirty draft", () => {
+    const { props } = mount();
+    fireEvent.click(screen.getByTestId("image-editor-flip-v"));
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(props.onClose).not.toHaveBeenCalled();
+    expect(screen.getByTestId("image-editor-discard")).toBeInTheDocument();
+  });
+
+  it("after a save the draft is clean again — Cancel closes without asking", async () => {
+    const { props } = mount();
+    fireEvent.click(screen.getByTestId("image-editor-flip-v"));
+    fireEvent.click(screen.getByTestId("image-editor-save"));
+    await waitFor(() => screen.getByTestId("image-editor-back"));
+    fireEvent.click(screen.getByTestId("image-editor-back"));
+    fireEvent.click(screen.getByTestId("image-editor-cancel"));
+    expect(screen.queryByTestId("image-editor-discard")).toBeNull();
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Clone 3695:45542 · Failure", () => {
+  it("a rejected onSave opens Version could not be saved; Continue editing keeps the draft", async () => {
     const onSave = vi.fn(async () => {
       throw new Error("upload boom");
     });
@@ -429,9 +515,33 @@ describe("Save version — J-3397:39917 (the Clone's Saved state lands with J-36
     fireEvent.click(tab("adjust"));
     fireEvent.click(screen.getByTestId("image-editor-preset-warm"));
     fireEvent.click(screen.getByTestId("image-editor-save"));
-    await waitFor(() => expect(onSave).toHaveBeenCalled());
-    await waitFor(() => expect(screen.getByTestId("image-editor-save")).toHaveTextContent("Save version"));
+    await waitFor(() => screen.getByTestId("image-editor-failed-title"));
+    expect(screen.getByTestId("image-editor-failed-body")).toHaveTextContent(
+      "Your edits are retained. Check your connection and try again.",
+    );
+    fireEvent.click(screen.getByTestId("image-editor-failed-continue"));
+    expect(screen.queryByTestId("image-editor-failed")).toBeNull();
     expect(screen.getByTestId("image-editor-preset-warm")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByTestId("image-editor-saved-title")).toBeNull();
     expect(props.onClose).not.toHaveBeenCalled();
+  });
+
+  it("Retry save re-runs the SAME save and lands on Saved when it succeeds", async () => {
+    let attempts = 0;
+    const onSave = vi.fn(async () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("upload boom");
+    });
+    mount({ onSave });
+    fireEvent.click(screen.getByTestId("image-editor-rotate-cw"));
+    fireEvent.click(screen.getByTestId("image-editor-save"));
+    await waitFor(() => screen.getByTestId("image-editor-failed-retry"));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("image-editor-failed-retry"));
+    });
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    expect(onSave.mock.calls[1]).toEqual(onSave.mock.calls[0]);
+    await waitFor(() => expect(screen.getByTestId("image-editor-saved-title")).toHaveTextContent("Version saved"));
+    expect(screen.queryByTestId("image-editor-failed")).toBeNull();
   });
 });

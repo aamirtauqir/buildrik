@@ -11,9 +11,16 @@
  * so.
  *
  * The model is the Clone's: Save creates a VERSION of the same asset and
- * applying it to the site is a separate step. Save awaits `onSave` and
- * closes; the Clone's Saved state (3681:20026), discard (3695:45549) and
- * failure (3695:45542) dialogs land in J-3681:20026.
+ * applying it to the site is a separate step. So a successful save does not
+ * close the dialog — it turns into the Saved state (3681:20026): no tab row,
+ * the saved bytes in the well, `Version saved` with the edits summary, and
+ * `‹ Back to editor` / `Done`. Done hands off to the host's `onDone` (P6-V
+ * opens Asset versions from it) and closes.
+ *
+ * Cancel on a dirty draft asks first (3695:45549 `DiscardEditsModal`);
+ * Escape and the scrim go through the same door. A rejected `onSave` opens
+ * 3695:45542 `SaveFailedModal` over the untouched draft; Retry re-runs the
+ * SAME bytes and snapshot.
  *
  * Save version is disabled only while the Resize entry is invalid — a
  * plain re-encode with no edit is a legitimate version (it is what the
@@ -31,9 +38,11 @@
 import * as React from "react";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ChevronLeft } from "lucide-react";
 import { Button, OverlayMount } from "@/editor/chrome-ui";
 import { estimateSize, loadImage } from "@/engine/media/MediaOptimizerHelpers";
+import { DiscardEditsModal } from "./components/DiscardEditsModal";
+import { SaveFailedModal } from "./components/SaveFailedModal";
 import {
   LIBRARY_MODAL_BTN_PRIMARY,
   LIBRARY_MODAL_BTN_SECONDARY,
@@ -43,6 +52,8 @@ import {
   EDITOR_TABS,
   INITIAL_DRAFT,
   buildCssFilter,
+  describeEdits,
+  isDraftDirty,
   outputSize,
   snapshotEdits,
   sourceFormatOf,
@@ -72,10 +83,15 @@ export interface ImageEditorModalProps {
    * Clone (`(dataUrl) => …`) still type-checks and still gets the bytes.
    */
   onSave: (dataUrl: string, edits: EditsSnapshot) => void | Promise<void>;
-  /** The Saved state's Done (J-3681:20026) — the host opens Asset versions from here. */
+  /** The Saved state's Done — the host opens Asset versions from here. */
   onDone?: () => void;
   /** Which tab opens first; the library's Optimize door asks for "optimise". */
   initialTab?: ImageEditorTab;
+}
+
+interface SavedVersion {
+  dataUrl: string;
+  edits: EditsSnapshot;
 }
 
 const ESTIMATE_DEBOUNCE_MS = 300;
@@ -101,6 +117,7 @@ const WELL =
 const STATUS =
   "tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:tabular-nums tw:text-[var(--bk-ink-soft)]";
 const FOOT_NOTE = "tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const SUMMARY_LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
 // ── Component ───────────────────────────────────────────────────────────────
 
@@ -110,16 +127,23 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
   imageSrc,
   fileName,
   onSave,
+  onDone,
   initialTab = "crop",
 }) => {
   const [tab, setTab] = React.useState<ImageEditorTab>(initialTab);
   const [draft, setDraft] = React.useState<ImageDraft>(INITIAL_DRAFT);
+  /* What "unchanged" means for Cancel: the draft as opened, then the draft as
+     last saved — after a save there is nothing left to lose. */
+  const [baseline, setBaseline] = React.useState<ImageDraft>(INITIAL_DRAFT);
   const [cropPixels, setCropPixels] = React.useState<Area>({ x: 0, y: 0, width: 0, height: 0 });
   const [intrinsic, setIntrinsic] = React.useState<OutputSize | null>(null);
   const [imageError, setImageError] = React.useState(false);
   const [originalBytes, setOriginalBytes] = React.useState(0);
   const [estimatedBytes, setEstimatedBytes] = React.useState<number | null>(null);
   const [saving, setSaving] = React.useState(false);
+  const [saved, setSaved] = React.useState<SavedVersion | null>(null);
+  const [failed, setFailed] = React.useState<SavedVersion | null>(null);
+  const [discarding, setDiscarding] = React.useState(false);
 
   const patch = React.useCallback((changes: Partial<ImageDraft>) => setDraft((d) => ({ ...d, ...changes })), []);
 
@@ -152,12 +176,13 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
   const output = outputSize(draft, crop);
   const sourceFormat = React.useMemo(() => sourceFormatOf(fileName, imageSrc), [fileName, imageSrc]);
   const resizeValid = draft.width === "" && draft.height === "" ? true : validateResize(draft.width, draft.height).ok;
+  const dirty = isDraftDirty(draft, baseline);
 
   /* The Optimise estimate: the draft encoded at the chosen format and quality
      through the same function Save uses, measured, dropped. Debounced so a
      slider drag does not encode on every tick. */
   React.useEffect(() => {
-    if (!isOpen || tab !== "optimise" || imageError || crop.width === 0) return;
+    if (!isOpen || tab !== "optimise" || saved || imageError || crop.width === 0) return;
     let alive = true;
     setEstimatedBytes(null);
     const timer = setTimeout(() => {
@@ -174,32 +199,65 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
       alive = false;
       clearTimeout(timer);
     };
-  }, [isOpen, tab, imageError, imageSrc, draft, cropPixels, crop.width]);
+  }, [isOpen, tab, saved, imageError, imageSrc, draft, cropPixels, crop.width]);
 
   const onCropComplete = React.useCallback((_: Area, pixels: Area) => setCropPixels(pixels), []);
+
+  /* One save path for the button and the failure dialog's Retry: the retry
+     re-sends the bytes that failed, never a re-render of a draft that may
+     have moved. */
+  const runSave = React.useCallback(
+    async (version: SavedVersion) => {
+      setSaving(true);
+      try {
+        await onSave(version.dataUrl, version.edits);
+        setFailed(null);
+        setSaved(version);
+        setBaseline(draft);
+      } catch {
+        setFailed(version);
+      } finally {
+        setSaving(false);
+      }
+    },
+    [onSave, draft],
+  );
 
   const handleSave = React.useCallback(async () => {
     if (saving || !resizeValid) return;
     setSaving(true);
+    let dataUrl: string;
     try {
-      const dataUrl = await renderImageEdits(imageSrc, draft, cropPixels);
-      await onSave(dataUrl, snapshotEdits(draft, output, sourceFormat));
-      onClose();
-    } catch (err) {
-      // The dialog stays open with the draft intact; the Clone's failure
-      // dialog (3695:45542) lands in J-3681:20026.
-      console.error("Image save failed:", err);
-    } finally {
+      dataUrl = await renderImageEdits(imageSrc, draft, cropPixels);
+    } catch {
       setSaving(false);
+      setFailed({ dataUrl: "", edits: snapshotEdits(draft, output, sourceFormat) });
+      return;
     }
-  }, [saving, resizeValid, imageSrc, draft, cropPixels, output, sourceFormat, onSave, onClose]);
+    await runSave({ dataUrl, edits: snapshotEdits(draft, output, sourceFormat) });
+  }, [saving, resizeValid, imageSrc, draft, cropPixels, output, sourceFormat, runSave]);
+
+  const handleRetry = React.useCallback(() => {
+    if (!failed) return;
+    if (failed.dataUrl) void runSave(failed);
+    else void handleSave();
+  }, [failed, runSave, handleSave]);
+
+  const requestCancel = React.useCallback(() => {
+    if (saved) {
+      onClose();
+      return;
+    }
+    if (dirty) setDiscarding(true);
+    else onClose();
+  }, [saved, dirty, onClose]);
 
   if (!isOpen) return null;
 
   const subtitle = [fileName, intrinsic ? `${intrinsic.width} × ${intrinsic.height}` : null].filter(Boolean).join(" · ");
 
   return (
-    <OverlayMount open={isOpen} onClose={onClose} labelledBy="image-editor-title">
+    <OverlayMount open={isOpen} onClose={requestCancel} dirty={dirty && !saved} labelledBy="image-editor-title">
       <div className={FRAME} data-testid="image-editor-card">
         {/* Head */}
         <div className="tw:shrink-0 tw:px-6 tw:pt-6 tw:pb-4">
@@ -211,7 +269,8 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
               {subtitle}
             </p>
           )}
-          <div className="tw:mt-4 tw:flex tw:gap-2" role="tablist" aria-label="Editor sections" data-testid="image-editor-tabs">
+          {!saved && (
+            <div className="tw:mt-4 tw:flex tw:gap-2" role="tablist" aria-label="Editor sections" data-testid="image-editor-tabs">
               {EDITOR_TABS.map((t) => (
                 <Button
                   key={t.id}
@@ -226,14 +285,17 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {t.label}
                 </Button>
               ))}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Body */}
         <div className="tw:flex tw:min-h-0 tw:flex-1 tw:gap-6 tw:bg-[var(--bk-bg-subtle)] tw:px-6 tw:py-6">
-          <section className={`${PREVIEW_CARD} tw:w-[510px] tw:shrink-0`} aria-label="Preview">
+          <section className={`${PREVIEW_CARD} ${saved ? "tw:flex-1" : "tw:w-[510px] tw:shrink-0"}`} aria-label="Preview">
             <div className={WELL} data-testid="image-editor-well">
-              {imageError ? (
+              {saved ? (
+                <img src={saved.dataUrl} alt="Saved version" className="tw:size-full tw:object-contain" />
+              ) : imageError ? (
                 <div className="tw:flex tw:h-full tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:px-8 tw:text-center tw:text-[var(--bk-ink-soft)]">
                   <AlertTriangle size={24} aria-hidden="true" />
                   <span className="tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:text-[var(--bk-ink)]">
@@ -268,18 +330,47 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
               <span className={STATUS} data-testid="image-editor-status">
                 {statusLine(draft, crop)}
               </span>
-              <Button
-                size="xs"
-                variant="ghost"
-                className={`${LIBRARY_MODAL_BTN_PRIMARY} tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`}
-                data-testid="image-editor-reset"
-                onClick={() => setDraft(INITIAL_DRAFT)}
-              >
-                Reset all
-              </Button>
+              {!saved && (
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  className={`${LIBRARY_MODAL_BTN_PRIMARY} tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`}
+                  data-testid="image-editor-reset"
+                  onClick={() => setDraft(INITIAL_DRAFT)}
+                >
+                  Reset all
+                </Button>
+              )}
             </div>
           </section>
 
+          {saved ? (
+            <aside className="tw:flex tw:w-[280px] tw:shrink-0 tw:flex-col tw:gap-4 tw:overflow-y-auto" data-testid="image-editor-saved">
+              <div>
+                <h3
+                  className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:leading-6 tw:font-semibold tw:text-[var(--bk-success-text)]"
+                  data-testid="image-editor-saved-title"
+                >
+                  Version saved
+                </h3>
+                <p
+                  className="tw:m-0 tw:mt-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
+                  data-testid="image-editor-saved-body"
+                >
+                  Version saved. Original retained.{" "}
+                  <br />
+                  Not yet applied to site.
+                </p>
+              </div>
+              <ul className="tw:m-0 tw:mt-6 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0" data-testid="image-editor-saved-summary">
+                {describeEdits(saved.edits).map((line) => (
+                  <li key={line} className={SUMMARY_LINE}>
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          ) : (
             <aside className="tw:flex tw:min-h-0 tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto" data-testid="image-editor-controls">
               {tab === "crop" && <CropControls draft={draft} patch={patch} />}
               {tab === "adjust" && <AdjustControls draft={draft} patch={patch} />}
@@ -293,10 +384,40 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 />
               )}
             </aside>
+          )}
         </div>
 
         {/* Foot */}
         <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-2 tw:px-6 tw:py-5">
+          {saved ? (
+            <>
+              <span className={FOOT_NOTE} data-testid="image-editor-foot-note">
+                To update site placements, use Replace across site from asset details.
+              </span>
+              <Button
+                size="xs"
+                variant="ghost"
+                className={`${LIBRARY_MODAL_BTN_PRIMARY} tw:gap-1 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`}
+                data-testid="image-editor-back"
+                onClick={() => setSaved(null)}
+              >
+                <ChevronLeft size={14} aria-hidden="true" />
+                Back to editor
+              </Button>
+              <Button
+                size="xs"
+                className={LIBRARY_MODAL_BTN_PRIMARY}
+                data-testid="image-editor-done"
+                onClick={() => {
+                  onDone?.();
+                  onClose();
+                }}
+              >
+                Done
+              </Button>
+            </>
+          ) : (
+            <>
               <span className={FOOT_NOTE} data-testid="image-editor-foot-note">
                 Your draft stays with you across tabs. Save creates a version; site placements stay unchanged.
               </span>
@@ -305,7 +426,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                 variant="secondary"
                 className={LIBRARY_MODAL_BTN_SECONDARY}
                 data-testid="image-editor-cancel"
-                onClick={onClose}
+                onClick={requestCancel}
               >
                 Cancel
               </Button>
@@ -318,8 +439,25 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
               >
                 {saving ? "Saving…" : "Save version"}
               </Button>
+            </>
+          )}
         </div>
       </div>
+
+      <DiscardEditsModal
+        open={discarding}
+        onKeepEditing={() => setDiscarding(false)}
+        onDiscard={() => {
+          setDiscarding(false);
+          onClose();
+        }}
+      />
+      <SaveFailedModal
+        open={failed !== null}
+        retrying={saving}
+        onContinueEditing={() => setFailed(null)}
+        onRetry={handleRetry}
+      />
     </OverlayMount>
   );
 };
