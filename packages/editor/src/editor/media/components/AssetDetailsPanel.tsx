@@ -22,7 +22,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem, VersionEntry } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { versionLabel } from "./VersionsModal";
+import { versionLabel } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   Button,
   IconButton,

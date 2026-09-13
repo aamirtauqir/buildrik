@@ -29,7 +29,7 @@ import * as React from "react";
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import type { EditsSnapshot } from "@shared/types/media";
 import type { LibraryItem, VersionEntry } from "../../sidebar/tabs/media/data/mediaTypes";
-import { namePages } from "../../sidebar/tabs/media/data/mediaUtils";
+import { namePages, versionLabel } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,
@@ -57,7 +57,7 @@ const CARD_EDITS = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var
  * the editor's (P6-X `describeEdits`); this is the card's compact reading of
  * the same snapshot — main folds the two once the editor's export lands.
  */
-export function versionEditLines(edits: EditsSnapshot): [string, string] {
+function versionEditLines(edits: EditsSnapshot): [string, string] {
   return [
     `Crop: ${edits.crop} · Preset: ${edits.preset} · Format: ${edits.format}`,
     `Brightness: ${edits.brightness} · Contrast: ${edits.contrast} · Saturation: ${edits.saturation} · Blur: ${edits.blur}`,
@@ -66,12 +66,7 @@ export function versionEditLines(edits: EditsSnapshot): [string, string] {
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
-/** `v2 · Latest saved · 2400 × 1600` — the head of a card or a rail row. */
-export function versionLabel(entry: VersionEntry, total: number): string {
-  const kind = entry.index === 1 ? "Original" : entry.index === total ? "Latest saved" : "Saved";
-  return `v${entry.index} · ${kind}`;
-}
-
+/** `v2 · Latest saved · 2400 × 1600` — the card's head. */
 function cardHead(entry: VersionEntry, total: number): string {
   const { width, height } = entry.item;
   return width && height ? `${versionLabel(entry, total)} · ${width} × ${height}` : versionLabel(entry, total);
