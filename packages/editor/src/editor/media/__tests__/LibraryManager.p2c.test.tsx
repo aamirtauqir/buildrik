@@ -48,7 +48,7 @@ const menuConfirm: ConfirmDeletePayload = {
   isBulk: false,
 };
 
-async function mountLibrary(over: Partial<MediaStateResult> = {}) {
+async function mountLibrary(over: Partial<MediaStateResult> = {}, downloaded = 1) {
   mocks.state.mediaState = makeMediaState({
     libraryItems: TEN,
     counts: { all: TEN.length, img: 5, vid: 2, ico: 2, fnt: 1 },
@@ -56,6 +56,7 @@ async function mountLibrary(over: Partial<MediaStateResult> = {}) {
   });
   const { LibraryManager } = await import("../LibraryManager");
   const composer = makeComposer(USAGES);
+  (composer.media as unknown as { downloadAssets: () => number }).downloadAssets = vi.fn(() => downloaded);
   const utils = render(<LibraryManager composer={composer} onClose={vi.fn()} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />);
   return { ...utils, composer };
 }
@@ -123,5 +124,27 @@ describe("Clone 3701:20353 · Rename from the rail", () => {
   it("no longer mounts the drawer's asset drill-in in the library", async () => {
     await mountLibrary({ detailItem: TEN[0] });
     expect(screen.queryByTestId("media-detail-panel")).toBeNull();
+  });
+});
+
+describe("Clone 3701:20394 · Download prepared", () => {
+  const checked = { selMode: true, selectedKeys: new Set(["hero", "chef"]) };
+
+  it("after the bulk Download starts, says the archive is ready; Done dismisses it", async () => {
+    const { composer } = await mountLibrary(checked, 2);
+    fireEvent.click(within(screen.getByTestId("mgr-bulk-bar")).getByRole("button", { name: "Download" }));
+    expect(composer.media.downloadAssets).toHaveBeenCalledWith([
+      { src: "blob:hero", name: "hero-dark.jpg" },
+      { src: "blob:chef", name: "chef-intro.mp4" },
+    ]);
+    expect(screen.getByTestId("mgr-download-title")).toHaveTextContent("Download prepared");
+    fireEvent.click(screen.getByTestId("mgr-download-done"));
+    expect(screen.queryByTestId("mgr-download-prepared")).toBeNull();
+  });
+
+  it("does not claim a download that never started", async () => {
+    await mountLibrary(checked, 0);
+    fireEvent.click(within(screen.getByTestId("mgr-bulk-bar")).getByRole("button", { name: "Download" }));
+    expect(screen.queryByTestId("mgr-download-prepared")).toBeNull();
   });
 });

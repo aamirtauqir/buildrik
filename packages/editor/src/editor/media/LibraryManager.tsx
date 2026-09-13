@@ -20,6 +20,7 @@ import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDele
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
 import { RenameAssetModal } from "./components/RenameAssetModal";
+import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
@@ -189,10 +190,22 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      drawer's asset drill-in hub (`AssetDetailOverlay`, board 146:2), which has
      no name field at all. */
   const [renameTarget, setRenameTarget] = React.useState<LibraryItem | null>(null);
+  /* Clone 3701:20394 — the result of a bulk Download, once every selected
+     file has been handed to the browser. */
+  const [downloadPrepared, setDownloadPrepared] = React.useState(false);
   /* Clone 3708:20650 — "Replace instead" on the delete confirm opens the
      rail's replace-across picker for that asset, so the picker's open state
      lives here rather than in the rail. */
   const [replacePickerOpen, setReplacePickerOpen] = React.useState(false);
+
+  const handleDownload = React.useCallback(
+    (assets: ReadonlyArray<{ src: string; name: string }>) => {
+      const started = composer.media.downloadAssets(assets);
+      if (started > 0) setDownloadPrepared(true);
+      return started;
+    },
+    [composer],
+  );
 
   /* Clone 3708:20446 — after the delete the rail is back to "Select an asset
      to see details.": a selection pointing at a deleted asset is dropped, one
@@ -405,7 +418,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             see comment in AssetGrid.tsx for the full reasoning. */}
         <AssetGrid
           isDragOver={isDragOver}
-          onDownload={(assets) => composer.media.downloadAssets(assets)}
+          onDownload={handleDownload}
           onDismissUpload={state.dismissUpload}
           state={state}
           visibleItems={visibleItems}
@@ -581,6 +594,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onClose={() => setRenameTarget(null)}
         />
       )}
+      <DownloadPreparedModal open={downloadPrepared} onClose={() => setDownloadPrepared(false)} />
       {/* Replace-all picker now lives inside <AssetDetailsPanel> — see
           ./components/AssetDetailsPanel.tsx (D5 Stage 2). */}
     </div>

@@ -141,6 +141,8 @@ export function makeComposer(usages: Record<string, number> = {}) {
     media: {
       getAssets: () => [] as Array<{ key: string; tags?: string[] }>,
       getAssetSrc: vi.fn(() => Promise.resolve(null)),
+      /* Real shape: how many of the given assets it handed to the browser. */
+      downloadAssets: vi.fn((assets: ReadonlyArray<unknown>) => assets.length),
     },
   } as unknown as Parameters<typeof LibraryManager>[0]["composer"];
 }
