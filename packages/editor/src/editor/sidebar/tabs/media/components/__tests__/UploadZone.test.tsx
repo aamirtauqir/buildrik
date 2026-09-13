@@ -6,7 +6,7 @@ describe("UploadZone — consumes StorageQuotaBar", () => {
   it("renders StorageQuotaBar with current quota", () => {
     const onUpload = vi.fn();
     const { container } = render(
-      <UploadZone storage={{ used: 1e9, total: 5e9 }} onUpload={onUpload} uploadQueue={[]} />
+      <UploadZone storage={{ used: 1024 ** 3, total: 5 * 1024 ** 3 }} onUpload={onUpload} uploadQueue={[]} />
     );
     expect(container.querySelector(".med-quota-bar")).toBeInTheDocument();
     expect(container.querySelector(".med-quota-text")?.textContent).toMatch(/1 GB of 5 GB used/);

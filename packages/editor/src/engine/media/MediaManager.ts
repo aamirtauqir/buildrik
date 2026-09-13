@@ -242,7 +242,21 @@ export class MediaManager extends MediaEventEmitter {
    */
   rebuildRetryQueueFromState(): void {
     for (const asset of this.state.assets) {
-      if (asset.localOnly) this.retryQueue.add(asset.id);
+      if (asset.localOnly) {
+        this.retryQueue.add(asset.id);
+        continue;
+      }
+      /* An upload whose server mirror never completed but which was persisted
+         before the failure branch could mark it: no serverId, and a src that
+         is still this session's Object URL. Measured 2026-09-13 — ten such
+         records sat in IndexedDB with localOnly=false, so the sync pill read
+         "0 not on the server" over ten files that were not, and no drain ever
+         picked them up. The marker is set here so the pill, the publish
+         warning and the retry all agree. */
+      if (!asset.serverId && asset.src.startsWith("blob:") && toServerAssetType(asset.type)) {
+        asset.localOnly = true;
+        this.retryQueue.add(asset.id);
+      }
     }
   }
 
@@ -716,6 +730,17 @@ export class MediaManager extends MediaEventEmitter {
     this.rebuildFolderRetryQueueFromState();
     this.initialized = true;
     this.emit(MEDIA_EVENTS.INITIALIZED, { assetCount: this.state.assets.length });
+    /* The queue survived the reload; nothing drained it. The only triggers
+       were the `online` event and the chained retry after a NEW upload, so a
+       stranded file waited for the network to flap or for the person to
+       upload something else (measured 2026-09-13: ten device-only files sat
+       through four reloads with the server reachable the whole time). */
+    if (
+      (this.retryQueue.size > 0 || this.folderRetryQueue.size > 0) &&
+      (typeof navigator === "undefined" || navigator.onLine !== false)
+    ) {
+      void this.retryLocalOnlyAssets();
+    }
   }
 
   /** Has storage been read yet? False means "unknown", not "empty". */

@@ -40,7 +40,15 @@ const contentSecurityPolicy = [
      editor loads a blob: source, and the optimizer decodes data: URLs. Neither
      scheme was listed, so the browser refused both with "Fetch API cannot load
      data:image/webp" and optimization failed with nothing on screen to say so. */
-  "connect-src 'self' data: blob: https://fonts.bunny.net",
+  /* Media uploads go from the BROWSER straight to Vercel Blob: the editor's
+     AssetUploadService calls @vercel/blob/client upload(), which mints its
+     token through /api/asset-upload (same origin) and then PUTs the bytes to
+     https://vercel.com/api/blob (multipart parts to *.blob.vercel-storage.com).
+     Neither host was listed, so with a valid BLOB_READ_WRITE_TOKEN every upload
+     was refused with "Connecting to 'https://vercel.com/api/blob/…' violates
+     … connect-src" and fell back to the device-only path — measured
+     2026-09-13, the first day the token existed in any env. */
+  "connect-src 'self' data: blob: https://fonts.bunny.net https://vercel.com https://blob.vercel-storage.com https://*.blob.vercel-storage.com",
   `frame-src 'self' ${videoFrameSrc}`,
 ].join("; ");
 

@@ -89,6 +89,23 @@ Walk record: `docs/design-jobs/CLONE-ASSETS/phase1-journeys.md`; rows in
 `packages/editor/scripts/conformance/boards.json`, family `Assets · Clone`.
 Backend-shaped drift was recorded, not built (grilling Q9).
 
+> **C1, C2, C5 CLOSED 2026-09-13 (same day)** — a Vercel Blob store
+> (`buildrick-media`, Public, IAD1, Hobby) was created and its token put in
+> the root `.env.local`. The first upload with a real token found three
+> defects that no env had ever reached, all fixed in `feat/assets-clone-p1`:
+>
+> | what | where | fix |
+> |---|---|---|
+> | The dashboard CSP's `connect-src` refused `https://vercel.com/api/blob` — every browser upload fell to device-only **even with a valid token, in prod too** | `packages/dashboard/next.config.mjs` | `https://vercel.com https://blob.vercel-storage.com https://*.blob.vercel-storage.com` added |
+> | `@vercel/blob` refuses to overwrite a pathname, so a second `photo.jpg` 400'd and its retry re-hit the 400 forever | `app/api/asset-upload/route.ts` | client tokens `addRandomSuffix: true` |
+> | The E7 / E2 migrations were unapplied on the dev DB, so `media.listAssets` failed on `media_assets.width` and no server media ever loaded | `prisma migrate deploy` | applied (both additive) — **prod still needs it before the next deploy** |
+> | The retry queue survived reloads and nothing drained it; a record persisted mid-upload (no serverId, `blob:` src) was never marked local-only | `engine/media/MediaManager.ts` | `init()` drains; stranded records marked + queued |
+> | `formatQuotaSize` was decimal while the server multiplies `storageMB` by 1024² — the 500 MB plan printed as "524 MB" | `StorageQuotaBar.tsx` | binary |
+>
+> Verified live: 21 rows on `public.blob.vercel-storage.com`, pill gone,
+> footer `1 MB / 500 MB`, Insert onto a selected image writes the Blob URL
+> with "applied ✓" (3695:43991 → drift-fixed). C3 and C4 stay open as written.
+
 | row | screen | what the Clone draws | why code cannot (yet) | owner |
 |---|---|---|---|---|
 | **C1** storage footer | 3695:45155 | `24 assets · 84 MB / 500 MB` — bytes actually held on the server against the plan's quota | The footer prints `useServerStorageQuota` when the server answers and the local IndexedDB total (`1 MB / 524 MB`) otherwise. With no `BLOB_READ_WRITE_TOKEN` nothing reaches the server, so the real-bytes half cannot be verified here; the shape is right. | env / dashboard |

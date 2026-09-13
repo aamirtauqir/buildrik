@@ -13,9 +13,9 @@
    "drift-open": 69,
    "match": 58,
    "driven": 116,
-   "drift-fixed": 34,
+   "drift-fixed": 35,
    "no": 67,
-   "unreachable": 30
+   "unreachable": 29
   },
   "retired": 8
  },
@@ -5687,7 +5687,7 @@
    "authority": "board:clone-3695:45155",
    "recipe": "",
    "verified": "drift-fixed",
-   "verifiedNote": "Clone P1 walk 2026-09-13 (unified editor, scratch-ver, 1440×900, local-only assets). Full-viewport overlay (no rail/topbar, own Close) displaces V1 1159:4593's 1380×844 in-shell band. Title 'Asset library' (was 'Asset Library' + MANAGE tag + 'All Media' crumb); Upload is the primary; count line '<N> files · <scope>' replaces the foot's 'Showing N of M'; view controls are words ('Grid · 3 columns' · 2 3 4 · List) and the toggle counts columns; sort 'Date added'/'Name A–Z'; bordered 8-inset cards, 124 thumb, 12/500 names; video tile not a broken <img>; details rail 378. NOT conformed: Trash row (code: data-safety door), '.webp' filenames + WEBP chip (code:auto-webp — the upload pipeline transcodes rasters), sync pill glyph. Density kept at 32 (founder:density-32); the Clone's 44 refused."
+   "verifiedNote": "Clone P1 walk 2026-09-13 (unified editor, scratch-ver, 1440×900, local-only assets). Full-viewport overlay (no rail/topbar, own Close) displaces V1 1159:4593's 1380×844 in-shell band. Title 'Asset library' (was 'Asset Library' + MANAGE tag + 'All Media' crumb); Upload is the primary; count line '<N> files · <scope>' replaces the foot's 'Showing N of M'; view controls are words ('Grid · 3 columns' · 2 3 4 · List) and the toggle counts columns; sort 'Date added'/'Name A–Z'; bordered 8-inset cards, 124 thumb, 12/500 names; video tile not a broken <img>; details rail 378. NOT conformed: Trash row (code: data-safety door), '.webp' filenames + WEBP chip (code:auto-webp — the upload pipeline transcodes rasters), sync pill glyph. Second pass with a Blob token: footer '21 assets · 1 MB / 500 MB' off the server quota, pill gone once every upload synced. Density kept at 32 (founder:density-32); the Clone's 44 refused."
   },
   {
    "nodeId": "3695:20340",
@@ -5924,8 +5924,8 @@
    "status": "active",
    "authority": "board:clone-3695:43991",
    "recipe": "",
-   "verified": "unreachable",
-   "verifiedNote": "Clone P1 walk 2026-09-13 (unified editor, scratch-ver, 1440×900, local-only assets). UNREACHABLE AS DRAWN: the board's asset came through a real upload to the server; this env has no BLOB_READ_WRITE_TOKEN, so every upload is localOnly and the editor (correctly) warns 'only on this device'. The apply itself is the 3695:44165 path and passed."
+   "verified": "drift-fixed",
+   "verifiedNote": "Clone P1 walk 2026-09-13, second pass with a Vercel Blob token (store buildrick-media). REACHABLE NOW, and the walk found three defects between the token and the screen: (1) the dashboard CSP's connect-src refused https://vercel.com/api/blob — every browser upload fell to device-only even with a valid token, in prod too; (2) @vercel/blob refuses to overwrite a pathname, so a second photo.jpg 400'd and its retry re-hit the 400 forever — client tokens now add a random suffix; (3) the two E7/E2 migrations were unapplied on this DB, so media.listAssets failed on media_assets.width and no server media ever loaded — applied. Also: init() now drains the retry queue (it survived reloads and nothing drained it), and a serverId-less blob: record is marked local-only at init. Upload → PUT to Blob 200 → MediaAsset row → Insert onto the selected image: src is the public.blob.vercel-storage.com URL, toast 'applied ✓', no device-only warning. Footer reads the server quota '1 MB / 500 MB' (formatter was decimal and printed the 500 MB plan as 524 MB)."
   },
   {
    "nodeId": "3695:44165",

@@ -156,6 +156,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return {
           allowedContentTypes: ALLOWED_CONTENT_TYPES,
           maximumSizeInBytes: maxFileBytes,
+          /* Two uploads named photo.jpg must both land. @vercel/blob refuses
+             to overwrite a pathname by default (400 "blob already exists"),
+             and the editor treats that 400 like a network failure — the
+             second file went device-only and its retry queue re-hit the same
+             400 forever. Measured 2026-09-13 with the Clone fixtures on the
+             first day a token existed in any env. The MediaAsset row keeps
+             the original filename; only the stored URL carries the suffix. */
+          addRandomSuffix: true,
           tokenPayload: JSON.stringify({
             userId,
             bytes: parsedClientPayload.bytes,

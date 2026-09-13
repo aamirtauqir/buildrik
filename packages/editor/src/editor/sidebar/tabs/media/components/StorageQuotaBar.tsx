@@ -29,16 +29,19 @@ interface StorageQuotaBarProps {
 /**
  * Board copy is MB-precise under a gigabyte: "842 MB of 1 GB used".
  *
- * DECIMAL, not binary, and exported so there is one quota formatter rather
- * than two. Plans are sold in decimal GB — a 5 GB plan is 5,000,000,000 bytes —
- * so `formatBytes` (1024-based, from shared/utils/helpers/number) renders the
- * same allowance as "4.66 GB". The fullpage library footer used it, so the
- * drawer said "of 5 GB" and the library said "/ 4.66 GB" for one quota, which
- * reads as the allowance shrinking when you expand the panel.
+ * BINARY, because that is what the server sells: `checkStorageQuota` turns
+ * PLAN_LIMITS.storageMB into bytes with `* 1024 * 1024`, so the FREE plan's
+ * "500 MB" arrives as 524,288,000. This formatter was decimal — on the belief
+ * that plans are sold in decimal GB — and printed that same allowance as
+ * "524 MB" (and PRO's 5 GB as "5.4 GB"): the library promised more than the
+ * plan grants. Measured 2026-09-13 with the first server quota this env
+ * ever answered. One formatter, exported, so the drawer and the fullpage
+ * library never disagree about the same number.
  */
+const MIB = 1024 * 1024;
 export function formatQuotaSize(bytes: number): string {
-  if (bytes < 1e9) return `${Math.round(bytes / 1e6)} MB`;
-  const gb = bytes / 1e9;
+  if (bytes < 1024 * MIB) return `${Math.round(bytes / MIB)} MB`;
+  const gb = bytes / (1024 * MIB);
   return `${gb >= 10 ? gb.toFixed(0) : gb.toFixed(1).replace(/\.0$/, "")} GB`;
 }
 

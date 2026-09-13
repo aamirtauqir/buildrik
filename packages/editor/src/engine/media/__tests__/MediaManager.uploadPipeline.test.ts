@@ -442,6 +442,50 @@ describe("retry queue rebuild (Phase B5 P2 durability)", () => {
     expect((manager as any).retryQueue.size).toBe(1);
   });
 
+  // A record persisted mid-upload — no serverId, src still a session blob:
+  // URL — is a stranded upload, not a synced one. Ten of them sat under a
+  // "0 not on the server" pill on 2026-09-13.
+  it("treats a serverId-less blob: asset as local-only and queues it", () => {
+    const manager = new MediaManager(makeRemoteSync());
+    mockStorage(manager);
+    seedAsset(manager, { id: "a-stranded", src: "blob:http://localhost:3000/551dd30e" });
+    seedAsset(manager, { id: "a-stock", src: "https://images.pexels.com/x.jpg" });
+    seedAsset(manager, { id: "a-audio", type: "audio", src: "blob:http://localhost:3000/aud" });
+
+    manager.rebuildRetryQueueFromState();
+
+    expect((manager as any).retryQueue.has("a-stranded")).toBe(true);
+    expect((manager as any).state.assets.find((a: MediaAsset) => a.id === "a-stranded").localOnly).toBe(true);
+    expect((manager as any).retryQueue.has("a-stock")).toBe(false);
+    expect((manager as any).retryQueue.has("a-audio")).toBe(false);
+  });
+
+  // The queue survived reloads; nothing drained it until the network
+  // flapped or a NEW upload succeeded. init() now drains it itself.
+  it("init() drains a rebuilt retry queue while online", async () => {
+    const remote = makeRemoteSync();
+    const manager = new MediaManager(remote);
+    const s = mockStorage(manager);
+    s.getAllAssets = vi.fn(async () => [
+      {
+        id: "a-local",
+        type: "image",
+        name: "x",
+        originalName: "x.png",
+        src: "blob:http://localhost:3000/abc",
+        mimeType: "image/png",
+        size: 3,
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        localOnly: true,
+      },
+    ]);
+
+    await manager.init();
+    await vi.waitFor(() => expect(remote.uploadAndCreate).toHaveBeenCalledTimes(1));
+  });
+
   it("rebuildFolderRetryQueueFromState seeds folderRetryQueue from localOnly folders", () => {
     const manager = new MediaManager(makeRemoteSync());
     mockStorage(manager);
