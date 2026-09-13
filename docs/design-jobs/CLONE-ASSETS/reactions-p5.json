@@ -1,0 +1,25 @@
+{
+ "sizes": [
+  "0:3721:43084 Typography · Choose heading family [Dialog card 640x372]",
+  "1:3721:44821 Typography · Brand inspector font picker [Dialog card 640x432]",
+  "2:3686:42317 Assets · Site fonts [Dialog card 640x421]",
+  "3:3695:45594 Assets · Font added [Dialog card 640x185]",
+  "4:3695:45606 Assets · No fonts found [Dialog card 640x168]"
+ ],
+ "sigs": [
+  "Inter · Built in|CLIC|SET_ @0,1",
+  "Inter · Built in|CLIC|CLOS @0,1",
+  "Inter Variable · Uploaded|CLIC|SET_ @0,1",
+  "Inter Variable · Uploaded|CLIC|CLOS @0,1",
+  "Manage site fonts|CLIC|OVE>3686:42317 Site fonts @0,1",
+  "Cancel|CLIC|CLOS @0,1,2,4",
+  "Inter Tight · Built in|CLIC|SET_ @1",
+  "Inter Tight · Built in|CLIC|CLOS @1",
+  "Action / Search fonts|CLIC|SWA>3695:45606 No fonts found @2",
+  "Add font|CLIC|SET_ @2",
+  "Add font|CLIC|SWA>3695:45594 Font added @2",
+  "Done|CLIC|CLOS @3",
+  "Action / Manage site fonts|CLIC|SWA>3686:42317 Site fonts @3",
+  "Clear search|CLIC|SWA>3686:42317 Site fonts @4"
+ ]
+}
