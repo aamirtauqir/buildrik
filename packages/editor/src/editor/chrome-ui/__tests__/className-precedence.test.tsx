@@ -64,3 +64,25 @@ describe("caller className vs flowbite theme", () => {
     expect(classes.every((c) => c.startsWith("tw:"))).toBe(true);
   });
 });
+
+/* IconButton is chrome-ui's own element, not a flowbite one, so nothing merged
+   for it: `size="sm"` appended `tw:h-6` after the base `tw:h-8` and a caller's
+   `tw:bg-[var(--bk-bg-card)]` sat beside the base `tw:bg-transparent`. Both
+   compiled, the stylesheet's order decided, and the library's card `···`
+   measured 32px and transparent live (2026-09-13). Same contract as above. */
+import { IconButton } from "../index";
+
+describe("caller className vs IconButton's own classes", () => {
+  it("size='sm' is 24 and a caller's background beats the transparent base", () => {
+    const { container } = render(
+      <IconButton label="More" size="sm" className="tw:bg-[var(--bk-bg-card)]">
+        ···
+      </IconButton>,
+    );
+    const utils = utilities(classesOf(container.firstElementChild));
+    expect(utils).toContain("h-6");
+    expect(utils).not.toContain("h-8");
+    expect(utils).toContain("bg-[var(--bk-bg-card)]");
+    expect(utils).not.toContain("bg-transparent");
+  });
+});
