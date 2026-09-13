@@ -866,7 +866,14 @@ export class MediaManager extends MediaEventEmitter {
 
     const validation = validateFile(file);
     if (!validation.valid) {
-      this.emit(MEDIA_EVENTS.UPLOAD_ERROR, { fileName: file.name, error: validation.error });
+      /* The numbers ride along with the prose: the drawer's rejected row
+         (Clone 3584:45522) offers a replacement against the real limit. */
+      this.emit(MEDIA_EVENTS.UPLOAD_ERROR, {
+        fileName: file.name,
+        error: validation.error,
+        size: file.size,
+        limit: validation.limit,
+      });
       return { success: false, error: validation.error, fileName: file.name };
     }
 

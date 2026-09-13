@@ -14,7 +14,8 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
-import { TEN, makeComposer, makeFolder, makeMediaState } from "./libraryFixture";
+import type { UploadResult } from "../../../shared/types/media";
+import { TEN, makeAsset, makeComposer, makeFile, makeFolder, makeMediaState } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
   state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
@@ -34,7 +35,11 @@ vi.mock("../../sidebar/tabs/media/components/ConfirmDeleteModal", () => ({ Confi
 vi.mock("../../sidebar/tabs/media/components/MediaContextMenu", () => ({ MediaContextMenu: () => null }));
 vi.mock("../../sidebar/tabs/media/components/AssetDetailOverlay", () => ({ AssetDetailOverlay: () => null }));
 
-async function mountLibrary(over: Partial<MediaStateResult> = {}, usages: Record<string, number> = {}) {
+async function mountLibrary(
+  over: Partial<MediaStateResult> = {},
+  usages: Record<string, number> = {},
+  media: Parameters<typeof makeComposer>[1] = {},
+) {
   mocks.state.mediaState = makeMediaState({
     libraryItems: TEN,
     counts: { all: TEN.length, img: 5, vid: 2, ico: 2, fnt: 1 },
@@ -43,7 +48,7 @@ async function mountLibrary(over: Partial<MediaStateResult> = {}, usages: Record
   const { LibraryManager } = await import("../LibraryManager");
   const onClose = vi.fn();
   const utils = render(
-    <LibraryManager composer={makeComposer(usages)} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />
+    <LibraryManager composer={makeComposer(usages, media)} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />
   );
   return { ...utils, onClose };
 }
@@ -355,14 +360,10 @@ describe("Clone 3700:20353 · Assets · Campaign images · empty folder created 
     click.mockRestore();
   });
 
-  it("files picked while a folder is the scope land IN that folder, the way a drop already did", async () => {
-    const upload = vi.fn(() => Promise.resolve(true));
-    await mountLibrary({ ...emptyFolder(), upload });
-    const input = document.querySelector<HTMLInputElement>("input[type='file']")!;
-    const file = new File(["x"], "campaign.png", { type: "image/png" });
-    fireEvent.change(input, { target: { files: [file] } });
-    expect(upload).toHaveBeenCalledWith([file], { folderId: "f-new" });
-  });
+  /* "files picked while a folder is the scope land IN that folder" moved to
+     the P3-U block below: Clone 3724:20828 puts the Upload files confirm
+     between the picker and `state.upload`, so the picker no longer uploads
+     on change. */
 
   it("the library-empty hero stays for the root and for smart scopes", async () => {
     await mountLibrary({ libraryItems: [], currentFolderId: null });
@@ -653,5 +654,138 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
     expect(bulkMoveAssets).toHaveBeenCalledWith(["hero", "chef"], null);
     await screen.findByTestId("mgr-det-move-result");
     expect(rail().getByRole("heading", { name: "Moved to All assets" })).toBeInTheDocument();
+  });
+});
+
+/* ─── P3-U Upload ───────────────────────────────────────────────────────── */
+
+const MB = 1024 * 1024;
+const fileTransfer = (files: File[]) => ({ types: ["Files"], files, dropEffect: "" });
+const pickFiles = (files: File[]) =>
+  fireEvent.change(document.querySelector<HTMLInputElement>("input[type='file'][multiple]")!, { target: { files } });
+const landedResult = (asset: ReturnType<typeof makeAsset>) => [{ success: true, asset, fileName: asset.originalName }];
+
+describe("Clone 3397:18137 · fullpage · drag-over (re-draws V1 1163:13948)", () => {
+  it("files over the library turn the grid column into the drop zone; the rail and the top bar stay", async () => {
+    await mountLibrary();
+    const root = screen.getByTestId("mgr-root");
+    fireEvent.dragEnter(root, { dataTransfer: fileTransfer([]) });
+    const zone = screen.getByTestId("mgr-dropzone");
+    expect(screen.getByTestId("mgr-grid-col")).toContainElement(zone);
+    expect(screen.getByTestId("mgr-dropzone-title")).toHaveTextContent("Drop files to upload");
+    // The code's formats and the code's limits — not the board's "50 MB per file".
+    expect(screen.getByTestId("mgr-dropzone-sub")).toHaveTextContent(
+      "JPG · PNG · GIF · WebP · SVG · AVIF · MP4 · WebM · OGV · MOV · WOFF2 · WOFF · TTF · OTF — up to 10 MB per image · 1 MB per SVG · 100 MB per video · 5 MB per font",
+    );
+    expect(screen.getByTestId("mgr-top")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-details")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-row-all-assets")).toBeInTheDocument();
+    fireEvent.dragLeave(root);
+    expect(screen.queryByTestId("mgr-dropzone")).toBeNull();
+  });
+
+  it("a drop uploads straight into the current scope — no confirm on the way (edge AFTE → 3397:17505)", async () => {
+    const upload = vi.fn(() => Promise.resolve([]));
+    await mountLibrary({ upload, currentFolderId: "f1", allFolders: [makeFolder({ id: "f1", name: "Products" })] });
+    const root = screen.getByTestId("mgr-root");
+    const file = makeFile("pasta-2-small.jpg", 8 * MB);
+    fireEvent.dragEnter(root, { dataTransfer: fileTransfer([file]) });
+    fireEvent.drop(root, { dataTransfer: fileTransfer([file]) });
+    expect(upload).toHaveBeenCalledWith([file], { folderId: "f1" });
+    expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
+    expect(screen.queryByTestId("mgr-dropzone")).toBeNull();
+  });
+});
+
+describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", () => {
+  it("the header Upload's picker opens the confirm; Cancel uploads nothing", async () => {
+    const upload = vi.fn(() => Promise.resolve([]));
+    await mountLibrary({ upload });
+    pickFiles([makeFile("pasta-2-small.jpg", 8 * MB)]);
+    expect(screen.getByTestId("mgr-upload-files")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-upload-files-line-0")).toHaveTextContent("pasta-2-small.jpg · JPG · 8 MB");
+    expect(upload).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("mgr-upload-files-cancel"));
+    expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
+    expect(upload).not.toHaveBeenCalled();
+  });
+
+  it("files picked while a folder is the scope land IN that folder, the way a drop already did (3700:20353)", async () => {
+    const upload = vi.fn(() => Promise.resolve([]));
+    await mountLibrary({
+      upload,
+      libraryItems: [],
+      currentFolderId: "f-new",
+      allFolders: [makeFolder({ id: "f-new", name: "Campaign images" })],
+    });
+    const file = makeFile("campaign.png", MB, "image/png");
+    pickFiles([file]);
+    fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
+    expect(upload).toHaveBeenCalledWith([file], { folderId: "f-new" });
+  });
+
+  it("Upload file → the modal waits on the queue, then Upload complete; View asset selects it in the rail and closes", async () => {
+    let finish: (v: UploadResult[]) => void = () => {};
+    const upload = vi.fn(() => new Promise<UploadResult[]>((resolve) => { finish = resolve; }));
+    await mountLibrary({
+      upload,
+      uploadQueue: [{ fileName: "hero-dark.jpg", progress: 62, status: "uploading" }],
+    });
+    const file = makeFile("hero-dark.jpg", 8 * MB);
+    pickFiles([file]);
+    fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
+    expect(upload).toHaveBeenCalledWith([file], { folderId: null });
+    // Still the Upload files modal, now reading the queue.
+    expect(screen.getByTestId("mgr-upload-files-pct-0")).toHaveTextContent("62%");
+    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
+    finish(landedResult(makeAsset({ id: "hero", originalName: "hero-dark.jpg" })));
+    const done = await screen.findByTestId("mgr-upload-complete");
+    expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
+    expect(within(done).getByTestId("mgr-upload-complete-body")).toHaveTextContent("hero-dark.jpg is now in your library.");
+    fireEvent.click(screen.getByTestId("mgr-upload-complete-view"));
+    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
+    expect(within(screen.getByTestId("mgr-details")).getByText("hero-dark.jpg")).toBeInTheDocument();
+  });
+
+  it("Done closes the result and selects nothing", async () => {
+    const upload = vi.fn(() => Promise.resolve(landedResult(makeAsset({ id: "hero", originalName: "hero-dark.jpg" }))));
+    await mountLibrary({ upload });
+    pickFiles([makeFile("hero-dark.jpg", 8 * MB)]);
+    fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
+    fireEvent.click(await screen.findByTestId("mgr-upload-complete-done"));
+    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
+    expect(within(screen.getByTestId("mgr-details")).queryByText("hero-dark.jpg")).toBeNull();
+  });
+
+  it("a batch where nothing landed closes without a result — the grid's failed rows are the door", async () => {
+    const upload = vi.fn(() =>
+      Promise.resolve([{ success: false, error: "Server rejected", fileName: "hero-dark.jpg" }]),
+    );
+    await mountLibrary({ upload });
+    pickFiles([makeFile("hero-dark.jpg", 8 * MB)]);
+    fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
+    await vi.waitFor(() => expect(screen.queryByTestId("mgr-upload-files")).toBeNull());
+    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
+  });
+
+  it("the empty-library hero's Upload goes through the same confirm", async () => {
+    const upload = vi.fn(() => Promise.resolve([]));
+    await mountLibrary({ upload, libraryItems: [], counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 } });
+    const click = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(() => {});
+    fireEvent.click(screen.getByTestId("mgr-empty-upload"));
+    expect(click).toHaveBeenCalledTimes(1);
+    click.mockRestore();
+    pickFiles([makeFile("first.png", MB, "image/png")]);
+    expect(screen.getByTestId("mgr-upload-files")).toBeInTheDocument();
+    expect(upload).not.toHaveBeenCalled();
+  });
+});
+
+describe("Clone 3585:23337 · Manage in full library — the drawer hands the file over", () => {
+  it("a file the drawer selected through the engine opens selected in the rail, and the handoff is consumed", async () => {
+    const selectAssets = vi.fn();
+    await mountLibrary({}, {}, { getSelectedAssets: () => [makeAsset({ id: "menu", originalName: "menu-cover.png" })], selectAssets });
+    expect(within(screen.getByTestId("mgr-details")).getByText("menu-cover.png")).toBeInTheDocument();
+    expect(selectAssets).toHaveBeenCalledWith([]);
   });
 });

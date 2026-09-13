@@ -172,7 +172,9 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
         listeners.get(`media:${event}`)?.delete(cb);
       }),
       getAssets: vi.fn(() => []),
-      uploadFile: vi.fn(async () => {}),
+      /* The engine's real shape — `UploadResult`. It resolved `undefined`
+         until `useUploadState.upload` started handing the results back. */
+      uploadFile: vi.fn(async (file: File) => ({ success: true, fileName: file.name })),
     },
     _emit: emit,
     _emitMedia: (event: string, payload?: unknown) => emit(`media:${event}`, payload),

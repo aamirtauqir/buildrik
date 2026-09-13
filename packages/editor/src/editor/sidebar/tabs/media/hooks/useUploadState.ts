@@ -8,7 +8,7 @@ import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { MEDIA_EVENTS, STORAGE_QUOTA_BYTES } from "../../../../../shared/constants/media";
-import type { UploadProgress } from "../../../../../shared/types/media";
+import type { UploadProgress, UploadResult } from "../../../../../shared/types/media";
 import type { FailedUpload, UploadStateResult } from "../data/mediaTypes";
 
 type ShowToast = (msg: string, type: "success" | "error" | "info" | "warning") => void;
@@ -89,10 +89,21 @@ export function useUploadState(
     };
 
     const onError = (payload: unknown) => {
-      const { fileName, error } = payload as { fileName?: string; error?: string };
+      const { fileName, error, size, limit } = payload as {
+        fileName?: string;
+        error?: string;
+        size?: number;
+        limit?: number;
+      };
       const name = fileName ?? "File";
       const reason = error ?? "Upload failed";
-      setFailedUploads((prev) => [...prev, { fileName: name, reason }]);
+      /* The engine's numbers come with the size gate's refusal (MediaManager
+         → validateFile). They are what Clone 3585:23326 reads back — "The
+         original 62 MB file was not uploaded", "Within the 10 MB limit". */
+      setFailedUploads((prev) => [
+        ...prev,
+        { fileName: name, reason, ...(size !== undefined ? { size } : {}), ...(limit !== undefined ? { limit } : {}) },
+      ]);
       /*
         Board 145:148 keeps the failure ON SCREEN above the footer, with the
         reason and a Retry. That row renders from `uploadQueue`, and a file
@@ -174,19 +185,20 @@ export function useUploadState(
       : STORAGE_QUOTA_BYTES;
 
   const upload = useCallback(
-    async (files: File[], opts: { folderId?: string | null } = {}): Promise<boolean> => {
+    async (files: File[], opts: { folderId?: string | null } = {}): Promise<UploadResult[]> => {
       const totalNew = files.reduce((acc, f) => acc + f.size, 0);
       // Skip cap check on unlimited tier (BUSINESS).
       if (!isUnlimited && storageUsed + totalNew > storageTotal) {
-        showToast("Not enough storage — delete some files to free space", "error");
-        return false;
+        const error = "Not enough storage — delete some files to free space";
+        showToast(error, "error");
+        return files.map((f) => ({ success: false, error, fileName: f.name }));
       }
       const uploadOpts =
         opts.folderId != null ? { folderId: opts.folderId } : undefined;
       // Await the uploads so callers can report success only after they
       // actually complete. Was fire-and-forget — callers toasted success
       // before uploadFile resolved, masking silent failures.
-      const results = await Promise.allSettled(
+      const settled = await Promise.allSettled(
         files.map((file) => {
           const existing = composer.media.getAssets().find((a) => a.name === file.name);
           if (existing) {
@@ -195,18 +207,26 @@ export function useUploadState(
           return composer.media.uploadFile(file, uploadOpts);
         }),
       );
-      // Retain rejected Files so they can be retried; clear retained Files
-      // that succeeded this round.
+      /* The engine resolves a refusal (`success: false`) and throws only the
+         quota error, so both shapes fold into one result per file. */
+      const results: UploadResult[] = settled.map((r, i) =>
+        r.status === "fulfilled"
+          ? r.value
+          : { success: false, error: r.reason instanceof Error ? r.reason.message : "Upload failed", fileName: files[i].name },
+      );
+      // Retain every File that did not land so it can be retried; clear the
+      // ones that did. Only the THROWN case was retained before, so Retry on
+      // an oversized file — the common refusal — silently did nothing.
       results.forEach((r, i) => {
         const f = files[i];
-        if (r.status === "rejected") failedFilesRef.current.set(f.name, f);
-        else failedFilesRef.current.delete(f.name);
+        if (r.success) failedFilesRef.current.delete(f.name);
+        else failedFilesRef.current.set(f.name, f);
       });
-      const failed = results.filter((r) => r.status === "rejected").length;
+      const failed = settled.filter((r) => r.status === "rejected").length;
       if (failed > 0) {
         showToast(`${failed} upload${failed === 1 ? "" : "s"} failed`, "error");
       }
-      return failed === 0;
+      return results;
     },
     [composer, storageUsed, storageTotal, isUnlimited, showToast]
   );
@@ -218,6 +238,9 @@ export function useUploadState(
    */
   const dismissUpload = useCallback((fileName: string) => {
     setUploadQueue((prev) => prev.filter((u) => u.fileName !== fileName));
+    /* Both records, or the replacement flow (Clone 3585:23326) would keep a
+       ghost of the file it just stood in for. */
+    setFailedUploads((prev) => prev.filter((f) => f.fileName !== fileName));
   }, []);
 
   const retryUpload = useCallback(

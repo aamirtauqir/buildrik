@@ -8,9 +8,11 @@ import { MEDIA_SIZE_LIMITS, getMaxFileSize, isAllowedMimeType, mimeTypeForFile }
 import { formatBytes } from "../../shared/utils/helpers/number";
 
 /**
- * Validate a file for upload
+ * Validate a file for upload. `limit` is set only when the size was the
+ * reason — the bytes this file's type may have — so the drawer can offer a
+ * replacement against it (Clone 3585:23326) without re-deriving the rule.
  */
-export function validateFile(file: File): { valid: boolean; error?: string } {
+export function validateFile(file: File): { valid: boolean; error?: string; limit?: number } {
   const mime = mimeTypeForFile(file);
   if (!isAllowedMimeType(mime)) {
     return { valid: false, error: `Unsupported file type: ${mime || file.name}` };
@@ -18,13 +20,16 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
 
   const maxSize = getMaxFileSize(mime);
   if (file.size > maxSize) {
-    // Board 145:148 names BOTH numbers: "Upload failed — file is 24 MB, limit
-    // is 10 MB". The old copy ("File too large. Max: 10MB") named only the
-    // limit, so the one fact the user needs to act on — how far over they are —
-    // was the fact it left out.
+    // Clone 3584:45522 (re-draws board 145:148) names BOTH numbers: "Upload
+    // failed — file is 62 MB, the limit is 50 MB per file". The copy before
+    // that ("File too large. Max: 10MB") named only the limit, so the one fact
+    // the user needs to act on — how far over they are — was the fact it left
+    // out. The file's size keeps a decimal: rounded, a 10.4 MB image read
+    // "file is 10 MB, the limit is 10 MB".
     return {
       valid: false,
-      error: `Upload failed — file is ${formatBytes(file.size, 0)}, limit is ${formatBytes(maxSize, 0)}`,
+      error: `Upload failed — file is ${formatBytes(file.size, 1)}, the limit is ${formatBytes(maxSize, 0)} per file`,
+      limit: maxSize,
     };
   }
 

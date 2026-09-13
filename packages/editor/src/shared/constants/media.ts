@@ -6,6 +6,8 @@
  * @license BSD-3-Clause
  */
 
+import { formatBytes } from "../utils/helpers/number";
+
 // ============================================
 // File Size Limits
 // ============================================
@@ -81,6 +83,41 @@ export const MEDIA_EXTENSIONS = {
   AUDIO: [".mp3", ".wav", ".ogg", ".webm", ".aac"] as const,
   FONT: [".woff2", ".woff", ".ttf", ".otf"] as const,
 } as const;
+
+/**
+ * The formats the library takes, spelled for a person — Clone 3397:18137's
+ * drop-zone line and 3437:36027's drawer footer both read it. Derived from
+ * `MEDIA_EXTENSIONS`, so a format added there reaches every line that names
+ * the list; the drawer used to carry its own hand-typed copy. Audio is left
+ * out on purpose: the library has no audio bucket and the server has no
+ * schema for it (`toServerAssetType` → null), so naming it would promise a
+ * kind the UI cannot show.
+ */
+const FORMAT_LABEL: Record<string, string> = { webp: "WebP", webm: "WebM" };
+export const MEDIA_ACCEPTED_FORMATS_LABEL = [
+  ...MEDIA_EXTENSIONS.IMAGE,
+  ...MEDIA_EXTENSIONS.VIDEO,
+  ...MEDIA_EXTENSIONS.FONT,
+]
+  .map((ext) => ext.slice(1))
+  .filter((ext) => ext !== "jpeg")
+  .map((ext) => FORMAT_LABEL[ext] ?? ext.toUpperCase())
+  .join(" · ");
+
+/**
+ * The code's own per-type limits, one line — the Clone's "up to 50 MB per
+ * file" is the board's sample, not a number this code has.
+ */
+export const MEDIA_SIZE_LIMITS_LABEL =
+  `up to ${formatBytes(MEDIA_SIZE_LIMITS.MAX_IMAGE_SIZE, 0)} per image · ` +
+  `${formatBytes(MEDIA_SIZE_LIMITS.MAX_SVG_SIZE, 0)} per SVG · ` +
+  `${formatBytes(MEDIA_SIZE_LIMITS.MAX_VIDEO_SIZE, 0)} per video · ` +
+  `${formatBytes(MEDIA_SIZE_LIMITS.MAX_FONT_SIZE, 0)} per font`;
+
+/** "pasta-2-small.jpg" → "JPG": the file's own extension, the way the Clone's lines spell it. */
+export function fileExtensionLabel(fileName: string): string {
+  return (fileName.match(/\.([a-z0-9]+)$/i)?.[1] ?? "").toUpperCase();
+}
 
 /**
  * The MIME a file should be handled as. Browsers fill `File.type` from the

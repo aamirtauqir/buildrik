@@ -10,7 +10,7 @@ import type {
   DiscIcon,
   DiscFont,
 } from "../../../../../engine/media/MediaManager";
-import type { MediaSortBy, SortDirection, UploadProgress } from "../../../../../shared/types/media";
+import type { MediaSortBy, SortDirection, UploadProgress, UploadResult } from "../../../../../shared/types/media";
 import type { MediaAsset } from "../../../../../shared/types/media";
 import type { StockFailureReason } from "../../../../../services/stock/StockService";
 
@@ -122,6 +122,11 @@ export interface ConfirmDeletePayload {
 export interface FailedUpload {
   fileName: string;
   reason: string;
+  /** The refused file's bytes — present when the engine's size gate said no. */
+  size?: number;
+  /** The bytes its type may have (Clone 3584:45522 → 3585:23326: the
+   *  rejected row offers a replacement against exactly this). */
+  limit?: number;
 }
 
 // --- Overlays ---
@@ -200,9 +205,12 @@ export interface UploadStateResult {
   /** Phase C: total quota bytes. From server when available, else local IndexedDB cap. */
   storageTotal: number;
   panelDragOver: boolean;
-  upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
+  /** Resolves the engine's result per file, in order — the asset that landed
+   *  or the reason it did not. Clone 3724:20832 (Upload complete) and
+   *  3585:23337 (Replacement uploaded) both read what landed. */
+  upload(files: File[], opts?: { folderId?: string | null }): Promise<UploadResult[]>;
   retryUpload(fileName: string): void;
-  /** Board 1163:13948 — drop a failed upload row. */
+  /** Board 1163:13948 — drop a failed upload row (queue and failure record). */
   dismissUpload(fileName: string): void;
   dismissFailedUploads(): void;
   handlePanelDragEnter(e: React.DragEvent): void;
@@ -316,9 +324,10 @@ export interface MediaStateResult {
   checkInUse(keys: string[]): AssetUsage[];
   /** Empty the checked set without leaving select mode (the bulk bar's ✕ Clear). */
   clearSelection(): void;
-  upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
+  /** See `UploadStateResult.upload` — the engine's result per file. */
+  upload(files: File[], opts?: { folderId?: string | null }): Promise<UploadResult[]>;
   retryUpload(fileName: string): void;
-  /** Board 1163:13948 — drop a failed upload row. */
+  /** Board 1163:13948 — drop a failed upload row (queue and failure record). */
   dismissUpload(fileName: string): void;
   failedUploads: FailedUpload[];
   dismissFailedUploads(): void;
@@ -495,8 +504,14 @@ export interface UploadZoneProps {
   /** Currently-uploading files. When any item has status "uploading"/"optimizing"/"processing",
    *  the zone applies med-upload-zone--uploading. Failed items render below the zone. */
   uploadQueue?: UploadProgress[];
+  /** The engine's verdicts by file name — a failed row whose record carries
+   *  a `limit` was the size gate, and its door is a replacement, not Retry
+   *  (Clone 3584:45522). */
+  failedUploads?: FailedUpload[];
   /** §22 — fired when user clicks Retry on a failed queue item. */
   onRetryUpload?(fileName: string): void;
+  /** `Choose a smaller file…` picked one: the refused record and the pick. */
+  onReplacementPicked?(original: FailedUpload, file: File): void;
   /** Quota-warn band's "Optimise images to free space ›" (board 145:199). */
   onOptimize?(): void;
 }

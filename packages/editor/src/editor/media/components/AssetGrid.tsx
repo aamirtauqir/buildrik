@@ -58,6 +58,7 @@ import type {
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
+import { MEDIA_ACCEPTED_FORMATS_LABEL, MEDIA_SIZE_LIMITS_LABEL } from "@shared/constants/media";
 import { Button } from "@/editor/chrome-ui";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
@@ -286,12 +287,22 @@ export function AssetGrid({
 
   return (
     <div className={`mgr-main${isDragOver ? " dragover" : ""}`} data-testid="mgr-grid-col">
+      {/* Clone 3397:18137 (re-draws V1 1163:13948) — the whole column is a
+          dashed accent zone on a tint, with one centred card: the title over
+          the formats the code accepts and the code's per-type limits. The
+          board's "up to 50 MB per file" is its sample; this line said "up to
+          1 GB total", which is the quota, not a file's limit. */}
       {isDragOver && (
         <div className="mgr-dropzone" aria-hidden="true" data-testid="mgr-dropzone">
-          <span className="mgr-dropzone-title" data-testid="mgr-dropzone-title">Drop files to upload</span>
-          <span className="mgr-dropzone-sub" data-testid="mgr-dropzone-sub">
-            Images, video, audio, SVG and fonts — up to {formatBytes(state.storage.total)} total
-          </span>
+          <div
+            className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-elevated)] tw:px-4 tw:py-2 tw:text-center"
+            data-testid="mgr-dropzone-card"
+          >
+            <span className="mgr-dropzone-title" data-testid="mgr-dropzone-title">Drop files to upload</span>
+            <span className="mgr-dropzone-sub" data-testid="mgr-dropzone-sub">
+              {MEDIA_ACCEPTED_FORMATS_LABEL} — {MEDIA_SIZE_LIMITS_LABEL}
+            </span>
+          </div>
         </div>
       )}
       {ghost && (

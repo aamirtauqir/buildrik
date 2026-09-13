@@ -140,14 +140,17 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
   it("rejects an SVG over the 1MB SVG limit", async () => {
     const manager = new MediaManager();
     mockStorage(manager);
+    const errors = captureEvents(manager, MEDIA_EVENTS.UPLOAD_ERROR);
 
     const result = await manager.uploadFile(
       makeFile("<svg/>", "big.svg", "image/svg+xml", 2 * 1024 * 1024),
     );
 
     expect(result.success).toBe(false);
-    // Board 145:148 names both numbers, so the assertion checks both.
-    expect(result.error).toMatch(/Upload failed — file is 2 MB, limit is 1 MB/);
+    // Clone 3584:45522 (re-draws board 145:148) names both numbers, so the assertion checks both.
+    expect(result.error).toMatch(/Upload failed — file is 2 MB, the limit is 1 MB per file/);
+    // The drawer's replacement flow reads the real numbers off the event, not the prose.
+    expect(errors[0]).toMatchObject({ fileName: "big.svg", size: 2 * 1024 * 1024, limit: 1024 * 1024 });
   });
 
   it("rejects a video over the 100MB video limit (limit is per-type, not global)", async () => {
@@ -159,7 +162,7 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/Upload failed — file is 101 MB, limit is 100 MB/);
+    expect(result.error).toMatch(/Upload failed — file is 101 MB, the limit is 100 MB per file/);
   });
 
   it("accepts an image over 1MB but under the 10MB image limit", async () => {

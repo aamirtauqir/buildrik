@@ -24,12 +24,14 @@ import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
 import { CreateFolderModal } from "./components/CreateFolderModal";
 import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
+import { UploadFilesModal } from "./components/UploadFilesModal";
+import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
 import { OptimizationPanel } from "./OptimizationPanel";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
-import type { IconConfig } from "../../shared/types/media";
+import type { IconConfig, MediaAsset } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
@@ -78,6 +80,17 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const dragDepth = React.useRef(0);
   const searchRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  /* Clone 3585:23337 — the drawer's "Manage in full library" selects the file
+     it just uploaded through the engine (`composer.media.selectAssets`) and
+     then opens this manager; the shell's `onOpenLibrary` carries no argument.
+     Consumed on mount so a later open starts clean. */
+  React.useEffect(() => {
+    const handed = composer.media.getSelectedAssets()[0];
+    if (!handed) return;
+    composer.media.selectAssets([]);
+    setSelectedAssetId(handed.id);
+  }, [composer]);
 
   // Keyboard shortcuts
   React.useEffect(() => {
@@ -346,20 +359,54 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     }
   }, [state, addToast]);
 
+  /* Clone 3724:20828 / 3724:20832 — the picker's files wait in the Upload
+     files confirm (the header ↑ Upload and both empty-state Uploads share
+     this input). Once sent, the same modal reads the queue until the batch
+     resolves; then Upload complete names what landed. A drop skips the
+     confirm — edge `AFTE|NAV>3397:17505` goes straight back to the library. */
+  const [uploadBatch, setUploadBatch] = React.useState<{ files: File[]; uploading: boolean } | null>(null);
+  const [uploadDone, setUploadDone] = React.useState<{
+    landed: MediaAsset[];
+    failed: Array<{ fileName: string; reason: string }>;
+  } | null>(null);
+
+  const handleFileChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.length) {
+      setUploadBatch({ files: Array.from(e.target.files), uploading: false });
+      e.target.value = "";
+    }
+  }, []);
+
   /* Clone 3700:20353 — "Upload files or move existing assets into this
      folder": files picked while a folder is the scope land IN that folder,
      the rule the drop path below already followed. The picker used to file
      everything at the root, so uploading from an empty folder's own CTA left
-     that folder empty. */
-  const handleFileChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files?.length) {
-        state.upload(Array.from(e.target.files), { folderId: state.currentFolderId });
-        e.target.value = "";
-      }
+     that folder empty. A batch where nothing landed shows no result — the
+     grid's failed rows (with their reasons) are the door. */
+  const runUploadBatch = React.useCallback(
+    async (files: File[]) => {
+      setUploadBatch({ files, uploading: true });
+      const results = await state.upload(files, { folderId: state.currentFolderId });
+      setUploadBatch(null);
+      const landed = results.flatMap((r) => (r.success && r.asset ? [r.asset] : []));
+      if (landed.length === 0) return;
+      setUploadDone({
+        landed,
+        failed: results.filter((r) => !r.success).map((r) => ({ fileName: r.fileName, reason: r.error ?? "Upload failed" })),
+      });
     },
-    [state]
+    [state],
   );
+
+  /* Edge `Action / View asset` — the rail IS the asset's details (decision in
+     the P3 brief: the prototype's 3721:45823 dialog is a placeholder). A smart
+     scope that would hide the new card is released. */
+  const viewUploadedAsset = React.useCallback(() => {
+    if (!uploadDone) return;
+    setSmartFolder(null);
+    setSelectedAssetId(uploadDone.landed[0].id);
+    setUploadDone(null);
+  }, [uploadDone]);
 
   const handleOpenIconPicker = React.useCallback(() => {
     if (!onOpenIconPicker) return;
@@ -727,6 +774,21 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         />
       )}
       <DownloadPreparedModal open={downloadPrepared} onClose={() => setDownloadPrepared(false)} />
+      <UploadFilesModal
+        open={uploadBatch !== null}
+        files={uploadBatch?.files ?? []}
+        uploading={uploadBatch?.uploading ?? false}
+        uploadQueue={state.uploadQueue}
+        onCancel={() => setUploadBatch(null)}
+        onUpload={(files) => void runUploadBatch(files)}
+      />
+      <UploadCompleteModal
+        open={uploadDone !== null}
+        landed={uploadDone?.landed ?? []}
+        failed={uploadDone?.failed ?? []}
+        onDone={() => setUploadDone(null)}
+        onViewAsset={viewUploadedAsset}
+      />
       <MoveAssetsModal
         open={moveModalOpen}
         items={checkedItems}

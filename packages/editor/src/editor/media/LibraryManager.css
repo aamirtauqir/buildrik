@@ -1130,27 +1130,19 @@
   color: var(--bk-ink-soft);
 }
 
-/* ─── Board 1163:13948 drop zone + upload rows ───────────────────────── */
+/* ─── Clone 3397:18137 drop zone (re-draws 1163:13948) + upload rows ──── */
+/* One dashed edge, 1px, on the zone itself. The V1 build drew a second
+   2px dashed ring in a `::after` on the column, inset 4 — two borders where
+   the board draws one. */
 .mgr-main.dragover { position: relative; }
-.mgr-main.dragover::after {
-  content: "";
-  position: absolute;
-  inset: var(--bk-space-4);
-  border: 2px dashed var(--bk-accent);
-  border-radius: var(--bk-radius-lg);
-  pointer-events: none;
-  z-index: 2;
-}
 .mgr-dropzone {
   position: absolute;
   inset: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--bk-space-8);
   background: var(--bk-accent-tint);
-  border: 2px dashed var(--bk-accent);
+  border: 1px dashed var(--bk-accent);
   pointer-events: none;
   z-index: 3;
 }

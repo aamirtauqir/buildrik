@@ -16,7 +16,32 @@
 
 import { vi } from "vitest";
 import type { LibraryItem, MediaFolder, MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { MediaAsset } from "../../../shared/types/media";
 import type { LibraryManager } from "../LibraryManager";
+
+/** A File of a claimed size — the bytes are never read, so a 62 MB one costs nothing. */
+export function makeFile(name: string, size: number, type = "image/jpeg"): File {
+  const file = new File(["x"], name, { type });
+  Object.defineProperty(file, "size", { value: size });
+  return file;
+}
+
+/** An engine asset the way `uploadFile` resolves one. */
+export function makeAsset(over: Partial<MediaAsset> = {}): MediaAsset {
+  return {
+    id: "asset-1",
+    type: "image",
+    name: "logo",
+    originalName: "logo.png",
+    src: "blob:logo",
+    mimeType: "image/png",
+    size: 1024,
+    tags: [],
+    createdAt: "2026-09-13T10:00:00.000Z",
+    updatedAt: "2026-09-13T10:00:00.000Z",
+    ...over,
+  };
+}
 
 export function makeFolder(over: Partial<MediaFolder> = {}): MediaFolder {
   return {
@@ -145,7 +170,10 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
   } as MediaStateResult;
 }
 
-export function makeComposer(usages: Record<string, number> = {}) {
+export function makeComposer(
+  usages: Record<string, number> = {},
+  media: { getSelectedAssets?: () => MediaAsset[]; selectAssets?: (ids: string[]) => void } = {},
+) {
   return {
     mediaOps: {
       getUsages: (src: string) => ({ count: usages[src] ?? 0, usages: [] }),
@@ -161,6 +189,10 @@ export function makeComposer(usages: Record<string, number> = {}) {
       getAssetSrc: vi.fn(() => Promise.resolve(null)),
       /* Real shape: how many of the given assets it handed to the browser. */
       downloadAssets: vi.fn((assets: ReadonlyArray<unknown>) => assets.length),
+      /* Clone 3585:23337 — the drawer's "Manage in full library" hands the
+         file over through the engine's selection; the manager consumes it. */
+      getSelectedAssets: media.getSelectedAssets ?? (() => []),
+      selectAssets: media.selectAssets ?? vi.fn(),
     },
   } as unknown as Parameters<typeof LibraryManager>[0]["composer"];
 }

@@ -122,7 +122,7 @@ function MediaTabWithComposer({
           const file = new File([blob], `${fileName}.${blob.type.split('/')[1]}`, { type: blob.type });
           
           // Upload new file — await so we only claim success when it lands.
-          const ok = await state.upload([file]);
+          const ok = (await state.upload([file])).every((r) => r.success);
           if (ok) {
             showToast(`New version of ${item.name} created ✓`, "success");
             // Record a server-side restore point of the pre-edit asset (synced

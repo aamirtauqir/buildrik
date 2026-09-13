@@ -27,8 +27,21 @@ describe("validateFile", () => {
   it("rejects files over the per-type size limit", () => {
     const r = validateFile(fileWithSize("image/png", 20 * 1024 * 1024));
     expect(r.valid).toBe(false);
-    // Board 145:148: the message names the file size AND the limit.
-    expect(r.error).toMatch(/Upload failed — file is 20 MB, limit is 10 MB/);
+    // Clone 3584:45522 (re-draws board 145:148): the message names the file
+    // size AND the limit, "the limit is … per file". The limit rides along
+    // so the drawer can offer a replacement against it.
+    expect(r.error).toBe("Upload failed — file is 20 MB, the limit is 10 MB per file");
+    expect(r.limit).toBe(10 * 1024 * 1024);
+  });
+
+  it("a size that rounds to the limit still shows its decimal, so 10.4 MB is not 'file is 10 MB, the limit is 10 MB'", () => {
+    const r = validateFile(fileWithSize("image/png", 10.4 * 1024 * 1024));
+    expect(r.error).toBe("Upload failed — file is 10.4 MB, the limit is 10 MB per file");
+  });
+
+  it("a refused type carries no limit", () => {
+    const r = validateFile(new File(["x"], "a.pdf", { type: "application/pdf" }));
+    expect(r.limit).toBeUndefined();
   });
 
   // Clone 3696:21550 — a font is a first-class asset. macOS Chromium hands a
