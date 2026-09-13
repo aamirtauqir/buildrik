@@ -32,10 +32,18 @@ import {
   Textarea,
   VersionRow,
 } from "@/editor/chrome-ui";
+import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
 const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
 const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
+/* The rail's full-width 32 buttons (3705:20396 / 4215:26635 / 3699:20381):
+   flowbite `xs` IS h-8; the accent fill is `.mgr-btn-primary`'s own, and the
+   quiet grey Clear selection is the same fill as the dialogs' Cancel. */
+const RAIL_PRIMARY = "mgr-btn-primary tw:w-full tw:shrink-0 tw:justify-center";
+const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
+/* 4215:26635 / 3699:20381 — the checked files, one 12 line each. */
+const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
 
@@ -70,10 +78,29 @@ interface ToastInput {
 
 export interface AssetDetailsPanelProps {
   selectedItem: LibraryItem | null;
-  /** Clone 3695:19968 / 20154 — while the library is in select mode the rail
-   *  is about the CHECKED set, not one file: "No assets selected" with its
-   *  hint, or "1 asset selected" with the filename and a Delete. */
-  bulk?: { names: string[]; onDelete(): void } | null;
+  /** Clone 3695:19968 / 4215:26635 — while the library is in select mode the
+   *  rail is about the CHECKED set, not one file: "No assets selected" with
+   *  its hint, or "N assets selected" with the filenames, Move to folder
+   *  (primary) and Clear selection. Exactly one checked file is that file's
+   *  full rail (3705:21059) — the orchestrator passes it as `selectedItem`
+   *  with `bulk` null; Phase 1's "1 asset selected" hint (3695:20154) is
+   *  displaced by the later section. */
+  bulk?: { names: string[]; onMove(): void; onClear(): void } | null;
+  /** Clone 3699:20381 / 3683:19964 — the result of the last move, on top of
+   *  every other state until the selection or the scope changes: "Moved to
+   *  <Folder>", which files moved and which were already there, the file
+   *  list, View destination (primary) and Clear selection. */
+  moveResult?: {
+    folderName: string;
+    names: string[];
+    moved: string[];
+    alreadyThere: string[];
+    onView(): void;
+    onClear(): void;
+  } | null;
+  /** Clone 4207:26629 — the rail is dimmed and inert while an asset is
+   *  being dragged over the folders. */
+  dimmed?: boolean;
   versions: LibraryItem[];
   usageCount: number;
   /** Page names the asset is placed on — the USED IN line names them
@@ -124,6 +151,8 @@ export interface AssetDetailsPanelProps {
 export function AssetDetailsPanel({
   selectedItem,
   bulk = null,
+  moveResult = null,
+  dimmed = false,
   versions,
   usageCount,
   usedIn,
@@ -145,27 +174,76 @@ export function AssetDetailsPanel({
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
   const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
   const [regenerating, setRegenerating] = React.useState(false);
+  /* 4207:26629 — dimmed and inert while an asset is dragged over the folders:
+     the drop is the only thing the pointer is doing. */
+  const railClass = `mgr-details${dimmed ? " tw:pointer-events-none tw:opacity-50" : ""}`;
+
+  if (moveResult) {
+    const { moved, alreadyThere } = moveResult;
+    /* 3699:20381 names the files when some were already in the destination;
+       3683:19964 counts them when every one moved. */
+    const body =
+      alreadyThere.length === 0
+        ? `${moved.length} ${moved.length === 1 ? "asset" : "assets"} moved successfully. Their existing site placements are unchanged.`
+        : `${moved.length > 0 ? `${moved.join(", ")} moved; ` : ""}${alreadyThere.join(", ")} ${
+            alreadyThere.length === 1 ? "was" : "were"
+          } already here. Site placements are unchanged.`;
+    return (
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
+        <div className="mgr-det-body" data-testid="mgr-det-move-result">
+          <h3 className="mgr-det-heading" data-testid="mgr-det-move-result-title">
+            Moved to {moveResult.folderName}
+          </h3>
+          <p className="mgr-det-hint" data-testid="mgr-det-move-result-body">
+            {body}
+          </p>
+          <ul className={FILE_LIST} data-testid="mgr-det-files">
+            {moveResult.names.map((name) => (
+              <li key={name} className="tw:truncate">{name}</li>
+            ))}
+          </ul>
+          <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
+            <Button size="xs" className={RAIL_PRIMARY} data-testid="mgr-det-view-destination" onClick={moveResult.onView}>
+              View destination
+            </Button>
+            <Button size="xs" variant="secondary" className={RAIL_QUIET} data-testid="mgr-det-clear-selection" onClick={moveResult.onClear}>
+              Clear selection
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (bulk) {
     const n = bulk.names.length;
     return (
-      <div className="mgr-details" data-testid="mgr-details">
-        <div className="mgr-det-body">
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
+        <div className="mgr-det-body" data-testid="mgr-det-bulk">
           <h3 className="mgr-det-heading">{n === 0 ? "No assets selected" : `${n} ${n === 1 ? "asset" : "assets"} selected`}</h3>
           <p className="mgr-det-hint">
             {n === 0
               ? "Select a file to inspect it. Select checkboxes to manage multiple assets."
-              : n === 1
-                ? `${bulk.names[0]} · Select another file to use bulk actions.`
-                : "Move, download or delete them from the bar above."}
+              : `Actions apply to ${n === 2 ? "both" : `all ${n}`} selected files. Moving files only changes library organisation.`}
           </p>
-          {/* 3695:20154 draws Delete right under the hint, not at the foot. */}
+          {/* 4215:26635 — the files, then Move to folder (primary) and Clear
+              selection, right under the hint. Delete stays in the bar. */}
           {n > 0 && (
-            <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-actions">
-              <Button className="mgr-btn danger" onClick={bulk.onDelete}>
-                Delete
-              </Button>
-            </div>
+            <>
+              <ul className={FILE_LIST} data-testid="mgr-det-files">
+                {bulk.names.map((name) => (
+                  <li key={name} className="tw:truncate">{name}</li>
+                ))}
+              </ul>
+              <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-bulk-actions">
+                <Button size="xs" className={RAIL_PRIMARY} data-testid="mgr-det-move-to-folder" onClick={bulk.onMove}>
+                  Move to folder
+                </Button>
+                <Button size="xs" variant="secondary" className={RAIL_QUIET} data-testid="mgr-det-clear-selection" onClick={bulk.onClear}>
+                  Clear selection
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -174,7 +252,7 @@ export function AssetDetailsPanel({
 
   if (!selectedItem) {
     return (
-      <div className="mgr-details" data-testid="mgr-details">
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         {/* Clone 3695:45155 — one line at the rail's top, no icon, where the
             details will appear. --bk-ink-disabled on white is 1.47:1, so the
             line is ink-soft. */}
@@ -210,7 +288,7 @@ export function AssetDetailsPanel({
 
   return (
     <>
-      <div className="mgr-details" data-testid="mgr-details">
+      <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         <div className="mgr-det-body">
           <div className="mgr-det-preview">
             {selectedItem.type === "img" ? (
@@ -294,10 +372,12 @@ export function AssetDetailsPanel({
             full set; a video has no Edit image; a font is neither inserted
             nor replaced across the site — Rename and Delete only. The Clone's
             "Manage font" needs the Site fonts overlay (Phase 5) and is not
-            drawn until that door exists. */}
+            drawn until that door exists. Insert to canvas is the PRIMARY:
+            3705:20396 and 4207:26629 (the later section) draw it filled,
+            over 3695:20340's outlined one. */}
         <div className="mgr-det-actions" data-testid="mgr-det-actions">
           {!isFont && (
-            <Button className="mgr-btn" onClick={() => onInsert(selectedItem.key)}>
+            <Button size="xs" className={RAIL_PRIMARY} onClick={() => onInsert(selectedItem.key)}>
               Insert to canvas
             </Button>
           )}

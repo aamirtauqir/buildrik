@@ -22,6 +22,8 @@ import { ImportUrlModal } from "./components/ImportUrlModal";
 import { RenameAssetModal } from "./components/RenameAssetModal";
 import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
 import { CreateFolderModal } from "./components/CreateFolderModal";
+import { MoveAssetsModal } from "./components/MoveAssetsModal";
+import { MoveFailedModal } from "./components/MoveFailedModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
@@ -127,11 +129,22 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     return state.libraryItems.filter((i) => new Date(i.createdAt).getTime() >= cutoff).length;
   }, [state.libraryItems]);
 
-  // Selected asset details
+  /* The checked set, in list order — what the bulk rail, the Move modal and
+     a drag of a checked row are all about. */
+  const checkedItems = React.useMemo(
+    () => (state.selMode ? state.libraryItems.filter((i) => state.selectedKeys.has(i.key)) : []),
+    [state.selMode, state.libraryItems, state.selectedKeys],
+  );
+
+  /* Clone 3705:21059 / 3705:20396 (section 3695:45625, later than
+     3695:20154): in select mode the rail shows the ONE checked file's full
+     details, the checked set otherwise. Phase 1's "1 asset selected" hint is
+     displaced. Outside select mode the rail is the clicked card. */
   const selectedItem = React.useMemo(() => {
+    if (state.selMode) return checkedItems.length === 1 ? checkedItems[0] : null;
     if (!selectedAssetId) return null;
     return state.libraryItems.find((item) => item.key === selectedAssetId) || null;
-  }, [selectedAssetId, state.libraryItems]);
+  }, [state.selMode, checkedItems, selectedAssetId, state.libraryItems]);
 
   const usageCount = React.useMemo(() => {
     if (!selectedItem) return 0;
@@ -218,6 +231,82 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      rail's replace-across picker for that asset, so the picker's open state
      lives here rather than in the rail. */
   const [replacePickerOpen, setReplacePickerOpen] = React.useState(false);
+
+  /* ─── P2-B Move & drag ─────────────────────────────────────────────── */
+  /* Clone 3683:19950 — the Move modal, from the bulk bar or the rail. */
+  const [moveModalOpen, setMoveModalOpen] = React.useState(false);
+  /* Clone 3699:20381 / 3683:19964 — the last move's result, read in the
+     rail with the selection kept, until the selection or the scope changes. */
+  const [moveResult, setMoveResult] = React.useState<{
+    folderId: string | null;
+    folderName: string;
+    names: string[];
+    moved: string[];
+    alreadyThere: string[];
+  } | null>(null);
+  /* Clone 3699:20347 — the move the engine refused, held so Retry can run
+     exactly it again. */
+  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null } | null>(null);
+  /* Clone 4207:26629 / 4215:26635 — the keys in flight while a card or row
+     is dragged: the folders outline, the rail dims, the footer says what a
+     drop does. React state, so every surface reads the one fact. */
+  const [assetDrag, setAssetDrag] = React.useState<{ keys: string[] } | null>(null);
+
+  React.useEffect(() => {
+    setMoveResult(null);
+  }, [state.selectedKeys, state.selMode, selectedAssetId, state.currentFolderId, smartFolder]);
+
+  const runMove = React.useCallback(
+    async (keys: string[], folderId: string | null) => {
+      setAssetDrag(null);
+      const items = keys
+        .map((k) => state.libraryItems.find((i) => i.key === k))
+        .filter((i): i is LibraryItem => i !== undefined);
+      const wasHere = new Set(items.filter((i) => (i.folderId ?? null) === folderId).map((i) => i.key));
+      try {
+        await state.bulkMoveAssets(keys, folderId);
+      } catch {
+        setMoveFailure({ keys, folderId });
+        return;
+      }
+      setMoveFailure(null);
+      const nameOf = (i: LibraryItem) => i.displayName ?? i.name;
+      setMoveResult({
+        folderId,
+        folderName: folderId === null ? "All assets" : (state.allFolders.find((f) => f.id === folderId)?.name ?? "folder"),
+        names: items.map(nameOf),
+        moved: items.filter((i) => !wasHere.has(i.key)).map(nameOf),
+        alreadyThere: items.filter((i) => wasHere.has(i.key)).map(nameOf),
+      });
+    },
+    [state],
+  );
+
+  /* A dropped asset carries the whole checked set when it is part of it
+     (4215:26635); an unchecked one moves alone even beside a selection. */
+  const handleDropOnFolder = React.useCallback(
+    (assetKey: string, folderId: string | null) => {
+      const keys = assetDrag?.keys.includes(assetKey) ? assetDrag.keys : [assetKey];
+      void runMove(keys, folderId);
+    },
+    [assetDrag, runMove],
+  );
+
+  /* Clone 3699:20381's View destination — edge `Action / Move to folder|CLIC|
+     SWA>Assets · Hero shots · folder/scope`: the destination becomes the
+     scope, the selection stays. Scoping clears the result (effect above). */
+  const viewMoveDestination = React.useCallback(() => {
+    if (!moveResult) return;
+    setSmartFolder(null);
+    state.setCurrentFolderId(moveResult.folderId);
+  }, [moveResult, state]);
+
+  /* Edge `Action / Clear selection` — the checked set empties, select mode
+     stays (the bar's ✕ Clear rule); a card selection is dropped with it. */
+  const clearRailSelection = React.useCallback(() => {
+    state.clearSelection();
+    setSelectedAssetId(null);
+  }, [state]);
 
   const handleDownload = React.useCallback(
     (assets: ReadonlyArray<{ src: string; name: string }>) => {
@@ -431,16 +520,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onTrashClick={() =>
             addToast({ description: "Trash coming soon", tone: "info" })
           }
-          onMoveAssetToFolder={(assetKey, folderId) => {
-            // Multi-select drag: if the dragged asset is part of the active
-            // selection, the whole set moves — single asset otherwise. Same
-            // rule the retired 560 panel used.
-            if (state.selMode && state.selectedKeys.has(assetKey) && state.selectedKeys.size > 1) {
-              state.bulkMoveAssets(Array.from(state.selectedKeys), folderId);
-            } else {
-              state.moveAsset(assetKey, folderId);
-            }
-          }}
+          onMoveAssetToFolder={handleDropOnFolder}
+          assetDragActive={assetDrag !== null}
         />
 
         {/* ─── MIDDLE: Asset grid ─── */}
@@ -461,6 +542,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onInsert={insertAndReturn}
           onUploadClick={handleUploadClick}
           onOpenStockModal={() => setStockModalOpen(true)}
+          onMoveSelected={() => setMoveModalOpen(true)}
+          onAssetDragStart={(keys) => setAssetDrag({ keys })}
+          onAssetDragEnd={() => setAssetDrag(null)}
           addToast={addToast}
         />
         {/* ─── RIGHT: Details rail ─── */}
@@ -470,16 +554,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         <AssetDetailsPanel
           selectedItem={selectedItem}
           bulk={
-            state.selMode
+            state.selMode && checkedItems.length !== 1
               ? {
-                  names: state.libraryItems
-                    .filter((i) => state.selectedKeys.has(i.key))
-                    .map((i) => i.displayName ?? i.name),
-                  onDelete: () =>
-                    state.requestBulkDelete(state.libraryItems.filter((i) => state.selectedKeys.has(i.key))),
+                  names: checkedItems.map((i) => i.displayName ?? i.name),
+                  onMove: () => setMoveModalOpen(true),
+                  onClear: clearRailSelection,
                 }
               : null
           }
+          moveResult={moveResult ? { ...moveResult, onView: viewMoveDestination, onClear: clearRailSelection } : null}
+          dimmed={assetDrag !== null}
           versions={versions}
           usageCount={usageCount}
           usedIn={usedIn}
@@ -521,6 +605,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       </div>
       {/* ═══ STATUS BAR ═══ */}
       <div className="mgr-status" data-testid="mgr-status">
+        {/* Clone 4215:26635 / 4207:26629 — while an asset is in flight the
+            footer leads with what a drop does; the board keeps the count and
+            the quota after it. */}
+        {assetDrag && (
+          <span className="tw:mr-2 tw:font-semibold tw:text-[var(--bk-accent-text)]" role="status" data-testid="mgr-status-drag-hint">
+            {assetDrag.keys.length === 1
+              ? "Drop on a folder to move · release outside to cancel"
+              : `Drop ${assetDrag.keys.length} files on a folder to move them · release outside to cancel`}
+          </span>
+        )}
         <span><strong style={{ color: "var(--bk-ink-soft)" }}>{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
         <span>{formatQuotaSize(state.storage.used)} / {formatQuotaSize(state.storage.total)}</span>
@@ -633,6 +727,20 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         />
       )}
       <DownloadPreparedModal open={downloadPrepared} onClose={() => setDownloadPrepared(false)} />
+      <MoveAssetsModal
+        open={moveModalOpen}
+        items={checkedItems}
+        folders={state.allFolders}
+        onClose={() => setMoveModalOpen(false)}
+        onMove={(folderId) => void runMove(checkedItems.map((i) => i.key), folderId)}
+      />
+      <MoveFailedModal
+        open={moveFailure !== null}
+        onClose={() => setMoveFailure(null)}
+        onRetry={() => {
+          if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId);
+        }}
+      />
       {/* Replace-all picker now lives inside <AssetDetailsPanel> — see
           ./components/AssetDetailsPanel.tsx (D5 Stage 2). */}
     </div>

@@ -3,8 +3,9 @@
  *
  * The MIDDLE asset grid + subbar + bulk-toolbar + grid-foot all live
  * here, lifted out of LibraryManager. Owns its own viewMode (grid
- * vs list), sort menu open state, and bulk-move picker open state —
- * those are pure UI toggles that have no readers outside this panel.
+ * vs list), sort menu open state, and the drag ghost — pure UI state
+ * with no readers outside this panel. (The bulk-move picker it also
+ * owned is gone: Clone 3683:19950 made Move a modal of the orchestrator.)
  *
  * Pre-extraction: lines 332-608 of LibraryManager.tsx (~276 LOC).
  *
@@ -48,6 +49,7 @@ import {
   Upload,
 } from "lucide-react";
 import * as React from "react";
+import { flushSync } from "react-dom";
 import type {
   LibraryItem,
   MediaSortBy,
@@ -107,9 +109,54 @@ const LIST_TYPE_LABEL: Record<LibraryItem["type"], string> = {
 const EMPTY_FOLDER_LINE_CLASS =
   "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
+/* Clone 4207:26629 / 4215:26635 / 4220:26643 — the native drag image: the
+   thumb (grid) or the row(s) (list) with an "N items" badge. Rendered
+   offscreen inside the column so setDragImage has a laid-out element to
+   snapshot; never in the flow, never on document.body. */
+const GHOST =
+  "tw:pointer-events-none tw:fixed tw:-top-[1000px] tw:-left-[1000px] tw:flex tw:flex-col tw:gap-1 " +
+  "tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-bg-card)] tw:p-1";
+const GHOST_THUMB =
+  "tw:flex tw:h-21 tw:w-30 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-[var(--bk-radius-sm)] " +
+  "tw:bg-[var(--bk-bg-subtle)] tw:[&>img]:size-full tw:[&>img]:object-cover";
+const GHOST_ROW =
+  "tw:flex tw:h-7 tw:w-50 tw:items-center tw:gap-3 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-card)] tw:px-2 " +
+  "tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
+const GHOST_BADGE =
+  "tw:absolute tw:-top-2 tw:-right-2 tw:whitespace-nowrap tw:rounded-full tw:bg-[var(--bk-accent)] tw:px-2 tw:py-0.5 " +
+  "tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:font-semibold tw:text-[var(--bk-accent-on)]";
+
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
   return SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Date added";
+}
+
+/* Clone 3696:20326 — a video with no poster is a neutral tile under its play
+   glyph. It used to fall through to <img src={videoBlob}>, which the browser
+   renders as a broken image with the filename as its alt. The same tile is
+   the drag ghost's face (4207:26629), so it is drawn once. */
+function thumbFor(item: LibraryItem, viewMode: "grid" | "list"): React.ReactNode {
+  if ((item.type === "img" || item.type === "vid") && item.thumb) {
+    return <img src={item.thumb || item.src} alt={item.name} loading="lazy" />;
+  }
+  if (item.type === "vid") return null;
+  if (item.type === "ico") {
+    return <img src={item.src} alt={item.name} className="tw:h-9 tw:w-9 tw:object-contain" />;
+  }
+  if (item.type === "fnt") {
+    return (
+      <span
+        style={{
+          fontSize: viewMode === "list" ? 18 : 32,
+          fontWeight: 700,
+          color: "var(--bk-ink)",
+        }}
+      >
+        Aa
+      </span>
+    );
+  }
+  return <img src={item.src} alt={item.name} loading="lazy" />;
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────
@@ -136,7 +183,16 @@ export interface AssetGridProps {
   /** Empty-state hero buttons. */
   onUploadClick(): void;
   onOpenStockModal(): void;
-  /** Bulk-move toast trigger. */
+  /** Clone 3683:19950 — the bulk bar's `Move to folder…` opens the
+   *  orchestrator's Move modal; the grid moves nothing itself. */
+  onMoveSelected(): void;
+  /** Clone 4207:26629 / 4215:26635 / 4220:26643 — a card or row is in
+   *  flight with these keys (the whole checked set when the dragged one is
+   *  checked, else itself); and it is over. The orchestrator outlines the
+   *  folders, dims the rail and writes the footer hint from these. */
+  onAssetDragStart(keys: string[]): void;
+  onAssetDragEnd(): void;
+  /** Bulk-download toast trigger. */
   addToast(t: ToastInput): void;
 }
 
@@ -155,9 +211,20 @@ export function AssetGrid({
   onInsert,
   onUploadClick,
   onOpenStockModal,
+  onMoveSelected,
+  onAssetDragStart,
+  onAssetDragEnd,
   addToast,
 }: AssetGridProps) {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  /* Clone 4207:26629 / 4215:26635 — the drag image is the library's own
+     ghost: the thumb (grid) or the row(s) (list) with an "N items" badge.
+     `setDragImage` reads the element the moment dragstart fires, so the
+     ghost is rendered synchronously (flushSync) from this state and handed
+     over in the same handler; it lives offscreen inside the column, never
+     on document.body (Gate 22). */
+  const [ghost, setGhost] = React.useState<{ item: LibraryItem; names: string[] } | null>(null);
+  const ghostRef = React.useRef<HTMLDivElement>(null);
 
   /* Board 1174:4867 — the format strip lists the formats THIS library
      actually holds, not a fixed JPG/PNG/SVG/MP4 row. A chip for a format
@@ -198,7 +265,18 @@ export function AssetGrid({
     ? `${visibleItems.length} ${visibleItems.length === 1 ? "result" : "results"} for "${searchQuery}"`
     : `${visibleItems.length} ${visibleItems.length === 1 ? "file" : "files"} · ${scopeLabel}`;
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
-  const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
+
+  /* Clone 3700:20353 — an empty FOLDER is not an empty library. Only for a
+     folder scope that truly holds nothing: a folder whose assets a search or
+     a format filter hides keeps the "No results" / hero branch below. The
+     shot draws NOTHING above the folder's heading, so the toolbar row goes
+     with the grid. */
+  const emptyFolderScope =
+    visibleItems.length === 0 &&
+    state.currentFolderId !== null &&
+    !smartFolder &&
+    !searchQuery &&
+    (state.folderCounts.get(state.currentFolderId) ?? 0) === 0;
 
   return (
     <div className={`mgr-main${isDragOver ? " dragover" : ""}`} data-testid="mgr-grid-col">
@@ -207,6 +285,24 @@ export function AssetGrid({
           <span className="mgr-dropzone-title" data-testid="mgr-dropzone-title">Drop files to upload</span>
           <span className="mgr-dropzone-sub" data-testid="mgr-dropzone-sub">
             Images, video, audio, SVG and fonts — up to {formatBytes(state.storage.total)} total
+          </span>
+        </div>
+      )}
+      {ghost && (
+        <div className={GHOST} ref={ghostRef} aria-hidden="true" data-testid="mgr-drag-ghost">
+          {viewMode === "grid" ? (
+            <div className={GHOST_THUMB}>{thumbFor(ghost.item, "grid")}</div>
+          ) : (
+            /* 4215:26635 stacks the rows; two is enough to read as a stack. */
+            ghost.names.slice(0, 2).map((name) => (
+              <div key={name} className={GHOST_ROW}>
+                <span className="mgr-list-check on" aria-hidden="true" />
+                <span className="tw:truncate">{name}</span>
+              </div>
+            ))
+          )}
+          <span className={GHOST_BADGE} data-testid="mgr-drag-ghost-badge">
+            {ghost.names.length} {ghost.names.length === 1 ? "item" : "items"}
           </span>
         </div>
       )}
@@ -219,6 +315,7 @@ export function AssetGrid({
         gets a visible, clearable chip — otherwise the manager would show a
         filtered library with no cause on screen.
       */}
+      {!emptyFolderScope && (
       <div className="mgr-subbar" data-testid="mgr-subbar">
         <span className="mgr-count" data-testid="mgr-count">{countLabel}</span>
 
@@ -347,6 +444,7 @@ export function AssetGrid({
           <CheckSquare size={13} />
         </Button>
       </div>
+      )}
 
       {/* Board 1163:4641 draws the bulk bar BELOW the toolbar, not in
           place of it: what you are filtering by stays on screen while a
@@ -355,63 +453,13 @@ export function AssetGrid({
         <div className="mgr-bulk-bar" data-testid="mgr-bulk-bar">
           <span className="mgr-bulk-count" data-testid="mgr-bulk-count">{state.selectedKeys.size} selected</span>
           <div className="mgr-spacer" />
-          {/* Bug #4 fix: Move → folder picker popover */}
-          <div className="mgr-sort-wrap">
-            <Button variant="link" className={BULK_LINK} onClick={() => setBulkMovePickerOpen((o) => !o)}>
-              Move to folder…
-            </Button>
-            {bulkMovePickerOpen && (
-              <>
-                <div
-                  className="mgr-sort-scrim"
-                  onClick={() => setBulkMovePickerOpen(false)}
-                />
-                <div
-                  className="mgr-sort-menu"
-                  style={{ minWidth: 200, maxHeight: 280, overflowY: "auto" }}
-                >
-                  <Button
-                    className="mgr-sort-item"
-                    onClick={() => {
-                      const keys = Array.from(state.selectedKeys);
-                      state.bulkMoveAssets(keys, null);
-                      addToast({
-                        description: `Moved ${keys.length} to root`,
-                        tone: "success",
-                      });
-                      setBulkMovePickerOpen(false);
-                      state.toggleSelMode();
-                    }}
-                  >
-                    <FolderOpen size={12} /> Root
-                  </Button>
-                  {state.folders.length > 0 && <div className="mgr-sort-sep" />}
-                  {state.folders.map((folder) => (
-                    <Button
-                      key={folder.id}
-                      className="mgr-sort-item"
-                      onClick={() => {
-                        const keys = Array.from(state.selectedKeys);
-                        state.bulkMoveAssets(keys, folder.id);
-                        addToast({
-                          description: `Moved ${keys.length} to ${folder.name}`,
-                          tone: "success",
-                        });
-                        setBulkMovePickerOpen(false);
-                        state.toggleSelMode();
-                      }}
-                    >
-                      <div
-                        className="mgr-folder-dot"
-                        style={{ background: "var(--bk-warning)" }}
-                      />
-                      {folder.name}
-                    </Button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+          {/* Clone 3683:19950 — the Move modal. The inline Root/folder
+              popover this replaces moved on the spot, toasted, and left
+              select mode; the result now reads in the rail with the
+              selection kept (3683:19964). */}
+          <Button variant="link" className={BULK_LINK} data-testid="mgr-bulk-move" onClick={onMoveSelected}>
+            Move to folder…
+          </Button>
           <Button
             variant="link"
             className={BULK_LINK}
@@ -534,32 +582,7 @@ export function AssetGrid({
         >
           {visibleItems.map((item) => {
             const isSelected = selectedAssetId === item.key;
-            /* Clone 3696:20326 — a video with no poster is a neutral tile under
-               its play glyph. It used to fall through to <img src={videoBlob}>,
-               which the browser renders as a broken image with the filename as
-               its alt. */
-            const thumbContent =
-              (item.type === "img" || item.type === "vid") && item.thumb ? (
-                <img src={item.thumb || item.src} alt={item.name} loading="lazy" />
-              ) : item.type === "vid" ? null : item.type === "ico" ? (
-                <img
-                  src={item.src}
-                  alt={item.name}
-                  className="tw:h-9 tw:w-9 tw:object-contain"
-                />
-              ) : item.type === "fnt" ? (
-                <span
-                  style={{
-                    fontSize: viewMode === "list" ? 18 : 32,
-                    fontWeight: 700,
-                    color: "var(--bk-ink)",
-                  }}
-                >
-                  Aa
-                </span>
-              ) : (
-                <img src={item.src} alt={item.name} loading="lazy" />
-              );
+            const thumbContent = thumbFor(item, viewMode);
 
             // Two drop targets read this drag: the canvas (src/type/name) and
             // the folder tree, which moves the asset and needs its KEY. The grid
@@ -573,6 +596,24 @@ export function AssetGrid({
               e.dataTransfer.setData("application/x-buildrik-media-asset-key", item.key);
               e.dataTransfer.setData("text/plain", item.key);
               e.dataTransfer.effectAllowed = "copyMove";
+              /* 4215:26635 — a checked card carries the whole checked set;
+                 an unchecked one, even beside a selection, carries itself. */
+              const keys =
+                state.selMode && state.selectedKeys.has(item.key) ? Array.from(state.selectedKeys) : [item.key];
+              const names = keys.map((k) => {
+                const i = state.libraryItems.find((x) => x.key === k);
+                return i ? (i.displayName ?? i.name) : k;
+              });
+              flushSync(() => setGhost({ item, names }));
+              /* Test harnesses hand-build the payload without setDragImage. */
+              if (ghostRef.current && typeof e.dataTransfer.setDragImage === "function") {
+                e.dataTransfer.setDragImage(ghostRef.current, 24, 24);
+              }
+              onAssetDragStart(keys);
+            };
+            const onDragEnd = () => {
+              setGhost(null);
+              onAssetDragEnd();
             };
 
             // Bug #10 fix: Cmd/Ctrl enters multi-select; in selMode, regular click toggles.
@@ -599,6 +640,7 @@ export function AssetGrid({
                   onContextMenu={(e) => state.openCtxMenu(e, item)}
                   draggable
                   onDragStart={onDragStart}
+                  onDragEnd={onDragEnd}
                 >
                   {/* Board 1163:4641 leads every row with its checkbox — list
                       view IS the bulk view, and dims left with it: the column
@@ -643,6 +685,7 @@ export function AssetGrid({
                 onContextMenu={(e) => state.openCtxMenu(e, item)}
                 draggable
                 onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
               >
                 <div className="mgr-asset-thumb" data-testid={`mgr-thumb-${item.key}`}>
                   {thumbContent}
@@ -688,17 +731,11 @@ export function AssetGrid({
             );
           })}
         </div>
-      ) : state.currentFolderId !== null &&
-        !smartFolder &&
-        !searchQuery &&
-        (state.folderCounts.get(state.currentFolderId) ?? 0) === 0 ? (
-        /* Clone 3700:20353 — an empty FOLDER is not an empty library. The
-           question here is "what goes in this folder?", so the grid reads
-           the folder's name, says it holds nothing yet, and offers the
-           library's own upload picker. Only for a folder scope that truly
-           holds nothing: a folder whose assets a search or a format filter
-           hides keeps the "No results" / hero branch below. Left-aligned at
-           the column's own inset, not the centred hero. */
+      ) : emptyFolderScope ? (
+        /* Clone 3700:20353 — the question here is "what goes in this
+           folder?", so the grid reads the folder's name, says it holds
+           nothing yet, and offers the library's own upload picker.
+           Left-aligned at the column's own inset, not the centred hero. */
         <div className="tw:flex tw:flex-col tw:items-start tw:gap-4 tw:pt-3" data-testid="mgr-empty-folder">
           <h3
             className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"

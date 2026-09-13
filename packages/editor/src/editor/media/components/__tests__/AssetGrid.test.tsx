@@ -51,11 +51,19 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
     onUploadClick: vi.fn(),
     onOpenStockModal: vi.fn(),
     onDownload: vi.fn(() => 0),
+    onMoveSelected: vi.fn(),
+    onAssetDragStart: vi.fn(),
+    onAssetDragEnd: vi.fn(),
     addToast: vi.fn(),
     ...over,
   };
   const utils = render(<AssetGrid {...props} />);
   return { ...utils, props };
+}
+
+/** A drag payload the way jsdom hands it to React: setData records, setDragImage is spied. */
+function dragTransfer() {
+  return { setData: vi.fn(), setDragImage: vi.fn(), effectAllowed: "", types: [] as string[] };
 }
 
 // Board 1161:35 files the manager by FORMAT, not by the drawer's type pills:
@@ -243,24 +251,19 @@ describe("AssetGrid — bulk toolbar", () => {
     expect(screen.getByText("2 selected")).toBeInTheDocument();
   });
 
-  it("Move to → folder calls bulkMoveAssets with keys + folder id, toasts, exits selMode", () => {
+  // Clone 3683:19950 — `Move to folder…` opens the orchestrator's Move
+  // modal (prototype edge `Move to folder…|CLIC|OVE>Assets · Move selected
+  // files`). The inline Root/folder picker it replaces moved on the spot,
+  // toasted, and threw the person out of select mode.
+  it("Move to folder… asks the orchestrator for the Move modal and moves nothing itself", () => {
     const state = bulkState();
     const { props } = mount(state);
-    fireEvent.click(screen.getByText(/Move to/));
-    fireEvent.click(screen.getByText("Brand"));
-    expect(state.bulkMoveAssets).toHaveBeenCalledWith(["a", "b"], "f1");
-    expect(props.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: "Moved 2 to Brand", tone: "success" }),
-    );
-    expect(state.toggleSelMode).toHaveBeenCalled();
-  });
-
-  it("Move to → Root passes folderId=null", () => {
-    const state = bulkState();
-    mount(state);
-    fireEvent.click(screen.getByText(/Move to/));
-    fireEvent.click(screen.getByText("Root"));
-    expect(state.bulkMoveAssets).toHaveBeenCalledWith(["a", "b"], null);
+    fireEvent.click(screen.getByText("Move to folder…"));
+    expect(props.onMoveSelected).toHaveBeenCalledTimes(1);
+    expect(state.bulkMoveAssets).not.toHaveBeenCalled();
+    expect(screen.queryByText("Root")).toBeNull();
+    expect(screen.queryByText("Brand")).toBeNull();
+    expect(state.toggleSelMode).not.toHaveBeenCalled();
   });
 
   it("Delete requests bulk delete with the selected LibraryItems", () => {
@@ -346,5 +349,78 @@ describe("AssetGrid — badges + footer", () => {
     });
     mount(state, { smartFolder: "unused" });
     expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · Unused");
+  });
+});
+
+// Clone 4207:26629 (one grid card) · 4215:26635 (two checked) · 4220:26643
+// (one list row): dragging draws a custom ghost — the thumb or the row with an
+// "N items" badge — and tells the orchestrator which keys are in flight.
+describe("AssetGrid — dragging a card or a row (Clone 4207:26629 / 4215:26635 / 4220:26643)", () => {
+  const two = () =>
+    makeState({
+      libraryItems: [makeItem({ key: "a", name: "hero-dark.jpg" }), makeItem({ key: "b", name: "chef-intro.mp4", type: "vid" })],
+      counts: { all: 2, img: 1, vid: 1, ico: 0, fnt: 0 },
+    });
+
+  it("a plain card drag carries just that asset and a '1 item' ghost", () => {
+    const state = two();
+    const { props } = mount(state);
+    const dt = dragTransfer();
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-a"), { dataTransfer: dt });
+    expect(props.onAssetDragStart).toHaveBeenCalledWith(["a"]);
+    expect(dt.setData).toHaveBeenCalledWith("application/x-buildrik-media-asset-key", "a");
+    const ghost = screen.getByTestId("mgr-drag-ghost");
+    expect(dt.setDragImage).toHaveBeenCalledWith(ghost, expect.any(Number), expect.any(Number));
+    expect(screen.getByTestId("mgr-drag-ghost-badge")).toHaveTextContent("1 item");
+    // 4207:26629 — the grid ghost is the card's thumb.
+    expect(ghost.querySelector("img")?.getAttribute("alt")).toBe("hero-dark.jpg");
+  });
+
+  it("dragging a CHECKED card carries the whole checked set and badges the count", () => {
+    const state = makeState({ ...two(), selMode: true, selectedKeys: new Set(["a", "b"]) });
+    const { props } = mount(state);
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
+    fireEvent.dragStart(screen.getByTestId("mgr-list-row-b"), { dataTransfer: dragTransfer() });
+    expect(props.onAssetDragStart).toHaveBeenCalledWith(["a", "b"]);
+    expect(screen.getByTestId("mgr-drag-ghost-badge")).toHaveTextContent("2 items");
+  });
+
+  it("dragging an UNCHECKED card while others are checked carries only itself", () => {
+    const state = makeState({ ...two(), selMode: true, selectedKeys: new Set(["b"]) });
+    const { props } = mount(state);
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-a"), { dataTransfer: dragTransfer() });
+    expect(props.onAssetDragStart).toHaveBeenCalledWith(["a"]);
+  });
+
+  it("dragend drops the ghost and tells the orchestrator", () => {
+    const state = two();
+    const { props } = mount(state);
+    fireEvent.dragStart(screen.getByTestId("mgr-asset-a"), { dataTransfer: dragTransfer() });
+    expect(screen.getByTestId("mgr-drag-ghost")).toBeInTheDocument();
+    fireEvent.dragEnd(screen.getByTestId("mgr-asset-a"));
+    expect(screen.queryByTestId("mgr-drag-ghost")).toBeNull();
+    expect(props.onAssetDragEnd).toHaveBeenCalledTimes(1);
+  });
+});
+
+// Clone 3700:20353 draws NOTHING above the empty folder's heading — no count
+// line, no format chips, no view or sort row.
+describe("AssetGrid — the toolbar over an empty folder (Clone 3700:20353)", () => {
+  it("hides the toolbar row while the empty-folder state renders", () => {
+    const state = makeState({
+      libraryItems: [],
+      currentFolderId: "f-new",
+      allFolders: [{ id: "f-new", name: "Campaign images", parentId: null, createdAt: "", updatedAt: "" }],
+    });
+    mount(state, { visibleItems: [] });
+    expect(screen.getByTestId("mgr-empty-folder")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-subbar")).toBeNull();
+  });
+
+  it("keeps the toolbar for a search with no results", () => {
+    const state = makeState({ libraryItems: [], librarySearch: "zzz" });
+    mount(state, { visibleItems: [] });
+    expect(screen.getByText("No results")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-subbar")).toBeInTheDocument();
   });
 });

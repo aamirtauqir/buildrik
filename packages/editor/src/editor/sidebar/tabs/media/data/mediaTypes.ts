@@ -53,6 +53,11 @@ export interface LibraryItem {
   type: "img" | "vid" | "ico" | "fnt";
   src: string;
   thumb?: string;
+  /** The folder the asset is filed in; null at the root ("unfiled"). The
+   *  Move modal (Clone 3683:19950) says where each checked file IS, and the
+   *  move result (3699:20381) tells a file that moved from one that was
+   *  already there — both read this. */
+  folderId?: string | null;
   size: number; // bytes
   duration?: number; // seconds, video only
   width?: number;
