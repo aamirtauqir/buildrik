@@ -48,16 +48,7 @@ const TAB_CLASS =
   "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:hover:bg-transparent " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
-export function Tabs({
-  tabs,
-  value,
-  onChange,
-  label = "Sections",
-  className,
-  tabClassName,
-  "data-testid": testId,
-  ...rest
-}: TabsProps & { "data-testid"?: string }) {
+export function Tabs({ tabs, value, onChange, label = "Sections", className, tabClassName, ...rest }: TabsProps) {
   const enabled = tabs.filter((t) => !t.disabled);
   const nodes = React.useRef(new Map<string, HTMLButtonElement>());
 
@@ -97,7 +88,6 @@ export function Tabs({
          `tw:p-0` has to REPLACE the default padding, not sit beside it. */
       className={twMerge("tw:flex tw:items-center tw:gap-1 tw:py-1 tw:px-3", className)}
       onKeyDown={onKeyDown}
-      data-testid={testId}
       {...rest}
     >
       {tabs.map((t) => (
@@ -110,8 +100,6 @@ export function Tabs({
           type="button"
           role="tab"
           className={tabClassName ? twMerge(TAB_CLASS, tabClassName) : TAB_CLASS}
-          /* `<row testid>-<tab id>` — the conformance recipes measure one tab. */
-          data-testid={testId ? `${testId}-${t.id}` : undefined}
           aria-selected={t.id === value}
           aria-disabled={t.disabled || undefined}
           tabIndex={t.id === value ? 0 : -1}
