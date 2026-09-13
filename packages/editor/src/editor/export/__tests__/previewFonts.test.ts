@@ -60,3 +60,31 @@ describe("preview keeps the site's fonts and nothing else external", () => {
     expect(out).toContain(".a{color:red}");
   });
 });
+
+/* Clone 3721:43423 (Fonts round trip): an ADDED site font is declared in the
+   document's own `<style>` as `@font-face { src: url("https://…woff2") }`.
+   The sheet filter drops any `<style>` carrying `url(` — so the whole
+   stylesheet went with it and the preview lost every rule (seen live
+   2026-09-14, Quick preview with Inter Var on a heading). A face whose every
+   url is https is the site's own font; anything else in a face is still out. */
+describe("preview keeps the site's own @font-face", () => {
+  const face = '@font-face{font-family:"Inter Var";src:url("https://cdn.example/inter-var.woff2") format("woff2");font-display:swap}';
+
+  it("keeps an https @font-face and the rest of the sheet it sits in", () => {
+    const out = sanitizeHTMLForPreview(withHead(`<style>${face}h1{color:red}</style>`));
+    expect(out).toContain('src:url("https://cdn.example/inter-var.woff2")');
+    expect(out).toContain("h1{color:red}");
+  });
+
+  it("drops a face pointing anywhere but https, and keeps the sheet around it", () => {
+    const bad = '@font-face{font-family:"X";src:url("javascript:alert(1)")}';
+    const out = sanitizeHTMLForPreview(withHead(`<style>${bad}h1{color:red}</style>`));
+    expect(out).not.toContain("javascript:");
+    expect(out).toContain("h1{color:red}");
+  });
+
+  it("still drops a url() outside a @font-face", () => {
+    const out = sanitizeHTMLForPreview(withHead('<style>h1{background:url("https://x/y.png")}</style>'));
+    expect(out).not.toContain("y.png");
+  });
+});

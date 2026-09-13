@@ -377,6 +377,16 @@ export class FontManager extends EventEmitter {
         });
 
         await fontFace.load();
+        /* One face per family: a second registration of the same file that
+           started while this load was in flight swept an empty set, so the
+           sweep happens here, at the moment of adding, not at the call. */
+        if (font.source === "custom" && typeof document.fonts.forEach === "function") {
+          const stale: FontFace[] = [];
+          document.fonts.forEach((face) => {
+            if (face.family.replace(/^"|"$/g, "") === font.family && face !== fontFace) stale.push(face);
+          });
+          for (const face of stale) document.fonts.delete(face);
+        }
         document.fonts.add(fontFace);
 
         variant.loaded = true;

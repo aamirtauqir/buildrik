@@ -14,6 +14,7 @@
  */
 
 import * as React from "react";
+import { twMerge } from "tailwind-merge";
 import {
   GoogleFontsService,
   searchGoogleFonts,
@@ -250,6 +251,9 @@ export interface FontPickerPanelProps {
   onSelect: (font: GoogleFont | SystemFont) => void;
   /** `Manage site fonts` — the foot row (3721:43084 → 3686:42317). */
   onManage: () => void;
+  /** Extra classes on the panel — a narrow host (the Brand token's 163px value
+   *  column) hands over a floor width so the category tabs are not clipped. */
+  className?: string;
 }
 
 export const FontPickerPanel: React.FC<FontPickerPanelProps> = ({
@@ -259,6 +263,7 @@ export const FontPickerPanel: React.FC<FontPickerPanelProps> = ({
   currentValue,
   onSelect,
   onManage,
+  className,
 }) => {
   const [fontSearch, setFontSearch] = React.useState("");
   const [selectedCategory, setSelectedCategory] = React.useState<FontCategory | "all">("all");
@@ -277,7 +282,14 @@ export const FontPickerPanel: React.FC<FontPickerPanelProps> = ({
 
   return (
     <div
-      className="tw:absolute tw:left-0 tw:right-0 tw:mt-1 tw:flex tw:flex-col tw:gap-0 tw:overflow-hidden tw:rounded-lg tw:border tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-panel)] tw:z-[var(--bk-z-popover)] tw:max-h-90"
+      /* `top-full`: the host row is a centred flex box, so an absolutely
+         positioned child with no `top` takes its STATIC position — centred on
+         the 34px row — and a 360px panel opened 165px above the trigger, its
+         head under the inspector's sticky header (measured live 2026-09-14). */
+      className={twMerge(
+        "tw:absolute tw:top-full tw:left-0 tw:right-0 tw:mt-1 tw:flex tw:flex-col tw:gap-0 tw:overflow-hidden tw:rounded-lg tw:border tw:border-[var(--bk-border-medium)] tw:bg-[var(--bk-bg-panel)] tw:z-[var(--bk-z-popover)] tw:max-h-90",
+        className,
+      )}
       id={id}
       role="listbox"
       aria-label="Font family selection"

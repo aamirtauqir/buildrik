@@ -233,6 +233,27 @@ describe("Composer listener hygiene", () => {
     vi.unstubAllGlobals();
   });
 
+  /* Seen live 2026-09-14: the library held two files both named
+     Inter-Var.woff2 — one added, one not. The FontManager keys a family by
+     FILE name, so the not-added duplicate's sync unregistered the added one:
+     the picker lost Inter Var and the preview shipped no @font-face. A file
+     name stays registered while ANY asset carrying it is added. */
+  it("a not-added duplicate of an added file's name does not unregister the family", async () => {
+    stubFontFaces();
+    const composer = new Composer({} as any);
+    await composer.whenReady();
+    composer.media.emitEvent("media:added", interVar({ id: "a", src: "https://cdn/a.woff2", siteFont: true }));
+    await vi.waitFor(() => expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(1));
+    composer.media.emitEvent("media:added", interVar({ id: "b", src: "https://cdn/b.woff2", siteFont: false }));
+    composer.media.emitEvent("media:updated", { asset: interVar({ id: "b", src: "https://cdn/b.woff2", siteFont: false }), changes: {} });
+    await new Promise((r) => setTimeout(r, 10));
+    expect(composer.fonts.getAllFonts({ source: "custom" }).map((f) => f.family)).toEqual(["Inter Var"]);
+    // Removing the ADDED one does unregister it — nothing else carries the name as added.
+    composer.media.emitEvent("media:updated", { asset: interVar({ id: "a", src: "https://cdn/a.woff2", siteFont: false }), changes: { siteFont: false } });
+    expect(composer.fonts.getAllFonts({ source: "custom" })).toHaveLength(0);
+    vi.unstubAllGlobals();
+  });
+
   it("3686:42317 · a font added on another device is registered when the library imports it", async () => {
     stubFontFaces();
     const composer = new Composer({} as any);

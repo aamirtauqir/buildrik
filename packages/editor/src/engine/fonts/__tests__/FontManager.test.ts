@@ -395,6 +395,20 @@ describe("library fonts (registerLibraryFont)", () => {
     expect([...faces][0].source).toBe("url(https://cdn/inter.woff2)");
   });
 
+  /* Seen live 2026-09-14: after a reload the editor's own init registered the
+     added font and the server import's MEDIA_UPDATED registered it again
+     before the first FontFace had finished loading — the sweep of stale faces
+     ran on an empty set and both faces landed. One family, one face. */
+  it("two registrations in flight for the same file still leave one face", async () => {
+    const manager = makeManager();
+    await Promise.all([
+      manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "blob:http://x/1" }),
+      manager.registerLibraryFont({ filename: "Inter-Var.woff2", url: "https://cdn/inter.woff2" }),
+    ]);
+    expect(faces.size).toBe(1);
+    expect(manager.getAllFonts({ source: "custom" })).toHaveLength(1);
+  });
+
   it("a font whose file cannot be decoded stays out of the list rather than listed as loaded", async () => {
     vi.stubGlobal("FontFace", class { load = vi.fn(async () => { throw new Error("bad font"); }); });
     const manager = makeManager();

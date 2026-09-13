@@ -432,17 +432,32 @@ export class Composer extends EventEmitter {
     /* The delete event carries only the id and fires after the asset has
        left the media state, so the file each id provided is remembered here. */
     const fontFileById = new Map<string, string>();
+    /* A family is keyed by FILE name, and two library files can share one
+       (seen live: two Inter-Var.woff2, one added). It stays registered while
+       ANY asset carrying that name is added — a not-added duplicate must not
+       pull the added one's family out from under the pickers. */
+    const stillAddedElsewhere = (filename: string, exceptId: string | undefined) => {
+      for (const [id, file] of fontFileById) if (id !== exceptId && file === filename) return true;
+      return false;
+    };
     const syncLibraryFont = (asset: unknown) => {
       const a = asset as
         | { id?: string; type?: string; originalName?: string; src?: string; siteFont?: boolean }
         | undefined;
       if (a?.type !== "font" || !a.originalName || !a.src) return;
       if (a.siteFont === true) {
+        /* A device-only upload reaching the server comes back under a new id
+           for the same file; the old id's entry would otherwise hold the
+           family registered forever. Entries the library no longer knows go. */
+        for (const [id, file] of fontFileById) {
+          if (id !== a.id && file === a.originalName && !this.media.getAsset(id)) fontFileById.delete(id);
+        }
         if (a.id) fontFileById.set(a.id, a.originalName);
         void this.fonts.registerLibraryFont({ filename: a.originalName, url: a.src }).catch(() => {});
         return;
       }
       if (a.id) fontFileById.delete(a.id);
+      if (stillAddedElsewhere(a.originalName, a.id)) return;
       this.fonts.unregisterLibraryFont(a.originalName);
     };
     this.media.on(MEDIA_EVENTS.MEDIA_ADDED, syncLibraryFont);
@@ -455,6 +470,7 @@ export class Composer extends EventEmitter {
       const filename = id ? fontFileById.get(id) : undefined;
       if (!filename) return;
       fontFileById.delete(id!);
+      if (stillAddedElsewhere(filename, id)) return;
       this.fonts.unregisterLibraryFont(filename);
     });
 

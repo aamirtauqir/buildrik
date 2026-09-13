@@ -89,6 +89,10 @@ export const FontFamilyPicker: React.FC<FontFamilyPickerProps> = ({ value, onCha
       {open && (
         <FontPickerPanel
           id="brand-token-font-listbox"
+          /* The value column is 163px wide; the panel keeps a 240 floor and
+             hangs off the column's RIGHT edge so it stays inside the drawer
+             (measured live 2026-09-14 — at 163 the category tabs were clipped). */
+          className="tw:left-auto tw:right-0 tw:w-60"
           systemFonts={SYSTEM_FONTS}
           uploadedFonts={uploadedFonts}
           currentValue={value}
