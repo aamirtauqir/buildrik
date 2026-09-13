@@ -94,3 +94,19 @@ describe("requestDelete / requestBulkDelete — the confirm payload", () => {
     ]);
   });
 });
+
+describe("executeDelete — the Undo toast", () => {
+  /* Clone 3708:20446 names the file the way the confirm did — "hero-dark.jpg",
+     the full display name — not the engine's stem. */
+  it("names a single deleted file by its full display name", async () => {
+    const showToast = vi.fn();
+    const composer = fakeComposer() as { mediaOps?: unknown };
+    composer.mediaOps = {
+      deleteWithGrace: vi.fn(async () => ({ name: "hero-dark", usageCount: 0, expiresAt: 0, undo: vi.fn(), commitNow: vi.fn() })),
+    };
+    const { result } = renderHook(() => useSelectionState(composer as never, [HERO, CHEF, TEAM], showToast));
+    act(() => result.current.requestDelete("hero"));
+    await act(() => result.current.executeDelete());
+    expect(showToast).toHaveBeenCalledWith('Deleted "hero-dark.jpg".', "info", expect.anything());
+  });
+});

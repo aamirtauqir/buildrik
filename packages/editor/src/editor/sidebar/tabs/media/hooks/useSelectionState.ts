@@ -174,21 +174,26 @@ export function useSelectionState(
 
   const executeDelete = useCallback(async () => {
     if (!confirmDelete) return;
-    const { keys } = confirmDelete;
+    const { keys, names } = confirmDelete;
     /* Every delete goes through the grace path, and the ones that could not
        be granted one (still uploading) have already happened the old way. */
     const graced: NonNullable<Awaited<ReturnType<typeof composer.mediaOps.deleteWithGrace>>>[] = [];
-    for (const key of keys) {
+    let gracedName = "";
+    for (const [i, key] of keys.entries()) {
       try {
         const g = await composer.mediaOps.deleteWithGrace(key);
-        if (g) graced.push(g);
+        if (g) {
+          graced.push(g);
+          gracedName = names[i];
+        }
       } catch {
-        const item = libraryItems.find((i) => i.key === key);
-        showToast(`Could not delete "${item?.name ?? key}"`, "error");
+        showToast(`Could not delete "${names[i] ?? key}"`, "error");
       }
     }
     if (graced.length > 0) {
-      const what = graced.length === 1 ? `"${graced[0].name}"` : `${graced.length} files`;
+      /* The toast names the file the way the confirm did — the full display
+         name (Clone 3708:20446), not the engine's stem. */
+      const what = graced.length === 1 ? `"${gracedName}"` : `${graced.length} files`;
       const broke = graced.reduce((n, g) => n + g.usageCount, 0);
       showToast(
         broke > 0
@@ -201,7 +206,7 @@ export function useSelectionState(
     setConfirmDelete(null);
     setSelectedKeys(new Set());
     if (keys.length > 1) setSelMode(false);
-  }, [composer, confirmDelete, libraryItems, showToast]);
+  }, [composer, confirmDelete, showToast]);
 
   const cancelDelete = useCallback(() => setConfirmDelete(null), []);
 
