@@ -174,9 +174,15 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
 
 export function makeComposer(
   usages: Record<string, number> = {},
-  media: { getSelectedAssets?: () => MediaAsset[]; selectAssets?: (ids: string[]) => void } = {},
+  media: {
+    getSelectedAssets?: () => MediaAsset[];
+    selectAssets?: (ids: string[]) => void;
+    /** The composer's own bus — the rail's Manage font emits `ui:site-fonts` on it (3686:42317). */
+    emit?: (event: string, payload?: unknown) => void;
+  } = {},
 ) {
   return {
+    emit: media.emit ?? vi.fn(),
     mediaOps: {
       getUsages: (src: string) => ({ count: usages[src] ?? 0, usages: [] }),
       insertMedia: vi.fn(),

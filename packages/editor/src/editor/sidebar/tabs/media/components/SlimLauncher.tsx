@@ -828,6 +828,22 @@ export function SlimLauncher(props: SlimLauncherProps) {
               Icons
             </Button>
           ) : null}
+          {/* Clone 3437:36027's fourth door, `Aa Fonts` — the Site fonts
+              dialog (3686:42317), mounted once in the shell and opened by
+              the composer event every door emits. No file to highlight
+              from here. The glyph is the board's own "Aa", the same mark
+              the rail's font preview uses. */}
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            variant="link" className="tw:min-h-6 tw:gap-1.5 tw:font-normal"
+            data-testid="media-fonts-action"
+            onClick={() => props.composer.emit("ui:site-fonts", {})}
+          >
+            <span aria-hidden="true" className="tw:text-[11px] tw:font-semibold tw:leading-none">Aa</span>{" "}
+            Fonts
+          </Button>
         </div>
           {/* The limits are the engine's (`MEDIA_SIZE_LIMITS`), written once
               in `MEDIA_SIZE_LIMITS_LABEL`. This line used to carry its own

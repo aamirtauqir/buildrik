@@ -94,6 +94,7 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     // landed in the library with no badge at all.
     assetSource: asset.assetSource,
     tags: asset.tags,
+    siteFont: asset.siteFont,
   };
 }
 
