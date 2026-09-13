@@ -60,3 +60,21 @@ describe("the preview document carries the site's fonts", () => {
     expect(combined).not.toContain("Helvetica+Neue");
   });
 });
+
+/* Clone 3721:43423 (Fonts round trip): an ADDED site font a heading uses must
+   render in Quick preview too — the preview builds its own document, so the
+   editor's document.fonts never reach it. Same block the export ships. */
+describe("the preview document declares the site's own added fonts", () => {
+  it("carries @font-face for an added family the page names, before the Google links", () => {
+    const composer = composerWith({ "font-family": '"Inter Var", sans-serif' });
+    (composer.fonts as unknown as { fonts: Map<string, unknown> }).fonts.set("library-inter-var", {
+      id: "library-inter-var",
+      family: "Inter Var",
+      source: "custom",
+      variants: [{ weight: "400", style: "normal", url: "https://cdn.example/inter-var.woff2" }],
+    });
+    const { combined } = composer.exportHTML();
+    expect(combined).toContain('@font-face{font-family:"Inter Var";src:url("https://cdn.example/inter-var.woff2") format("woff2");font-display:swap}');
+    expect(combined).not.toContain("family=Inter+Var");
+  });
+});

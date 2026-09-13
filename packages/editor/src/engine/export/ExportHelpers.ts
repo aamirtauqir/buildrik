@@ -116,7 +116,11 @@ export function siteTokensCSS(
 function usedFontFamilies(css: string, extraFamilies: readonly string[]): Set<string> {
   const used = new Set<string>();
   const first = (stack: string) => stack.split(",")[0].trim().replace(/^["']|["']$/g, "");
-  for (const decl of css.matchAll(/font-family\s*:\s*([^;}]+)/g)) {
+  /* The preview document names families INLINE (`style="font-family: &quot;Inter
+     Var&quot;, …"`) — the entity's own `;` ended the declaration at `&`, so a
+     quoted family was never found. An entity-escaped quote is a quote here. */
+  const text = css.replace(/&quot;|&#34;/g, '"').replace(/&#39;/g, "'");
+  for (const decl of text.matchAll(/font-family\s*:\s*([^;}]+)/g)) {
     const family = first(decl[1]);
     if (family) used.add(family.toLowerCase());
   }

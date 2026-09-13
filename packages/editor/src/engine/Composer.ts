@@ -34,7 +34,7 @@ import { TraitDataBinding } from "./data/TraitDataBinding";
 import { DragManager } from "./drag/DragManager";
 import { ElementManager } from "./elements/ElementManager";
 import { EventEmitter } from "./EventEmitter";
-import { RESET_CSS, siteFontCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
+import { RESET_CSS, siteFontCSS, siteFontFaceCSS, siteTokensCSS, googleFontsHeadLinks, siteFontsFromTokens } from "./export/ExportHelpers";
 import { resolvePageTitle, resolveLanguage } from "./export/SEOInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./export/interactionRuntime";
 import { escapeHTML } from "../shared/utils/html/encoding";
@@ -711,9 +711,17 @@ export class Composer extends EventEmitter {
     // The HTML too, not just the CSS: this document carries element styles
     // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
     // a style attribute and nowhere in the stylesheet.
+    const slotFamilies = [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f));
+    /* The site's ADDED fonts (Clone 3721:43423): this document renders in its
+       own frame, where the editor's document.fonts never reach, so the faces
+       the export declares are declared here too — and a family the site
+       provides is never asked of Google. */
+    const siteFonts = this.fonts?.getAllFonts({ source: "custom" }) ?? [];
+    const faces = siteFontFaceCSS(`${css}${siteCss}${html}`, slotFamilies, siteFonts).css;
     const fontLinks = googleFontsHeadLinks(
       `${css}${siteCss}${html}`,
-      [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f))
+      slotFamilies,
+      siteFonts.map((f) => f.family)
     );
 
     // The THIRD head this codebase assembles, after the single-file export and
@@ -752,7 +760,7 @@ export class Composer extends EventEmitter {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHTML(title)}</title>
-${fontLinks ? `${fontLinks}\n` : ""}  <style>${RESET_CSS}${css}${siteCss}</style>
+${fontLinks ? `${fontLinks}\n` : ""}  <style>${faces}${RESET_CSS}${css}${siteCss}</style>
 </head>
 <body>
 ${html}${interactionScript}
