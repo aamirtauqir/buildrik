@@ -31,7 +31,7 @@ export function useSelectionState(
      on. */
   const checkInUse = useCallback(
     (keys: string[]): AssetUsage[] => {
-      type ElNode = { getParent?: () => ElNode | null; id?: string };
+      type ElNode = { getParent?: () => ElNode | null; getId?: () => string; id?: string };
       const elements = composer.elements as unknown as {
         findByMediaSrc?: (src: string) => ElNode[];
       };
@@ -50,7 +50,12 @@ export function useSelectionState(
         /* Bounded: a cycle in the parent chain would hang the confirm dialog,
            and no tree in this product is anywhere near this deep. */
         for (let hops = 0; node && hops < 200; hops++) {
-          if (node.id && pageOfRoot.has(node.id)) return pageOfRoot.get(node.id)!;
+          /* The engine's Element answers getId(); its `id` is not a public
+             field — reading it found no page for any live placement, so the
+             confirms and the versions cards said "on the site" without a name
+             (seen 2026-09-14). The test doubles carry a bare `id`. */
+          const id = node.getId?.() ?? node.id;
+          if (id && pageOfRoot.has(id)) return pageOfRoot.get(id)!;
           node = node.getParent?.() ?? null;
         }
         return null;
