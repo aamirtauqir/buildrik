@@ -12,6 +12,7 @@ screen indices each edge appears on).
 - Login: seeded e2e QA account via the magic-link `auth.setup.ts` path; cookies imported into gstack `/browse`. Viewport 1440×900.
 - Library seeded through the UI's file input with the 10 fixtures in `packages/editor/e2e/fixtures/clone-assets/`. No `BLOB_READ_WRITE_TOKEN`, so all 10 are `localOnly` ("10 not on the server") — accepted env, Q5. Rasters are transcoded to `.webp` by the upload pipeline (code:auto-webp), so the on-screen names read `hero-dark.webp` etc.
 - Figma calls spent today: 29 of the 40 agreed (9 before the plan, 18 screenshots, 1 dragging-frame lookup, 1 dragging-frame shot).
+- **Second pass, same day, with a Blob token** (store `buildrick-media`): every upload reaches `public.blob.vercel-storage.com`, the pill is gone, the footer reads the server quota (`1 MB / 500 MB`), a server-hosted asset applies to a selected image with "applied ✓", and a library `.woff2` is a family the Typography picker offers ("Inter Var", renders, survives reload). The five defects that walk found — CSP connect-src and font-src, Blob overwrite 400, unapplied migrations, an undrained retry queue, a decimal quota formatter — are in `BLOCKERS.md` → "Assets · Clone Phase 1". Rows 3695:43991 → drift-fixed; 3696:21550 usable, `Manage font` still Phase 5.
 
 ## The 19 screens
 
