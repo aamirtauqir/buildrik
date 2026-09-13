@@ -111,11 +111,10 @@ describe("SlimLauncher — §10 default 280px experience", () => {
     expect(screen.getByTestId("media-upload-action")).toBeInTheDocument();
   });
 
-  it("one door, one name — stock is worded the same everywhere", () => {
-    // The footer said "Stock" while the empty and error states said "Browse
-    // stock", in the same panel.
+  it("the footer door is 'Stock' (Clone 3437:36027) and the empty CTA says what pressing it does", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByTestId("media-stock-action")).toHaveTextContent("Browse stock");
+    expect(screen.getByTestId("media-stock-action")).toHaveTextContent("Stock");
+    expect(screen.getByTestId("media-stock-action")).not.toHaveTextContent("Browse");
     expect(screen.getByTestId("media-empty-cta")).toHaveTextContent("Browse stock");
   });
 
@@ -271,10 +270,12 @@ describe("Clone 3585:23326 / 3585:23337 · replacement upload from the drawer", 
     expect(onDismissUpload).toHaveBeenCalledWith("pasta-2.jpg");
     expect(onUpload).toHaveBeenCalledWith([smaller]);
     expect(screen.queryByTestId("media-replacement-modal")).toBeNull();
-    // 3585:23337 — the banner at the top of the drawer.
+    // 3585:23337 — the banner at the top of the drawer. It names the file the
+    // LIBRARY prints: the pipeline landed a WebP (code:auto-webp), so the
+    // banner and the rail cannot disagree on what the file is called.
     const banner = await screen.findByTestId("media-replacement-banner");
-    expect(within(banner).getByTestId("media-replacement-name")).toHaveTextContent("pasta-2-small.jpg");
-    expect(within(banner).getByTestId("media-replacement-meta")).toHaveTextContent("Uploaded · JPG · 8 MB · In site library");
+    expect(within(banner).getByTestId("media-replacement-name")).toHaveTextContent("pasta-2-small.webp");
+    expect(within(banner).getByTestId("media-replacement-meta")).toHaveTextContent("Uploaded · WEBP · 8 MB · In site library");
     // Above the search, below Manage assets.
     expect(banner.compareDocumentPosition(screen.getByTestId("media-search")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByTestId("media-manage-assets").compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -285,7 +286,7 @@ describe("Clone 3585:23326 / 3585:23337 · replacement upload from the drawer", 
   });
 
   it("a replacement that stayed on this device says so instead of 'In site library'", async () => {
-    const landed = makeAsset({ id: "loc-1", originalName: "pasta-2-small.jpg", size: 8 * MB, localOnly: true });
+    const landed = makeAsset({ id: "loc-1", name: "pasta-2-small", originalName: "pasta-2-small.jpg", mimeType: "image/jpeg", size: 8 * MB, localOnly: true });
     const onUpload = vi.fn(() => Promise.resolve([{ success: true, asset: landed, fileName: "pasta-2-small.jpg" }]));
     render(<SlimLauncher {...baseProps()} uploadQueue={[queueRow]} failedUploads={[rejected]} onUpload={onUpload} onDismissUpload={vi.fn()} />);
     pickReplacement(makeFile("pasta-2-small.jpg", 8 * MB));

@@ -17,6 +17,7 @@
 
 import { Button, ModalBody, ModalContent, ModalRoot } from "@/editor/chrome-ui";
 import type { MediaAsset } from "@shared/types/media";
+import { displayNameFor } from "../../sidebar/tabs/media/data/mediaUtils";
 import {
   LIBRARY_MODAL_BODY,
   LIBRARY_MODAL_BTN_PRIMARY,
@@ -51,7 +52,9 @@ export function UploadCompleteModal({ open, landed, failed, onDone, onViewAsset 
         </h2>
         <ModalBody>
           <p className={`${LIBRARY_MODAL_BODY} tw:text-[var(--bk-ink)]`} data-testid="mgr-upload-complete-body">
-            {one ? `${one.originalName} is now in your library.` : `${landed.length} files are now in your library.`}
+            {/* The name the library prints, not the file that was picked — the
+                pipeline lands rasters as WebP (code:auto-webp). */}
+            {one ? `${displayNameFor(one.name, one.mimeType)} is now in your library.` : `${landed.length} files are now in your library.`}
           </p>
           {failed.map((f, i) => (
             <p

@@ -28,6 +28,7 @@ import { Upload, Cloud, Shapes, Folder, ChevronDown, CheckSquare, ArrowUpRight }
 import type { Composer } from "@/engine/Composer";
 import type { MediaAsset, UploadResult } from "@shared/types/media";
 import { MEDIA_SIZE_LIMITS_LABEL, fileExtensionLabel } from "@shared/constants/media";
+import { displayNameFor } from "../data/mediaUtils";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { FailedUpload, LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { flattenFolderTree } from "../utils/folderTree";
@@ -251,11 +252,15 @@ export function SlimLauncher(props: SlimLauncherProps) {
           role="status"
           data-testid="media-replacement-banner"
         >
+          {/* The name the LIBRARY prints — the pipeline transcodes rasters to
+              WebP (code:auto-webp), so the file that landed is not the file
+              that was picked; a banner reading "pasta-2-small.jpg · JPG" over a
+              rail reading "pasta-2-small.webp" named two files (seen live). */}
           <span className="tw:truncate tw:text-[var(--bk-ink)]" data-testid="media-replacement-name">
-            {replacementBanner.originalName}
+            {displayNameFor(replacementBanner.name, replacementBanner.mimeType)}
           </span>
           <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="media-replacement-meta">
-            Uploaded · {fileExtensionLabel(replacementBanner.originalName)} · {formatBytes(replacementBanner.size, 1)} ·{" "}
+            Uploaded · {fileExtensionLabel(displayNameFor(replacementBanner.name, replacementBanner.mimeType))} · {formatBytes(replacementBanner.size, 1)} ·{" "}
             {replacementBanner.localOnly ? "On this device only" : "In site library"}
           </span>
           <Button
@@ -779,7 +784,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           data-testid="media-footer"
         >
         <div
-          className="tw:flex tw:h-11 tw:items-center tw:gap-6 tw:px-4 tw:text-[var(--bk-accent-text)]"
+          className="tw:flex tw:h-11 tw:items-center tw:gap-4 tw:whitespace-nowrap tw:px-4 tw:text-[var(--bk-accent-text)]"
           data-testid="media-footer-links"
         >
           <Button
@@ -803,11 +808,12 @@ export function SlimLauncher(props: SlimLauncherProps) {
             onClick={onOpenStock}
           >
             <Cloud size={14} aria-hidden="true" />
-            {/* Was "Stock". The empty state and the load-error state have both
-                said "Browse stock" all along, so one door wore two names in the
-                same panel. The longer phrase wins because "Stock" on its own
-                does not say what pressing it does. */}
-            Browse stock
+            {/* Clone 3437:36027 — the footer row is `↑ Upload · Stock · Icons`
+                on ONE line; "Browse stock" wrapped the row at 280 (measured
+                live 2026-09-13). The empty and load-error CTAs keep the
+                longer phrase: a CTA says what pressing it does, the footer
+                names the door. */}
+            Stock
           </Button>
           {props.onOpenIconPicker ? (
             <Button

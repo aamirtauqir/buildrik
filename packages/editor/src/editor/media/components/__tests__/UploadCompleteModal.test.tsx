@@ -14,7 +14,8 @@ import { makeAsset } from "../../__tests__/libraryFixture";
 function mount(over: Partial<React.ComponentProps<typeof UploadCompleteModal>> = {}) {
   const props = {
     open: true,
-    landed: [makeAsset({ id: "new-1", name: "pasta-2-small", originalName: "pasta-2-small.jpg" })],
+    /* A JPG picked, a WebP landed (code:auto-webp) — the dialog names what the library prints. */
+    landed: [makeAsset({ id: "new-1", name: "pasta-2-small", originalName: "pasta-2-small.jpg", mimeType: "image/webp" })],
     failed: [],
     onDone: vi.fn(),
     onViewAsset: vi.fn(),
@@ -28,7 +29,7 @@ describe("Clone 3724:20832 · Upload complete", () => {
   it("names the file, says it is not used yet, and offers Done (primary) · View asset", () => {
     const { props } = mount();
     expect(screen.getByTestId("mgr-upload-complete-title")).toHaveTextContent("Upload complete");
-    expect(screen.getByTestId("mgr-upload-complete-body")).toHaveTextContent("pasta-2-small.jpg is now in your library.");
+    expect(screen.getByTestId("mgr-upload-complete-body")).toHaveTextContent("pasta-2-small.webp is now in your library.");
     expect(screen.getByTestId("mgr-upload-complete-hint")).toHaveTextContent(
       "Not used on this site. Choose the image when you are ready to insert it.",
     );

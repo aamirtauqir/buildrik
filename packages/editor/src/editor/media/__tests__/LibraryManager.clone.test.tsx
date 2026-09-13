@@ -754,7 +754,7 @@ describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", ()
     // Still the Upload files modal, now reading the queue.
     expect(screen.getByTestId("mgr-upload-files-pct-0")).toHaveTextContent("62%");
     expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
-    finish(landedResult(makeAsset({ id: "hero", originalName: "hero-dark.jpg" })));
+    finish(landedResult(makeAsset({ id: "hero", name: "hero-dark", originalName: "hero-dark.jpg", mimeType: "image/jpeg" })));
     const done = await screen.findByTestId("mgr-upload-complete");
     expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
     expect(within(done).getByTestId("mgr-upload-complete-body")).toHaveTextContent("hero-dark.jpg is now in your library.");

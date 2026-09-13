@@ -228,15 +228,21 @@ export function UploadZone({
             return (
               <li
                 key={item.fileName}
-                className="med-upload-queue-item med-upload-queue-item--error tw:flex tw:flex-col tw:gap-1 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3"
+                /* Clone 3584:45522 — a COLUMN: name over the reason over the
+                   door, all flush left. The legacy `.med-upload-queue-item` row
+                   rules (flex row, centred, 40% name, one-line reason) beat
+                   these utilities on source order and centred the name while
+                   the reason ran off the band (measured live 2026-09-13), so
+                   the error row no longer carries them. */
+                className="med-upload-queue-item--error tw:flex tw:flex-col tw:items-start tw:gap-1 tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3"
                 data-testid="media-upload-error-row"
               >
-                <span className="med-upload-queue-item__name tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="media-upload-error-name">
+                <span className="tw:w-full tw:truncate tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="media-upload-error-name">
                   {item.fileName}
                 </span>
                 {/* Board 145:197 — --color/warning-text, the token this system
                     already ships as `--bk-warning-text`. */}
-                <span className="med-upload-queue-item__reason tw:text-[11px] tw:leading-4 tw:text-[var(--bk-warning-text)]" data-testid="media-upload-error-reason">
+                <span className="tw:w-full tw:text-[11px] tw:leading-4 tw:text-[var(--bk-warning-text)]" data-testid="media-upload-error-reason">
                   {item.error ?? "Upload failed"}
                 </span>
                 {sizeGate ? (
@@ -245,7 +251,7 @@ export function UploadZone({
                     color="light"
                     size="xs"
                     variant="link"
-                    className="med-upload-queue-item__retry tw:mt-1 tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-ink)]"
+                    className="tw:mt-1 tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-ink)]"
                     data-testid="media-upload-error-replace"
                     onClick={() => chooseReplacement(sizeGate)}
                     aria-label={`Choose a smaller file to replace ${item.fileName}`}
@@ -258,7 +264,7 @@ export function UploadZone({
                     color="light"
                     size="xs"
                     variant="link"
-                    className="med-upload-queue-item__retry tw:mt-1 tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+                    className="tw:mt-1 tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
                     data-testid="media-upload-error-retry"
                     onClick={() => onRetryUpload(item.fileName)}
                     aria-label={`Retry ${item.fileName}`}

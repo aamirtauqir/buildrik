@@ -87,32 +87,6 @@
   flex-direction: column;
   gap: 4px;
 }
-.med-upload-queue-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
-  font-size: 11px;
-  border-radius: var(--bk-radius-sm, 4px);
-  border-left: 2px solid transparent;
-}
-.med-upload-queue-item__name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 40%;
-}
-.med-upload-queue-item__reason {
-  flex: 1;
-  opacity: 0.85;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.med-upload-queue-item__retry {
-  flex-shrink: 0;
-}
-
 /* §21 — Replace-across per-page selector */
 /* ── Replace-across dialog shell (board 1164:4738) ──────────────────────────
    These rules did not exist. Only the PAGE LIST below was ever styled, so the

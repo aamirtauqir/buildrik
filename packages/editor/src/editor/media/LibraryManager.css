@@ -1125,7 +1125,9 @@
 .mgr-main.dragover { position: relative; }
 .mgr-dropzone {
   position: absolute;
-  inset: 0;
+  /* Clone 3397:18137 — the zone sits a gutter in from the column's edges. */
+  inset: var(--bk-space-16);
+  border-radius: var(--bk-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
