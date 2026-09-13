@@ -24,14 +24,18 @@
 
 import * as React from "react";
 import { PanelFrame, Button, Menu, MenuItem, Popover, SkeletonBlock, TextField } from "@/editor/chrome-ui";
-import { Upload, Cloud, Shapes, Folder, ChevronDown, CheckSquare } from "lucide-react";
+import { Upload, Cloud, Shapes, Folder, ChevronDown, CheckSquare, ArrowUpRight } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
-import type { LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
+import type { MediaAsset, UploadResult } from "@shared/types/media";
+import { MEDIA_SIZE_LIMITS_LABEL, fileExtensionLabel } from "@shared/constants/media";
+import { formatBytes } from "@shared/utils/helpers/number";
+import type { FailedUpload, LibraryItem, MediaBucket, MediaFolder, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { flattenFolderTree } from "../utils/folderTree";
 import { TypePills } from "./TypePills";
 import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
 import { UploadZone } from "./UploadZone";
+import { ReplacementUploadModal } from "./ReplacementUploadModal";
 import "./SlimLauncher.css";
 
 interface SlimLauncherProps {
@@ -56,7 +60,15 @@ interface SlimLauncherProps {
   statusPill?: string | null;
   /** Any interaction with the drawer clears a pill left by a closed modal. */
   onDismissStatusPill?(): void;
-  onUpload(files: File[]): void;
+  /** Resolves the engine's result per file — the replacement banner
+   *  (Clone 3585:23337) names the asset that landed. */
+  onUpload(files: File[]): Promise<UploadResult[]>;
+  /** The engine's verdicts by name; a size-gate record offers a replacement
+   *  (Clone 3584:45522). */
+  failedUploads?: FailedUpload[];
+  /** Drop a failed upload's row — the replacement confirm clears the file it
+   *  stands in for. */
+  onDismissUpload?(fileName: string): void;
   /** Storage has not been read yet — draw the skeleton, not the empty state. */
   loading?: boolean;
   /** Storage could not be read. Distinct from empty: the assets still exist. */
@@ -142,6 +154,33 @@ export function SlimLauncher(props: SlimLauncherProps) {
   // duplicating one: two inputs would mean two accept-lists to keep in step.
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
   const [folderMenuOpen, setFolderMenuOpen] = React.useState(false);
+
+  /* Clone 3584:45522 → 3585:23326 → 3585:23337. The rejected row's `Choose a
+     smaller file…` picked a file: it waits in the confirm; Upload file drops
+     the refused row and sends it; what lands is named in a banner at the top
+     of the drawer until the next upload starts. */
+  const [replacement, setReplacement] = React.useState<{ original: FailedUpload; file: File } | null>(null);
+  const [replacementBanner, setReplacementBanner] = React.useState<MediaAsset | null>(null);
+  const confirmReplacement = async () => {
+    if (!replacement) return;
+    const { original, file } = replacement;
+    setReplacement(null);
+    props.onDismissUpload?.(original.fileName);
+    const [landed] = await props.onUpload([file]);
+    if (landed.success && landed.asset) setReplacementBanner(landed.asset);
+  };
+  const uploadFromDrawer = (files: File[]) => {
+    setReplacementBanner(null);
+    return props.onUpload(files);
+  };
+  /* Edge `Manage in full library|CLIC|OVE>` — the fullpage, with this file
+     selected. The shell's opener takes no argument, so the file travels
+     through the engine's own selection and `LibraryManager` reads it on mount. */
+  const manageInFullLibrary = (asset: MediaAsset) => {
+    props.composer.media.selectAssets([asset.id]);
+    setReplacementBanner(null);
+    props.onOpenLibrary?.();
+  };
   // "All" is the honest label for the whole library; a folder that has been
   // deleted while its id is still selected falls back to it rather than
   // rendering an empty scope name.
@@ -177,6 +216,61 @@ export function SlimLauncher(props: SlimLauncherProps) {
         />
       ) : null}
       <PanelFrame.Header title="Media" onClose={onClose} onExpandToggle={props.onExpand} />
+
+      {/* Clone 3584:45522 / 3584:45876 / 3585:23337 — `Manage assets ↗`, a
+          full-width quiet button under the header, is the drawer's named
+          door to the fullpage library. The only door before this was the
+          header's expand brackets, which say nothing about where they go.
+          3437:36027 draws the same button above the footer instead; the
+          later frames win. */}
+      {props.onOpenLibrary ? (
+        <div className="tw:px-4 tw:pb-2" data-testid="media-manage-assets-row">
+          <Button
+            type="button"
+            size="xs"
+            variant="secondary"
+            className="tw:w-full tw:gap-1 tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]"
+            data-testid="media-manage-assets"
+            onClick={() => props.onOpenLibrary?.()}
+          >
+            Manage assets
+            <ArrowUpRight size={12} aria-hidden="true" />
+          </Button>
+        </div>
+      ) : null}
+
+      {/* Clone 3585:23337 — the replacement that landed: name, `Uploaded ·
+          EXT · size · where it is`, and the door to its details. EXT is the
+          picked file's (the library may hold it transcoded); size and place
+          are the asset's. A file the mirror never took says so — "In site
+          library" over a local-only asset would be the `uploaded ✓` toast's
+          lie a second time. */}
+      {replacementBanner ? (
+        <div
+          className="tw:flex tw:flex-col tw:gap-0.5 tw:px-4 tw:pb-2 tw:text-[13px] tw:leading-5"
+          role="status"
+          data-testid="media-replacement-banner"
+        >
+          <span className="tw:truncate tw:text-[var(--bk-ink)]" data-testid="media-replacement-name">
+            {replacementBanner.originalName}
+          </span>
+          <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="media-replacement-meta">
+            Uploaded · {fileExtensionLabel(replacementBanner.originalName)} · {formatBytes(replacementBanner.size, 1)} ·{" "}
+            {replacementBanner.localOnly ? "On this device only" : "In site library"}
+          </span>
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            variant="link"
+            className="tw:min-h-6 tw:self-start tw:pl-3.5 tw:text-[13px] tw:leading-5 tw:font-normal tw:text-[var(--bk-ink)]"
+            data-testid="media-replacement-manage"
+            onClick={() => manageInFullLibrary(replacementBanner)}
+          >
+            Manage in full library
+          </Button>
+        </div>
+      ) : null}
 
       {/* Search — board `144:7`: 28h field inset 16, on bg-subtle. */}
       {/* Boards 303:1997 / 303:2032 — the running job names itself over the
@@ -657,29 +751,25 @@ export function SlimLauncher(props: SlimLauncherProps) {
           compact
           inputRef={uploadInputRef}
           storage={props.storage}
-          onUpload={props.onUpload}
+          onUpload={(files) => void uploadFromDrawer(files)}
           onRetryUpload={props.onRetryUpload}
+          onReplacementPicked={(original, file) => setReplacement({ original, file })}
           onOptimize={props.onOpenLibrary ? () => props.onOpenLibrary?.() : undefined}
           uploadQueue={props.uploadQueue}
+          failedUploads={props.failedUploads}
           disabled={props.storage.used >= props.storage.total}
         />
         {/*
-          Board `144:46` — and it is 182 tall, not 44. The footer grew between
-          the 2026-09-02 and 2026-09-07 captures of the same node: under the
-          links row it now carries the accept list and the line that explains
-          why Sort and List view sit disabled in the folder row. Both are facts
-          the drawer already owned and never said out loud — `UploadZone`'s
-          `ACCEPT_TYPES` + `MAX_FILE_BYTES`, and the two controls at 144:12 —
-          so the board is asking for copy, not for behaviour.
+          Clone 3437:36027 / 3585:23337 (re-draws board `144:46`): the links
+          row, then ONE line — `Images, videos and fonts · up to 50 MB per
+          file` on the board, the code's own per-type limits here. V1's second
+          line ("Sort and list view live in the full library", 2838:12023) is
+          not drawn by the Clone and is gone.
 
-          The board paints both lines accent blue with `cursor-pointer`, which
-          is the link node they were duplicated from, not a decision: neither
-          line goes anywhere. The one board that colours them as text rather
-          than as links — 145:250, quota-full — uses --color/ink-muted, and
-          that board also turns this whole foot to --color/bg-subtle, where
-          ink-muted computes 4.39:1 and fails AA. So they take ink-soft: 7.4 on
-          the panel, 7.0 on the tint, and no board asserts a colour for them
-          that the harness can hold either of us to.
+          The line takes ink-soft: the one board that colours this text as
+          text rather than as a link — 145:250, quota-full — uses ink-muted on
+          a bg-subtle foot, where it computes 4.39:1 and fails AA; ink-soft is
+          7.4 on the panel, 7.0 on the tint.
         */}
         {/* Board 145:294 — when storage is full the whole foot goes to
             --color/bg-subtle: Upload cannot run, and a footer that still looks
@@ -733,20 +823,23 @@ export function SlimLauncher(props: SlimLauncherProps) {
             </Button>
           ) : null}
         </div>
-          {/* Board 2838:12022. The list is `UploadZone`'s own accept string and
-              its own 50 MB ceiling, spelled for a person. */}
+          {/* The limits are the engine's (`MEDIA_SIZE_LIMITS`), written once
+              in `MEDIA_SIZE_LIMITS_LABEL`. This line used to carry its own
+              "50 MB per file" — a number the engine never had. */}
           <p className="tw:m-0 tw:px-4 tw:text-[var(--bk-ink-soft)]" data-testid="media-footer-accepts">
-            Accepts PNG, JPG, GIF, WebP, AVIF, SVG, MP4, WebM, MOV, TTF, OTF, WOFF, WOFF2 — 50 MB per file
-          </p>
-          {/* Board 2838:12023 — why the view and sort controls at 144:12 are
-              disabled. They were present-but-disabled and said nothing; a
-              disabled control that names its destination is the difference
-              between "broken" and "not here". */}
-          <p className="tw:m-0 tw:px-4 tw:pt-7 tw:text-[var(--bk-ink-soft)]" data-testid="media-footer-hint">
-            Sort and list view live in the full library
+            Images, videos and fonts · {MEDIA_SIZE_LIMITS_LABEL}
           </p>
         </div>
       </div>
+      {replacement ? (
+        <ReplacementUploadModal
+          open
+          original={replacement.original}
+          file={replacement.file}
+          onUpload={() => void confirmReplacement()}
+          onCancel={() => setReplacement(null)}
+        />
+      ) : null}
     </PanelFrame>
   );
 }

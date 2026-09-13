@@ -204,7 +204,7 @@ function mediaDrawer(over: Partial<React.ComponentProps<typeof SlimLauncher>> = 
       onInsert={() => {}}
       onToggleType={() => {}}
       onSearchChange={() => {}}
-      onUpload={() => {}}
+      onUpload={async () => []}
       onRetryUpload={() => {}}
       onOpenDetail={() => {}}
       onOpenIconPicker={() => {}}
@@ -221,11 +221,15 @@ const ACTIVE_UPLOAD: UploadProgress[] = [
   { fileName: "pasta-2.jpg", progress: 62, status: "uploading" },
 ];
 
-/* The limit in this string is the code's own `MAX_FILE_BYTES` (50 MB), not a
-   made-up one: the fixture said "limit is 10 MB" and board 145:148 says 50, so
-   the probe was rendering a rule the product does not enforce. */
+/* The limit in this string is the engine's for a JPG (`MEDIA_SIZE_LIMITS.
+   MAX_IMAGE_SIZE`, 10 MB) — the copy `validateFile` produces. It read
+   "50 MB" while UploadZone carried its own `MAX_FILE_BYTES`, a ceiling the
+   engine never had; that gate is gone (Clone 3584:45522). No `failedUploads`
+   record here, so the row keeps V1 145:148's Retry, which recipe
+   media-upload-failed measures; the Clone's `Choose a smaller file…` door
+   needs a record with `limit` and belongs to that frame's own recipe. */
 const FAILED_UPLOAD: UploadProgress[] = [
-  { fileName: "pasta-2.jpg", progress: 0, status: "error", error: "Upload failed — file is 62 MB, the limit is 50 MB per file" },
+  { fileName: "pasta-2.jpg", progress: 0, status: "error", error: "Upload failed — file is 62 MB, the limit is 10 MB per file" },
 ];
 
 /**

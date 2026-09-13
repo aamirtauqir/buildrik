@@ -333,6 +333,8 @@ function MediaTabWithComposer({
         onDismissStatusPill={() => setStatusPill(null)}
         onUpload={state.upload}
         onRetryUpload={state.retryUpload}
+        failedUploads={state.failedUploads}
+        onDismissUpload={state.dismissUpload}
         loading={state.libraryLoading}
         loadError={state.libraryError}
         onRetryLoad={state.retryLibraryLoad}
