@@ -107,6 +107,27 @@ export function siteTokensCSS(
 }
 
 /**
+ * The families the page uses: the FIRST family of every `font-family` stack
+ * the CSS names, plus the site's own slots — lower-cased, unquoted. What both
+ * font emitters below decide from. Only the first family, because the picker
+ * writes `'Inter Var', sans-serif` and the fallback is not a use of a second
+ * face.
+ */
+function usedFontFamilies(css: string, extraFamilies: readonly string[]): Set<string> {
+  const used = new Set<string>();
+  const first = (stack: string) => stack.split(",")[0].trim().replace(/^["']|["']$/g, "");
+  for (const decl of css.matchAll(/font-family\s*:\s*([^;}]+)/g)) {
+    const family = first(decl[1]);
+    if (family) used.add(family.toLowerCase());
+  }
+  for (const f of extraFamilies) {
+    const family = first(String(f ?? ""));
+    if (family) used.add(family.toLowerCase());
+  }
+  return used;
+}
+
+/**
  * The stylesheet link the published page needs for the Google families it uses.
  *
  * The font picker loads a family into the EDITOR (`GoogleFontsService` injects
@@ -123,15 +144,7 @@ export function googleFontsHeadLinks(
   css: string,
   extraFamilies: readonly string[] = []
 ): string {
-  const used = new Set<string>();
-  for (const decl of css.matchAll(/font-family\s*:\s*([^;}]+)/g)) {
-    const first = decl[1].split(",")[0].trim().replace(/^["']|["']$/g, "");
-    if (first) used.add(first.toLowerCase());
-  }
-  for (const f of extraFamilies) {
-    const first = String(f ?? "").split(",")[0].trim().replace(/^["']|["']$/g, "");
-    if (first) used.add(first.toLowerCase());
-  }
+  const used = usedFontFamilies(css, extraFamilies);
 
   const wanted = GOOGLE_FONT_CATALOGUE.filter((f) => used.has(f.family.toLowerCase()));
   if (!wanted.length) return "";
@@ -149,6 +162,69 @@ export function googleFontsHeadLinks(
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
     `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?${families}&display=swap">`
   );
+}
+
+/** The `format()` hint by file extension — the four the Asset library accepts. */
+const FONT_FORMAT_BY_EXT: Record<string, string> = {
+  woff2: "woff2",
+  woff: "woff",
+  ttf: "truetype",
+  otf: "opentype",
+};
+
+/** What a site font needs to be declared: its family and its files' urls. */
+export interface SiteFontFaceSource {
+  family: string;
+  variants: ReadonlyArray<{ url?: string }>;
+}
+
+/**
+ * The `@font-face` rules for the ADDED site fonts the page uses.
+ *
+ * The other half of the Google links above: a family the user uploaded has
+ * no Google to fetch it from, so the export declares the face itself, from
+ * the file's own url. Without this the picker half of BLOCKERS C4 stopped at
+ * the canvas — a heading set in "Inter Var" rendered it in the editor and the
+ * published page named a family the visitor's browser had never heard of.
+ *
+ * One rule per used family, from the first variant url that is on the
+ * server. A font whose only url is a session `blob:` / `data:` never reached
+ * the server — the page would name a url that dies with the tab — so it is
+ * left out and returned in `skipped` for the caller to report. The family
+ * and url are user data (a filename, a server path) and are stripped of the
+ * characters that could leave the rule: `"` ends the string, `;` `{` `}` the
+ * declaration or block, `<` the surrounding `</style>`, `)` the `url()`.
+ */
+export function siteFontFaceCSS(
+  css: string,
+  extraFamilies: readonly string[],
+  fonts: ReadonlyArray<SiteFontFaceSource>
+): { css: string; skipped: string[] } {
+  const used = usedFontFamilies(css, extraFamilies);
+  const rules: string[] = [];
+  const skipped: string[] = [];
+  const declared = new Set<string>();
+  for (const font of fonts) {
+    const key = font.family.toLowerCase();
+    if (!used.has(key) || declared.has(key)) continue;
+    declared.add(key);
+    const url = font.variants
+      .map((v) => (v.url ?? "").trim())
+      .find((u) => u && !/^(blob|data):/i.test(u));
+    if (!url) {
+      skipped.push(font.family);
+      continue;
+    }
+    const family = font.family.replace(/["\\;{}<\r\n]/g, "");
+    const safeUrl = url.replace(/["'\\;{}<>()\s]/g, "");
+    const ext = safeUrl.split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i)?.[1]?.toLowerCase();
+    const format = ext ? FONT_FORMAT_BY_EXT[ext] : undefined;
+    rules.push(
+      `@font-face{font-family:"${family}";src:url("${safeUrl}")` +
+        `${format ? ` format("${format}")` : ""};font-display:swap}`
+    );
+  }
+  return { css: rules.join("\n"), skipped };
 }
 
 export const RESET_CSS = `

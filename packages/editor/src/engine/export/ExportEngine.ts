@@ -23,6 +23,7 @@ import { AssetBundler } from "./AssetBundler";
 import {
   RESET_CSS,
   siteFontCSS,
+  siteFontFaceCSS,
   siteTokensCSS,
   googleFontsHeadLinks,
   siteFontsFromTokens,
@@ -32,6 +33,7 @@ import {
   minifyCSS,
   downloadFile,
 } from "./ExportHelpers";
+import { devWarn } from "../../shared/utils/devLogger";
 import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector, resolveLanguage } from "./SEOInjector";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
@@ -240,6 +242,31 @@ export class ExportEngine {
   }
 
   /**
+   * The `@font-face` rules for the ADDED site fonts this CSS uses — the
+   * export half of BLOCKERS C4. `getAllFonts({ source: "custom" })` is that
+   * list (the Composer registers a library font only once it is added). A
+   * font still on a session `blob:` is reported the way the bundler reports
+   * an asset it cannot fetch: a dev warning, and the export goes on without
+   * it — the page falls back to the stack's next family rather than naming
+   * a url that dies with the tab.
+   */
+  private siteFontFaces(css: string): string {
+    const { css: faces, skipped } = siteFontFaceCSS(
+      css,
+      this.siteFontFamilies(),
+      this.composer.fonts?.getAllFonts({ source: "custom" }) ?? []
+    );
+    for (const family of skipped) {
+      devWarn(
+        "ExportEngine",
+        `Site font "${family}" is not on the server yet (its only url is a session blob:) — ` +
+          "no @font-face was written for it; the exported page falls back to the next family in the stack"
+      );
+    }
+    return faces;
+  }
+
+  /**
    * Generate CSS from the design
    */
   generateCSS(config?: Partial<ExportConfig>): string {
@@ -260,30 +287,34 @@ export class ExportEngine {
     css += siteFontCSS(siteFontsFromTokens(this.composer.getProjectSettings?.()?.designTokens));
 
     const page = this.composer.elements.getActivePage?.();
-    if (!page) return css;
+    const rootElement = page ? this.composer.elements.getElement(page.root.id) : undefined;
+    if (rootElement) {
+      const styles = this.extractStyles(rootElement, cfg);
+      css += styles;
 
-    const rootElement = this.composer.elements.getElement(page.root.id);
-    if (!rootElement) return css;
+      // The breakpoint overrides. `extractStyles` walks base styles only, so a
+      // site styled for phones exported with its desktop rules and nothing else —
+      // the mobile layout simply was not in the file. The publish path has always
+      // appended these, and the order is the same for the same reason: base and
+      // breakpoint rules share specificity, so the @media has to come later to
+      // win at its viewport.
+      const responsive = this.composer.styles?.generateResponsiveCSS?.({ minify: cfg.minify }) ?? "";
+      if (responsive) css += (cfg.minify ? "" : "\n") + responsive;
 
-    const styles = this.extractStyles(rootElement, cfg);
-    css += styles;
+      // Emit @keyframes for any bd-anim-* animation referenced in the styles.
+      // Element animations write `animation: bd-anim-<name> …` but the exported
+      // site never loads the editor's animation-utils.css, so without this the
+      // keyframes are undefined and the animation silently no-ops on the live
+      // site. Only used keyframes are emitted (no bloat when none are animated).
+      const keyframes = collectUsedKeyframes(css);
+      if (keyframes) css += `\n${keyframes}`;
+    }
 
-    // The breakpoint overrides. `extractStyles` walks base styles only, so a
-    // site styled for phones exported with its desktop rules and nothing else —
-    // the mobile layout simply was not in the file. The publish path has always
-    // appended these, and the order is the same for the same reason: base and
-    // breakpoint rules share specificity, so the @media has to come later to
-    // win at its viewport.
-    const responsive = this.composer.styles?.generateResponsiveCSS?.({ minify: cfg.minify }) ?? "";
-    if (responsive) css += (cfg.minify ? "" : "\n") + responsive;
-
-    // Emit @keyframes for any bd-anim-* animation referenced in the styles.
-    // Element animations write `animation: bd-anim-<name> …` but the exported
-    // site never loads the editor's animation-utils.css, so without this the
-    // keyframes are undefined and the animation silently no-ops on the live
-    // site. Only used keyframes are emitted (no bloat when none are animated).
-    const keyframes = collectUsedKeyframes(css);
-    if (keyframes) css += `\n${keyframes}`;
+    // The faces the site's ADDED fonts provide, ahead of every rule that
+    // names them. Decided from the finished CSS — a family reaches it from an
+    // element's style or from a site font token, and both count as a use.
+    const faces = this.siteFontFaces(css);
+    if (faces) css = `${faces}\n${css}`;
 
     return cfg.minify ? minifyCSS(css) : css;
   }
@@ -493,20 +524,23 @@ export class ExportEngine {
       if (seoBlock) head += `${indent}${seoBlock}${nl}`;
     }
 
+    if (embeddedCSS) {
+      head += `${indent}<style>${nl}${embeddedCSS}${indent}</style>${nl}`;
+    } else if (config.cssStyle === "external") {
+      head += `${indent}<link rel="stylesheet" href="styles.css">${nl}`;
+    }
+
     // The families the page names have to be fetched, or the visitor gets the
-    // generic fallback while the editor showed the real face.
+    // generic fallback while the editor showed the real face. Asked for AFTER
+    // the site's own stylesheet: that is where the faces the site uploaded
+    // itself are declared (`@font-face`, at its top), and the page declares
+    // its own before it asks Google for the rest.
     const fontLinks = googleFontsHeadLinks(css ?? "", this.siteFontFamilies());
     if (fontLinks) {
       head += fontLinks
         .split("\n")
         .map((l) => `${indent}${l}`)
         .join(nl) + nl;
-    }
-
-    if (embeddedCSS) {
-      head += `${indent}<style>${nl}${embeddedCSS}${indent}</style>${nl}`;
-    } else if (config.cssStyle === "external") {
-      head += `${indent}<link rel="stylesheet" href="styles.css">${nl}`;
     }
 
     // User's global custom CSS (Settings → Advanced). Emitted last so it can
@@ -691,6 +725,13 @@ export class ExportEngine {
     const publishKeyframes = collectUsedKeyframes(css);
     if (publishKeyframes) css += (options.minify ? "" : "\n") + publishKeyframes;
 
+    /* …and the faces the site's ADDED fonts provide, at the top of the one
+       stylesheet every page links — once, before any rule on any page that
+       names them. Same reader as the single file; `generateCSS` above is a
+       different assembly, so it has its own call. */
+    const faces = this.siteFontFaces(css);
+    if (faces) css = faces + (options.minify ? "" : "\n\n") + css;
+
     /* CMS export options. The default was "none", and nothing set it: publish
        calls exportAllPages({format,minify}) and the ZIP path does the same, so
        an element bound to a collection shipped whatever static text sat in the
@@ -818,13 +859,6 @@ export class ExportEngine {
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0">',
     ];
 
-    // Same reason as generateHTML: a named family that is never fetched is the
-    // visitor's default sans, not the site's font.
-    const pageFontLinks = googleFontsHeadLinks(css, this.siteFontFamilies());
-    if (pageFontLinks) {
-      headParts.push(...pageFontLinks.split("\n").map((l) => `  ${l}`));
-    }
-
     // Inject SEO meta tags (title, description, OG, Twitter cards, etc.)
     const seoTags = this.seoInjector.inject(page, siteSEO);
     if (seoTags) {
@@ -833,6 +867,14 @@ export class ExportEngine {
 
     if (css) {
       headParts.push('  <link rel="stylesheet" href="styles.css">');
+    }
+
+    // Same reason as generateHTML: a named family that is never fetched is the
+    // visitor's default sans, not the site's font. After the stylesheet, for
+    // the same reason as there: the site's own faces are declared in it.
+    const pageFontLinks = googleFontsHeadLinks(css, this.siteFontFamilies());
+    if (pageFontLinks) {
+      headParts.push(...pageFontLinks.split("\n").map((l) => `  ${l}`));
     }
 
     // D1 responsive visibility now lives in the class-based styles.css
