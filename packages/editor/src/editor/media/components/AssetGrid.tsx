@@ -43,8 +43,6 @@ import {
   CheckSquare,
   ChevronDown,
   FolderOpen,
-  Grid2X2,
-  List,
   Search,
   Trash2,
   Upload,
@@ -58,7 +56,6 @@ import type {
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
-import { formatRelativeTime } from "@shared/utils/relativeTime";
 import { Button } from "@/editor/chrome-ui";
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
@@ -87,12 +84,20 @@ const BULK_LINK = "tw:min-h-6 tw:text-[11px] tw:font-medium";
 const BULK_LINK_DANGER = `${BULK_LINK} tw:text-[var(--bk-error-text)]`;
 const BULK_LINK_MUTED = "tw:min-h-6 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";
 
+/* Clone 3695:44951 — the sort names its key AND its direction on the button
+   ("Date added", "Name A–Z"), so the menu's separate Ascending/Descending row
+   no longer has to be opened to learn which way the list runs. */
 const SORT_OPTIONS: ReadonlyArray<{ value: MediaSortBy; label: string }> = [
-  { value: "date", label: "Recent" },
+  { value: "date", label: "Date added" },
   { value: "name", label: "Name" },
   { value: "size", label: "Size" },
   { value: "type", label: "Type" },
 ];
+
+function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
+  if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
+  return SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Date added";
+}
 
 // ─── Props ────────────────────────────────────────────────────────────────
 
@@ -110,8 +115,6 @@ export interface AssetGridProps {
   onDownload: (assets: ReadonlyArray<{ src: string; name: string }>) => number;
   /** Whole grid becomes the drop zone while a file drag is over the manager. */
   isDragOver?: boolean;
-  /** Breadcrumb path for the footer label. */
-  breadcrumbPath: { id: string | null; name: string }[];
   /** Selected item highlight + click target. */
   selectedAssetId: string | null;
   onSelectAsset(key: string): void;
@@ -132,7 +135,6 @@ export function AssetGrid({
   onDismissUpload,
   onDownload,
   isDragOver = false,
-  breadcrumbPath,
   selectedAssetId,
   onSelectAsset,
   onUploadClick,
@@ -161,15 +163,24 @@ export function AssetGrid({
     [state.uploadQueue],
   );
 
-  /* Board 1174:4866 — "24 files · Last added 2h ago". */
-  const lastAddedLabel = React.useMemo(() => {
-    let newest = 0;
-    for (const i of state.libraryItems) {
-      const t = new Date(i.createdAt).getTime();
-      if (Number.isFinite(t) && t > newest) newest = t;
+  /* Clone 3695:45155 — "24 files · All assets": the count line names the
+     scope the grid is showing. It replaced two things at once: the V1 board's
+     "Last added 2h ago" tail (1174:4866) and the grid foot's "Showing N of M
+     in <scope>", which said the same count a third time. In a search the line
+     reads `1 result for "menu"` (3695:44339). */
+  const scopeLabel = React.useMemo(() => {
+    if (smartFolder === "recent") return "Recent";
+    if (smartFolder === "in-use") return "In use";
+    if (smartFolder === "unused") return "Unused";
+    if (state.currentFolderId) {
+      return state.folders.find((f) => f.id === state.currentFolderId)?.name ?? "All assets";
     }
-    return newest ? formatRelativeTime(newest) : "";
-  }, [state.libraryItems]);
+    return "All assets";
+  }, [smartFolder, state.currentFolderId, state.folders]);
+  const searchQuery = state.librarySearch.trim();
+  const countLabel = searchQuery
+    ? `${visibleItems.length} ${visibleItems.length === 1 ? "result" : "results"} for "${searchQuery}"`
+    : `${visibleItems.length} ${visibleItems.length === 1 ? "file" : "files"} · ${scopeLabel}`;
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
   const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
 
@@ -193,10 +204,7 @@ export function AssetGrid({
         filtered library with no cause on screen.
       */}
       <div className="mgr-subbar" data-testid="mgr-subbar">
-        <span className="mgr-count" data-testid="mgr-count">
-          {state.counts.all} {state.counts.all === 1 ? "file" : "files"}
-          {lastAddedLabel ? ` · Last added ${lastAddedLabel}` : ""}
-        </span>
+        <span className="mgr-count" data-testid="mgr-count">{countLabel}</span>
 
         {availableFormats.length > 0 && (
           <div className="mgr-fmt-strip" role="group" aria-label="Filter by format" data-testid="mgr-fmt-strip">
@@ -226,29 +234,17 @@ export function AssetGrid({
 
         <div className="mgr-spacer" />
 
+        {/* Clone 3695:45155 — the view reads as words: "Grid · 3 columns  2 3 4
+            List". The V1 board's icon pair (1161:35) is gone; a label that says
+            the column count is the only place that count was ever printed. */}
         <div className="mgr-view-toggle">
           <Button
             className={viewMode === "grid" ? "active" : ""}
             data-testid="mgr-view-grid"
             onClick={() => setViewMode("grid")}
-            title="Grid view"
-            /* Icon-only, so `title` was its whole accessible name — browsers do
-               fall back to it, but it is the weakest form and nothing else here
-               relies on that. Name it properly. */
-            aria-label="Grid view"
             aria-pressed={viewMode === "grid"}
           >
-            <Grid2X2 size={12} />
-          </Button>
-          <Button
-            className={viewMode === "list" ? "active" : ""}
-            data-testid="mgr-view-list"
-            onClick={() => setViewMode("list")}
-            title="List view"
-            aria-label="List view"
-            aria-pressed={viewMode === "list"}
-          >
-            <List size={12} />
+            Grid · {state.gridN} columns
           </Button>
         </div>
 
@@ -260,16 +256,30 @@ export function AssetGrid({
               className={`mgr-gridn-btn${state.gridN === n ? " active" : ""}`}
               data-testid={`mgr-gridn-${n}`}
               aria-pressed={state.gridN === n}
-              onClick={() => state.setGridN(n)}
+              onClick={() => {
+                state.setGridN(n);
+                setViewMode("grid");
+              }}
             >
               {n}
             </Button>
           ))}
         </div>
 
+        <div className="mgr-view-toggle">
+          <Button
+            className={viewMode === "list" ? "active" : ""}
+            data-testid="mgr-view-list"
+            onClick={() => setViewMode("list")}
+            aria-pressed={viewMode === "list"}
+          >
+            List
+          </Button>
+        </div>
+
         <div className="mgr-sort-wrap">
           <Button className="mgr-sort" data-testid="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
-            {SORT_OPTIONS.find((o) => o.value === state.sort)?.label || "Recent"}
+            {sortButtonLabel(state.sort, state.sortDir)}
             <ChevronDown size={12} />
           </Button>
           {sortMenuOpen && (
@@ -475,20 +485,24 @@ export function AssetGrid({
           data-testid="mgr-assets"
           data-view={viewMode}
           className={viewMode === "grid" ? "mgr-grid" : "mgr-list"}
-          /* Board 1174:4876 draws "3" active with 144px cards, five to a row —
-             so the toggle sizes the CARD, it does not count columns. */
+          /* Clone 3695:44543 / 44747 — the toggle counts columns; the label
+             above it says "Grid · N columns" and N is what you get. */
           style={
             viewMode === "grid"
-              ? ({ "--mgr-card": `${state.gridN === 2 ? 176 : state.gridN === 4 ? 118 : 144}px` } as React.CSSProperties)
+              ? ({ "--mgr-cols": state.gridN } as React.CSSProperties)
               : undefined
           }
         >
           {visibleItems.map((item) => {
             const isSelected = selectedAssetId === item.key;
+            /* Clone 3696:20326 — a video with no poster is a neutral tile under
+               its play glyph. It used to fall through to <img src={videoBlob}>,
+               which the browser renders as a broken image with the filename as
+               its alt. */
             const thumbContent =
               (item.type === "img" || item.type === "vid") && item.thumb ? (
                 <img src={item.thumb || item.src} alt={item.name} loading="lazy" />
-              ) : item.type === "ico" ? (
+              ) : item.type === "vid" ? null : item.type === "ico" ? (
                 <img
                   src={item.src}
                   alt={item.name}
@@ -666,16 +680,7 @@ export function AssetGrid({
         </div>
       )}
 
-      <div className="mgr-grid-foot">
-        <span>
-          Showing <strong>{visibleItems.length}</strong> of {state.counts.all}
-          {smartFolder
-            ? ` in ${smartFolder === "in-use" ? "In use" : smartFolder === "unused" ? "Unused" : "Recent"}`
-            : state.currentFolderId && breadcrumbPath.length > 1
-              ? ` in ${breadcrumbPath[breadcrumbPath.length - 1].name}`
-              : ""}
-        </span>
-      </div>
+
     </div>
   );
 }

@@ -17,7 +17,7 @@
  * @license BSD-3-Clause
  */
 
-import { Download, FolderOpen, Gauge, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
+import { Download, Gauge, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
@@ -114,15 +114,11 @@ export function AssetDetailsPanel({
   if (!selectedItem) {
     return (
       <div className="mgr-details" data-testid="mgr-details">
-        <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:p-8">
-          {/* --bk-ink-disabled on white is 1.47:1 — the empty state that tells
-              you what to do next was very nearly invisible. Measured against
-              board 1159:4593, not eyeballed. */}
-          <div className="tw:text-center tw:text-[var(--bk-ink-soft)]">
-            <FolderOpen size={32} className="tw:mb-3 tw:opacity-40" />
-            {/* Board 1163:13947 — "see", and the sentence ends. */}
-            <div className="tw:text-[13px]">Select an asset to see details.</div>
-          </div>
+        {/* Clone 3695:45155 — one line at the rail's top, no icon, where the
+            details will appear. --bk-ink-disabled on white is 1.47:1, so the
+            line is ink-soft. */}
+        <div className="tw:p-4 tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
+          Select an asset to see details.
         </div>
       </div>
     );

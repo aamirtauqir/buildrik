@@ -113,7 +113,6 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
     visibleItems: state.libraryItems,
     usageMap: new Map<string, number>(),
     smartFolder: null,
-    breadcrumbPath: [{ id: null, name: "Home" }],
     selectedAssetId: null,
     onSelectAsset: vi.fn(),
     onUploadClick: vi.fn(),
@@ -129,10 +128,22 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
 // Board 1161:35 files the manager by FORMAT, not by the drawer's type pills:
 // the count line, then a strip of the formats this library actually holds.
 describe("AssetGrid — toolbar (board 1161:35)", () => {
-  it("leads with the file count and the last-added time", () => {
-    const state = makeState({ counts: { all: 4, img: 3, vid: 1, ico: 0, fnt: 0 } });
+  // Clone 3695:45155 — "<N> files · <scope>". The count is the VISIBLE set,
+  // the scope is the rail's selection; the V1 board's "Last added 2h ago"
+  // tail (1174:4866) is gone.
+  it("leads with the visible file count and the scope", () => {
+    const state = makeState({
+      libraryItems: [makeItem({ key: "a" }), makeItem({ key: "b" })],
+      counts: { all: 4, img: 3, vid: 1, ico: 0, fnt: 0 },
+    });
     mount(state);
-    expect(screen.getByText(/^4 files/)).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 files · All assets");
+  });
+
+  it("reads '<N> results for \"q\"' while a search is active (3695:44339)", () => {
+    const state = makeState({ libraryItems: [makeItem({ key: "a" })], librarySearch: "menu" });
+    mount(state);
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent('1 result for "menu"');
   });
 
   it("the format strip lists only formats present in the library", () => {
@@ -189,7 +200,7 @@ describe("AssetGrid — sort menu", () => {
   it("opens the sort menu and selecting an option calls setSort keeping direction", () => {
     const state = makeState({ sort: "date", sortDir: "desc" });
     mount(state);
-    fireEvent.click(screen.getByText("Recent"));
+    fireEvent.click(screen.getByText("Date added"));
     fireEvent.click(screen.getByText("Name"));
     expect(state.setSort).toHaveBeenCalledWith("name", "desc");
   });
@@ -213,7 +224,7 @@ describe("AssetGrid — grid/list view toggle", () => {
     expect(container.querySelector(".mgr-grid")).toBeInTheDocument();
     expect(container.querySelector(".mgr-list")).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByTitle("List view"));
+    fireEvent.click(screen.getByRole("button", { name: "List" }));
     expect(container.querySelector(".mgr-list")).toBeInTheDocument();
     expect(container.querySelector(".mgr-list-row")).toBeInTheDocument();
   });
@@ -370,12 +381,12 @@ describe("AssetGrid — badges + footer", () => {
     expect(document.querySelectorAll(".mgr-kind")).toHaveLength(3);
   });
 
-  it("footer shows 'Showing N of M in <smart folder>'", () => {
+  it("the count line names the smart folder as its scope", () => {
     const state = makeState({
       libraryItems: [makeItem({ key: "a" })],
       counts: { all: 5, img: 5, vid: 0, ico: 0, fnt: 0 },
     });
     mount(state, { smartFolder: "unused" });
-    expect(screen.getByText(/of 5 in Unused/)).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · Unused");
   });
 });

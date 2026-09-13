@@ -1,3 +1,12 @@
+/* Clone 3695:45155 — the library covers the editor. FullPageRouter portals
+   `.mgr` inside this host, so the shell's rail and topbar sit underneath it. */
+.mgr-host {
+  position: fixed;
+  inset: 0;
+  z-index: var(--bk-z-overlay);
+  background: var(--bk-bg-panel);
+}
+
 .mgr {
   width: 100%;
   height: 100%;
@@ -28,27 +37,14 @@
   align-items: center;
 }
 
+/* Clone 3695:45155 — a plain 16/600 title, no icon, no tag. */
 .mgr-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 700;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--bk-ink);
   white-space: nowrap;
-}
-
-.mgr-title svg { width: 16px; height: 16px; color: var(--bk-accent); }
-
-.mgr-title .mgr-tag {
-  background: var(--bk-accent-tint);
-  color: var(--bk-ink);
-  font-size: var(--bk-text-11);
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: var(--bk-radius-lg);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
 }
 
 .mgr-middle {
@@ -60,9 +56,9 @@
 
 .mgr-search {
   flex: 1;
-  max-width: 420px;
+  max-width: 560px;
   margin-left: auto;
-  height: 29px;
+  height: 32px;
   border: 1px solid var(--bk-border, #D1D9E6);
   border-radius: 4px;
   background: var(--bk-bg-subtle, var(--bk-bg-subtle));
@@ -105,6 +101,16 @@
   gap: var(--bk-space-8);
 }
 
+/* 32 is the chrome's control height (DESIGN.md compact; the Clone's 44 was
+   refused — founder:density-32). Two classes deep so it beats flowbite's own
+   tw:h-10 on Button; a single-class rule ties and loses on source order. */
+.mgr-top .mgr-btn,
+.mgr-top .mgr-btn-primary,
+.mgr-top .mgr-close {
+  height: 32px;
+  min-height: 0;
+}
+
 .mgr-btn {
   padding: 6px var(--bk-space-12);
   border-radius: var(--bk-radius-md);
@@ -141,16 +147,17 @@
 
 .mgr-btn-primary svg { width: 14px; height: 14px; }
 
+/* Clone draws Close as a borderless text button at the bar's end. */
 .mgr-close {
-  width: 34px;
-  height: 34px;
+  padding: 6px var(--bk-space-8);
   border-radius: var(--bk-radius-md);
-  border: 1px solid var(--bk-border);
-  background: var(--bk-bg-card);
-  color: var(--bk-ink-muted);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--bk-ink-soft);
+  font-size: 12px;
+  font-weight: 500;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
 }
 
@@ -158,7 +165,10 @@
 
 .mgr-body {
   display: grid;
-  grid-template-columns: 240px 1fr 320px;
+  /* Clone 3695:20340 — 240 rail · grid · 378 details (the V1 board's 320
+     details column is displaced; the Clone's rail holds the two-up
+     Edit image | Rename row at full width). */
+  grid-template-columns: 240px 1fr 378px;
   min-height: 0;
   overflow: hidden;
 }
@@ -324,7 +334,7 @@
   overflow: hidden;
   /* 1159:4643 — 12 top, 16 either side, 12 between blocks. The columns'
      children each carried their own 20 inset instead. */
-  padding: var(--bk-space-12) var(--bk-space-16) 0;
+  padding: var(--bk-space-12) var(--bk-space-24) 0;
   gap: var(--bk-space-12);
 }
 
@@ -380,45 +390,33 @@
 
 .mgr-sort svg { width: 12px; height: 12px; color: var(--bk-ink-muted); }
 
+/* Clone 3695:45155 — "Grid · 3 columns" and "List" are words in the toolbar
+   line, not an icon pill: no fill behind them, the active one in ink. */
 .mgr-view-toggle {
   display: inline-flex;
-  background: var(--bk-bg-subtle);
-  border-radius: 4px;
-  padding: 2px;
-  gap: 2px;
 }
 
 .mgr-view-toggle button {
   /* flowbite's Button carries its own background, border and min-height at a
-     specificity a bare element selector loses to — the two toggles rendered
-     as blank white pills with the icon invisible inside them. */
-  width: 28px;
+     specificity a bare element selector loses to. */
   height: 24px;
   min-height: 0;
-  padding: 0;
+  padding: 0 6px;
   border-radius: 3px;
   background: transparent !important;
   border: 0 !important;
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
   display: flex;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
 }
-.mgr-view-toggle button svg { width: 12px; height: 12px; }
-.mgr-view-toggle button.active {
-  background: var(--bk-bg-card) !important;
-  color: var(--bk-accent-text);
-  box-shadow: var(--bk-shadow-raised);
-}
 
 .mgr-view-toggle button.active {
-  background: var(--bk-bg-card);
-  color: var(--bk-accent);
-  box-shadow: 0 1px 2px rgba(15,23,42,0.08);
+  color: var(--bk-ink);
 }
-
-.mgr-view-toggle button svg { width: 12px; height: 12px; }
 
 .mgr-grid {
   /* Board 1174:4876 — the 2 / 3 / 4 toggle sets the column count, so the
@@ -429,15 +427,23 @@
   padding: 0 0 var(--bk-space-16);
   overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, var(--mgr-card, 144px));
+  /* Clone 3695:44543 / 44747 — "Grid · 2 columns" means two to a row: the
+     toggle COUNTS columns (the prototype sets card widths of 378 / 246.7 /
+     181 in its 772 band). The V1 board (1174:4876) sized the card instead
+     and let the row fill; that is the reading the Clone displaced. */
+  grid-template-columns: repeat(var(--mgr-cols, 3), minmax(0, 1fr));
   gap: var(--bk-space-12);
   align-content: start;
 }
 
 
+/* Clone 3695:20340 — a bordered card: 1px border, 8 inset, thumb over name
+   over usage. The V1 board's flat tile (no border, no inset) is displaced. */
 .mgr-asset {
   background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
   border-radius: var(--bk-radius-lg);
+  padding: var(--bk-space-8);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -455,7 +461,7 @@
 }
 
 .mgr-asset-thumb {
-  height: 100px;
+  height: 124px;
   position: relative;
   background: var(--bk-gray-200);
   border: 1px solid transparent;
@@ -486,8 +492,9 @@
 }
 
 .mgr-asset-name {
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-soft);
+  /* Clone 3695:20340 — 12/500 ink; the V1 card's 11 ink-soft is displaced. */
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -690,17 +697,6 @@
   color: var(--bk-ink-muted);
   text-align: right;
   font-variant-numeric: tabular-nums;
-}
-
-.mgr-grid-foot {
-  border: 0 solid var(--bk-border);
-  border-top-width: 1px;
-  padding: 10px 0;
-  display: flex;
-  align-items: center;
-  font-size: 11px;
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
 }
 
 .mgr-details {
@@ -1029,6 +1025,16 @@
   white-space: nowrap;
 }
 .mgr-fmt-strip { display: flex; gap: var(--bk-space-4); }
+/* Two classes deep on purpose: flowbite's Button carries tw:h-10 and tw:px-4,
+   and a single-class rule ties on specificity and loses on source order —
+   these chips shipped 40 tall. */
+.mgr-subbar .mgr-fmt,
+.mgr-subbar .mgr-gridn-btn,
+.mgr-subbar .mgr-sort {
+  height: 22px;
+  min-height: 0;
+  line-height: 1;
+}
 .mgr-fmt {
   padding: 2px 6px;
   border: 1px solid var(--bk-border);

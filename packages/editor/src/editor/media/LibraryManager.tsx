@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import {
-  Upload, Plus, X, Search, FolderOpen, Download, AlertCircle,
+  Upload, Plus, Search, Download, AlertCircle,
 } from "lucide-react";
 import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
@@ -29,7 +29,6 @@ import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
-import { FolderBreadcrumb } from "../sidebar/tabs/media/components/FolderBreadcrumb";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
 import { generateAltTextRemote } from "../../services/AltTextService";
@@ -149,16 +148,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [selectedItem, state.libraryItems]);
-
-  // Build breadcrumb path
-  const breadcrumbPath = React.useMemo(() => {
-    const parts = [{ id: null as string | null, name: "Home" }];
-    if (state.currentFolderId) {
-      const folder = state.folders.find((f) => f.id === state.currentFolderId);
-      if (folder) parts.push({ id: folder.id, name: folder.name });
-    }
-    return parts;
-  }, [state.currentFolderId, state.folders]);
 
   const handleUploadClick = React.useCallback(() => {
     fileInputRef.current?.click();
@@ -288,25 +277,20 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   return (
     <div className="mgr" data-testid="mgr-root" {...fileDragProps}>
       {/* ═══ TOP BAR ═══ */}
+      {/* Clone 3695:45155 — the top bar is title · search · actions. The MANAGE
+          tag and the folder breadcrumb the V1 board drew are gone; the scope
+          now reads in the grid's count line ("24 files · All assets") and the
+          rail highlights the folder, so the crumb said it a third time. */}
       <div className="mgr-top" data-testid="mgr-top">
-        <div className="mgr-title">
-          <FolderOpen size={16} />
-          Asset Library
-          <span className="mgr-tag">MANAGE</span>
-        </div>
+        <h2 className="mgr-title">Asset library</h2>
 
         <div className="mgr-middle">
-          <FolderBreadcrumb
-            folders={state.allFolders}
-            currentFolderId={state.currentFolderId}
-            onNavigate={state.setCurrentFolderId}
-          />
           <div className="mgr-search">
             <Search size={14} />
             <TextInput
               ref={searchRef}
               type="text"
-              placeholder="Search across all folders..."
+              placeholder="Search across all folders…"
               value={state.librarySearch}
               onChange={(e) => state.setLibrarySearch(e.target.value)}
             />
@@ -314,21 +298,23 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           </div>
         </div>
 
+        {/* Upload is the primary — it is the action the library exists for.
+            Stock was primary here until the Clone walk. */}
         <div className="mgr-right">
           <Button className="mgr-btn" data-testid="mgr-btn-import" onClick={() => setImportUrlOpen(true)}>
             <Download size={14} />
             Import URL
           </Button>
-          <Button className="mgr-btn" data-testid="mgr-btn-upload" onClick={handleUploadClick}>
+          <Button className="mgr-btn-primary" data-testid="mgr-btn-upload" onClick={handleUploadClick}>
             <Upload size={14} />
             Upload
           </Button>
-          <Button className="mgr-btn-primary" data-testid="mgr-btn-stock" onClick={() => setStockModalOpen(true)}>
+          <Button className="mgr-btn" data-testid="mgr-btn-stock" onClick={() => setStockModalOpen(true)}>
             <Plus size={14} />
             Add from stock
           </Button>
-          <Button className="mgr-close" onClick={onClose} aria-label="Close">
-            <X size={14} />
+          <Button className="mgr-close" data-testid="mgr-btn-close" onClick={onClose}>
+            Close
           </Button>
         </div>
       </div>
@@ -380,7 +366,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           visibleItems={visibleItems}
           usageMap={usageMap}
           smartFolder={smartFolder}
-          breadcrumbPath={breadcrumbPath}
           selectedAssetId={selectedAssetId}
           onSelectAsset={setSelectedAssetId}
           onUploadClick={handleUploadClick}

@@ -1003,43 +1003,6 @@
    place they would have won on specificity and the redesign would have been
    invisible. */
 
-/* ─── §13 FolderBreadcrumb ─────────────────────────────────────────────── */
-.med-folder-breadcrumb {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-muted);
-  white-space: nowrap;
-  min-width: 0;
-  flex-shrink: 0;
-}
-.med-folder-breadcrumb__seg {
-  background: transparent;
-  border: 0;
-  padding: 4px 6px;
-  border-radius: var(--bk-radius-sm);
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  line-height: 1.2;
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.med-folder-breadcrumb__seg:hover {
-  background: var(--bk-ink-muted);
-  color: var(--bk-ink);
-}
-.med-folder-breadcrumb__seg--current {
-  color: var(--bk-ink);
-  font-weight: 600;
-}
-.med-folder-breadcrumb__sep {
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-}
-
 /* ── Drawer drag-over feedback ───────────────────────────────────────────────
    `med-drag-overlay` and `med-drag-label` had no rules, so dragging a file over
    the Media drawer rendered an unpositioned div with a bare icon and a line of
