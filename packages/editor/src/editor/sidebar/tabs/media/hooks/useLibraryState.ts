@@ -135,10 +135,12 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   const libraryItems = useMemo(() => {
     const d = sortDir === "asc" ? 1 : -1;
 
-    // Filter by folder first — O(n) lookup via Map (was O(n*m) via .find)
-    const inFolder = allLibraryItems.filter(
-      (i) => folderByAssetId.get(i.key) === currentFolderId,
-    );
+    // Scope first — a folder narrows to its direct children (O(n) via the
+    // Map); the root is the whole library, the way "All assets 24" counts it
+    // (Clone 3698:20337).
+    const inFolder = currentFolderId
+      ? allLibraryItems.filter((i) => folderByAssetId.get(i.key) === currentFolderId)
+      : allLibraryItems;
 
     const byType = activeTypes.size
       ? inFolder.filter((i) => activeTypes.has(i.type as MediaBucket))

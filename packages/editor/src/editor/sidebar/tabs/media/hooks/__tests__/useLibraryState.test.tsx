@@ -69,14 +69,20 @@ beforeEach(() => {
 });
 
 describe("useLibraryState — folder scoping", () => {
-  it("shows only root assets by default (folderId null)", () => {
+  /* Clone 3698:20337 — "All assets 24" is the whole library: In use 14 +
+     Unused 10, and Products 8 + Hero shots 5 + Icons 6 sit inside it. The
+     root scope lists every file; a folder is a narrower view of the same
+     set, never a sibling of "unfiled". (This read "only root assets" until
+     the first live move put two files in a folder and made "23 files · All
+     assets" list 21.) */
+  it("the root scope is every asset, foldered or not", () => {
     const composer = makeComposer([
       asset({ id: "root1" }),
       asset({ id: "nested1", folderId: "f1" }),
     ]);
     const { result } = renderHook(() => useLibraryState(composer));
     const keys = result.current.libraryItems.map((i) => i.key);
-    expect(keys).toEqual(["root1"]);
+    expect(keys).toEqual(["root1", "nested1"]);
   });
 
   it("scopes to a folder when currentFolderId is set", () => {
