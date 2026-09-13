@@ -119,13 +119,28 @@ Backend-shaped drift was recorded, not built (grilling Q9).
 > as name/altText: a second browser that cached the row BEFORE the tag was
 > set keeps the stale row (`importServerAssets` skips ids it already holds).
 > Walk record: `CLONE-ASSETS/phase3-journeys.md`.
+>
+> **Phase 5 (2026-09-14) — C4 CLOSED, both halves.** `Manage font` (rail),
+> `Aa Fonts` (drawer) and both pickers' `Manage site fonts` open the Site fonts
+> dialog (3686:42317); `Add font` sets `siteFont` on the asset (mirrored as
+> `userMetadata.siteFont`, no server change) and only ADDED fonts register with
+> the FontManager and reach the pickers (the Clone's uploaded → added model).
+> The export — `generateHTML`, `exportAllPages`/publish, and the Quick-preview
+> document — declares `@font-face` for every added family the page uses
+> (`siteFontFaceCSS`), keeps those families out of the Google lookup, and the
+> ZIP bundler collects the file; the preview sanitizer lifts https faces past
+> its `url()` filter. Verified live: Add → Font added → the Family picker
+> lists `Inter Var · Uploaded` → a heading takes it → survives reload → Quick
+> preview's frame fetches the Blob `.woff2` (200) with the face in its
+> `<style>`. Not verified: a real cPanel deploy of a page using an added font
+> (the deploy path is the same `exportAllPages` output).
 
 | row | screen | what the Clone draws | why code cannot (yet) | owner |
 |---|---|---|---|---|
 | **C1** storage footer | 3695:45155 | `24 assets · 84 MB / 500 MB` — bytes actually held on the server against the plan's quota | The footer prints `useServerStorageQuota` when the server answers and the local IndexedDB total (`1 MB / 524 MB`) otherwise. With no `BLOB_READ_WRITE_TOKEN` nothing reaches the server, so the real-bytes half cannot be verified here; the shape is right. | env / dashboard |
 | **C2** "N not on the server" pill | every library screen | `⚠ 2 not on the server` | NOT a defect. It is the accepted local-only env (Q5): every upload in this dev tree is `localOnly` because the Blob token is absent. Do not file it. | — |
 | **C3** TAGS rail — ✅ CLOSED 2026-09-13 (Phase 3, see above) | 3695:45155 | `menu · team · food` chips under the folders | Was: **no UI writes a tag at all** — `asset.tags` is only ever `[]` from the upload path, and the rail is a reader of a field nothing sets. Persistence needs no migration: `MediaAsset.userMetadata` (Json) exists and `media.updateAsset` accepts it, so Phase 3 builds the tag editor and mirrors `tags` into `userMetadata.tags` in the same change (like `name`/`altText` in `MediaManager.updateAsset`). Building the mirror alone now would be a writer with no caller. | editor, Phase 3 |
-| **C4** Manage font | 3696:21550 | `Manage font` opens the Site fonts overlay; an uploaded font appears in the Typography picker | **Picker half CLOSED 2026-09-13:** the Composer registers every library font file with the FontManager (init + add/update/delete), the Family picker lists them under UPLOADED, and `font-src` allows the Blob host (FontFace.load failed with "A network error occurred" until it did). Verified live: a heading set to "Inter Var" renders it and it survives reload. **Still open:** the rail's `Manage font` button → Site fonts overlay (Phase 5 board), and `@font-face` for uploaded fonts in exported/published HTML (check `exportHTML` when Phase 5 lands). | editor, Phase 5 |
+| **C4** Manage font — ✅ CLOSED 2026-09-14 (Phase 5, see below) | 3696:21550 | `Manage font` opens the Site fonts overlay; an uploaded font appears in the Typography picker | **Picker half CLOSED 2026-09-13:** the Composer registers every library font file with the FontManager (init + add/update/delete), the Family picker lists them under UPLOADED, and `font-src` allows the Blob host (FontFace.load failed with "A network error occurred" until it did). Verified live: a heading set to "Inter Var" renders it and it survives reload. **Still open:** the rail's `Manage font` button → Site fonts overlay (Phase 5 board), and `@font-face` for uploaded fonts in exported/published HTML (check `exportHTML` when Phase 5 lands). | editor, Phase 5 |
 | **C5** uploaded image applied | 3695:43991 | the asset came through a real upload | Same env as C1/C2 — unreachable without the token; the apply path (3695:44165) passed. | env |
 
 ## Counts
