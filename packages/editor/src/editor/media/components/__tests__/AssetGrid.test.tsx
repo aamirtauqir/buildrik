@@ -348,3 +348,25 @@ describe("AssetGrid — badges + footer", () => {
     expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · Unused");
   });
 });
+
+// Clone 3700:20353 draws NOTHING above the empty folder's heading — no count
+// line, no format chips, no view or sort row.
+describe("AssetGrid — the toolbar over an empty folder (Clone 3700:20353)", () => {
+  it("hides the toolbar row while the empty-folder state renders", () => {
+    const state = makeState({
+      libraryItems: [],
+      currentFolderId: "f-new",
+      allFolders: [{ id: "f-new", name: "Campaign images", parentId: null, createdAt: "", updatedAt: "" }],
+    });
+    mount(state, { visibleItems: [] });
+    expect(screen.getByTestId("mgr-empty-folder")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-subbar")).toBeNull();
+  });
+
+  it("keeps the toolbar for a search with no results", () => {
+    const state = makeState({ libraryItems: [], librarySearch: "zzz" });
+    mount(state, { visibleItems: [] });
+    expect(screen.getByText("No results")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-subbar")).toBeInTheDocument();
+  });
+});

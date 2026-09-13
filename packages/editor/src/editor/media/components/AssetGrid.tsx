@@ -200,6 +200,18 @@ export function AssetGrid({
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
   const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
 
+  /* Clone 3700:20353 — an empty FOLDER is not an empty library. Only for a
+     folder scope that truly holds nothing: a folder whose assets a search or
+     a format filter hides keeps the "No results" / hero branch below. The
+     shot draws NOTHING above the folder's heading, so the toolbar row goes
+     with the grid. */
+  const emptyFolderScope =
+    visibleItems.length === 0 &&
+    state.currentFolderId !== null &&
+    !smartFolder &&
+    !searchQuery &&
+    (state.folderCounts.get(state.currentFolderId) ?? 0) === 0;
+
   return (
     <div className={`mgr-main${isDragOver ? " dragover" : ""}`} data-testid="mgr-grid-col">
       {isDragOver && (
@@ -219,6 +231,7 @@ export function AssetGrid({
         gets a visible, clearable chip — otherwise the manager would show a
         filtered library with no cause on screen.
       */}
+      {!emptyFolderScope && (
       <div className="mgr-subbar" data-testid="mgr-subbar">
         <span className="mgr-count" data-testid="mgr-count">{countLabel}</span>
 
@@ -347,6 +360,7 @@ export function AssetGrid({
           <CheckSquare size={13} />
         </Button>
       </div>
+      )}
 
       {/* Board 1163:4641 draws the bulk bar BELOW the toolbar, not in
           place of it: what you are filtering by stays on screen while a
@@ -688,17 +702,11 @@ export function AssetGrid({
             );
           })}
         </div>
-      ) : state.currentFolderId !== null &&
-        !smartFolder &&
-        !searchQuery &&
-        (state.folderCounts.get(state.currentFolderId) ?? 0) === 0 ? (
-        /* Clone 3700:20353 — an empty FOLDER is not an empty library. The
-           question here is "what goes in this folder?", so the grid reads
-           the folder's name, says it holds nothing yet, and offers the
-           library's own upload picker. Only for a folder scope that truly
-           holds nothing: a folder whose assets a search or a format filter
-           hides keeps the "No results" / hero branch below. Left-aligned at
-           the column's own inset, not the centred hero. */
+      ) : emptyFolderScope ? (
+        /* Clone 3700:20353 — the question here is "what goes in this
+           folder?", so the grid reads the folder's name, says it holds
+           nothing yet, and offers the library's own upload picker.
+           Left-aligned at the column's own inset, not the centred hero. */
         <div className="tw:flex tw:flex-col tw:items-start tw:gap-4 tw:pt-3" data-testid="mgr-empty-folder">
           <h3
             className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
