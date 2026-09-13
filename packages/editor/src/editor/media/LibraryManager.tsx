@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import {
-  Upload, Plus, Search, Download, AlertCircle,
+  Upload, Plus, Search, Download, AlertCircle, X,
 } from "lucide-react";
 import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
@@ -26,7 +26,7 @@ import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
+import { useToast, Button, IconButton, TextInput, OverlayMount } from "@/editor/chrome-ui";
 import { OptimizationPanel } from "./OptimizationPanel";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
@@ -38,6 +38,12 @@ import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQ
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
+
+/* Clone 3721:43697 — the search field's tag token, `Tag: menu · Clear filter ×`,
+   in the placeholder's own grey inside the field; × clears the tag. */
+const SEARCH_TAG_TOKEN =
+  "tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:whitespace-nowrap tw:text-[13px] tw:text-[var(--bk-ink-soft)]";
+const SEARCH_TAG_CLEAR = "tw:h-5 tw:w-5 tw:text-[var(--bk-ink-soft)]";
 
 interface LibraryManagerProps {
   composer: Composer;
@@ -406,19 +412,19 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     [onOpenImageEditor, state, addToast, composer]
   );
 
-  // Collect all unique tags from assets (Bug #9 fix)
+  /* Clone 3721:43697 — TAGS lists the LIBRARY's tags (`menu · team · food`
+     stay while Products is the scope), so it reads the unscoped list. It used
+     to re-read the engine on every scoped-list change, which is the same set
+     one memo later. */
   const allTags = React.useMemo(() => {
     const tagSet = new Set<string>();
-    const assets = composer.media.getAssets();
-    for (const asset of assets) {
-      if (Array.isArray(asset.tags)) {
-        for (const tag of asset.tags) {
-          if (tag && typeof tag === "string") tagSet.add(tag);
-        }
+    for (const item of state.allLibraryItems) {
+      for (const tag of item.tags ?? []) {
+        if (tag) tagSet.add(tag);
       }
     }
     return Array.from(tagSet).sort();
-  }, [state.libraryItems, composer]);
+  }, [state.allLibraryItems]);
 
   const storageUsedPct = Math.min(100, (state.storage.used / state.storage.total) * 100);
 
@@ -460,10 +466,29 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         <div className="mgr-middle">
           <div className="mgr-search">
             <Search size={14} />
+            {/* Clone 3721:43697 — while a tag is the filter the field leads
+                with its token, `Tag: menu · Clear filter ×`, where the
+                placeholder was; typing after it searches within the tag. */}
+            {state.tagFilter && (
+              <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
+                Tag: {state.tagFilter} · Clear filter
+                <IconButton
+                  size="sm"
+                  label="Clear the tag filter"
+                  className={SEARCH_TAG_CLEAR}
+                  data-testid="mgr-search-tag-clear"
+                  onClick={() => state.setTagFilter(null)}
+                >
+                  <X size={12} />
+                </IconButton>
+              </span>
+            )}
             <TextInput
               ref={searchRef}
               type="text"
-              placeholder="Search across all folders…"
+              placeholder={state.tagFilter ? "" : "Search across all folders…"}
+              aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : undefined}
+              data-testid="mgr-search-input"
               value={state.librarySearch}
               onChange={(e) => state.setLibraryQuery(e.target.value)}
             />
@@ -513,7 +538,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           inUseCount={inUseCount}
           unusedCount={unusedCount}
           allTags={allTags}
-          setLibrarySearch={state.setLibrarySearch}
+          tagFilter={state.tagFilter}
+          setTagFilter={state.setTagFilter}
           folderCounts={state.folderCounts}
           onNewFolder={() => setCreateFolderOpen(true)}
           deleteFolder={state.deleteFolder}

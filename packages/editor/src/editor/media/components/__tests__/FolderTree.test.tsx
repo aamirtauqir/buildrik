@@ -1,6 +1,6 @@
 /**
  * FolderTree — smart folders, nested folder nav, collapse/expand, the
- * New folder door, delete folders, tag search shortcuts, Trash stub (pinned).
+ * New folder door, delete folders, tag filter chips, Trash stub (pinned).
  *
  * @license BSD-3-Clause
  */
@@ -27,7 +27,8 @@ function mount(over: Partial<FolderTreeProps> = {}) {
     inUseCount: 0,
     unusedCount: 0,
     allTags: [],
-    setLibrarySearch: vi.fn(),
+    tagFilter: null,
+    setTagFilter: vi.fn(),
     folderCounts: new Map(),
     onNewFolder: vi.fn(),
     deleteFolder: vi.fn(async () => {}),
@@ -169,14 +170,32 @@ describe("FolderTree — user folders", () => {
   });
 });
 
-describe("FolderTree — tags", () => {
-  it("renders a Tags section when tags exist and clicking one searches", () => {
+/* Clone 3721:43697 / 43902 / 44107 — a TAGS chip is a FILTER: it sets the
+   library's tag filter (never the search string, which V1 1160:44's chips
+   wrote), the active chip is pressed, and clicking another chip swaps. */
+describe("FolderTree — tags (Clone 3721:43697)", () => {
+  it("renders a Tags section when tags exist and clicking a chip sets the tag filter", () => {
     /* Board 1160:44 makes tags PILLS, not rows with counts, so the count that
        `libraryItems` was passed in for is gone and so is the prop. */
     const { props } = mount({ allTags: ["summer"] });
     expect(screen.getByText("Tags")).toBeInTheDocument();
     fireEvent.click(screen.getByText("summer"));
-    expect(props.setLibrarySearch).toHaveBeenCalledWith("summer");
+    expect(props.setTagFilter).toHaveBeenCalledWith("summer");
+  });
+
+  it("the active chip is pressed and carries the active class; the others are not", () => {
+    mount({ allTags: ["food", "menu", "team"], tagFilter: "menu" });
+    const menu = screen.getByTestId("mgr-tag-menu");
+    expect(menu).toHaveAttribute("aria-pressed", "true");
+    expect(menu).toHaveClass("active");
+    expect(screen.getByTestId("mgr-tag-team")).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByTestId("mgr-tag-team")).not.toHaveClass("active");
+  });
+
+  it("clicking the active chip again clears the filter", () => {
+    const { props } = mount({ allTags: ["menu"], tagFilter: "menu" });
+    fireEvent.click(screen.getByTestId("mgr-tag-menu"));
+    expect(props.setTagFilter).toHaveBeenCalledWith(null);
   });
 
   it("hides the Tags section when no tags exist", () => {

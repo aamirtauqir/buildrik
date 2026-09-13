@@ -277,27 +277,15 @@
 
 .mgr-node.active .mgr-node-ico { color: var(--bk-accent); }
 
-/* 1160:44 / 1160:45 — tag chips: a pill row on a 6 gap, each 8/3 on a full
-   radius with a --color/border edge on --color/bg-panel. */
+/* 1160:44 / 1160:45 — tag chips: a pill row on a 6 gap. The chip itself is
+   `tw:` utilities on its Button (FolderTree.tsx), since a single-class rule
+   here never displaced flowbite's own height. */
 .mgr-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   padding: 0 var(--bk-space-8);
 }
-
-.mgr-tag {
-  padding: 3px var(--bk-space-8);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-bg-panel);
-  color: var(--bk-ink-soft);
-  font-size: var(--bk-text-11);
-  line-height: 14px;
-  cursor: pointer;
-}
-
-.mgr-tag:hover { background: var(--bk-bg-subtle); }
 
 .mgr-node .mgr-node-name {
   flex: 1;

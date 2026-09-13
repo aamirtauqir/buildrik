@@ -93,7 +93,14 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     // after a stock save. Verified live 2026-08-17 — a saved stock photo
     // landed in the library with no badge at all.
     assetSource: asset.assetSource,
+    tags: asset.tags,
   };
+}
+
+/** Clone 3721:43697 — the TAGS chip filter: the files carrying exactly this tag. */
+export function filterByTag(items: LibraryItem[], tag: string | null): LibraryItem[] {
+  if (!tag) return items;
+  return items.filter((i) => i.tags?.includes(tag));
 }
 
 /** Filter library items by type pill */

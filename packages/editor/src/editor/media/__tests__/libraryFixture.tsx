@@ -129,6 +129,8 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
     librarySearch: "",
     setLibrarySearch: noop(),
     setLibraryQuery: noop(),
+    tagFilter: null,
+    setTagFilter: noop(),
     storage: { used: 0, total: 1024 * 1024 * 1024 },
     copyUrl: noop(),
     ctxMenu: null,

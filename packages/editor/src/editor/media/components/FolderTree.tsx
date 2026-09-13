@@ -38,6 +38,22 @@ import "../LibraryManager.css";
 
 export type SmartFolder = null | "recent" | "in-use" | "unused";
 
+/* 1160:44 / Clone 3695:45155 — a tag chip: 8/3 on a full radius, a
+   --bk-border edge on bg-panel, 11 ink-soft. On a flowbite Button every one of
+   its own groups (h-10, px-5, text-sm, font-medium, rounded-lg, the primary
+   fill) has to be displaced per property or it stands; the `.mgr-tag` rule
+   this replaces set no height, so the chips would have drawn 40 tall.
+   The active chip (3721:43697) takes the toolbar's format-chip recipe —
+   accent edge on the accent tint; the board's own pressed state is drawn at
+   near-zero contrast and is not a colour anyone can read. */
+const TAG_CHIP =
+  "tw:h-auto tw:min-h-0 tw:px-2 tw:py-[3px] tw:rounded-full tw:border tw:font-normal " +
+  "tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
+const TAG_CHIP_REST =
+  `${TAG_CHIP} tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
+const TAG_CHIP_ACTIVE =
+  `${TAG_CHIP} active tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-[var(--bk-accent-tint)]`;
+
 export interface TypeCounts {
   all: number;
   img: number;
@@ -80,8 +96,13 @@ export interface FolderTreeProps {
   recentCount: number;
   inUseCount: number;
   unusedCount: number;
+  /** Every tag in the LIBRARY (Clone 3721:43697 lists `menu · team · food`
+   *  whatever the scope) — the orchestrator reads `allLibraryItems`. */
   allTags: string[];
-  setLibrarySearch(q: string): void;
+  /** Clone 3721:43697 — the active chip; a chip is a FILTER, not a search
+   *  string. Clicking the active one clears it. */
+  tagFilter: string | null;
+  setTagFilter(tag: string | null): void;
   /** Clone 3698:20337 — each folder row prints its own asset count. */
   folderCounts: ReadonlyMap<string, number>;
   /** Clone 3700:20347 — `row/＋ New folder` opens the orchestrator's modal. */
@@ -202,7 +223,8 @@ export function FolderTree({
   inUseCount,
   unusedCount,
   allTags,
-  setLibrarySearch,
+  tagFilter,
+  setTagFilter,
   folderCounts,
   onNewFolder,
   deleteFolder,
@@ -399,14 +421,19 @@ export function FolderTree({
             <div className="mgr-tree-section" data-testid="mgr-section-tags">Tags</div>
             {/* 1160:44 — tags are PILLS on a 6 gap, not another column of
                 rows with counts. A tag is a filter you scan sideways; giving
-                it the same row shape as a folder said it was a place. */}
+                it the same row shape as a folder said it was a place.
+                Clone 3721:43697 — a chip FILTERS (`tagFilter`), it does not
+                write the search string; the pressed one is the active tag,
+                another chip swaps it, the same chip again clears it. */}
             <div className="mgr-tags" role="group" aria-label="Filter by tag" data-testid="mgr-tags">
               {allTags.map((tag) => (
                 <Button
                   key={`tag-${tag}`}
-                  className="mgr-tag"
+                  variant="secondary"
+                  className={tagFilter === tag ? TAG_CHIP_ACTIVE : TAG_CHIP_REST}
                   data-testid={`mgr-tag-${tag}`}
-                  onClick={() => setLibrarySearch(tag)}
+                  aria-pressed={tagFilter === tag}
+                  onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
                 >
                   {tag}
                 </Button>

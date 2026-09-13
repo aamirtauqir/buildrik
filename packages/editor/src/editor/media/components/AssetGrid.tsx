@@ -267,9 +267,15 @@ export function AssetGrid({
     return "All assets";
   }, [smartFolder, state.currentFolderId, state.allFolders]);
   const searchQuery = state.librarySearch.trim();
-  const countLabel = searchQuery
-    ? `${visibleItems.length} ${visibleItems.length === 1 ? "result" : "results"} for "${searchQuery}"`
-    : `${visibleItems.length} ${visibleItems.length === 1 ? "file" : "files"} · ${scopeLabel}`;
+  const n = visibleItems.length;
+  /* Clone 3721:43697 — under a tag the line counts the matches, `N matching
+     assets · Tag: menu`, whatever else is typed (the search field shows the
+     query itself); otherwise as above. */
+  const countLabel = state.tagFilter
+    ? `${n} matching ${n === 1 ? "asset" : "assets"} · Tag: ${state.tagFilter}`
+    : searchQuery
+      ? `${n} ${n === 1 ? "result" : "results"} for "${searchQuery}"`
+      : `${n} ${n === 1 ? "file" : "files"} · ${scopeLabel}`;
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
 
   /* Clone 3700:20353 — an empty FOLDER is not an empty library. Only for a

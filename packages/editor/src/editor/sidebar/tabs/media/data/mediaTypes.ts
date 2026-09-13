@@ -87,6 +87,9 @@ export interface LibraryItem {
    * AssetVersion) from the detail drawer's Versions tab.
    */
   assetId?: string;
+  /** The file's tags — the rail's TAGS chips (Clone 3695:45155) and the tag
+   *  filter (3721:43697) read them; the rail's TAGS block writes them. */
+  tags?: string[];
 }
 
 // --- Delete confirmation ---
@@ -183,6 +186,10 @@ export interface LibraryStateResult {
   activeTypes: ReadonlySet<MediaBucket>;
   librarySearch: string;
   setLibrarySearch(q: string): void;
+  /** Clone 3721:43697 — the TAGS chip's filter: a tag, or null for none.
+   *  Applied after the scope and before the search; the scope stays. */
+  tagFilter: string | null;
+  setTagFilter(tag: string | null): void;
   setSort(by: MediaSortBy, dir: SortDirection): void;
   setGridN(n: 2 | 3 | 4): void;
   setFmtFilter(f: string): void;
@@ -369,6 +376,9 @@ export interface MediaStateResult {
    *  "Stock search isn't set up" on every third keystroke when no provider
    *  key is configured. */
   setLibraryQuery(q: string): void;
+  /** See `LibraryStateResult.tagFilter`. */
+  tagFilter: string | null;
+  setTagFilter(tag: string | null): void;
   storage: { used: number; total: number };
 
   // Clipboard

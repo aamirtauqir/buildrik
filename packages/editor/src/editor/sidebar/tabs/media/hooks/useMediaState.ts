@@ -436,6 +436,8 @@ export function useMediaState(composer: Composer): MediaStateResult {
     librarySearch: library.librarySearch,
     setLibrarySearch: setUnifiedSearch,
     setLibraryQuery: library.setLibrarySearch,
+    tagFilter: library.tagFilter,
+    setTagFilter: library.setTagFilter,
     storage: { used: upload.storageUsed, total: upload.storageTotal },
 
     // Clipboard
