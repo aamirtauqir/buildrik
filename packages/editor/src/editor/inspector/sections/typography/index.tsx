@@ -16,6 +16,7 @@ import type { Composer } from "../../../../engine";
 import { Section, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../../shared/controls";
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
+import { primaryFamily } from "./FontPickerDropdown";
 import { TypographyControls } from "./TypographyControls";
 
 // ============================================================================
@@ -67,8 +68,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 
   // Collapsed preview: "Inter · 14" so users can scan the current font without
   // expanding. Trim quotes and fallback stacks so only the primary face shows.
-  const fontFamilyRaw = styles["font-family"] || "";
-  const primaryFont = fontFamilyRaw.split(",")[0]?.replace(/["']/g, "").trim() || "";
+  const primaryFont = primaryFamily(styles["font-family"] || "");
   const fontSize = styles["font-size"] || "";
   const typographyPreview =
     primaryFont || fontSize ? (
