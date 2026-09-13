@@ -186,17 +186,9 @@
   color: var(--bk-ink-muted);
 }
 
-/* 1174:4859 — the disclosure is a 10px ink-soft line, not error-red body
-   copy: it is a control for reading detail, and the outcome line above it
-   already carries the tone. */
-.med-rx-failed {
-  margin: 0;
-  font-size: var(--bk-text-11);
-  color: var(--bk-ink-soft);
-}
-
-/* 1164:4746 / 1174:4860 — 8 gap, 11px, and no margin of its own (the dialog
-   column owns the spacing). */
+/* 1164:4746 — 8 gap, 11px, and no margin of its own (the dialog column owns
+   the spacing). The result phases that shared this footer (1174:4860) are
+   the Clone's ReplaceResultModal now. */
 .med-rx-footer {
   display: flex;
   align-items: center;
@@ -205,11 +197,6 @@
   margin-top: 0;
   font-size: 11px;
 }
-
-/* Result phases reuse the body copy slot, tinted by outcome. */
-.med-rx-body--success { color: var(--bk-success-text); font-size: var(--bk-text-12); font-weight: 600; }
-.med-rx-body--warn { color: var(--bk-warning-text); font-size: var(--bk-text-12); font-weight: 600; }
-.med-rx-body--error { color: var(--bk-error-text); font-size: var(--bk-text-12); font-weight: 600; }
 
 /* Board 1174:4832 — a bare 4-gap list under a PAGES caption, not a bordered
    scroll box. The box read as a second dialog inside the dialog. */

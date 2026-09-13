@@ -5,17 +5,17 @@
  "generatedAt": "2026-08-14",
  "counts": {
   "total": 541,
-  "active": 440,
+  "active": 439,
   "designAhead": 41,
   "outOfScope": 50,
   "activeFamilies": 36,
   "verifiedActive": {
    "match": 92,
-   "drift-fixed": 301,
+   "drift-fixed": 300,
    "unreachable": 46,
    "drift-open": 1
   },
-  "retired": 10
+  "retired": 11
  },
  "activeFamilies": [
   "AI",
@@ -5253,11 +5253,11 @@
    "state": "replace-across results",
    "width": 948,
    "height": 80,
-   "status": "active",
-   "authority": "board",
-   "recipe": "media-replace-across-results",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe media-replace-across-results): 9 properties. The partial-failure footer (1174:4860/4861/4862) is two text links, matching the clean state's 'Done', which already cited this board. NOT conformed: 1174:4850, the committing phase — the spec node's own name records why: replace-across is SYNCHRONOUS, five samples at 400ms all read the finished state, and its determinate progress bar is drawing a proportion of an operation with no steps.",
-   "verified": "drift-fixed"
+   "status": "retired",
+   "authority": "superseded:board:clone-3695:43900",
+   "recipe": null,
+   "verifiedNote": "RETIRED 2026-09-14 — displaced by Clone 3695:43897 / 3695:43900 / 3695:43903 / 3695:43906 (Assets · Clone, P6-R): the replace-across outcome is ReplaceResultModal (media/components/ReplaceResultModal.tsx) — `Replacing image` → `Replacement complete` (`3 of 3 uses updated` · per page · `Other elements are unchanged.` · Done) / `Some uses could not update` (`2 updated · 1 failed` · `<Page> / <element>: update could not be saved. The previous image remains.` · Close · Retry failed use → `Retrying failed use`). The three states this board draws — `Replaced 3 uses ✓`, the `▸ Failed elements (1)` disclosure and the two-text-link footer — no longer exist in the product. Recipe, spec, raw-figma capture, probe case and `.conformance-baseline` key deleted in the same commit; the Clone cards are verified by the live walk against the Clone shots. Earlier history: measured 2026-09-08 at 9 properties; its committing phase (1174:4850) was never joined because replace-across is synchronous — the Clone's busy card is shown for the microtask the run is deferred by, for the same reason.",
+   "verified": "unreachable"
   },
   {
    "nodeId": "1175:4804",

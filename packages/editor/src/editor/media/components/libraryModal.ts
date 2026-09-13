@@ -38,6 +38,10 @@ export const LIBRARY_MODAL_BTN_PRIMARY = BTN;
 export const LIBRARY_MODAL_BTN_SECONDARY =
   `${BTN} tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]`;
 
+/** flowbite `light` as it comes — the Clone's white bordered button beside a
+ *  grey Done or a blue primary (3720:43316 View versions, 3695:43903 Close). */
+export const LIBRARY_MODAL_BTN_OUTLINE = BTN;
+
 /* Board 1175:4838 draws Delete in --color/error WHILE the type-DELETE gate is
    up — that is the state the whole frame is about. flowbite swaps a disabled
    button to bg-subtle/ink-muted (BK_BUTTON_THEME.disabled), so the shipped

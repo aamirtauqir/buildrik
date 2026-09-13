@@ -15,7 +15,7 @@ import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { UploadResult } from "../../../shared/types/media";
-import { TEN, makeAsset, makeComposer, makeFile, makeFolder, makeItem, makeMediaState } from "./libraryFixture";
+import { TEN, makeAsset, makeComposer, makeFile, makeFolder, makeItem, makeMediaState, makeSitePages } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
   state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
@@ -55,6 +55,7 @@ async function mountLibrary(
   over: Partial<MediaStateResult> = {},
   usages: Record<string, number> = {},
   media: Parameters<typeof makeComposer>[1] = {},
+  elements?: Parameters<typeof makeComposer>[2],
 ) {
   mocks.state.mediaState = makeMediaState({
     libraryItems: TEN,
@@ -63,10 +64,11 @@ async function mountLibrary(
   });
   const { LibraryManager } = await import("../LibraryManager");
   const onClose = vi.fn();
+  const composer = makeComposer(usages, media, elements);
   const utils = render(
-    <LibraryManager composer={makeComposer(usages, media)} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />
+    <LibraryManager composer={composer} onClose={onClose} onOpenImageEditor={vi.fn()} onOpenIconPicker={vi.fn()} />
   );
-  return { ...utils, onClose };
+  return { ...utils, onClose, composer };
 }
 
 describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", () => {
@@ -922,5 +924,97 @@ describe("Clone 3695:45569 → 3695:45573 · Stock assets, from the library", ()
     await vi.waitFor(() => expect(saveToLibrary).toHaveBeenCalledTimes(1));
     expect(stockStub.props?.open).toBe(true);
     expect(screen.queryByRole("heading", { name: "Stock image saved" })).toBeNull();
+  });
+});
+
+/* hero-dark.jpg sits on Home twice and on Menu once — the prototype's "3 uses
+   on Home and Menu". */
+const heroSite = () =>
+  makeSitePages([
+    {
+      id: "home",
+      name: "Home",
+      elements: [
+        { id: "e1", src: "blob:hero", name: "Hero" },
+        { id: "e2", src: "blob:hero", name: "Gallery" },
+      ],
+    },
+    { id: "menu", name: "Menu", elements: [{ id: "e3", src: "blob:hero", name: "Hero image" }] },
+  ]);
+
+const ok = (...ids: string[]) => ids.map((elementId) => ({ elementId, previousSrc: "blob:hero" }));
+const bad = (...ids: string[]) => ids.map((elementId) => ({ elementId, error: "locked" }));
+
+/** Rail → Replace across site… → the picker → menu-cover.png. */
+const pickMenuCover = () => {
+  fireEvent.click(screen.getByTestId("mgr-asset-hero"));
+  fireEvent.click(rail().getByRole("button", { name: "Replace across site…" }));
+  const picker = screen.getByText(/across 3 uses/).closest('[role="dialog"]') as HTMLElement;
+  fireEvent.click(within(picker).getByText("menu-cover.png"));
+};
+
+describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace across site…, from the library", () => {
+  it("choosing the replacement closes the picker, shows Replacing image while the engine runs, then Replacement complete per page; Done closes it", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    vi.mocked(composer.mediaOps.replaceAcross).mockReturnValueOnce({ replaced: ok("e1", "e2", "e3"), failed: [], clean: true });
+    pickMenuCover();
+    expect(screen.queryByText(/across 3 uses/)).toBeNull();
+    expect(screen.getByTestId("rx-result-title")).toHaveTextContent("Replacing image");
+    expect(screen.getByTestId("rx-result-busy")).toHaveTextContent("Updating 3 uses across Home and Menu. Please wait.");
+    await screen.findByText("Replacement complete");
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:menu");
+    expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
+    expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
+    expect(screen.getByTestId("rx-result-note")).toHaveTextContent("Other elements are unchanged.");
+    fireEvent.click(screen.getByTestId("rx-result-done"));
+    expect(screen.queryByTestId("rx-result")).toBeNull();
+    /* The rail is still the asset's details — nothing else moved. */
+    expect(rail().getByText("hero-dark.jpg")).toBeInTheDocument();
+  });
+
+  it("a placement the engine could not update is named; Retry failed use runs the engine again and completes", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    vi.mocked(composer.mediaOps.replaceAcross)
+      .mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false })
+      .mockReturnValueOnce({ replaced: ok("e3"), failed: [], clean: true });
+    pickMenuCover();
+    await screen.findByText("Some uses could not update");
+    expect(screen.getByTestId("rx-result-count")).toHaveTextContent("2 updated · 1 failed");
+    expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated");
+    expect(screen.getByTestId("rx-result-failed-0")).toHaveTextContent(
+      "Menu / Hero image: update could not be saved. The previous image remains.",
+    );
+    fireEvent.click(screen.getByTestId("rx-result-retry"));
+    expect(screen.getByTestId("rx-result-title")).toHaveTextContent("Retrying failed use");
+    expect(screen.getByTestId("rx-result-busy")).toHaveTextContent(
+      "Retrying Menu / Hero image only. The 2 successful updates will not be repeated.",
+    );
+    await screen.findByText("Replacement complete");
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
+    expect(screen.getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
+  });
+
+  it("a run the engine rolled back (it threw) is every placement failed, with Retry — never a busy card with no door", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    vi.mocked(composer.mediaOps.replaceAcross).mockImplementationOnce(() => {
+      throw new Error("transaction failed");
+    });
+    pickMenuCover();
+    await screen.findByText("Some uses could not update");
+    expect(screen.getByTestId("rx-result-count")).toHaveTextContent("0 updated · 3 failed");
+    expect(screen.getByTestId("rx-result-failed-0")).toHaveTextContent("Home / Hero: update could not be saved.");
+    expect(screen.getByTestId("rx-result-failed-2")).toHaveTextContent("Menu / Hero image: update could not be saved.");
+    expect(screen.getByTestId("rx-result-retry")).toBeInTheDocument();
+  });
+
+  it("Close on the partial card leaves the engine's partial result standing", async () => {
+    const { composer } = await mountLibrary({}, { "blob:hero": 3 }, {}, heroSite());
+    vi.mocked(composer.mediaOps.replaceAcross).mockReturnValueOnce({ replaced: ok("e1", "e2"), failed: bad("e3"), clean: false });
+    pickMenuCover();
+    await screen.findByText("Some uses could not update");
+    fireEvent.click(screen.getByTestId("rx-result-close"));
+    expect(screen.queryByTestId("rx-result")).toBeNull();
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledTimes(1);
   });
 });

@@ -538,18 +538,14 @@ const PICKER_COMPOSER = {
 } as unknown as React.ComponentProps<typeof MediaLibraryPanel>["composer"];
 
 /**
- * Replace-across fixtures (boards 1164:4738 / 1174:4849).
+ * Replace-across fixture (board 1164:4738 — the picker half).
  *
  * The dialog reads its page list from the SAME two calls the used-in view
- * makes, so it reuses USAGE_COMPOSER's answers and adds only the two commit
- * verbs. The result phases are reached by clicking the dialog's own commit
- * button rather than by handing the component a `result` prop — the phase is
- * internal state and a fixture that forced it would be measuring the fixture.
- *
- * `replaceAcrossSelective` returns the PARTIAL outcome (2 replaced, 1 failed)
- * because that is the state board 1174:4849 draws the most of; the clean state
- * is the same slots with a different tone. Only one of the three can be on
- * screen at a time — the dialog is `position: fixed` and singular.
+ * makes, so it reuses USAGE_COMPOSER's answers and adds only the commit verb.
+ * The result half is the Clone's ReplaceResultModal (3695:43897 … 3695:43906)
+ * since 2026-09-14, verified by the live walk against the Clone shots; the
+ * `media-replace-across-result` case that clicked through to V1 board
+ * 1174:4849's states went with that board.
  */
 const RX_RESULT_PARTIAL = {
   replaced: [{ elementId: "e1" }, { elementId: "e2" }],
@@ -565,7 +561,6 @@ const RX_COMPOSER = {
         ["menu", [usageEl("e3", "header")]],
       ]),
     replaceAcrossSelective: () => RX_RESULT_PARTIAL,
-    replaceAcross: () => RX_RESULT_PARTIAL,
   },
   elements: { getAllPages: () => USAGE_PAGES },
 } as unknown as React.ComponentProps<typeof ReplaceAcrossDialog>["composer"];
@@ -2902,11 +2897,6 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   "media-replace-across": () => <div data-probe="media-replace-across">{rxDialog()}</div>,
-  "media-replace-across-result": () => (
-    <div data-probe="media-replace-across-result">
-      <AutoOpen testid="rx-commit">{rxDialog()}</AutoOpen>
-    </div>
-  ),
   "media-icon-picker": () => (
     <div data-probe="media-icon-picker">
       {withRecentIcons(drillHost(<IconBrowserOverlay onClose={() => {}} onPick={() => {}} />))}

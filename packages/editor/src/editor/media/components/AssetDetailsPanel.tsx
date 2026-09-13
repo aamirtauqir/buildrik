@@ -139,6 +139,10 @@ export interface AssetDetailsPanelProps {
    *  the picker's open state. Omitted, the panel keeps it itself. */
   replacePickerOpen?: boolean;
   onReplacePickerOpenChange?(open: boolean): void;
+  /** Clone 3695:43897 → 3695:43900 — the picked replacement is handed to the
+   *  orchestrator, whose result dialogs report the run per page. Omitted,
+   *  the panel runs `replaceAcross` itself and toasts the counts. */
+  onReplaceAcross?(candidate: LibraryItem): void;
   /** Composer for replaceAcross + (transitively) the version revert button. */
   composer: Composer;
   addToast(t: ToastInput): void;
@@ -190,6 +194,7 @@ export function AssetDetailsPanel({
   onRequestDelete,
   replacePickerOpen,
   onReplacePickerOpenChange,
+  onReplaceAcross,
   composer,
   addToast,
   onUpdateAltText,
@@ -488,6 +493,11 @@ export function AssetDetailsPanel({
                   key={i.key}
                   className="med-img-card"
                   onClick={() => {
+                    if (onReplaceAcross) {
+                      setReplaceAllPickerOpen(false);
+                      onReplaceAcross(i);
+                      return;
+                    }
                     const result = composer.mediaOps.replaceAcross(selectedItem.src, i.src);
                     if (result.replaced.length > 0) {
                       addToast({

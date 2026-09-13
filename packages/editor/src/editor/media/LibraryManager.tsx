@@ -26,6 +26,7 @@ import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
 import { CreateFolderModal } from "./components/CreateFolderModal";
 import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
+import { ReplaceResultModal, replacingLabel, resultIds, type ReplaceOutcome } from "./components/ReplaceResultModal";
 import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
@@ -258,6 +259,32 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      rail's replace-across picker for that asset, so the picker's open state
      lives here rather than in the rail. */
   const [replacePickerOpen, setReplacePickerOpen] = React.useState(false);
+  /* Clone 3695:43897 → 3695:43900 / 3695:43903 — the run the picker started:
+     its two srcs, the placements it is about to update (the busy line names
+     their pages) and, once the engine has answered, the ids either way. */
+  const [replaceRun, setReplaceRun] = React.useState<{
+    oldSrc: string;
+    newSrc: string;
+    targets: string[];
+    result: ReplaceOutcome | null;
+  } | null>(null);
+
+  const runReplaceAcross = React.useCallback(
+    (oldSrc: string, newSrc: string) => {
+      const targets = composer.elements.findByMediaSrc(oldSrc).map((el) => el.getId());
+      setReplaceRun({ oldSrc, newSrc, targets, result: null });
+      /* A microtask later, so the busy card paints before the synchronous run.
+         A throw is the engine's rollback — nothing changed, so every target
+         is a failed placement the card can offer to retry. */
+      Promise.resolve()
+        .then(() => resultIds(composer.mediaOps.replaceAcross(oldSrc, newSrc)))
+        .catch((): ReplaceOutcome => ({ replaced: [], failed: targets }))
+        .then((result) => {
+          setReplaceRun((prev) => (prev && prev.oldSrc === oldSrc && prev.newSrc === newSrc ? { ...prev, result } : prev));
+        });
+    },
+    [composer],
+  );
 
   /* ─── P2-B Move & drag ─────────────────────────────────────────────── */
   /* Clone 3683:19950 — the Move modal, from the bulk bar or the rail. */
@@ -732,6 +759,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onRequestDelete={state.requestDelete}
           replacePickerOpen={replacePickerOpen}
           onReplacePickerOpenChange={setReplacePickerOpen}
+          onReplaceAcross={(candidate) => {
+            if (selectedItem) runReplaceAcross(selectedItem.src, candidate.src);
+          }}
           composer={composer}
           addToast={addToast}
           onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
@@ -946,7 +976,23 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         }}
       />
       {/* Replace-all picker now lives inside <AssetDetailsPanel> — see
-          ./components/AssetDetailsPanel.tsx (D5 Stage 2). */}
+          ./components/AssetDetailsPanel.tsx (D5 Stage 2). Its run reports
+          here: Replacing image → Replacement complete / Some uses could not
+          update → Retrying failed use (Clone 3695:43897 … 3695:43906). */}
+      {replaceRun && (
+        <ReplaceResultModal
+          open
+          composer={composer}
+          title="Replacement complete"
+          replaced={replaceRun.result?.replaced ?? []}
+          failed={replaceRun.result?.failed ?? []}
+          busy={replaceRun.result ? undefined : { label: replacingLabel(composer, replaceRun.targets) }}
+          /* The updated placements no longer match the old src, so the
+             engine's whole-site run reaches only the ones that failed. */
+          onRetry={async () => resultIds(composer.mediaOps.replaceAcross(replaceRun.oldSrc, replaceRun.newSrc))}
+          onDone={() => setReplaceRun(null)}
+        />
+      )}
     </div>
   );
 }

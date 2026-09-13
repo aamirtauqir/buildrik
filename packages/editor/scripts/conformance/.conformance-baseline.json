@@ -1246,14 +1246,6 @@
     "contrastPairs": {},
     "nonTextPairs": {}
   },
-  "media-replace-across-results": {
-    "skipped": 0,
-    "compared": 9,
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {}
-  },
   "insert-dragging": {
     "skipped": 4,
     "compared": 25

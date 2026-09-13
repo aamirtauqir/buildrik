@@ -172,6 +172,49 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
   } as MediaStateResult;
 }
 
+/** One placement on a page, the way `summarizeByPage` reads it back. */
+interface SiteElement {
+  getId(): string;
+  getType(): string;
+  getAttribute(name: string): string | undefined;
+  getParent(): SiteElement | null;
+}
+
+/**
+ * A site's pages the way `summarizeByPage` walks them — in site order, each
+ * placement parented straight to its page root. `name` lands as the
+ * `data-name` attribute, the label the used-in view already reads
+ * (`collectUsageByPage`); without one the placement is called by its type.
+ */
+export function makeSitePages(
+  pages: Array<{ id: string; name: string; elements: Array<{ id: string; src?: string; type?: string; name?: string }> }>,
+) {
+  const byId = new Map<string, SiteElement>();
+  const pageData = pages.map((p) => {
+    const rootId = `root-${p.id}`;
+    const root: SiteElement = {
+      getId: () => rootId,
+      getType: () => "container",
+      getAttribute: () => undefined,
+      getParent: () => null,
+    };
+    for (const e of p.elements) {
+      byId.set(e.id, {
+        getId: () => e.id,
+        getType: () => e.type ?? "image",
+        getAttribute: (name) => (name === "src" ? e.src : name === "data-name" ? e.name : undefined),
+        getParent: () => root,
+      });
+    }
+    return { id: p.id, name: p.name, root: { id: rootId } };
+  });
+  return {
+    getAllPages: () => pageData,
+    getElement: (id: string) => byId.get(id),
+    findByMediaSrc: (src: string) => [...byId.values()].filter((el) => el.getAttribute("src") === src),
+  };
+}
+
 export function makeComposer(
   usages: Record<string, number> = {},
   media: {
@@ -180,17 +223,20 @@ export function makeComposer(
     /** The composer's own bus — the rail's Manage font emits `ui:site-fonts` on it (3686:42317). */
     emit?: (event: string, payload?: unknown) => void;
   } = {},
+  /** The site's pages and placements (`makeSitePages`) — Replace across site reports per page from them. */
+  elements: ReturnType<typeof makeSitePages> = makeSitePages([]),
 ) {
   return {
     emit: media.emit ?? vi.fn(),
+    elements,
     mediaOps: {
       getUsages: (src: string) => ({ count: usages[src] ?? 0, usages: [] }),
       insertMedia: vi.fn(),
-      // Real shape: `{ replaced: ElementId[]; failed: ElementId[] }`.
-      // The replace-all picker reads `result.replaced.length` and
-      // `result.failed.length` — returning a number here would crash the
+      // Real shape: `ReplaceAcrossResult` — `{ replaced: { elementId }[];
+      // failed: { elementId, error }[]; clean }`. The result dialog maps both
+      // lists to ids (`resultIds`); returning a number here would crash the
       // first test that exercises the picker click path.
-      replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
+      replaceAcross: vi.fn(() => ({ replaced: [], failed: [], clean: true })),
     },
     media: {
       getAssets: () => [] as Array<{ key: string; tags?: string[] }>,
