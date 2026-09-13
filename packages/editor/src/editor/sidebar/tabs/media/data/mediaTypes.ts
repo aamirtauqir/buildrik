@@ -208,6 +208,10 @@ export interface SelectionStateResult {
   shiftSelect(key: string): void;
   /** §14 — right-click "Select" entry: enter mode + pre-select one item. */
   enterSelectModeWith(key: string): void;
+  /** Which of these assets are on a page, and which pages. The delete confirm
+   *  and the details rail's USED IN (Clone 3695:20340 — "1 place — Menu
+   *  preview") read the same answer. */
+  checkInUse(keys: string[]): AssetUsage[];
 }
 
 export type DiscSource = "unsplash" | "pexels" | "pixabay";
@@ -284,6 +288,7 @@ export interface MediaStateResult {
   selectAll(): void;
   shiftSelect(key: string): void;
   enterSelectModeWith(key: string): void;
+  checkInUse(keys: string[]): AssetUsage[];
   upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
   retryUpload(fileName: string): void;
   /** Board 1163:13948 — drop a failed upload row. */

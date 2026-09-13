@@ -318,7 +318,7 @@ describe("useUploadState — media event listeners", () => {
     });
   });
 
-  it("UPLOAD_COMPLETE toasts success for files, info for fonts, and recalcs storage", () => {
+  it("UPLOAD_COMPLETE toasts success for every file type and recalcs storage", () => {
     const { composer, getAssets, showToast, result } = setup();
     expect(result.current.storageUsed).toBe(0);
 
@@ -332,16 +332,17 @@ describe("useUploadState — media event listeners", () => {
     expect(showToast).toHaveBeenCalledWith("pic.png uploaded ✓", "success");
     expect(result.current.storageUsed).toBe(250);
 
+    /* A font used to get "Use it via Text Style → Font → My Fonts" — a path
+       that does not exist (nothing calls FontManager.uploadFont, and no
+       picker has a My Fonts group). Until the Site fonts flow lands (Clone
+       Phase 5), a font is an upload like any other. */
     act(() => {
       composer._emitMedia(MEDIA_EVENTS.UPLOAD_COMPLETE, {
         fileName: "brand.ttf",
         mimeType: "font/ttf",
       });
     });
-    expect(showToast).toHaveBeenCalledWith(
-      "Font uploaded! Use it via Text Style → Font → My Fonts",
-      "info"
-    );
+    expect(showToast).toHaveBeenCalledWith("brand.ttf uploaded ✓", "success");
   });
 
   /* "uploaded ✓" over a file that never left the browser. The server mirror is

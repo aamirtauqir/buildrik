@@ -22,6 +22,8 @@ export const MEDIA_SIZE_LIMITS = {
   MAX_AUDIO_SIZE: 50 * 1024 * 1024,
   /** Maximum SVG file size (1MB) */
   MAX_SVG_SIZE: 1 * 1024 * 1024,
+  /** Maximum font file size (5MB) — a full variable family is ~1MB. */
+  MAX_FONT_SIZE: 5 * 1024 * 1024,
   /** Thumbnail max dimension in pixels */
   THUMBNAIL_SIZE: 200,
   /** Maximum image dimension (width or height) */
@@ -49,6 +51,11 @@ export const ALLOWED_MIME_TYPES = {
   VIDEO: ["video/mp4", "video/webm", "video/ogg", "video/quicktime"] as const,
   /** Allowed audio MIME types */
   AUDIO: ["audio/mpeg", "audio/wav", "audio/ogg", "audio/webm", "audio/aac"] as const,
+  /** Allowed font MIME types. The engine, the server enum and the library's
+   *  `fnt` bucket all had a font type; the upload gate never let one in, so
+   *  Clone screen 3696:21550 ("Selected · Inter-Var.woff2") was unreachable
+   *  and the file input's `.woff2` accept was a promise nothing kept. */
+  FONT: ["font/woff2", "font/woff", "font/ttf", "font/otf"] as const,
 } as const;
 
 /**
@@ -58,6 +65,7 @@ export const ALL_ALLOWED_MIME_TYPES = [
   ...ALLOWED_MIME_TYPES.IMAGE,
   ...ALLOWED_MIME_TYPES.VIDEO,
   ...ALLOWED_MIME_TYPES.AUDIO,
+  ...ALLOWED_MIME_TYPES.FONT,
 ] as const;
 
 // ============================================
@@ -71,7 +79,28 @@ export const MEDIA_EXTENSIONS = {
   IMAGE: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".avif"] as const,
   VIDEO: [".mp4", ".webm", ".ogv", ".mov"] as const,
   AUDIO: [".mp3", ".wav", ".ogg", ".webm", ".aac"] as const,
+  FONT: [".woff2", ".woff", ".ttf", ".otf"] as const,
 } as const;
+
+/**
+ * The MIME a file should be handled as. Browsers fill `File.type` from the
+ * OS registry, and macOS Chromium has no entry for `.woff2` — the type comes
+ * back "" and the upload was refused as "Unsupported file type: " (measured
+ * 2026-09-13 with the Clone fixture). Only the font extensions are inferred:
+ * images and video always arrive typed, and inferring those would let a
+ * renamed file past the sniffer.
+ */
+export function mimeTypeForFile(file: Pick<File, "name" | "type">): string {
+  if (file.type) return file.type;
+  const ext = file.name.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
+  switch (ext) {
+    case "woff2": return "font/woff2";
+    case "woff": return "font/woff";
+    case "ttf": return "font/ttf";
+    case "otf": return "font/otf";
+    default: return "";
+  }
+}
 
 // ============================================
 // Media Events
@@ -204,6 +233,13 @@ export function isAllowedAudioType(mimeType: string): boolean {
 }
 
 /**
+ * Check if a MIME type is allowed for fonts
+ */
+export function isAllowedFontType(mimeType: string): boolean {
+  return (ALLOWED_MIME_TYPES.FONT as readonly string[]).includes(mimeType);
+}
+
+/**
  * Check if a MIME type is allowed
  */
 export function isAllowedMimeType(mimeType: string): boolean {
@@ -225,6 +261,9 @@ export function getMaxFileSize(mimeType: string): number {
   if (isAllowedAudioType(mimeType)) {
     return MEDIA_SIZE_LIMITS.MAX_AUDIO_SIZE;
   }
+  if (isAllowedFontType(mimeType)) {
+    return MEDIA_SIZE_LIMITS.MAX_FONT_SIZE;
+  }
   return MEDIA_SIZE_LIMITS.MAX_IMAGE_SIZE; // Default fallback
 }
 
@@ -233,11 +272,12 @@ export function getMaxFileSize(mimeType: string): number {
  */
 export function getAssetTypeFromMime(
   mimeType: string
-): "image" | "video" | "audio" | "svg" | "icon" | null {
+): "image" | "video" | "audio" | "svg" | "icon" | "font" | null {
   if (mimeType === "image/svg+xml") return "svg";
   if (isAllowedImageType(mimeType)) return "image";
   if (isAllowedVideoType(mimeType)) return "video";
   if (isAllowedAudioType(mimeType)) return "audio";
+  if (isAllowedFontType(mimeType)) return "font";
   return null;
 }
 

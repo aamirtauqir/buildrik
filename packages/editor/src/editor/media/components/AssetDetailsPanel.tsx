@@ -17,7 +17,7 @@
  * @license BSD-3-Clause
  */
 
-import { Download, Gauge, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
@@ -39,6 +39,24 @@ const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
 
+/** "PNG" / "MP4" / "WOFF2" — the filename's own extension, else the MIME subtype. */
+function fileExt(item: LibraryItem): string {
+  const fromName = (item.displayName ?? item.name).match(/\.([a-z0-9]+)$/i)?.[1];
+  const raw = fromName ?? item.mimeType.split("/")[1]?.split("+")[0] ?? item.type;
+  return (raw === "jpeg" ? "jpg" : raw).toUpperCase();
+}
+
+/** "220 KB" / "1.1 MB" — one decimal only past a megabyte, as the board prints. */
+function shortBytes(bytes: number): string {
+  return formatBytes(bytes, bytes >= 1024 * 1024 ? 1 : 0);
+}
+
+/** "Aug 4" — the board's added-on date. */
+function shortDate(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 // ─── Toast contract (matches @/editor/chrome-ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
@@ -54,6 +72,9 @@ export interface AssetDetailsPanelProps {
   selectedItem: LibraryItem | null;
   versions: LibraryItem[];
   usageCount: number;
+  /** Page names the asset is placed on — the USED IN line names them
+   *  ("1 place — Menu preview"). Empty when the pages cannot be traced. */
+  usedIn: string[];
   /** All library items (for the replace-all picker). */
   libraryItems: LibraryItem[];
   /** Pass-through to set the highlighted version row in versions tab. */
@@ -95,6 +116,7 @@ export function AssetDetailsPanel({
   selectedItem,
   versions,
   usageCount,
+  usedIn,
   libraryItems,
   onSelectAsset,
   onInsert,
@@ -107,7 +129,6 @@ export function AssetDetailsPanel({
   onUpdateAltText,
   onRegenerateAltText,
 }: AssetDetailsPanelProps) {
-  const [detailTab, setDetailTab] = React.useState<"details" | "versions" | "used">("details");
   const [replaceAllPickerOpen, setReplaceAllPickerOpen] = React.useState(false);
   const [regenerating, setRegenerating] = React.useState(false);
 
@@ -128,175 +149,154 @@ export function AssetDetailsPanel({
     (i) => i.key !== selectedItem.key && i.type === selectedItem.type,
   );
 
+  /* Clone 3695:20340 — one column, top to bottom: preview · filename · meta
+     line · ALT TEXT · VERSIONS · USED IN · stacked actions. The V1 rail's
+     three tabs and its Type/Dimensions/MIME grid are displaced: the meta line
+     says the same in one row ("1600 × 1200 · 220 KB · PNG · added Aug 4"),
+     and a version or a usage is on screen without a tab click first. */
+  const ext = fileExt(selectedItem);
+  const metaLine =
+    selectedItem.width && selectedItem.height
+      ? `${selectedItem.width} × ${selectedItem.height} · ${shortBytes(selectedItem.size)} · ${ext} · added ${shortDate(selectedItem.createdAt)}`
+      : `Selected asset · ${ext}`;
+  const usedLine =
+    usageCount === 0
+      ? "Not used on this site"
+      : usedIn.length > 0
+        ? `${usageCount} ${usageCount === 1 ? "place" : "places"} — ${usedIn.join(", ")}`
+        : `Used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`;
+  const isImage = selectedItem.type === "img" || selectedItem.type === "ico";
+  const isFont = selectedItem.type === "fnt";
+
   return (
     <>
       <div className="mgr-details" data-testid="mgr-details">
-        <div className="mgr-det-head">
-          <div className="mgr-det-filename">{selectedItem.name}</div>
-          <div className="mgr-det-sub">
-            {selectedItem.type.toUpperCase()} · {formatBytes(selectedItem.size)}
-          </div>
-        </div>
-        <div className="mgr-det-preview">
-          {selectedItem.type === "img" || selectedItem.type === "vid" ? (
-            <img src={selectedItem.src} alt={selectedItem.name} />
-          ) : selectedItem.type === "ico" ? (
-            <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
-          ) : selectedItem.type === "fnt" ? (
-            <span className="tw:text-5xl tw:font-bold tw:text-[var(--bk-ink)]">Aa Bb</span>
-          ) : null}
-        </div>
-        <div className="mgr-det-tabs">
-          <Button
-            className={`mgr-det-tab${detailTab === "details" ? " active" : ""}`}
-            onClick={() => setDetailTab("details")}
-          >
-            Details
-          </Button>
-          {versions.length > 1 && (
-            <Button
-              className={`mgr-det-tab${detailTab === "versions" ? " active" : ""}`}
-              onClick={() => setDetailTab("versions")}
-            >
-              Versions · {versions.length}
-            </Button>
-          )}
-          <Button
-            className={`mgr-det-tab${detailTab === "used" ? " active" : ""}`}
-            onClick={() => setDetailTab("used")}
-          >
-            Used in · {usageCount}
-          </Button>
-        </div>
         <div className="mgr-det-body">
-          {detailTab === "details" && (
-            <>
-              <div className="mgr-kv">
-                <span className="mgr-kv-key">Type</span>
-                <span className="mgr-kv-val">{selectedItem.type.toUpperCase()}</span>
-                {selectedItem.width && selectedItem.height && (
-                  <>
-                    <span className="mgr-kv-key">Dimensions</span>
-                    <span className="mgr-kv-val">
-                      {selectedItem.width} × {selectedItem.height} px
-                    </span>
-                  </>
-                )}
-                <span className="mgr-kv-key">File size</span>
-                <span className="mgr-kv-val">{formatBytes(selectedItem.size)}</span>
-                <span className="mgr-kv-key">MIME</span>
-                <span className="mgr-kv-val">{selectedItem.mimeType}</span>
-                <span className="mgr-kv-key">Added</span>
-                <span className="mgr-kv-val">
-                  {new Date(selectedItem.createdAt).toLocaleDateString()}
-                </span>
+          <div className="mgr-det-preview">
+            {selectedItem.type === "img" ? (
+              <img src={selectedItem.src} alt={selectedItem.name} />
+            ) : selectedItem.type === "vid" ? (
+              /* A video is not an <img>: that rendered a broken image with the
+                 filename as its alt (measured, Clone walk 2026-09-13). The
+                 first frame is the preview the board's grey tile stands for. */
+              <video src={selectedItem.src} muted playsInline preload="metadata" data-testid="mgr-det-video" />
+            ) : selectedItem.type === "ico" ? (
+              <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
+            ) : isFont ? (
+              <span className="tw:text-5xl tw:font-bold tw:text-[var(--bk-ink)]">Aa Bb</span>
+            ) : null}
+          </div>
+          <div className="mgr-det-filename">{selectedItem.displayName ?? selectedItem.name}</div>
+          <div className="mgr-det-meta" data-testid="mgr-det-meta">{metaLine}</div>
+
+          {selectedItem.type === "img" && onUpdateAltText && (
+            <AltTextSection
+              item={selectedItem}
+              regenerating={regenerating}
+              onUpdateAltText={onUpdateAltText}
+              onRegenerateAltText={onRegenerateAltText}
+              setRegenerating={setRegenerating}
+              addToast={addToast}
+            />
+          )}
+
+          {versions.length > 1 && (
+            <section className="mgr-det-section" data-testid="mgr-det-versions">
+              <h4 className="mgr-det-label">Versions</h4>
+              <div className="mgr-version-list">
+                {versions.map((v, i) => (
+                  <VersionRow
+                    key={v.key}
+                    title={v.name}
+                    meta={i === 0 ? "" : shortDate(v.createdAt)}
+                    current={i === 0}
+                    selected={v.key === selectedItem.key}
+                    onClick={() => onSelectAsset(v.key)}
+                    leading={
+                      <span className="mgr-version-thumb">
+                        {v.thumb ? (
+                          <img src={v.thumb || v.src} alt={v.name} />
+                        ) : (
+                          <span className="tw:text-[length:var(--bk-text-11)]">{v.type.toUpperCase()}</span>
+                        )}
+                      </span>
+                    }
+                    actions={
+                      i > 0 && v.key !== selectedItem.key ? (
+                        <Button
+                          className={`mgr-btn ${MINI_BTN}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Revert: replace all usages of current version with this one.
+                            if (versions[0]) {
+                              composer.mediaOps.replaceAcross(versions[0].src, v.src);
+                              addToast({ description: `Reverted to ${v.name}`, tone: "success" });
+                            }
+                          }}
+                        >
+                          Revert
+                        </Button>
+                      ) : undefined
+                    }
+                  />
+                ))}
               </div>
-              {selectedItem.type === "img" && onUpdateAltText && (
-                <AltTextSection
-                  item={selectedItem}
-                  regenerating={regenerating}
-                  onUpdateAltText={onUpdateAltText}
-                  onRegenerateAltText={onRegenerateAltText}
-                  setRegenerating={setRegenerating}
-                  addToast={addToast}
-                />
-              )}
-            </>
+            </section>
           )}
-          {detailTab === "versions" && (
-            <div className="mgr-version-list">
-              {versions.map((v, i) => (
-                <VersionRow
-                  key={v.key}
-                  title={v.name}
-                  meta={`${formatBytes(v.size)} · ${new Date(v.createdAt).toLocaleString()}`}
-                  current={i === 0}
-                  selected={v.key === selectedItem.key}
-                  onClick={() => onSelectAsset(v.key)}
-                  leading={
-                    <span className="mgr-version-thumb">
-                      {v.thumb ? (
-                        <img src={v.thumb || v.src} alt={v.name} />
-                      ) : (
-                        <span className="tw:text-[length:var(--bk-text-11)]">{v.type.toUpperCase()}</span>
-                      )}
-                    </span>
-                  }
-                  actions={
-                    i > 0 && v.key !== selectedItem.key ? (
-                      <Button
-                        className={`mgr-btn ${MINI_BTN}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Revert: replace all usages of current version with this one.
-                          if (versions[0]) {
-                            composer.mediaOps.replaceAcross(versions[0].src, v.src);
-                            addToast({ description: `Reverted to ${v.name}`, tone: "success" });
-                          }
-                        }}
-                      >
-                        Revert
-                      </Button>
-                    ) : undefined
-                  }
-                />
-              ))}
-            </div>
-          )}
-          {detailTab === "used" && (
-            <div>
-              <div className="mgr-used-head">
-                Used in <span className="mgr-used-count">{usageCount} places</span>
-              </div>
-              {usageCount === 0 ? (
-                <div className={`tw:p-2 ${MUTED_SM}`}>Not used on any page yet</div>
-              ) : (
-                <div className={`tw:p-2 ${MUTED_SM}`}>
-                  {usageCount} element{usageCount !== 1 ? "s" : ""} reference this asset
-                </div>
-              )}
-            </div>
-          )}
-          <div className="mgr-det-actions">
+
+          <section className="mgr-det-section" data-testid="mgr-det-used">
+            <h4 className="mgr-det-label">Used in</h4>
+            <p className="mgr-det-used-line">{usedLine}</p>
+          </section>
+        </div>
+
+        {/* Per type (phase1-journeys.md, J-B table): images and SVGs get the
+            full set; a video has no Edit image; a font is neither inserted
+            nor replaced across the site — Rename and Delete only. The Clone's
+            "Manage font" needs the Site fonts overlay (Phase 5) and is not
+            drawn until that door exists. */}
+        <div className="mgr-det-actions" data-testid="mgr-det-actions">
+          {!isFont && (
             <Button className="mgr-btn" onClick={() => onInsert(selectedItem.key)}>
-              <Download size={12} />
-              Insert
+              Insert to canvas
             </Button>
-            {/* Bug #1 fix: Edit → image editor for images, rename overlay otherwise. */}
+          )}
+          {isImage ? (
+            <div className="mgr-det-actions-row">
+              <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
+                Edit image
+              </Button>
+              <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
+                Rename
+              </Button>
+            </div>
+          ) : (
+            <Button className="mgr-btn" onClick={() => onOpenRename(selectedItem)}>
+              Rename
+            </Button>
+          )}
+          {!isFont && (
             <Button
               className="mgr-btn"
-              onClick={() => {
-                if (selectedItem.type === "img") {
-                  onEditImage(selectedItem);
-                } else {
-                  onOpenRename(selectedItem);
-                }
-              }}
+              disabled={usageCount === 0}
+              title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
+              onClick={() => setReplaceAllPickerOpen(true)}
             >
-              <Pencil size={12} />
-              {selectedItem.type === "img" ? "Edit" : "Rename"}
+              Replace across site…
             </Button>
-            {selectedItem.type === "img" && onOptimizeImage && (
-              <Button className="mgr-btn" onClick={() => onOptimizeImage(selectedItem)}>
-                <Gauge size={12} />
-                Optimize
-              </Button>
-            )}
-            {/* Bug #5 fix: Replace all opens library picker instead of URL prompt. */}
-            {usageCount > 0 && (
-              <Button className="mgr-btn" onClick={() => setReplaceAllPickerOpen(true)}>
-                <Replace size={12} />
-                Replace all
-              </Button>
-            )}
-            <Button
-              className="mgr-btn danger"
-              onClick={() => onRequestDelete(selectedItem.key)}
-            >
-              <Trash2 size={12} />
-              Delete
+          )}
+          {/* Not on the Clone. The optimiser's only other door is the picker
+              modal, which is reachable only mid-way through choosing an image
+              for an element; Phase 6 folds Optimise into the editor dialog and
+              this row goes with it. */}
+          {selectedItem.type === "img" && onOptimizeImage && (
+            <Button className="mgr-btn" onClick={() => onOptimizeImage(selectedItem)}>
+              Optimize
             </Button>
-          </div>
+          )}
+          <Button className="mgr-btn danger" onClick={() => onRequestDelete(selectedItem.key)}>
+            Delete
+          </Button>
         </div>
       </div>
 
@@ -406,11 +406,8 @@ function AltTextSection({
   };
 
   return (
-    <div data-testid="alt-text-section" className="tw:flex tw:flex-col tw:gap-1.5 tw:mt-4">
-      <label
-        htmlFor={`alt-text-${item.key}`}
-        className="tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-soft)]"
-      >
+    <div data-testid="alt-text-section" className="mgr-det-section">
+      <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
         Alt text
       </label>
       <Textarea
@@ -419,7 +416,7 @@ function AltTextSection({
         value={item.altText ?? ""}
         maxLength={ALT_TEXT_MAX}
         rows={2}
-        placeholder="Describe this image for screen readers"
+        placeholder="Add a description for this image"
         onChange={(e) => onUpdateAltText(item.key, e.target.value)}
       />
       <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">

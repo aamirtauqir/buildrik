@@ -4,18 +4,19 @@
  * @license BSD-3-Clause
  */
 
-import { MEDIA_SIZE_LIMITS, getMaxFileSize, isAllowedMimeType } from "../../shared/constants/media";
+import { MEDIA_SIZE_LIMITS, getMaxFileSize, isAllowedMimeType, mimeTypeForFile } from "../../shared/constants/media";
 import { formatBytes } from "../../shared/utils/helpers/number";
 
 /**
  * Validate a file for upload
  */
 export function validateFile(file: File): { valid: boolean; error?: string } {
-  if (!isAllowedMimeType(file.type)) {
-    return { valid: false, error: `Unsupported file type: ${file.type}` };
+  const mime = mimeTypeForFile(file);
+  if (!isAllowedMimeType(mime)) {
+    return { valid: false, error: `Unsupported file type: ${mime || file.name}` };
   }
 
-  const maxSize = getMaxFileSize(file.type);
+  const maxSize = getMaxFileSize(mime);
   if (file.size > maxSize) {
     // Board 145:148 names BOTH numbers: "Upload failed — file is 24 MB, limit
     // is 10 MB". The old copy ("File too large. Max: 10MB") named only the

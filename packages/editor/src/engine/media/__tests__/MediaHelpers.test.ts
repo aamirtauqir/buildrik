@@ -31,6 +31,21 @@ describe("validateFile", () => {
     expect(r.error).toMatch(/Upload failed — file is 20 MB, limit is 10 MB/);
   });
 
+  // Clone 3696:21550 — a font is a first-class asset. macOS Chromium hands a
+  // .woff2 over with type "" (no OS registry entry), which used to read as
+  // "Unsupported file type: " with nothing after the colon.
+  it("accepts a .woff2 whose File.type is empty, by its extension", () => {
+    const r = validateFile(new File(["x"], "Inter-Var.woff2", { type: "" }));
+    expect(r.valid).toBe(true);
+  });
+
+  it("accepts a typed font and still rejects an untyped non-font", () => {
+    expect(validateFile(new File(["x"], "a.ttf", { type: "font/ttf" })).valid).toBe(true);
+    const r = validateFile(new File(["x"], "mystery.bin", { type: "" }));
+    expect(r.valid).toBe(false);
+    expect(r.error).toBe("Unsupported file type: mystery.bin");
+  });
+
   it("accepts a supported, small file", () => {
     expect(validateFile(fileWithSize("image/png", 1024))).toEqual({ valid: true });
   });

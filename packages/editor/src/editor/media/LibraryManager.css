@@ -707,120 +707,109 @@
   overflow: hidden;
 }
 
-.mgr-det-head {
-  padding: var(--bk-space-16) var(--bk-space-20) 10px;
-  border-bottom: 1px solid var(--bk-border);
-  background: var(--bk-bg-card);
-}
-
-.mgr-det-filename {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--bk-ink);
-  margin-bottom: var(--bk-space-4);
+/* Clone 3695:20340 — the details rail is one 16-inset column: preview ·
+   filename · meta · ALT TEXT · VERSIONS · USED IN, with the actions stacked at
+   the foot. The V1 rail's head band, tab strip and KV grid are displaced. */
+.mgr-det-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--bk-space-16);
   display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.mgr-det-sub {
-  font-size: 11px;
-  color: var(--bk-ink-muted);
+  flex-direction: column;
+  gap: var(--bk-space-8);
 }
 
 .mgr-det-preview {
-  height: 180px;
+  height: 158px;
+  flex-shrink: 0;
   background: var(--bk-bg-subtle);
-  position: relative;
+  border-radius: var(--bk-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
 
-.mgr-det-preview img {
+.mgr-det-preview img,
+.mgr-det-preview video {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
 }
 
-.mgr-det-tabs {
-  display: flex;
-  padding: 0 var(--bk-space-16);
-  border-bottom: 1px solid var(--bk-border);
-  background: var(--bk-bg-card);
-}
-
-.mgr-det-tab {
-  padding: 10px var(--bk-space-12);
-  font-size: 12px;
+.mgr-det-filename {
+  font-size: var(--bk-text-12);
   font-weight: 500;
-  color: var(--bk-ink-muted);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  position: relative;
-  top: 1px;
-}
-
-.mgr-det-tab.active {
-  color: var(--bk-accent);
-  border-bottom: 2px solid var(--bk-accent);
-  font-weight: 600;
-}
-
-.mgr-det-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--bk-space-12) var(--bk-space-20) var(--bk-space-20);
-}
-
-.mgr-kv {
-  display: grid;
-  grid-template-columns: 88px 1fr;
-  gap: 6px 10px;
-  font-size: 12px;
-  margin-bottom: var(--bk-space-16);
-}
-
-.mgr-kv-key { color: var(--bk-ink-muted); }
-
-.mgr-kv-val { color: var(--bk-ink-soft); font-weight: 500; }
-
-.mgr-used-head {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--bk-ink-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 var(--bk-space-8);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mgr-used-count {
-  background: var(--bk-accent-tint);
   color: var(--bk-ink);
-  padding: 2px 7px;
-  border-radius: var(--bk-radius-lg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mgr-det-meta {
   font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
+}
+
+.mgr-det-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-4);
+  margin-top: var(--bk-space-8);
+}
+
+.mgr-det-label {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bk-ink-muted);
+}
+
+.mgr-det-used-line {
+  margin: 0;
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink-soft);
 }
 
 .mgr-det-actions {
+  flex-shrink: 0;
+  padding: var(--bk-space-16);
+  border: 0 solid var(--bk-border);
+  border-top-width: 1px;
   display: flex;
-  gap: 6px;
-  margin-top: 14px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: var(--bk-space-8);
 }
 
+.mgr-det-actions-row {
+  display: flex;
+  gap: var(--bk-space-8);
+}
+
+/* `flex: none`, not `flex: 1`: in this column a basis of 0 overrides the
+   height and the buttons collapsed to 19px of text (measured). Only the
+   two-up row shares its width. */
 .mgr-det-actions .mgr-btn {
-  flex: 1;
+  flex: none;
+  width: 100%;
   min-width: 0;
-  height: 30px;
-  font-size: 11px;
-  padding: 0 var(--bk-space-8);
+  height: 32px;
+  min-height: 0;
+  font-size: 12px;
+  padding: 0 var(--bk-space-12);
   justify-content: center;
+}
+
+.mgr-det-actions-row .mgr-btn {
+  flex: 1 1 0;
+  width: auto;
+}
+
+.mgr-det-actions .mgr-btn:disabled {
+  color: var(--bk-ink-disabled);
+  cursor: not-allowed;
 }
 
 .mgr-det-actions .mgr-btn.danger {

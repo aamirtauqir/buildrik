@@ -136,6 +136,13 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     return composer.mediaOps.getUsages(selectedItem.src).count;
   }, [selectedItem, composer]);
 
+  /* Clone 3695:20340 — USED IN names the pages ("1 place — Menu preview").
+     Same trace the delete confirm runs, so the two never disagree. */
+  const usedIn = React.useMemo(
+    () => (selectedItem ? (state.checkInUse([selectedItem.key])[0]?.pages ?? []) : []),
+    [selectedItem, state],
+  );
+
   // Version history: group _v1234 files by base name
   const versions = React.useMemo(() => {
     if (!selectedItem) return [];
@@ -380,6 +387,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           selectedItem={selectedItem}
           versions={versions}
           usageCount={usageCount}
+          usedIn={usedIn}
           libraryItems={state.libraryItems}
           onSelectAsset={setSelectedAssetId}
           onInsert={state.insertToCanvas}

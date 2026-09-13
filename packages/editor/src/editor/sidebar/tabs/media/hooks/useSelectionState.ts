@@ -212,5 +212,6 @@ export function useSelectionState(
     cancelDelete,
     shiftSelect,
     enterSelectModeWith,
+    checkInUse,
   };
 }

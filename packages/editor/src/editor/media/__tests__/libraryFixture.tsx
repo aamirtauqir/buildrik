@@ -118,6 +118,7 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
     closeDetail: noop,
     selectionContext: null,
     setSelectionContext: noop,
+    checkInUse: vi.fn(() => []),
     ...over,
   } as MediaStateResult;
 }

@@ -35,6 +35,7 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof AssetDetails
     selectedItem: makeImage(),
     versions: [],
     usageCount: 0,
+    usedIn: [],
     libraryItems: [],
     onSelectAsset: vi.fn(),
     onInsert: vi.fn(),

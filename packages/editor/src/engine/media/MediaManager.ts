@@ -12,6 +12,7 @@ import {
   MEDIA_EVENTS,
   STORAGE_QUOTA_BYTES,
   getAssetTypeFromMime,
+  mimeTypeForFile,
 } from "../../shared/constants/media";
 import { MediaQuotaError } from "./MediaStorageTypes";
 import type {
@@ -869,7 +870,10 @@ export class MediaManager extends MediaEventEmitter {
       this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
 
       let finalBlob: Blob = file;
-      let finalMime = file.type;
+      /* `mimeTypeForFile`, not `file.type`: a .woff2 arrives untyped from
+         macOS Chromium and validation already accepted it on its extension. */
+      const declaredMime = mimeTypeForFile(file);
+      let finalMime = declaredMime;
       // Will be reassigned to sniffed type below if SVG content was detected
       let finalSize = file.size;
       let finalDimensions = await getMediaDimensions(file, src);
@@ -879,7 +883,7 @@ export class MediaManager extends MediaEventEmitter {
       // actually SVG, route to the sanitizer regardless of declared type.
       const sniffedMime = await sniffMimeType(file);
       const actualType =
-        sniffedMime === "image/svg+xml" ? "image/svg+xml" : file.type;
+        sniffedMime === "image/svg+xml" ? "image/svg+xml" : declaredMime;
 
       // SVG sanitization — strip <script>, event handlers, external refs, etc.
       // DOMPurify's USE_PROFILES:{svg,svgFilters} keeps drawing instructions
@@ -919,8 +923,8 @@ export class MediaManager extends MediaEventEmitter {
       // Auto-optimization
       if (
         options.autoOptimize !== false &&
-        file.type.startsWith("image/") &&
-        file.type !== "image/svg+xml"
+        declaredMime.startsWith("image/") &&
+        declaredMime !== "image/svg+xml"
       ) {
         progress.status = "optimizing";
         this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
