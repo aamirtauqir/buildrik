@@ -28,6 +28,7 @@ function mount(over: Partial<FolderTreeProps> = {}) {
     unusedCount: 0,
     allTags: [],
     setLibrarySearch: vi.fn(),
+    folderCounts: new Map(),
     createFolder: vi.fn(async () => {}),
     deleteFolder: vi.fn(async () => {}),
     onTrashClick: vi.fn(),
@@ -101,6 +102,27 @@ describe("FolderTree — user folders", () => {
     fireEvent.click(screen.getByText("Photos"));
     expect(props.setSmartFolder).toHaveBeenCalledWith(null);
     expect(props.setCurrentFolderId).toHaveBeenCalledWith("f3");
+  });
+
+  // Clone 3698:20337 — "Products 8 · Hero shots 5 · Icons 6": each FOLDERS
+  // row carries its own count, right-aligned like the smart rows above it. A
+  // folder the map does not know is a folder with nothing in it (3700:20353
+  // draws the just-created one at 0), not a row with no number.
+  it("Clone 3698:20337 — each folder row carries its own count, 0 when the map has none", () => {
+    mount({ folders: nested, folderCounts: new Map([["f1", 8], ["f2", 5]]) });
+    expect(screen.getByTestId("mgr-row-folder-f1").querySelector(".mgr-node-count")).toHaveTextContent("8");
+    expect(screen.getByTestId("mgr-row-folder-f2").querySelector(".mgr-node-count")).toHaveTextContent("5");
+    expect(screen.getByTestId("mgr-row-folder-f3").querySelector(".mgr-node-count")).toHaveTextContent("0");
+  });
+
+  // Clone 3698:20337 draws a folder glyph before every folder name. The
+  // shipped rail drew a 10px colour swatch cycling through five hexes — a
+  // palette no board names and Gate 16 ratchets against.
+  it("Clone 3698:20337 — a folder row draws the folder glyph, not a colour swatch", () => {
+    const { container } = mount({ folders: nested });
+    expect(container.querySelector(".mgr-folder-dot")).toBeNull();
+    const row = screen.getByTestId("mgr-row-folder-f1");
+    expect(row.querySelector("svg.mgr-node-ico")).not.toBeNull();
   });
 
   it("delete button deletes the folder without also navigating into it", () => {

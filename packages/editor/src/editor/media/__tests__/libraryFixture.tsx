@@ -15,8 +15,19 @@
  */
 
 import { vi } from "vitest";
-import type { LibraryItem, MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
+import type { LibraryItem, MediaFolder, MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { LibraryManager } from "../LibraryManager";
+
+export function makeFolder(over: Partial<MediaFolder> = {}): MediaFolder {
+  return {
+    id: "f1",
+    name: "Products",
+    parentId: null,
+    createdAt: "2026-08-01T10:00:00.000Z",
+    updatedAt: "2026-08-01T10:00:00.000Z",
+    ...over,
+  };
+}
 
 export function makeItem(over: Partial<LibraryItem> = {}): LibraryItem {
   return {
@@ -62,7 +73,11 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
     setCurrentFolderId: noop(),
     libraryItems: [],
     folders: [],
-    createFolder: noopAsync(),
+    allFolders: [],
+    folderCounts: new Map<string, number>(),
+    /* Resolves with a folder the way the engine does — the orchestrator
+       scopes to the id it gets back (Clone 3700:20353). */
+    createFolder: vi.fn((name: string) => Promise.resolve(makeFolder({ id: `new-${name}`, name }))),
     deleteFolder: noopAsync(),
     moveAsset: noopAsync(),
     bulkMoveAssets: noopAsync(),

@@ -343,8 +343,13 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         {/* D5 Stage 1 (audit-remediation 2026-05-08): LEFT panel + collapsed
             state + recursive renderer + TreeNode all live in
             ./components/FolderTree.tsx now. */}
+        {/* Clone 3698:20337 / 3700:20353 — the rail is handed EVERY folder,
+            not the root-only list. `createFolder` files a new folder under
+            the current scope, and the tree renders children under their
+            parent, so a folder made inside "Products" had no row at all
+            until now: the tree never received it. */}
         <FolderTree
-          folders={state.folders}
+          folders={state.allFolders}
           currentFolderId={state.currentFolderId}
           setCurrentFolderId={state.setCurrentFolderId}
           counts={state.counts}
@@ -355,6 +360,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           unusedCount={unusedCount}
           allTags={allTags}
           setLibrarySearch={state.setLibrarySearch}
+          folderCounts={state.folderCounts}
           createFolder={state.createFolder}
           deleteFolder={state.deleteFolder}
           onTrashClick={() =>

@@ -18,6 +18,7 @@ import {
   Clock,
   CheckCircle,
   MinusCircle,
+  Folder,
   FolderOpen,
   Trash2,
   ChevronDown,
@@ -77,6 +78,8 @@ export interface FolderTreeProps {
   unusedCount: number;
   allTags: string[];
   setLibrarySearch(q: string): void;
+  /** Clone 3698:20337 — each folder row prints its own asset count. */
+  folderCounts: ReadonlyMap<string, number>;
   createFolder(name: string): Promise<void>;
   deleteFolder(id: string): Promise<void>;
   /** Trash placeholder — orchestrator wires this to a toast. */
@@ -171,8 +174,6 @@ function TreeNode({
 
 // ─── FolderTree (LEFT panel) ──────────────────────────────────────────────
 
-const FOLDER_COLORS = ["#F59E0B", "#10B981", "#EC4899", "var(--bk-ink-soft)", "#0EA5E9"];
-
 export function FolderTree({
   folders,
   currentFolderId,
@@ -185,6 +186,7 @@ export function FolderTree({
   unusedCount,
   allTags,
   setLibrarySearch,
+  folderCounts,
   createFolder,
   deleteFolder,
   onTrashClick,
@@ -253,20 +255,20 @@ export function FolderTree({
     (parentId: string | null, depth: number): React.ReactNode => {
       const children = folders.filter((f) => f.parentId === parentId);
       if (children.length === 0) return null;
-      return children.map((folder, i) => {
+      return children.map((folder) => {
         const hasChildren = folders.some((f) => f.parentId === folder.id);
         const isCollapsed = collapsedFolders.has(folder.id);
         return (
           <React.Fragment key={folder.id}>
+            {/* Clone 3698:20337 — a folder glyph and the folder's own count
+                ("Products 8"). The 10px swatch this replaces cycled five hexes
+                no board names. A folder the map does not know holds nothing,
+                so it reads 0 (3700:20353), not blank. */}
             <TreeNode
-              icon={
-                <div
-                  className="mgr-folder-dot"
-                  style={{ background: FOLDER_COLORS[i % FOLDER_COLORS.length] }}
-                />
-              }
+              icon={<Folder size={14} className="mgr-node-ico" />}
               label={folder.name}
               testId={`mgr-row-folder-${folder.id}`}
+              count={folderCounts.get(folder.id) ?? 0}
               active={currentFolderId === folder.id}
               expandable={hasChildren}
               expanded={!isCollapsed}
@@ -286,7 +288,7 @@ export function FolderTree({
         );
       });
     },
-    [folders, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder]
+    [folders, folderCounts, currentFolderId, deleteFolder, setCurrentFolderId, setSmartFolder, collapsedFolders, toggleCollapsed, dropTargetId, handleAssetDragOver, handleAssetDragLeave, handleAssetDrop, onMoveAssetToFolder]
   );
 
   return (

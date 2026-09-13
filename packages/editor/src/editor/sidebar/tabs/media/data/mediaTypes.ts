@@ -149,6 +149,8 @@ export interface LibraryStateResult {
   libraryItems: LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
+  /** Direct-child asset count per folder id; a folder with none is absent. */
+  folderCounts: ReadonlyMap<string, number>;
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
   createFolder(name: string): Promise<void>;
@@ -269,6 +271,8 @@ export interface MediaStateResult {
   libraryItems: LibraryItem[];
   folders: MediaFolder[];
   allFolders: MediaFolder[];
+  /** See `LibraryStateResult.folderCounts`. */
+  folderCounts: ReadonlyMap<string, number>;
   createFolder(name: string): Promise<void>;
   inspectFolder(id: string): { assetCount: number; subFolderCount: number };
   deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;

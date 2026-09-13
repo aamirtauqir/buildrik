@@ -241,6 +241,10 @@
   /* Board 1205:4829 — 8, not 6. Every row in this rail, at every depth. */
   gap: var(--bk-space-8);
   padding: 6px var(--bk-space-8);
+  /* Clone 3698:20337 at density 32 (founder:density-32): every rail row is
+     the chrome's control height. Padding alone left it at the text's own
+     ~26, so the rail's rows were the one control in the library under 32. */
+  min-height: var(--bk-size-row);
   border-radius: var(--bk-radius-md);
   font-size: var(--bk-text-12);
   color: var(--bk-ink-soft);
@@ -257,7 +261,7 @@
 .mgr-left .mgr-node {
   background: transparent;
   border: 0;
-  min-height: 0;
+  min-height: var(--bk-size-row);
   font-weight: 400;
   text-align: left;
 }
@@ -308,12 +312,6 @@
 }
 
 .mgr-tag:hover { background: var(--bk-bg-subtle); }
-
-.mgr-node .mgr-folder-dot {
-  width: 10px; height: 10px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
 
 .mgr-node .mgr-node-name {
   flex: 1;

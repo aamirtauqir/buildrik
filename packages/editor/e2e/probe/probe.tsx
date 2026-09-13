@@ -2572,6 +2572,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         unusedCount={10}
         allTags={[]}
         setLibrarySearch={() => {}}
+        folderCounts={new Map()}
         createFolder={async () => {}}
         deleteFolder={async () => {}}
         onTrashClick={() => {}}

@@ -120,6 +120,18 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     return m;
   }, [rawAssets]);
 
+  /* Clone 3698:20337 — every FOLDERS row carries its own count ("Products 8"),
+     and a folder just created reads 0 (3700:20353). Direct children only —
+     the same set `libraryItems` shows when that folder is the scope — and a
+     folder with nothing in it is simply absent. */
+  const folderCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const folderId of folderByAssetId.values()) {
+      if (folderId) m.set(folderId, (m.get(folderId) ?? 0) + 1);
+    }
+    return m;
+  }, [folderByAssetId]);
+
   const libraryItems = useMemo(() => {
     const d = sortDir === "asc" ? 1 : -1;
 
@@ -414,6 +426,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     libraryItems,
     folders,
     allFolders,
+    folderCounts,
     currentFolderId,
     setCurrentFolderId,
     createFolder,

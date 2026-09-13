@@ -14,7 +14,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
-import { TEN, makeComposer, makeMediaState } from "./libraryFixture";
+import { TEN, makeComposer, makeFolder, makeMediaState } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
   state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
@@ -174,6 +174,33 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     fireEvent.click(screen.getByRole("button", { name: "List" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Select all files" }));
     expect(selectAll).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () => {
+  it("draws every folder in FOLDERS with its own count, a nested one under its parent", async () => {
+    await mountLibrary({
+      folders: [makeFolder({ id: "f1", name: "Products" })],
+      allFolders: [
+        makeFolder({ id: "f1", name: "Products" }),
+        makeFolder({ id: "f2", name: "Campaign images", parentId: "f1" }),
+      ],
+      folderCounts: new Map([["f1", 8]]),
+    });
+    const rail = within(screen.getByTestId("mgr-folders"));
+    expect(rail.getByTestId("mgr-row-folder-f1").querySelector(".mgr-node-count")).toHaveTextContent("8");
+    // The nested folder used to be invisible here: the tree was handed the
+    // root-only list, so a folder created inside a scope had no row at all.
+    const nested = rail.getByTestId("mgr-row-folder-f2");
+    expect(nested).toHaveClass("depth-2");
+    expect(nested.querySelector(".mgr-node-count")).toHaveTextContent("0");
+  });
+
+  it("clicking a folder row scopes the grid to it and clears the smart folder", async () => {
+    const setCurrentFolderId = vi.fn();
+    await mountLibrary({ allFolders: [makeFolder({ id: "f1", name: "Products" })], setCurrentFolderId });
+    fireEvent.click(screen.getByTestId("mgr-row-folder-f1"));
+    expect(setCurrentFolderId).toHaveBeenCalledWith("f1");
   });
 });
 

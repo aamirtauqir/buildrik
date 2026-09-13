@@ -225,6 +225,24 @@ describe("useLibraryState — counts", () => {
     act(() => result.current.setLibrarySearch("hero"));
     expect(result.current.counts).toMatchObject({ all: 2, img: 1, vid: 1 });
   });
+
+  // Clone 3698:20337 — every FOLDERS row carries its own count ("Products 8"),
+  // and 3700:20353 draws a just-created folder at 0. Direct children only: the
+  // same set the grid shows when that folder is the scope.
+  it("folderCounts counts the direct children of each folder, whatever the scope", () => {
+    const composer = makeComposer([
+      asset({ id: "root1" }),
+      asset({ id: "p1", folderId: "f1" }),
+      asset({ id: "p2", folderId: "f1" }),
+      asset({ id: "h1", folderId: "f2" }),
+    ]);
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.folderCounts.get("f1")).toBe(2);
+    expect(result.current.folderCounts.get("f2")).toBe(1);
+    expect(result.current.folderCounts.get("f9")).toBeUndefined();
+    act(() => result.current.setCurrentFolderId("f2"));
+    expect(result.current.folderCounts.get("f1")).toBe(2);
+  });
 });
 
 describe("useLibraryState — folder delete guard", () => {
