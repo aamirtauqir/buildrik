@@ -24,11 +24,13 @@ import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
 import {
   Button,
+  IconButton,
   ModalBody,
   ModalClose,
   ModalContent,
   ModalRoot,
   ModalTitle,
+  TextInput,
   Textarea,
   VersionRow,
 } from "@/editor/chrome-ui";
@@ -36,6 +38,15 @@ import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
 const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
+/* The rail's tag chip — the same pill the folder rail draws (1160:44 /
+   3695:45155: 8/3, full radius, --bk-border edge on bg-panel, 11 ink-soft),
+   with a 16 × inside it. A span, not a button: the × is the control. */
+const TAG_CHIP =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] " +
+  "tw:py-[3px] tw:pl-2 tw:pr-1 tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:text-[var(--bk-ink-soft)]";
+const TAG_CHIP_REMOVE = "tw:h-4 tw:w-4 tw:rounded-full tw:text-[var(--bk-ink-muted)]";
+/** A tag is one word or two, never a sentence. */
+const TAG_MAX = 24;
 const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
 /* The rail's full-width 32 buttons (3705:20396 / 4215:26635 / 3699:20381):
    flowbite `xs` IS h-8; the accent fill is `.mgr-btn-primary`'s own, and the
@@ -144,6 +155,13 @@ export interface AssetDetailsPanelProps {
    * preserved an existing user-typed alt text.
    */
   onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
+  /**
+   * BLOCKERS C3 (authority `code:tag-writer`) — write the file's whole tag
+   * list back. The Clone draws the TAGS chips (3695:45155) and the tag filter
+   * (3721:43697) but no editor, and nothing wrote a tag; the block only
+   * renders when the orchestrator hands it this writer.
+   */
+  onUpdateTags?(key: string, tags: string[]): void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -169,6 +187,7 @@ export function AssetDetailsPanel({
   addToast,
   onUpdateAltText,
   onRegenerateAltText,
+  onUpdateTags,
 }: AssetDetailsPanelProps) {
   const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
@@ -317,6 +336,8 @@ export function AssetDetailsPanel({
               addToast={addToast}
             />
           )}
+
+          {onUpdateTags && <TagsSection item={selectedItem} onUpdateTags={onUpdateTags} />}
 
           {versions.length > 1 && (
             <section className="mgr-det-section" data-testid="mgr-det-versions">
@@ -562,5 +583,74 @@ function AltTextSection({
         )}
       </div>
     </div>
+  );
+}
+
+// ─── TagsSection (BLOCKERS C3, authority code:tag-writer) ───────────────────
+
+interface TagsSectionProps {
+  item: LibraryItem;
+  onUpdateTags(key: string, tags: string[]): void;
+}
+
+/**
+ * The file's tags as chips with ×, and an Add tag field: Enter adds the
+ * entry lower-cased and trimmed, capped at TAG_MAX, never empty, never a
+ * duplicate (a repeat just clears the field — the chip is already there).
+ * Under ALT TEXT, above VERSIONS / USED IN; drawn for every file type.
+ */
+function TagsSection({ item, onUpdateTags }: TagsSectionProps) {
+  const [draft, setDraft] = React.useState("");
+  const tags = item.tags ?? [];
+
+  const add = () => {
+    const tag = draft.trim().toLowerCase().slice(0, TAG_MAX);
+    if (!tag) return;
+    setDraft("");
+    if (tags.includes(tag)) return;
+    onUpdateTags(item.key, [...tags, tag]);
+  };
+
+  return (
+    <section className="mgr-det-section" data-testid="mgr-det-tags">
+      <label htmlFor={`tag-input-${item.key}`} className="mgr-det-label">
+        Tags
+      </label>
+      {tags.length > 0 && (
+        <div className="tw:flex tw:flex-wrap tw:gap-1.5" data-testid="mgr-det-tag-list">
+          {tags.map((tag) => (
+            <span key={tag} className={TAG_CHIP} data-testid={`mgr-det-tag-${tag}`}>
+              {tag}
+              <IconButton
+                size="sm"
+                label={`Remove tag ${tag}`}
+                className={TAG_CHIP_REMOVE}
+                onClick={() =>
+                  onUpdateTags(
+                    item.key,
+                    tags.filter((t) => t !== tag),
+                  )
+                }
+              >
+                <X size={10} />
+              </IconButton>
+            </span>
+          ))}
+        </div>
+      )}
+      <TextInput
+        id={`tag-input-${item.key}`}
+        data-testid="mgr-det-tag-input"
+        value={draft}
+        maxLength={TAG_MAX}
+        placeholder="Add tag"
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter") return;
+          e.preventDefault();
+          add();
+        }}
+      />
+    </section>
   );
 }

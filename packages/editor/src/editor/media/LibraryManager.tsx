@@ -604,6 +604,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onReplacePickerOpenChange={setReplacePickerOpen}
           composer={composer}
           addToast={addToast}
+          onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
           onUpdateAltText={(key, altText) => {
             // User-typed edit — clear AI provenance so the chip disappears.
             // Empty user edit also counts as "no longer AI's text."

@@ -537,6 +537,18 @@ describe("loadServerMedia — one page, and its edges", () => {
     expect(mocks.mediaListAssetsQuery).toHaveBeenCalledWith({ siteId: "s1", limit: 200, cursor: "cur-1" });
   });
 
+  /* BLOCKERS C3 — the row's `userMetadata` (where `tags` lives) reaches the
+     engine untouched; `importServerAssets` is the one place a server row
+     becomes a MediaAsset, so the decode lives there and this leg only has
+     to not drop the column. */
+  it("hands the row's userMetadata through to the engine", async () => {
+    const tagged = { ...asset("a1"), userMetadata: { tags: ["team"] } };
+    mocks.mediaListAssetsQuery.mockResolvedValue({ items: [tagged], nextCursor: null, total: 1 });
+    mocks.mediaListFoldersQuery.mockResolvedValue([]);
+    const r = await loadServerMedia("s1");
+    expect(r?.assets[0].userMetadata).toEqual({ tags: ["team"] });
+  });
+
   /* Folders come back on EVERY page. Skipping them looked free — folders are
      not paged — but they are not frozen either: a folder created in another tab
      between page 1 and page 2 leaves page 2's assets pointing at a folder this

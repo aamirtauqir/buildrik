@@ -67,6 +67,18 @@ function toServerAssetType(
       return null;
   }
 }
+
+/**
+ * BLOCKERS C3: the tag list a server row carries at `userMetadata.tags` —
+ * the JSON column `updateAsset` mirrors `{ tags }` into. Anything that is not
+ * a string array reads as no tags; a stray non-string inside one is dropped
+ * rather than failing the whole import.
+ */
+function tagsFromUserMetadata(meta: unknown): string[] {
+  if (typeof meta !== "object" || meta === null || !("tags" in meta)) return [];
+  const tags: unknown = meta.tags;
+  return Array.isArray(tags) ? tags.filter((t): t is string => typeof t === "string") : [];
+}
 // only via dashboard.media.searchStock tRPC. Engine no longer touches I/O for stock.
 
 // --- Discovery stub types ---
@@ -499,6 +511,8 @@ export class MediaManager extends MediaEventEmitter {
       folderId: string | null;
       createdAt: string | Date;
       updatedAt: string | Date;
+      /** The row's JSON column; `tags` lives at `userMetadata.tags` (C3). */
+      userMetadata?: unknown;
     }>,
     serverFolders: ReadonlyArray<{
       id: string;
@@ -545,7 +559,7 @@ export class MediaManager extends MediaEventEmitter {
         size: sa.bytes,
         altText: sa.altText ?? undefined,
         folderId: sa.folderId ?? undefined,
-        tags: [],
+        tags: tagsFromUserMetadata(sa.userMetadata),
         createdAt: typeof sa.createdAt === "string" ? sa.createdAt : sa.createdAt.toISOString(),
         updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
         assetSource: "uploaded",
@@ -1226,18 +1240,31 @@ export class MediaManager extends MediaEventEmitter {
     // persisted across devices. Guarded on serverId (asset is synced) and
     // an actual name/altText change in this update (folderId keeps its own
     // moveAsset path above).
-    if (
-      this.remoteSync &&
-      asset.serverId &&
-      ((Object.prototype.hasOwnProperty.call(updates, "name") && asset.name !== updated.name) ||
-        (Object.prototype.hasOwnProperty.call(updates, "altText") &&
-          asset.altText !== updated.altText))
-    ) {
-      await this.remoteSync.updateAsset(asset.serverId, {
-        filename: updated.name,
-        altText: updated.altText ?? null,
-      });
-      // Failure tolerated — local ahead until next edit / full sync.
+    //
+    // BLOCKERS C3 (2026-09-13): tags ride the same patch as
+    // `userMetadata: { tags }` — the server row's JSON column, which
+    // `media.updateAsset` already took and `importServerAssets` reads back.
+    // Sent only when the list actually changed, so a name edit's patch is
+    // still exactly `{ filename, altText }`.
+    if (this.remoteSync && asset.serverId) {
+      const patch: Parameters<RemoteAssetSync["updateAsset"]>[1] = {};
+      if (
+        (Object.prototype.hasOwnProperty.call(updates, "name") && asset.name !== updated.name) ||
+        (Object.prototype.hasOwnProperty.call(updates, "altText") && asset.altText !== updated.altText)
+      ) {
+        patch.filename = updated.name;
+        patch.altText = updated.altText ?? null;
+      }
+      if (
+        Object.prototype.hasOwnProperty.call(updates, "tags") &&
+        (asset.tags.length !== updated.tags.length || asset.tags.some((t, i) => t !== updated.tags[i]))
+      ) {
+        patch.userMetadata = { tags: updated.tags };
+      }
+      if (Object.keys(patch).length > 0) {
+        await this.remoteSync.updateAsset(asset.serverId, patch);
+        // Failure tolerated — local ahead until next edit / full sync.
+      }
     }
 
     this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, changes: updates });

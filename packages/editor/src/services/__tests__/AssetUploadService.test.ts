@@ -246,6 +246,20 @@ describe("createRemoteAssetSync — mutations", () => {
     await expect(sync.updateAsset("a1", { filename: "new.png" })).resolves.toBe(false);
   });
 
+  /* BLOCKERS C3 — the tag mirror rides the same patch: `userMetadata` is
+     forwarded whole (the server replaces the JSON column), and only when the
+     caller sent it. */
+  it("updateAsset forwards userMetadata when given, and only then", async () => {
+    const sync = createRemoteAssetSync();
+    media.updateAsset.mockResolvedValue({});
+
+    await expect(sync.updateAsset("a1", { userMetadata: { tags: ["team"] } })).resolves.toBe(true);
+    expect(media.updateAsset.mock.calls[0][0]).toEqual({ assetId: "a1", userMetadata: { tags: ["team"] } });
+
+    await sync.updateAsset("a1", { altText: "x" });
+    expect("userMetadata" in (media.updateAsset.mock.calls[1][0] as Record<string, unknown>)).toBe(false);
+  });
+
   it("renameFolder: NOT_FOUND is success, other failures are false", async () => {
     const sync = createRemoteAssetSync();
 
