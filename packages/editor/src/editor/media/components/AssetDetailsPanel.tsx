@@ -96,6 +96,11 @@ export interface AssetDetailsPanelProps {
   onOpenRename(item: LibraryItem): void;
   /** Delete request (orchestrator's state.requestDelete). */
   onRequestDelete(key: string): void;
+  /** Clone 3708:20650 — the delete confirm's "Replace instead" opens THIS
+   *  rail's replace-across picker for the asset, so the orchestrator may own
+   *  the picker's open state. Omitted, the panel keeps it itself. */
+  replacePickerOpen?: boolean;
+  onReplacePickerOpenChange?(open: boolean): void;
   /** Composer for replaceAcross + (transitively) the version revert button. */
   composer: Composer;
   addToast(t: ToastInput): void;
@@ -129,12 +134,16 @@ export function AssetDetailsPanel({
   onOptimizeImage,
   onOpenRename,
   onRequestDelete,
+  replacePickerOpen,
+  onReplacePickerOpenChange,
   composer,
   addToast,
   onUpdateAltText,
   onRegenerateAltText,
 }: AssetDetailsPanelProps) {
-  const [replaceAllPickerOpen, setReplaceAllPickerOpen] = React.useState(false);
+  const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
+  const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
+  const setReplaceAllPickerOpen = onReplacePickerOpenChange ?? setLocalPickerOpen;
   const [regenerating, setRegenerating] = React.useState(false);
 
   if (bulk) {

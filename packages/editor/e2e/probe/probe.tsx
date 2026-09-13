@@ -2531,8 +2531,8 @@ const CASES: Record<string, () => React.ReactElement> = {
           names: Array.from({ length: 34 }, (_, i) => `photo-${i}.jpg`),
           inUseCount: 5,
           inUse: [
-            { name: "hero-dark.jpg", pages: ["Home", "Menu"] },
-            { name: "pasta.jpg", pages: ["Menu"] },
+            { key: "k0", name: "hero-dark.jpg", count: 3, pages: ["Home", "Menu"] },
+            { key: "k1", name: "pasta.jpg", count: 2, pages: ["Menu"] },
           ],
           isBulk: true,
         }}

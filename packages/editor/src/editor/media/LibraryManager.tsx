@@ -19,8 +19,8 @@ import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceMo
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
-import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
+import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
 import { OptimizationPanel } from "./OptimizationPanel";
@@ -185,6 +185,28 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
      was being mid-way through choosing an image for an element. It belongs
      beside Edit, on the asset you are looking at. */
   const [optimizeItem, setOptimizeItem] = React.useState<LibraryItem | null>(null);
+  /* Clone 3708:20650 — "Replace instead" on the delete confirm opens the
+     rail's replace-across picker for that asset, so the picker's open state
+     lives here rather than in the rail. */
+  const [replacePickerOpen, setReplacePickerOpen] = React.useState(false);
+
+  /* Clone 3708:20446 — after the delete the rail is back to "Select an asset
+     to see details.": a selection pointing at a deleted asset is dropped, one
+     pointing elsewhere is kept. */
+  const handleExecuteDelete = React.useCallback(async () => {
+    const deleted = state.confirmDelete?.keys ?? [];
+    await state.executeDelete();
+    if (selectedAssetId && deleted.includes(selectedAssetId)) setSelectedAssetId(null);
+  }, [state, selectedAssetId]);
+
+  const handleReplaceInstead = React.useCallback(
+    (key: string) => {
+      state.cancelDelete();
+      setSelectedAssetId(key);
+      setReplacePickerOpen(true);
+    },
+    [state],
+  );
 
   const handleImportFromUrl = React.useCallback(async (url: string) => {
     try {
@@ -419,6 +441,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onOptimizeImage={setOptimizeItem}
           onOpenRename={state.openDetail}
           onRequestDelete={state.requestDelete}
+          replacePickerOpen={replacePickerOpen}
+          onReplacePickerOpenChange={setReplacePickerOpen}
           composer={composer}
           addToast={addToast}
           onUpdateAltText={(key, altText) => {
@@ -504,8 +528,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       {state.confirmDelete && (
         <ConfirmDeleteModal
           payload={state.confirmDelete}
-          onConfirm={state.executeDelete}
+          onConfirm={handleExecuteDelete}
           onCancel={state.cancelDelete}
+          onReplaceInstead={handleReplaceInstead}
         />
       )}
       {state.ctxMenu && (

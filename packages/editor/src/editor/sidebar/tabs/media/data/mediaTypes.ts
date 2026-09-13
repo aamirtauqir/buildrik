@@ -88,7 +88,14 @@ export interface LibraryItem {
 
 /** One asset the delete would break, and where it is used. */
 export interface AssetUsage {
+  /** Library key — the confirm joins each checked file to its count by it. */
+  key: string;
   name: string;
+  /** Elements on the site referencing it — the Clone's "Used in 3 site
+   *  placements" (3708:20650) and "hero-dark.jpg (3 uses)" (3701:20385). The
+   *  same `findByMediaSrc` answer the rail's USED IN and the grid's `used ×3`
+   *  print, so the three never disagree. */
+  count: number;
   /** Page names holding an element that references it. Empty when the element
    *  cannot be traced to a page — named as unknown rather than dropped. */
   pages: string[];

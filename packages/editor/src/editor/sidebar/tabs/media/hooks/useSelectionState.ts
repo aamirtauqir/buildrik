@@ -72,7 +72,7 @@ export function useSelectionState(
         const found = elements.findByMediaSrc!(asset.src);
         if (found.length === 0) continue;
         const pages = [...new Set(found.map(pageFor).filter((n): n is string => Boolean(n)))];
-        usages.push({ name: asset.name ?? key, pages });
+        usages.push({ key, name: asset.name ?? key, count: found.length, pages });
       }
       return usages;
     },
