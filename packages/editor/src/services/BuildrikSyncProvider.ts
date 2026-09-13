@@ -446,6 +446,9 @@ export async function loadServerMedia(
     folderId: string | null;
     createdAt: string | Date;
     updatedAt: string | Date;
+    /** The row's JSON column, passed through whole — `importServerAssets`
+     *  reads `tags` out of it (BLOCKERS C3). */
+    userMetadata?: unknown;
   }>;
   folders: ReadonlyArray<{
     id: string;
@@ -504,6 +507,7 @@ export async function loadServerMedia(
       folderId: string | null;
       createdAt: string | Date;
       updatedAt: string | Date;
+      userMetadata?: unknown;
     }>;
     const folders = foldersResult as unknown as ReadonlyArray<{
       id: string;

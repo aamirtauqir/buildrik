@@ -1,9 +1,10 @@
 /**
  * §16 MediaContextMenu group structure — Phase 7 Tasks 38-41.
  *
- * Asserts the right-click menu renders 4 logical groups separated
- * by dividers, includes an Insert action, and the Move submenu uses
- * allFolders with depth-based indentation.
+ * Asserts the right-click menu renders one list with one divider, includes
+ * an Insert action, and that `Move to folder…` is a plain item that asks the
+ * orchestrator for the Move modal (Clone 3721:43552 / 3721:45952 — the
+ * nested folder submenu §16 used to assert here is displaced).
  *
  * @license BSD-3-Clause
  */
@@ -11,7 +12,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { MediaContextMenu } from "../MediaContextMenu";
-import type { LibraryItem, MediaFolder } from "../../data/mediaTypes";
+import type { LibraryItem } from "../../data/mediaTypes";
 
 function makeItem(overrides: Partial<LibraryItem> = {}): LibraryItem {
   return {
@@ -29,7 +30,7 @@ function makeItem(overrides: Partial<LibraryItem> = {}): LibraryItem {
 const handlers = () => ({
   onSelect: vi.fn(),
   onRename: vi.fn(),
-  onMove: vi.fn(),
+  onMoveToFolder: vi.fn(),
   onDelete: vi.fn(),
   onCopyUrl: vi.fn(),
   onEditImage: vi.fn(),
@@ -38,22 +39,9 @@ const handlers = () => ({
   onClose: vi.fn(),
 });
 
-function renderMenu(
-  item: LibraryItem,
-  folders: MediaFolder[] = [],
-  extra: Record<string, unknown> = {},
-) {
+function renderMenu(item: LibraryItem) {
   const h = handlers();
-  const { container } = render(
-    <MediaContextMenu
-      x={50}
-      y={50}
-      item={item}
-      folders={folders}
-      {...h}
-      {...extra}
-    />,
-  );
+  const { container } = render(<MediaContextMenu x={50} y={50} item={item} {...h} />);
   return { container, ...h };
 }
 
@@ -118,43 +106,37 @@ describe("§16 — MediaContextMenu groups", () => {
   });
 });
 
-describe("§16 — Move submenu uses allFolders with depth indentation", () => {
-  const NESTED: MediaFolder[] = [
-    { id: "f1", name: "Brand", parentId: null, createdAt: "x", updatedAt: "x" },
-    { id: "f2", name: "Logos", parentId: "f1", createdAt: "x", updatedAt: "x" },
-    {
-      id: "f3",
-      name: "Marketing",
-      parentId: null,
-      createdAt: "x",
-      updatedAt: "x",
-    },
-  ];
-
-  it("renders folders from allFolders prop, not folders", () => {
-    const { container } = renderMenu(makeItem(), [], { allFolders: NESTED });
-    const submenuTrigger = screen.getByRole("menuitem", { name: /move to folder/i });
-    expect(submenuTrigger).toBeInTheDocument();
-    fireEvent.mouseEnter(submenuTrigger as HTMLElement);
-    expect(screen.getByRole("menuitem", { name: /brand/i })).toBeInTheDocument();
-    expect(screen.getByRole("menuitem", { name: /logos/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole("menuitem", { name: /marketing/i }),
-    ).toBeInTheDocument();
+/* Clone 3721:43552 / 3721:45952 (section 3721:43517) — `Move to folder…` is a
+   plain item that opens the Move modal for that one file; it displaces the
+   V1 1163:13695 nested folder submenu (`(Root)` + every folder, indented)
+   that §16 used to assert here. The menu no longer needs a folder list. */
+describe("Clone 3721:43552 — Move to folder… opens the Move modal, no submenu", () => {
+  it("is a plain menu item that hands the file to the orchestrator and closes", () => {
+    const { onMoveToFolder, onClose } = renderMenu(makeItem());
+    const move = screen.getByRole("menuitem", { name: "Move to folder…" });
+    expect(move).toHaveAttribute("data-testid", "media-ctx-move");
+    fireEvent.mouseEnter(move);
+    expect(screen.queryByRole("menuitem", { name: "(Root)" })).toBeNull();
+    fireEvent.click(move);
+    expect(onMoveToFolder).toHaveBeenCalledTimes(1);
+    expect(onMoveToFolder.mock.calls[0][0]?.key).toBe("a1");
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("indents nested folders by parentId depth", () => {
-    const { container } = renderMenu(makeItem(), [], { allFolders: NESTED });
-    const submenuTrigger = screen.getByRole("menuitem", { name: /move to folder/i });
-    fireEvent.mouseEnter(submenuTrigger);
-    const brandBtn = screen.getByRole("menuitem", {
-      name: /brand/i,
-    }) as HTMLElement;
-    const logosBtn = screen.getByRole("menuitem", {
-      name: /logos/i,
-    }) as HTMLElement;
-    const brandPadding = parseInt(brandBtn.style.paddingLeft || "0", 10);
-    const logosPadding = parseInt(logosBtn.style.paddingLeft || "0", 10);
-    expect(logosPadding).toBeGreaterThan(brandPadding);
+  it("orders the Clone's five as Select · Rename… · Edit image… · Move to folder… ── Delete", () => {
+    renderMenu(makeItem());
+    const names = screen.getAllByRole("menuitem").map((el) => el.textContent?.trim());
+    const clone = ["Select", "Rename…", "Edit image…", "Move to folder…", "Delete"];
+    expect(names.filter((n) => clone.includes(n ?? ""))).toEqual(clone);
+    // Insert to canvas stays first (Phase 1's V1 rule); the code's own items
+    // sit between Move and the divider.
+    expect(names[0]).toBe("Insert to canvas");
+  });
+
+  it("every item the live walk drives carries its anchor", () => {
+    renderMenu(makeItem({ altText: "a hero" }));
+    for (const id of ["media-ctx-insert", "media-ctx-select", "media-ctx-rename", "media-ctx-edit", "media-ctx-move", "media-ctx-copy-url", "media-ctx-delete"]) {
+      expect(screen.getByTestId(id)).toBeInTheDocument();
+    }
   });
 });

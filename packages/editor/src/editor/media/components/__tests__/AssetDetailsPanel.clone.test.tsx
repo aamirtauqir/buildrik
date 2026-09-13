@@ -302,3 +302,70 @@ describe("Clone 4207:26629 · the rail dims while an asset is dragged", () => {
     expect(screen.getByTestId("mgr-details")).not.toHaveAttribute("data-dimmed");
   });
 });
+
+/* BLOCKERS C3 — the rail's TAGS block is the code's addition (authority
+   `code:tag-writer`): the Clone draws chips under FOLDERS (3695:45155) and
+   a tag filter (3721:43697) but no editor, and nothing wrote a tag. The
+   block sits under ALT TEXT and above USED IN: the file's chips with ×, and
+   an Add tag field — Enter adds, lower-cased, trimmed, deduped, ≤ 24 chars,
+   never empty. */
+describe("code:tag-writer · the rail's TAGS block", () => {
+  const tagged = (tags: string[]) => ({ ...byName("team-photo.jpg"), tags });
+
+  it("lists the file's tags as chips, each with a × that removes it", () => {
+    const onUpdateTags = vi.fn();
+    mount(tagged(["team", "staff"]), { onUpdateTags });
+    const block = within(screen.getByTestId("mgr-det-tags"));
+    expect(block.getByText("Tags")).toBeInTheDocument();
+    expect(block.getByTestId("mgr-det-tag-team")).toHaveTextContent("team");
+    expect(block.getByTestId("mgr-det-tag-staff")).toHaveTextContent("staff");
+    fireEvent.click(block.getByRole("button", { name: "Remove tag staff" }));
+    expect(onUpdateTags).toHaveBeenCalledWith("team", ["team"]);
+  });
+
+  it("sits under ALT TEXT and above USED IN", () => {
+    mount(tagged(["team"]), { onUpdateTags: vi.fn(), onUpdateAltText: vi.fn() });
+    const order = Array.from(document.querySelectorAll("[data-testid='alt-text-section'], [data-testid='mgr-det-tags'], [data-testid='mgr-det-used']")).map(
+      (el) => el.getAttribute("data-testid"),
+    );
+    expect(order).toEqual(["alt-text-section", "mgr-det-tags", "mgr-det-used"]);
+  });
+
+  it("Enter adds the typed tag lower-cased and trimmed, then empties the field", () => {
+    const onUpdateTags = vi.fn();
+    mount(tagged(["team"]), { onUpdateTags });
+    const input = screen.getByTestId("mgr-det-tag-input");
+    expect(input).toHaveAttribute("placeholder", "Add tag");
+    fireEvent.change(input, { target: { value: "  Summer Menu " } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onUpdateTags).toHaveBeenCalledWith("team", ["team", "summer menu"]);
+    expect(input).toHaveValue("");
+  });
+
+  it("refuses an empty entry and a duplicate, and caps a tag at 24 characters", () => {
+    const onUpdateTags = vi.fn();
+    mount(tagged(["team"]), { onUpdateTags });
+    const input = screen.getByTestId("mgr-det-tag-input");
+    fireEvent.change(input, { target: { value: "   " } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    fireEvent.change(input, { target: { value: "TEAM" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onUpdateTags).not.toHaveBeenCalled();
+    expect(input).toHaveAttribute("maxlength", "24");
+    fireEvent.change(input, { target: { value: "x".repeat(30) } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onUpdateTags).toHaveBeenCalledWith("team", ["team", "x".repeat(24)]);
+  });
+
+  it("draws the block for every file type, with no chips when the file has none", () => {
+    mount(byName("Inter-Var.woff2"), { onUpdateTags: vi.fn() });
+    expect(screen.getByTestId("mgr-det-tags")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-det-tag-list")).toBeNull();
+    expect(screen.getByTestId("mgr-det-tag-input")).toBeInTheDocument();
+  });
+
+  it("is absent when the orchestrator gives it no writer", () => {
+    mount(tagged(["team"]));
+    expect(screen.queryByTestId("mgr-det-tags")).toBeNull();
+  });
+});

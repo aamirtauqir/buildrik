@@ -333,13 +333,16 @@ export function useMediaState(composer: Composer): MediaStateResult {
     [library.setLibrarySearch, discovery.discSearchAll]
   );
 
-  const openCtxMenu = useCallback((e: React.MouseEvent, item: LibraryItem) => {
+  const openCtxMenu = useCallback((e: React.MouseEvent, item: LibraryItem, anchor?: { x: number; y: number }) => {
     e.preventDefault();
     // Clamp position so menu doesn't render off-screen (~160px wide, ~140px tall)
     const MENU_W = 160;
     const MENU_H = 140;
-    const x = Math.min(e.clientX, window.innerWidth - MENU_W - 8);
-    const y = Math.min(e.clientY, window.innerHeight - MENU_H - 8);
+    /* The card's `···` (Clone 3721:43552) anchors the menu to itself; a
+       right-click anchors it to the pointer. A keyboard-fired click has no
+       pointer at all, which is why the button passes its own box. */
+    const x = Math.min(anchor?.x ?? e.clientX, window.innerWidth - MENU_W - 8);
+    const y = Math.min(anchor?.y ?? e.clientY, window.innerHeight - MENU_H - 8);
     setCtxMenu({ x, y, item });
   }, []);
 
@@ -436,6 +439,8 @@ export function useMediaState(composer: Composer): MediaStateResult {
     librarySearch: library.librarySearch,
     setLibrarySearch: setUnifiedSearch,
     setLibraryQuery: library.setLibrarySearch,
+    tagFilter: library.tagFilter,
+    setTagFilter: library.setTagFilter,
     storage: { used: upload.storageUsed, total: upload.storageTotal },
 
     // Clipboard

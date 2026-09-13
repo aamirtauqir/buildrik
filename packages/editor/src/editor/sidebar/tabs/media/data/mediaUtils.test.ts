@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { LibraryItem } from "./mediaTypes";
 import type { MediaAsset } from "@/shared/types/media";
-import { countByType, fmtSize, toLibraryItem } from "./mediaUtils";
+import { countByType, filterByTag, fmtSize, toLibraryItem } from "./mediaUtils";
 
 describe("toLibraryItem — assetId threading (G11)", () => {
   const base = {
@@ -14,6 +14,27 @@ describe("toLibraryItem — assetId threading (G11)", () => {
   });
   it("leaves assetId undefined for local-only / unsynced assets", () => {
     expect(toLibraryItem(base as unknown as MediaAsset).assetId).toBeUndefined();
+  });
+  // Clone 3721:43697 — the TAGS chips and the tag filter read the item's tags.
+  it("carries the asset's tags across", () => {
+    const tagged = { ...base, tags: ["menu", "food"] } as unknown as MediaAsset;
+    expect(toLibraryItem(tagged).tags).toEqual(["menu", "food"]);
+  });
+});
+
+describe("filterByTag (Clone 3721:43697)", () => {
+  const item = (key: string, tags?: string[]): LibraryItem =>
+    ({ key, name: key, type: "img", src: "", size: 0, createdAt: "", mimeType: "", tags }) as LibraryItem;
+  const items = [item("menu", ["menu"]), item("pasta", ["food", "menu"]), item("plain")];
+
+  it("keeps the files carrying the tag, exactly", () => {
+    expect(filterByTag(items, "menu").map((i) => i.key)).toEqual(["menu", "pasta"]);
+    expect(filterByTag(items, "food").map((i) => i.key)).toEqual(["pasta"]);
+    expect(filterByTag(items, "men")).toEqual([]);
+  });
+
+  it("no tag is everything", () => {
+    expect(filterByTag(items, null)).toBe(items);
   });
 });
 

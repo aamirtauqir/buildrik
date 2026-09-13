@@ -24,6 +24,7 @@ function asset(over: Partial<MediaAsset> = {}): MediaAsset {
     size: over.size ?? 100,
     createdAt: over.createdAt ?? "2026-01-01T00:00:00.000Z",
     folderId: over.folderId,
+    tags: over.tags ?? [],
   } as MediaAsset;
 }
 
@@ -156,6 +157,59 @@ describe("useLibraryState — filters", () => {
     const { result } = renderHook(() => useLibraryState(composer));
     act(() => result.current.setLibrarySearch("hero"));
     expect(result.current.libraryItems.map((i) => i.key)).toEqual(["hero"]);
+  });
+});
+
+/* Clone 3721:43697 / 43902 / 44107 — a TAGS chip is a FILTER of its own, not
+   a search string: it narrows to the files carrying the tag, combines with
+   the folder scope and with typed search, and clears on its own. */
+describe("useLibraryState — tag filter (Clone 3721:43697)", () => {
+  const tagged = () => [
+    asset({ id: "menu", name: "menu-cover", tags: ["menu"] }),
+    asset({ id: "team", name: "team-photo", tags: ["team"] }),
+    asset({ id: "pasta", name: "pasta-closeup", tags: ["food", "menu"], folderId: "f1" }),
+    asset({ id: "plain", name: "plain" }),
+  ];
+
+  it("is off by default and narrows to the files carrying the tag", () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.tagFilter).toBeNull();
+    act(() => result.current.setTagFilter("menu"));
+    expect(result.current.tagFilter).toBe("menu");
+    expect(result.current.libraryItems.map((i) => i.key).sort()).toEqual(["menu", "pasta"]);
+  });
+
+  it("combines with the folder scope and with typed search", () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    act(() => result.current.setTagFilter("menu"));
+    act(() => result.current.setCurrentFolderId("f1"));
+    expect(result.current.libraryItems.map((i) => i.key)).toEqual(["pasta"]);
+    act(() => result.current.setCurrentFolderId(null));
+    act(() => result.current.setLibrarySearch("cover"));
+    expect(result.current.libraryItems.map((i) => i.key)).toEqual(["menu"]);
+  });
+
+  it("swaps to another tag and clears back to everything", () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    act(() => result.current.setTagFilter("menu"));
+    act(() => result.current.setTagFilter("team"));
+    expect(result.current.libraryItems.map((i) => i.key)).toEqual(["team"]);
+    act(() => result.current.setTagFilter(null));
+    expect(result.current.libraryItems).toHaveLength(4);
+  });
+
+  it("carries each asset's tags onto its library item, and updateItem writes them back", async () => {
+    const composer = makeComposer(tagged());
+    const { result } = renderHook(() => useLibraryState(composer));
+    expect(result.current.allLibraryItems.find((i) => i.key === "pasta")?.tags).toEqual(["food", "menu"]);
+    await act(() => result.current.updateItem("pasta", { tags: ["food"] }));
+    expect((composer as unknown as { media: { updateAsset: ReturnType<typeof vi.fn> } }).media.updateAsset).toHaveBeenCalledWith(
+      "pasta",
+      { tags: ["food"] },
+    );
   });
 });
 

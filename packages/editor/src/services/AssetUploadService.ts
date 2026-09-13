@@ -229,6 +229,7 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
           // untouched rather than nulling it.
           ...(patch.filename !== undefined ? { filename: patch.filename } : {}),
           ...(patch.altText !== undefined ? { altText: patch.altText } : {}),
+          ...(patch.userMetadata !== undefined ? { userMetadata: patch.userMetadata } : {}),
         });
         return true;
       } catch {

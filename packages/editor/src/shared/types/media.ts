@@ -250,10 +250,13 @@ export interface RemoteAssetSync {
    * the server `media.updateAsset` route, so a renamed asset / hand-written
    * alt text was lost on a new device. Returns true on success; false is
    * tolerated (local stays ahead until the next edit / full sync).
+   *
+   * `userMetadata` (BLOCKERS C3, 2026-09-13) carries the tag list as
+   * `{ tags }` — the server REPLACES the JSON column with what is sent.
    */
   updateAsset(
     serverId: string,
-    patch: { filename?: string; altText?: string | null }
+    patch: { filename?: string; altText?: string | null; userMetadata?: Record<string, unknown> }
   ): Promise<boolean>;
 
   /**

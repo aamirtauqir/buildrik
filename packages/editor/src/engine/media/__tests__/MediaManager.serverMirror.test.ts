@@ -143,3 +143,94 @@ describe("MediaManager server mirror — folder rename (#9/#16)", () => {
     expect(remote.renameFolder).not.toHaveBeenCalled();
   });
 });
+
+/* BLOCKERS C3 (Assets · Clone Phase 3, P3-T): tags persist locally like every
+   other field and mirror to the server row's `userMetadata.tags` — the
+   column exists and `media.updateAsset` already takes it, so no server
+   change. The same key is read back when server rows are imported, which
+   is what makes a tag survive a fresh browser. */
+describe("MediaManager server mirror — tags ↔ userMetadata.tags (C3)", () => {
+  it("mirrors a tags edit as userMetadata: { tags } for a synced asset, and nothing else", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "a1", serverId: "srv-a1", name: "team-photo.jpg" });
+
+    const updated = await manager.updateAsset("a1", { tags: ["team", "staff"] });
+
+    expect(updated?.tags).toEqual(["team", "staff"]);
+    expect(remote.updateAsset).toHaveBeenCalledTimes(1);
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-a1", { userMetadata: { tags: ["team", "staff"] } });
+  });
+
+  it("an unchanged tag list does not round-trip to the server", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "a1", serverId: "srv-a1" });
+    (manager as any).state.assets[0].tags = ["team"];
+
+    await manager.updateAsset("a1", { tags: ["team"] });
+
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+  });
+
+  it("does NOT mirror tags for a local-only asset", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "a1" });
+
+    await manager.updateAsset("a1", { tags: ["team"] });
+
+    expect(remote.updateAsset).not.toHaveBeenCalled();
+    expect(manager.getAsset("a1")?.tags).toEqual(["team"]);
+  });
+
+  it("a name edit that also carries tags sends filename, altText AND userMetadata in one patch", async () => {
+    const remote = makeRemoteSync();
+    const manager = makeManager(remote);
+    seedAsset(manager, { id: "a1", serverId: "srv-a1", name: "old.png" });
+
+    await manager.updateAsset("a1", { name: "new.png", tags: ["menu"] });
+
+    expect(remote.updateAsset).toHaveBeenCalledWith("srv-a1", {
+      filename: "new.png",
+      altText: null,
+      userMetadata: { tags: ["menu"] },
+    });
+  });
+
+  const row = (id: string, userMetadata?: unknown) => ({
+    id,
+    url: `https://cdn/${id}.jpg`,
+    bytes: 10,
+    type: "image" as const,
+    mimeType: "image/jpeg",
+    filename: `${id}.jpg`,
+    altText: null,
+    folderId: null,
+    createdAt: "2026-09-13T00:00:00.000Z",
+    updatedAt: "2026-09-13T00:00:00.000Z",
+    ...(userMetadata !== undefined ? { userMetadata } : {}),
+  });
+
+  it("importServerAssets reads userMetadata.tags back onto the asset (strings only)", async () => {
+    const manager = makeManager(makeRemoteSync());
+
+    await manager.importServerAssets(
+      [
+        row("team", { tags: ["team", "staff"] }),
+        row("mixed", { tags: ["food", 7, null] }),
+        row("bare"),
+        row("nulled", null),
+        row("wrong", { tags: "menu" }),
+      ],
+      [],
+    );
+
+    const tags = (id: string) => manager.getAsset(id)?.tags;
+    expect(tags("team")).toEqual(["team", "staff"]);
+    expect(tags("mixed")).toEqual(["food"]);
+    expect(tags("bare")).toEqual([]);
+    expect(tags("nulled")).toEqual([]);
+    expect(tags("wrong")).toEqual([]);
+  });
+});

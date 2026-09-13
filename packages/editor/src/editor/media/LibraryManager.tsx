@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import {
-  Upload, Plus, Search, Download, AlertCircle,
+  Upload, Plus, Search, Download, AlertCircle, X,
 } from "lucide-react";
 import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
@@ -28,7 +28,7 @@ import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
+import { useToast, Button, IconButton, TextInput, OverlayMount } from "@/editor/chrome-ui";
 import { OptimizationPanel } from "./OptimizationPanel";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig, MediaAsset } from "../../shared/types/media";
@@ -40,6 +40,12 @@ import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQ
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
+
+/* Clone 3721:43697 — the search field's tag token, `Tag: menu · Clear filter ×`,
+   in the placeholder's own grey inside the field; × clears the tag. */
+const SEARCH_TAG_TOKEN =
+  "tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:whitespace-nowrap tw:text-[13px] tw:text-[var(--bk-ink-soft)]";
+const SEARCH_TAG_CLEAR = "tw:h-5 tw:w-5 tw:text-[var(--bk-ink-soft)]";
 
 interface LibraryManagerProps {
   composer: Composer;
@@ -66,6 +72,11 @@ const SORT_OPTIONS = [
   { value: "size", label: "Size" },
   { value: "type", label: "Type" },
 ] as const;
+
+/* Which door a move came through decides where its receipt reads: the checked
+   set's move reports in the rail (Clone 3683:19964), the card menu's in the
+   count line (3721:45960). */
+type MoveDoor = "selection" | "menu";
 
 export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
   const state = useMediaState(composer);
@@ -258,8 +269,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     alreadyThere: string[];
   } | null>(null);
   /* Clone 3699:20347 — the move the engine refused, held so Retry can run
-     exactly it again. */
-  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null } | null>(null);
+     exactly it again — including which door it came through. */
+  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor } | null>(null);
+  /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
+     modal for that ONE file; it creates no selection. */
+  const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
+  /* Clone 3721:45960 — a menu move's receipt is the count line (`Products ·
+     team-photo.jpg moved`), not the rail, which keeps whatever it showed. It
+     clears on the next scope or filter change. */
+  const [movedNote, setMovedNote] = React.useState<string | null>(null);
   /* Clone 4207:26629 / 4215:26635 — the keys in flight while a card or row
      is dragged: the folders outline, the rail dims, the footer says what a
      drop does. React state, so every surface reads the one fact. */
@@ -269,8 +287,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     setMoveResult(null);
   }, [state.selectedKeys, state.selMode, selectedAssetId, state.currentFolderId, smartFolder]);
 
+  React.useEffect(() => {
+    setMovedNote(null);
+  }, [state.currentFolderId, smartFolder, state.tagFilter, state.librarySearch, state.fmtFilter, state.activeTypes]);
+
   const runMove = React.useCallback(
-    async (keys: string[], folderId: string | null) => {
+    async (keys: string[], folderId: string | null, from: MoveDoor = "selection") => {
       setAssetDrag(null);
       const items = keys
         .map((k) => state.libraryItems.find((i) => i.key === k))
@@ -279,11 +301,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       try {
         await state.bulkMoveAssets(keys, folderId);
       } catch {
-        setMoveFailure({ keys, folderId });
+        setMoveFailure({ keys, folderId, from });
         return;
       }
       setMoveFailure(null);
       const nameOf = (i: LibraryItem) => i.displayName ?? i.name;
+      if (from === "menu") {
+        setMovedNote(items[0] ? nameOf(items[0]) : null);
+        return;
+      }
       setMoveResult({
         folderId,
         folderName: folderId === null ? "All assets" : (state.allFolders.find((f) => f.id === folderId)?.name ?? "folder"),
@@ -453,19 +479,19 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     [onOpenImageEditor, state, addToast, composer]
   );
 
-  // Collect all unique tags from assets (Bug #9 fix)
+  /* Clone 3721:43697 — TAGS lists the LIBRARY's tags (`menu · team · food`
+     stay while Products is the scope), so it reads the unscoped list. It used
+     to re-read the engine on every scoped-list change, which is the same set
+     one memo later. */
   const allTags = React.useMemo(() => {
     const tagSet = new Set<string>();
-    const assets = composer.media.getAssets();
-    for (const asset of assets) {
-      if (Array.isArray(asset.tags)) {
-        for (const tag of asset.tags) {
-          if (tag && typeof tag === "string") tagSet.add(tag);
-        }
+    for (const item of state.allLibraryItems) {
+      for (const tag of item.tags ?? []) {
+        if (tag) tagSet.add(tag);
       }
     }
     return Array.from(tagSet).sort();
-  }, [state.libraryItems, composer]);
+  }, [state.allLibraryItems]);
 
   const storageUsedPct = Math.min(100, (state.storage.used / state.storage.total) * 100);
 
@@ -507,10 +533,29 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         <div className="mgr-middle">
           <div className="mgr-search">
             <Search size={14} />
+            {/* Clone 3721:43697 — while a tag is the filter the field leads
+                with its token, `Tag: menu · Clear filter ×`, where the
+                placeholder was; typing after it searches within the tag. */}
+            {state.tagFilter && (
+              <span className={SEARCH_TAG_TOKEN} data-testid="mgr-search-tag-token">
+                Tag: {state.tagFilter} · Clear filter
+                <IconButton
+                  size="sm"
+                  label="Clear the tag filter"
+                  className={SEARCH_TAG_CLEAR}
+                  data-testid="mgr-search-tag-clear"
+                  onClick={() => state.setTagFilter(null)}
+                >
+                  <X size={12} />
+                </IconButton>
+              </span>
+            )}
             <TextInput
               ref={searchRef}
               type="text"
-              placeholder="Search across all folders…"
+              placeholder={state.tagFilter ? "" : "Search across all folders…"}
+              aria-label={state.tagFilter ? `Search within tag ${state.tagFilter}` : undefined}
+              data-testid="mgr-search-input"
               value={state.librarySearch}
               onChange={(e) => state.setLibraryQuery(e.target.value)}
             />
@@ -560,7 +605,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           inUseCount={inUseCount}
           unusedCount={unusedCount}
           allTags={allTags}
-          setLibrarySearch={state.setLibrarySearch}
+          tagFilter={state.tagFilter}
+          setTagFilter={state.setTagFilter}
           folderCounts={state.folderCounts}
           onNewFolder={() => setCreateFolderOpen(true)}
           deleteFolder={state.deleteFolder}
@@ -584,6 +630,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           visibleItems={visibleItems}
           usageMap={usageMap}
           smartFolder={smartFolder}
+          movedNote={movedNote}
           selectedAssetId={selectedAssetId}
           onSelectAsset={setSelectedAssetId}
           onInsert={insertAndReturn}
@@ -625,6 +672,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onReplacePickerOpenChange={setReplacePickerOpen}
           composer={composer}
           addToast={addToast}
+          onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
           onUpdateAltText={(key, altText) => {
             // User-typed edit — clear AI provenance so the chip disappears.
             // Empty user edit also counts as "no longer AI's text."
@@ -728,12 +776,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           x={state.ctxMenu.x}
           y={state.ctxMenu.y}
           item={state.ctxMenu.item}
-          folders={state.folders}
-          allFolders={state.allFolders}
           onInsert={(item) => insertAndReturn(item.key)}
           onSelect={(item) => state.enterSelectModeWith(item.key)}
           onRename={setRenameTarget}
-          onMove={(item, fid) => state.moveAsset(item.key, fid)}
+          onMoveToFolder={setMenuMoveTarget}
           onDelete={(item) => state.requestDelete(item.key)}
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
@@ -789,18 +835,27 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onDone={() => setUploadDone(null)}
         onViewAsset={viewUploadedAsset}
       />
+      {/* One Move modal for both doors: the checked set (3683:19950) or the
+          card menu's one file (3721:45952). */}
       <MoveAssetsModal
-        open={moveModalOpen}
-        items={checkedItems}
+        open={moveModalOpen || menuMoveTarget !== null}
+        items={menuMoveTarget ? [menuMoveTarget] : checkedItems}
         folders={state.allFolders}
-        onClose={() => setMoveModalOpen(false)}
-        onMove={(folderId) => void runMove(checkedItems.map((i) => i.key), folderId)}
+        onClose={() => {
+          setMoveModalOpen(false);
+          setMenuMoveTarget(null);
+        }}
+        onMove={(folderId) =>
+          void (menuMoveTarget
+            ? runMove([menuMoveTarget.key], folderId, "menu")
+            : runMove(checkedItems.map((i) => i.key), folderId))
+        }
       />
       <MoveFailedModal
         open={moveFailure !== null}
         onClose={() => setMoveFailure(null)}
         onRetry={() => {
-          if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId);
+          if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId, moveFailure.from);
         }}
       />
       {/* Replace-all picker now lives inside <AssetDetailsPanel> — see

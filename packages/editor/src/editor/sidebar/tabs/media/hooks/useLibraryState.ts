@@ -10,11 +10,13 @@ import { MEDIA_EVENTS } from "../../../../../shared/constants/media";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import { getSiteIdFromUrl, loadServerMedia } from "../../../../../services/BuildrikSyncProvider";
 import type { MediaSortBy, SortDirection } from "../../../../../shared/types/media";
+import type { MediaAsset } from "../../../../../shared/types/media";
 import type { LibraryItem, LibraryStateResult, MediaBucket, MediaTypeFilter } from "../data/mediaTypes";
 import {
   countByType,
   filterByFmt,
   filterBySearch,
+  filterByTag,
   filterByType,
   toLibraryItem,
 } from "../data/mediaUtils";
@@ -63,6 +65,10 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   const activeType: MediaTypeFilter = activeTypes.size === 1 ? [...activeTypes][0] : "all";
   const [fmtFilter, setFmtFilter_] = useState("");
   const [librarySearch, setLibrarySearch_] = useState("");
+  /* Clone 3721:43697 — a TAGS chip is a filter of its own, not a search
+     string (which is what the chips wrote until Phase 3): it survives typing,
+     combines with the scope, and clears from the search field's token. */
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
 
   // Subscribe to engine events
   useEffect(() => {
@@ -142,9 +148,13 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
       ? allLibraryItems.filter((i) => folderByAssetId.get(i.key) === currentFolderId)
       : allLibraryItems;
 
+    // The tag after the scope and before the search (Clone 3721:43697):
+    // "1 matching assets · Tag: menu" inside whatever folder is open, and a
+    // search typed while the tag is active searches within it.
+    const byTag = filterByTag(inFolder, tagFilter);
     const byType = activeTypes.size
-      ? inFolder.filter((i) => activeTypes.has(i.type as MediaBucket))
-      : inFolder;
+      ? byTag.filter((i) => activeTypes.has(i.type as MediaBucket))
+      : byTag;
     const byFmt = filterByFmt(byType, fmtFilter);
     const bySearch = filterBySearch(byFmt, librarySearch);
     return [...bySearch].sort((a, b) => {
@@ -165,6 +175,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     allLibraryItems,
     folderByAssetId,
     currentFolderId,
+    tagFilter,
     activeTypes,
     fmtFilter,
     librarySearch,
@@ -293,9 +304,10 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const updateItem = useCallback(
     async (key: string, updates: Partial<LibraryItem>) => {
-      const assetUpdates: any = {};
+      const assetUpdates: Partial<MediaAsset> = {};
       if (updates.name) assetUpdates.name = updates.name;
       if (updates.altText !== undefined) assetUpdates.altText = updates.altText;
+      if (updates.tags !== undefined) assetUpdates.tags = updates.tags;
       await composer.media.updateAsset(key, assetUpdates);
     },
     [composer]
@@ -449,6 +461,8 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     activeTypes,
     librarySearch,
     setLibrarySearch,
+    tagFilter,
+    setTagFilter,
     setSort,
     setGridN,
     setFmtFilter,
