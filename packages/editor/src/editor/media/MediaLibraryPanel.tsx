@@ -36,6 +36,7 @@ import type { MediaAsset, MediaAssetType } from "../../shared/types/media";
 import { Button, ModalBody, ModalContent, ModalRoot, Spinner, TextInput } from "@/editor/chrome-ui";
 import { useMediaManager } from "../shell/hooks";
 import { acceptedFormats, acceptedLimit, acceptedMimes, kindLabel, kindNoun } from "@shared/constants/media";
+import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import { ImportUrlModal } from "./components/ImportUrlModal";
 import { ImportResultModal, type ImportResult } from "./components/ImportResultModal";
 import {
@@ -144,7 +145,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
     setSearchQuery("");
     setPane("library");
     setSelectedId(asset.id);
-    setAdded(asset.name);
+    setAdded(displayNameFor(asset.name, asset.mimeType));
     setPendingFile(null);
     setUploadError(null);
   };
@@ -266,7 +267,8 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                       }}
                     >
                       {thumb ? <img src={thumb} alt="" className={THUMB} /> : <span className={THUMB} aria-hidden="true" />}
-                      <span className={NAME}>{asset.name}</span>
+                      {/* The library's name — the engine stores the stem. */}
+                      <span className={NAME}>{displayNameFor(asset.name, asset.mimeType)}</span>
                       {count !== null ? (
                         <span className={USAGE} data-testid={`picker-card-usage-${asset.id}`}>
                           <span
