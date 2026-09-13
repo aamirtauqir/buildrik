@@ -104,7 +104,6 @@ import type { UploadProgress } from "@/shared/types/media";
 import { PageList } from "@/editor/sidebar/tabs/pages/components/PageList";
 import { ConfirmDeleteModal } from "@/editor/sidebar/tabs/media/components/ConfirmDeleteModal";
 import { ImportUrlModal } from "@/editor/media/components/ImportUrlModal";
-import { FolderTree } from "@/editor/media/components/FolderTree";
 import { DrawerGallery } from "@/editor/sidebar/tabs/templates/components/DrawerGallery";
 import { SITE_TEMPLATES } from "@/editor/sidebar/tabs/templates/templatesData";
 import { ApplyProgressOverlay } from "@/editor/sidebar/tabs/templates/ApplyProgressOverlay";
@@ -2548,34 +2547,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   "media-import-url": () => (
     <div data-probe="media-import-url">
       <ImportUrlModal open onClose={() => {}} onImport={() => {}} />
-    </div>
-  ),
-  /* Board 1205:4829 — the folders rail with an inline new-folder field. The
-     field is opened by the recipe's own click on `＋ New folder`, because
-     `newFolderName` is FolderTree's internal state and there is no prop that
-     forces it: a fixture that faked it would measure a component the product
-     does not render. 240 wide, the board's own frame. */
-  "media-new-folder-inline": () => (
-    <div data-probe="media-new-folder-inline" className="tw:flex tw:h-82.5 tw:w-60 tw:flex-col tw:bg-white">
-      <FolderTree
-        folders={[
-          { id: "f1", name: "Products", parentId: null, createdAt: "", updatedAt: "" },
-          { id: "f2", name: "Hero shots", parentId: null, createdAt: "", updatedAt: "" },
-        ]}
-        currentFolderId={null}
-        setCurrentFolderId={() => {}}
-        counts={{ all: 24, img: 14, vid: 4, ico: 4, fnt: 2 }}
-        smartFolder={null}
-        setSmartFolder={() => {}}
-        recentCount={6}
-        inUseCount={14}
-        unusedCount={10}
-        allTags={[]}
-        setLibrarySearch={() => {}}
-        createFolder={async () => {}}
-        deleteFolder={async () => {}}
-        onTrashClick={() => {}}
-      />
     </div>
   ),
   "media-drawer-filtered": () => (

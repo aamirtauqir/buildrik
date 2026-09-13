@@ -1,6 +1,6 @@
 /**
- * FolderTree — smart folders, nested folder nav, collapse/expand,
- * create/delete folders, tag search shortcuts, Trash stub (pinned).
+ * FolderTree — smart folders, nested folder nav, collapse/expand, the
+ * New folder door, delete folders, tag search shortcuts, Trash stub (pinned).
  *
  * @license BSD-3-Clause
  */
@@ -28,7 +28,8 @@ function mount(over: Partial<FolderTreeProps> = {}) {
     unusedCount: 0,
     allTags: [],
     setLibrarySearch: vi.fn(),
-    createFolder: vi.fn(async () => {}),
+    folderCounts: new Map(),
+    onNewFolder: vi.fn(),
     deleteFolder: vi.fn(async () => {}),
     onTrashClick: vi.fn(),
     ...over,
@@ -103,6 +104,27 @@ describe("FolderTree — user folders", () => {
     expect(props.setCurrentFolderId).toHaveBeenCalledWith("f3");
   });
 
+  // Clone 3698:20337 — "Products 8 · Hero shots 5 · Icons 6": each FOLDERS
+  // row carries its own count, right-aligned like the smart rows above it. A
+  // folder the map does not know is a folder with nothing in it (3700:20353
+  // draws the just-created one at 0), not a row with no number.
+  it("Clone 3698:20337 — each folder row carries its own count, 0 when the map has none", () => {
+    mount({ folders: nested, folderCounts: new Map([["f1", 8], ["f2", 5]]) });
+    expect(screen.getByTestId("mgr-row-folder-f1").querySelector(".mgr-node-count")).toHaveTextContent("8");
+    expect(screen.getByTestId("mgr-row-folder-f2").querySelector(".mgr-node-count")).toHaveTextContent("5");
+    expect(screen.getByTestId("mgr-row-folder-f3").querySelector(".mgr-node-count")).toHaveTextContent("0");
+  });
+
+  // Clone 3698:20337 draws a folder glyph before every folder name. The
+  // shipped rail drew a 10px colour swatch cycling through five hexes — a
+  // palette no board names and Gate 16 ratchets against.
+  it("Clone 3698:20337 — a folder row draws the folder glyph, not a colour swatch", () => {
+    const { container } = mount({ folders: nested });
+    expect(container.querySelector(".mgr-folder-dot")).toBeNull();
+    const row = screen.getByTestId("mgr-row-folder-f1");
+    expect(row.querySelector("svg.mgr-node-ico")).not.toBeNull();
+  });
+
   it("delete button deletes the folder without also navigating into it", () => {
     const { props } = mount({ folders: [makeFolder({ id: "f9", name: "Old" })] });
     fireEvent.click(screen.getAllByLabelText("Delete folder")[0]);
@@ -110,53 +132,35 @@ describe("FolderTree — user folders", () => {
     expect(props.setCurrentFolderId).not.toHaveBeenCalled();
   });
 
-  // These three replace two that asserted `window.prompt`. A native dialog
-  // cannot be styled, cannot explain a refusal, and freezes any automated
-  // walk of the product; the name is typed in the tree now.
-  it("New folder opens an input in the tree, not an OS dialog", () => {
+  // Clone 3700:20347 — `row/＋ New folder` opens the Create folder OVERLAY.
+  // These replace four tests that protected V1 board 1205:4829's inline
+  // editing row (a field that opened in the tree, Enter/Esc spelled out
+  // under it). The tree no longer names anything; it asks the orchestrator
+  // for the modal, and — as before the inline row — never an OS prompt.
+  it("Clone 3700:20347 — '+ New folder' asks for the modal; nothing opens in the tree, no OS dialog", () => {
     const promptSpy = vi.spyOn(window, "prompt");
-    mount();
-    fireEvent.click(screen.getByTitle("New folder"));
-    expect(screen.getByTestId("mgr-new-folder-input")).toBeInTheDocument();
+    const { props } = mount();
+    fireEvent.click(screen.getByRole("button", { name: "New folder" }));
+    expect(props.onNewFolder).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("textbox")).toBeNull();
+    expect(screen.queryByTestId("mgr-new-folder-input")).toBeNull();
     expect(promptSpy).not.toHaveBeenCalled();
   });
 
-  it("boards 1163:13695/1205:4829 — the trigger is a labelled row in the list, not a header icon, and the input replaces it while editing", () => {
-    mount();
-    // The label reads, unlike the old icon-only 18x18 button — and it sits
-    // in the tree body, not in a group caption. The rail's single "Folders"
-    // HEAD is gone (board 1159:4593 gives the rail three named groups —
-    // Smart / Folders / Tags — and no head of its own), so the assertion is
-    // now against the caption that replaced it.
-    const trigger = screen.getByTitle("New folder");
-    expect(trigger.textContent).toContain("New folder");
+  it("Clone 3698:20337 — the trigger is a row in FOLDERS after the last folder, not a caption icon, and it does not scope", () => {
+    const { props } = mount({ folders: nested });
+    const trigger = screen.getByTestId("mgr-new-folder-open");
+    expect(trigger).toHaveClass("mgr-node");
+    expect(trigger).toHaveTextContent("New folder");
     const foldersCaption = screen.getByTestId("mgr-section-folders");
-    expect(foldersCaption).toHaveClass("mgr-tree-section");
     expect(foldersCaption.contains(trigger)).toBe(false);
-
-    fireEvent.click(trigger);
-    // Mutually exclusive with the input, same as the board's two states.
-    expect(screen.queryByTitle("New folder")).toBeNull();
-    expect(screen.getByTestId("mgr-new-folder-input")).toBeInTheDocument();
-  });
-
-  it("Enter creates the folder with the trimmed name", () => {
-    const { props } = mount();
-    fireEvent.click(screen.getByTitle("New folder"));
-    const input = screen.getByTestId("mgr-new-folder-input");
-    fireEvent.change(input, { target: { value: "  Assets 2026  " } });
-    fireEvent.keyDown(input, { key: "Enter" });
-    expect(props.createFolder).toHaveBeenCalledWith("Assets 2026");
-  });
-
-  it("Escape creates nothing and closes the input", () => {
-    const { props } = mount();
-    fireEvent.click(screen.getByTitle("New folder"));
-    const input = screen.getByTestId("mgr-new-folder-input");
-    fireEvent.change(input, { target: { value: "Scratch" } });
-    fireEvent.keyDown(input, { key: "Escape" });
-    expect(props.createFolder).not.toHaveBeenCalled();
-    expect(screen.queryByTestId("mgr-new-folder-input")).toBeNull();
+    // After the folders it will land beside, before the TAGS group.
+    const rows = Array.from(document.querySelectorAll("[data-testid^='mgr-row-folder-'], [data-testid='mgr-new-folder-open']"));
+    expect(rows[rows.length - 1]).toBe(trigger);
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(props.onNewFolder).toHaveBeenCalledTimes(1);
+    expect(props.setCurrentFolderId).not.toHaveBeenCalled();
+    expect(props.setSmartFolder).not.toHaveBeenCalled();
   });
 
   it("shows the empty hint when there are no folders", () => {

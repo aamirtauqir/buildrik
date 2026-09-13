@@ -14,7 +14,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import type { MediaStateResult } from "../../sidebar/tabs/media/data/mediaTypes";
-import { TEN, makeComposer, makeMediaState } from "./libraryFixture";
+import { TEN, makeComposer, makeFolder, makeMediaState } from "./libraryFixture";
 
 const mocks = vi.hoisted(() => ({
   state: { mediaState: null as unknown as import("../../sidebar/tabs/media/data/mediaTypes").MediaStateResult },
@@ -174,6 +174,149 @@ describe("Clone 3695:19968 / 20154 · bulk mode", () => {
     fireEvent.click(screen.getByRole("button", { name: "List" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Select all files" }));
     expect(selectAll).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Clone 3698:20337 · Assets · Products · folder scope — P2-A", () => {
+  it("draws every folder in FOLDERS with its own count, a nested one under its parent", async () => {
+    await mountLibrary({
+      folders: [makeFolder({ id: "f1", name: "Products" })],
+      allFolders: [
+        makeFolder({ id: "f1", name: "Products" }),
+        makeFolder({ id: "f2", name: "Campaign images", parentId: "f1" }),
+      ],
+      folderCounts: new Map([["f1", 8]]),
+    });
+    const rail = within(screen.getByTestId("mgr-folders"));
+    expect(rail.getByTestId("mgr-row-folder-f1").querySelector(".mgr-node-count")).toHaveTextContent("8");
+    // The nested folder used to be invisible here: the tree was handed the
+    // root-only list, so a folder created inside a scope had no row at all.
+    const nested = rail.getByTestId("mgr-row-folder-f2");
+    expect(nested).toHaveClass("depth-2");
+    expect(nested.querySelector(".mgr-node-count")).toHaveTextContent("0");
+  });
+
+  it("clicking a folder row scopes the grid to it and clears the smart folder", async () => {
+    const setCurrentFolderId = vi.fn();
+    await mountLibrary({ allFolders: [makeFolder({ id: "f1", name: "Products" })], setCurrentFolderId });
+    fireEvent.click(screen.getByTestId("mgr-row-folder-f1"));
+    expect(setCurrentFolderId).toHaveBeenCalledWith("f1");
+  });
+});
+
+describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
+  it("'+ New folder' opens the Create folder modal; Cancel returns with scope and selection unchanged (A06)", async () => {
+    const setCurrentFolderId = vi.fn();
+    await mountLibrary({ setCurrentFolderId });
+    fireEvent.click(screen.getByTestId("mgr-asset-menu"));
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    expect(screen.getByTestId("mgr-create-folder")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "New folder" })).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("mgr-create-folder-cancel"));
+    expect(screen.queryByTestId("mgr-create-folder")).toBeNull();
+    expect(within(screen.getByTestId("mgr-details")).getByText("menu-cover.png")).toBeInTheDocument();
+    expect(setCurrentFolderId).not.toHaveBeenCalled();
+  });
+
+  it("Create folder files the name at the current level and the new folder becomes the scope", async () => {
+    const setCurrentFolderId = vi.fn();
+    const createFolder = vi.fn((name: string) => Promise.resolve(makeFolder({ id: "f-new", name })));
+    await mountLibrary({ createFolder, setCurrentFolderId });
+    fireEvent.click(screen.getByRole("button", { name: /^Unused/ }));
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "Campaign images" } });
+    fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
+    expect(createFolder).toHaveBeenCalledWith("Campaign images");
+    await vi.waitFor(() => expect(setCurrentFolderId).toHaveBeenLastCalledWith("f-new"));
+    // The smart-folder scope it was opened from is released with it.
+    expect(screen.getByTestId("mgr-count")).not.toHaveTextContent(/Unused$/);
+    expect(screen.queryByTestId("mgr-create-folder")).toBeNull();
+  });
+
+  it("a name already at this level is refused with the next free name, which creates that folder", async () => {
+    const createFolder = vi.fn((name: string) => Promise.resolve(makeFolder({ id: "f-new", name })));
+    await mountLibrary({
+      createFolder,
+      allFolders: [makeFolder({ id: "f1", name: "Products" }), makeFolder({ id: "f2", name: "Nested", parentId: "f1" })],
+    });
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "products" } });
+    fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
+    expect(createFolder).not.toHaveBeenCalled();
+    expect(screen.getByRole("heading", { name: "Folder name already exists" })).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("mgr-create-folder-use"));
+    expect(createFolder).toHaveBeenCalledWith("Products 2");
+  });
+
+  it("the duplicate check is against the CURRENT level: a root name is free inside a folder", async () => {
+    const createFolder = vi.fn((name: string) => Promise.resolve(makeFolder({ id: "f-new", name })));
+    await mountLibrary({
+      createFolder,
+      currentFolderId: "f1",
+      allFolders: [makeFolder({ id: "f1", name: "Products" }), makeFolder({ id: "f2", name: "Nested", parentId: "f1" })],
+    });
+    fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
+    fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "Products" } });
+    fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
+    expect(createFolder).toHaveBeenCalledWith("Products");
+  });
+});
+
+describe("Clone 3700:20353 · Assets · Campaign images · empty folder created — P2-A", () => {
+  const emptyFolder = () => ({
+    libraryItems: [],
+    currentFolderId: "f-new",
+    allFolders: [makeFolder({ id: "f1", name: "Products" }), makeFolder({ id: "f-new", name: "Campaign images" })],
+    folderCounts: new Map([["f1", 8]]),
+  });
+
+  it("an empty FOLDER scope reads the folder's own state, not the library's empty hero", async () => {
+    await mountLibrary(emptyFolder());
+    const empty = within(screen.getByTestId("mgr-empty-folder"));
+    expect(empty.getByRole("heading", { name: "Campaign images" })).toBeInTheDocument();
+    expect(empty.getByText("Folder created · No assets yet")).toBeInTheDocument();
+    expect(empty.getByText("Upload files or move existing assets into this folder.")).toBeInTheDocument();
+    expect(empty.getByRole("button", { name: "Upload files" })).toBeInTheDocument();
+    expect(screen.queryByText("No images or files yet.")).toBeNull();
+    expect(screen.queryByTestId("mgr-empty")).toBeNull();
+    // Its row lights in FOLDERS at 0 while the folder it was made beside keeps its count.
+    expect(screen.getByTestId("mgr-row-folder-f-new")).toHaveClass("active");
+    expect(screen.getByTestId("mgr-row-folder-f-new").querySelector(".mgr-node-count")).toHaveTextContent("0");
+  });
+
+  it("'Upload files' is the library's own upload picker", async () => {
+    const click = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(() => {});
+    await mountLibrary(emptyFolder());
+    fireEvent.click(within(screen.getByTestId("mgr-empty-folder")).getByRole("button", { name: "Upload files" }));
+    expect(click).toHaveBeenCalledTimes(1);
+    click.mockRestore();
+  });
+
+  it("files picked while a folder is the scope land IN that folder, the way a drop already did", async () => {
+    const upload = vi.fn(() => Promise.resolve(true));
+    await mountLibrary({ ...emptyFolder(), upload });
+    const input = document.querySelector<HTMLInputElement>("input[type='file']")!;
+    const file = new File(["x"], "campaign.png", { type: "image/png" });
+    fireEvent.change(input, { target: { files: [file] } });
+    expect(upload).toHaveBeenCalledWith([file], { folderId: "f-new" });
+  });
+
+  it("the library-empty hero stays for the root and for smart scopes", async () => {
+    await mountLibrary({ libraryItems: [], currentFolderId: null });
+    expect(screen.getByText("No images or files yet.")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-empty-folder")).toBeNull();
+  });
+
+  it("a search or a format filter that empties a folder is 'No results', not 'Folder created'", async () => {
+    await mountLibrary({ ...emptyFolder(), folderCounts: new Map([["f-new", 3]]), librarySearch: "zzz" });
+    expect(screen.getByText("No results")).toBeInTheDocument();
+    expect(screen.queryByTestId("mgr-empty-folder")).toBeNull();
+  });
+
+  it("a folder that holds assets the filters hide is not 'empty'", async () => {
+    await mountLibrary({ ...emptyFolder(), folderCounts: new Map([["f-new", 3]]), fmtFilter: "png" });
+    expect(screen.queryByTestId("mgr-empty-folder")).toBeNull();
+    expect(screen.getByTestId("mgr-empty")).toBeInTheDocument();
   });
 });
 

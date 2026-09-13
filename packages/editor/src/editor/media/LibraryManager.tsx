@@ -21,6 +21,7 @@ import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextM
 import { ImportUrlModal } from "./components/ImportUrlModal";
 import { RenameAssetModal } from "./components/RenameAssetModal";
 import { DownloadPreparedModal } from "./components/DownloadPreparedModal";
+import { CreateFolderModal } from "./components/CreateFolderModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast, Button, TextInput, OverlayMount } from "@/editor/chrome-ui";
@@ -182,6 +183,26 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   );
 
   const [importUrlOpen, setImportUrlOpen] = React.useState(false);
+  /* Clone 3700:20347 — `row/＋ New folder` opens a modal. The folder lands
+     under the current scope (the hook's own rule), so the names the modal
+     refuses are that level's siblings — a root name is free inside a folder. */
+  const [createFolderOpen, setCreateFolderOpen] = React.useState(false);
+  const siblingFolderNames = React.useMemo(
+    () => state.allFolders.filter((f) => f.parentId === state.currentFolderId).map((f) => f.name),
+    [state.allFolders, state.currentFolderId],
+  );
+  /* Clone 3700:20353 — the folder just created IS the scope: its row lights
+     in FOLDERS and the grid shows its (empty) contents. A smart-folder scope
+     it was opened from is released with it, the way clicking a folder row
+     releases one. */
+  const handleCreateFolder = React.useCallback(
+    async (name: string) => {
+      const folder = await state.createFolder(name);
+      setSmartFolder(null);
+      state.setCurrentFolderId(folder.id);
+    },
+    [state],
+  );
   /* The optimizer shipped as a tab on the PICKER modal, so the only door to it
      was being mid-way through choosing an image for an element. It belongs
      beside Edit, on the asset you are looking at. */
@@ -236,10 +257,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     }
   }, [state, addToast]);
 
+  /* Clone 3700:20353 — "Upload files or move existing assets into this
+     folder": files picked while a folder is the scope land IN that folder,
+     the rule the drop path below already followed. The picker used to file
+     everything at the root, so uploading from an empty folder's own CTA left
+     that folder empty. */
   const handleFileChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files?.length) {
-        state.upload(Array.from(e.target.files));
+        state.upload(Array.from(e.target.files), { folderId: state.currentFolderId });
         e.target.value = "";
       }
     },
@@ -382,8 +408,13 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         {/* D5 Stage 1 (audit-remediation 2026-05-08): LEFT panel + collapsed
             state + recursive renderer + TreeNode all live in
             ./components/FolderTree.tsx now. */}
+        {/* Clone 3698:20337 / 3700:20353 — the rail is handed EVERY folder,
+            not the root-only list. `createFolder` files a new folder under
+            the current scope, and the tree renders children under their
+            parent, so a folder made inside "Products" had no row at all
+            until now: the tree never received it. */}
         <FolderTree
-          folders={state.folders}
+          folders={state.allFolders}
           currentFolderId={state.currentFolderId}
           setCurrentFolderId={state.setCurrentFolderId}
           counts={state.counts}
@@ -394,7 +425,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           unusedCount={unusedCount}
           allTags={allTags}
           setLibrarySearch={state.setLibrarySearch}
-          createFolder={state.createFolder}
+          folderCounts={state.folderCounts}
+          onNewFolder={() => setCreateFolderOpen(true)}
           deleteFolder={state.deleteFolder}
           onTrashClick={() =>
             addToast({ description: "Trash coming soon", tone: "info" })
@@ -584,6 +616,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         open={importUrlOpen}
         onClose={() => setImportUrlOpen(false)}
         onImport={handleImportFromUrl}
+      />
+      <CreateFolderModal
+        open={createFolderOpen}
+        existingNames={siblingFolderNames}
+        onClose={() => setCreateFolderOpen(false)}
+        onCreate={(name) => void handleCreateFolder(name)}
       />
 
       {renameTarget && (

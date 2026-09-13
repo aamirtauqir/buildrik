@@ -103,6 +103,10 @@ const LIST_TYPE_LABEL: Record<LibraryItem["type"], string> = {
   fnt: "FONT",
 };
 
+/* Clone 3700:20353 — the empty folder's two 13 lines in ink-soft. */
+const EMPTY_FOLDER_LINE_CLASS =
+  "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+
 function sortButtonLabel(sort: MediaSortBy, dir: "asc" | "desc"): string {
   if (sort === "name") return dir === "asc" ? "Name A–Z" : "Name Z–A";
   return SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Date added";
@@ -683,6 +687,36 @@ export function AssetGrid({
               </div>
             );
           })}
+        </div>
+      ) : state.currentFolderId !== null &&
+        !smartFolder &&
+        !searchQuery &&
+        (state.folderCounts.get(state.currentFolderId) ?? 0) === 0 ? (
+        /* Clone 3700:20353 — an empty FOLDER is not an empty library. The
+           question here is "what goes in this folder?", so the grid reads
+           the folder's name, says it holds nothing yet, and offers the
+           library's own upload picker. Only for a folder scope that truly
+           holds nothing: a folder whose assets a search or a format filter
+           hides keeps the "No results" / hero branch below. Left-aligned at
+           the column's own inset, not the centred hero. */
+        <div className="tw:flex tw:flex-col tw:items-start tw:gap-4 tw:pt-3" data-testid="mgr-empty-folder">
+          <h3
+            className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+            data-testid="mgr-empty-folder-title"
+          >
+            {state.allFolders.find((f) => f.id === state.currentFolderId)?.name ?? "Folder"}
+          </h3>
+          <p className={EMPTY_FOLDER_LINE_CLASS} data-testid="mgr-empty-folder-status">
+            Folder created · No assets yet
+          </p>
+          <p className={EMPTY_FOLDER_LINE_CLASS} data-testid="mgr-empty-folder-hint">
+            Upload files or move existing assets into this folder.
+          </p>
+          {/* flowbite's `xs` IS the chrome's 32 (founder:density-32; the
+              Clone's 44 is refused) — no height override to fight. */}
+          <Button size="xs" data-testid="mgr-empty-folder-upload" onClick={onUploadClick}>
+            Upload files
+          </Button>
         </div>
       ) : (
         <div className="mgr-empty" data-testid="mgr-empty">
