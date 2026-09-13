@@ -783,8 +783,13 @@ export function SlimLauncher(props: SlimLauncherProps) {
           className={`tw:pb-7.5 tw:text-[13px] tw:leading-5 ${props.storage.used >= props.storage.total ? "tw:bg-[var(--bk-bg-subtle)]" : ""}`}
           data-testid="media-footer"
         >
+        {/* Four doors in 248px. Board 3437:36027 draws them spanning the row's
+            full width at ~14px gaps; at the code's 13px type a fixed 16 gap
+            overflows the drawer by ~20px (the same trap that wrapped "Browse
+            stock" here), so the gap is distributed instead — the board's
+            spread, and it cannot overflow while the labels fit. */}
         <div
-          className="tw:flex tw:h-11 tw:items-center tw:gap-4 tw:whitespace-nowrap tw:px-4 tw:text-[var(--bk-accent-text)]"
+          className="tw:flex tw:h-11 tw:items-center tw:justify-between tw:gap-2 tw:whitespace-nowrap tw:px-4 tw:text-[var(--bk-accent-text)]"
           data-testid="media-footer-links"
         >
           <Button
