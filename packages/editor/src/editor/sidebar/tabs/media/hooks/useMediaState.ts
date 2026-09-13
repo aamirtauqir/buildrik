@@ -82,29 +82,22 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
   // Recompute usageMap when library or page graph changes.
   // Equality-check guards against infinite re-renders from new Map identity.
+  //
+  // Read through `checkInUse` — the same `findByMediaSrc` answer the delete
+  // confirm and the library's rail read. This used to walk
+  // `page.root.getDescendants()` and match `el.attrs.src`, neither of which
+  // the engine's page roots or elements carry (a root is `{id, type, classes,
+  // tagName, children}`), so no drawer card ever showed its pips (measured
+  // live 2026-09-14 against three used files). A placement on a saved
+  // version counts for the file it belongs to — usage is the family's
+  // (Clone 3695:45529), as the library reads it.
   useEffect(() => {
     const map = new Map<string, number>();
-    const elementsApi = (composer as unknown as {
-      elements?: { getAllPages?: () => unknown[] };
-    }).elements;
-    const pages = elementsApi?.getAllPages?.() ?? [];
-    for (const page of pages) {
-      const pageTyped = page as { root?: { getDescendants?: () => unknown[] } };
-      const elements = pageTyped?.root?.getDescendants?.() ?? [];
-      const usedInThisPage = new Set<string>();
-      for (const el of elements) {
-        const elTyped = el as {
-          styles?: { backgroundImage?: string };
-          attrs?: { src?: string };
-        };
-        const assetSrc = elTyped.styles?.backgroundImage ?? elTyped.attrs?.src ?? "";
-        if (!assetSrc) continue;
-        const item = library.libraryItems.find((i) => i.src && assetSrc.includes(i.src));
-        if (item) usedInThisPage.add(item.key);
-      }
-      for (const key of usedInThisPage) {
-        map.set(key, (map.get(key) ?? 0) + 1);
-      }
+    for (const item of library.libraryItems) {
+      const family = library.versionsOf(item.key);
+      const members = (family.length > 0 ? family : [item]).map((m) => m.key);
+      const pages = new Set(selection.checkInUse(members).flatMap((u) => u.pages));
+      if (pages.size > 0) map.set(item.key, pages.size);
     }
     setUsageMap((prev) => {
       if (prev.size !== map.size) return map;
@@ -113,7 +106,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
       }
       return prev;
     });
-  }, [composer, library.libraryItems]);
+  }, [library.libraryItems, library.versionsOf, selection.checkInUse]);
 
   // Listen for selection mode requests from other parts of the UI
   useEffect(() => {

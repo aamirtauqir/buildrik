@@ -14,12 +14,15 @@ const stableMocks = vi.hoisted(() => {
   const libraryItems = [
     { key: "a", name: "a.jpg", type: "img", src: "https://cdn/a.jpg" },
   ];
-  return { libraryItems };
+  /* a's family: itself and a saved version the site may sit on (hidden row). */
+  const aV2 = { key: "a-v2", name: "a-v2.webp", type: "img", src: "https://cdn/a-v2.webp", versionOf: "a" };
+  return { libraryItems, aV2 };
 });
 
 vi.mock("../useLibraryState", () => ({
   useLibraryState: () => ({
     libraryItems: stableMocks.libraryItems,
+    versionsOf: (key: string) => (key === "a" ? [stableMocks.libraryItems[0], stableMocks.aV2] : []),
     folders: [],
     allFolders: [],
     counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
@@ -45,8 +48,10 @@ vi.mock("../useLibraryState", () => ({
   }),
 }));
 
+/* The site: a-v2's src sits on Home — what `checkInUse` answers for "a-v2". */
 vi.mock("../useSelectionState", () => ({
   useSelectionState: () => ({
+    checkInUse: (keys: string[]) => keys.filter((k) => k === "a-v2").map((key) => ({ key, name: key, count: 1, pages: ["Home"] })),
     selMode: false,
     selectedKeys: new Set(),
     toggleSelMode: vi.fn(),
@@ -141,5 +146,14 @@ describe("useMediaState — usageMap", () => {
     const composer = makeFakeComposer();
     const { result } = renderHook(() => useMediaState(composer as never));
     expect(result.current.usageMap.get("nonexistent") ?? 0).toBe(0);
+  });
+
+  /* Clone 3695:45529 — after Apply the page sits on a-v2's src; the drawer
+     card must go on reading `used`, under the file's key. */
+  it("a placement on a saved version counts for the file it belongs to", () => {
+    const composer = makeFakeComposer();
+    const { result } = renderHook(() => useMediaState(composer as never));
+    expect(result.current.usageMap.get("a")).toBe(1);
+    expect(result.current.usageMap.has("a-v2")).toBe(false);
   });
 });
