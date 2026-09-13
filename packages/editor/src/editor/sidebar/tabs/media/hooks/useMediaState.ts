@@ -228,7 +228,14 @@ export function useMediaState(composer: Composer): MediaStateResult {
          exactly like cancelling (audit A03). An explicit selection context
          (the inspector's Choose image, a dropped empty Image) still wins. */
       const selectedEl = composer.selection.getCount() === 1 ? composer.selection.getSelected() : null;
-      const assetKind = asset.type === "vid" || asset.type === "video" ? "video" : asset.type === "img" || asset.type === "image" ? "image" : null;
+      const assetKind =
+        asset.type === "vid" || asset.type === "video"
+          ? "video"
+          : asset.type === "img" || asset.type === "image"
+            ? "image"
+            : asset.type === "svg"
+              ? "svg"
+              : null;
       const replaceTarget =
         selectionContext?.elementId ??
         (selectedEl && assetKind && selectedEl.getType() === assetKind ? selectedEl.getId() : null);

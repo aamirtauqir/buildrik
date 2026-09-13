@@ -294,7 +294,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // Listen for tab switch events
   React.useEffect(() => {
     if (!composer) return;
-    const handler = (data: { tab: string }) => {
+    const handler = (data: { tab: string; fullPage?: boolean }) => {
       /* Boards 170:2 and 66:225 put AI in the INSPECTOR column with a
          "‹ Inspector" way back — not in the left sidebar. Every existing
          entry point (the inspector's ✦ AI chip, the multi-select toolbar, the
@@ -306,6 +306,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       }
       onLeftPanelTabChange?.(data.tab);
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
+      /* Clone 3724:43815 — the inspector's "Manage video" opens the Asset
+         LIBRARY (the fullpage), not the drawer; the file to select rides on
+         the engine's media selection the way the drawer's own door hands it. */
+      if (data.tab === "assets" && data.fullPage) setMediaFullPage(true);
     };
     composer.on("ui:switch-tab", handler);
     return () => {

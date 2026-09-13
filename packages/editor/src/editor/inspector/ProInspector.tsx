@@ -35,6 +35,7 @@ import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hoo
 import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
+import { MediaSourceRow } from "./sections/MediaSourceRow";
 import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
@@ -576,6 +577,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         aria-label="Element properties"
       >
         <div className="bdi-body">
+          {/* Clone 3721:45178 / 3724:43815 / 3724:44339 — a media element's
+              source is the first thing in its inspector, above SIZE. */}
+          <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
           <InspectorErrorBoundary>
             <InspectorTabContent
               tabId="style"

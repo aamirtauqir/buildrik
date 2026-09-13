@@ -125,6 +125,25 @@ describe("insertToCanvas — an image element selected on the canvas", () => {
     expect(c.mediaOps.insertMediaAt).toHaveBeenCalled();
   });
 
+  /* Clone 3724:44922 "Typed asset round trips" — the typed replacement is
+     per kind: a video swaps a selected Video's source (chef → grand-opening),
+     an SVG swaps a selected SVG image's. */
+  it("swaps a selected video's source for another video, and a selected SVG's for another SVG", async () => {
+    for (const [type, elType, src] of [["vid", "video", "https://cdn/grand.mp4"], ["svg", "svg", "https://cdn/star.svg"]] as const) {
+      const composer = composerWith({ src, type, name: "x" });
+      const c = composer as unknown as { selection: Record<string, ReturnType<typeof vi.fn>>; mediaOps: Record<string, ReturnType<typeof vi.fn>> };
+      c.selection.getSelected = vi.fn(() => ({ getId: () => "el", getType: () => elType }));
+      c.selection.getCount = vi.fn(() => 1);
+      c.mediaOps.replaceMedia = vi.fn(() => ({ elementId: "el", previousSrc: "old" }));
+      const { result } = renderHook(() => useMediaState(composer as never));
+      await act(async () => {
+        await result.current.insertToCanvas("a1");
+      });
+      expect(c.mediaOps.replaceMedia).toHaveBeenCalledWith("el", src);
+      expect(c.mediaOps.insertMediaAt).not.toHaveBeenCalled();
+    }
+  });
+
   it("does not put a video into a selected image element", async () => {
     const composer = composerWith({ src: "https://cdn/chef.mp4", type: "vid", name: "chef-intro.mp4" });
     const c = composer as unknown as { selection: Record<string, ReturnType<typeof vi.fn>>; mediaOps: Record<string, ReturnType<typeof vi.fn>> };
