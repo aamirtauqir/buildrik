@@ -71,6 +71,11 @@ const SORT_OPTIONS = [
   { value: "type", label: "Type" },
 ] as const;
 
+/* Which door a move came through decides where its receipt reads: the checked
+   set's move reports in the rail (Clone 3683:19964), the card menu's in the
+   count line (3721:45960). */
+type MoveDoor = "selection" | "menu";
+
 export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
   const state = useMediaState(composer);
   const { addToast } = useToast();
@@ -251,8 +256,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     alreadyThere: string[];
   } | null>(null);
   /* Clone 3699:20347 — the move the engine refused, held so Retry can run
-     exactly it again. */
-  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null } | null>(null);
+     exactly it again — including which door it came through. */
+  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor } | null>(null);
+  /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
+     modal for that ONE file; it creates no selection. */
+  const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
+  /* Clone 3721:45960 — a menu move's receipt is the count line (`Products ·
+     team-photo.jpg moved`), not the rail, which keeps whatever it showed. It
+     clears on the next scope or filter change. */
+  const [movedNote, setMovedNote] = React.useState<string | null>(null);
   /* Clone 4207:26629 / 4215:26635 — the keys in flight while a card or row
      is dragged: the folders outline, the rail dims, the footer says what a
      drop does. React state, so every surface reads the one fact. */
@@ -262,8 +274,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     setMoveResult(null);
   }, [state.selectedKeys, state.selMode, selectedAssetId, state.currentFolderId, smartFolder]);
 
+  React.useEffect(() => {
+    setMovedNote(null);
+  }, [state.currentFolderId, smartFolder, state.tagFilter, state.librarySearch, state.fmtFilter, state.activeTypes]);
+
   const runMove = React.useCallback(
-    async (keys: string[], folderId: string | null) => {
+    async (keys: string[], folderId: string | null, from: MoveDoor = "selection") => {
       setAssetDrag(null);
       const items = keys
         .map((k) => state.libraryItems.find((i) => i.key === k))
@@ -272,11 +288,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       try {
         await state.bulkMoveAssets(keys, folderId);
       } catch {
-        setMoveFailure({ keys, folderId });
+        setMoveFailure({ keys, folderId, from });
         return;
       }
       setMoveFailure(null);
       const nameOf = (i: LibraryItem) => i.displayName ?? i.name;
+      if (from === "menu") {
+        setMovedNote(items[0] ? nameOf(items[0]) : null);
+        return;
+      }
       setMoveResult({
         folderId,
         folderName: folderId === null ? "All assets" : (state.allFolders.find((f) => f.id === folderId)?.name ?? "folder"),
@@ -563,6 +583,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           visibleItems={visibleItems}
           usageMap={usageMap}
           smartFolder={smartFolder}
+          movedNote={movedNote}
           selectedAssetId={selectedAssetId}
           onSelectAsset={setSelectedAssetId}
           onInsert={insertAndReturn}
@@ -708,12 +729,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           x={state.ctxMenu.x}
           y={state.ctxMenu.y}
           item={state.ctxMenu.item}
-          folders={state.folders}
-          allFolders={state.allFolders}
           onInsert={(item) => insertAndReturn(item.key)}
           onSelect={(item) => state.enterSelectModeWith(item.key)}
           onRename={setRenameTarget}
-          onMove={(item, fid) => state.moveAsset(item.key, fid)}
+          onMoveToFolder={setMenuMoveTarget}
           onDelete={(item) => state.requestDelete(item.key)}
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
@@ -754,18 +773,27 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         />
       )}
       <DownloadPreparedModal open={downloadPrepared} onClose={() => setDownloadPrepared(false)} />
+      {/* One Move modal for both doors: the checked set (3683:19950) or the
+          card menu's one file (3721:45952). */}
       <MoveAssetsModal
-        open={moveModalOpen}
-        items={checkedItems}
+        open={moveModalOpen || menuMoveTarget !== null}
+        items={menuMoveTarget ? [menuMoveTarget] : checkedItems}
         folders={state.allFolders}
-        onClose={() => setMoveModalOpen(false)}
-        onMove={(folderId) => void runMove(checkedItems.map((i) => i.key), folderId)}
+        onClose={() => {
+          setMoveModalOpen(false);
+          setMenuMoveTarget(null);
+        }}
+        onMove={(folderId) =>
+          void (menuMoveTarget
+            ? runMove([menuMoveTarget.key], folderId, "menu")
+            : runMove(checkedItems.map((i) => i.key), folderId))
+        }
       />
       <MoveFailedModal
         open={moveFailure !== null}
         onClose={() => setMoveFailure(null)}
         onRetry={() => {
-          if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId);
+          if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId, moveFailure.from);
         }}
       />
       {/* Replace-all picker now lives inside <AssetDetailsPanel> — see

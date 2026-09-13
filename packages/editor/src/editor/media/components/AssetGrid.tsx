@@ -178,6 +178,10 @@ export interface AssetGridProps {
   usageMap: Map<string, number>;
   /** Smart folder gating the visibleItems filter (drives footer label). */
   smartFolder: SmartFolder;
+  /** Clone 3721:45960 — the file a menu move just moved; the count line
+   *  reads `<Scope> · <file> moved` until the orchestrator clears it on the
+   *  next scope / filter change. */
+  movedNote?: string | null;
   /** Board 1163:13948 — the error row's Dismiss. */
   onDismissUpload?: (fileName: string) => void;
   /** Board 1163:4641's bulk Download — routed to the engine's media layer. */
@@ -212,6 +216,7 @@ export function AssetGrid({
   visibleItems,
   usageMap,
   smartFolder,
+  movedNote = null,
   onDismissUpload,
   onDownload,
   isDragOver = false,
@@ -338,7 +343,12 @@ export function AssetGrid({
       */}
       {!emptyFolderScope && (
       <div className="mgr-subbar" data-testid="mgr-subbar">
-        <span className="mgr-count" data-testid="mgr-count">{countLabel}</span>
+        {/* Clone 3721:45960 — right after a menu move the line is the move's
+            receipt, `<Scope> · <file> moved`, until the next scope or filter
+            change clears it upstream. */}
+        <span className="mgr-count" data-testid="mgr-count">
+          {movedNote ? `${scopeLabel} · ${movedNote} moved` : countLabel}
+        </span>
 
         {availableFormats.length > 0 && (
           <div className="mgr-fmt-strip" role="group" aria-label="Filter by format" data-testid="mgr-fmt-strip">
