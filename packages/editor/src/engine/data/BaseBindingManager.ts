@@ -109,7 +109,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
        is now untracked (see CMSBindingManager.applyBinding), so this is belt
        and braces; the order still matters if a subclass ever writes without
        the wrapper. */
-    void this.applyBinding(elementId, binding).finally(() => {
+    void Promise.resolve(this.applyBinding(elementId, binding)).finally(() => {
       this.composer.history?.noteUnrecordedAction?.("binding a field to content");
     });
   }
