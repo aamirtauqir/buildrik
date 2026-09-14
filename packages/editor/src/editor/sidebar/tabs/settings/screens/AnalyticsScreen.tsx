@@ -9,15 +9,21 @@
  * The Connection status and Last received data rows are the tracker's own
  * `siteDetail.analytics.status` — OUR `AnalyticsEvent` rows, phase2-backend
  * §5; GA's Data API is OAuth, `blocked:external` — read on open (3953:49515
- * loading, 3953:49670 load-error) and again on Verify. A refused save shows
- * the banner (3951:26455).
+ * loading, 3953:49670 load-error) and again on Verify, which checks the id's
+ * shape, stamps `verifiedAt` into the draft (flushed on the next Save — no
+ * mutation of its own, phase2-backend §1) and opens Connection verified
+ * (4256:26844). A refused save shows the banner (3951:26455).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { Badge, Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { getBuildrikClient } from "@/services/api-client";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { devError } from "@/shared/utils/devLogger";
 import { Input, LoadCard, SCREEN_FIELD_ERROR, SCREEN_INFO, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
+import { ConnectionVerifiedDialog, eventsPhrase } from "../components/ConnectionVerifiedDialog";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
@@ -59,11 +65,6 @@ export function formatDay(at: string | Date): string {
 export function formatDayTime(at: string | Date): string {
   const d = new Date(at);
   return `${formatDay(d)}, ${two(d.getHours())}:${two(d.getMinutes())}`;
-}
-
-/** `1,284 events` / `1 event`. */
-export function eventsPhrase(n: number): string {
-  return `${n.toLocaleString("en-GB")} ${n === 1 ? "event" : "events"}`;
 }
 
 export type ConnectionPill = "RECEIVING DATA" | "NO DATA YET" | "NOT VERIFIED";
@@ -165,6 +166,10 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const [clarityEnabled, setClarityEnabled] = React.useState(stored.clarityEnabled);
   const [cookieConsent, setCookieConsent] = React.useState(stored.cookieConsent);
   const [status, setStatus] = React.useState<AnalyticsStatus | null>(null);
+  const [verifying, setVerifying] = React.useState(false);
+  /** The Connection verified dialog's subject, while it is open. */
+  const [verified, setVerified] = React.useState<{ id: string; events24h: number } | null>(null);
+  const gaInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     onDirtyChange?.(isDirty);
@@ -206,6 +211,31 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const gtmError = gtmId !== "" && !/^GTM-[A-Z0-9]{4,}$/i.test(gtmId);
   const pixelError = pixelId !== "" && !/^\d{15,16}$/.test(pixelId);
   const clarityError = clarityId !== "" && !/^[a-z0-9]{6,15}$/i.test(clarityId);
+
+  /* Verify (4256:26844): the id's shape, then the tracker's status read
+     again, then `verifiedAt` into the draft — the next Save carries it. A
+     malformed or empty id just lands the cursor on the field (its sentence is
+     already under it); a failed re-read is the load-error card, not a dialog
+     that claims a check it could not make. */
+  const verify = async () => {
+    if (gaId === "" || gaError) {
+      gaInputRef.current?.focus();
+      return;
+    }
+    setVerifying(true);
+    try {
+      const next = projectId ? await readAnalyticsStatus(getBuildrikClient(DASHBOARD_URL), projectId) : status;
+      setStatus(next);
+      setGaVerifiedAt(new Date().toISOString());
+      markDirty();
+      setVerified({ id: gaId, events24h: next?.events24h ?? 0 });
+    } catch (error: unknown) {
+      devError("settings", `analytics status re-read failed for site ${projectId}`, error);
+      load.retry();
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   // Flush local buffer → composer once on Save click (see SettingsTab). The
   // other providers' `verifiedAt` ride through from the stored config.
@@ -274,6 +304,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
         <Row stem="google-analytics-id" label="Google Analytics ID" htmlFor="google-analytics-id">
           <div className={INPUT_CELL}>
             <Input
+              ref={gaInputRef}
               id="google-analytics-id"
               type="text"
               value={gaId}
@@ -309,7 +340,15 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 Measurement ID verified on {formatDay(gaVerifiedAt)}
               </span>
             ) : null}
-            <Button type="button" variant="secondary" size="xs" className={`${SET_BTN} tw:ml-auto`} data-testid="set-an-ga-verify">
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              className={`${SET_BTN} tw:ml-auto`}
+              disabled={verifying}
+              onClick={verify}
+              data-testid="set-an-ga-verify"
+            >
               Verify
             </Button>
           </div>
@@ -468,6 +507,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
           need GDPR consent today, add your own banner in Settings → Custom code.
         </div>
       </Section>
+
+      <ConnectionVerifiedDialog
+        open={verified !== null}
+        id={verified?.id ?? ""}
+        events24h={verified?.events24h ?? 0}
+        onBack={() => setVerified(null)}
+      />
     </Screen>
   );
 };
