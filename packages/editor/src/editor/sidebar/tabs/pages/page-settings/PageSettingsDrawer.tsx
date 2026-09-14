@@ -136,7 +136,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
         <div className="bd-pg-drawer-body" data-testid="pg-drawer-body">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
-              <SeoTab s={s} page={page} />
+              <SeoTab s={s} page={page} composer={composer} />
             </div>
           )}
           {s.activeTab === "social" && (
