@@ -145,6 +145,8 @@ interface SiteColumnSettings {
   metaDescription?: string | null;
   metaTitleTemplate?: string | null;
   ogImage?: string | null;
+  allowIndexing?: boolean;
+  robotsTxt?: string | null;
   headCode?: string | null;
   bodyCode?: string | null;
   socialLinks?: Record<string, string> | null;
@@ -165,6 +167,8 @@ interface SiteColumnSettings {
  *   settings.seo.metaDescription    → metaDescription
  *   settings.seo.metaTitleTemplate  → metaTitleTemplate
  *   settings.seo.defaultOgImage     → ogImage
+ *   settings.seo.allowIndexing      → allowIndexing
+ *   settings.seo.robotsTxt          → robotsTxt
  *   settings.seo.touchIcon          → touchIcon
  *   settings.seo.socialLinks        → socialLinks
  *   settings.customCode.headScripts → headCode
@@ -211,6 +215,10 @@ function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
      (the SEO screen writes "" for an untouched field) saved under a red
      banner. Measured live — batch 207, `ogImage: Invalid url`. */
   if (seo?.defaultOgImage !== undefined) patch.ogImage = emptyToNull(seo.defaultOgImage);
+  if (seo?.allowIndexing !== undefined) patch.allowIndexing = seo.allowIndexing;
+  /* Round-trips what the row carried: the editor only previews robots.txt
+     (Clone 3397:32076), the dashboard's SEO tab edits it. */
+  if (seo?.robotsTxt !== undefined) patch.robotsTxt = emptyToNull(seo.robotsTxt);
   if (seo?.touchIcon !== undefined) patch.touchIcon = emptyToNull(seo.touchIcon);
   if (seo?.socialLinks !== undefined) patch.socialLinks = seo.socialLinks as Record<string, string>;
   if (customCode?.headScripts !== undefined) patch.headCode = customCode.headScripts;
@@ -240,6 +248,8 @@ function mergeSiteColumnsIntoSettings(
   if (siteCols.metaDescription != null) seo.metaDescription = siteCols.metaDescription;
   if (siteCols.metaTitleTemplate != null) seo.metaTitleTemplate = siteCols.metaTitleTemplate;
   if (siteCols.ogImage != null) seo.defaultOgImage = siteCols.ogImage;
+  if (siteCols.allowIndexing != null) seo.allowIndexing = siteCols.allowIndexing;
+  if (siteCols.robotsTxt != null) seo.robotsTxt = siteCols.robotsTxt;
   if (siteCols.touchIcon != null) seo.touchIcon = siteCols.touchIcon;
   if (siteCols.socialLinks != null) seo.socialLinks = siteCols.socialLinks as SiteSEO["socialLinks"];
   if (siteCols.headCode != null) customCode.headScripts = siteCols.headCode;

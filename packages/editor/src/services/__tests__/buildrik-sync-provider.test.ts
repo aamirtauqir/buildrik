@@ -166,6 +166,23 @@ describe("loadProject", () => {
       twitterHandle: "@kept",
     });
   });
+
+  it("merges Site.allowIndexing (false included) and robotsTxt into seo", async () => {
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "T", projectSettings: {} });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({
+      allowIndexing: false,
+      robotsTxt: "User-agent: *\nDisallow: /",
+      plan: "FREE",
+    });
+
+    const project = await loadProject("s1");
+
+    expect(project.settings?.seo).toMatchObject({
+      allowIndexing: false,
+      robotsTxt: "User-agent: *\nDisallow: /",
+    });
+  });
 });
 
 describe("saveProject", () => {
@@ -554,6 +571,37 @@ describe("saveProject dual-save routing (P0.2b)", () => {
     } as any);
 
     expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", favicon: null });
+  });
+
+  /* SEO defaults (Clone 3397:32076): the indexing switch joins the mirror;
+     robots.txt only round-trips — the editor previews it, the dashboard edits
+     it — and an empty one clears the column (null), which is "default". */
+  it("carries allowIndexing and round-trips robotsTxt, empty → null", async () => {
+    await saveProject("s1", {
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: { seo: { allowIndexing: false, robotsTxt: "User-agent: *\nDisallow: /private" } },
+    } as any);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenLastCalledWith({
+      id: "s1",
+      allowIndexing: false,
+      robotsTxt: "User-agent: *\nDisallow: /private",
+    });
+
+    await saveProject("s1", {
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: { seo: { allowIndexing: true, robotsTxt: "" } },
+    } as any);
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenLastCalledWith({
+      id: "s1",
+      allowIndexing: true,
+      robotsTxt: null,
+    });
   });
 
   it("skips the settings call entirely when no mirrored fields are present", async () => {
