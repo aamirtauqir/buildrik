@@ -1422,12 +1422,18 @@ model PublishBuildJob {
 }
 
 model Redirect {
-  id        String   @id @default(cuid())
-  siteId    String
-  fromPath  String
-  toUrl     String
-  type      String   @default("301")
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  siteId     String
+  fromPath   String
+  toUrl      String
+  type       String   @default("301")
+  // Settings S3 (Clone 4254:75736). `matchQuery` is the dialog's "Match query
+  // strings" toggle — a recorded preference: Vercel's configuration redirects
+  // always forward the incoming query string, so publish cannot strip it when
+  // this is false (lib/publish-files.ts). `notes` is the dialog's free text.
+  matchQuery Boolean  @default(false)
+  notes      String?
+  createdAt  DateTime @default(now())
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 

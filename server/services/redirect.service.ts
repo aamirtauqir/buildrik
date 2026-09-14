@@ -11,9 +11,24 @@ export async function listRedirects(siteId: string) {
   });
 }
 
+/**
+ * One rule per source path. Two rows with the same `fromPath` would ship two
+ * `vercel.json` redirects for one request, and only the first would ever
+ * fire — so the second is refused (REDIRECT_EXISTS) rather than stored.
+ * There is no unique index behind this (S3 added only the two columns), so
+ * the check is here, on create and on a rename.
+ */
+async function assertFromPathFree(siteId: string, fromPath: string, exceptId?: string) {
+  const clash = await prisma.redirect.findFirst({
+    where: { siteId, fromPath, ...(exceptId ? { id: { not: exceptId } } : {}) },
+    select: { id: true },
+  });
+  if (clash) throw new Error("REDIRECT_EXISTS");
+}
+
 export async function createRedirect(
   siteId: string,
-  data: { fromPath: string; toUrl: string; type: string },
+  data: { fromPath: string; toUrl: string; type: string; matchQuery?: boolean; notes?: string | null },
   plan: PlanName
 ) {
   const limit = PLAN_LIMITS[plan].urlRedirects as number;
@@ -22,6 +37,7 @@ export async function createRedirect(
     const count = await prisma.redirect.count({ where: { siteId } });
     if (count >= limit) throw new Error("REDIRECT_LIMIT");
   }
+  await assertFromPathFree(siteId, data.fromPath);
 
   return prisma.redirect.create({
     data: {
@@ -29,14 +45,18 @@ export async function createRedirect(
       fromPath: data.fromPath,
       toUrl: data.toUrl,
       type: data.type,
+      matchQuery: data.matchQuery ?? false,
+      notes: data.notes ?? null,
     },
   });
 }
 
 export async function updateRedirect(
   id: string,
-  data: { fromPath?: string; toUrl?: string; type?: string }
+  siteId: string,
+  data: { fromPath?: string; toUrl?: string; type?: string; matchQuery?: boolean; notes?: string | null }
 ) {
+  if (data.fromPath !== undefined) await assertFromPathFree(siteId, data.fromPath, id);
   return prisma.redirect.update({ where: { id }, data });
 }
 

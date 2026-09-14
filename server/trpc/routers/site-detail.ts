@@ -3,7 +3,7 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
-import { getSettingsOverview, getSiteOverview, getLocales } from "@/server/services/site-detail.service";
+import { getSettingsOverview, getSiteOverview, getLocales, getRedirectSuggestions } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
@@ -23,6 +23,7 @@ import { getSiteAnalytics, getAnalyticsStatus } from "@/server/services/analytic
 import {
   updateSiteSettingsSchema,
   createRedirectSchema,
+  updateRedirectSchema,
   connectDomainSchema,
   checkDomainAvailabilitySchema,
   updateDomainSchema,
@@ -141,6 +142,21 @@ export const siteDetailRouter = router({
         return listRedirects(input.siteId);
       }),
 
+    // Settings S3 (Clone 3397:32517 "404 suggester"): the old page slugs the
+    // site no longer serves and has no redirect for. Read-only, same access
+    // as `list`.
+    suggestions: protectedProcedure
+      .input(z.object({ siteId: z.string() }))
+      .query(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return getRedirectSuggestions(input.siteId);
+      }),
+
     create: protectedProcedure
       .input(createRedirectSchema)
       .mutation(async ({ ctx, input }) => {
@@ -156,17 +172,20 @@ export const siteDetailRouter = router({
         });
         const planResult = z.enum(["FREE", "PRO", "BUSINESS"] as const).safeParse(member?.workspace?.plan ?? "FREE");
         const safePlan: PlanName = planResult.success ? planResult.data : "FREE";
+        const { siteId, ...data } = input;
         try {
-          return await createRedirect(input.siteId, { fromPath: input.fromPath, toUrl: input.toUrl, type: input.type }, safePlan);
+          return await createRedirect(siteId, data, safePlan);
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "REDIRECT_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit reached." });
+          if (e instanceof Error && e.message === "REDIRECT_EXISTS")
+            throw new TRPCError({ code: "CONFLICT", message: `A redirect from ${input.fromPath} already exists.` });
           throw e;
         }
       }),
 
     update: protectedProcedure
-      .input(z.object({ id: z.string(), fromPath: z.string().optional(), toUrl: z.string().optional(), type: z.enum(["301", "302"]).optional() }))
+      .input(updateRedirectSchema)
       .mutation(async ({ ctx, input }) => {
         const redirect = await ctx.prisma.redirect.findUnique({
           where: { id: input.id },
@@ -180,7 +199,13 @@ export const siteDetailRouter = router({
           throw e;
         }
         const { id, ...data } = input;
-        return updateRedirect(id, data);
+        try {
+          return await updateRedirect(id, redirect.siteId, data);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "REDIRECT_EXISTS")
+            throw new TRPCError({ code: "CONFLICT", message: `A redirect from ${input.fromPath} already exists.` });
+          throw e;
+        }
       }),
 
     delete: protectedProcedure

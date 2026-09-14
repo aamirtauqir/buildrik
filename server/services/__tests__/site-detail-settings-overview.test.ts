@@ -21,7 +21,6 @@ const { db } = vi.hoisted(() => ({
     domain: { findFirst: vi.fn() },
     dnsRecord: { findMany: vi.fn() },
     redirect: { findMany: vi.fn() },
-    slugHistory: { findMany: vi.fn() },
     siteAnalytics: { count: vi.fn() },
     formBlock: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
@@ -55,12 +54,13 @@ type Site = {
 
 type Delivery = { status: string; event: string; httpStatus: number | null; error: string | null; createdAt: Date };
 
+type PageRow = { id: string; name: string; slug: string; isHomePage: boolean; slugHistory: unknown; translations: unknown };
+
 type Rows = {
-  pages?: Array<{ translations: unknown }>;
+  pages?: PageRow[];
   primaryDomain?: { domain: string } | null;
   pendingDns?: Array<{ type: string; host: string; domain: { domain: string } }>;
   redirects?: Array<{ fromPath: string }>;
-  slugHistory?: Array<{ oldSlug: string }>;
   analyticsDays?: number;
   forms?: number;
   submissions?: number;
@@ -105,12 +105,30 @@ const seededSite: Site = {
   workspace: { plan: "PRO", subscription: { plan: "PRO", price: 2900, interval: "MONTHLY" } },
 };
 
+/** A page row as the overview selects it; `translations` and `slugHistory` default to none. */
+const page = (slug: string, over: Partial<PageRow> = {}): PageRow => ({
+  id: `p-${slug}`,
+  name: slug,
+  slug,
+  isHomePage: false,
+  slugHistory: null,
+  translations: null,
+  ...over,
+});
+
 const seededRows: Rows = {
-  pages: Array.from({ length: 6 }, () => ({ translations: null })),
+  pages: [
+    page("home", { isHomePage: true }),
+    // S3: two renamed pages no redirect covers — the Overview's "2 suggestions".
+    page("menu", { slugHistory: [{ slug: "lunch-menu", changedAt: "2026-09-10T09:00:00.000Z" }] }),
+    page("about", { slugHistory: [{ slug: "our-story", changedAt: "2026-09-11T09:00:00.000Z" }] }),
+    page("contact"),
+    page("book"),
+    page("gallery"),
+  ],
   primaryDomain: { domain: "bellacucina.example" },
   pendingDns: [{ type: "TXT", host: "_buildrick", domain: { domain: "bellacucina.example" } }],
   redirects: [{ fromPath: "/old-menu" }, { fromPath: "/old-about" }, { fromPath: "/old-contact" }],
-  slugHistory: [{ oldSlug: "lunch-menu" }, { oldSlug: "our-story" }],
   analyticsDays: 7,
   forms: 3,
   submissions: 38,
@@ -129,7 +147,6 @@ function setup(site: Site, rows: Rows = {}) {
   db.domain.findFirst.mockResolvedValue(rows.primaryDomain ?? null);
   db.dnsRecord.findMany.mockResolvedValue(rows.pendingDns ?? []);
   db.redirect.findMany.mockResolvedValue(rows.redirects ?? []);
-  db.slugHistory.findMany.mockResolvedValue(rows.slugHistory ?? []);
   db.siteAnalytics.count.mockResolvedValue(rows.analyticsDays ?? 0);
   db.formBlock.count.mockResolvedValue(rows.forms ?? 0);
   db.formSubmission.count.mockResolvedValue(rows.submissions ?? 0);
@@ -196,10 +213,15 @@ describe("getSettingsOverview — the seeded site", () => {
     expect(db.site.findUnique).toHaveBeenCalledTimes(1);
     for (const model of [
       db.page.findMany, db.domain.findFirst, db.dnsRecord.findMany, db.redirect.findMany,
-      db.slugHistory.findMany, db.siteAnalytics.count, db.formBlock.count, db.formSubmission.count,
+      db.siteAnalytics.count, db.formBlock.count, db.formSubmission.count,
       db.workspaceIntegration.count, db.workspaceWebhook.findUnique, db.workspaceMember.count,
     ]) expect(model).toHaveBeenCalledTimes(1);
-    expect(db.page.findMany).toHaveBeenCalledWith({ where: { siteId: "s1" }, select: { translations: true } });
+    // One page read serves both the translation count and the suggester (S3).
+    expect(db.page.findMany).toHaveBeenCalledWith({
+      where: { siteId: "s1" },
+      orderBy: { position: "asc" },
+      select: { id: true, name: true, slug: true, isHomePage: true, slugHistory: true, translations: true },
+    });
     expect(db.workspaceMember.count).toHaveBeenCalledWith({ where: { workspaceId: "ws1", status: "ACTIVE" } });
   });
 });
@@ -239,7 +261,7 @@ describe("getSettingsOverview — the empty site", () => {
 describe("localization — not started", () => {
   it("never lists the default locale: its content is Page.blocks, not a translation", async () => {
     setup({ ...emptySite, defaultLocale: "en", enabledLocales: ["en", "fr"] }, {
-      pages: [{ translations: null }],
+      pages: [page("home")],
     });
     const overview = await getSettingsOverview("s1");
     expect(overview.localization.notStarted).toEqual(["fr"]);
@@ -248,7 +270,7 @@ describe("localization — not started", () => {
 
   it("a locale with one translated page is started", async () => {
     setup({ ...emptySite, enabledLocales: ["en", "fr", "de"] }, {
-      pages: [{ translations: { fr: { blocks: [] } } }, { translations: {} }, { translations: null }],
+      pages: [page("home", { translations: { fr: { blocks: [] } } }), page("menu", { translations: {} }), page("about")],
     });
     const overview = await getSettingsOverview("s1");
     expect(overview.localization).toEqual({ locales: 3, notStarted: ["de"] });
@@ -256,7 +278,7 @@ describe("localization — not started", () => {
   });
 
   it("counts a single page in the singular", async () => {
-    setup({ ...emptySite, enabledLocales: ["en", "ar"] }, { pages: [{ translations: null }] });
+    setup({ ...emptySite, enabledLocales: ["en", "ar"] }, { pages: [page("home")] });
     const overview = await getSettingsOverview("s1");
     expect(overview.attention[0].detail).toBe("0 of 1 page · not started");
   });
@@ -269,10 +291,14 @@ describe("localization — not started", () => {
 });
 
 describe("redirects — suggestions", () => {
-  it("is the slug-history rows no redirect covers, compared as paths", async () => {
+  it("counts the old page slugs no redirect covers — the same rule as redirects.suggestions (S3)", async () => {
     setup(emptySite, {
       redirects: [{ fromPath: "/lunch-menu" }, { fromPath: "/old-about" }],
-      slugHistory: [{ oldSlug: "lunch-menu" }, { oldSlug: "/old-about" }, { oldSlug: "our-story" }],
+      pages: [
+        page("home"),
+        page("menu", { slugHistory: [{ slug: "lunch-menu", changedAt: "2026-09-10T09:00:00.000Z" }] }),
+        page("about", { slugHistory: [{ slug: "old-about", changedAt: "2026-09-11T09:00:00.000Z" }, { slug: "our-story", changedAt: "2026-09-12T09:00:00.000Z" }] }),
+      ],
     });
     const overview = await getSettingsOverview("s1");
     expect(overview.redirects).toEqual({ rules: 2, suggestions: 1 });
