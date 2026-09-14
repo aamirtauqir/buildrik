@@ -37,6 +37,7 @@ const serverRow = () => ({
   name: "Acme Site",
   favicon: "https://acme.test/favicon.ico",
   defaultLocale: "fr",
+  enabledLocales: ["en", "fr"],
   socialLinks: {
     twitter: "https://twitter.com/acme",
     facebook: "https://facebook.com/acme",
@@ -248,6 +249,26 @@ describe("SiteSettingsScreen — the site name says what the server will accept"
     setup();
     await loaded();
     fireEvent.change(siteName(), { target: { value: "Renamed Site" } });
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  /* `Site.defaultLocale ∈ Site.enabledLocales` is a server invariant
+     (`DEFAULT_LOCALE_NOT_ENABLED` refuses the whole mirror). The select
+     offers every locale the product knows; picking one the site has not
+     enabled is warned about here, not discovered in a banner. */
+  it("warns when the picked language is not one of the site's enabled locales", async () => {
+    setup();
+    await loaded();
+    fireEvent.change(language(), { target: { value: "de" } });
+    expect(screen.getByRole("alert")).toHaveTextContent(/German is not enabled for this site yet/);
+    expect(language()).toHaveAttribute("aria-invalid", "true");
+    fireEvent.change(language(), { target: { value: "en" } });
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("checks nothing against enabled locales without a Site row", () => {
+    setup({ projectId: null });
+    fireEvent.change(language(), { target: { value: "ja" } });
     expect(screen.queryByRole("alert")).toBeNull();
   });
 });

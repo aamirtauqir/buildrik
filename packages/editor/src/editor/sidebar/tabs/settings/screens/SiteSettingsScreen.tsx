@@ -51,6 +51,8 @@ interface GeneralRow {
   name?: string | null;
   favicon?: string | null;
   defaultLocale?: string | null;
+  /** `Site.defaultLocale` must be one of these or the server refuses the save. */
+  enabledLocales?: string[] | null;
   /** A Json column — whatever the dashboard stored; only string values are links. */
   socialLinks?: unknown;
 }
@@ -110,6 +112,9 @@ export const SiteSettingsScreen: React.FC<ScreenProps & ServerLoadProps> = ({
   const [twitter, setTwitter] = React.useState(social.value.twitter);
   const [facebook, setFacebook] = React.useState(social.value.facebook);
   const [linkedin, setLinkedin] = React.useState(social.value.linkedin);
+  /* null = no Site row read (the standalone demo), so nothing to check
+     against; the server enforces `defaultLocale ∈ enabledLocales` either way. */
+  const [enabledLocales, setEnabledLocales] = React.useState<string[] | null>(null);
 
   const isDirty = identity.isDirty || social.isDirty;
 
@@ -141,6 +146,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps & ServerLoadProps> = ({
       setSiteName(row.name ?? "");
       setFavicon(row.favicon ?? "");
       setLanguage(row.defaultLocale ?? "en");
+      setEnabledLocales(row.enabledLocales ?? null);
       setTwitter(socialLink(row.socialLinks, "twitter"));
       setFacebook(socialLink(row.socialLinks, "facebook"));
       setLinkedin(socialLink(row.socialLinks, "linkedin"));
@@ -198,6 +204,14 @@ export const SiteSettingsScreen: React.FC<ScreenProps & ServerLoadProps> = ({
   const languageOptions = SITE_LOCALES.some((l) => l.code === language)
     ? SITE_LOCALES
     : [{ code: language, label: localeLabel(language) }, ...SITE_LOCALES];
+  /* `Site.defaultLocale` must be one of the site's enabled locales — the
+     server refuses the whole settings mirror otherwise
+     (`DEFAULT_LOCALE_NOT_ENABLED`), and Localization is where a locale is
+     enabled. Said under the select, before Save has to say it in a banner. */
+  const languageError =
+    enabledLocales && !enabledLocales.includes(language)
+      ? `${localeLabel(language)} is not enabled for this site yet — add it under Localization first, or the save will be refused.`
+      : null;
 
   return (
     <Screen>
@@ -231,6 +245,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps & ServerLoadProps> = ({
           <Select
             id="site-language"
             value={language}
+            aria-invalid={languageError ? true : undefined}
             onChange={(e) => { setLanguage(e.target.value); identity.markDirty(); }}
           >
             {languageOptions.map((l) => (
@@ -239,6 +254,11 @@ export const SiteSettingsScreen: React.FC<ScreenProps & ServerLoadProps> = ({
               </option>
             ))}
           </Select>
+          {languageError && (
+            <div role="alert" className={SCREEN_FIELD_ERROR}>
+              {languageError}
+            </div>
+          )}
         </Field>
       </Section>
 
