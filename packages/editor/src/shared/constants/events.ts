@@ -347,6 +347,10 @@ export const EVENTS = {
   UI_UNPUBLISH_REQUEST: "ui:unpublish-request",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
+  /** Settings' `Export` row (Clone 3397:32011) — OPEN, not toggle: the row
+   *  leaves Settings for the Export modal, and a toggle emitted with the modal
+   *  already up would close it. Handled beside `handleExport` in StudioHeader. */
+  UI_OPEN_EXPORTER: "ui:open-exporter",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
   UI_TOGGLE_LAYERS: "ui:toggle:layers",
   UI_TOGGLE_ASSETS: "ui:toggle:assets",

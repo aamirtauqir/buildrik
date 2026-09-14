@@ -1,29 +1,48 @@
 /**
- * SettingsTab — prototype-aligned shell.
+ * SettingsTab — the Clone shell (3397:32011), every frame of the section
+ * around whichever screen is open.
  *
- * Layout: 140px snav + 1fr pane. Central dirty counter + sticky savebar.
- * Branding renders a placeholder linking to the Palette tab (no embedded
- * DesignSystemTab chrome).
+ *   ┌ sidebar 256 ─────────┬ pane ─────────────────────────────────────────┐
+ *   │ ‹ Back to canvas     │ Group / Screen          [Upgrade | Search]     │
+ *   │ Settings             │ subtitle                                       │
+ *   │ <site>               ├────────────────────────────────────────────────┤
+ *   │                      │ body on the subtle ground — the screen's cards │
+ *   │ ▸ Overview           │                                                │
+ *   │ SITE SETUP …         ├────────────────────────────────────────────────┤
+ *   │ WORKSPACE …          │ status                   Cancel  Save changes  │
+ *   └──────────────────────┴────────────────────────────────────────────────┘
  *
- * Spec: docs/reference/left-panel/tab-settings.html
+ * The sidebar is always there — there is no root/section drill-in any more.
+ * The shell owns: the footer and its four states (`All changes saved` ·
+ * `Changes not saved` + `Retry save` · `Loading settings…` · `Settings could
+ * not load`), the save path, the Settings saved dialog, the Unsaved settings
+ * guard (Back to canvas / Cancel / Done / Escape / any nav click while
+ * dirty), the plan gate's `Upgrade`, and the doors: Fonts & colours → the
+ * Brand panel, Export → the Export modal, Members / Billing → the dashboard.
+ * The screen owns its cards, its load card and its save-error banner
+ * (`ScreenProps.onLoadStateChange` / `saveError`).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { ConfirmDialog, PanelFrame, Button } from "@/editor/chrome-ui";
+import { ArrowUpRight, ChevronLeft, Search as SearchIcon } from "lucide-react";
+import { Button } from "@/editor/chrome-ui";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
-import { DrillInHeader } from "../../shared/DrillInHeader";
 import {
   type SettingsTabProps,
   type PlanTier,
+  type SettingsNavId,
+  type SettingsNavDef,
+  type SettingsNavGroupId,
+  type ScreenLoadState,
   SCREEN_PLAN_REQUIREMENTS,
-  SiteSettingsIcon,
-  IntegrationsIcon,
-  TourIcon,
-  SeoIcon,
-  BillingIcon,
-  DesignSystemIcon,
+  SETTINGS_NAV,
+  SETTINGS_NAV_GROUPS,
+  WORKSPACE_LINKS,
+  NAV_ICONS,
+  SET_BTN,
+  SET_EYEBROW,
   SiteSettingsScreen,
   LockedScreen,
   AnalyticsScreen,
@@ -36,185 +55,39 @@ import {
   LocalizationScreen,
   DomainsScreen,
   WebhooksScreen,
+  OverviewScreen,
 } from "./index";
-import { Section } from "./shared";
-import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
+import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
+import { SettingsSavedDialog } from "./components/SettingsSavedDialog";
+import { SearchSettingsModal } from "./components/SearchSettingsModal";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
 import "./settings.css";
-// ─── Nav definition ──────────────────────────────────────────────────────────
-//
-// A1 day-1: nav reshuffle to 10 in-tab sections + 8 workspace deep-links,
-// per locked prototype at:
-//   ~/.gstack/projects/aamirtauqir-buildrik/designs/settings-industrial-20260507/prototype.html
-//
-// In-tab sections live in 3 groups (SITE / DISTRIBUTION / PLUMBING). The 4th
-// group (WORKSPACE) is deep-link only — clicking opens the dashboard URL.
-//
-// Existing screens reused: General/Branding/SEO/Analytics/Custom code (Advanced)/Integrations.
-// A1 day-3: all 4 originally-stubbed sections (Redirects/Forms/Headers/Localization) now real.
 
-type InTabNavId =
-  | "general" | "branding" | "seo"
-  | "analytics" | "localization" | "domains"
-  | "custom-code" | "redirects" | "headers" | "forms" | "integrations" | "webhooks"
-  | "export";
+// ─── Module-scope data ───────────────────────────────────────────────────────
 
-type NavGroupId = "site" | "distribution" | "plumbing";
-
-interface NavDef {
-  id: InTabNavId;
-  title: string;
-  subtitle?: string;
-  group: NavGroupId;
-  icon: React.FC;
-}
-
-const NAV: NavDef[] = [
-  // SITE
-  { id: "general", title: "General", subtitle: "Project metadata", group: "site", icon: SiteSettingsIcon },
-  { id: "branding", title: "Branding", subtitle: "Colors, type, favicon", group: "site", icon: DesignSystemIcon },
-  { id: "seo", title: "SEO", subtitle: "Search & social preview", group: "site", icon: SeoIcon },
-  // DISTRIBUTION — "Publish history" lived here until M2; it is now History › Published
-  { id: "export", title: "Export", subtitle: "Download the site as code", group: "distribution", icon: IntegrationsIcon },
-  { id: "domains", title: "Domains", subtitle: "Custom domain + DNS", group: "distribution", icon: IntegrationsIcon },
-  { id: "analytics", title: "Analytics", subtitle: "GA4, Plausible, PostHog, Pixel", group: "distribution", icon: IntegrationsIcon },
-  { id: "localization", title: "Localization", subtitle: "Locale claim and preview", group: "distribution", icon: IntegrationsIcon },
-  // PLUMBING
-  { id: "custom-code", title: "Custom code", subtitle: "Head, body, CSS injections", group: "plumbing", icon: IntegrationsIcon },
-  { id: "redirects", title: "Redirects", subtitle: "301 / 302 + 404 suggester", group: "plumbing", icon: IntegrationsIcon },
-  { id: "headers", title: "Headers", subtitle: "CSP, HSTS, security policy", group: "plumbing", icon: IntegrationsIcon },
-  { id: "forms", title: "Forms", subtitle: "Submissions inbox + config", group: "plumbing", icon: IntegrationsIcon },
-  { id: "integrations", title: "Integrations", subtitle: "Third-party OAuth", group: "plumbing", icon: IntegrationsIcon },
-  { id: "webhooks", title: "Webhooks", subtitle: "Workspace event deliveries", group: "plumbing", icon: IntegrationsIcon },
+/** What `usePanelNavigation` may land on: Overview plus every in-pane screen.
+ *  Doors and dashboard links are not screens and never persist. */
+const SETTINGS_SCREENS = [
+  { id: "overview", title: "Overview" },
+  ...SETTINGS_NAV.filter((n) => n.kind === "screen").map(({ id, title }) => ({ id, title })),
 ];
 
-const GROUP_LABELS: Record<NavGroupId, string> = {
-  site: "SITE",
-  distribution: "DISTRIBUTION",
-  plumbing: "PLUMBING",
+const GROUP_ORDER: SettingsNavGroupId[] = ["site-setup", "seo-publishing", "visitors", "advanced", "workspace"];
+
+/** 3950:26309 / 3951:26319 / 3951:26607 — the banner each S1 screen draws
+ *  when its Save fails. Other screens get the same sentence with their own
+ *  name in it. */
+const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
+  general: "Site settings were not saved. Your changes are still here. Review the values, then retry.",
+  seo: "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
+  "custom-code": "Custom code was not saved. Your changes are still here. Review the values, then retry.",
 };
 
-// Workspace deep-links — open dashboard URLs in new tab. Not in-tab screens.
-//
-// Only links to dashboard pages that actually exist ship here. A1 day-1
-// shipped 8 links optimistically; subsequent verification revealed only
-// 3 had real backing pages (Domains + Members under /dashboard/settings/team +
-// Billing under /dashboard/settings/billing). API tokens / Webhooks / Environments /
-// Audit log / Versions are deferred until their dashboard pages exist —
-// linking to 404s silently is worse than not linking at all.
-interface WorkspaceLink {
-  id: string;
-  title: string;
-  /**
-   * Site-scoped: path appended to `${DASHBOARD_URL}/dashboard/sites/${siteId}/`.
-   * Workspace-scoped: full path appended to `${DASHBOARD_URL}` (must include
-   * the leading `/dashboard/...` segment — see Members / Billing below).
-   */
-  path: string;
-  scope: "site" | "workspace";
-}
-
-const WORKSPACE_LINKS: WorkspaceLink[] = [
-  { id: "members", title: "Members", path: "/dashboard/settings/team", scope: "workspace" },
-  { id: "billing", title: "Billing", path: "/dashboard/settings/billing", scope: "workspace" },
-];
-
-function buildWorkspaceUrl(link: WorkspaceLink, siteId: string | null): string {
-  if (link.scope === "workspace") return `${DASHBOARD_URL}${link.path}`;
-  if (!siteId) return `${DASHBOARD_URL}/dashboard`; // graceful fallback when siteId unknown
-  return `${DASHBOARD_URL}/dashboard/sites/${siteId}/${link.path}`;
-}
-
-const SETTINGS_SCREENS = NAV.map(({ id, title }) => ({ id, title }));
-
-// ─── Branding section ─────────────────────────────────────────────────────────
-//
-// Branding spans two canonical homes: the Palette tab owns design tokens
-// (colors, type, spacing) and the General section owns site identity
-// (favicon, social links). Rather than duplicate either as a fake passthrough
-// here, the section is a navigation map with deep-jumps to the real fields.
-
-interface BrandingFieldRow {
-  label: string;
-  /** Where the field actually lives. Rendered as a muted secondary line. */
-  location: string;
-  /** Optional in-tab nav target for sibling screens (general / seo). */
-  jumpTo?: "general" | "seo";
-}
-
-const BRANDING_FIELD_MAP: BrandingFieldRow[] = [
-  { label: "Brand color", location: "Palette → Colors" },
-  { label: "Brand font", location: "Palette → Type" },
-  { label: "Favicon", location: "General → Site Identity", jumpTo: "general" },
-  { label: "Social card image", location: "SEO → Default OG Image", jumpTo: "seo" },
-  { label: "Social handles", location: "General → Social Links", jumpTo: "general" },
-];
-
-interface BrandingSectionProps {
-  onOpenPalette?: () => void;
-  onJumpTo?: (screenId: "general" | "seo") => void;
-}
-
-const BrandingSection: React.FC<BrandingSectionProps> = ({ onOpenPalette, onJumpTo }) => (
-  <>
-    <div className="bd-set-section">
-      <h3 className="bd-set-section-h">Where Branding lives</h3>
-      <div className="bd-set-section-d">
-        Branding splits across Palette (design tokens) and the General + SEO
-        sections (site identity). Each row below jumps to the canonical home
-        for that field.
-      </div>
-      <ul className="bd-set-branding-map" aria-label="Branding field map">
-        {BRANDING_FIELD_MAP.map((row) => {
-          const handleJump =
-            row.jumpTo && onJumpTo ? () => onJumpTo(row.jumpTo!) : undefined;
-          return (
-            <li key={row.label} className="bd-set-branding-map-row">
-              <div className="bd-set-branding-map-text">
-                <div className="bd-set-branding-map-label">{row.label}</div>
-                <div className="bd-set-branding-map-loc">{row.location}</div>
-              </div>
-              {handleJump ? (
-                <Button
-                  type="button"
-                  className="bd-set-btn sec"
-                  onClick={handleJump}
-                  aria-label={`Jump to ${row.location}`}
-                >
-                  Open →
-                </Button>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-
-    <div className="bd-set-section">
-      <h3 className="bd-set-section-h">Design tokens</h3>
-      <div className="bd-set-section-d">
-        Colors, typography, spacing, and other brand tokens live in the Palette tab.
-        Changes there apply to every page on the site.
-      </div>
-      <div className="bd-set-branding-placeholder">
-        <Button
-          type="button"
-          className="bd-set-btn pri"
-          onClick={onOpenPalette}
-          disabled={!onOpenPalette}
-        >
-          Open Palette →
-        </Button>
-      </div>
-    </div>
-  </>
-);
-
-// ─── Module-scope helpers ─────────────────────────────────────────────────────
+const OVERVIEW_SUBTITLE = " · everything on this page is scoped to this project.";
 
 function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
   const required = SCREEN_PLAN_REQUIREMENTS[screenId];
@@ -222,156 +95,120 @@ function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
   return required === "pro" ? userPlan === "starter" : userPlan !== "enterprise";
 }
 
+// ─── Row chrome ──────────────────────────────────────────────────────────────
+
+/* A sidebar row: 32 high, icon + label, on the accent tint when current.
+   `size="xs"` gives the Button its 32; everything else is replaced per
+   property through twMerge (padding, alignment, type). The <a> rows for
+   Members / Billing wear the same string — nothing in it needs a button. */
+const NAV_ROW =
+  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
+  "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
+  "tw:text-[var(--bk-ink)] tw:no-underline tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const NAV_ROW_ON =
+  "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
+  "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
+
+const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
+  const Icon = NAV_ICONS[id];
+  return (
+    <span className="tw:flex tw:size-4 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
+      <Icon size={16} strokeWidth={1.5} />
+    </span>
+  );
+};
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export const SettingsTab: React.FC<
   SettingsTabProps & {
-    /**
-     * Switch to the Palette (`design`) tab. Threaded from
-     * LeftSidebar → TabRouter → SettingsTab so the Branding section's
-     * "Open Palette →" button can navigate cross-tab.
-     */
+    /** Switch to the Brand (`design`) tab — the `Fonts & colours` door. */
     onOpenDesignTab?: () => void;
     /** Deep-link screen id from `openLeftPanelToTab("settings", <id>)`. */
     initialScreen?: string;
   }
-> = ({
-  composer,
-  initialScreen,
-  isExpanded: _isPinned,
-  onExpandToggle: _onPinToggle,
-  onHelpClick,
-  onClose,
-  userPlan,
-  onReplayTour,
-  projectId: projectIdProp,
-  onDirtyChange,
-  onOpenDesignTab,
-}) => {
-  // P6: the standalone shell (:5050/?siteId=) never threads projectId through
-  // AquibraStudio → StudioPanels, which left every server-side screen
-  // (Redirects/Forms/Domains/…) gated behind "open from the dashboard".
-  // The URL param is the same source BuildrikSyncProvider loads from.
+> = ({ composer, initialScreen, onClose, userPlan, projectId: projectIdProp, onDirtyChange, onOpenDesignTab }) => {
+  // The standalone shell (:5050/?siteId=) never threads projectId through
+  // AquibraStudio → StudioPanels; the URL param is the same source
+  // BuildrikSyncProvider loads from.
   const projectId = projectIdProp ?? currentSiteId();
-  // Effective plan: explicit prop wins; otherwise read the real workspace tier
-  // captured at project load. Previously defaulted to "starter" for everyone,
-  // permanently locking the Custom-code + Integrations screens.
+  // Effective plan: explicit prop wins; otherwise the real workspace tier
+  // captured at project load.
   const effectivePlan: PlanTier = userPlan ?? getEditorPlanTier();
   const { currentScreen, navigateTo } = usePanelNavigation({
     storageKey: `settings-panel${projectId ? `-${projectId}` : ""}`,
     screens: SETTINGS_SCREENS,
-    defaultScreen: "general",
+    defaultScreen: "overview",
   });
 
-
+  // The site name, read from the composer the way the topbar reads it.
+  const [siteName, setSiteName] = React.useState("Untitled site");
+  React.useEffect(() => {
+    if (!composer) return;
+    const read = () => setSiteName(composer.getProjectMetadata?.()?.name || "Untitled site");
+    read();
+    composer.on(EVENTS.PROJECT_LOADED, read);
+    composer.on(EVENTS.PROJECT_METADATA_CHANGED, read);
+    return () => {
+      composer.off(EVENTS.PROJECT_LOADED, read);
+      composer.off(EVENTS.PROJECT_METADATA_CHANGED, read);
+    };
+  }, [composer]);
 
   const [screenIsDirty, setScreenIsDirty] = React.useState(false);
-  const [dirtyCount, setDirtyCount] = React.useState(0);
-  const [guardOpen, setGuardOpen] = React.useState(false);
-  /* The guard knew two intents — pop to root, and swap sections — and the
-     header ✕ was neither, so it went straight through to the parent's onClose
-     with the screen dirty. Measured 2026-08-25: typed a value, counter read
-     "1 unsaved", clicked ✕, no dialog, ZERO POSTs during close, field empty on
-     reopen. Escape on the identical state raised the guard. Third intent. */
-  const pendingCloseRef = React.useRef(false);
-  const pendingNavRef = React.useRef<InTabNavId | null>(null);
-  const [resetKey, setResetKey] = React.useState(0);
-
-  const prefersReducedMotion = useReducedMotion();
-
-  // v2 layout state — see docs/designs/settings-v2.md §3.
-  //
-  // `isRoot=true` shows the snav root; `isRoot=false` shows the drilled-in
-  // section. `sectionMounted` is the lifecycle gate: section is mounted when
-  // user clicks a row (BEFORE isRoot flips, so CSS has a node to animate),
-  // unmounted only after pop transitionend completes. `transitioning` blocks
-  // re-entrant nav during the 180ms animation window (D20).
-  const [isRoot, setIsRoot] = React.useState(true);
-  const [sectionMounted, setSectionMounted] = React.useState(false);
-  const [transitioning, setTransitioning] = React.useState(false);
-  const sectionRef = React.useRef<HTMLDivElement | null>(null);
-
-  // Codex P0 #1: shadow screenIsDirty into a ref so click-handlers (navigate,
-  // Escape) read the LATEST value synchronously, not the post-render state.
-  // Screens push dirty via a post-render useEffect — without this ref, a click
-  // in the same gesture as an edit reads stale false.
-  //
-  // Codex pass-3 acknowledged limitation: BOTH the screen's onDirtyChange
-  // effect AND this ref-mirror effect are post-render. A truly synchronous
-  // edit+click within the SAME microtask (no event-loop boundary) could still
-  // see stale false. This is unreachable for human input — browser keystroke
-  // and click events are separated by paint cycles, so React commits the
-  // edit's effects before processing the click. Tests drive both via
-  // `fireEvent` + `waitFor` so the propagation chain has time to land.
-  //
-  // Architectural fix (deferred): change useSettingsScreen to publish dirty
-  // SYNCHRONOUSLY via a ref prop instead of via post-render onDirtyChange.
-  // Touches 4 screens (Site, Advanced, SEO, Analytics) + the hook contract.
-  // Out of v2 scope — separate arc when programmatic edit+nav becomes a real
-  // path (e.g., hotkey-driven save+navigate gesture).
+  // Click handlers read the LATEST dirty value synchronously through this
+  // ref, not the post-render state: screens push dirty via an effect, and a
+  // click in the same gesture as an edit would otherwise read stale false.
   const screenIsDirtyRef = React.useRef(false);
   React.useEffect(() => {
     screenIsDirtyRef.current = screenIsDirty;
   }, [screenIsDirty]);
 
-  // Codex P0 #2: track last-focused snav row so pop can restore focus.
-  // Set in renderRow's onClick (Task 4); read in navigateToRoot transitionend.
-  const lastFocusedRowRef = React.useRef<HTMLButtonElement | null>(null);
+  /* What the Unsaved settings dialog was raised for. Its Discard finishes
+     that intent — the door out, or the screen that was clicked — after the
+     edits are rolled back. */
+  type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
+  const [guardOpen, setGuardOpen] = React.useState(false);
+  const pendingRef = React.useRef<Pending | null>(null);
+  const [savedOpen, setSavedOpen] = React.useState(false);
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [saving, setSaving] = React.useState(false);
+  const [resetKey, setResetKey] = React.useState(0);
+  /* A Search result names a field; it is scrolled to once its screen is on. */
+  const pendingFieldRef = React.useRef<string | null>(null);
 
-  // B1 fix (systematic-QA finding): snapshot composer.projectSettings on every
-  // screen mount so Discard can restore the user's pre-edit state.
-  //
-  // Without this, screens (e.g., SiteSettingsScreen) push edits live into
-  // composer.setProjectSettings on every keystroke. Clicking Discard previously
-  // only bumped resetKey + cleared dirty — the composer mutations stayed live,
-  // so the canvas + savebar disagreed (savebar said "clean", composer held
-  // user's typed values, next dirty edit re-derived from the dirty baseline).
-  //
-  // Snapshot is taken via structuredClone — composer.getProjectSettings()
-  // returns a reference, so a shallow capture would mutate as the user types.
+  // Snapshot composer.projectSettings on every screen mount so Discard can
+  // restore the user's pre-edit state. Composer-backed screens push edits
+  // live; without this the canvas and the footer would disagree after a
+  // discard. structuredClone — getProjectSettings() returns a reference.
   const screenSnapshotRef = React.useRef<ProjectSettings | null>(null);
 
-  // Server-side screens (Redirects/Headers/Localization) write directly via
-  // tRPC, not through composer state. They register their own save handler so
-  // the central savebar's Save invokes the right write path instead of a
-  // composer.saveProject() that silently no-ops their fields.
+  // Server-side screens (Redirects/Headers/Localization) write via tRPC, not
+  // composer state; they register their own save so the footer's Save runs
+  // the right write path instead of a saveProject() that no-ops their fields.
   const screenSaveHandlerRef = React.useRef<(() => Promise<void>) | null>(null);
-  const registerSaveHandler = React.useCallback(
-    (handler: (() => Promise<void>) | null) => {
-      screenSaveHandlerRef.current = handler;
-    },
-    []
-  );
+  const registerSaveHandler = React.useCallback((handler: (() => Promise<void>) | null) => {
+    screenSaveHandlerRef.current = handler;
+  }, []);
 
-  // Composer-backed screens (General/SEO/Analytics/Advanced) flush local
-  // edit buffer into composer right before saveProject() so PROJECT_CHANGED
-  // fires once per Save instead of once per keystroke.
+  // Composer-backed screens flush their local edit buffer into composer right
+  // before saveProject() so PROJECT_CHANGED fires once per Save, not per key.
   const screenFlushHandlerRef = React.useRef<(() => void) | null>(null);
-  const registerFlushHandler = React.useCallback(
-    (handler: (() => void) | null) => {
-      screenFlushHandlerRef.current = handler;
-    },
-    []
-  );
+  const registerFlushHandler = React.useCallback((handler: (() => void) | null) => {
+    screenFlushHandlerRef.current = handler;
+  }, []);
 
   React.useEffect(() => {
     setScreenIsDirty(false);
-    setDirtyCount(0);
     setGuardOpen(false);
-    // Clear stale handlers on screen change — old screen unmounts, new
-    // screen re-registers if applicable.
+    setSaveError(null);
+    setLoadState("ready");
     screenSaveHandlerRef.current = null;
     screenFlushHandlerRef.current = null;
-    // B1: capture composer's current projectSettings so Discard can restore.
-    // Server-side screens (Redirects/Headers/Localization) own their own state
-    // and don't write through composer — null snapshot means restore is a no-op
-    // for them, which is correct (their handler refreshes on Discard via
-    // resetKey-driven remount).
-    if (composer) {
-      screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
-    } else {
-      screenSnapshotRef.current = null;
-    }
+    screenSnapshotRef.current = composer ? structuredClone(composer.getProjectSettings()) : null;
   }, [currentScreen, composer]);
 
   React.useEffect(() => {
@@ -380,623 +217,418 @@ export const SettingsTab: React.FC<
 
   const handleScreenDirty = React.useCallback((dirty: boolean) => {
     setScreenIsDirty(dirty);
-    setDirtyCount(dirty ? 1 : 0);
   }, []);
 
-  // Push: snav root → section. Mounts section first, then flips isRoot on next
-  // rAF tick so CSS transition has a starting state. Reduced-motion path skips
-  // both the animation AND the input lock — render is instant.
-  //
-  // Codex P0 #1: read screenIsDirtyRef.current (not state) — click in same
-  // gesture as edit must see latest dirty.
-  // Codex P0 #2: blur active element before flipping isRoot so focus does not
-  // remain inside what becomes aria-hidden=true. DrillInHeader's mount effect
-  // will then place focus on breadcrumb-current.
-  //
-  // Codex P0 #3 hardening (Task-7 follow-up): dirty check applies to BOTH
-  // push and section→section paths. Without this, a section-to-section jump
-  // (e.g., Branding's "Open General →" button) silently clears dirty edits
-  // instead of routing through ConfirmDialog. ConfirmDialog's onConfirm
-  // already handles all 4 (isRoot × pendingNav) quadrants — pass-2 wiring.
-  const navigate = React.useCallback(
-    (nextId: InTabNavId) => {
-      if (transitioning) return;
-      if (nextId === currentScreen && !isRoot) return;
-      // Universal dirty check FIRST — applies to push + section→section.
-      // ConfirmDialog's onConfirm handles routing based on (isRoot, pendingNav)
-      // post-discard.
+  /* A field reached through Search: once its screen has rendered (and, for a
+     server-backed screen, loaded), scroll it into view and focus it. */
+  React.useEffect(() => {
+    const fieldId = pendingFieldRef.current;
+    if (!fieldId || loadState !== "ready") return;
+    const frame = requestAnimationFrame(() => {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+      pendingFieldRef.current = null;
+      el.scrollIntoView({ block: "center" });
+      el.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [currentScreen, loadState, resetKey]);
+
+  // ─── Doors and navigation ─────────────────────────────────────────────
+
+  const leave = React.useCallback(() => {
+    onClose?.();
+  }, [onClose]);
+
+  const performNav = React.useCallback(
+    (id: SettingsNavId) => {
+      switch (id) {
+        case "branding":
+          onOpenDesignTab?.();
+          return;
+        case "export":
+          /* The Export modal is the surface (plan: the row LEAVES Settings);
+             StudioHeader opens it beside its own Export button. */
+          composer?.emit(EVENTS.UI_OPEN_EXPORTER, undefined);
+          onClose?.();
+          return;
+        default:
+          navigateTo(id);
+      }
+    },
+    [composer, navigateTo, onClose, onOpenDesignTab],
+  );
+
+  const requestNav = React.useCallback(
+    (id: SettingsNavId) => {
+      if (id === currentScreen) return;
       if (screenIsDirtyRef.current) {
-        pendingNavRef.current = nextId;
+        pendingRef.current = { kind: "nav", id };
         setGuardOpen(true);
         return;
       }
-      // Section→section nav (clean): drilled-in user clicking another section
-      // (Branding's onJumpTo path). Routes through navigateBetweenSections to
-      // avoid the push state-machine deadlock + skip animation.
-      if (!isRoot) {
-        navigateBetweenSections(nextId);
-        return;
-      }
-      // Codex P0 #2: blur the clicked snav row before root becomes aria-hidden.
-      (document.activeElement as HTMLElement | null)?.blur?.();
-      navigateTo(nextId);
-      setSectionMounted(true);
-
-      if (prefersReducedMotion) {
-        setIsRoot(false);
-        return;
-      }
-      setTransitioning(true);
-      requestAnimationFrame(() => setIsRoot(false));
+      performNav(id);
     },
-    // navigateBetweenSections is omitted from deps because it only closes over
-    // currentScreen / transitioning / navigateTo + stable setters — all
-    // non-setter deps are already listed below, so navigate is rebuilt
-    // whenever they change and the new closure picks up the latest
-    // navigateBetweenSections function. (Function declarations DO get
-    // re-instantiated every render; the safety comes from closure-over-deps,
-    // not declaration identity.)
-    [currentScreen, isRoot, navigateTo, transitioning, prefersReducedMotion],
+    [currentScreen, performNav],
   );
 
-  // Pop: section → snav. Section stays mounted during animation; transitionend
-  // handler unmounts it AND restores focus to the originating snav row.
-  // Reduced-motion path unmounts immediately + restores focus inline.
-  //
-  // Codex P0 #1 pass-2 hardening: navigateToRoot also reads
-  // screenIsDirtyRef.current (NOT the prop chain through DrillInHeader's
-  // isDirty) so back-button + Escape + any other pop path are guarded.
-  // DrillInHeader's onBackAttempt prop fires on stale-but-positive isDirty
-  // reads; navigateToRoot fires on stale-and-negative isDirty reads. Both
-  // safety paths converge here.
-  //
-  // Codex P0 #2: blur active element so focus does not stay inside the
-  // section as it becomes aria-hidden=true.
-  /* Deep links arrive by the name the DOOR uses, which is not always the name
-     the screen has. The site menu says "Plugins"; the screen is "integrations"
-     — the marketplace/OAuth surface it means. Without the alias the panel
-     renders its root, which reads as a broken menu item rather than a mismatch.
-
-     It routes through `navigate`, not `navigateTo`: this panel keeps its own
-     `isRoot` flag, so setting the screen alone leaves the snav root on top and
-     the deep link still looks dead — which is exactly what the first attempt
-     at this fix did. `navigate` is the same push a row click makes: dirty
-     guard, blur, animation and all. */
-  React.useEffect(() => {
-    if (!initialScreen) return;
-    const target = initialScreen === "plugins" ? "integrations" : initialScreen;
-    /* An id matching no screen is left alone rather than guessed at. */
-    const hit = NAV.find((n) => n.id === target);
-    if (hit) navigate(hit.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialScreen]);
-
-  const navigateToRoot = React.useCallback(() => {
-    if (transitioning) return;
-    // Codex P0 #1: dirty re-check at navigate-time, not just at click-time.
-    // A dirty edit landing in the same gesture as a back-click can leave
-    // DrillInHeader's prop view as isDirty=false; trust the ref.
+  const requestLeave = React.useCallback(() => {
     if (screenIsDirtyRef.current) {
-      pendingNavRef.current = null; // null = back-attempt path (not pending-nav)
+      pendingRef.current = { kind: "leave" };
       setGuardOpen(true);
       return;
     }
-    (document.activeElement as HTMLElement | null)?.blur?.();
-    if (prefersReducedMotion) {
-      setIsRoot(true);
-      setSectionMounted(false);
-      // Restore focus to the row that opened this section (best effort).
-      setTimeout(() => lastFocusedRowRef.current?.focus(), 0);
-      return;
-    }
-    setTransitioning(true);
-    setIsRoot(true);
-  }, [transitioning, prefersReducedMotion]);
+    leave();
+  }, [leave]);
 
-  // Section→section nav (in-section→in-section, no animation, no lock).
-  // Used by:
-  //   - Branding section's onJumpTo (jumps to general / seo)
-  //   - ConfirmDialog discard branch when pendingNav targets a different
-  //     section while user is already drilled-in
-  //
-  // Force-remounts the section content via resetKey so focus + screen-state
-  // fully reset; sectionMounted stays true; isRoot stays false.
-  //
-  // Function declaration form (not useCallback). The render closure rebuilds
-  // it each time, but its callers (navigate, JSX onClick handlers in Task 4)
-  // are themselves rebuilt by React when their deps change, so they pick up
-  // the freshest navigateBetweenSections automatically.
-  function navigateBetweenSections(nextId: InTabNavId) {
-    if (nextId === currentScreen) return;
-    if (transitioning) return;
-    navigateTo(nextId);
-    setResetKey((k) => k + 1);
-    setScreenIsDirty(false);
-    setDirtyCount(0);
-    // DrillInHeader unmounts + remounts because of resetKey-keyed wrapper —
-    // its own mount effect will refire and focus breadcrumb-current.
-  }
+  /* Deep links arrive by the name the DOOR uses, which is not always the name
+     the screen has: the site menu says "Plugins"; the screen is
+     "integrations". An id matching no screen is left alone rather than
+     guessed at. */
+  React.useEffect(() => {
+    if (!initialScreen) return;
+    const target = initialScreen === "plugins" ? "integrations" : initialScreen;
+    if (SETTINGS_SCREENS.some((s) => s.id === target)) navigateTo(target);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialScreen]);
 
-  const handleStackTransitionEnd = React.useCallback(
-    (e: React.TransitionEvent<HTMLDivElement>) => {
-      // Only act on transform completion (filter out opacity events).
-      if (e.propertyName !== "transform") return;
-      // Section's pop animation completed → unmount it + restore focus.
-      if (e.target === sectionRef.current && isRoot) {
-        setSectionMounted(false);
-        // Codex P0 #2: focus the row that opened this section so keyboard
-        // users land back in a meaningful place after the pop.
-        setTimeout(() => lastFocusedRowRef.current?.focus(), 0);
-      }
-      // Either screen finishing its transform clears the navigation block.
-      setTransitioning(false);
-    },
-    [isRoot],
-  );
-
-  // Settings v2 owns Escape. DrillInHeader is opted out via
-  // enableDocumentEscape={false}. ConfirmDialog handles its own Escape via
-  // onEscapeKeyDown preventDefault (Task 2).
-  //
-  // Codex P0 #1: read screenIsDirtyRef.current (sync), not state — Escape in
-  // the same tick as an edit must see the latest dirty value. The ref-shadow
-  // effect (Step 1) guarantees ref is at-most-one-render stale; for click +
-  // keydown handlers, that's already the latest value.
+  // Escape is one more door out — guarded like the rest. The dialogs own
+  // their own Escape while they are up; an input keeps its own.
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (guardOpen) return; // ConfirmDialog will handle via onEscapeKeyDown
-      if (isRoot) return;    // already at root, nothing to pop
-      if (transitioning) return;
+      if (guardOpen || savedOpen || searchOpen) return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) {
-        return; // input handles its own Escape (blur/clear)
-      }
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return;
       e.preventDefault();
-      if (screenIsDirtyRef.current) {
-        setGuardOpen(true);
-      } else {
-        navigateToRoot();
-      }
+      requestLeave();
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [guardOpen, isRoot, transitioning, navigateToRoot]);
+  }, [guardOpen, savedOpen, searchOpen, requestLeave]);
+
+  // ─── The guard ────────────────────────────────────────────────────────
+
+  const handleKeepEditing = React.useCallback(() => {
+    pendingRef.current = null;
+    setGuardOpen(false);
+  }, []);
 
   const handleDiscard = React.useCallback(() => {
-    // B1: restore composer to pre-edit snapshot. setProjectSettings emits
-    // PROJECT_CHANGED, which triggers screen re-render with restored values.
-    // structuredClone on the way out so further composer mutations don't
-    // poison the snapshot we still hold (snapshot stays the discard baseline
-    // until next screen change or save).
+    const pending = pendingRef.current;
+    pendingRef.current = null;
+    setGuardOpen(false);
+    // Roll composer back to the snapshot taken when the screen mounted (or
+    // last saved). structuredClone on the way out so later composer
+    // mutations don't poison the snapshot we still hold.
     if (composer && screenSnapshotRef.current) {
       composer.setProjectSettings(structuredClone(screenSnapshotRef.current));
     }
     setResetKey((k) => k + 1);
     setScreenIsDirty(false);
-    setDirtyCount(0);
-  }, [composer]);
+    setSaveError(null);
+    // Prime the ref synchronously — the effect that mirrors it has not run
+    // yet, and the intent below reads it.
+    screenIsDirtyRef.current = false;
+    if (!pending || pending.kind === "leave") {
+      leave();
+      return;
+    }
+    performNav(pending.id);
+  }, [composer, leave, performNav]);
+
+  // ─── Save ─────────────────────────────────────────────────────────────
+
+  const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
+  const isOverview = currentScreen === "overview";
 
   const handleSave = React.useCallback(() => {
-    const screenHandler = screenSaveHandlerRef.current;
-    if (screenHandler) {
-      // Server-side screen owns persistence. Skip composer.saveProject() —
-      // it would silently drop Redirects/Headers/Localization fields.
-      screenHandler()
-        .then(() => {
-          setScreenIsDirty(false);
-          setDirtyCount(0);
-        })
-        .catch((err) => {
-          console.error("[settings] screen save failed", err);
-          // Screen renders its own error banner; keep dirty so savebar stays visible.
-        });
-      return;
-    }
-    if (!composer) return;
-    // Composer-backed screens (General/SEO/Analytics/Advanced) hold edits in
-    // local state. Flush once now so composer holds the user's typed values
-    // before saveProject() serializes. Without this, screens with a dead
-    // local handleSave (SEO/Analytics/Advanced) would silently drop input.
-    screenFlushHandlerRef.current?.();
-    const maybePromise = composer.saveProject?.();
-    // B1: refresh snapshot to the just-saved state. After Save, the user's
-    // edits ARE the new baseline — Discard from this point onwards should
-    // restore to the saved values, not the pre-Save values.
-    const refreshSnapshot = () => {
-      screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
+    if (saving) return;
+    const failed = (err: unknown) => {
+      console.error("[settings] save failed", err);
+      setSaveError(SAVE_ERROR_MESSAGES[currentScreen as SettingsNavId] ??
+        `Changes to ${current?.title ?? "settings"} were not saved. Your changes are still here. Review the values, then retry.`);
     };
-    if (!maybePromise) {
-      refreshSnapshot();
+    const succeeded = () => {
+      if (composer) screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
+      setSaveError(null);
       setScreenIsDirty(false);
-      setDirtyCount(0);
+      setSavedOpen(true);
+    };
+    const screenHandler = screenSaveHandlerRef.current;
+    let run: Promise<void> | void;
+    if (screenHandler) {
+      // Server-side screen owns persistence; composer.saveProject() would
+      // silently drop its fields.
+      run = screenHandler();
+    } else {
+      if (!composer) return;
+      // Flush the screen's local edits into composer once, then persist.
+      screenFlushHandlerRef.current?.();
+      run = composer.saveProject?.();
+    }
+    if (!run) {
+      succeeded();
       return;
     }
-    maybePromise
-      .then(() => {
-        refreshSnapshot();
-        setScreenIsDirty(false);
-        setDirtyCount(0);
-      })
-      .catch((err) => {
-        console.error("[settings] save failed", err);
-      });
-  }, [composer]);
+    setSaving(true);
+    run.then(succeeded, failed).finally(() => setSaving(false));
+  }, [composer, current, currentScreen, saving]);
 
-  const current = NAV.find((n) => n.id === currentScreen) ?? NAV[0];
+  const openBilling = React.useCallback(() => {
+    window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`, "_blank", "noopener,noreferrer");
+  }, []);
 
-  const renderContent = (): React.ReactNode => {
-    if (isScreenLocked(currentScreen, effectivePlan)) {
-      const requiredPlan = SCREEN_PLAN_REQUIREMENTS[currentScreen];
-      return <LockedScreen variant={requiredPlan} />;
-    }
-    switch (currentScreen) {
+  // ─── Pane content ─────────────────────────────────────────────────────
+
+  const locked = !isOverview && isScreenLocked(currentScreen, effectivePlan);
+
+  const renderScreen = (): React.ReactNode => {
+    if (isOverview) return <OverviewScreen projectId={projectId} onOpenScreen={requestNav} />;
+    if (locked) return <LockedScreen variant={SCREEN_PLAN_REQUIREMENTS[currentScreen]} onUpgrade={openBilling} />;
+    const common = {
+      composer,
+      projectId,
+      onDirtyChange: handleScreenDirty,
+      registerSaveHandler,
+      registerFlushHandler,
+      onLoadStateChange: setLoadState,
+      saveError,
+    };
+    switch (currentScreen as SettingsNavId) {
       case "general":
-        return (
-          <SiteSettingsScreen
-            composer={composer}
-            onDirtyChange={handleScreenDirty}
-            registerFlushHandler={registerFlushHandler}
-          />
-        );
-      case "branding":
-        return (
-          <BrandingSection
-            onOpenPalette={onOpenDesignTab}
-            // Codex P0 #3 (post-Task-7 hardening): route through navigate() so
-            // the dirty guard applies. navigate detects !isRoot and delegates to
-            // navigateBetweenSections only when clean. When dirty, opens
-            // ConfirmDialog with pendingNav=screenId.
-            onJumpTo={(screenId) => navigate(screenId)}
-          />
-        );
+        return <SiteSettingsScreen {...common} />;
       case "seo":
-        return (
-          <SeoScreen
-            composer={composer}
-            onDirtyChange={handleScreenDirty}
-            registerFlushHandler={registerFlushHandler}
-          />
-        );
+        return <SeoScreen {...common} />;
       case "analytics":
-        return (
-          <AnalyticsScreen
-            composer={composer}
-            onDirtyChange={handleScreenDirty}
-            registerFlushHandler={registerFlushHandler}
-          />
-        );
+        return <AnalyticsScreen {...common} />;
       case "custom-code":
-        return (
-          <AdvancedScreen
-            composer={composer}
-            onDirtyChange={handleScreenDirty}
-            registerFlushHandler={registerFlushHandler}
-          />
-        );
+        return <AdvancedScreen {...common} />;
       case "integrations":
         return (
-          <IntegrationsHub
-            composer={composer}
-            onDirtyChange={handleScreenDirty}
-            registerFlushHandler={registerFlushHandler}
-          />
+          <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} registerFlushHandler={registerFlushHandler} />
         );
-      // A1 day-3 complete: all 4 stubs drained (Redirects, Forms, Headers, Localization).
-      // Redirects/Headers/Localization own server-side save — register handler so
-      // the savebar's Save calls their write path instead of composer.saveProject().
       case "localization":
-        return (
-          <LocalizationScreen
-            composer={composer}
-            projectId={projectId}
-            onDirtyChange={handleScreenDirty}
-            registerSaveHandler={registerSaveHandler}
-          />
-        );
+        return <LocalizationScreen {...common} />;
       case "redirects":
-        return (
-          <RedirectsScreen
-            projectId={projectId}
-            onDirtyChange={handleScreenDirty}
-            registerSaveHandler={registerSaveHandler}
-          />
-        );
+        return <RedirectsScreen {...common} />;
       case "headers":
-        return (
-          <HeadersScreen
-            projectId={projectId}
-            onDirtyChange={handleScreenDirty}
-            registerSaveHandler={registerSaveHandler}
-          />
-        );
+        return <HeadersScreen {...common} />;
       case "forms":
-        return <FormsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
-      // P6: Domains graduates from a workspace deep-link to an in-tab screen;
-      // Webhooks is new (workspace endpoint, ADMIN-gated server-side).
+        return <FormsScreen {...common} />;
       case "domains":
-        return <DomainsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
+        return <DomainsScreen {...common} />;
       case "webhooks":
-        return <WebhooksScreen onDirtyChange={handleScreenDirty} />;
-      // `publish-history` used to render here. It moved to History › Published
-      // (M2 / Finding C): the same PublishHistory component answered at three
-      // addresses — the Publish panel, this screen, and the History › Published
-      // boards in Figma — and only the two code ones were undrawn. The Publish
-      // panel keeps its embedded copy on purpose; that one answers "did mine
-      // land?" at the moment of publishing, which is a different question from
-      // "what shipped, and can I go back?".
-      /* `Section`, not hand-rolled `.bd-set-section` markup. Every other S7
-         screen composes this card, which is what stamps `set-card-<stem>` and
-         `set-card-title-<stem>`; this one duplicated the three class names by
-         hand and therefore had NO anchor at all — the only settings screen a
-         conformance recipe could not address, and the one that would drift
-         silently the next time the chassis moves (as it did on 2026-09-08, when
-         cards, the 180 label column and the uppercase card titles all changed
-         under all thirteen screens at once). */
-      case "export":
-        return (
-          <Section
-            title="Export"
-            desc="Download the whole site as clean HTML/CSS you can host anywhere. Opens the exporter with format and scope options."
-          >
-            <Button
-              color="light"
-              size="xs"
-              data-testid="set-export-open"
-              onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}
-            >
-              Open exporter
-            </Button>
-          </Section>
-        );
+        return <WebhooksScreen {...common} />;
       default:
         return null;
     }
   };
 
-  const renderRow = (n: NavDef) => {
+  const headTitle = isOverview || !current ? "Settings" : `${SETTINGS_NAV_GROUPS[current.group]} / ${current.title}`;
+  const headSub = isOverview || !current ? `${siteName}${OVERVIEW_SUBTITLE}` : current.subtitle;
+
+  const footStatus: { text: string; tone: "muted" | "danger" | "warning" } = isOverview
+    ? { text: "Pick a section to edit its settings", tone: "muted" }
+    : loadState === "loading"
+      ? { text: "Loading settings…", tone: "muted" }
+      : loadState === "error"
+        ? { text: "Settings could not load", tone: "danger" }
+        : saveError
+          ? { text: "Changes not saved", tone: "danger" }
+          : screenIsDirty
+            ? { text: "Unsaved changes", tone: "warning" }
+            : { text: "All changes saved", tone: "muted" };
+  const FOOT_TONE = {
+    muted: "tw:text-[var(--bk-ink-muted)]",
+    danger: "tw:text-[var(--bk-error)]",
+    warning: "tw:text-[var(--bk-warning-text)]",
+  } as const;
+
+  // ─── Sidebar rows ─────────────────────────────────────────────────────
+
+  const renderRow = (n: SettingsNavDef) => {
     const active = currentScreen === n.id;
-    const locked = isScreenLocked(n.id, effectivePlan);
-    const Icon = n.icon;
+    if (n.kind === "external") {
+      return (
+        <a
+          key={n.id}
+          href={`${DASHBOARD_URL}${WORKSPACE_LINKS[n.id] ?? "/dashboard"}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={NAV_ROW}
+          data-testid={`set-nav-${n.id}`}
+        >
+          <NavRowIcon id={n.id} />
+          <span className="tw:min-w-0 tw:flex-1 tw:truncate">{n.title}</span>
+          <ArrowUpRight size={12} className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" aria-hidden />
+        </a>
+      );
+    }
+    const rowLocked = isScreenLocked(n.id, effectivePlan);
     return (
       <Button
         key={n.id}
         type="button"
-        onClick={(e) => {
-          // Codex P0 #2: capture clicked row so navigateToRoot's transitionend
-          // can restore focus when the user pops back.
-          lastFocusedRowRef.current = e.currentTarget as HTMLButtonElement;
-          navigate(n.id);
-        }}
-        className={`bd-set-snav-row${active ? " on" : ""}`}
+        variant="ghost"
+        size="xs"
+        className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
+        onClick={() => requestNav(n.id)}
+        data-testid={`set-nav-${n.id}`}
       >
-        <span className="bd-set-snav-icon">
-          <Icon />
-        </span>
-        <span className="bd-set-snav-label">{n.title}</span>
-        {locked ? <span className="bd-set-snav-badge">Pro</span> : null}
+        <NavRowIcon id={n.id} />
+        <span className="tw:min-w-0 tw:flex-1 tw:truncate">{n.title}</span>
+        {rowLocked ? (
+          <span className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:leading-4 tw:text-[var(--bk-accent)]">
+            Pro
+          </span>
+        ) : null}
       </Button>
     );
   };
 
-  // Workspace deep-links: open dashboard URL in new tab.
-  // Only renders when projectId is known (siteId equivalent) for site-scoped links.
-  const renderWorkspaceLink = (link: WorkspaceLink) => (
-    <a
-      key={link.id}
-      href={buildWorkspaceUrl(link, projectId ?? null)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="bd-set-snav-row bd-set-snav-row-external"
-    >
-      <span className="bd-set-snav-icon" aria-hidden>↗</span>
-      <span className="bd-set-snav-label">{link.title}</span>
-      <span className="bd-set-snav-arrow" aria-hidden>open</span>
-    </a>
-  );
-
-  // Group rows by group id for rendering, preserving NAV array order within each group.
-  const navByGroup: Record<NavGroupId, NavDef[]> = { site: [], distribution: [], plumbing: [] };
-  NAV.forEach((n) => navByGroup[n.group].push(n));
-
   return (
-    /* width="fullpage" is load-bearing, not cosmetic. Settings graduated to a
-       full-page surface (tabsConfig `mode: "fullpage"`), so its host is
-       `.ls-fullpage-container` — a flex COLUMN. The default `narrow` width
-       carries `tw:flex-none`, which in that column resolves to the root's
-       content height: the header row alone, with the body (`flex-1 min-h-0`)
-       at zero. Every screen below mounted, measured 1379 wide by 0 tall and
-       drew nothing — the surface looked like an empty page under a
-       "Settings" header. (Do not restate the header's pixel height here: the
-       green-panel allowlist counts `NNpx` in this file even inside a
-       comment, unlike Gate 14 itself, which excludes doc lines.) */
-    <PanelFrame width="fullpage">
-      <PanelFrame.Header
-        title={isRoot ? "Settings" : current.title}
-        subtitle={!isRoot ? current.subtitle : undefined}
-        onHelpClick={onHelpClick}
-        onClose={() => {
-          if (screenIsDirtyRef.current) {
-            pendingCloseRef.current = true;
-            setGuardOpen(true);
-            return;
-          }
-          onClose?.();
-        }}
-        /* The header titles itself after the drilled-in section, so the derived
-           name read "Close General" on a control that closes all of Settings. */
-        closeLabel="Close settings"
-      />
-      <PanelFrame.Body noScroll>
-        <div
-          className={`bd-set-stack${transitioning ? " transitioning" : ""}${prefersReducedMotion ? " no-motion" : ""}`}
-          onTransitionEnd={handleStackTransitionEnd}
-        >
-          {/* Root screen — ALWAYS mounted (codex P2 #7 contract: aria-hidden flips, mount stays).
-              inert + aria-hidden={!isRoot} means assistive tech ignores it AND focus cannot land
-              inside it during the section animation. Codex P0 #2 focus contract relies on this. */}
-          <div
-            className={`bd-set-screen bd-set-screen--root${isRoot ? " on" : " off"}`}
-            aria-hidden={!isRoot}
-            inert={!isRoot}
+    <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
+      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
+      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
+        <div className="tw:flex tw:flex-col tw:px-5 tw:pt-4">
+          <Button
+            type="button"
+            variant="link"
+            className="tw:h-auto tw:min-h-0 tw:self-start tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)] tw:enabled:hover:no-underline"
+            onClick={requestLeave}
+            data-testid="set-back"
           >
-            <nav className="bd-set-snav" aria-label="Settings sections">
-              <div className="bd-set-snav-list">
-                {(Object.keys(navByGroup) as NavGroupId[]).map((groupId) => (
-                  <React.Fragment key={groupId}>
-                    <div className="bd-set-snav-group">{GROUP_LABELS[groupId]}</div>
-                    {navByGroup[groupId].map(renderRow)}
-                  </React.Fragment>
-                ))}
-                <div className="bd-set-snav-group">
-                  WORKSPACE <span className="bd-set-snav-group-hint">opens dashboard ↗</span>
-                </div>
-                {WORKSPACE_LINKS.map(renderWorkspaceLink)}
-                {onReplayTour ? (
-                  <Button
-                    type="button"
-                    onClick={onReplayTour}
-                    className="bd-set-snav-row bd-set-snav-row-sep"
-                  >
-                    <span className="bd-set-snav-icon">
-                      <TourIcon />
-                    </span>
-                    <span className="bd-set-snav-label">Tour</span>
-                  </Button>
-                ) : null}
-              </div>
-            </nav>
+            <ChevronLeft size={12} aria-hidden />
+            Back to canvas
+          </Button>
+          <h2
+            className="tw:m-0 tw:mt-4 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
+            data-testid="set-title"
+          >
+            Settings
+          </h2>
+          <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-site">
+            {siteName}
           </div>
-          {/* Section screen — mount-on-push, unmount-on-pop-transitionend.
-              inert + aria-hidden={isRoot} during the pop animation prevents focus retention
-              inside the departing subtree (codex P0 #2). */}
-          {sectionMounted && (
-            <div
-              ref={sectionRef}
-              className={`bd-set-screen bd-set-screen--section${isRoot ? " departing" : " entered"}`}
-              aria-hidden={isRoot}
-              inert={isRoot}
+        </div>
+        <nav className="tw:flex tw:flex-col tw:px-3 tw:pb-4 tw:pt-20" aria-label="Settings sections">
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
+            className={`${NAV_ROW}${isOverview ? ` ${NAV_ROW_ON}` : ""}`}
+            aria-current={isOverview ? "page" : undefined}
+            onClick={() => requestNav("overview")}
+            data-testid="set-nav-overview"
+          >
+            <NavRowIcon id="overview" />
+            <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
+          </Button>
+          {GROUP_ORDER.map((group) => (
+            <React.Fragment key={group}>
+              <div className={`${SET_EYEBROW} tw:px-3 tw:pb-1 tw:pt-3`}>{SETTINGS_NAV_GROUPS[group]}</div>
+              {SETTINGS_NAV.filter((n) => n.group === group).map(renderRow)}
+            </React.Fragment>
+          ))}
+        </nav>
+      </aside>
+
+      {/* ── Pane ────────────────────────────────────────────────────────── */}
+      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+        <header
+          className={`tw:flex tw:shrink-0 tw:items-start tw:justify-between tw:gap-6 tw:px-12 tw:pt-7 ${
+            isOverview ? "tw:pb-2" : "tw:border-b tw:border-[var(--bk-border)] tw:pb-6"
+          }`}
+        >
+          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
+            <h2
+              className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:text-[var(--bk-ink)]"
+              data-testid="set-head-title"
             >
-              <DrillInHeader
-                title={current.title}
-                parentName="Settings"
-                breadcrumb={[GROUP_LABELS[current.group], current.title]}
-                focusTarget="breadcrumb-current"
-                enableDocumentEscape={false}
-                onBack={navigateToRoot}
-                isDirty={screenIsDirty}
-                onBackAttempt={() => setGuardOpen(true)}
-              />
-              <div className="bd-set-pane-body" key={resetKey}>
-                {renderContent()}
-              </div>
-              <div
-                className={`bd-set-savebar${screenIsDirty ? " on" : ""}`}
-                role="region"
-                aria-label="Unsaved changes"
-                aria-hidden={!screenIsDirty}
+              {headTitle}
+            </h2>
+            <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="set-head-sub">
+              {headSub}
+            </p>
+          </div>
+          {isOverview ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              className={`${SET_BTN} tw:w-70 tw:shrink-0 tw:justify-start tw:gap-2 tw:font-normal tw:text-[var(--bk-ink-muted)]`}
+              onClick={() => setSearchOpen(true)}
+              data-testid="set-search-open"
+            >
+              <SearchIcon size={14} aria-hidden />
+              Search settings
+            </Button>
+          ) : null}
+          {locked ? (
+            <Button type="button" size="xs" className={`${SET_BTN} tw:shrink-0`} onClick={openBilling} data-testid="set-head-upgrade">
+              Upgrade
+            </Button>
+          ) : null}
+        </header>
+
+        <div
+          key={resetKey}
+          className={`tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-6 tw:overflow-y-auto tw:px-12 tw:pb-8 ${
+            isOverview ? "tw:bg-[var(--bk-bg-panel)] tw:pt-2" : "tw:bg-[var(--bk-bg-subtle)] tw:pt-8"
+          }`}
+          data-testid="set-body"
+        >
+          {renderScreen()}
+        </div>
+
+        <footer className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:gap-4 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-12">
+          <span
+            className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
+            role="status"
+            data-testid="set-foot-status"
+          >
+            {footStatus.text}
+          </span>
+          {isOverview ? (
+            <Button type="button" size="xs" className={SET_BTN} onClick={requestLeave} data-testid="set-ov-done">
+              Done
+            </Button>
+          ) : (
+            <div className="tw:flex tw:items-center tw:gap-2">
+              <Button type="button" variant="ghost" size="xs" className={SET_BTN} onClick={requestLeave} data-testid="set-foot-cancel">
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                size="xs"
+                className={SET_BTN}
+                disabled={loadState !== "ready" || saving}
+                onClick={handleSave}
+                data-testid="set-foot-save"
               >
-                <span className="bd-set-savebar-note">
-                  <span>{dirtyCount} unsaved</span>
-                </span>
-                {/* The bar is aria-hidden when clean, but its buttons stayed
-                    enabled and focusable — an interactive control inside an
-                    aria-hidden region, and a primary action that looked exactly
-                    as live at "0 unsaved" as at "1 unsaved". */}
-                <div className="bd-set-savebar-actions">
-                  <Button type="button" className="bd-set-btn sec" onClick={handleDiscard} disabled={!screenIsDirty}>
-                    Discard
-                  </Button>
-                  <Button type="button" className="bd-set-btn pri" onClick={handleSave} disabled={!screenIsDirty}>
-                    Save
-                  </Button>
-                </div>
-              </div>
+                {saveError ? "Retry save" : "Save changes"}
+              </Button>
             </div>
           )}
-        </div>
-      </PanelFrame.Body>
-      <ConfirmDialog
-        open={guardOpen}
-        onClose={() => {
-          pendingNavRef.current = null;
-          pendingCloseRef.current = false;
-          setGuardOpen(false);
+        </footer>
+      </div>
+
+      <UnsavedSettingsDialog open={guardOpen} siteName={siteName} onKeepEditing={handleKeepEditing} onDiscard={handleDiscard} />
+      <SettingsSavedDialog open={savedOpen} siteName={siteName} onReturn={() => setSavedOpen(false)} />
+      <SearchSettingsModal
+        open={searchOpen}
+        siteName={siteName}
+        onClose={() => setSearchOpen(false)}
+        onOpen={(screenId, fieldId) => {
+          setSearchOpen(false);
+          pendingFieldRef.current = fieldId ?? null;
+          if (SETTINGS_NAV.some((n) => n.id === screenId)) requestNav(screenId as SettingsNavId);
         }}
-        onConfirm={() => {
-          const next = pendingNavRef.current;
-          // Codex P1 #6 pass-3 hardening: warn FIRST (with full state snapshot)
-          // before any setters mutate the state we want to diagnose.
-          //
-          //   isRoot=false, next=null  → back-attempt while dirty → pop to root
-          //   isRoot=false, next=id    → pending-nav while dirty (in-section) →
-          //                              swap section content (no animation)
-          //   isRoot=true,  next=null  → UNREACHABLE: root view has no dirty
-          //                              state (section is unmounted; savebar
-          //                              never shows). Guard openable only from
-          //                              section-mounted view.
-          //   isRoot=true,  next=id    → UNREACHABLE: navigate() opens dialog
-          //                              when entering section while parent
-          //                              still has stale dirty (impossible —
-          //                              dirty resets on screen change).
-          if (isRoot) {
-            console.warn(
-              "[settings-v2] ConfirmDialog onConfirm reached unreachable branch — pre-mutation state:",
-              {
-                isRoot,
-                next,
-                screenIsDirty: screenIsDirtyRef.current,
-                guardOpen: true,
-              },
-            );
-          }
-          pendingNavRef.current = null;
-          setGuardOpen(false);
-          setScreenIsDirty(false);
-          setDirtyCount(0);
-          // B1: restore composer snapshot — Discard via dialog is the same
-          // semantic operation as Discard via savebar; both unwind composer
-          // mutations the user typed since this screen mounted (or last save).
-          if (composer && screenSnapshotRef.current) {
-            composer.setProjectSettings(structuredClone(screenSnapshotRef.current));
-          }
-          // Codex C1 fix: prime screenIsDirtyRef synchronously so navigateToRoot's
-          // dirty-check (which reads the ref) sees the cleared value. Without
-          // this, the ref-mirror useEffect hasn't flushed yet (we're still
-          // inside the synchronous click handler), and navigateToRoot would
-          // re-open the guard instead of popping to root.
-          screenIsDirtyRef.current = false;
-          if (pendingCloseRef.current) {
-            pendingCloseRef.current = false;
-            onClose?.();
-            return;
-          }
-          if (!isRoot && next === null) {
-            navigateToRoot();
-            return;
-          }
-          if (!isRoot && next !== null) {
-            navigateBetweenSections(next);
-            return;
-          }
-          // Defensive — does NOT touch state past the mutations above. If we
-          // ever land here, the branch is genuinely impossible AND stateful
-          // operations have already been committed; log alone is sufficient.
-          if (next !== null) navigate(next);
-        }}
-        title="Discard changes?"
-        message={
-          pendingCloseRef.current
-            ? "You have unsaved changes. Closing settings will discard them."
-            : "You have unsaved changes. Switching will discard them."
-        }
-        confirmLabel="Discard"
-        cancelLabel="Keep editing"
-        tone="destructive"
       />
-    </PanelFrame>
+    </div>
   );
 };
 

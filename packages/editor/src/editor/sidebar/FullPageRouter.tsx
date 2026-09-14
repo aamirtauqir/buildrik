@@ -94,22 +94,29 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
         </Portal>
       ) : null;
 
-    // P5: Site settings graduated from the narrow drawer to a full-page surface
-    // (authoritative IA 14-screen-specs.md:8 — "Site full-page = settings…").
-    // SettingsTab is the same snav+pane component; it ignores the pin props, so
-    // it renders unchanged at full width. FullPageView supplies the back/close.
+    /* Clone 3397:32011 — Settings is edge-to-edge the same way the library
+       is: a 256 sidebar at x=0 whose `‹ Back to canvas` is the one door out,
+       and a 1184 pane, which is the full 1440. Inside the slot it would have
+       been 1123 under a topbar whose own `‹ Exit` sat beside Back to canvas.
+       Same portal, same reason it is not an OverlayMount: the tab owns its
+       Escape, its guard and its dialogs. */
     case "settings":
       return (
-        <SettingsTab
-          initialScreen={activeSubTab}
-          composer={composer}
-          projectId={projectId}
-          onReplayTour={onReplayTour}
-          onDirtyChange={onSettingsDirtyChange}
-          onOpenDesignTab={onSwitchToDesign}
-          onClose={commonTabProps.onClose}
-          onHelpClick={commonTabProps.onHelpClick}
-        />
+        <Portal>
+          <div
+            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
+            data-testid="set-host"
+          >
+            <SettingsTab
+              initialScreen={activeSubTab}
+              composer={composer}
+              projectId={projectId}
+              onDirtyChange={onSettingsDirtyChange}
+              onOpenDesignTab={onSwitchToDesign}
+              onClose={commonTabProps.onClose}
+            />
+          </div>
+        </Portal>
       );
 
     default:
