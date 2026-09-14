@@ -9,46 +9,46 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "domain-rec-r1"
+      "testId": "set-dom-dns-row-d1-0"
     }
   ],
   "contrastScope": "[data-probe]",
   "targets": [
     {
       "name": "rec-a",
-      "testId": "domain-rec-r1"
+      "testId": "set-dom-dns-row-d1-0"
     },
     {
       "name": "rec-a-cell",
-      "testId": "domain-rec-r1",
+      "testId": "set-dom-dns-row-d1-0",
       "spec": "s6-2-custom-domain-dns-verification",
       "nodeId": "807:8767"
     },
     {
       "name": "rec-a-state",
-      "testId": "domain-rec-state-r1",
+      "testId": "set-dom-dns-state-d1-0",
       "spec": "s6-2-custom-domain-dns-verification",
       "nodeId": "807:8770"
     },
     {
       "name": "rec-cname",
-      "testId": "domain-rec-r2"
+      "testId": "set-dom-dns-row-d1-1"
     },
     {
       "name": "rec-cname-cell",
-      "testId": "domain-rec-r2",
+      "testId": "set-dom-dns-row-d1-1",
       "spec": "s6-2-custom-domain-dns-verification",
       "nodeId": "807:8773"
     },
     {
       "name": "rec-head",
-      "testId": "domain-rec-head-d1",
+      "testId": "set-dom-dns-d1",
       "spec": "s6-2-custom-domain-dns-verification",
       "nodeId": "807:8762"
     },
     {
       "name": "rec-cname-state",
-      "testId": "domain-rec-state-r2"
+      "testId": "set-dom-dns-state-d1-1"
     }
   ],
   "_note": [

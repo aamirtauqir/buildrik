@@ -9,11 +9,11 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "domain-add"
+      "testId": "set-dom-add"
     },
     {
       "action": "click",
-      "testId": "domain-add"
+      "testId": "set-dom-add"
     },
     {
       "action": "waitFor",

@@ -407,7 +407,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                           {rec.value}
                         </td>
                         <td className={`${TD} tw:pr-0`}>
-                          <StatusPill status={rec.verified ? "VERIFIED" : "PENDING"} />
+                          <StatusPill status={rec.verified ? "VERIFIED" : "PENDING"} data-testid={`set-dom-dns-state-${row.id}-${j}`} />
                         </td>
                       </tr>
                     ))
