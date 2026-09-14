@@ -15,12 +15,11 @@
  */
 
 import * as React from "react";
-import { Field, Input, SCREEN_FIELD_ERROR, Screen, Section, Select } from "../shared";
+import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
-import { useServerLoad, type ServerLoadProps } from "../hooks/useServerLoad";
+import { useServerLoad } from "../hooks/useServerLoad";
 import { SITE_LOCALES, localeLabel } from "../constants";
 import type { ScreenProps } from "../types";
-import { LoadCard, SaveErrorBanner } from "./loadCard";
 
 interface IdentitySettings {
   siteName: string;
@@ -77,7 +76,7 @@ function siteNameError(value: string): string | null {
   return null;
 }
 
-export const SiteSettingsScreen: React.FC<ScreenProps & ServerLoadProps> = ({
+export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   composer,
   projectId,
   onDirtyChange,

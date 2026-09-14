@@ -543,7 +543,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onClose={handleFullPageClose}
             onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
             onSwitchToDesign={() => onLeftPanelTabChange?.("design")}
-            onReplayTour={undefined}
             /* The deep-link sub-tab reached the DRAWER and stopped there. Every
                fullpage tab — Settings above all — got nothing, so the site
                menu's "Plugins" landed on the Settings root and looked like a

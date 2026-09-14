@@ -370,6 +370,21 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     setTimeout(() => onSetExportLoading(false), 500);
   }, [onSetExportLoading, onShowExporter]);
 
+  /* Settings' `Export` row (Clone 3397:32011) is a door to this modal, not a
+     screen of its own. It emits OPEN rather than the ⌘K palette's TOGGLE so a
+     modal that is already up stays up. Read through a ref: the subscription
+     is per composer, not per render (F7 — the bar subscribes once). */
+  const handleExportRef = React.useRef(handleExport);
+  handleExportRef.current = handleExport;
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = () => handleExportRef.current();
+    composer.on(EVENTS.UI_OPEN_EXPORTER, open);
+    return () => {
+      composer.off(EVENTS.UI_OPEN_EXPORTER, open);
+    };
+  }, [composer]);
+
   // 60-save-states: "offline" is the browser being offline OR the dashboard sync
   // being disconnected. Either way edits are queued locally, so it outranks
   // every other state — a queued edit is not a failed one.

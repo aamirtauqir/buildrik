@@ -16,30 +16,15 @@
  * @license BSD-3-Clause
  */
 
+import type { ScreenLoadState, ScreenProps } from "../types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getBuildrikClient, type BuildrikApiClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
 
-export type LoadState = "loading" | "ready" | "error";
-
-/**
- * The three `ScreenProps` fields the S1 brief adds to `settings/types.ts`
- * (E1 owns that file). Declared here, identically, so the screens type-check
- * before the two trees meet; once `types.ts` carries them this interface is
- * redundant and `ScreenProps` alone is the contract.
- */
-export interface ServerLoadProps {
-  /** The screen's server read: the shell's footer and the screen's own card follow it. */
-  onLoadStateChange?: (state: LoadState) => void;
-  /** Registered by a screen that loads from the server; the load-error card's Try again calls it. */
-  registerRetryLoad?: (fn: (() => void) | null) => void;
-  /** The last Save's failure, set by the shell; the screen renders the banner above its cards. */
-  saveError?: string | null;
-}
 
 export interface ServerLoad {
-  state: LoadState;
+  state: ScreenLoadState;
   /** Re-runs the read. The load card's Try again and the shell's retry both land here. */
   retry: () => void;
 }
@@ -48,9 +33,9 @@ export function useServerLoad<T>(
   projectId: string | null | undefined,
   read: (client: BuildrikApiClient, siteId: string) => Promise<T>,
   apply: (data: T) => void,
-  { onLoadStateChange, registerRetryLoad }: ServerLoadProps,
+  { onLoadStateChange, registerRetryLoad }: Pick<ScreenProps, "onLoadStateChange" | "registerRetryLoad">,
 ): ServerLoad {
-  const [state, setState] = useState<LoadState>(projectId ? "loading" : "ready");
+  const [state, setState] = useState<ScreenLoadState>(projectId ? "loading" : "ready");
   const [attempt, setAttempt] = useState(0);
 
   // Screens pass inline arrows for `read` / `apply` / `onLoadStateChange`.
@@ -64,7 +49,7 @@ export function useServerLoad<T>(
   const reportRef = useRef(onLoadStateChange);
   reportRef.current = onLoadStateChange;
 
-  const report = useCallback((next: LoadState) => {
+  const report = useCallback((next: ScreenLoadState) => {
     setState(next);
     reportRef.current?.(next);
   }, []);

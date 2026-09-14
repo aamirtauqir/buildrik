@@ -171,7 +171,7 @@ describe("SiteSettingsScreen — loading and load-error (3953:26363 / 3953:26503
     expect(screen.getByTestId("set-load-card")).toBeInTheDocument();
     expect(screen.getByTestId("set-load-title")).toHaveTextContent("Site identity");
     expect(screen.getByTestId("set-load-card")).toHaveTextContent("Site name, favicon, language and social profiles.");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("Loading…");
+    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
     expect(screen.queryByTestId("set-load-retry")).toBeNull();
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
 
@@ -187,7 +187,7 @@ describe("SiteSettingsScreen — loading and load-error (3953:26363 / 3953:26503
     setup({ onLoadStateChange, registerRetryLoad });
 
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent(
+    expect(screen.getByTestId("set-load-state")).toHaveTextContent(
       "Couldn't load your site settings. Check your connection, then try again.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");

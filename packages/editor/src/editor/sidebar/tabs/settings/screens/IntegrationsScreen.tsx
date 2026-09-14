@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { INTEGRATION_CATALOG } from "../constants";
+import { INTEGRATION_CATALOG } from "@buildrik/shared/schemas/integrations";
 import { Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
 import { Button, IntegrationRow } from "@/editor/chrome-ui";

@@ -204,7 +204,7 @@ describe("SeoScreen — loading, load-error and save-error", () => {
     setup({ onLoadStateChange });
     expect(screen.getByTestId("set-load-title")).toHaveTextContent("SEO defaults");
     expect(screen.getByTestId("set-load-card")).toHaveTextContent("Title, description and social preview defaults.");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("Loading…");
+    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
     await act(async () => { resolve(serverRow()); });
     await loaded();
@@ -216,7 +216,7 @@ describe("SeoScreen — loading, load-error and save-error", () => {
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent(
+    expect(screen.getByTestId("set-load-state")).toHaveTextContent(
       "Couldn't load your SEO defaults. Check your connection, then try again.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");

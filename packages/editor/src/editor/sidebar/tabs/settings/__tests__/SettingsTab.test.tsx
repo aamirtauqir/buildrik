@@ -1,42 +1,29 @@
 /**
- * Settings Tab Tests — v2 drill-in drawer.
+ * SettingsTab — the Clone shell (3397:32011 around a screen, 3397:32915 the
+ * Overview, 3953:26363 / 3953:26503 / 3950:26309 the footer's states).
  *
- * Covers (codex P1 #4 — REAL coverage, not stubs):
- *   Root view: 10-section snav + 3 workspace deep-links + WORKSPACE group header.
- *   Push/pop animation: section mount-on-click, unmount-on-pop-transitionend,
- *     focus restore on pop.
- *   Escape contract: SettingsTab owns Escape; clean section pops; DIRTY section
- *     opens ConfirmDialog (drive dirty via real form input).
- *   Dialog Discard (back-attempt) → pops to root + clears dirty.
- *   Dialog Cancel → closes dialog, dirty preserved, section stays.
- *   Pending-nav guard: dirty + click another row → dialog opens; Discard →
- *     navigateBetweenSections swaps content (no animation lock).
- *   Reduced-motion path: stack has .no-motion, no .transitioning flip.
- *   Branding signpost: jump button → navigateBetweenSections (no unmount).
- *   aria-hidden + inert flip together on root during section view.
+ * Covers:
+ *   Shell: the persistent sidebar (Back to canvas · Settings · site · Overview
+ *     · five groups · Pro on locked rows · ↗ dashboard rows), the pane header
+ *     per screen, the footer per state, the deep link.
+ *   Doors: Fonts & colours → the Brand panel · Export → `ui:open-exporter` and
+ *     out · Back / Done / Cancel / Escape → out.
+ *   Guard: every door and every nav click while dirty raises Unsaved
+ *     settings; Keep editing keeps; Discard rolls composer back and finishes
+ *     the intent (out, or the clicked screen).
+ *   Save: success → Settings saved; failure → `Changes not saved` + `Retry
+ *     save` + the screen's `saveError`; retry → saved.
+ *   Load: the screen's `onLoadStateChange` drives the footer and disables Save.
+ *   Search: a result opens its screen and lands on its field.
  *
- * Note: useSettingsScreen is mocked — production hook re-creates selectors
- * on every render, causing an infinite jsdom re-render loop. Mock preserves
- * external contract: { value, isDirty, markDirty, markClean, setValue }.
- *
- * Note: navigate() wraps setIsRoot(false) in rAF. jsdom does not flush rAF
- * synchronously on click. While the section is mounted but isRoot is still
- * true, the section has aria-hidden=true + inert, so Testing Library's
- * accessibility queries (getByRole) exclude its descendants. Tests must
- * await the aria-hidden flip on root before querying section content.
+ * E3's dialogs and the Search modal are stubbed to their prop contracts here;
+ * `useSettingsScreen` is mocked as before (the production hook re-creates
+ * selectors per render and loops under jsdom).
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, vi, afterEach } from "vitest";
-import {
-  render,
-  screen,
-  fireEvent,
-  cleanup,
-  act,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import { render, screen, fireEvent, cleanup, waitFor, within, act } from "@testing-library/react";
 import * as React from "react";
 
 vi.mock("../hooks/useSettingsScreen", () => ({
@@ -70,16 +57,109 @@ vi.mock("../hooks/useSettingsScreen", () => ({
   ),
 }));
 
-const reducedMotionRef: { value: boolean } = { value: false };
-vi.mock("@/shared/hooks/useReducedMotion", () => ({
-  useReducedMotion: () => reducedMotionRef.value,
+/* E3's three components, by the brief's prop contracts. */
+vi.mock("../components/UnsavedSettingsDialog", () => ({
+  UnsavedSettingsDialog: ({
+    open,
+    onKeepEditing,
+    onDiscard,
+  }: {
+    open: boolean;
+    onKeepEditing: () => void;
+    onDiscard: () => void;
+  }) =>
+    open ? (
+      <div role="dialog" data-testid="set-unsaved">
+        <button type="button" data-testid="set-unsaved-keep" onClick={onKeepEditing}>
+          Keep editing
+        </button>
+        <button type="button" data-testid="set-unsaved-discard" onClick={onDiscard}>
+          Discard and return to canvas
+        </button>
+      </div>
+    ) : null,
+}));
+vi.mock("../components/SettingsSavedDialog", () => ({
+  SettingsSavedDialog: ({ open, siteName, onReturn }: { open: boolean; siteName: string; onReturn: () => void }) =>
+    open ? (
+      <div role="dialog" data-testid="set-saved">
+        {siteName} · Configuration saved.
+        <button type="button" data-testid="set-saved-return" onClick={onReturn}>
+          Return to settings
+        </button>
+      </div>
+    ) : null,
+}));
+vi.mock("../components/SearchSettingsModal", () => ({
+  SearchSettingsModal: ({
+    open,
+    onClose,
+    onOpen,
+  }: {
+    open: boolean;
+    onClose: () => void;
+    onOpen: (screen: string, field?: string) => void;
+  }) =>
+    open ? (
+      <div role="dialog" data-testid="set-search">
+        <button type="button" data-testid="set-search-row-0" onClick={() => onOpen("seo", "seo-meta-title")}>
+          SEO defaults
+        </button>
+        <button type="button" data-testid="set-search-row-1" onClick={() => onOpen("general", "site-name")}>
+          Site name
+        </button>
+        <button type="button" data-testid="set-search-row-2" onClick={() => onOpen("members")}>
+          Members
+        </button>
+        <button type="button" data-testid="set-search-cancel" onClick={onClose}>
+          Cancel
+        </button>
+      </div>
+    ) : null,
+}));
+
+/* A screen that exercises the shell's load-state and save-error contract
+   without a server: SEO stands in. */
+vi.mock("../screens/SeoScreen", () => ({
+  SeoScreen: ({
+    onLoadStateChange,
+    onDirtyChange,
+    saveError,
+  }: {
+    onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
+    onDirtyChange?: (d: boolean) => void;
+    saveError?: string | null;
+  }) => (
+    <div data-testid="fake-seo">
+      {saveError ? <div data-testid="set-save-error">{saveError}</div> : null}
+      <input id="seo-meta-title" aria-label="Meta title" onChange={() => onDirtyChange?.(true)} />
+      <button type="button" onClick={() => onLoadStateChange?.("loading")}>
+        go loading
+      </button>
+      <button type="button" onClick={() => onLoadStateChange?.("error")}>
+        go error
+      </button>
+      <button type="button" onClick={() => onLoadStateChange?.("ready")}>
+        go ready
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock("../screens/OverviewScreen", () => ({
+  OverviewScreen: ({ onOpenScreen }: { onOpenScreen: (id: string) => void }) => (
+    <div data-testid="fake-overview">
+      <button type="button" data-testid="set-ov-row-domains" onClick={() => onOpenScreen("domains")}>
+        Domains
+      </button>
+    </div>
+  ),
 }));
 
 import { SettingsTab } from "../SettingsTab";
 
 afterEach(() => {
   cleanup();
-  reducedMotionRef.value = false;
   try {
     localStorage.clear();
   } catch {
@@ -87,321 +167,353 @@ afterEach(() => {
   }
 });
 
-const makeComposer = () => ({
+beforeEach(() => {
+  try {
+    localStorage.clear();
+  } catch {
+    /* ignore */
+  }
+});
+
+const makeComposer = (saveProject: () => Promise<void> = () => Promise.resolve()) => ({
   getProjectSettings: () => ({ seo: { siteName: "Test Site" } }),
   setProjectSettings: vi.fn(),
-  saveProject: vi.fn(() => Promise.resolve()),
+  getProjectMetadata: () => ({ name: "Bella Cucina" }),
+  saveProject: vi.fn(saveProject),
+  emit: vi.fn(),
   on: vi.fn(),
   off: vi.fn(),
 });
+type FakeComposer = ReturnType<typeof makeComposer>;
+const asComposer = (c: FakeComposer) => c as unknown as React.ComponentProps<typeof SettingsTab>["composer"];
 
-const dispatchTransform = (el: HTMLElement) => {
-  // jsdom@28 supports new TransitionEvent. Verified via env construct check.
-  act(() => {
-    el.dispatchEvent(
-      new TransitionEvent("transitionend", { bubbles: true, propertyName: "transform" }),
-    );
-  });
-};
+const headTitle = () => screen.getByTestId("set-head-title").textContent;
+const footStatus = () => screen.getByTestId("set-foot-status").textContent;
 
-// Click a snav row + wait for the push animation's first state-flip
-// (isRoot=false → root.aria-hidden="true"), then fire transitionend to clear
-// the `transitioning` lock. Without this, navigate()/navigateToRoot() return
-// early when called from a subsequent click in the same test (D20 lock).
-async function clickRowAndAwaitPush(rowName: RegExp) {
-  const row = screen.getByRole("button", { name: rowName });
-  fireEvent.click(row);
-  await waitFor(() => {
-    const root = document.querySelector(".bd-set-screen--root");
-    expect(root?.getAttribute("aria-hidden")).toBe("true");
-  });
-  // Clear .transitioning so subsequent nav clicks are not blocked.
-  const section = document.querySelector(".bd-set-screen--section") as HTMLElement | null;
-  if (section) dispatchTransform(section);
-  return row;
-}
-
-// Drive dirty via a real form input edit + await the post-render
-// onDirtyChange propagation chain (screen useEffect -> parent setState).
-async function makeSectionDirty(siteNameInput: HTMLInputElement) {
+async function openGeneralAndEdit() {
+  fireEvent.click(screen.getByTestId("set-nav-general"));
+  const siteNameInput = (await screen.findByLabelText("Site name")) as HTMLInputElement;
   fireEvent.change(siteNameInput, { target: { value: "Edited Site" } });
-  // Two render cycles: 1) screen sets local state + isDirty=true,
-  //                    2) effect fires onDirtyChange -> parent setScreenIsDirty.
-  await waitFor(() => {
-    // Savebar shows "1 unsaved" once parent registers dirty.
-    expect(document.querySelector(".bd-set-savebar.on")).not.toBeNull();
-  });
+  await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
+  return siteNameInput;
 }
 
-// ─── Group 1 — Root view ─────────────────────────────────────────────────────
+// ─── Shell ────────────────────────────────────────────────────────────────
 
-describe("SettingsTab v2 — root view", () => {
-  it("renders 12 in-tab sections + WORKSPACE group with 2 deep-links", () => {
-    render(<SettingsTab composer={makeComposer() as never} userPlan="enterprise" />);
-    [
-      /general/i, /branding/i, /seo/i,
-      /analytics/i, /localization/i, /domains/i,
-      /custom code/i, /redirects/i, /headers/i, /forms/i, /integrations/i, /webhooks/i,
-    ].forEach((re) => {
-      expect(screen.getByRole("button", { name: re })).toBeTruthy();
-    });
-    const links = screen.getAllByRole("link");
-    const labels = links.map((a) => a.textContent ?? "");
-    // P6: Domains graduated from a deep-link to an in-tab screen.
-    expect(labels.some((l) => /Domains/.test(l))).toBe(false);
-    expect(labels.some((l) => /Members/.test(l))).toBe(true);
-    expect(labels.some((l) => /Billing/.test(l))).toBe(true);
-    links.forEach((a) => {
-      expect(a.getAttribute("target")).toBe("_blank");
-      expect(a.getAttribute("rel")).toContain("noopener");
-    });
+describe("SettingsTab — the shell", () => {
+  it("draws the sidebar: Back to canvas, Settings, the site, Overview and the five groups", () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} userPlan="enterprise" />);
+    expect(screen.getByTestId("set-back").textContent).toContain("Back to canvas");
+    expect(screen.getByTestId("set-title").textContent).toBe("Settings");
+    expect(screen.getByTestId("set-site").textContent).toBe("Bella Cucina");
+    const nav = screen.getByRole("navigation", { name: /settings sections/i });
+    const labels = Array.from(nav.querySelectorAll('[data-testid^="set-nav-"]')).map((el) => ({
+      id: el.getAttribute("data-testid"),
+      text: el.textContent?.trim(),
+    }));
+    expect(labels).toEqual([
+      { id: "set-nav-overview", text: "Overview" },
+      { id: "set-nav-general", text: "General" },
+      { id: "set-nav-branding", text: "Fonts & colours" },
+      { id: "set-nav-localization", text: "Localization" },
+      { id: "set-nav-seo", text: "SEO defaults" },
+      { id: "set-nav-domains", text: "Domains" },
+      { id: "set-nav-redirects", text: "Redirects" },
+      { id: "set-nav-export", text: "Export" },
+      { id: "set-nav-analytics", text: "Analytics" },
+      { id: "set-nav-forms", text: "Forms" },
+      { id: "set-nav-custom-code", text: "Custom code" },
+      { id: "set-nav-headers", text: "Headers" },
+      { id: "set-nav-integrations", text: "Integrations" },
+      { id: "set-nav-webhooks", text: "Webhooks" },
+      { id: "set-nav-members", text: "Members" },
+      { id: "set-nav-billing", text: "Billing" },
+    ]);
+    const groups = Array.from(nav.children)
+      .filter((el) => el.tagName === "DIV")
+      .map((el) => el.textContent);
+    expect(groups).toEqual(["Site setup", "SEO & publishing", "Visitors", "Advanced", "Workspace"]);
+    expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBe("page");
+    for (const id of ["members", "billing"]) {
+      const link = screen.getByTestId(`set-nav-${id}`);
+      expect(link.tagName).toBe("A");
+      expect(link.getAttribute("target")).toBe("_blank");
+      expect(link.getAttribute("rel")).toContain("noopener");
+    }
+    expect(screen.getByTestId("set-nav-members").getAttribute("href")).toContain("/dashboard/settings/team");
+    expect(screen.getByTestId("set-nav-billing").getAttribute("href")).toContain("/dashboard/settings/billing");
   });
 
-  it("panel header title is 'Settings' at root + section is NOT mounted", () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("Settings");
-    expect(container.querySelector(".bd-set-screen--section")).toBeNull();
+  it("keeps the Pro badge on the locked rows for a starter plan", () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} userPlan="starter" />);
+    expect(within(screen.getByTestId("set-nav-custom-code")).getByText("Pro")).toBeTruthy();
+    expect(within(screen.getByTestId("set-nav-integrations")).getByText("Pro")).toBeTruthy();
+    expect(within(screen.getByTestId("set-nav-general")).queryByText("Pro")).toBeNull();
+  });
+
+  it("lands on the Overview: its header, the Search field, and a Done footer that is Back to canvas", () => {
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    expect(headTitle()).toBe("Settings");
+    expect(screen.getByTestId("set-head-sub").textContent).toBe(
+      "Bella Cucina · everything on this page is scoped to this project.",
+    );
+    expect(screen.getByTestId("set-search-open")).toBeTruthy();
+    expect(screen.getByTestId("fake-overview")).toBeTruthy();
+    expect(footStatus()).toBe("Pick a section to edit its settings");
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
+    fireEvent.click(screen.getByTestId("set-ov-done"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("an Overview row is the same nav as the sidebar", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} projectId="site-1" />);
+    fireEvent.click(screen.getByTestId("set-ov-row-domains"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / Domains"));
+    expect(screen.getByTestId("set-nav-domains").getAttribute("aria-current")).toBe("page");
+  });
+
+  it("a screen gets `Group / Screen`, its subtitle, the current row on the tint, and the saved footer", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    expect(screen.getByTestId("set-head-sub").textContent).toBe(
+      "Manage your site identity, language and social profiles.",
+    );
+    const row = screen.getByTestId("set-nav-general");
+    expect(row.getAttribute("aria-current")).toBe("page");
+    expect(row.className).toContain("tw:bg-[var(--bk-accent-tint)]");
+    expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBeNull();
+    expect(footStatus()).toBe("All changes saved");
+    expect(screen.getByTestId("set-foot-cancel").textContent).toBe("Cancel");
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save changes");
+    expect(screen.queryByTestId("set-search-open")).toBeNull();
+    expect(screen.getByTestId("set-card-site-identity")).toBeTruthy();
+  });
+
+  it("the plan gate puts Upgrade in the header and the locked card in the body", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} userPlan="starter" />);
+    fireEvent.click(screen.getByTestId("set-nav-custom-code"));
+    await waitFor(() => expect(headTitle()).toBe("Advanced / Custom code"));
+    expect(screen.getByTestId("set-head-upgrade").textContent).toBe("Upgrade");
+    expect(screen.getByText(/Custom code is a Pro feature/)).toBeTruthy();
+    cleanup();
+    render(<SettingsTab composer={asComposer(makeComposer())} userPlan="enterprise" />);
+    fireEvent.click(screen.getByTestId("set-nav-custom-code"));
+    await waitFor(() => expect(headTitle()).toBe("Advanced / Custom code"));
+    expect(screen.queryByTestId("set-head-upgrade")).toBeNull();
+  });
+
+  it("deep-links: 'plugins' opens Integrations; an id that names no screen stays on the Overview", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} userPlan="enterprise" initialScreen="plugins" />);
+    await waitFor(() => expect(headTitle()).toBe("Advanced / Integrations"));
+    cleanup();
+    localStorage.clear(); // the nav position persists per project
+    render(<SettingsTab composer={asComposer(makeComposer())} initialScreen="not-a-screen" />);
+    await new Promise((r) => setTimeout(r, 30));
+    expect(headTitle()).toBe("Settings");
   });
 });
 
-// ─── Deep links ───────────────────────────────────────────────────────────────
+// ─── Doors ────────────────────────────────────────────────────────────────
 
-/* The site menu's "Plugins" landed on the Settings ROOT and read as a dead
-   door. Two separate reasons, both fixed together:
-     - the deep-link sub-tab reached the drawer and never the fullpage surface,
-       and Settings is a fullpage tab;
-     - the door's name ("plugins") is not the screen's id ("integrations").
-   And a third that only the running app showed: setting the screen is not
-   enough, because this panel keeps its own `isRoot` flag — the first fix moved
-   `currentScreen` and the root list stayed on top, so the door still looked
-   dead. These assert the drilled-in state, not just the id. */
-describe("SettingsTab — deep link", () => {
-  it("opens Integrations when the door asks for 'plugins'", async () => {
-    const { container } = render(
-      <SettingsTab composer={makeComposer() as never} userPlan="enterprise" initialScreen="plugins" />,
-    );
-    /* Assert the HEADER, which is what a person reads — the section node
-       mounts a tick before the panel finishes flipping out of its root. */
-    await waitFor(() =>
-      expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("Integrations"),
-    );
-    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
+describe("SettingsTab — doors", () => {
+  it("Fonts & colours opens the Brand panel and stays where it was", () => {
+    const onOpenDesignTab = vi.fn();
+    render(<SettingsTab composer={asComposer(makeComposer())} onOpenDesignTab={onOpenDesignTab} />);
+    fireEvent.click(screen.getByTestId("set-nav-branding"));
+    expect(onOpenDesignTab).toHaveBeenCalledTimes(1);
+    expect(headTitle()).toBe("Settings");
   });
 
-  it("opens a screen asked for by its own id", async () => {
-    const { container } = render(
-      <SettingsTab composer={makeComposer() as never} userPlan="enterprise" initialScreen="seo" />,
-    );
-    await waitFor(() =>
-      expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("SEO"),
-    );
-    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
-  });
-
-  it("stays at the root for an id that names no screen, rather than guessing", async () => {
-    const { container } = render(
-      <SettingsTab composer={makeComposer() as never} initialScreen="not-a-screen" />,
-    );
-    await new Promise((r) => setTimeout(r, 50));
-    expect(container.querySelector(".bd-set-screen--section")).toBeNull();
-    expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("Settings");
-  });
-});
-
-// ─── Group 2 — Push / pop / focus ─────────────────────────────────────────────
-
-describe("SettingsTab v2 — push/pop + focus", () => {
-  it("click snav row → section mounts + root has aria-hidden=true + inert", async () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    await clickRowAndAwaitPush(/general/i);
-    const section = container.querySelector(".bd-set-screen--section");
-    expect(section).not.toBeNull();
-    const root = container.querySelector(".bd-set-screen--root");
-    // Codex P0 #2 + P2 #7: root stays mounted; gets aria-hidden + inert.
-    expect(root?.getAttribute("aria-hidden")).toBe("true");
-    expect(root?.hasAttribute("inert")).toBe(true);
-  });
-
-  it("back button pops + unmounts section + restores focus to opening row", async () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    const generalRow = await clickRowAndAwaitPush(/general/i);
-    const section = container.querySelector(".bd-set-screen--section") as HTMLElement;
-    expect(section).not.toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /back to settings/i }));
-    // Section stays mounted during the pop animation.
-    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
-    dispatchTransform(section);
-    expect(container.querySelector(".bd-set-screen--section")).toBeNull();
-    // Codex P0 #2: focus restored to General row via setTimeout(0).
-    await waitFor(() => {
-      expect(document.activeElement).toBe(generalRow);
-    });
-  });
-});
-
-// ─── Group 3 — Escape contract (clean + dirty) ───────────────────────────────
-
-describe("SettingsTab v2 — Escape contract", () => {
-  it("Escape from section (clean) pops to root", async () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    await clickRowAndAwaitPush(/general/i);
-    fireEvent.keyDown(document, { key: "Escape" });
-    const section = container.querySelector(".bd-set-screen--section");
-    if (section) dispatchTransform(section as HTMLElement);
-    expect(container.querySelector(".bd-set-screen--section")).toBeNull();
-  });
-
-  it("Escape from root is a no-op (no dialog)", () => {
-    render(<SettingsTab composer={makeComposer() as never} />);
-    fireEvent.keyDown(document, { key: "Escape" });
-    expect(screen.queryByRole("dialog")).toBeNull();
-  });
-
-  it("Escape from DIRTY section opens ConfirmDialog + section stays visible", async () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    await clickRowAndAwaitPush(/general/i);
-    // Drive dirty via real input edit.
-    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
-    await makeSectionDirty(siteNameInput);
-    // Press Escape on document body (NOT inside an input — Escape inside
-    // input is handled by the input's blur/clear).
-    fireEvent.keyDown(document.body, { key: "Escape" });
-    await waitFor(() => {
-      expect(screen.getByRole("dialog")).toBeTruthy();
-    });
-    // Codex P0 #1: section MUST still be visible behind the dialog.
-    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
-  });
-});
-
-// ─── Group 4 — ConfirmDialog Discard / Cancel paths ──────────────────────────
-
-describe("SettingsTab v2 — ConfirmDialog Discard / Cancel", () => {
-  it("Discard (back-attempt path): pops to root + clears dirty", async () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
-    await makeSectionDirty(siteNameInput);
-    // Click DrillInHeader's back button while dirty → dialog opens.
-    fireEvent.click(screen.getByRole("button", { name: /back to settings/i }));
-    const dialog = await screen.findByRole("dialog");
-    // Click "Discard" in the dialog.
-    fireEvent.click(within(dialog).getByRole("button", { name: /discard/i }));
-    // Section animates out — fire transitionend.
-    const section = container.querySelector(".bd-set-screen--section") as HTMLElement | null;
-    if (section) dispatchTransform(section);
-    await waitFor(() => {
-      expect(container.querySelector(".bd-set-screen--section")).toBeNull();
-    });
-  });
-
-  // B1 (systematic-QA finding): Discard must roll the composer's project
-  // settings back to the snapshot taken when the screen mounted. Without this,
-  // user edits flowed through composer.setProjectSettings live (per keystroke);
-  // clearing dirty on Discard left the composer holding the dirty values.
-  it("Discard restores composer projectSettings to mount-time snapshot", async () => {
+  it("Export opens the exporter and leaves Settings", () => {
     const composer = makeComposer();
-    const { container } = render(<SettingsTab composer={composer as never} />);
-    await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
-    await makeSectionDirty(siteNameInput);
-    // Capture mount-time snapshot for assertion (composer.getProjectSettings()
-    // is the source of the snapshot, so this matches what Discard should send).
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(composer)} onClose={onClose} />);
+    fireEvent.click(screen.getByTestId("set-nav-export"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:open-exporter", undefined);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("Back to canvas, Cancel and Escape all leave a clean screen", async () => {
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    fireEvent.click(screen.getByTestId("set-back"));
+    fireEvent.click(screen.getByTestId("set-foot-cancel"));
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(3);
+    // An input keeps its own Escape.
+    const input = await screen.findByLabelText("Site name");
+    fireEvent.keyDown(input, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(3);
+  });
+});
+
+// ─── The guard ────────────────────────────────────────────────────────────
+
+describe("SettingsTab — Unsaved settings", () => {
+  it("Back to canvas while dirty raises the dialog; Keep editing keeps the edits", async () => {
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-back"));
+    expect(screen.getByTestId("set-unsaved")).toBeTruthy();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+    expect(footStatus()).toBe("Unsaved changes");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("Discard rolls composer back to the mount-time snapshot and returns to the canvas", async () => {
+    const composer = makeComposer();
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(composer)} onClose={onClose} />);
+    await openGeneralAndEdit();
     const snapshot = composer.getProjectSettings();
-    composer.setProjectSettings.mockClear();
-    // Click savebar Discard.
-    fireEvent.click(within(container.querySelector(".bd-set-savebar") as HTMLElement)
-      .getByRole("button", { name: /discard/i }));
-    // setProjectSettings called with deep-cloned snapshot (not same reference).
+    fireEvent.click(screen.getByTestId("set-foot-cancel"));
+    fireEvent.click(screen.getByTestId("set-unsaved-discard"));
     expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
     const arg = composer.setProjectSettings.mock.calls[0][0];
     expect(arg).toEqual(snapshot);
-    expect(arg).not.toBe(snapshot); // structuredClone → fresh object identity
+    expect(arg).not.toBe(snapshot);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("Cancel: dialog closes + section stays + dirty preserved", async () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
-    await makeSectionDirty(siteNameInput);
-    fireEvent.click(screen.getByRole("button", { name: /back to settings/i }));
-    const dialog = await screen.findByRole("dialog");
-    fireEvent.click(within(dialog).getByRole("button", { name: /keep editing/i }));
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-    // Section still in DOM, savebar still on.
-    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
-    expect(container.querySelector(".bd-set-savebar.on")).not.toBeNull();
+  it("Escape while dirty raises the dialog instead of leaving", async () => {
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    await openGeneralAndEdit();
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(screen.getByTestId("set-unsaved")).toBeTruthy();
+    expect(onClose).not.toHaveBeenCalled();
   });
-});
 
-// ─── Group 5 — Pending-nav guard (codex P0 #3) ───────────────────────────────
-//
-// Note: In v2, the snav root is `inert` + `aria-hidden=true` while drilled-in,
-// so a user CANNOT navigate between sections via the snav while in section
-// view. The only section→section path is the Branding signpost, which calls
-// `navigate()` (which delegates to `navigateBetweenSections` when clean, or
-// opens ConfirmDialog when dirty). jsdom's fireEvent.click bypasses inert, so
-// we can also exercise the snav-while-drilled-in path here to cover the dirty
-// guard for both entry points.
-describe("SettingsTab v2 — pending-nav guard", () => {
-  it("dirty + jump to another section → dialog opens; Discard swaps section in-place", async () => {
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    await clickRowAndAwaitPush(/general/i);
-    const siteNameInput = (await screen.findByPlaceholderText(/Bella Cucina/i)) as HTMLInputElement;
-    await makeSectionDirty(siteNameInput);
-    // jsdom's fireEvent.click bypasses inert, so we can exercise the
-    // navigate(!isRoot) dirty path via a snav row click.
-    const seoRow = Array.from(
-      container.querySelectorAll<HTMLButtonElement>(".bd-set-snav-row"),
-    ).find((b) => b.textContent?.toLowerCase().includes("seo"));
-    expect(seoRow).toBeTruthy();
-    fireEvent.click(seoRow!);
-    // Dirty guard now fires for section→section nav: dialog opens.
-    const dialog = await screen.findByRole("dialog");
-    fireEvent.click(within(dialog).getByRole("button", { name: /discard/i }));
-    // Codex P0 #3: navigateBetweenSections swaps content WITHOUT unmounting
-    // the section. Header title flips to SEO. Stack should NOT be
-    // .transitioning (no animation lock for in-section swap).
-    await waitFor(() => {
-      expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("SEO");
-    });
-    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
-    expect(container.querySelector(".bd-set-stack.transitioning")).toBeNull();
+  it("a nav click while dirty raises the dialog; Discard finishes that click", async () => {
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(makeComposer())} onClose={onClose} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    expect(screen.getByTestId("set-unsaved")).toBeTruthy();
+    expect(headTitle()).toBe("Site setup / General");
+    fireEvent.click(screen.getByTestId("set-unsaved-discard"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    expect(onClose).not.toHaveBeenCalled();
+    expect(footStatus()).toBe("All changes saved");
+  });
+
+  it("a door while dirty is guarded too", async () => {
+    const onOpenDesignTab = vi.fn();
+    render(<SettingsTab composer={asComposer(makeComposer())} onOpenDesignTab={onOpenDesignTab} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-nav-branding"));
+    expect(screen.getByTestId("set-unsaved")).toBeTruthy();
+    expect(onOpenDesignTab).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("set-unsaved-discard"));
+    expect(onOpenDesignTab).toHaveBeenCalledTimes(1);
   });
 });
 
-// ─── Group 6 — Reduced motion + Branding ─────────────────────────────────────
+// ─── Save ─────────────────────────────────────────────────────────────────
 
-describe("SettingsTab v2 — reduced motion", () => {
-  it("stack has .no-motion + skips .transitioning class", async () => {
-    reducedMotionRef.value = true;
-    const { container } = render(<SettingsTab composer={makeComposer() as never} />);
-    fireEvent.click(screen.getByRole("button", { name: /general/i }));
-    // Reduced-motion path skips rAF + .transitioning entirely; isRoot flips
-    // synchronously inside the click handler.
-    const stack = container.querySelector(".bd-set-stack");
-    expect(stack?.classList.contains("no-motion")).toBe(true);
-    expect(stack?.classList.contains("transitioning")).toBe(false);
+describe("SettingsTab — Save changes", () => {
+  it("a successful save shows Settings saved and settles the footer", async () => {
+    const composer = makeComposer();
+    render(<SettingsTab composer={asComposer(composer)} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    expect(composer.saveProject).toHaveBeenCalledTimes(1);
+    const saved = await screen.findByTestId("set-saved");
+    expect(saved.textContent).toContain("Bella Cucina");
+    expect(footStatus()).toBe("All changes saved");
+    fireEvent.click(screen.getByTestId("set-saved-return"));
+    expect(screen.queryByTestId("set-saved")).toBeNull();
   });
-});
 
-describe("SettingsTab v2 — branding signpost (jump-to via navigateBetweenSections)", () => {
-  it("Branding 'Open →' jump button swaps section without unmount + no animation lock", async () => {
-    const { container } = render(
-      <SettingsTab composer={makeComposer() as never} userPlan="enterprise" />,
+  it("a failed save: `Changes not saved`, `Retry save`, the screen's banner — and the retry saves", async () => {
+    let attempt = 0;
+    const composer = makeComposer(() => (attempt++ === 0 ? Promise.reject(new Error("503")) : Promise.resolve()));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    render(<SettingsTab composer={asComposer(composer)} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
+    await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await waitFor(() => expect(footStatus()).toBe("Changes not saved"));
+    expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Retry save");
+    expect(screen.getByTestId("set-save-error").textContent).toBe(
+      "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
     );
-    await clickRowAndAwaitPush(/branding/i);
-    expect(screen.getByText(/Where Branding lives/)).toBeTruthy();
-    // First "Open →" button maps to the General row (Favicon location).
-    const jumpButtons = screen.getAllByRole("button", { name: /jump to/i });
-    expect(jumpButtons.length).toBeGreaterThan(0);
-    fireEvent.click(jumpButtons[0]);
-    // Codex P0 #3: section→section nav, no animation lock, no unmount.
-    expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
-    expect(container.querySelector(".bd-set-stack.transitioning")).toBeNull();
-    // Header reflects new section (General per BRANDING_FIELD_MAP first jump).
-    expect(document.querySelector('[role="heading"][aria-level="2"]')?.textContent).toBe("General");
+    expect(screen.queryByTestId("set-saved")).toBeNull();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await screen.findByTestId("set-saved");
+    expect(composer.saveProject).toHaveBeenCalledTimes(2);
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save changes");
+    errorSpy.mockRestore();
+  });
+});
+
+// ─── Load states ──────────────────────────────────────────────────────────
+
+describe("SettingsTab — the footer follows the screen's load", () => {
+  it("Loading settings… and Settings could not load, Save disabled in both", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    const save = () => screen.getByTestId("set-foot-save") as HTMLButtonElement;
+    fireEvent.click(screen.getByText("go loading"));
+    expect(footStatus()).toBe("Loading settings…");
+    expect(save().disabled).toBe(true);
+    fireEvent.click(screen.getByText("go error"));
+    expect(footStatus()).toBe("Settings could not load");
+    expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
+    expect(save().disabled).toBe(true);
+    fireEvent.click(screen.getByText("go ready"));
+    expect(footStatus()).toBe("All changes saved");
+    expect(save().disabled).toBe(false);
+  });
+});
+
+// ─── Search ───────────────────────────────────────────────────────────────
+
+describe("SettingsTab — Search settings", () => {
+  it("opens from the Overview header; a result opens its screen and lands on the field", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-search-open"));
+    expect(screen.getByTestId("set-search")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("set-search-row-0"));
+    expect(screen.queryByTestId("set-search")).toBeNull();
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    await act(async () => {
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+    });
+    expect(document.activeElement).toBe(document.getElementById("seo-meta-title"));
+  });
+
+  it("a field whose control has no id lands on its Field anchor's control", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-search-open"));
+    fireEvent.click(screen.getByTestId("set-search-row-1"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    await act(async () => {
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+    });
+    const input = within(screen.getByTestId("set-field-site-name")).getByRole("textbox");
+    expect(document.activeElement).toBe(input);
+  });
+
+  it("a dashboard section takes the same door as its sidebar row", () => {
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-search-open"));
+    fireEvent.click(screen.getByTestId("set-search-row-2"));
+    expect(open).toHaveBeenCalledWith(expect.stringContaining("/dashboard/settings/team"), "_blank", "noopener,noreferrer");
+    expect(headTitle()).toBe("Settings");
+    open.mockRestore();
   });
 });

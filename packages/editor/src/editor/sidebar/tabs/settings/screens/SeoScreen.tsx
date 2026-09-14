@@ -17,11 +17,10 @@
 import * as React from "react";
 import { ToggleSwitch } from "@/editor/chrome-ui";
 import type { BuildrikApiClient } from "@/services/api-client";
-import { Field, Input, SCREEN_FIELD_ERROR, SCREEN_INFO, Screen, Section } from "../shared";
+import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SCREEN_INFO, SaveErrorBanner, Screen, Section } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
-import { useServerLoad, type ServerLoadProps } from "../hooks/useServerLoad";
+import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
-import { LoadCard, SaveErrorBanner } from "./loadCard";
 
 const DEFAULT_SEO = {
   metaTitle: "",
@@ -85,7 +84,7 @@ export function robotsPreview(input: { robotsTxt: string; allowIndexing: boolean
   return lines.join("\n");
 }
 
-export const SeoScreen: React.FC<ScreenProps & ServerLoadProps> = ({
+export const SeoScreen: React.FC<ScreenProps> = ({
   composer,
   projectId,
   onDirtyChange,

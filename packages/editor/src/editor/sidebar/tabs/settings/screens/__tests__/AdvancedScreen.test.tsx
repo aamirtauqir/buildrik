@@ -123,11 +123,11 @@ describe("AdvancedScreen — the frame's three cards, read from the Site row", (
     setup({ projectId: "s1", onLoadStateChange });
     expect(screen.getByTestId("set-load-title")).toHaveTextContent("Custom code");
     expect(screen.getByTestId("set-load-card")).toHaveTextContent("Head, body and CSS injections for this site.");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("Loading…");
+    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
 
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent(
+    expect(screen.getByTestId("set-load-state")).toHaveTextContent(
       "Couldn't load your custom code. Check your connection, then try again.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");

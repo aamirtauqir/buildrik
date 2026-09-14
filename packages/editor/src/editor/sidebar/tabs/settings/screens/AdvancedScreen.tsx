@@ -20,10 +20,9 @@ import type { CustomCodeConfig } from "@/shared/types/project";
 import { validateHtml, type HtmlValidationResult } from "@/shared/utils/validateHtml";
 import { validateCss, type CssValidationResult } from "@/shared/utils/validateCss";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
-import { useServerLoad, type ServerLoadProps } from "../hooks/useServerLoad";
-import { Screen, Section, Textarea } from "../shared";
+import { useServerLoad } from "../hooks/useServerLoad";
+import { LoadCard, SaveErrorBanner, Screen, Section, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
-import { LoadCard, SaveErrorBanner } from "./loadCard";
 
 const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
   headScripts: "",
@@ -121,7 +120,7 @@ const CodeCard: React.FC<{
   </Section>
 );
 
-export const AdvancedScreen: React.FC<ScreenProps & ServerLoadProps> = ({
+export const AdvancedScreen: React.FC<ScreenProps> = ({
   composer,
   projectId,
   onDirtyChange,

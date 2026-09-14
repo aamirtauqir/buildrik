@@ -1,189 +1,12 @@
 /**
- * Settings tab styles — matches docs/reference/left-panel/tab-settings.html.
- * Tokens: --bd-* only.
+ * Settings tab styles — what the Clone shell (SettingsTab.tsx, `tw:`
+ * utilities) does NOT draw: the S7 probe's pane ground, the hand-rolled
+ * `.bd-set-section` blocks in Analytics / Domains / Webhooks, the switch row,
+ * and the Domains / Webhooks screens' own rows. Nothing new goes here — the
+ * styling ratchet only lets this file shrink.
  */
 
-/* ── Shell (drill-in stack — replaces peer-layout grid) ──
- * The Task-4 JSX wraps content in <TabFrame> directly, so the prior
- * .bd-set-root grid wrapper is no longer rendered. Removed entirely
- * per codex review P2 #8.
- */
-
-/* Stack: dual-mount container for root + section screens */
-.bd-set-stack {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-.bd-set-stack.transitioning {
-  pointer-events: none; /* block input during 180ms animation window */
-}
-
-/* Screens: position absolutely so root + section stack on the same plane */
-.bd-set-screen {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  transition: transform 180ms ease-out, opacity 180ms ease-out;
-  will-change: transform, opacity;
-  background: var(--bk-bg-card);
-  /* Allow inner snav / pane-body to scroll independently. */
-  min-height: 0;
-}
-.bd-set-stack.no-motion .bd-set-screen {
-  transition: none;
-}
-
-/* Root screen: visible at root state, slid off-left when drilled */
-.bd-set-screen--root.on  {
-  transform: translateX(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-.bd-set-screen--root.off {
-  transform: translateX(-12%);
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-/* Section screen: animates in from right; departing on pop */
-.bd-set-screen--section {
-  transform: translateX(100%);
-  box-shadow: var(--bk-shadow-raised);
-  pointer-events: auto;
-}
-.bd-set-screen--section.entered   { transform: translateX(0);    opacity: 1; }
-.bd-set-screen--section.departing { transform: translateX(100%); opacity: 1; }
-
-/* ── Snav (root-screen content) ── */
-.bd-set-snav {
-  background: var(--bk-bg-subtle);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  flex: 1;
-  min-height: 0;
-}
-.bd-set-snav-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  padding: 6px;
-}
-.bd-set-snav-row {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  padding: 6px var(--bk-space-8);
-  border: none;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--bk-ink-soft);
-  font: 500 var(--bk-text-12) var(--bk-font-ui);
-  text-align: left;
-  cursor: pointer;
-  transition: background 120ms, color 120ms;
-}
-.bd-set-snav-row:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-.bd-set-snav-row.on {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-  font-weight: 600;
-}
-.bd-set-snav-row:focus-visible {
-  outline: 2px solid var(--bk-accent);
-  outline-offset: 2px;
-}
-.bd-set-snav-row.bd-set-snav-row-sep {
-  margin-top: var(--bk-space-12);
-  border-top: 1px solid var(--bk-border);
-  padding-top: 10px;
-}
-
-/* A1 day-1: group headers in 4-group nav structure */
-.bd-set-snav-group {
-  font: 600 var(--bk-text-11)/1.2 var(--bk-font-ui);
-  color: var(--bk-ink-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 12px 10px 4px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.bd-set-snav-group-hint {
-  font-weight: 500;
-  font-size: var(--bk-text-11);
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--bk-ink-soft);
-}
-
-/* External (workspace) deep-links visually distinct from in-tab nav */
-.bd-set-snav-row.bd-set-snav-row-external {
-  background: var(--bk-bg-panel);
-  border: 1px dashed var(--bk-border-medium);
-  color: var(--bk-ink-muted);
-  margin: 0 0 2px 0;
-  text-decoration: none;
-}
-.bd-set-snav-row.bd-set-snav-row-external:hover {
-  border-style: solid;
-  border-color: var(--bk-accent);
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-}
-.bd-set-snav-row.bd-set-snav-row-external .bd-set-snav-icon {
-  color: var(--bk-ink-muted);
-}
-.bd-set-snav-row.bd-set-snav-row-external:hover .bd-set-snav-icon {
-  color: var(--bk-accent);
-}
-.bd-set-snav-arrow {
-  margin-left: auto;
-  font: 500 var(--bk-text-11)/1 var(--bk-font-mono);
-  color: var(--bk-ink-muted);
-  letter-spacing: 0.04em;
-}
-.bd-set-snav-row.bd-set-snav-row-external:hover .bd-set-snav-arrow {
-  color: var(--bk-accent);
-  font-weight: 600;
-}
-.bd-set-snav-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-.bd-set-snav-label {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.bd-set-snav-badge {
-  margin-left: auto;
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  padding: 1px 5px;
-  border-radius: 3px;
-  background: var(--bk-bg-subtle);
-  letter-spacing: 0.04em;
-}
-.bd-set-snav-row.on .bd-set-snav-badge {
-  color: var(--bk-accent);
-  background: var(--bk-bg-card);
-}
-
-/* ── Section pane body (inside .bd-set-screen--section) ── */
+/* ── Pane ground — `e2e/probe/probe.tsx` hosts every S7 screen on it ── */
 /* 638:2689 — the pane body is the ground the cards sit on: --color/bg-app,
    32 either side, 24 top and bottom, 16 between cards. */
 .bd-set-pane-body {
@@ -203,7 +26,7 @@
    shipped as a borderless block with a rule underneath and asymmetric 12/16
    padding, which read as one long scroll rather than as grouped settings.
    The pane ground behind them is --bk-bg-app, which is what makes the white
-   card read as a card at all (see .bd-set-pane-body below). */
+   card read as a card at all (see .bd-set-pane-body above). */
 .bd-set-section {
   display: flex;
   flex-direction: column;
@@ -213,74 +36,11 @@
   border: 1px solid var(--bk-border);
   border-radius: var(--bk-radius-lg);
 }
-/* 638:2691 — the card's title is 11/16 MEDIUM in ink-muted at 0.88 tracking,
-   in caps. It shipped 12/600 in full ink, which competed with the field
-   labels under it instead of heading them. */
-.bd-set-section-h {
-  margin: 0;
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  line-height: 16px;
-  letter-spacing: 0.88px;
-  text-transform: uppercase;
-  color: var(--bk-ink-muted);
-}
 .bd-set-section-d {
   font: 500 var(--bk-text-11) var(--bk-font-ui);
   color: var(--bk-ink-muted);
   line-height: 1.4;
   margin-bottom: 10px;
-}
-
-/* ── Field ──
-   638:2692 lays a field out SIDE BY SIDE: a 180 label column, 16 gap, then
-   the control — not a label stacked over a full-width input. 638:2693 gives
-   the label 13/20 in ink-soft, Inter, not the 11px mono it shipped as. The
-   card's own `gap: 12` now spaces the rows, so the per-field margin is gone. */
-.bd-set-field {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-16);
-}
-.bd-set-field-lbl {
-  flex: none;
-  width: 180px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--bk-space-4);
-  font: 400 var(--bk-text-13) var(--bk-font-ui);
-  line-height: 20px;
-  color: var(--bk-ink-soft);
-  margin-bottom: 0;
-}
-.bd-set-field-hint {
-  color: var(--bk-ink-muted);
-  font-size: var(--bk-text-11);
-}
-/* .bd-set-field-cc (+ .warn/.err) removed 2026-05-24 — zero JSX
-   consumers. Char-count display now uses vibcoder SectionLabel
-   counter slot, not bespoke class. */
-
-/* ── Input / Textarea / Select ── */
-.bd-set-input {
-  width: 100%;
-  padding: 7px 9px;
-  background: var(--bk-bg-card);
-  border: 1px solid var(--bk-border);
-  border-radius: 5px;
-  font: 500 var(--bk-text-12) var(--bk-font-ui);
-  color: var(--bk-ink);
-  outline: none;
-  transition: border-color 120ms, box-shadow 120ms;
-}
-textarea.bd-set-input {
-  resize: vertical;
-  min-height: 52px;
-  font-family: var(--bk-font-ui);
-}
-.bd-set-input:focus {
-  border-color: var(--bk-accent);
-  box-shadow: 0 0 0 3px var(--bk-accent-tint);
 }
 
 /* ── Switch row ── */
@@ -332,118 +92,6 @@ textarea.bd-set-input {
 .bd-set-switch.on .bd-set-switch-knob {
   left: 14px;
 }
-
-/* ── Savebar ── */
-.bd-set-savebar {
-  position: sticky;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: var(--bk-space-8) 10px;
-  background: var(--bk-bg-card);
-  border-top: 1px solid var(--bk-border);
-  transform: translateY(100%);
-  transition: transform 180ms ease-out;
-  z-index: 5;
-}
-.bd-set-savebar.on {
-  transform: translateY(0);
-}
-.bd-set-savebar-note {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--bk-space-4);
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-warning);
-}
-.bd-set-savebar-actions {
-  display: flex;
-  gap: var(--bk-space-4);
-}
-.bd-set-btn {
-  padding: 5px 10px;
-  border-radius: 5px;
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  cursor: pointer;
-  border: 1px solid transparent;
-  background: transparent;
-}
-.bd-set-btn.sec {
-  color: var(--bk-ink-soft);
-}
-.bd-set-btn.sec:hover {
-  color: var(--bk-ink);
-  background: var(--bk-bg-subtle);
-}
-.bd-set-btn.pri {
-  background: var(--bk-accent);
-  color: var(--bk-bg-card);
-}
-.bd-set-btn.pri:hover {
-  background: var(--bk-accent-hover);
-}
-.bd-set-btn:focus-visible {
-  outline: 2px solid var(--bk-accent);
-  outline-offset: 2px;
-}
-
-/* ── Branding placeholder (V1 — replaces DesignSystemTab delegate) ── */
-.bd-set-branding-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--bk-space-8);
-  padding: var(--bk-space-16) var(--bk-space-12);
-  background: var(--bk-bg-subtle);
-  border: 1px dashed var(--bk-border-medium);
-  border-radius: var(--bk-radius-md);
-  margin: var(--bk-space-12);
-}
-/* .bd-set-branding-placeholder-t/-d removed 2026-05-24 — zero JSX
-   consumers. Branding placeholder uses vibcoder EmptyState now. */
-
-/* ── Branding field map (signposts to where each field lives) ── */
-.bd-set-branding-map {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.bd-set-branding-map-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--bk-space-8);
-  padding: 8px 10px;
-  background: var(--bk-bg-subtle);
-  border: 1px solid var(--bk-border-medium);
-  border-radius: var(--bk-radius-md);
-}
-.bd-set-branding-map-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.bd-set-branding-map-label {
-  font: 600 12px var(--bk-font-ui);
-  color: var(--bk-ink);
-}
-.bd-set-branding-map-loc {
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-}
-
-/* Panel header rules deleted 2026-05-24 in header-pattern migration
-   (commit e63ac890). Settings now uses TabFrame.Header which sources
-   layout/typography/icon-btn styling from PanelHeader + SurfaceHead.
-   Removed rules: .bd-set-panel-h, .bd-set-panel-h-ttl, .bd-set-panel-sub,
-   .bd-set-panel-acts, .bd-set-icon-btn (+ hover + focus-visible). */
-
 
 /* ── Domains screen (P6) ── */
 .bd-set-domain-card {
