@@ -82,7 +82,9 @@ export interface DeployInputs {
 interface VercelRedirect {
   source: string;
   destination: string;
-  permanent: boolean;
+  /** The row's literal code. `permanent` would mean 308 / 307. */
+  statusCode?: 301 | 302;
+  permanent?: boolean;
   has?: Array<{ type: "host"; value: string }>;
 }
 
@@ -99,10 +101,10 @@ interface VercelConfig {
  *
  * Redirects (verified against the vercel.json reference and
  * @vercel/routing-utils `convertRedirects`, 2026-09-14):
- * - `permanent: true` is a 308, `false` a 307 — the modern, method-preserving
- *   forms of the 301 / 302 the row stores; both are cached / not cached the
- *   way the dialog's copy promises. `statusCode: 301|302` exists for the
- *   literal codes but "cannot be used with `permanent`".
+ * - The row's code ships literally as `statusCode: 301 | 302` — the dialog
+ *   promises "301 Permanent · 302 Temporary" and the table prints the number.
+ *   `permanent: true / false` would mean 308 / 307 instead, and Vercel refuses
+ *   the two keys together, so a page rule never carries `permanent`.
  * - `source` matches the pathname only; the incoming query string is always
  *   forwarded to the destination ("all query strings found in the source path
  *   will be passed to the destination path"). There is no per-rule switch to
@@ -121,7 +123,7 @@ function buildVercelConfig(input: Pick<DeployInputs, "redirects" | "domains" | "
   const redirects: VercelRedirect[] = input.redirects.map((r) => ({
     source: r.fromPath,
     destination: r.toUrl,
-    permanent: r.type === "301",
+    statusCode: r.type === "302" ? 302 : 301,
   }));
 
   const primary = input.domains.find((d) => d.isPrimary)?.domain ?? null;

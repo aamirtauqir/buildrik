@@ -126,12 +126,12 @@ describe("buildDeployFiles — vercel.json", () => {
     expect(vercelJson({ headers: headers({ cspPolicy: "   ", hstsMaxAge: 0, xFrameOptions: "" }) })).toBeNull();
   });
 
-  it("turns each redirect row into a rule: 301 is permanent (308), 302 is not (307)", () => {
+  it("turns each redirect row into a rule with its literal code: 301 or 302", () => {
     const json = vercelJson({ redirects: [rule("/old-menu", "/menu"), rule("/reservations", "https://book.example/x", "302")] });
     expect(json).toEqual({
       redirects: [
-        { source: "/old-menu", destination: "/menu", permanent: true },
-        { source: "/reservations", destination: "https://book.example/x", permanent: false },
+        { source: "/old-menu", destination: "/menu", statusCode: 301 },
+        { source: "/reservations", destination: "https://book.example/x", statusCode: 302 },
       ],
     });
   });
@@ -218,7 +218,7 @@ describe("buildDeployFiles — vercel.json", () => {
     const files = build({ redirects: [rule("/a", "/b")], headers: headers({ xFrameOptions: "DENY" }) });
     expect(files.map((f) => f.file)).toEqual(["index.html", "about.html", "pricing.html", "robots.txt", "sitemap.xml", "vercel.json"]);
     expect(JSON.parse(byName(files, "vercel.json"))).toEqual({
-      redirects: [{ source: "/a", destination: "/b", permanent: true }],
+      redirects: [{ source: "/a", destination: "/b", statusCode: 301 }],
       headers: [{ source: "/(.*)", headers: [{ key: "X-Frame-Options", value: "DENY" }] }],
     });
   });
