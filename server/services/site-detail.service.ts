@@ -1,9 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { LocaleStatus, LocalesSummary, SettingsOverview, SiteOverview } from "@buildrik/shared/schemas/site-detail";
+import type {
+  LocaleStatus,
+  LocalesSummary,
+  RedirectSuggestion,
+  SettingsOverview,
+  SiteOverview,
+} from "@buildrik/shared/schemas/site-detail";
 import { INTEGRATION_CATALOG } from "@buildrik/shared/schemas/integrations";
 
 const filled = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+
+/** The page columns `suggestRedirects` reads — shared by the query and the Overview's count. */
+const SUGGESTION_PAGE_SELECT = { id: true, name: true, slug: true, isHomePage: true, slugHistory: true } as const;
+
+type SuggestionPage = { id: string; name: string; slug: string; isHomePage: boolean; slugHistory: unknown };
 
 export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
   const site = await prisma.site.findUnique({
@@ -218,7 +229,6 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     primaryDomain,
     pendingDns,
     redirects,
-    slugHistory,
     analyticsDays,
     forms,
     submissions,
@@ -226,7 +236,7 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     webhook,
     members,
   ] = await Promise.all([
-    prisma.page.findMany({ where: { siteId }, select: { translations: true } }),
+    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: { ...SUGGESTION_PAGE_SELECT, translations: true } }),
     prisma.domain.findFirst({ where: { siteId, isPrimary: true }, select: { domain: true } }),
     prisma.dnsRecord.findMany({
       where: { verified: false, domain: { siteId } },
@@ -234,7 +244,6 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
       select: { type: true, host: true, domain: { select: { domain: true } } },
     }),
     prisma.redirect.findMany({ where: { siteId }, select: { fromPath: true } }),
-    prisma.slugHistory.findMany({ where: { siteId }, select: { oldSlug: true } }),
     prisma.siteAnalytics.count({ where: { siteId, date: { gte: sevenDaysAgo } } }),
     prisma.formBlock.count({ where: { siteId } }),
     prisma.formSubmission.count({ where: { siteId } }),
@@ -266,12 +275,10 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     (locale) => locale !== site.defaultLocale && !translatedPages.has(locale),
   );
 
-  // SlugHistory.oldSlug is written bare ("old-page"); Redirect.fromPath is a
-  // path ("/old-page"). Compare them as paths.
-  const redirected = new Set(redirects.map((r) => r.fromPath));
-  const suggestions = slugHistory.filter(
-    (h) => !redirected.has(h.oldSlug.startsWith("/") ? h.oldSlug : `/${h.oldSlug}`),
-  ).length;
+  // S1 counted `SlugHistory` rows (site-slug renames) here; the Redirects
+  // screen's suggester (S3) reads the PAGE slug history, so the count and the
+  // screen come from the same rule.
+  const suggestions = suggestRedirects(pages, redirects).length;
 
   // `projectSettings` is the editor's ProjectSettings JSON: analytics is keyed
   // by provider id (googleAnalytics, facebookPixel, …) with an `enabled` flag;
@@ -380,6 +387,66 @@ export async function getLocales(siteId: string): Promise<LocalesSummary> {
   });
 
   return { locales, total };
+}
+
+/**
+ * Settings → Redirects, the "404 suggester" card (Clone 3397:32517).
+ *
+ * The published site sends no 404 events, so the source is what the editor
+ * already records: `Page.slugHistory`, the `{ slug, changedAt }` entries
+ * PageManager.updatePage appends (the OLD slug, on every change). One row per
+ * old slug that no page serves any more and no `Redirect.fromPath` covers.
+ */
+export async function getRedirectSuggestions(siteId: string): Promise<RedirectSuggestion[]> {
+  const [pages, redirects] = await Promise.all([
+    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: SUGGESTION_PAGE_SELECT }),
+    prisma.redirect.findMany({ where: { siteId }, select: { fromPath: true } }),
+  ]);
+  return suggestRedirects(pages, redirects);
+}
+
+/**
+ * The rule behind the suggester and the Overview's "<n> suggestions" line.
+ *
+ * - A page's current path is `/<slug>`; the home page's is `/`. Which page is
+ *   home follows the export (`resolveHomePageId`): the `isHomePage` row, else
+ *   the first in site order — the flag is not guaranteed to be set.
+ * - An old slug that is now some page's current path is live, not a 404, and
+ *   is skipped; an old slug that already has a redirect is done.
+ * - The same old slug can recur (a → b → a → b): one suggestion, the newest.
+ * - Newest change first. An entry without a string `slug` or a parseable
+ *   `changedAt` is not a row the card can draw ("renamed <d MMM>") and is
+ *   skipped.
+ */
+function suggestRedirects(
+  pages: ReadonlyArray<SuggestionPage>,
+  redirects: ReadonlyArray<{ fromPath: string }>,
+): RedirectSuggestion[] {
+  const homeId = (pages.find((p) => p.isHomePage) ?? pages[0])?.id;
+  const currentPath = (page: SuggestionPage) => (page.id === homeId ? "/" : `/${page.slug}`);
+  const covered = new Set([...redirects.map((r) => r.fromPath), ...pages.map(currentPath)]);
+
+  const newest = new Map<string, RedirectSuggestion>();
+  for (const page of pages) {
+    if (!Array.isArray(page.slugHistory)) continue;
+    for (const entry of page.slugHistory) {
+      if (!isRecord(entry) || typeof entry.slug !== "string" || !entry.slug) continue;
+      const changedAt = typeof entry.changedAt === "string" ? new Date(entry.changedAt) : null;
+      if (!changedAt || Number.isNaN(changedAt.getTime())) continue;
+      const fromPath = `/${entry.slug.replace(/^\/+/, "")}`;
+      if (covered.has(fromPath)) continue;
+      const prior = newest.get(fromPath);
+      if (prior && prior.changedAt >= changedAt.toISOString()) continue;
+      newest.set(fromPath, {
+        fromPath,
+        toUrl: currentPath(page),
+        pageId: page.id,
+        pageName: page.name,
+        changedAt: changedAt.toISOString(),
+      });
+    }
+  }
+  return [...newest.values()].sort((a, b) => b.changedAt.localeCompare(a.changedAt));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -91,11 +91,70 @@ export const updateSiteSettingsSchema = z.object({
   localeAutoRedirect: z.boolean().optional(),
 });
 
+/**
+ * A redirect destination is a site path (`/new-page`, never `//host`) or a
+ * full http(s) URL — the rule the Add-redirect dialog (Clone 4254:75736)
+ * states and, since S3, the rule Vercel's `vercel.json` enforces at deploy
+ * time: a bare `new-page` there fails the whole publish, so it is refused
+ * here first.
+ */
+export const redirectTargetSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(2048)
+  .refine(
+    (value) => {
+      if (value.startsWith("/")) return !value.startsWith("//");
+      try {
+        const { protocol } = new URL(value);
+        return protocol === "http:" || protocol === "https:";
+      } catch {
+        return false;
+      }
+    },
+    { message: "To URL must be a path (/new-page) or a full URL (https://example.com/new)." },
+  );
+
+/**
+ * Settings S3 (Clone 4254:75736 Add redirect, 4254:75747 Edit redirect).
+ * `matchQuery` is the dialog's "Match query strings" toggle, `notes` its
+ * free text ("Optional — why this redirect exists."). Both optional so the
+ * dashboard's older redirect manager keeps calling `create` unchanged.
+ */
 export const createRedirectSchema = z.object({
   siteId: z.string(),
   fromPath: z.string().startsWith("/"),
-  toUrl: z.string(),
+  toUrl: redirectTargetSchema,
   type: z.enum(["301", "302"]),
+  matchQuery: z.boolean().optional(),
+  notes: z.string().max(500).nullable().optional(),
+});
+
+export const updateRedirectSchema = z.object({
+  id: z.string(),
+  fromPath: z.string().startsWith("/").optional(),
+  toUrl: redirectTargetSchema.optional(),
+  type: z.enum(["301", "302"]).optional(),
+  matchQuery: z.boolean().optional(),
+  notes: z.string().max(500).nullable().optional(),
+});
+
+/**
+ * `siteDetail.redirects.suggestions` (Clone 3397:32517, the "404 suggester"
+ * card). One row per old page slug the site no longer serves and has no
+ * redirect for — sourced from `Page.slugHistory`, the `{ slug, changedAt }`
+ * entries the editor's PageManager appends on every slug change, not from
+ * real 404 hits (the published site sends none). `toUrl` is the page's
+ * current path (`/` for the home page); `changedAt` is an ISO string; newest
+ * first. `Accept` creates a 301 from exactly these two fields.
+ */
+export const redirectSuggestionSchema = z.object({
+  fromPath: z.string(),
+  toUrl: z.string(),
+  pageId: z.string(),
+  pageName: z.string(),
+  changedAt: z.string().datetime(),
 });
 
 /** RFC 1123 hostname: 1-63 char labels, alphanumeric + hyphens, no leading
@@ -256,6 +315,8 @@ export type SiteOverview = z.infer<typeof siteOverviewSchema>;
 export type SettingsOverview = z.infer<typeof settingsOverviewSchema>;
 export type UpdateSiteSettingsInput = z.infer<typeof updateSiteSettingsSchema>;
 export type CreateRedirectInput = z.infer<typeof createRedirectSchema>;
+export type UpdateRedirectInput = z.infer<typeof updateRedirectSchema>;
+export type RedirectSuggestion = z.infer<typeof redirectSuggestionSchema>;
 export type ConnectDomainInput = z.infer<typeof connectDomainSchema>;
 export type DomainKind = z.infer<typeof domainKindSchema>;
 export type DnsProviderId = (typeof DNS_PROVIDERS)[number]["id"];

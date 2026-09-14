@@ -78,8 +78,9 @@ function escapeXml(s: string): string {
  * publish payload carries pages, so nothing else ever reached the deploy.
  *
  * Entries use the uploaded filenames (about.html), because that is what the
- * deploy serves: there is no vercel.json asking for clean URLs, and a sitemap
- * of /about would be a list of 404s. A page carrying its own noindex is left
+ * deploy serves: the vercel.json we ship (publish-files.ts, Settings S3)
+ * carries redirects and headers, not `cleanUrls`, and a sitemap of /about
+ * would be a list of 404s. A page carrying its own noindex is left
  * out — a sitemap is a list of pages you want indexed.
  */
 export function buildSitemapXml(
