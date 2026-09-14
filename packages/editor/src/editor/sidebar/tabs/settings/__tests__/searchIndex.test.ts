@@ -134,6 +134,20 @@ describe("SETTINGS_SEARCH_INDEX", () => {
     ]);
     for (const e of own.slice(1)) expect(e.group).toBe("Domains");
   });
+
+  it("lists the Headers rows S3 built on 3397:32602 in card order, under the controls' own ids", () => {
+    const own = SETTINGS_SEARCH_INDEX.filter((e) => e.screen === "headers");
+    expect(own[0]).toMatchObject({ id: "headers", title: "Headers", description: "CSP, HSTS, security policy", group: "Advanced" });
+    expect(own.slice(1).map((e) => [e.title, e.description, e.fieldId])).toEqual([
+      ["CSP header value", "Content Security Policy", "set-hd-csp"],
+      ["Policy", "X-Frame-Options", "set-hd-xfo"],
+      ["Policy", "Referrer-Policy", "set-hd-referrer"],
+      ["Enable HSTS", "HSTS (HTTP Strict Transport Security)", "set-hd-hsts-enable"],
+      ["Max age", "HSTS (HTTP Strict Transport Security)", "set-hd-hsts-max"],
+      ["Header value", "Permissions-Policy", "set-hd-permissions"],
+    ]);
+    for (const e of own.slice(1)) expect(e.group).toBe("Headers");
+  });
 });
 
 describe("searchSettings", () => {

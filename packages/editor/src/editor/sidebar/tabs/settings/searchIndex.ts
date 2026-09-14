@@ -189,12 +189,16 @@ const SECTIONS: SectionDef[] = [
     title: "Headers",
     description: "CSP, HSTS, security policy",
     group: ADVANCED,
+    // Clone 3397:32602's rows in its card order; each id is the control's
+    // own `id` (the S3 brief's `set-hd-*` testids), so Search lands on the
+    // control itself. Permissions-Policy is the code's card below the frame's.
     fields: [
-      ["CSP header value", "Content Security Policy", "csp-header-value"],
-      ["Max age", "HSTS (HTTP Strict Transport Security)", "max-age"],
-      ["Policy", "X-Frame-Options", "x-frame-policy"],
-      ["Policy", "Referrer-Policy", "referrer-policy"],
-      ["Header value", "Permissions-Policy", "header-value"],
+      ["CSP header value", "Content Security Policy", "set-hd-csp"],
+      ["Policy", "X-Frame-Options", "set-hd-xfo"],
+      ["Policy", "Referrer-Policy", "set-hd-referrer"],
+      ["Enable HSTS", "HSTS (HTTP Strict Transport Security)", "set-hd-hsts-enable"],
+      ["Max age", "HSTS (HTTP Strict Transport Security)", "set-hd-hsts-max"],
+      ["Header value", "Permissions-Policy", "set-hd-permissions"],
     ],
   },
   { screen: "integrations", title: "Integrations", description: "Third-party services", group: ADVANCED },
