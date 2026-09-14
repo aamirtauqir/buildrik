@@ -16,6 +16,8 @@
  * What the Overview reads afterwards (site otherwise untouched):
  *   Localization  2 locales · Arabic not started        (attention row)
  *   Domains       scratchver.example.com · 1 DNS pending (attention row)
+ *                 S2: kind PRIMARY · Force HTTPS on · Namecheap · A + CNAME
+ *                 verified, TXT pending
  *   Redirects     3 rules · 2 suggestions
  *   Analytics     receiving (7 daily rows; provider set in the UI)
  *   Forms         3 forms · 38 submissions
@@ -31,6 +33,14 @@ const ID = "sclone-";
 const LOCALE = "ar";
 const DOMAIN = "scratchver.example.com";
 const INTEGRATIONS = ["mailchimp", "zapier"];
+// What `connectDomain` writes without a Vercel attachment (domain.service),
+// in the shape the dialog draws. The TXT value is a fixture, not the
+// service's row-id token — nothing checks it against a real zone here.
+const DNS_RECORDS = [
+  { id: `${ID}dns-a`, type: "A", host: "@", value: "76.76.21.21", verified: true },
+  { id: `${ID}dns-cname`, type: "CNAME", host: "www", value: "cname.vercel-dns.com", verified: true },
+  { id: `${ID}dns-txt`, type: "TXT", host: "_buildrick", value: "brk-verify-sclone", verified: false },
+];
 const REDIRECTS = [
   { id: `${ID}redirect-menu`, fromPath: "/old-menu", toUrl: "/menu", type: "301" },
   { id: `${ID}redirect-about`, fromPath: "/about-us", toUrl: "/about", type: "301" },
@@ -86,9 +96,15 @@ async function seed() {
     throw new Error(`${DOMAIN} belongs to site ${existingDomain.siteId}, not the scratch site.`);
   }
   const currentPrimary = await prisma.domain.findFirst({ where: { siteId: SITE_ID, isPrimary: true }, select: { id: true } });
+  // S2 (Clone 3397:32206 / 3737:43669): the dialog's type · provider · Force
+  // HTTPS on the row, and the three records it draws — A and CNAME answering,
+  // the `_buildrick` TXT still pending (the frame's VERIFIED / VERIFIED /
+  // PENDING). The columns are set on re-run too, so an S1-seeded row picks
+  // them up. `status` stays PENDING: that is what `check` computes for
+  // two-of-three, and the Overview's "1 DNS pending" row depends on it.
   const domain = await prisma.domain.upsert({
     where: { domain: DOMAIN },
-    update: {},
+    update: { kind: "PRIMARY", forceHttps: true, dnsProvider: "namecheap" },
     create: {
       id: `${ID}domain`,
       siteId: SITE_ID,
@@ -96,13 +112,18 @@ async function seed() {
       status: "PENDING",
       sslStatus: "PENDING",
       isPrimary: currentPrimary === null,
+      kind: "PRIMARY",
+      forceHttps: true,
+      dnsProvider: "namecheap",
     },
   });
-  await prisma.dnsRecord.upsert({
-    where: { id: `${ID}dns-txt` },
-    update: {},
-    create: { id: `${ID}dns-txt`, domainId: domain.id, type: "TXT", host: "_buildrick", value: "buildrick-verify=sclone", verified: false },
-  });
+  for (const r of DNS_RECORDS) {
+    await prisma.dnsRecord.upsert({
+      where: { id: r.id },
+      update: { type: r.type, host: r.host, value: r.value, verified: r.verified },
+      create: { ...r, domainId: domain.id },
+    });
+  }
 
   for (const r of REDIRECTS) {
     await prisma.redirect.upsert({

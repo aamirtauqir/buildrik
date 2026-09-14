@@ -10,7 +10,7 @@ vi.mock("@/lib/prisma", () => ({
     formSubmission: { count: vi.fn() },
     formBlock: { findMany: vi.fn() },
     redirect: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-    domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn(), count: vi.fn() },
+    domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn(), findUniqueOrThrow: vi.fn(), count: vi.fn() },
     workspace: { findUnique: vi.fn() },
     shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
     analyticsEvent: { findMany: vi.fn(), groupBy: vi.fn(), count: vi.fn() },
@@ -143,8 +143,11 @@ describe("Site Detail Service", () => {
       vi.mocked(prisma.domain.create).mockResolvedValue({
         id: "d2", domain: "example.com", status: "PENDING", sslStatus: "PENDING",
       } as any);
-      vi.mocked(prisma.dnsRecord.createMany).mockResolvedValue({ count: 2 });
-      const result = await connectDomain("s1", "example.com");
+      vi.mocked(prisma.dnsRecord.createMany).mockResolvedValue({ count: 3 });
+      vi.mocked(prisma.domain.findUniqueOrThrow).mockResolvedValue({
+        id: "d2", domain: "example.com", status: "PENDING", sslStatus: "PENDING", dnsRecords: [],
+      } as any);
+      const result = await connectDomain("s1", { domain: "example.com" });
       expect(result.domain).toBe("example.com");
       expect(result.status).toBe("PENDING");
     });
@@ -155,7 +158,7 @@ describe("Site Detail Service", () => {
       vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
       vi.mocked(prisma.domain.count).mockResolvedValue(0);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue({ id: "d1" } as any);
-      await expect(connectDomain("s1", "example.com")).rejects.toThrow("DOMAIN_IN_USE");
+      await expect(connectDomain("s1", { domain: "example.com" })).rejects.toThrow("DOMAIN_IN_USE");
     });
   });
 

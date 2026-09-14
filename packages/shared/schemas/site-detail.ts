@@ -101,9 +101,63 @@ export const createRedirectSchema = z.object({
  *  Rejects protocols, paths, and ports — DNS apex / subdomain only. */
 const HOSTNAME_RE = /^(?=.{1,253}\.?$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+\.?$/;
 
+/** One hostname rule for `connect` and for the availability check's `invalid`. */
+export const domainNameSchema = z
+  .string()
+  .min(3)
+  .max(253)
+  .regex(HOSTNAME_RE, "Must be a valid hostname (e.g. example.com or sub.example.com)");
+
+/**
+ * Settings S2 (Clone 3737:43669). What a connected domain IS: the one that
+ * serves the site, one that 301s to it, or a subdomain of it. `Domain.isPrimary`
+ * is a different fact ("which one currently serves") and stays as it was.
+ */
+export const domainKindSchema = z.enum(["PRIMARY", "REDIRECT", "SUBDOMAIN"]);
+
+/**
+ * The DNS providers the Add-a-domain dialog offers, with the nameservers the
+ * "Nameservers · Read-only · set at your registrar" block draws. Shared because
+ * the editor renders the select and the block from it and the server stores
+ * the chosen `id` in `Domain.dnsProvider`. Namecheap's pair is fixed
+ * (BasicDNS). Cloudflare assigns two per zone from `<name>.ns.cloudflare.com`
+ * and GoDaddy a numbered pair from `nsNN.domaincontrol.com` — the entries name
+ * the pattern, not a pair the user will necessarily hold. "Other" lists none.
+ */
+export const DNS_PROVIDERS = [
+  { id: "namecheap", label: "Namecheap", nameservers: ["dns1.registrar-servers.com", "dns2.registrar-servers.com"] },
+  { id: "cloudflare", label: "Cloudflare", nameservers: ["<first>.ns.cloudflare.com", "<second>.ns.cloudflare.com"] },
+  { id: "godaddy", label: "GoDaddy", nameservers: ["ns01.domaincontrol.com", "ns02.domaincontrol.com"] },
+  { id: "other", label: "Other", nameservers: [] },
+] as const satisfies ReadonlyArray<{ id: string; label: string; nameservers: ReadonlyArray<string> }>;
+
 export const connectDomainSchema = z.object({
   siteId: z.string(),
-  domain: z.string().min(3).max(253).regex(HOSTNAME_RE, "Must be a valid hostname (e.g. example.com or sub.example.com)"),
+  domain: domainNameSchema,
+  kind: domainKindSchema.optional(),
+  dnsProvider: z.string().min(1).max(40).optional(),
+  forceHttps: z.boolean().optional(),
+});
+
+/** `siteDetail.domains.checkAvailability` — the dialog's `Available` / `Already connected` tag. */
+export const checkDomainAvailabilitySchema = z.object({
+  domain: z.string().max(253),
+});
+
+/**
+ * `available` means no `Domain.domain` in this database matches, compared
+ * case-insensitively. Registrar availability is out of scope (external).
+ * `invalid` = not a hostname; `connected` = a site here already has it.
+ */
+export const domainAvailabilitySchema = z.object({
+  available: z.boolean(),
+  reason: z.enum(["connected", "invalid"]).optional(),
+});
+
+/** `siteDetail.domains.update` — the card's Force HTTPS toggle (ADMIN). */
+export const updateDomainSchema = z.object({
+  id: z.string(),
+  forceHttps: z.boolean(),
 });
 
 export const createShareLinkSchema = z.object({
@@ -152,5 +206,10 @@ export type SettingsOverview = z.infer<typeof settingsOverviewSchema>;
 export type UpdateSiteSettingsInput = z.infer<typeof updateSiteSettingsSchema>;
 export type CreateRedirectInput = z.infer<typeof createRedirectSchema>;
 export type ConnectDomainInput = z.infer<typeof connectDomainSchema>;
+export type DomainKind = z.infer<typeof domainKindSchema>;
+export type DnsProviderId = (typeof DNS_PROVIDERS)[number]["id"];
+export type CheckDomainAvailabilityInput = z.infer<typeof checkDomainAvailabilitySchema>;
+export type DomainAvailability = z.infer<typeof domainAvailabilitySchema>;
+export type UpdateDomainInput = z.infer<typeof updateDomainSchema>;
 export type CreateShareLinkInput = z.infer<typeof createShareLinkSchema>;
 export type SiteAnalyticsQuery = z.infer<typeof siteAnalyticsQuerySchema>;

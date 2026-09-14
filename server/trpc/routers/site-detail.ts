@@ -7,11 +7,28 @@ import { getSettingsOverview, getSiteOverview } from "@/server/services/site-det
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
-import { checkDomainDns, listDomains, connectDomain, removeDomain, setPrimaryDomain, listWorkspaceDomains } from "@/server/services/domain.service";
+import {
+  checkDomainDns,
+  listDomains,
+  connectDomain,
+  removeDomain,
+  setPrimaryDomain,
+  listWorkspaceDomains,
+  checkDomainAvailability,
+  updateDomain,
+} from "@/server/services/domain.service";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
 import { getSiteAnalytics } from "@/server/services/analytics.service";
-import { updateSiteSettingsSchema, createRedirectSchema, connectDomainSchema, createShareLinkSchema, siteAnalyticsQuerySchema } from "@buildrik/shared/schemas/site-detail";
+import {
+  updateSiteSettingsSchema,
+  createRedirectSchema,
+  connectDomainSchema,
+  checkDomainAvailabilitySchema,
+  updateDomainSchema,
+  createShareLinkSchema,
+  siteAnalyticsQuerySchema,
+} from "@buildrik/shared/schemas/site-detail";
 
 export const siteDetailRouter = router({
   overview: protectedProcedure
@@ -226,6 +243,13 @@ export const siteDetailRouter = router({
       return listWorkspaceDomains(workspaceId);
     }),
 
+    // The Add-a-domain dialog's `Available` / `Already connected` tag. Not
+    // site-scoped: a hostname is unique across the whole database, and the
+    // answer reveals only what `connect` would say anyway (DOMAIN_IN_USE).
+    checkAvailability: protectedProcedure
+      .input(checkDomainAvailabilitySchema)
+      .query(({ input }) => checkDomainAvailability(input.domain)),
+
     check: protectedProcedure
       .input(z.object({ id: z.string(), siteId: z.string() }))
       .mutation(async ({ ctx, input }) => {
@@ -250,7 +274,8 @@ export const siteDetailRouter = router({
           throw e;
         }
         try {
-          const domain = await connectDomain(input.siteId, input.domain);
+          const { siteId, ...options } = input;
+          const domain = await connectDomain(siteId, options);
           await recordForSite({
             siteId: input.siteId,
             actorId: ctx.session.user!.id!,
@@ -270,6 +295,25 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
           throw e;
         }
+      }),
+
+    // The card's Force HTTPS toggle (Clone 3397:32206). Same gate as `remove`:
+    // the row names its site, and ADMIN on that site is required.
+    update: protectedProcedure
+      .input(updateDomainSchema)
+      .mutation(async ({ ctx, input }) => {
+        const domain = await ctx.prisma.domain.findUnique({
+          where: { id: input.id },
+          select: { siteId: true },
+        });
+        if (!domain) throw new TRPCError({ code: "NOT_FOUND" });
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, domain.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return updateDomain(input.id, { forceHttps: input.forceHttps });
       }),
 
     remove: protectedProcedure
