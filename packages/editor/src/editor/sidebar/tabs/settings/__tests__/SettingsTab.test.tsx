@@ -134,13 +134,18 @@ vi.mock("../screens/SeoScreen", () => ({
     onLoadStateChange,
     onDirtyChange,
     saveError,
+    registerHeaderAction,
   }: {
     onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
     onDirtyChange?: (d: boolean) => void;
     saveError?: string | null;
+    registerHeaderAction?: (node: React.ReactNode | null) => void;
   }) => (
     <div data-testid="fake-seo">
       {saveError ? <div data-testid="set-save-error">{saveError}</div> : null}
+      <button type="button" onClick={() => registerHeaderAction?.(<button type="button" data-testid="set-head-action">Add thing</button>)}>
+        register header action
+      </button>
       <input id="seo-meta-title" aria-label="Meta title" onChange={() => onDirtyChange?.(true)} />
       <button type="button" onClick={() => onLoadStateChange?.("loading")}>
         go loading
@@ -520,6 +525,31 @@ describe("SettingsTab — Save changes with a site id goes through the sync prov
     await screen.findByTestId("set-saved");
     expect(sync.saveProject).toHaveBeenCalledTimes(2);
     errorSpy.mockRestore();
+  });
+});
+
+// ─── Header action + immediate screens (S2) ───────────────────────────────
+
+describe("SettingsTab — a screen's own header action, and screens whose actions apply at once", () => {
+  it("renders what the screen registers at the header's right and clears it on a screen change", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    /* The mocked SEO screen registers `Add thing` when told to. */
+    fireEvent.click(screen.getByText("register header action"));
+    expect(screen.getByTestId("set-head-action")).toHaveTextContent("Add thing");
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    expect(screen.queryByTestId("set-head-action")).toBeNull();
+  });
+
+  it("Domains (3397:32206) has no Cancel / Save — `Actions apply immediately · nothing to save here` and Done", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-domains"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / Domains"));
+    expect(footStatus()).toBe("Actions apply immediately · nothing to save here");
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
+    expect(screen.getByTestId("set-foot-done")).toHaveTextContent("Done");
   });
 });
 

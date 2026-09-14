@@ -86,7 +86,15 @@ const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
   general: "Site settings were not saved. Your changes are still here. Review the values, then retry.",
   seo: "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
   "custom-code": "Custom code was not saved. Your changes are still here. Review the values, then retry.",
+  domains: "Domain changes were not saved. Your changes are still here. Review the values, then retry.",
+  analytics: "Analytics settings were not saved. Your changes are still here. Review the values, then retry.",
+  localization: "Localization settings were not saved. Your changes are still here. Review the values, then retry.",
 };
+
+/* Screens whose actions apply as they happen — the frame draws them with no
+   Cancel / Save (3397:32206 Domains: `Actions apply immediately · nothing to
+   save here` · Done). */
+const IMMEDIATE_SCREENS = new Set<SettingsNavId>(["domains"]);
 
 const OVERVIEW_SUBTITLE = " · everything on this page is scoped to this project.";
 
@@ -156,6 +164,12 @@ export const SettingsTab: React.FC<
       composer.off(EVENTS.PROJECT_METADATA_CHANGED, read);
     };
   }, [composer]);
+
+  /* The screen's own header primary (`Add domain`, `Add locale`) — see
+     ScreenProps.registerHeaderAction. Cleared whenever the screen changes. */
+  const [headerAction, setHeaderAction] = React.useState<React.ReactNode | null>(null);
+  const registerHeaderAction = React.useCallback((node: React.ReactNode | null) => setHeaderAction(node), []);
+  React.useEffect(() => setHeaderAction(null), [currentScreen]);
 
   const [screenIsDirty, setScreenIsDirty] = React.useState(false);
   // Click handlers read the LATEST dirty value synchronously through this
@@ -431,6 +445,7 @@ export const SettingsTab: React.FC<
       registerFlushHandler,
       onLoadStateChange: setLoadState,
       saveError,
+      registerHeaderAction,
     };
     switch (currentScreen as SettingsNavId) {
       case "general":
@@ -465,8 +480,11 @@ export const SettingsTab: React.FC<
   const headTitle = isOverview || !current ? "Settings" : `${SETTINGS_NAV_GROUPS[current.group]} / ${current.title}`;
   const headSub = isOverview || !current ? `${siteName}${OVERVIEW_SUBTITLE}` : current.subtitle;
 
+  const immediate = IMMEDIATE_SCREENS.has(currentScreen as SettingsNavId);
   const footStatus: { text: string; tone: "muted" | "danger" | "warning" } = isOverview
     ? { text: "Pick a section to edit its settings", tone: "muted" }
+    : immediate && loadState === "ready"
+      ? { text: "Actions apply immediately · nothing to save here", tone: "muted" }
     : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
@@ -607,7 +625,9 @@ export const SettingsTab: React.FC<
             <Button type="button" size="xs" className={`${SET_BTN} tw:shrink-0`} onClick={openBilling} data-testid="set-head-upgrade">
               Upgrade
             </Button>
-          ) : null}
+          ) : (
+            headerAction
+          )}
         </header>
 
         <div
@@ -631,8 +651,8 @@ export const SettingsTab: React.FC<
           >
             {footStatus.text}
           </span>
-          {isOverview ? (
-            <Button type="button" size="xs" className={SET_BTN} onClick={requestLeave} data-testid="set-ov-done">
+          {isOverview || immediate ? (
+            <Button type="button" size="xs" className={SET_BTN} onClick={requestLeave} data-testid={isOverview ? "set-ov-done" : "set-foot-done"}>
               Done
             </Button>
           ) : (

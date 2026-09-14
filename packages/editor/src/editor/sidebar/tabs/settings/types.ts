@@ -3,6 +3,7 @@
  * @license BSD-3-Clause
  */
 
+import type * as React from "react";
 import type { Composer } from "../../../../engine";
 
 // ============================================
@@ -77,6 +78,13 @@ export interface ScreenProps {
   registerRetryLoad?: (fn: (() => void) | null) => void;
   /** The last Save's failure, set by the shell; the screen renders the banner above its cards. */
   saveError?: string | null;
+  /**
+   * A screen's own primary in the pane header — `Add domain` (Clone
+   * 3397:32206), `Add locale` (3397:32376). Registered in an effect on mount
+   * and cleared with `null` on unmount; the shell renders it at the header's
+   * right, where the locked screen's `Upgrade` sits.
+   */
+  registerHeaderAction?: (node: React.ReactNode | null) => void;
 }
 
 // ============================================
