@@ -165,20 +165,36 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
 
     const value = await this.resolveBinding(binding);
 
-    switch (binding.property) {
-      case "content":
-        element.setContent(value);
-        break;
-      case "src":
-      case "href":
-      case "alt":
-      case "title":
-        element.setTrait(binding.property, value);
-        break;
-      default:
-        // For other properties, try setting as trait
-        element.setTrait(binding.property, value);
-    }
+    /* The write below is a real project change — it must dirty the project
+       and reach autosave — but it must NOT become an undo entry. Bindings live
+       in a map outside the snapshot, so a history record of this write would
+       be an entry that restores the text and not the binding: Undo would look
+       armed, and undo nothing a user can see. That is exactly what was
+       measured 2026-09-15: `bind()` had already declared the action
+       unrecorded, then this write arrived, `markDirty` emitted
+       PROJECT_CHANGED, HistoryManager recorded a normal patch, and the guard
+       was silently re-armed 1000ms later. `runWithoutTracking` stops the
+       recorder seeing this one emit while leaving the dirty flag and autosave
+       untouched — they read the same event through their own listeners. */
+    const write = () => {
+      switch (binding.property) {
+        case "content":
+          element.setContent(value);
+          break;
+        case "src":
+        case "href":
+        case "alt":
+        case "title":
+          element.setTrait(binding.property, value);
+          break;
+        default:
+          // For other properties, try setting as trait
+          element.setTrait(binding.property, value);
+      }
+    };
+    const history = this.composer.history;
+    if (history?.runWithoutTracking) history.runWithoutTracking(write);
+    else write();
   }
 
   /**

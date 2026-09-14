@@ -103,8 +103,15 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
        wrapping this in a transaction would flip canUndo true over an entry
        that restores nothing. Say so instead: Undo enabled itself after a
        binding and undid an unrelated earlier edit, measured 2026-09-03. */
-    this.composer.history?.noteUnrecordedAction?.("binding a field to content");
-    void this.applyBinding(elementId, binding);
+    /* Declared AFTER the apply settles, not before it. Declared first, the
+       content write that follows re-armed Undo through a normal history record
+       and the guard lasted 500ms — measured live 2026-09-15. The write itself
+       is now untracked (see CMSBindingManager.applyBinding), so this is belt
+       and braces; the order still matters if a subclass ever writes without
+       the wrapper. */
+    void this.applyBinding(elementId, binding).finally(() => {
+      this.composer.history?.noteUnrecordedAction?.("binding a field to content");
+    });
   }
 
   /**

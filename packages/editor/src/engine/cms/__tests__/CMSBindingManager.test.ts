@@ -382,9 +382,34 @@ describe("CMSBindingManager — a binding tells history it happened outside it",
     const manager = new CMSBindingManager(composer, cms);
 
     manager.bindToField("el-1", collection.id, item.id, "title", "content");
-    expect(noteUnrecordedAction).toHaveBeenCalledWith("binding a field to content");
+    /* The announce lands AFTER the apply settles, not synchronously inside
+       bind(). Announced first, the content write that followed re-armed Undo
+       through a normal history record and the guard lasted 500ms — measured
+       live 2026-09-15. So the order is the contract, and this awaits it. */
+    await vi.waitFor(() => expect(noteUnrecordedAction).toHaveBeenCalledWith("binding a field to content"));
 
     manager.unbindAll("el-1");
     expect(noteUnrecordedAction).toHaveBeenCalledWith("unbinding a field");
+  });
+
+  /* THE ONE THAT CATCHES THE ACTUAL DEFECT. Announcing was never the hard
+     part; the write that applies the bound value must not itself become a
+     history entry, or Undo re-arms over an entry that restores the text and
+     not the binding. This asserts the write went through runWithoutTracking
+     and that the announce is the last word, in that order. */
+  it("applies the bound value without letting history record it", async () => {
+    const { cms, collection, item } = await setupWithContent();
+    const { composer } = makeComposer({ "el-1": makeElementStub() });
+    const calls: string[] = [];
+    const runWithoutTracking = vi.fn((fn: () => void) => { calls.push("untracked-write"); fn(); });
+    const noteUnrecordedAction = vi.fn(() => { calls.push("announce"); });
+    Object.assign(composer, { history: { runWithoutTracking, noteUnrecordedAction } });
+    const manager = new CMSBindingManager(composer, cms);
+
+    manager.bindToField("el-1", collection.id, item.id, "title", "content");
+    await vi.waitFor(() => expect(noteUnrecordedAction).toHaveBeenCalled());
+
+    expect(runWithoutTracking).toHaveBeenCalledTimes(1);
+    expect(calls).toEqual(["untracked-write", "announce"]);
   });
 });
