@@ -112,7 +112,10 @@ export function SearchSettingsModal({ open, siteName, onClose, onOpen }: SearchS
             <TextInput
               ref={inputRef}
               id="set-search-input"
-              type="search"
+              /* `text`, not `search`: WebKit draws its own clear control on a
+                 search input, and the frame's one ✕ became two (walked live
+                 2026-09-14). The ✕ below is the one the frame draws. */
+              type="text"
               value={query}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
               autoFocus

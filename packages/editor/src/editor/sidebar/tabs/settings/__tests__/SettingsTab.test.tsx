@@ -26,6 +26,15 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, within, act } from "@testing-library/react";
 import * as React from "react";
 
+const sync = vi.hoisted(() => ({
+  saveProject: vi.fn(async (_siteId: string, _data: unknown) => ({ success: true, savedAt: new Date() })),
+}));
+vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
+  saveProject: sync.saveProject,
+  getEditorPlanTier: () => "starter",
+}));
+
 vi.mock("../hooks/useSettingsScreen", () => ({
   useSettingsScreen: vi.fn(
     (
@@ -157,6 +166,7 @@ vi.mock("../screens/OverviewScreen", () => ({
 }));
 
 import { SettingsTab } from "../SettingsTab";
+import { SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 
 afterEach(() => {
   cleanup();
@@ -180,6 +190,8 @@ const makeComposer = (saveProject: () => Promise<void> = () => Promise.resolve()
   setProjectSettings: vi.fn(),
   getProjectMetadata: () => ({ name: "Bella Cucina" }),
   saveProject: vi.fn(saveProject),
+  exportProject: () => ({ pages: [] }),
+  markSaved: vi.fn(),
   emit: vi.fn(),
   on: vi.fn(),
   off: vi.fn(),
@@ -297,11 +309,15 @@ describe("SettingsTab — the shell", () => {
     await waitFor(() => expect(headTitle()).toBe("Advanced / Custom code"));
     expect(screen.getByTestId("set-head-upgrade").textContent).toBe("Upgrade");
     expect(screen.getByText(/Custom code is a Pro feature/)).toBeTruthy();
+    /* 3397:32859 draws no footer under the locked card. */
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
     cleanup();
     render(<SettingsTab composer={asComposer(makeComposer())} userPlan="enterprise" />);
     fireEvent.click(screen.getByTestId("set-nav-custom-code"));
     await waitFor(() => expect(headTitle()).toBe("Advanced / Custom code"));
     expect(screen.queryByTestId("set-head-upgrade")).toBeNull();
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save changes");
   });
 
   it("deep-links: 'plugins' opens Integrations; an id that names no screen stays on the Overview", async () => {
@@ -454,6 +470,55 @@ describe("SettingsTab — Save changes", () => {
     expect(composer.saveProject).toHaveBeenCalledTimes(2);
     expect(screen.queryByTestId("set-save-error")).toBeNull();
     expect(screen.getByTestId("set-foot-save").textContent).toBe("Save changes");
+    errorSpy.mockRestore();
+  });
+});
+
+/* The shipping editor (a site id in the URL) persists through the sync
+   provider, not `composer.saveProject()`: the server mirror is the save.
+   Walked live 2026-09-14 — an invalid OG image read `Settings saved` while
+   the server answered 207 and kept the old value. */
+describe("SettingsTab — Save changes with a site id goes through the sync provider", () => {
+  beforeEach(() => sync.saveProject.mockClear());
+
+  /* The SEO screen is mocked above (a real General would read the server). */
+  async function openSeoAndEdit() {
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
+    await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
+  }
+
+  it("awaits the provider's save and marks the composer saved; composer.saveProject is not used", async () => {
+    const composer = makeComposer();
+    render(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
+    await openSeoAndEdit();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await screen.findByTestId("set-saved");
+    expect(sync.saveProject).toHaveBeenCalledTimes(1);
+    expect(sync.saveProject.mock.calls[0][0]).toBe("site-1");
+    expect(composer.saveProject).not.toHaveBeenCalled();
+    expect(composer.markSaved).toHaveBeenCalledTimes(1);
+  });
+
+  it("a refused settings mirror (the provider's window event) is this save's failure", async () => {
+    const composer = makeComposer();
+    sync.saveProject.mockImplementationOnce(async () => {
+      window.dispatchEvent(new CustomEvent(SETTINGS_MIRROR_ERROR_EVENT, { detail: { message: "ogImage: Invalid url" } }));
+      return { success: true, savedAt: new Date() };
+    });
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    render(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
+    await openSeoAndEdit();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await waitFor(() => expect(footStatus()).toBe("Changes not saved"));
+    expect(screen.getByTestId("set-save-error").textContent).toBe(
+      "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
+    );
+    expect(screen.queryByTestId("set-saved")).toBeNull();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await screen.findByTestId("set-saved");
+    expect(sync.saveProject).toHaveBeenCalledTimes(2);
     errorSpy.mockRestore();
   });
 });

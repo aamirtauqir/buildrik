@@ -62,7 +62,7 @@ import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
 import { SettingsSavedDialog } from "./components/SettingsSavedDialog";
 import { SearchSettingsModal } from "./components/SearchSettingsModal";
 import type { ProjectSettings } from "@/shared/types/project";
-import { getEditorPlanTier, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
+import { getEditorPlanTier, saveProject as syncSaveProject, SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { currentSiteId } from "@/services/ReviewService";
@@ -377,19 +377,27 @@ export const SettingsTab: React.FC<
       if (!composer) return;
       // Flush the screen's local edits into composer once, then persist.
       screenFlushHandlerRef.current?.();
-      /* `saveProject` resolves even when the Site-column mirror
-         (`siteDetail.settings.update`) fails — the sync provider reports that
-         failure as a window event instead, so the project data is not lost
-         over a settings 4xx. Here that mirror IS the save (General / SEO /
-         Custom code live on the Site row), so its failure is this save's
-         failure: the 3950:26309 banner and `Retry save`. */
+      /* The shipping editor persists through BuildrikSyncProvider, not through
+         `composer.saveProject()` — that one writes the engine's own storage,
+         and the server mirror (`siteDetail.settings.update`, where General /
+         SEO / Custom code actually live) only ran on the autosave tick seconds
+         later. Walked live 2026-09-14: an invalid OG image showed `Settings
+         saved` while the server answered 207 and kept the old value. With a
+         site id the save is the provider's, awaited here; the provider resolves
+         even when the mirror is refused and reports that as a window event
+         (so the page save is not undone by a settings 4xx), and here the
+         mirror IS the save — its failure is the 3950:26309 banner + Retry save. */
       run = new Promise<void>((resolve, reject) => {
         let mirrorError: string | null = null;
         const onMirror = (e: Event) => {
           mirrorError = (e as CustomEvent<{ message?: string }>).detail?.message ?? "Settings were not saved.";
         };
         window.addEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirror);
-        Promise.resolve(composer.saveProject?.())
+        const snapshot = projectId ? composer.exportProject() : null;
+        const write = snapshot
+          ? syncSaveProject(projectId!, snapshot).then(() => composer.markSaved(snapshot))
+          : Promise.resolve(composer.saveProject?.());
+        write
           .then(() => (mirrorError ? reject(new Error(mirrorError)) : resolve()), reject)
           .finally(() => window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirror));
       });
@@ -400,7 +408,7 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving]);
+  }, [composer, current, currentScreen, saving, projectId]);
 
   const openBilling = React.useCallback(() => {
     window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`, "_blank", "noopener,noreferrer");
@@ -612,6 +620,9 @@ export const SettingsTab: React.FC<
           {renderScreen()}
         </div>
 
+        {/* A locked screen has nothing to save and the frame (3397:32859)
+            draws no footer under it — its only action is the header's Upgrade. */}
+        {locked ? null : (
         <footer className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:gap-4 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-12">
           <span
             className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
@@ -642,6 +653,7 @@ export const SettingsTab: React.FC<
             </div>
           )}
         </footer>
+        )}
       </div>
 
       <UnsavedSettingsDialog open={guardOpen} siteName={siteName} onKeepEditing={handleKeepEditing} onDiscard={handleDiscard} />
