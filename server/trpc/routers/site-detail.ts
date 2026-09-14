@@ -3,15 +3,32 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
-import { getSettingsOverview, getSiteOverview } from "@/server/services/site-detail.service";
+import { getSettingsOverview, getSiteOverview, getLocales } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
-import { checkDomainDns, listDomains, connectDomain, removeDomain, setPrimaryDomain, listWorkspaceDomains } from "@/server/services/domain.service";
+import {
+  checkDomainDns,
+  listDomains,
+  connectDomain,
+  removeDomain,
+  setPrimaryDomain,
+  listWorkspaceDomains,
+  checkDomainAvailability,
+  updateDomain,
+} from "@/server/services/domain.service";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
-import { getSiteAnalytics } from "@/server/services/analytics.service";
-import { updateSiteSettingsSchema, createRedirectSchema, connectDomainSchema, createShareLinkSchema, siteAnalyticsQuerySchema } from "@buildrik/shared/schemas/site-detail";
+import { getSiteAnalytics, getAnalyticsStatus } from "@/server/services/analytics.service";
+import {
+  updateSiteSettingsSchema,
+  createRedirectSchema,
+  connectDomainSchema,
+  checkDomainAvailabilitySchema,
+  updateDomainSchema,
+  createShareLinkSchema,
+  siteAnalyticsQuerySchema,
+} from "@buildrik/shared/schemas/site-detail";
 
 export const siteDetailRouter = router({
   overview: protectedProcedure
@@ -38,6 +55,26 @@ export const siteDetailRouter = router({
         throw e;
       }
       return getSettingsOverview(input.siteId);
+    }),
+
+  // Settings → Localization (Clone 3397:32376 Locales table, 3737:44869
+  // checklist): one row per enabled locale with its translation progress.
+  locales: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return await getLocales(input.siteId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        throw e;
+      }
     }),
 
   settings: router({
@@ -226,6 +263,13 @@ export const siteDetailRouter = router({
       return listWorkspaceDomains(workspaceId);
     }),
 
+    // The Add-a-domain dialog's `Available` / `Already connected` tag. Not
+    // site-scoped: a hostname is unique across the whole database, and the
+    // answer reveals only what `connect` would say anyway (DOMAIN_IN_USE).
+    checkAvailability: protectedProcedure
+      .input(checkDomainAvailabilitySchema)
+      .query(({ input }) => checkDomainAvailability(input.domain)),
+
     check: protectedProcedure
       .input(z.object({ id: z.string(), siteId: z.string() }))
       .mutation(async ({ ctx, input }) => {
@@ -250,7 +294,8 @@ export const siteDetailRouter = router({
           throw e;
         }
         try {
-          const domain = await connectDomain(input.siteId, input.domain);
+          const { siteId, ...options } = input;
+          const domain = await connectDomain(siteId, options);
           await recordForSite({
             siteId: input.siteId,
             actorId: ctx.session.user!.id!,
@@ -270,6 +315,25 @@ export const siteDetailRouter = router({
             throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
           throw e;
         }
+      }),
+
+    // The card's Force HTTPS toggle (Clone 3397:32206). Same gate as `remove`:
+    // the row names its site, and ADMIN on that site is required.
+    update: protectedProcedure
+      .input(updateDomainSchema)
+      .mutation(async ({ ctx, input }) => {
+        const domain = await ctx.prisma.domain.findUnique({
+          where: { id: input.id },
+          select: { siteId: true },
+        });
+        if (!domain) throw new TRPCError({ code: "NOT_FOUND" });
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, domain.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return updateDomain(input.id, { forceHttps: input.forceHttps });
       }),
 
     remove: protectedProcedure
@@ -407,5 +471,20 @@ export const siteDetailRouter = router({
       }
       const { siteId, ...params } = input;
       return getSiteAnalytics(siteId, params);
+    }),
+
+  // Settings → Analytics (Clone 3397:32295 "Last received data", 4256:26844).
+  // Top-level because `analytics` above is already a leaf procedure — a
+  // `analytics.status` sub-router would have to replace it.
+  analyticsStatus: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getAnalyticsStatus(input.siteId);
     }),
 });

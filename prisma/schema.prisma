@@ -364,6 +364,9 @@ model Site {
   permissionsPolicy String?
   defaultLocale     String    @default("en")
   enabledLocales    String[]  @default(["en"])
+  // Settings S2 (Clone 3397:32376): first-visit redirect to the browser's
+  // language. Stored here; the export engine emits the snippet when on.
+  localeAutoRedirect Boolean  @default(false)
   deletedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -608,6 +611,13 @@ model Domain {
   lastCheckedAt DateTime?
   autoRenewSsl  Boolean   @default(true)
   isPrimary     Boolean   @default(false)
+  // Settings S2 (Clone 3737:43669). `kind` is what the domain IS
+  // (PRIMARY | REDIRECT | SUBDOMAIN); `isPrimary` stays the "which one serves
+  // the site" flag, flipped by setPrimaryDomain. `dnsProvider` is a
+  // DNS_PROVIDERS id (packages/shared/schemas/site-detail.ts) or null.
+  kind          String    @default("PRIMARY")
+  forceHttps    Boolean   @default(true)
+  dnsProvider   String?
   createdAt     DateTime  @default(now())
 
   site       Site        @relation(fields: [siteId], references: [id], onDelete: Cascade)
