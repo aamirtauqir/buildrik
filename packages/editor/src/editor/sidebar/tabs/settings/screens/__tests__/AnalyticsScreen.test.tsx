@@ -1,7 +1,7 @@
 /**
  * AnalyticsScreen tests — Clone 3397:32295 Analytics: the five cards in the
  * frame's order with their label-left rows, the Connection status pill and
- * Last received data line off the tracker's `analytics.status` read
+ * Last received data line off the tracker's `analyticsStatus` read
  * (3953:49515 / 3953:49670), the save-error banner (3951:26455), Verify and
  * the Connection verified dialog (4256:26844), the id normalisation, the
  * per-provider validation that holds Save (3397:34148), dirty wiring and the
@@ -18,7 +18,7 @@ import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockCo
 const { api } = vi.hoisted(() => ({
   api: {
     siteDetail: {
-      analytics: { status: { query: vi.fn() } },
+      analyticsStatus: { query: vi.fn() },
     },
   },
 }));
@@ -29,7 +29,7 @@ vi.mock("@/services/api-client", () => ({
 
 import { AnalyticsScreen, connectionPill, formatDay, formatDayTime, lastReceivedLine } from "../AnalyticsScreen";
 
-const statusMock = api.siteDetail.analytics.status.query;
+const statusMock = api.siteDetail.analyticsStatus.query;
 
 /** Local wall-clock 19:38 on 2 Jul 2025 — the frame's shape, in the runner's zone. */
 const LAST_EVENT = new Date(2025, 6, 2, 19, 38).toISOString();

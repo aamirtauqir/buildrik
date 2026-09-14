@@ -50,7 +50,7 @@ import {
   type DnsProviderId,
   type DomainAvailability,
   type DomainKind,
-} from "../screens/domainsContract";
+} from "@buildrik/shared/schemas/site-detail";
 
 export interface AddDomainSubmission {
   domain: string;

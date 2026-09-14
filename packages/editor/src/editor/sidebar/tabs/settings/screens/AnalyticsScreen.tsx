@@ -28,7 +28,7 @@ import { ConnectionVerifiedDialog, eventsPhrase } from "../components/Connection
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
-import { readAnalyticsStatus, type AnalyticsStatus } from "./analyticsContract";
+import type { AnalyticsStatus } from "@buildrik/shared/schemas/site-detail";
 import { validateProviderId } from "./analyticsIds";
 
 const DEFAULT_ANALYTICS = {
@@ -202,7 +202,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
 
   const load = useServerLoad<AnalyticsStatus>(
     projectId,
-    (client, siteId) => readAnalyticsStatus(client, siteId),
+    (client, siteId) => client.siteDetail.analyticsStatus.query({ siteId }),
     setStatus,
     { onLoadStateChange, registerRetryLoad }
   );
@@ -226,7 +226,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     }
     setVerifying(true);
     try {
-      const next = projectId ? await readAnalyticsStatus(getBuildrikClient(DASHBOARD_URL), projectId) : status;
+      const next = projectId ? await getBuildrikClient(DASHBOARD_URL).siteDetail.analyticsStatus.query({ siteId: projectId }) : status;
       setStatus(next);
       setGaVerifiedAt(new Date().toISOString());
       markDirty();

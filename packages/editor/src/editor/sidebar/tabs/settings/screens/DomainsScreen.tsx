@@ -34,7 +34,26 @@ import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { AddDomainDialog, type AddDomainSubmission } from "../components/AddDomainDialog";
 import { RemoveDomainDialog } from "../components/RemoveDomainDialog";
-import { domainsApi, type DomainRow, type HeaderActionProps } from "./domainsContract";
+export interface DnsRecordRow {
+  type: string;
+  host: string;
+  value: string;
+  verified: boolean;
+}
+
+/** What this screen reads of a `Domain` row (`domains.list` returns a superset). */
+export interface DomainRow {
+  id: string;
+  domain: string;
+  /** PENDING | VERIFIED | FAILED */
+  status: string;
+  isPrimary: boolean;
+  /** PRIMARY | REDIRECT | SUBDOMAIN */
+  kind: string;
+  forceHttps: boolean;
+  dnsProvider: string | null;
+  dnsRecords: DnsRecordRow[];
+}
 
 /** 3397:33134 — the banner a refused remove, toggle or check leaves over the cards. */
 export const DOMAINS_SAVE_ERROR =
@@ -108,7 +127,7 @@ const LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
-export const DomainsScreen: React.FC<ScreenProps & HeaderActionProps> = ({
+export const DomainsScreen: React.FC<ScreenProps> = ({
   composer,
   projectId,
   onDirtyChange,
@@ -137,12 +156,12 @@ export const DomainsScreen: React.FC<ScreenProps & HeaderActionProps> = ({
 
   const load = useServerLoad<DomainRow[]>(
     projectId,
-    (client, siteId) => domainsApi(client).list.query({ siteId }),
+    (client, siteId) => client.siteDetail.domains.list.query({ siteId }),
     (list) => setRows(primaryFirst(list)),
     { onLoadStateChange, registerRetryLoad },
   );
 
-  const api = () => domainsApi(getBuildrikClient(DASHBOARD_URL));
+  const api = () => getBuildrikClient(DASHBOARD_URL).siteDetail.domains;
 
   /* After an action: the rows as the server now has them, without the load
      card in between. A read that fails here goes back through the load path,
@@ -150,7 +169,7 @@ export const DomainsScreen: React.FC<ScreenProps & HeaderActionProps> = ({
   const relist = React.useCallback(async () => {
     if (!projectId) return;
     try {
-      setRows(primaryFirst(await domainsApi(getBuildrikClient(DASHBOARD_URL)).list.query({ siteId: projectId })));
+      setRows(primaryFirst(await getBuildrikClient(DASHBOARD_URL).siteDetail.domains.list.query({ siteId: projectId })));
     } catch {
       load.retry();
     }
