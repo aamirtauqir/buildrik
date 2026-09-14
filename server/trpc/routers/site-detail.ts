@@ -3,7 +3,7 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
-import { getSiteOverview } from "@/server/services/site-detail.service";
+import { getSettingsOverview, getSiteOverview } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
@@ -24,6 +24,20 @@ export const siteDetailRouter = router({
         throw e;
       }
       return getSiteOverview(input.siteId);
+    }),
+
+  // The editor's Settings → Overview (Clone 3397:32915): a summary line per
+  // section + the NEEDS ATTENTION rows. Read-only, same access as `overview`.
+  settingsOverview: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getSettingsOverview(input.siteId);
     }),
 
   settings: router({

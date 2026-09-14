@@ -119,7 +119,36 @@ export const siteAnalyticsQuerySchema = z.object({
   granularity: z.enum(["hourly", "daily", "weekly", "monthly"]).default("daily"),
 });
 
+/**
+ * The editor's Settings Overview (Clone frame 3397:32915): one summary line per
+ * settings section plus the NEEDS ATTENTION rows. Every field is derived from
+ * columns that already exist — there is no migration behind it. Served by
+ * `siteDetail.settingsOverview`; the on-screen copy ("English (en-US)",
+ * "Indexing allowed · robots.txt set") is built by the editor from these facts.
+ */
+export const settingsOverviewSchema = z.object({
+  site: z.object({ name: z.string(), defaultLocale: z.string(), plan: z.enum(["FREE", "PRO", "BUSINESS"]) }),
+  general: z.object({ siteName: z.string(), language: z.string() }),            // "English (en-US)" label built client-side from defaultLocale
+  localization: z.object({ locales: z.number(), notStarted: z.array(z.string()) }),
+  seo: z.object({ allowIndexing: z.boolean(), robotsTxtSet: z.boolean() }),
+  domains: z.object({ primary: z.string().nullable(), pendingDns: z.number() }),
+  redirects: z.object({ rules: z.number(), suggestions: z.number() }),
+  analytics: z.object({ providers: z.array(z.string()), receiving: z.boolean() }),
+  forms: z.object({ forms: z.number(), submissions: z.number() }),
+  customCode: z.object({ head: z.boolean(), body: z.boolean(), css: z.boolean() }),
+  headers: z.object({ csp: z.boolean(), hsts: z.boolean() }),
+  integrations: z.object({ connected: z.number(), available: z.number() }),
+  webhooks: z.object({ endpoints: z.number(), lastDelivery: z.enum(["ok", "failed"]).nullable() }),
+  members: z.object({ used: z.number(), seats: z.number() }),
+  billing: z.object({ plan: z.string(), priceMonthly: z.number() }),
+  attention: z.array(z.object({
+    kind: z.enum(["locale-not-started", "dns-pending", "webhook-failed"]),
+    title: z.string(), detail: z.string(), section: z.string(),               // section = the nav id to open
+  })),
+});
+
 export type SiteOverview = z.infer<typeof siteOverviewSchema>;
+export type SettingsOverview = z.infer<typeof settingsOverviewSchema>;
 export type UpdateSiteSettingsInput = z.infer<typeof updateSiteSettingsSchema>;
 export type CreateRedirectInput = z.infer<typeof createRedirectSchema>;
 export type ConnectDomainInput = z.infer<typeof connectDomainSchema>;
