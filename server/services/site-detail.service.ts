@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { SettingsOverview, SiteOverview } from "@buildrik/shared/schemas/site-detail";
+import type { LocaleStatus, LocalesSummary, SettingsOverview, SiteOverview } from "@buildrik/shared/schemas/site-detail";
 import { INTEGRATION_CATALOG } from "@buildrik/shared/schemas/integrations";
 
 const filled = (v: unknown) => typeof v === "string" && v.trim().length > 0;
@@ -259,7 +259,7 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
   for (const page of pages) {
     if (!isRecord(page.translations)) continue;
     for (const [locale, entry] of Object.entries(page.translations)) {
-      if (entry) translatedPages.set(locale, (translatedPages.get(locale) ?? 0) + 1);
+      if (isTranslation(entry)) translatedPages.set(locale, (translatedPages.get(locale) ?? 0) + 1);
     }
   }
   const notStarted = site.enabledLocales.filter(
@@ -344,8 +344,51 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
   };
 }
 
+/**
+ * The editor's Settings → Localization (Clone 3397:32376 Locales table,
+ * 3737:44869 Translation checklist): one row per enabled locale. The default
+ * locale's content is `Page.blocks`, so it is always fully translated and its
+ * path is `/`; every other locale is served under `/<code>` and counts the
+ * pages carrying a `translations[code]` entry (`page.service setTranslation`
+ * writes `{ blocks }` there). `pending` lists the untranslated page names in
+ * site order — the checklist's "Begin with Home, then Menu, …" line.
+ */
+export async function getLocales(siteId: string): Promise<LocalesSummary> {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { defaultLocale: true, enabledLocales: true, deletedAt: true },
+  });
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  const pages = await prisma.page.findMany({
+    where: { siteId },
+    orderBy: { position: "asc" },
+    select: { name: true, translations: true },
+  });
+  const total = pages.length;
+
+  const locales = site.enabledLocales.map((code) => {
+    if (code === site.defaultLocale) {
+      return { code, path: "/", translated: total, total, status: "LIVE" as LocaleStatus, pending: [] };
+    }
+    const pending = pages
+      .filter((page) => !(isRecord(page.translations) && isTranslation(page.translations[code])))
+      .map((page) => page.name);
+    const translated = total - pending.length;
+    const status: LocaleStatus = translated === total ? "LIVE" : translated === 0 ? "NOT_STARTED" : "PENDING";
+    return { code, path: `/${code}`, translated, total, status, pending };
+  });
+
+  return { locales, total };
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** A page counts as translated into a locale when its entry is a non-empty object. */
+function isTranslation(entry: unknown): boolean {
+  return isRecord(entry) && Object.keys(entry).length > 0;
 }
 
 function planOf(raw: string): PlanName {

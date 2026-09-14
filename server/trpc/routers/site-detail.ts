@@ -3,7 +3,7 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/services/permission.service";
 import type { PlanName } from "@/lib/constants/plan-limits";
-import { getSettingsOverview, getSiteOverview } from "@/server/services/site-detail.service";
+import { getSettingsOverview, getSiteOverview, getLocales } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
@@ -55,6 +55,26 @@ export const siteDetailRouter = router({
         throw e;
       }
       return getSettingsOverview(input.siteId);
+    }),
+
+  // Settings → Localization (Clone 3397:32376 Locales table, 3737:44869
+  // checklist): one row per enabled locale with its translation progress.
+  locales: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return await getLocales(input.siteId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        throw e;
+      }
     }),
 
   settings: router({

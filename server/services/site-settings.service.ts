@@ -81,6 +81,7 @@ export async function getSiteSettings(siteId: string) {
       permissionsPolicy: true,
       defaultLocale: true,
       enabledLocales: true,
+      localeAutoRedirect: true,
       deletedAt: true,
       workspace: { select: { plan: true } },
     },
@@ -154,6 +155,7 @@ export async function updateSiteSettings(
     permissionsPolicy?: string | null;
     defaultLocale?: string;
     enabledLocales?: string[];
+    localeAutoRedirect?: boolean;
   }
 ) {
   // Gate Pro-only fields on actual content, not field presence. Editor

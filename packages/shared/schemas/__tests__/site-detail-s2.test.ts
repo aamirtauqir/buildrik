@@ -12,7 +12,9 @@ import {
   connectDomainSchema,
   domainAvailabilitySchema,
   domainKindSchema,
+  localesSummarySchema,
   updateDomainSchema,
+  updateSiteSettingsSchema,
 } from "../site-detail";
 
 describe("domains", () => {
@@ -66,5 +68,25 @@ describe("analytics", () => {
     expect(analyticsStatusSchema.parse({ lastEventAt: null, events24h: 0 }).lastEventAt).toBeNull();
     expect(analyticsStatusSchema.safeParse({ lastEventAt: "2 Jul 2025", events24h: 1 }).success).toBe(false);
     expect(analyticsStatusSchema.safeParse({ lastEventAt: null, events24h: -1 }).success).toBe(false);
+  });
+});
+
+describe("localization", () => {
+  it("localesSummarySchema is the Locales table: code · path · translated of total · status · pending", () => {
+    const summary = localesSummarySchema.parse({
+      locales: [
+        { code: "en", path: "/", translated: 6, total: 6, status: "LIVE", pending: [] },
+        { code: "fr", path: "/fr", translated: 4, total: 6, status: "PENDING", pending: ["Contact", "Privacy"] },
+        { code: "ar", path: "/ar", translated: 0, total: 6, status: "NOT_STARTED", pending: ["Home", "Menu"] },
+      ],
+      total: 6,
+    });
+    expect(summary.locales).toHaveLength(3);
+    expect(localesSummarySchema.safeParse({ locales: [{ code: "fr", path: "/fr", translated: 1, total: 6, status: "DRAFT", pending: [] }], total: 6 }).success).toBe(false);
+  });
+
+  it("updateSiteSettingsSchema accepts localeAutoRedirect", () => {
+    expect(updateSiteSettingsSchema.parse({ id: "s1", localeAutoRedirect: true })).toEqual({ id: "s1", localeAutoRedirect: true });
+    expect(updateSiteSettingsSchema.safeParse({ id: "s1", localeAutoRedirect: "yes" }).success).toBe(false);
   });
 });

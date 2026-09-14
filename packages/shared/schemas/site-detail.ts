@@ -87,6 +87,8 @@ export const updateSiteSettingsSchema = z.object({
   permissionsPolicy: z.string().max(2048).nullable().optional(),
   defaultLocale: z.string().min(2).max(10).optional(),
   enabledLocales: z.array(z.string().min(2).max(10)).min(1).max(50).optional(),
+  // Settings S2 (Clone 3397:32376) — "Auto-redirect by browser".
+  localeAutoRedirect: z.boolean().optional(),
 });
 
 export const createRedirectSchema = z.object({
@@ -213,6 +215,29 @@ export const analyticsStatusSchema = z.object({
   events24h: z.number().int().nonnegative(),
 });
 
+/**
+ * `siteDetail.locales` (Clone 3397:32376 Locales table, 3737:44869 checklist).
+ * One row per enabled locale: `path` is `/` for the default locale, else
+ * `/<code>`; `translated` counts pages carrying a non-empty
+ * `translations[code]`; the default locale is always LIVE (its content is
+ * `Page.blocks`); `pending` is the untranslated page names in site order.
+ */
+export const localeStatusSchema = z.enum(["LIVE", "PENDING", "NOT_STARTED"]);
+
+export const localeSummarySchema = z.object({
+  code: z.string(),
+  path: z.string(),
+  translated: z.number().int().nonnegative(),
+  total: z.number().int().nonnegative(),
+  status: localeStatusSchema,
+  pending: z.array(z.string()),
+});
+
+export const localesSummarySchema = z.object({
+  locales: z.array(localeSummarySchema),
+  total: z.number().int().nonnegative(),
+});
+
 export type SiteOverview = z.infer<typeof siteOverviewSchema>;
 export type SettingsOverview = z.infer<typeof settingsOverviewSchema>;
 export type UpdateSiteSettingsInput = z.infer<typeof updateSiteSettingsSchema>;
@@ -224,5 +249,8 @@ export type CheckDomainAvailabilityInput = z.infer<typeof checkDomainAvailabilit
 export type DomainAvailability = z.infer<typeof domainAvailabilitySchema>;
 export type UpdateDomainInput = z.infer<typeof updateDomainSchema>;
 export type AnalyticsStatus = z.infer<typeof analyticsStatusSchema>;
+export type LocaleStatus = z.infer<typeof localeStatusSchema>;
+export type LocaleSummary = z.infer<typeof localeSummarySchema>;
+export type LocalesSummary = z.infer<typeof localesSummarySchema>;
 export type CreateShareLinkInput = z.infer<typeof createShareLinkSchema>;
 export type SiteAnalyticsQuery = z.infer<typeof siteAnalyticsQuerySchema>;

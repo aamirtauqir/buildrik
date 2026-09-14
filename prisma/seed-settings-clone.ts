@@ -7,14 +7,17 @@
  *
  * Scoped to the scratch site and its workspace. Every row this writes carries
  * an `sclone-` id, so a re-run is a no-op and `--reset` deletes exactly those
- * rows and nothing else. The one non-row change — `ar` joining the site's
- * enabled locales — is undone the same way (removed, never replaced).
+ * rows and nothing else. The non-row changes — `fr` and `ar` joining the
+ * site's enabled locales, `translations.fr` on two pages, the Google
+ * Analytics entry in projectSettings — are undone the same way (removed,
+ * never replaced; each carries a marker only this seed writes).
  *
  *   pnpm tsx prisma/seed-settings-clone.ts           # seed (idempotent)
  *   pnpm tsx prisma/seed-settings-clone.ts --reset   # remove what it seeded
  *
  * What the Overview reads afterwards (site otherwise untouched):
- *   Localization  2 locales · Arabic not started        (attention row)
+ *   Localization  3 locales · Arabic not started        (attention row)
+ *                 S2: en LIVE · fr PENDING (2 of the pages) · ar NOT STARTED
  *   Domains       scratchver.example.com · 1 DNS pending (attention row)
  *                 S2: kind PRIMARY · Force HTTPS on · Namecheap · A + CNAME
  *                 verified, TXT pending
@@ -32,7 +35,12 @@ const prisma = new PrismaClient();
 
 const SITE_ID = "scratchver0000000000000001";
 const ID = "sclone-";
-const LOCALE = "ar";
+// S2 Localization (Clone 3397:32376): `fr` PENDING (2 of the scratch pages
+// translated), `ar` NOT STARTED (untouched, as in S1). Order is the frame's.
+const LOCALES = ["fr", "ar"];
+const TRANSLATED_LOCALE = "fr";
+const TRANSLATED_PAGES = 2;
+const TRANSLATION_SOURCE = "seed-settings-clone";
 const DOMAIN = "scratchver.example.com";
 const INTEGRATIONS = ["mailchimp", "zapier"];
 // What `connectDomain` writes without a Vercel attachment (domain.service),
@@ -98,10 +106,30 @@ async function seed() {
   const site = await loadSite();
   const { workspaceId } = site;
 
-  if (!site.enabledLocales.includes(LOCALE)) {
+  const missingLocales = LOCALES.filter((l) => !site.enabledLocales.includes(l));
+  if (missingLocales.length > 0) {
     await prisma.site.update({
       where: { id: SITE_ID },
-      data: { enabledLocales: [...site.enabledLocales, LOCALE] },
+      data: { enabledLocales: [...site.enabledLocales.filter((l) => !LOCALES.includes(l)), ...LOCALES] },
+    });
+  }
+
+  // `translations[locale]` in the shape `pages.setTranslation` writes
+  // (`{ blocks }`), plus a `source` marker so reset removes exactly these and
+  // never a translation someone actually wrote. The first pages in site order,
+  // so the checklist's pending list is the tail.
+  const pages = await prisma.page.findMany({
+    where: { siteId: SITE_ID },
+    orderBy: { position: "asc" },
+    take: TRANSLATED_PAGES,
+    select: { id: true, blocks: true, translations: true },
+  });
+  for (const page of pages) {
+    const translations = asRecord(page.translations);
+    if (translations[TRANSLATED_LOCALE]) continue;
+    await prisma.page.update({
+      where: { id: page.id },
+      data: { translations: { ...translations, [TRANSLATED_LOCALE]: { blocks: page.blocks, source: TRANSLATION_SOURCE } } },
     });
   }
 
@@ -308,10 +336,23 @@ async function reset() {
     });
   }
 
-  if (site.enabledLocales.includes(LOCALE) && site.defaultLocale !== LOCALE) {
+  const translated = await prisma.page.findMany({
+    where: { siteId: SITE_ID, translations: { path: [TRANSLATED_LOCALE, "source"], equals: TRANSLATION_SOURCE } },
+    select: { id: true, translations: true },
+  });
+  for (const page of translated) {
+    const { [TRANSLATED_LOCALE]: _seeded, ...rest } = asRecord(page.translations);
+    await prisma.page.update({
+      where: { id: page.id },
+      data: { translations: Object.keys(rest).length === 0 ? Prisma.JsonNull : rest },
+    });
+  }
+
+  const removable = LOCALES.filter((l) => site.enabledLocales.includes(l) && site.defaultLocale !== l);
+  if (removable.length > 0) {
     await prisma.site.update({
       where: { id: SITE_ID },
-      data: { enabledLocales: site.enabledLocales.filter((l) => l !== LOCALE) },
+      data: { enabledLocales: site.enabledLocales.filter((l) => !removable.includes(l)) },
     });
   }
 
