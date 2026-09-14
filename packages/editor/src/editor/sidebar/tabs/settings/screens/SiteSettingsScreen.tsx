@@ -178,6 +178,12 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
           },
         },
       });
+      /* The site name is the project's name too: the sidebar, the topbar and
+         the Settings saved dialog read `getProjectMetadata().name`, which was
+         loaded from the Site row and would keep the old name until a reload
+         after the mirror wrote `Site.name` (walked live 2026-09-14). */
+      const name = s.siteName.trim();
+      if (name && name !== composer.getProjectMetadata?.()?.name) composer.updateProjectMetadata?.({ name });
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);
