@@ -58,12 +58,12 @@ describe("Clone 3737:46109 · Search settings", () => {
   it("narrows as you type: the frame's `domain` lists Domains, then its fields, with the count in both places", () => {
     mount();
     type("domain");
-    expect(screen.getByTestId("set-search-scope")).toHaveTextContent('Bella Cucina · 3 results for "domain"');
-    expect(rowTitles()).toEqual(["Domains", "Domain", "DNS records"]);
-    expect(screen.getByTestId("set-search-count")).toHaveTextContent("3 results");
-    const dns = screen.getByTestId("set-search-row-2");
-    expect(dns).toHaveTextContent("Custom domain");
-    expect(dns.lastElementChild).toHaveTextContent("Domains");
+    expect(screen.getByTestId("set-search-scope")).toHaveTextContent('Bella Cucina · 4 results for "domain"');
+    expect(rowTitles()).toEqual(["Domains", "Domain", "Force HTTPS", "DNS records"]);
+    expect(screen.getByTestId("set-search-count")).toHaveTextContent("4 results");
+    const https = screen.getByTestId("set-search-row-2");
+    expect(https).toHaveTextContent("Custom domain");
+    expect(https.lastElementChild).toHaveTextContent("Domains");
     expect(screen.getByTestId("set-search-clear-x")).toBeInTheDocument();
     expect(screen.getByTestId("set-search-clear")).toBeEnabled();
   });
@@ -74,8 +74,8 @@ describe("Clone 3737:46109 · Search settings", () => {
     fireEvent.click(screen.getByTestId("set-search-row-0"));
     expect(props.onOpen).toHaveBeenLastCalledWith("domains", undefined);
     expect(props.onClose).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByTestId("set-search-row-2"));
-    expect(props.onOpen).toHaveBeenLastCalledWith("domains", "dns-records");
+    fireEvent.click(screen.getByTestId("set-search-row-3"));
+    expect(props.onOpen).toHaveBeenLastCalledWith("domains", "dom-dns-records");
     expect(props.onClose).toHaveBeenCalledTimes(2);
   });
 

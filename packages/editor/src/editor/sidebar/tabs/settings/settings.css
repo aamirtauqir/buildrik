@@ -1,8 +1,8 @@
 /**
  * Settings tab styles — what the Clone shell (SettingsTab.tsx, `tw:`
  * utilities) does NOT draw: the S7 probe's pane ground, the hand-rolled
- * `.bd-set-section` blocks in Analytics / Domains / Webhooks, the switch row,
- * and the Domains / Webhooks screens' own rows. Nothing new goes here — the
+ * `.bd-set-section` blocks in Analytics / Webhooks, the switch row, and the
+ * Webhooks screen's own rows. Nothing new goes here — the
  * styling ratchet only lets this file shrink.
  */
 
@@ -93,105 +93,13 @@
   left: 14px;
 }
 
-/* ── Domains screen (P6) ── */
-.bd-set-domain-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-8);
-  padding: 10px;
-  /* Board 807:8757 puts the DNS block on WHITE, and everything above hangs off
-     that: 807:8766's rows are --flowbite/gray/50, which on the --bk-bg-subtle
-     ground this card used to have is one step from invisible; and 807:8762's
-     ink-muted column headers measure 4.39:1 on bg-subtle against a 4.5 floor
-     but 4.83:1 on white. Two problems, one ground. */
-  background: var(--bk-bg-panel);
-  border: 1px solid var(--bk-border);
-  border-radius: var(--bk-radius-md);
-  margin-bottom: 10px;
-}
-.bd-set-domain-name {
-  font: 600 12px var(--bk-font-mono);
-  color: var(--bk-ink);
-  word-break: break-all;
-}
-.bd-set-domain-status {
-  font: 500 var(--bk-text-11) var(--bk-font-ui);
-  line-height: 1.4;
-  /* Was --bk-ink-muted, which on the card's --bk-bg-subtle ground measures
-     4.39:1 — under the 4.5 floor, on the one line that tells you whether the
-     domain is live. ink-soft is 7.0:1 there. The ok/err tones below are
-     unaffected. */
-  color: var(--bk-ink-soft);
-}
-.bd-set-domain-status[data-tone="ok"] {
-  color: var(--bk-success);
-}
-.bd-set-domain-status[data-tone="err"] {
-  color: var(--bk-error);
-}
-.bd-set-domain-records {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bk-space-8);
-}
-/* 807:8762-8765 — the board heads the four columns. Without them a row reads
-   `A  @  76.76.21.21  verified` and nothing on screen says which is the host
-   and which is the value, which is the one thing a person has to get right
-   at their registrar. */
-.bd-set-domain-rec-head {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  padding: 0 var(--bk-space-8);
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-}
-.bd-set-domain-rec-state.ok { color: var(--bk-success-text); font-weight: 600; }
-.bd-set-domain-rec-state.pending { color: var(--bk-warning-text); font-weight: 600; }
-/* Board 807:8766/8772 — a DNS record is a 36-high --flowbite/gray/50 bar on a
-   4 radius with 12px cells in --flowbite/gray/700 and NO border. It shipped as
-   an 11px mono chip on 4/6 padding inside a --bk-border-medium hairline, which
-   at that size was closer to a tag than to a row of a table. */
-.bd-set-domain-record {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  font: 400 var(--bk-text-12) var(--bk-font-mono);
-  color: var(--bk-gray-700);
-  height: var(--bk-space-36);
-  padding: 0 var(--bk-space-8);
-  background: var(--bk-gray-50);
-  border: 0;
-  border-radius: var(--bk-radius-sm);
-  min-width: 0;
-}
-.bd-set-domain-rec-type {
-  font-weight: 600;
-  color: var(--bk-ink);
-  flex-shrink: 0;
-}
-.bd-set-domain-rec-host {
-  flex-shrink: 0;
-}
-.bd-set-domain-rec-value {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  min-width: 0;
-}
-.bd-set-domain-rec-state {
-  flex-shrink: 0;
-}
-.bd-set-domain-actions,
+/* ── Webhooks screen (P6) ── */
 .bd-set-webhook-actions {
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
   margin-top: 2px;
 }
-.bd-set-domain-empty,
-.bd-set-domain-add,
 .bd-set-webhook-empty,
 .bd-set-webhook-form {
   display: flex;
@@ -200,7 +108,6 @@
   align-items: flex-start;
 }
 
-/* ── Webhooks screen (P6) ── */
 /* Board 640:4161 draws the connected endpoint as rows INSIDE the ENDPOINT
    card — a URL, its events, its delivery line and the Signing secret field, on
    the card's own white. This was a second card inside that one: a bg-subtle

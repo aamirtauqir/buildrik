@@ -18,10 +18,9 @@
  * label, its description the card it sits in (Custom code's three cards ARE
  * the fields, so their description is the row label the frame draws beside
  * each editor: `<head>`, `</body>`, `styles`), and its `group` the section it
- * belongs to — the frame's `DNS records · … · DOMAINS`. The frame's
- * `Force HTTPS` row is not here: the Domains screen has no such control
- * (boards.json records it NOT BUILT), and a result that opens a screen to
- * nothing is a fake state.
+ * belongs to — the frame's `DNS records · … · DOMAINS`. (The frame's
+ * `Force HTTPS` row was left out until S2 built the control on 3397:32206;
+ * a result that opens a screen to nothing is a fake state.)
  *
  * `fieldId` is the field's label slug — the stem the screens' `Field` uses
  * for `set-field-<slug>` and the `id` the S1 screens set on the control — so
@@ -124,8 +123,9 @@ const SECTIONS: SectionDef[] = [
     description: "Custom domain + DNS",
     group: SEO_PUBLISHING,
     fields: [
-      ["Domain", "Custom domain", "domain"],
-      ["DNS records", "Custom domain", "dns-records"],
+      ["Domain", "Custom domain", "dom-domain"],
+      ["Force HTTPS", "Custom domain", "dom-force-https"],
+      ["DNS records", "Records to add at your registrar", "dom-dns-records"],
     ],
   },
   {
