@@ -5,18 +5,18 @@
  "generatedAt": "2026-08-14",
  "counts": {
   "total": 595,
-  "active": 486,
+  "active": 484,
   "designAhead": 41,
   "outOfScope": 57,
   "activeFamilies": 36,
   "verifiedActive": {
-   "match": 92,
-   "drift-fixed": 338,
+   "match": 91,
+   "drift-fixed": 337,
    "unreachable": 46,
    "drift-open": 3,
    "driven": 7
   },
-  "retired": 11
+  "retired": 13
  },
  "activeFamilies": [
   "AI",
@@ -4529,11 +4529,11 @@
    "state": "dirty",
    "width": 1440,
    "height": 900,
-   "status": "active",
-   "authority": "board",
+   "status": "retired",
+   "authority": "superseded:board:clone-3737:43639",
    "recipe": null,
-   "verifiedNote": "drift-no-dirty-guard-FIXED",
-   "verified": "drift-fixed"
+   "verifiedNote": "RETIRED 2026-09-14 — drawn on the Project settings modal, which is gone (see 1172:4867); the dirty guard it asked for is the full-screen Settings' Unsaved settings dialog (Clone 3737:43639 — Back / Cancel / Escape / any nav click while dirty). Earlier history: drift-no-dirty-guard-FIXED",
+   "verified": "unreachable"
   },
   {
    "nodeId": "183:31",
@@ -5242,11 +5242,11 @@
    "state": "project-settings-modal",
    "width": 560,
    "height": 244,
-   "status": "active",
-   "authority": "board",
+   "status": "retired",
+   "authority": "superseded:board:clone-3397:32915",
    "recipe": null,
-   "verifiedNote": "match",
-   "verified": "match"
+   "verifiedNote": "RETIRED 2026-09-14 — the Project settings modal (General · Canvas · SEO, ⌃,) is superseded by the Clone's full-screen Settings (Settings · Clone, S1): the site menu's `Site settings` row and ⌃, now open the Settings tab on the Overview (StudioModals routes the flag AquibraStudio raises), the modal's Author and Canvas grid (grid size · snap) live on General's Site identity / Canvas cards and its site title is General's Site name. ProjectSettingsModal.tsx, its test and the spec deleted in the same commit. Earlier history: match",
+   "verified": "unreachable"
   },
   {
    "nodeId": "1174:4849",

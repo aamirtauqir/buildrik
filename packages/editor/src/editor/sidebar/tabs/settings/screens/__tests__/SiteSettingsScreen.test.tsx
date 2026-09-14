@@ -362,4 +362,22 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     // Sibling seo key owned by SeoScreen is preserved (spread of current.seo).
     expect(settings.seo.twitterHandle).toBe("@keepme");
   });
+
+  /* Board 1172:4867's Project settings modal is superseded by this screen;
+     its Author and Canvas grid live here and reach the engine on the flush. */
+  it("flush writes Author to the project metadata and the Canvas grid to the engine", async () => {
+    let flush: (() => void) | null = null;
+    const registerFlushHandler = vi.fn((h: (() => void) | null) => {
+      flush = h;
+    });
+    const { composer } = setup({ registerFlushHandler });
+    await loaded();
+    fireEvent.change(screen.getByLabelText("Author"), { target: { value: "Bella Cucina team" } });
+    fireEvent.change(screen.getByRole("spinbutton", { name: /Grid size/ }), { target: { value: "8" } });
+    fireEvent.click(screen.getByRole("switch", { name: "Snap to grid" }));
+    act(() => flush!());
+    expect(composer.updateProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ author: "Bella Cucina team" }));
+    expect(composer.setGridSize).toHaveBeenCalledWith(8);
+    expect(composer.setSnapToGrid).toHaveBeenCalledWith(true);
+  });
 });

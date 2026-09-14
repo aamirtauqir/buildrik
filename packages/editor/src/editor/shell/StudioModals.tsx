@@ -15,10 +15,10 @@ import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
 import { useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
-import { ProjectSettingsModal } from "./modals/ProjectSettingsModal";
 
 // ============================================================================
 // TYPES
@@ -133,6 +133,18 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   showCMSRecords,
   onCloseCMSRecords,
 }) => {
+  /* Board 1172:4867's Project settings modal (General · Canvas · SEO) is
+     superseded by the Clone's full-screen Settings (3397:32915 — its General
+     carries the site name, author and the canvas grid). The shell's two doors
+     to the modal — the site menu's `Site settings` row and ⌃, — are wired in
+     AquibraStudio to `openProjectSettings`, so the flag is the seam: it opens
+     the Settings tab and clears itself. */
+  React.useEffect(() => {
+    if (!showProjectSettings) return;
+    composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "settings" });
+    onCloseProjectSettings();
+  }, [showProjectSettings, composer, onCloseProjectSettings]);
+
   const { addToast } = useToast();
 
   // Modal-error handler factory. Each async modal gets a labeled error sink
@@ -248,13 +260,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
               }
             : undefined
         }
-      />
-
-      {/* Project Settings Modal */}
-      <ProjectSettingsModal
-        isOpen={showProjectSettings}
-        onClose={onCloseProjectSettings}
-        composer={composer}
       />
 
       {/* CMS Collection Setup Modal (WS-14a) */}

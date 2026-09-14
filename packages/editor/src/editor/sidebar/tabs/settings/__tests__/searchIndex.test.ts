@@ -31,7 +31,7 @@ const NAV_ORDER: SettingsSearchScreen[] = [
 
 /** The brief's field ids for S1's three screens, by screen. */
 const S1_FIELDS: Record<"general" | "seo" | "custom-code", string[]> = {
-  general: ["site-name", "favicon-url", "site-language", "social-twitter", "social-facebook", "social-linkedin"],
+  general: ["site-name", "favicon-url", "site-language", "site-author", "social-twitter", "social-facebook", "social-linkedin", "canvas-grid-size", "canvas-snap"],
   seo: ["seo-meta-title", "seo-meta-description", "seo-twitter", "seo-og", "seo-allow-indexing", "seo-robots"],
   "custom-code": ["code-head", "code-body", "code-css"],
 };

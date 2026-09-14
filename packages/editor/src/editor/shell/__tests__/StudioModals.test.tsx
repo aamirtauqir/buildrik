@@ -48,11 +48,6 @@ vi.mock("../modals/CreateComponentModal", () => ({
   CreateComponentModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-create-component" /> : null,
 }));
-vi.mock("../modals/ProjectSettingsModal", () => ({
-  ProjectSettingsModal: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-project-settings" /> : null,
-}));
-
 import { StudioModals, type StudioModalsProps } from "../StudioModals";
 import { ToastProvider } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
@@ -63,6 +58,7 @@ function makeComposer() {
     elements: { getElement: vi.fn() },
     selection: { select: vi.fn() },
     components: { createComponent: vi.fn().mockResolvedValue(undefined) },
+    emit: vi.fn(),
   } as unknown as Composer;
 }
 
@@ -122,7 +118,6 @@ const ALL_MARKERS = [
   "modal-icon-picker",
   "modal-collection-setup",
   "modal-create-component",
-  "modal-project-settings",
   "modal-cms-setup",
   "modal-cms-records",
   "modal-command-palette",
@@ -130,6 +125,18 @@ const ALL_MARKERS = [
 
 describe("StudioModals — mounting contract", () => {
   afterEach(() => cleanup());
+
+  /* Board 1172:4867's modal is superseded by the Clone's full-screen Settings:
+     the flag AquibraStudio raises for `Site settings` / ⌃, opens the tab and
+     clears itself — nothing mounts. */
+  it("showProjectSettings: true opens the Settings tab and closes the flag; no modal mounts", () => {
+    const onCloseProjectSettings = vi.fn();
+    const composer = makeComposer();
+    renderModals({ showProjectSettings: true, onCloseProjectSettings, composer } as Partial<StudioModalsProps>);
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "settings" });
+    expect(onCloseProjectSettings).toHaveBeenCalledTimes(1);
+    for (const id of ALL_MARKERS) expect(screen.queryByTestId(id)).toBeNull();
+  });
 
   it("renders NO modal when every flag is false", () => {
     renderModals();
@@ -146,7 +153,6 @@ describe("StudioModals — mounting contract", () => {
     ["showMediaLibrary", "modal-media-library"],
     ["showCollectionSetup", "modal-collection-setup"],
     ["showCreateComponent", "modal-create-component"],
-    ["showProjectSettings", "modal-project-settings"],
     ["showCMSCollectionSetup", "modal-cms-setup"],
     ["showCMSRecords", "modal-cms-records"],
   ] as [keyof StudioModalsProps, string][])(

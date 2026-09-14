@@ -163,6 +163,10 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
     },
     saveProject: vi.fn(async () => {}),
     getProjectMetadata: vi.fn(() => opts.projectMetadata ?? { domain: null }),
+    updateProjectMetadata: vi.fn(),
+    getState: vi.fn(() => ({ gridSize: 10, snapToGrid: false })),
+    setGridSize: vi.fn(),
+    setSnapToGrid: vi.fn(),
     media: {
       on: vi.fn((event: string, cb: (payload: unknown) => void) => {
         if (!listeners.has(`media:${event}`)) listeners.set(`media:${event}`, new Set());
