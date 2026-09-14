@@ -288,7 +288,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
         <div className="tw:col-span-full tw:flex tw:items-center tw:gap-4">
           <span
             id="seo-allow-indexing-label"
-            className="tw:w-36 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
+            className="tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
           >
             Allow search indexing
           </span>
@@ -306,7 +306,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({
         <div className="tw:col-span-full tw:flex tw:items-start tw:gap-4">
           <span
             id="seo-robots-label"
-            className="tw:w-36 tw:shrink-0 tw:pt-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
+            className="tw:w-48 tw:shrink-0 tw:pt-2 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
           >
             robots.txt
           </span>

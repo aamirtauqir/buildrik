@@ -289,6 +289,18 @@ export interface ProjectSettings {
   designPresets?: DesignPresetRecord[];
   /** Custom code injection (head scripts, body scripts, global CSS) */
   customCode?: CustomCodeConfig;
+  /**
+   * The site's locales as the Site row holds them, mirrored on load for the
+   * export engine (Clone 3397:32376 `Auto-redirect by browser`). Read-only
+   * here — the Localization screen writes the row through
+   * `siteDetail.settings.update`; nothing in the editor writes this slot.
+   */
+  localization?: {
+    defaultLocale: string;
+    enabledLocales: string[];
+    /** First visit on a default-locale page → `/<browser locale>/…` when enabled. */
+    autoRedirect: boolean;
+  };
 }
 
 /**

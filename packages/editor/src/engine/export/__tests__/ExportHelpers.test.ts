@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { RESET_CSS, camelToKebab, escapeHTML, stylesToString, stylesToCSS, minifyCSS, downloadHTML, downloadCSS } from "../ExportHelpers";
+import { RESET_CSS, camelToKebab, escapeHTML, stylesToString, stylesToCSS, minifyCSS, downloadHTML, downloadCSS, localeRedirectSnippet } from "../ExportHelpers";
 import { getDefaultTagName } from "../../../shared/utils/html";
 import { THEME } from "../../../shared/constants/defaultStyles";
 
@@ -195,5 +195,23 @@ describe("download helpers (DOM side effects)", () => {
 
     downloadCSS("body{margin:0}", "theme.css");
     expect(clicks[1].download).toBe("theme.css");
+  });
+});
+
+/* Clone 3397:32376 — Settings → Localization `Auto-redirect by browser`. */
+describe("localeRedirectSnippet", () => {
+  it("is nothing when the setting is off or the site has only its default locale", () => {
+    expect(localeRedirectSnippet(undefined)).toBeNull();
+    expect(localeRedirectSnippet({ defaultLocale: "en", enabledLocales: ["en", "fr"], autoRedirect: false })).toBeNull();
+    expect(localeRedirectSnippet({ defaultLocale: "en", enabledLocales: ["en"], autoRedirect: true })).toBeNull();
+  });
+
+  it("names the other locales and redirects once per session, off default-locale paths only", () => {
+    const snippet = localeRedirectSnippet({ defaultLocale: "en", enabledLocales: ["en", "fr", "ar"], autoRedirect: true })!;
+    expect(snippet.startsWith("<script>")).toBe(true);
+    expect(snippet).toContain('var langs=["fr","ar"]');
+    expect(snippet).toContain('sessionStorage.getItem("brk-locale-redirect")');
+    expect(snippet).toContain("location.replace(");
+    expect(snippet).not.toContain('"en"');
   });
 });

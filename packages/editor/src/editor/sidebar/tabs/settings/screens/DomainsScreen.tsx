@@ -110,7 +110,7 @@ const StatusPill: React.FC<{ status: string; "data-testid"?: string }> = ({ stat
    has the same shape). `col-span-full` keeps each on its own line in the
    Section's grid. */
 const ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
-const ROW_LABEL = "tw:w-36 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
 const RESTORE_STRIP =
   "tw:rounded tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2.5 " +

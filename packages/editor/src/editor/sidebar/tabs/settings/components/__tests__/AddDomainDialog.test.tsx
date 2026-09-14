@@ -69,8 +69,8 @@ describe("Clone 3737:43669 · Add a domain — the frame's shape", () => {
     expect(within(records).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Type", "Name", "Value"]);
     const rows = within(records).getAllByRole("row").slice(1);
     expect(rows.map((r) => within(r).getAllByRole("cell").map((c) => c.textContent))).toEqual([
-      ["A", "@", "<ip>"],
-      ["CNAME", "www", "<target>"],
+      ["A", "@", "76.76.21.21"],
+      ["CNAME", "www", "cname.vercel-dns.com"],
       ["TXT", "_buildrick", "brk-verify-…"],
     ]);
 

@@ -32,6 +32,7 @@ import {
   stylesToCSS,
   minifyCSS,
   downloadFile,
+  localeRedirectSnippet,
 } from "./ExportHelpers";
 import { devWarn } from "../../shared/utils/devLogger";
 import { FormspreeInjector } from "./FormspreeInjector";
@@ -565,6 +566,11 @@ export class ExportEngine {
     const headScripts = sanitizeHeadCode(customCode?.headScripts);
     if (headScripts) head += `${indent}${headScripts}${nl}`;
 
+    // Settings → Localization `Auto-redirect by browser` (Clone 3397:32376):
+    // the Site row's flag, mirrored into settings.localization on load.
+    const localeRedirect = localeRedirectSnippet(this.composer.getProjectSettings?.()?.localization);
+    if (localeRedirect) head += `${indent}${localeRedirect}${nl}`;
+
     // Inject analytics scripts before closing head tag.
     //
     // `config.analytics` is EXPORT config, and nothing has ever filled it in —
@@ -898,6 +904,11 @@ export class ExportEngine {
     // wrapInDocument. Sanitised by the same allowlist as the per-page field.
     const siteHeadScripts = sanitizeHeadCode(siteCustomCode?.headScripts);
     if (siteHeadScripts) headParts.push(`  ${siteHeadScripts}`);
+
+    // Settings → Localization `Auto-redirect by browser` (Clone 3397:32376),
+    // on every published page as well as the single-file export.
+    const localeRedirect = localeRedirectSnippet(this.composer.getProjectSettings?.()?.localization);
+    if (localeRedirect) headParts.push(`  ${localeRedirect}`);
 
     // …and the site's analytics, which the published page never carried: the
     // single-file path read an export-config field nobody fills in, and this

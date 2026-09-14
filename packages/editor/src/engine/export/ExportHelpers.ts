@@ -265,6 +265,31 @@ p,h1,h2,h3,h4,h5,h6{overflow-wrap:break-word}
 /**
  * Convert camelCase to kebab-case
  */
+/**
+ * Clone 3397:32376 `Auto-redirect by browser`: on a visitor's FIRST page of
+ * the session, a default-locale page sends them to `/<their language>/…`
+ * when the site has that locale — once per session, never off a prefixed
+ * path, never for the default language itself. Inline and self-contained
+ * so a published page needs nothing else; `null` when the setting is off or
+ * the site has only its default locale.
+ */
+export function localeRedirectSnippet(
+  localization: { defaultLocale: string; enabledLocales: string[]; autoRedirect: boolean } | undefined,
+): string | null {
+  if (!localization?.autoRedirect) return null;
+  const others = localization.enabledLocales.filter((code) => code && code !== localization.defaultLocale);
+  if (others.length === 0) return null;
+  const langs = JSON.stringify(others.map((c) => c.toLowerCase()));
+  return (
+    `<script>(function(){try{if(sessionStorage.getItem("brk-locale-redirect"))return;` +
+    `var langs=${langs};var want=(navigator.language||"").toLowerCase();` +
+    `var pick=langs.indexOf(want)>=0?want:langs.indexOf(want.split("-")[0])>=0?want.split("-")[0]:null;` +
+    `if(!pick)return;var p=location.pathname;` +
+    `if(langs.some(function(l){return p===("/"+l)||p.indexOf("/"+l+"/")===0}))return;` +
+    `sessionStorage.setItem("brk-locale-redirect","1");location.replace("/"+pick+(p==="/"?"/":p));}catch(e){}})();</script>`
+  );
+}
+
 export function camelToKebab(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }

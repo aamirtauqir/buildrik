@@ -339,7 +339,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         <div className="tw:col-span-full tw:flex tw:items-center tw:gap-4">
           <span
             id="canvas-snap-label"
-            className="tw:w-36 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
+            className="tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
           >
             Snap to grid
           </span>

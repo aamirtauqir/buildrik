@@ -47,6 +47,7 @@ import {
 import { SCREEN_FIELD_ERROR, SET_BTN, Select } from "../shared";
 import {
   DNS_PROVIDERS,
+  DNS_TARGETS,
   type DnsProviderId,
   type DomainAvailability,
   type DomainKind,
@@ -78,13 +79,13 @@ const KINDS: { id: DomainKind; label: string }[] = [
   { id: "SUBDOMAIN", label: "Subdomain" },
 ];
 
-/* The three records `connect` writes (phase2-backend §1). The values are the
-   server's to issue — the A target, the CNAME target and the `_buildrick`
-   token — so before it answers the dialog draws the shape and nothing more. */
+/* The three records `connect` writes (phase2-backend §1) — the real targets
+   from the shared constant, as the frame draws them; only the TXT token is
+   minted per row, so it is the one value still elided. */
 const EXPECTED_DNS_RECORDS: { type: string; host: string; value: string }[] = [
-  { type: "A", host: "@", value: "<ip>" },
-  { type: "CNAME", host: "www", value: "<target>" },
-  { type: "TXT", host: "_buildrick", value: "brk-verify-…" },
+  { type: "A", host: "@", value: DNS_TARGETS.apexIp },
+  { type: "CNAME", host: "www", value: DNS_TARGETS.cname },
+  { type: "TXT", host: DNS_TARGETS.txtHost, value: `${DNS_TARGETS.txtPrefix}…` },
 ];
 
 type Availability = "idle" | "checking" | "failed" | DomainAvailability;

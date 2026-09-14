@@ -141,6 +141,8 @@ interface SiteColumnSettings {
   name?: string;
   favicon?: string | null;
   defaultLocale?: string;
+  enabledLocales?: string[];
+  localeAutoRedirect?: boolean;
   metaTitle?: string | null;
   metaDescription?: string | null;
   metaTitleTemplate?: string | null;
@@ -263,6 +265,15 @@ function mergeSiteColumnsIntoSettings(
   settings.seo = seo;
   settings.customCode = customCode;
   settings.publishing = publishing;
+  /* Read-only mirror for the export engine's auto-redirect snippet; the
+     Localization screen writes these columns itself. */
+  if (siteCols.defaultLocale != null) {
+    settings.localization = {
+      defaultLocale: siteCols.defaultLocale,
+      enabledLocales: siteCols.enabledLocales ?? [siteCols.defaultLocale],
+      autoRedirect: siteCols.localeAutoRedirect ?? false,
+    };
+  }
   return settings;
 }
 

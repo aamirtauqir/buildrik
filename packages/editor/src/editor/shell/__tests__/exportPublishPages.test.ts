@@ -92,3 +92,27 @@ describe("exportPublishPages — the stylesheet has to travel", () => {
     expect(out).toEqual([{ path: "index.html", html }]);
   });
 });
+
+/* Clone 3397:32376 — Settings → Localization `Auto-redirect by browser` rides
+   on every published page's head; off, nothing is emitted. */
+describe("exportPublishPages — the locale auto-redirect snippet", () => {
+  const withLocalization = (autoRedirect: boolean) => {
+    const composer = composerWithSlug("about");
+    composer.setProjectSettings({
+      ...composer.getProjectSettings(),
+      localization: { defaultLocale: "en", enabledLocales: ["en", "fr"], autoRedirect },
+    });
+    return composer;
+  };
+
+  it("emits it on every page when the setting is on", async () => {
+    const pages = await exportPublishPages(withLocalization(true));
+    for (const p of pages) expect(p.html).toContain('sessionStorage.getItem("brk-locale-redirect")');
+    expect(pages[0].html).toContain('var langs=["fr"]');
+  });
+
+  it("emits nothing when it is off", async () => {
+    const pages = await exportPublishPages(withLocalization(false));
+    for (const p of pages) expect(p.html).not.toContain("brk-locale-redirect");
+  });
+});

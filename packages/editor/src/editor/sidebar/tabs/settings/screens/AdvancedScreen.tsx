@@ -99,7 +99,7 @@ const CodeCard: React.FC<{
     <div className="tw:col-span-full tw:flex tw:items-start tw:gap-4">
       <label
         htmlFor={id}
-        className="tw:w-36 tw:shrink-0 tw:pt-2 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
+        className="tw:w-48 tw:shrink-0 tw:pt-2 tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
       >
         {side}
       </label>

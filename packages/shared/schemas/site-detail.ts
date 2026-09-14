@@ -126,6 +126,20 @@ export const domainKindSchema = z.enum(["PRIMARY", "REDIRECT", "SUBDOMAIN"]);
  * and GoDaddy a numbered pair from `nsNN.domaincontrol.com` — the entries name
  * the pattern, not a pair the user will necessarily hold. "Other" lists none.
  */
+/**
+ * The targets `domains.connect` points a domain at when the workspace has no
+ * Vercel attachment — the A apex and the `www` CNAME (Vercel's, which is where
+ * every Buildrick site is served from) plus the `_buildrick` verification
+ * TXT whose token is minted per row. Shared so the Add-a-domain dialog draws
+ * the real values before the row exists (Clone 3737:43669).
+ */
+export const DNS_TARGETS = {
+  apexIp: "76.76.21.21",
+  cname: "cname.vercel-dns.com",
+  txtHost: "_buildrick",
+  txtPrefix: "brk-verify-",
+} as const;
+
 export const DNS_PROVIDERS = [
   { id: "namecheap", label: "Namecheap", nameservers: ["dns1.registrar-servers.com", "dns2.registrar-servers.com"] },
   { id: "cloudflare", label: "Cloudflare", nameservers: ["<first>.ns.cloudflare.com", "<second>.ns.cloudflare.com"] },

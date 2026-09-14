@@ -93,7 +93,7 @@ export function lastReceivedLine(status: AnalyticsStatus | null): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ROW_LABEL =
-  "tw:w-36 tw:shrink-0 tw:py-1.5 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+  "tw:w-48 tw:shrink-0 tw:py-1.5 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
 const Row: React.FC<{ stem: string; label: string; htmlFor?: string; children: React.ReactNode }> = ({
   stem,

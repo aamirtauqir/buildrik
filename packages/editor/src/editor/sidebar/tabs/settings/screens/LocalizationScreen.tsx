@@ -51,7 +51,7 @@ const RESTORE_STRIP =
 /* Label-left rows, as the Default card draws them (the SEO screen's Indexing
    card is the same shape): a 144 label column, the control after it. */
 const ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
-const ROW_LABEL = "tw:w-36 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
 /* The Locales table: an eyebrow header row on a hairline, 32-high body rows. */
 const TH =

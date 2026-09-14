@@ -4,13 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { addDomainToVercelProject, removeDomainFromVercelProject, slugifyProjectName } from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
-import { domainNameSchema, type DomainAvailability, type DomainKind } from "@buildrik/shared/schemas/site-detail";
+import { domainNameSchema, type DomainAvailability, type DomainKind, DNS_TARGETS } from "@buildrik/shared/schemas/site-detail";
 
 // Vercel's canonical targets — what a domain should point at when we have no
 // live verification records yet: the apex A record and the `www` CNAME
 // (replacing the old dead "sites.buildrik.app" host that nothing ever served).
-const VERCEL_CNAME = "cname.vercel-dns.com";
-const VERCEL_APEX_IP = "76.76.21.21";
+const VERCEL_CNAME = DNS_TARGETS.cname;
+const VERCEL_APEX_IP = DNS_TARGETS.apexIp;
 
 /**
  * The `TXT _buildrick brk-verify-…` record the Add-a-domain dialog draws
