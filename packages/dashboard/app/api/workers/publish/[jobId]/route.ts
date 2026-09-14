@@ -289,9 +289,37 @@ async function runVercelDeployJob(
 ): Promise<string> {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { slug: true, name: true, publishedPassword: true, favicon: true, touchIcon: true, ogImage: true, canonicalUrl: true, allowIndexing: true, robotsTxt: true },
+    select: {
+      slug: true,
+      name: true,
+      publishedPassword: true,
+      favicon: true,
+      touchIcon: true,
+      ogImage: true,
+      canonicalUrl: true,
+      allowIndexing: true,
+      robotsTxt: true,
+      // Settings S3: the Headers screen's columns ship in vercel.json.
+      cspPolicy: true,
+      hstsMaxAge: true,
+      xFrameOptions: true,
+      referrerPolicy: true,
+      permissionsPolicy: true,
+    },
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
+
+  /* Settings S3: the Redirects screen's rules and the REDIRECT-kind domains
+     become vercel.json redirects (publish-files.ts). Until now neither left
+     the database — a redirect saved in Settings never redirected anything. */
+  const [redirects, domains] = await Promise.all([
+    prisma.redirect.findMany({
+      where: { siteId },
+      orderBy: { createdAt: "asc" },
+      select: { fromPath: true, toUrl: true, type: true, matchQuery: true },
+    }),
+    prisma.domain.findMany({ where: { siteId }, select: { domain: true, kind: true, isPrimary: true } }),
+  ]);
 
   // Enforce the published-site password on the live URL via Vercel deployment
   // protection. null = no/legacy password → clears protection on deploy.
@@ -373,6 +401,15 @@ async function runVercelDeployJob(
     robotsTxt: site.robotsTxt,
     appScripts,
     showBadge,
+    redirects,
+    domains,
+    headers: {
+      cspPolicy: site.cspPolicy,
+      hstsMaxAge: site.hstsMaxAge,
+      xFrameOptions: site.xFrameOptions,
+      referrerPolicy: site.referrerPolicy,
+      permissionsPolicy: site.permissionsPolicy,
+    },
   });
 
   // Step 0 — Generating pages: editor already rendered HTML; just mark done.
