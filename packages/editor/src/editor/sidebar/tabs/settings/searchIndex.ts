@@ -137,10 +137,11 @@ const SECTIONS: SectionDef[] = [
     title: "Redirects",
     description: "301 / 302 redirects",
     group: SEO_PUBLISHING,
+    // Clone 3397:32517's two cards; the ids are the table's and the switch's
+    // own `id`. The Add / Edit fields live in a dialog, not on the screen.
     fields: [
-      ["From path", "Add redirect", "from-path"],
-      ["To URL", "Add redirect", "to-url"],
-      ["Type", "Add redirect", "type"],
+      ["Redirect rules", "From path, to URL and type", "rd-rules"],
+      ["Suggest redirects from 404s", "404 suggester", "rd-suggest-from-404s"],
     ],
   },
   { screen: "export", title: "Export", description: "HTML, ZIP or React", group: SEO_PUBLISHING },
