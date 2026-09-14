@@ -42,6 +42,7 @@ import {
   SETTINGS_NAV,
   SETTINGS_NAV_GROUPS,
   WORKSPACE_LINKS,
+  SAVE_ERROR_MESSAGES,
   NAV_ICONS,
   SET_BTN,
   SET_EYEBROW,
@@ -80,20 +81,6 @@ const SETTINGS_SCREENS = [
 ];
 
 const GROUP_ORDER: SettingsNavGroupId[] = ["site-setup", "seo-publishing", "visitors", "advanced", "workspace"];
-
-/** 3950:26309 / 3951:26319 / 3951:26607 — the banner each S1 screen draws
- *  when its Save fails. Other screens get the same sentence with their own
- *  name in it. */
-const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
-  general: "Site settings were not saved. Your changes are still here. Review the values, then retry.",
-  seo: "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
-  "custom-code": "Custom code was not saved. Your changes are still here. Review the values, then retry.",
-  domains: "Domain changes were not saved. Your changes are still here. Review the values, then retry.",
-  analytics: "Analytics settings were not saved. Your changes are still here. Review the values, then retry.",
-  localization: "Localization settings were not saved. Your changes are still here. Review the values, then retry.",
-  redirects: "Redirect changes were not saved. Your changes are still here. Review the values, then retry.",
-  headers: "Header changes were not saved. Your changes are still here. Review the values, then retry.",
-};
 
 /* Screens whose actions apply as they happen — the frame draws them with no
    Cancel / Save (3397:32206 Domains: `Actions apply immediately · nothing to

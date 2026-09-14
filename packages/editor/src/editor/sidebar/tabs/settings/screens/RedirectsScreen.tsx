@@ -31,13 +31,14 @@ import { Button, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
-import { LoadCard, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
+import { LoadCard, SET_BTN, SET_RESTORE_STRIP, SET_ROW, SET_ROW_LABEL, SaveErrorBanner, Screen, Section } from "../shared";
+import { SAVE_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { RedirectRepair, ScreenProps } from "../types";
 import { RedirectDialog, type RedirectDraft } from "../components/RedirectDialog";
 import { RedirectRepairCard } from "../components/RedirectRepairCard";
-import { redirectsApi, type RedirectRow, type RedirectSuggestion } from "./redirectsContract";
+import type { RedirectSuggestion, RedirectType } from "@buildrik/shared/schemas/site-detail";
 
 export interface RedirectsScreenProps extends ScreenProps {
   /** The Pages door's URL-repair draft (3519:19920), handed down by the shell from `ui:settings-open`; slugs bare or as paths. */
@@ -46,9 +47,18 @@ export interface RedirectsScreenProps extends ScreenProps {
   onRepairDone?: () => void;
 }
 
-/** 3951:26730 — the banner a refused Accept leaves over the cards. */
-export const REDIRECTS_SAVE_ERROR =
-  "Redirect changes were not saved. Your changes are still here. Review the values, then retry.";
+/** What this screen reads of a `Redirect` row (`redirects.list` returns a superset). */
+export interface RedirectRow {
+  id: string;
+  fromPath: string;
+  toUrl: string;
+  /** "301" | "302" — a String column; the dialog reads it as the enum. */
+  type: string;
+  matchQuery: boolean;
+  notes: string | null;
+}
+
+const asType = (type: string): RedirectType => (type === "302" ? "302" : "301");
 
 const CARD_LINE = "Old URLs sent to new ones, and the 404 suggester.";
 
@@ -68,17 +78,6 @@ interface RepairCard extends RedirectRepair {
 }
 
 // ─── Chrome ──────────────────────────────────────────────────────────────────
-
-/* The same amber strip Domains and Localization draw — each screen carries
-   its own copy until main folds one into shared.tsx. */
-const RESTORE_STRIP =
-  "tw:rounded tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2.5 " +
-  "tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-normal tw:text-[var(--bk-warning-text)]";
-
-/* Label-left rows at the 192 column, as 3397:32517 draws the suggester
-   (the SEO screen's Indexing card has the same shape). */
-const ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
-const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
 const TABLE = "tw:w-full tw:border-collapse tw:text-left tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 const TH =
@@ -148,8 +147,10 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
   const load = useServerLoad<{ list: RedirectRow[]; suggestions: RedirectSuggestion[] }>(
     projectId,
     async (client, siteId) => {
-      const api = redirectsApi(client);
-      const [list, suggested] = await Promise.all([api.list.query({ siteId }), api.suggestions.query({ siteId })]);
+      const [list, suggested] = await Promise.all([
+        client.siteDetail.redirects.list.query({ siteId }),
+        client.siteDetail.redirects.suggestions.query({ siteId }),
+      ]);
       return { list, suggestions: suggested };
     },
     ({ list, suggestions: suggested }) => {
@@ -159,7 +160,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     { onLoadStateChange, registerRetryLoad },
   );
 
-  const api = () => redirectsApi(getBuildrikClient(DASHBOARD_URL));
+  const api = () => getBuildrikClient(DASHBOARD_URL).siteDetail.redirects;
 
   /* After an action: the rows and the suggestions as the server now has them
      (a created rule also takes its suggestion away), without the load card
@@ -290,14 +291,14 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     );
   }
 
-  const banner = saveError ?? (actionFailed ? REDIRECTS_SAVE_ERROR : null);
+  const banner = saveError ?? (actionFailed ? SAVE_ERROR_MESSAGES.redirects : null);
   const visibleSuggestions = suggest ? suggestions : [];
 
   return (
     <Screen>
       {banner ? <SaveErrorBanner message={banner} /> : null}
 
-      <div className={RESTORE_STRIP} data-testid="set-rd-restore">
+      <div className={SET_RESTORE_STRIP} data-testid="set-rd-restore">
         Restoring a site version leaves this configuration unchanged.
       </div>
 
@@ -371,8 +372,8 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
       </Section>
 
       <Section title="404 suggester">
-        <div className={ROW}>
-          <span id="rd-suggest-from-404s-label" className={ROW_LABEL}>
+        <div className={SET_ROW}>
+          <span id="rd-suggest-from-404s-label" className={SET_ROW_LABEL}>
             Suggest redirects from 404s
           </span>
           <ToggleSwitch
@@ -392,8 +393,8 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         {visibleSuggestions.map((s, i) => {
           const day = renamedDay(s.changedAt);
           return (
-            <div key={`${s.pageId}-${s.fromPath}`} className={ROW} data-testid={`set-rd-suggestion-${i}`}>
-              <span className={`${ROW_LABEL} tw:text-[var(--bk-ink)]`}>
+            <div key={`${s.pageId}-${s.fromPath}`} className={SET_ROW} data-testid={`set-rd-suggestion-${i}`}>
+              <span className={`${SET_ROW_LABEL} tw:text-[var(--bk-ink)]`}>
                 {s.fromPath} → {s.toUrl}
                 {day ? <span className={MUTED}> renamed {day}</span> : null}
               </span>
@@ -417,7 +418,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         open={dialog !== null}
         mode={dialog?.mode ?? "add"}
         siteName={siteName}
-        initial={dialog?.mode === "edit" ? dialog.row : null}
+        initial={dialog?.mode === "edit" ? { ...dialog.row, type: asType(dialog.row.type) } : null}
         onSubmit={submitDialog}
         onDelete={dialog?.mode === "edit" ? deleteFromDialog : undefined}
         onCancel={() => setDialog(null)}

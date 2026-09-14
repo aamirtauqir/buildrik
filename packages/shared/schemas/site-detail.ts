@@ -316,6 +316,7 @@ export type SettingsOverview = z.infer<typeof settingsOverviewSchema>;
 export type UpdateSiteSettingsInput = z.infer<typeof updateSiteSettingsSchema>;
 export type CreateRedirectInput = z.infer<typeof createRedirectSchema>;
 export type UpdateRedirectInput = z.infer<typeof updateRedirectSchema>;
+export type RedirectType = CreateRedirectInput["type"];
 export type RedirectSuggestion = z.infer<typeof redirectSuggestionSchema>;
 export type ConnectDomainInput = z.infer<typeof connectDomainSchema>;
 export type DomainKind = z.infer<typeof domainKindSchema>;

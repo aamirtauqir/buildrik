@@ -37,13 +37,14 @@ vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => api,
 }));
 
-import { REDIRECTS_SAVE_ERROR, RedirectsScreen, renamedDay } from "../RedirectsScreen";
-import type { RedirectRow, RedirectSuggestion } from "../redirectsContract";
+import { RedirectsScreen, renamedDay, type RedirectRow } from "../RedirectsScreen";
+import { SAVE_ERROR_MESSAGES } from "../../constants";
+import type { RedirectSuggestion } from "@buildrik/shared/schemas/site-detail";
 
 const r = api.siteDetail.redirects;
 
 function row(id: string, fromPath: string, toUrl: string, over: Partial<RedirectRow> = {}): RedirectRow {
-  return { id, siteId: "s1", fromPath, toUrl, type: "301", matchQuery: false, notes: null, createdAt: "2026-09-01T00:00:00.000Z", ...over };
+  return { id, fromPath, toUrl, type: "301", matchQuery: false, notes: null, ...over };
 }
 
 const SEEDED: RedirectRow[] = [
@@ -228,9 +229,9 @@ describe("Clone 3397:32517 — the strip, the Redirects card, the 404 suggester"
   });
 
   it("the shell's saveError is the banner above the cards", async () => {
-    setup({ saveError: REDIRECTS_SAVE_ERROR });
+    setup({ saveError: SAVE_ERROR_MESSAGES.redirects! });
     await loaded();
-    expect(screen.getByTestId("set-save-error")).toHaveTextContent(REDIRECTS_SAVE_ERROR);
+    expect(screen.getByTestId("set-save-error")).toHaveTextContent(SAVE_ERROR_MESSAGES.redirects!);
   });
 });
 
@@ -413,7 +414,7 @@ describe("Accept — a 301 at once, the row leaves; a refusal is the banner (395
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-rd-accept-1"));
-    await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(REDIRECTS_SAVE_ERROR));
+    await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(SAVE_ERROR_MESSAGES.redirects!));
     expect(screen.getByTestId("set-rd-suggestion-1")).toBeInTheDocument();
     expect(r.list.query).toHaveBeenCalledTimes(1);
   });

@@ -116,6 +116,21 @@ export const SETTINGS_NAV: SettingsNavDef[] = [
  * Billing under /dashboard/settings/billing); linking to a 404 silently is
  * worse than not linking at all. Billing is also where every `Upgrade` goes.
  */
+/** 3950:26309 / 3951:26319 / 3951:26607 — the banner a screen draws when
+ *  its Save fails; the shell sets it after a refused Save, Domains and
+ *  Redirects after a refused row action. Other screens get the same
+ *  sentence with their own name in it. */
+export const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
+  general: "Site settings were not saved. Your changes are still here. Review the values, then retry.",
+  seo: "SEO defaults were not saved. Your changes are still here. Review the values, then retry.",
+  "custom-code": "Custom code was not saved. Your changes are still here. Review the values, then retry.",
+  domains: "Domain changes were not saved. Your changes are still here. Review the values, then retry.",
+  analytics: "Analytics settings were not saved. Your changes are still here. Review the values, then retry.",
+  localization: "Localization settings were not saved. Your changes are still here. Review the values, then retry.",
+  redirects: "Redirect changes were not saved. Your changes are still here. Review the values, then retry.",
+  headers: "Header changes were not saved. Your changes are still here. Review the values, then retry.",
+};
+
 export const WORKSPACE_LINKS: Partial<Record<SettingsNavId, string>> = {
   members: "/dashboard/settings/team",
   billing: "/dashboard/settings/billing",

@@ -33,7 +33,8 @@ vi.mock("@/services/api-client", () => ({
   getBuildrikClient: () => api,
 }));
 
-import { DomainsScreen, DOMAINS_SAVE_ERROR } from "../DomainsScreen";
+import { DomainsScreen } from "../DomainsScreen";
+import { SAVE_ERROR_MESSAGES } from "../../constants";
 import type { DomainRow } from "../DomainsScreen";
 
 const d = api.siteDetail.domains;
@@ -203,7 +204,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
     setup();
     await loaded();
     fireEvent.click(httpsToggle());
-    await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(DOMAINS_SAVE_ERROR));
+    await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(SAVE_ERROR_MESSAGES.domains!));
     expect(httpsToggle()).toHaveAttribute("aria-checked", "true");
     expect(httpsToggle()).not.toBeDisabled();
   });

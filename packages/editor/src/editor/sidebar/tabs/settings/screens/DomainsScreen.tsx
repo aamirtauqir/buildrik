@@ -29,7 +29,20 @@ import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
-import { LoadCard, SCREEN_INFO, SET_BTN, SET_CARD, SET_EYEBROW, SaveErrorBanner, Screen, Section } from "../shared";
+import {
+  LoadCard,
+  SCREEN_INFO,
+  SET_BTN,
+  SET_CARD,
+  SET_EYEBROW,
+  SET_RESTORE_STRIP,
+  SET_ROW,
+  SET_ROW_LABEL,
+  SaveErrorBanner,
+  Screen,
+  Section,
+} from "../shared";
+import { SAVE_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { AddDomainDialog, type AddDomainSubmission } from "../components/AddDomainDialog";
@@ -54,10 +67,6 @@ export interface DomainRow {
   dnsProvider: string | null;
   dnsRecords: DnsRecordRow[];
 }
-
-/** 3397:33134 — the banner a refused remove, toggle or check leaves over the cards. */
-export const DOMAINS_SAVE_ERROR =
-  "Domain changes were not saved. Your changes are still here. Review the values, then retry.";
 
 const CARD_LINE = "Point your own domain at this site. DNS changes happen at your domain registrar.";
 const ADMIN_REASON = "Only an admin can change the domain";
@@ -105,16 +114,6 @@ const StatusPill: React.FC<{ status: string; "data-testid"?: string }> = ({ stat
 };
 
 // ─── Row chrome ──────────────────────────────────────────────────────────────
-
-/* Label-left rows, as 3397:32206 draws them (the SEO screen's Indexing card
-   has the same shape). `col-span-full` keeps each on its own line in the
-   Section's grid. */
-const ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
-const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
-
-const RESTORE_STRIP =
-  "tw:rounded tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2.5 " +
-  "tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-normal tw:text-[var(--bk-warning-text)]";
 
 const TABLE = "tw:w-full tw:border-collapse tw:text-left tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 const TH =
@@ -281,7 +280,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
     );
   }
 
-  const banner = saveError ?? (actionFailed ? DOMAINS_SAVE_ERROR : null);
+  const banner = saveError ?? (actionFailed ? SAVE_ERROR_MESSAGES.domains : null);
 
   return (
     <Screen>
@@ -290,7 +289,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
       <div className={SCREEN_INFO} data-testid="set-dom-strip">
         Domain actions apply as soon as you confirm them. There is nothing to save on this screen.
       </div>
-      <div className={RESTORE_STRIP} data-testid="set-dom-restore">
+      <div className={SET_RESTORE_STRIP} data-testid="set-dom-restore">
         Restoring a site version leaves this configuration unchanged.
       </div>
 
@@ -323,8 +322,8 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
         <React.Fragment key={row.id}>
           <div data-testid={`set-dom-card-${row.id}`}>
             <Section title="Custom domain" anchor={nth("custom-domain", i)}>
-              <div className={ROW}>
-                <span id={`${nth("dom-domain", i)}-label`} className={ROW_LABEL}>
+              <div className={SET_ROW}>
+                <span id={`${nth("dom-domain", i)}-label`} className={SET_ROW_LABEL}>
                   Domain
                 </span>
                 <TextInput
@@ -336,12 +335,12 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                   className="tw:min-w-0 tw:flex-1"
                 />
               </div>
-              <div className={ROW}>
-                <span className={ROW_LABEL}>Status</span>
+              <div className={SET_ROW}>
+                <span className={SET_ROW_LABEL}>Status</span>
                 <StatusPill status={row.status} data-testid={`set-dom-status-${row.id}`} />
               </div>
-              <div className={ROW}>
-                <span id={`${nth("dom-force-https", i)}-label`} className={ROW_LABEL}>
+              <div className={SET_ROW}>
+                <span id={`${nth("dom-force-https", i)}-label`} className={SET_ROW_LABEL}>
                   Force HTTPS
                 </span>
                 <ToggleSwitch

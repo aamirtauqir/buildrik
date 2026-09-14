@@ -23,7 +23,18 @@ import { ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import type { UpdateSiteSettingsInput } from "@buildrik/shared/schemas/site-detail";
-import { Input, LoadCard, SCREEN_EMPTY, SaveErrorBanner, Screen, Section, Select, Textarea } from "../shared";
+import {
+  Input,
+  LoadCard,
+  SCREEN_EMPTY,
+  SET_RESTORE_STRIP,
+  SET_ROW_LABEL,
+  SaveErrorBanner,
+  Screen,
+  Section,
+  Select,
+  Textarea,
+} from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 
@@ -63,17 +74,10 @@ interface HeadersRow {
   permissionsPolicy?: string | null;
 }
 
-/* The amber strip under the header: --bk-warning ink on the warning tint. */
-const RESTORE_STRIP =
-  "tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] " +
-  "tw:px-3 tw:py-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning)]";
-
 /* Label-left rows at the 192 label column (the SEO screen's Indexing card set
    the shape). `stem` is the label's slug — the `set-field-*` anchors the S7
    probes target. A row with a 32 control centres its label; the CSP well is
    top-aligned, its label on the well's first line (the Custom code cards). */
-const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
-
 const Row: React.FC<{
   stem: string;
   label: string;
@@ -81,7 +85,7 @@ const Row: React.FC<{
   align?: "center" | "top";
   children: React.ReactNode;
 }> = ({ stem, label, htmlFor, align = "center", children }) => {
-  const labelClass = align === "top" ? `${ROW_LABEL} tw:pt-2` : ROW_LABEL;
+  const labelClass = align === "top" ? `${SET_ROW_LABEL} tw:pt-2` : SET_ROW_LABEL;
   return (
     <div
       className={`tw:col-span-full tw:flex tw:min-h-8 tw:gap-4 ${align === "top" ? "tw:items-start" : "tw:items-center"}`}
@@ -198,7 +202,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
     <Screen>
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
-      <div className={RESTORE_STRIP} data-testid="set-hd-restore">
+      <div className={SET_RESTORE_STRIP} data-testid="set-hd-restore">
         Restoring a site version leaves this configuration unchanged.
       </div>
 

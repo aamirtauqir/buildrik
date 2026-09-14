@@ -26,7 +26,18 @@ import { Badge, Button, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
-import { LoadCard, SaveErrorBanner, SCREEN_EMPTY, SET_BTN, Screen, Section, Select } from "../shared";
+import {
+  LoadCard,
+  SaveErrorBanner,
+  SCREEN_EMPTY,
+  SET_BTN,
+  SET_RESTORE_STRIP,
+  SET_ROW,
+  SET_ROW_LABEL,
+  Screen,
+  Section,
+  Select,
+} from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { localeLabel } from "../constants";
@@ -42,16 +53,6 @@ import type { LocaleStatus, LocaleSummary as LocaleRow, LocalesSummary } from "@
 export type LocalizationScreenProps = ScreenProps & {
   registerHeaderAction?: (node: React.ReactNode | null) => void;
 };
-
-/* The amber strip under the header: --bk-warning ink on the warning tint. */
-const RESTORE_STRIP =
-  "tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] " +
-  "tw:px-3 tw:py-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning)]";
-
-/* Label-left rows, as the Default card draws them (the SEO screen's Indexing
-   card is the same shape): a 144 label column, the control after it. */
-const ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
-const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
 /* The Locales table: an eyebrow header row on a hairline, 32-high body rows. */
 const TH =
@@ -245,13 +246,13 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
     <Screen>
       {saveError ? <SaveErrorBanner message={saveError} /> : null}
 
-      <div className={RESTORE_STRIP} data-testid="set-loc-restore">
+      <div className={SET_RESTORE_STRIP} data-testid="set-loc-restore">
         Restoring a site version leaves this configuration unchanged.
       </div>
 
       <Section title="Default">
-        <div className={ROW}>
-          <label htmlFor="default-locale" className={ROW_LABEL}>
+        <div className={SET_ROW}>
+          <label htmlFor="default-locale" className={SET_ROW_LABEL}>
             Default locale
           </label>
           <Select
@@ -271,8 +272,8 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
             ))}
           </Select>
         </div>
-        <div className={ROW}>
-          <span id="locale-auto-redirect-label" className={ROW_LABEL}>
+        <div className={SET_ROW}>
+          <span id="locale-auto-redirect-label" className={SET_ROW_LABEL}>
             Auto-redirect by browser
           </span>
           <ToggleSwitch

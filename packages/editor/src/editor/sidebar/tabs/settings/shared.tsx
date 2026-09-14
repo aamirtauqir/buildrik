@@ -47,6 +47,20 @@ export const SET_EYEBROW =
 export const SET_CARD =
   "tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)]";
 
+/** The amber strip under the header — `Restoring a site version leaves this
+ *  configuration unchanged.` — on Domains, Localization, Redirects, Headers:
+ *  --bk-warning ink on the warning tint inside a yellow-100 hairline. */
+export const SET_RESTORE_STRIP =
+  "tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-yellow-100)] tw:bg-[var(--bk-warning-tint)] " +
+  "tw:px-3 tw:py-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning)]";
+
+/** Label-left rows at the 192 label column (the SEO screen's Indexing card
+ *  set the shape; `Enable Google Analytics` wrapped at 144). `col-span-full`
+ *  keeps each on its own line in the Section's grid. */
+export const SET_ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
+export const SET_ROW_LABEL =
+  "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Section
 // ─────────────────────────────────────────────────────────────────────────────

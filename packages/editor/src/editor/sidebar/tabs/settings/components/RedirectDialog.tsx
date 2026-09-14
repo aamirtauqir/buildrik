@@ -44,7 +44,7 @@ import {
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
 import { SCREEN_FIELD_ERROR, SET_BTN } from "../shared";
-import type { RedirectType } from "../screens/redirectsContract";
+import type { RedirectType } from "@buildrik/shared/schemas/site-detail";
 
 export interface RedirectDraft {
   fromPath: string;
