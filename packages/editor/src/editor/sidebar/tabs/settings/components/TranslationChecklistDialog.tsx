@@ -24,7 +24,7 @@ import {
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
 import { RTL_LOCALES, localeLabel } from "../constants";
-import type { LocaleRow } from "../screens/localesContract";
+import type { LocaleSummary as LocaleRow } from "@buildrik/shared/schemas/site-detail";
 
 export interface TranslationChecklistDialogProps {
   open: boolean;

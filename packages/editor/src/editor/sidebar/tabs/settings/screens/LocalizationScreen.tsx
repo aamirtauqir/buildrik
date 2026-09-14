@@ -15,7 +15,7 @@
  * the dialog (3737:44855), whose Create writes at once and re-reads here.
  *
  * URL strategy stays subdirectory (`/fr/about`; the default locale serves
- * at the root) and the codes stay bare — see `localesContract.ts` for the
+ * at the root) and the codes stay bare — see the shared schema for the
  * server shapes this is typed against until the S2 backend merges.
  *
  * @license BSD-3-Clause
@@ -32,15 +32,7 @@ import type { ScreenProps } from "../types";
 import { localeLabel } from "../constants";
 import { AddLocaleDialog } from "../components/AddLocaleDialog";
 import { TranslationChecklistDialog } from "../components/TranslationChecklistDialog";
-import {
-  readLocales,
-  readLocaleSettings,
-  writeLocaleSettings,
-  type LocaleRow,
-  type LocaleSettingsRow,
-  type LocaleStatus,
-  type LocalesSummary,
-} from "./localesContract";
+import type { LocaleStatus, LocaleSummary as LocaleRow, LocalesSummary } from "@buildrik/shared/schemas/site-detail";
 
 /**
  * The header-action slot the shell grows at merge (phase2-brief.md, "Header
@@ -85,7 +77,7 @@ const PILL_TONE: Record<LocaleStatus, { label: string; className: string }> = {
 };
 
 interface LocalesRead {
-  row: LocaleSettingsRow;
+  row: { defaultLocale?: string | null; enabledLocales?: string[] | null; localeAutoRedirect?: boolean | null };
   summary: LocalesSummary;
 }
 
@@ -112,7 +104,10 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
   const load = useServerLoad<LocalesRead>(
     projectId,
     async (client, siteId) => {
-      const [row, summary] = await Promise.all([readLocaleSettings(client, siteId), readLocales(client, siteId)]);
+      const [row, summary] = await Promise.all([
+        client.siteDetail.settings.get.query({ siteId }),
+        client.siteDetail.locales.query({ siteId }),
+      ]);
       return { row, summary };
     },
     ({ row, summary }) => {
@@ -138,7 +133,7 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
   const handleSave = React.useCallback(async () => {
     if (!projectId) return;
     // Rejects on failure — the shell's Save keeps the banner and Retry save up.
-    await writeLocaleSettings(getBuildrikClient(DASHBOARD_URL), {
+    await getBuildrikClient(DASHBOARD_URL).siteDetail.settings.update.mutate({
       id: projectId,
       defaultLocale,
       enabledLocales,
@@ -162,7 +157,7 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
        at `/`), so it is re-read quietly after the write — the save has
        already succeeded, and a stale table is the only cost of this failing. */
     try {
-      setLocales((await readLocales(getBuildrikClient(DASHBOARD_URL), projectId)).locales);
+      setLocales((await getBuildrikClient(DASHBOARD_URL).siteDetail.locales.query({ siteId: projectId })).locales);
     } catch (error) {
       devError("settings", `locales refresh failed for site ${projectId}`, error);
     }
@@ -197,7 +192,7 @@ export const LocalizationScreen: React.FC<LocalizationScreenProps> = ({
     /* Create is a save of the screen as it stands plus the new locale —
        nothing on screen snaps back when the dialog closes and the rows
        re-read. Rejects on failure; the dialog shows it. */
-    await writeLocaleSettings(getBuildrikClient(DASHBOARD_URL), {
+    await getBuildrikClient(DASHBOARD_URL).siteDetail.settings.update.mutate({
       id: projectId,
       defaultLocale: setAsDefault ? code : defaultLocale,
       enabledLocales: [...enabledLocales, code],

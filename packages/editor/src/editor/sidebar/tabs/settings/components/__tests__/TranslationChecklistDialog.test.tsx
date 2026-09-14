@@ -12,7 +12,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { TranslationChecklistDialog, checklistLine } from "../TranslationChecklistDialog";
-import type { LocaleRow } from "../../screens/localesContract";
+import type { LocaleSummary as LocaleRow } from "@buildrik/shared/schemas/site-detail";
 
 const arabic = (over: Partial<LocaleRow> = {}): LocaleRow => ({
   code: "ar",
