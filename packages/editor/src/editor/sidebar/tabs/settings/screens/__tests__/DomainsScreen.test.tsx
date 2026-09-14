@@ -3,7 +3,7 @@
  * domain + DNS records card pair per domain (primary first), the actions
  * that land on the server as they are confirmed (Force HTTPS → update, Check
  * DNS → check, Remove → 3397:34402 → remove), the header's Add domain →
- * 3737:43669 → connect → re-list, the load states (3397:32985 / 3397:33085) and the banner a refused action
+ * 3737:43669 → connect → re-list, the empty card (3397:33034), the load states (3397:32985 / 3397:33085) and the banner a refused action
  * leaves (3397:33134). Never dirty.
  *
  * @license BSD-3-Clause
@@ -281,7 +281,23 @@ describe("DomainsScreen — Remove → 3397:34402", () => {
   });
 });
 
-describe("DomainsScreen — loading (3397:32985), load-error (3397:33085)", () => {
+describe("DomainsScreen — empty (3397:33034), loading (3397:32985), load-error (3397:33085)", () => {
+  it("with no domains draws the one CUSTOM DOMAIN card with its Add domain, and registers no header action", async () => {
+    d.list.query.mockResolvedValue([]);
+    const registerHeaderAction = vi.fn();
+    setup({ registerHeaderAction });
+    await loaded();
+    const empty = screen.getByTestId("set-dom-empty");
+    expect(empty).toHaveTextContent("Custom domain");
+    expect(empty).toHaveTextContent("Point your own domain at this site. DNS changes happen at your domain registrar.");
+    expect(empty).toHaveTextContent("No custom domain. Using the free buildrick.app address until you connect one.");
+    expect(screen.queryByTestId("set-dom-removed")).toBeNull();
+    expect(within(empty).getByTestId("set-dom-add")).toHaveClass("tw:h-8");
+    expect(registerHeaderAction).not.toHaveBeenCalledWith(expect.objectContaining({ type: expect.anything() }));
+    fireEvent.click(within(empty).getByTestId("set-dom-add"));
+    expect(screen.getByTestId("set-dom-dialog")).toBeInTheDocument();
+  });
+
   it("shows the CUSTOM DOMAIN load card while the rows are on their way", async () => {
     let resolve!: (rows: DomainRow[]) => void;
     d.list.query.mockReturnValue(new Promise((r) => { resolve = r; }));

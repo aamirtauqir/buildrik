@@ -6,7 +6,8 @@
  * server as it is confirmed, so the screen is never dirty and the shell's
  * footer reads `Actions apply immediately · nothing to save here` · Done.
  * The rows come from `domains.list` on open (3397:32985 loading, 3397:33085
- * load-error with Try again). Per domain, primary first: a **Custom domain** card — the name, its
+ * load-error with Try again); none → the one empty card (3397:33034). Per
+ * domain, primary first: a **Custom domain** card — the name, its
  * status pill, `Force HTTPS` (writes `domains.update` at once) and
  * `Remove <domain>…` (3397:34402 confirm → `domains.remove`) — and a **DNS
  * records** card whose pills are `DnsRecord.verified` and whose `Check DNS`
@@ -27,7 +28,7 @@ import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
-import { LoadCard, SCREEN_INFO, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
+import { LoadCard, SCREEN_INFO, SET_BTN, SET_CARD, SET_EYEBROW, SaveErrorBanner, Screen, Section } from "../shared";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { AddDomainDialog, type AddDomainSubmission } from "../components/AddDomainDialog";
@@ -155,7 +156,8 @@ export const DomainsScreen: React.FC<ScreenProps & HeaderActionProps> = ({
   const ready = load.state === "ready";
   const hasRows = rows.length > 0;
 
-  // The header's `Add domain` (3397:32206) — the shell renders it.
+  // The header's `Add domain` (3397:32206) — the shell renders it. On the
+  // empty card the button is the card's own, so the header carries none.
   React.useEffect(() => {
     if (!registerHeaderAction) return;
     if (!ready || !hasRows) {
@@ -267,6 +269,25 @@ export const DomainsScreen: React.FC<ScreenProps & HeaderActionProps> = ({
       <div className={RESTORE_STRIP} data-testid="set-dom-restore">
         Restoring a site version leaves this configuration unchanged.
       </div>
+
+      {!hasRows ? (
+        <section className={`${SET_CARD} tw:flex tw:flex-col tw:items-start tw:gap-2 tw:p-4`} data-testid="set-dom-empty">
+          <div className={SET_EYEBROW}>Custom domain</div>
+          <div className={LINE}>{CARD_LINE}</div>
+          <div className={LINE}>No custom domain. Using the free buildrick.app address until you connect one.</div>
+          <Button
+            type="button"
+            size="xs"
+            className={`${SET_BTN} tw:mt-1`}
+            disabled={!canManage}
+            title={canManage ? undefined : ADMIN_REASON}
+            onClick={() => setAddOpen(true)}
+            data-testid="set-dom-add"
+          >
+            Add domain
+          </Button>
+        </section>
+      ) : null}
 
       {rows.map((row, i) => (
         <React.Fragment key={row.id}>
