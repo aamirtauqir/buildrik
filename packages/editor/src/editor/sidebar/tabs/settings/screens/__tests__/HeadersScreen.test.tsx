@@ -265,6 +265,23 @@ describe("HeadersScreen — the server states", () => {
 });
 
 describe("HeadersScreen — edits, dirty and the save handler", () => {
+  it("registers no save handler while clean; an edit reports dirty and a save reports clean again (3397:34227)", async () => {
+    const { box, register } = saveHandlerSpy();
+    const onDirtyChange = vi.fn();
+    setup({ registerSaveHandler: register, onDirtyChange });
+    await loaded();
+    expect(box.current).toBeNull();
+    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
+    fireEvent.change(xfo(), { target: { value: "DENY" } });
+    await waitFor(() => expect(box.current).not.toBeNull());
+    expect(onDirtyChange).toHaveBeenLastCalledWith(true);
+    await act(async () => {
+      await box.current!();
+    });
+    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
+    await waitFor(() => expect(box.current).toBeNull());
+  });
+
   it("the handler writes the five columns — trimmed text as null when empty, selects as null when Not set", async () => {
     const { box, register } = saveHandlerSpy();
     setup({ registerSaveHandler: register });
