@@ -41,7 +41,7 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
     id: "set-brand",
     label: "Set your brand",
     description:
-      "Apply your fonts and colors in the Brand panel — everything you build uses them.",
+      "Pick a starter or set your six colours and two fonts in Brand — every block and template uses them.",
     actionLabel: "Open Brand panel",
     actionKey: "open-brand",
     completed: false,
@@ -56,10 +56,12 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
   },
   {
     id: "insert-section",
-    label: "Insert a section",
+    /* v3 IA (2026-09-14): the rail says Add and the sections are Blocks.
+       Copy names what the user will see, not the old panel. */
+    label: "Add a block",
     description:
-      "Drop a ready-made section — hero, features, footer — onto the canvas.",
-    actionLabel: "Open Insert panel",
+      "Drop a ready-made block — hero, features, footer — from Add › Blocks onto the canvas. Blocks use your brand colours and fonts.",
+    actionLabel: "Open Add panel",
     actionKey: "open-build",
     completed: false,
   },

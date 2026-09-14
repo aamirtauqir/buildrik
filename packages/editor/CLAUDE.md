@@ -23,7 +23,8 @@ Demo app: `demo/main.tsx` on port 5050.
 ## FIGMA UI REBUILD — THE LOOP (founder rules, 2026-08-06)
 
 Full-UI rebuild in progress: every editor surface rebuilt to Figma
-`g4GzQFqzNYz5sosz1QtZXC` page `1:3`. Checklist = `scripts/conformance/boards.json`
+`g4GzQFqzNYz5sosz1QtZXC` page `4418:45431` (Editor v3 · IA — source of truth since
+2026-09-15; `1:3` and the two Clone pages are `Archive ·`). Checklist = `scripts/conformance/boards.json`
 (300 active boards / 33 families as of 2026-08-07). The 2026-08-06 plan doc was
 removed on founder order 2026-08-07 (superseded by
 `docs/plans/2026-08-07-editor-figma-completion.md`; recovery: git history).

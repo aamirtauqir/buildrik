@@ -52,9 +52,11 @@ const baseProps = () => ({
 });
 
 describe("SlimLauncher — §10 default 280px experience", () => {
-  it("renders panel header with 'Media' title", () => {
+  // v3 IA Q4 (2026-09-14): the panel is "Assets" — rail label, header and
+  // the Webflow/Framer term the target user already uses.
+  it("renders panel header with 'Assets' title", () => {
     render(<SlimLauncher {...baseProps()} />);
-    expect(screen.getByRole("heading", { name: /^Media$/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Assets$/ })).toBeInTheDocument();
   });
 
   it("renders TypePills row", () => {

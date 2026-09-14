@@ -156,6 +156,25 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     }
   );
 
+  // 4b. v3 IA doors (docs/plans/2026-09-14-editor-v3-ia.md Q8) — the two
+  // features that had no non-keystroke entry once the rail's ⋯ More went:
+  // the page-replace flow lives inside Templates, the cheat sheet behind `?`.
+  commands.push(
+    {
+      id: "templates-replace-layout",
+      label: "Replace page layout with template…",
+      group: "Pages",
+      handler: () => { composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {}); onClose(); },
+    },
+    {
+      id: "help-keyboard-shortcuts",
+      label: "Keyboard shortcuts",
+      group: "Help",
+      shortcut: "?",
+      handler: () => { composer.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); onClose(); },
+    },
+  );
+
   // 5. Registry-backed commands (S3.14 B8 fix). The CommandCenter holds ~39
   // commands the hardcoded list never surfaced — Export HTML/JSON, Open
   // Exporter, device switches — so ⌘K couldn't reach them. Append the ones not

@@ -75,6 +75,11 @@ export const ICON_PATHS: Record<string, string> = {
   // Navigation
   eye: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z",
 
+  // v3 IA context menu — Replace with block / Improve with AI / Bind to CMS / Add interaction
+  sparkles: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8L19 17z",
+  database: "M12 2C7 2 3 3.6 3 5.5S7 9 12 9s9-1.6 9-3.5S17 2 12 2zM3 5.5v13C3 20.4 7 22 12 22s9-1.6 9-3.5v-13M3 12c0 1.9 4 3.5 9 3.5s9-1.6 9-3.5",
+  zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
+
   // Default dot
   default: "",
 };

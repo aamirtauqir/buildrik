@@ -53,6 +53,7 @@ import { StructurePopover } from "./StructurePopover";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
+import { getTabMode, type GroupedTabId } from "../rail/tabsConfig";
 import { ConflictModal } from "./modals/ConflictModal";
 import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
@@ -716,6 +717,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           composer={composer}
           device={state.device}
           zoom={state.zoom}
+          /* F15 — a full-page tab replaces the canvas, so the footer's selection
+             readout and zoom control describe something that is not on screen.
+             The footer is a flex sibling OUTSIDE LayoutShell's grid, which is
+             why `.layout-shell--fullpage` cannot reach it and the mode has to
+             be handed over explicitly. StudioPanels derives the same condition
+             from the same tab for its own grid. */
+          fullPage={getTabMode((state.leftPanelTab as GroupedTabId) || "add") === "fullpage"}
           onZoomChange={(z) => {
             state.setZoom(z);
             if (composer) composer.setZoom(z);

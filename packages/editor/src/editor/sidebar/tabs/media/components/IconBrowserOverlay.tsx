@@ -159,7 +159,7 @@ export function IconBrowserOverlay({ onClose, onPick }: IconBrowserOverlayProps)
       aria-label="Icon picker"
       data-testid="media-icon-browser"
     >
-      <PanelFrame.Header title="Media" onClose={onClose} />
+      <PanelFrame.Header title="Assets" onClose={onClose} />
 
       <Button
         variant="link" className="tw:flex tw:h-9 tw:shrink-0 tw:w-full tw:items-center tw:justify-start tw:px-4 tw:text-left"

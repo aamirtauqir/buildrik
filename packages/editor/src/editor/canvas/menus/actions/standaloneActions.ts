@@ -8,7 +8,66 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
 
+/** Element types a block can stand in for — the section-shaped ones. */
+const SECTION_TYPES = new Set([
+  "container", "section", "hero", "features", "header", "footer", "nav", "navbar",
+  "cta", "card", "pricing", "columns", "grid", "flex",
+]);
+/** Element types the CMS can feed a field into. */
+const BINDABLE_TYPES = new Set(["text", "heading", "paragraph", "image", "button", "link"]);
+
 export const standaloneActions: ContextAction[] = [
+  // ── v3 IA (docs/plans/2026-09-14-editor-v3-ia.md Q8): the features a designer
+  // looks for AT the element — board "Canvas · selected · Hero · ⋯ menu"
+  // (4428:43928) — instead of a rail hunt. Each row is a door to an existing
+  // surface, never a second implementation of it.
+  {
+    id: "replace-with-block",
+    label: "Replace with block…",
+    icon: "layout",
+    group: "standalone",
+    // Blocks are sections; offering to replace a heading with a hero is noise.
+    isVisible: ({ element, isRoot }) => !isRoot && SECTION_TYPES.has(element.getType?.() ?? ""),
+    handler: ({ composer, element }) => {
+      composer.selection.select(element as never);
+      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });
+      composer.emit(EVENTS.UI_INSERT_OPEN_GROUP, { group: "blocks" });
+    },
+  },
+  {
+    id: "improve-with-ai",
+    label: "Improve with AI",
+    icon: "sparkles",
+    group: "standalone",
+    // Same door the inspector's ✦ chip uses; hidden when the shell mounted the
+    // menu without an AI handler rather than showing a row that does nothing.
+    isVisible: ({ openAI }) => Boolean(openAI),
+    handler: ({ openAI }) => openAI?.(),
+  },
+  {
+    id: "bind-to-cms",
+    label: "Bind to CMS field…",
+    icon: "database",
+    group: "standalone",
+    isVisible: ({ element, isRoot }) => !isRoot && BINDABLE_TYPES.has(element.getType?.() ?? ""),
+    handler: ({ composer, element }) => {
+      // The CMS panel binds the CURRENT selection (Content › record › field);
+      // select first so the panel opens on the right element.
+      composer.selection.select(element as never);
+      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "content" });
+    },
+  },
+  {
+    id: "add-interaction",
+    label: "Add interaction",
+    icon: "zap",
+    group: "standalone",
+    isVisible: ({ isRoot }) => !isRoot,
+    handler: ({ composer, element }) => {
+      composer.selection.select(element as never);
+      composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "interactions" });
+    },
+  },
   {
     id: "save-as-component",
     label: "Save as component",

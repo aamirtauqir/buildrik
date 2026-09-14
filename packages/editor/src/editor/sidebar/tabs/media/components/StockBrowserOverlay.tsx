@@ -196,7 +196,7 @@ export function StockBrowserOverlay({
       aria-label="Stock browser"
       data-testid="media-stock-browser"
     >
-      <PanelFrame.Header title="Media" onClose={onClose} />
+      <PanelFrame.Header title="Assets" onClose={onClose} />
 
       <Button
         variant="link" className="tw:flex tw:h-9 tw:w-full tw:shrink-0 tw:items-center tw:justify-start tw:px-4 tw:text-left"

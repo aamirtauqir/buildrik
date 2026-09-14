@@ -54,7 +54,7 @@ export function MediaTab(props: MediaTabProps) {
   if (!props.composer) {
     return (
       <PanelFrame className="med-tab">
-        <PanelFrame.Header title="Media" {...props} />
+        <PanelFrame.Header title="Assets" {...props} />
         <PanelFrame.Body>
           <div className="med-no-project">Open a project to manage media.</div>
         </PanelFrame.Body>

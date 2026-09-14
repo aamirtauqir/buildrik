@@ -151,7 +151,7 @@ describe("step items", () => {
     const row = screen.getByRole("button", { name: "Set your brand" });
     expect(row).toHaveAttribute("aria-expanded", "true");
     expect(
-      screen.getByText(/Apply your fonts and colors/)
+      screen.getByText(/Pick a starter or set your six colours/)
     ).toBeInTheDocument();
 
     // CTA fires onAction with the step's actionKey
@@ -192,7 +192,7 @@ describe("step items", () => {
         })}
       />
     );
-    expect(screen.queryByText(/Apply your fonts and colors/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Pick a starter or set your six colours/)).not.toBeInTheDocument();
   });
 });
 

@@ -10,6 +10,8 @@
 
 import * as React from "react";
 import { Kbd, ModalContent, ModalRoot, Button, TextInput } from "@/editor/chrome-ui";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import { tokens } from "../shared/tokens";
 
 export interface KeyboardCheatSheetProps {
@@ -372,13 +374,24 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
 /**
  * Hook to manage cheat sheet state and keyboard trigger
  */
-export function useKeyboardCheatSheet(): {
+export function useKeyboardCheatSheet(composer?: Composer | null): {
   isOpen: boolean;
   open: () => void;
   close: () => void;
   toggle: () => void;
 } {
   const [isOpen, setIsOpen] = React.useState(false);
+
+  // ⌘K "Keyboard shortcuts" (v3 IA Q8). Until this, the sheet's only door was
+  // the `?` key — a shortcut you have to already know to learn the shortcuts.
+  React.useEffect(() => {
+    if (!composer) return;
+    const toggle = () => setIsOpen((prev) => !prev);
+    composer.on(EVENTS.UI_TOGGLE_CHEAT_SHEET, toggle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_CHEAT_SHEET, toggle);
+    };
+  }, [composer]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

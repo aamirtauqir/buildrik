@@ -341,6 +341,17 @@ export const EVENTS = {
   UI_BROWSE_TEMPLATES: "ui:browse-templates",
   /** Rail switches to a named tab. Six emitters, no constant until now. */
   UI_SWITCH_TAB: "ui:switch-tab",
+  /** Add panel expands one named group (`{ group: InsertGroupId }`). The
+   *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
+   *  switching the tab alone leaves the user at ELEMENTS. */
+  UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** Inspector expands one section and scrolls it into view
+   *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
+   *  other way to reach a collapsed section. */
+  UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
+  /** Toggle the keyboard cheat sheet. It lives in Canvas behind the `?` key
+   *  only; ⌘K "Keyboard shortcuts" needs a door that is not a keystroke. */
+  UI_TOGGLE_CHEAT_SHEET: "ui:toggle:cheat-sheet",
   /** The site menu asked to take the site down. The Publish panel owns the
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */
