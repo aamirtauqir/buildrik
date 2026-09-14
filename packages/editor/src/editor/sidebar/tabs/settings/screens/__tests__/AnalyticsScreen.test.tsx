@@ -3,8 +3,9 @@
  * frame's order with their label-left rows, the Connection status pill and
  * Last received data line off the tracker's `analytics.status` read
  * (3953:49515 / 3953:49670), the save-error banner (3951:26455), Verify and
- * the Connection verified dialog (4256:26844), the id normalisation, dirty
- * wiring and the flush-handler contract.
+ * the Connection verified dialog (4256:26844), the id normalisation, the
+ * per-provider validation that holds Save (3397:34148), dirty wiring and the
+ * flush-handler contract.
  *
  * @license BSD-3-Clause
  */
@@ -56,6 +57,7 @@ afterEach(() => cleanup());
 function setup(opts: {
   projectId?: string | null;
   onDirtyChange?: (d: boolean) => void;
+  registerSaveHandler?: (h: (() => Promise<void>) | null) => void;
   registerFlushHandler?: (h: (() => void) | null) => void;
   onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
   saveError?: string | null;
@@ -67,6 +69,7 @@ function setup(opts: {
       composer={composer}
       projectId={opts.projectId === undefined ? "s1" : opts.projectId}
       onDirtyChange={opts.onDirtyChange}
+      registerSaveHandler={opts.registerSaveHandler}
       registerFlushHandler={opts.registerFlushHandler}
       onLoadStateChange={opts.onLoadStateChange}
       saveError={opts.saveError}
@@ -386,16 +389,75 @@ describe("AnalyticsScreen — id normalisation", () => {
     expect(pixelInput().value).toBe("123456");
   });
 
-  it("a malformed Measurement ID flags the field and says so under it; an empty one is not an error", async () => {
+});
+
+describe("AnalyticsScreen — validation (3397:34148)", () => {
+  const GA_SENTENCE =
+    "This doesn't look right. Your Google Analytics ID should start with G- followed by 10 characters, like G-ABCD123456.";
+
+  it("a malformed Measurement ID flags the field and says the frame's sentence under it; an empty one is not an error", async () => {
     setup();
     await loaded();
-    fireEvent.change(gaInput(), { target: { value: "G-123" } });
+    fireEvent.change(gaInput(), { target: { value: "G-ABC" } });
     expect(gaInput()).toHaveAttribute("aria-invalid", "true");
     expect(gaInput()).toHaveAttribute("aria-describedby", "ga-error");
-    expect(screen.getByTestId("set-an-ga-error")).toHaveTextContent(/should start with G- followed by 10 characters/);
+    expect(screen.getByTestId("set-an-ga-error")).toHaveTextContent(GA_SENTENCE);
+    expect(screen.getByTestId("set-an-ga-error").id).toBe("ga-error");
     fireEvent.change(gaInput(), { target: { value: "" } });
     expect(screen.queryByRole("alert")).toBeNull();
     expect(gaInput()).toHaveAttribute("aria-invalid", "false");
+    fireEvent.change(gaInput(), { target: { value: "G-ABCD123456" } });
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("each other provider gets its own sentence, under its own field", async () => {
+    setup();
+    await loaded();
+    fireEvent.change(gtmInput(), { target: { value: "GTM-AB" } });
+    expect(gtmInput()).toHaveAttribute("aria-invalid", "true");
+    expect(gtmInput()).toHaveAttribute("aria-describedby", "gtm-error");
+    expect(screen.getByTestId("set-an-gtm-error")).toHaveTextContent(
+      "Your GTM Container ID should start with GTM- followed by 6 to 8 characters, like GTM-ABC1234.",
+    );
+    fireEvent.change(pixelInput(), { target: { value: "12345678" } });
+    expect(pixelInput()).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByTestId("set-an-pixel-error")).toHaveTextContent("Your Pixel ID should be 15 or 16 digits, like 1234567890123456.");
+    fireEvent.change(clarityInput(), { target: { value: "abc" } });
+    expect(clarityInput()).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByTestId("set-an-clarity-error")).toHaveTextContent(
+      "Your Clarity Project ID should be 10 letters or digits, like abcdefghij.",
+    );
+    expect(screen.getAllByRole("alert")).toHaveLength(3);
+  });
+
+  it("while an id is malformed the screen stays dirty and registers a save that rejects with the sentence; a fixed id clears it", async () => {
+    const onDirtyChange = vi.fn();
+    const registerSaveHandler = vi.fn();
+    setup({ onDirtyChange, registerSaveHandler });
+    await loaded();
+    expect(registerSaveHandler).not.toHaveBeenCalled();
+
+    fireEvent.change(gaInput(), { target: { value: "G-ABC" } });
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
+    expect(registerSaveHandler).toHaveBeenLastCalledWith(expect.any(Function));
+    const refuse = registerSaveHandler.mock.calls.at(-1)![0] as () => Promise<void>;
+    await expect(refuse()).rejects.toThrow(GA_SENTENCE);
+
+    fireEvent.change(gaInput(), { target: { value: "G-ABCD123456" } });
+    expect(registerSaveHandler).toHaveBeenLastCalledWith(null);
+    await waitFor(() => expect(onDirtyChange).toHaveBeenLastCalledWith(true));
+  });
+
+  it("the flush throws the sentence too and writes nothing while an id is malformed", async () => {
+    let flush: (() => void) | null = null;
+    const { composer } = setup({ registerFlushHandler: (h) => { flush = h; } });
+    await loaded();
+    fireEvent.change(pixelInput(), { target: { value: "12345678" } });
+    expect(() => flush!()).toThrow("Your Pixel ID should be 15 or 16 digits");
+    expect(composer.setProjectSettings).not.toHaveBeenCalled();
+    fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
+    act(() => flush!());
+    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
   });
 });
 

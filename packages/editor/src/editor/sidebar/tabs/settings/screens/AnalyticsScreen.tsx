@@ -12,7 +12,8 @@
  * loading, 3953:49670 load-error) and again on Verify, which checks the id's
  * shape, stamps `verifiedAt` into the draft (flushed on the next Save — no
  * mutation of its own, phase2-backend §1) and opens Connection verified
- * (4256:26844). A refused save shows the banner (3951:26455).
+ * (4256:26844). A malformed id shows its provider's sentence under the field
+ * and holds Save (3397:34148); a refused save shows the banner (3951:26455).
  *
  * @license BSD-3-Clause
  */
@@ -28,9 +29,7 @@ import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { readAnalyticsStatus, type AnalyticsStatus } from "./analyticsContract";
-
-// GA4 measurement ID: exactly G- followed by 10 alphanumeric characters (EC-05)
-const GA_ID_REGEX = /^G-[A-Z0-9]{10}$/i;
+import { validateProviderId } from "./analyticsIds";
 
 const DEFAULT_ANALYTICS = {
   gaId: "",
@@ -133,6 +132,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   composer,
   projectId,
   onDirtyChange,
+  registerSaveHandler,
   registerFlushHandler,
   onLoadStateChange,
   registerRetryLoad,
@@ -207,10 +207,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     { onLoadStateChange, registerRetryLoad }
   );
 
-  const gaError = gaId !== "" && !GA_ID_REGEX.test(gaId);
-  const gtmError = gtmId !== "" && !/^GTM-[A-Z0-9]{4,}$/i.test(gtmId);
-  const pixelError = pixelId !== "" && !/^\d{15,16}$/.test(pixelId);
-  const clarityError = clarityId !== "" && !/^[a-z0-9]{6,15}$/i.test(clarityId);
+  const gaError = validateProviderId("googleAnalytics", gaId);
+  const gtmError = validateProviderId("googleTagManager", gtmId);
+  const pixelError = validateProviderId("facebookPixel", pixelId);
+  const clarityError = validateProviderId("microsoftClarity", clarityId);
+  /** The first malformed id's sentence — while one stands, Save is refused. */
+  const firstError = gaError ?? gtmError ?? pixelError ?? clarityError;
 
   /* Verify (4256:26844): the id's shape, then the tracker's status read
      again, then `verifiedAt` into the draft — the next Save carries it. A
@@ -237,15 +239,28 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     }
   };
 
+  /* 3397:34148: Save is refused while an id is malformed. The shell runs a
+     registered save handler IN PLACE of the flush + persist, so while an id
+     is wrong the screen registers one that rejects with the field's sentence
+     — the shell shows its banner and nothing is written — and clears it the
+     moment every id is right again. The flush below throws the same sentence
+     as a second lock, for a host that reaches it directly. */
+  React.useEffect(() => {
+    if (!registerSaveHandler || !firstError) return;
+    registerSaveHandler(() => Promise.reject(new Error(firstError)));
+    return () => registerSaveHandler(null);
+  }, [registerSaveHandler, firstError]);
+
   // Flush local buffer → composer once on Save click (see SettingsTab). The
   // other providers' `verifiedAt` ride through from the stored config.
-  const stateRef = React.useRef({ gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent });
-  stateRef.current = { gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent };
+  const stateRef = React.useRef({ gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent, firstError });
+  stateRef.current = { gaId, gaEnabled, gaVerifiedAt, gtmId, gtmEnabled, pixelId, pixelEnabled, clarityId, clarityEnabled, cookieConsent, firstError };
   React.useEffect(() => {
     if (!composer || !registerFlushHandler) return;
     registerFlushHandler(() => {
-      const current = composer.getProjectSettings();
       const s = stateRef.current;
+      if (s.firstError) throw new Error(s.firstError);
+      const current = composer.getProjectSettings();
       composer.setProjectSettings({
         ...current,
         analytics: {
@@ -316,13 +331,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
               }}
               placeholder="G-XXXXXXXXXX"
               aria-describedby={gaError ? "ga-error" : undefined}
-              aria-invalid={gaError}
+              aria-invalid={gaError !== null}
               data-testid="set-an-ga-id"
             />
             {gaError && (
               <div id="ga-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-ga-error">
-                This doesn&apos;t look right. Your Google Analytics ID should start with G- followed by 10
-                characters, like G-ABCD123456.
+                {gaError}
               </div>
             )}
           </div>
@@ -387,12 +401,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               placeholder="GTM-XXXXXXX"
-              aria-invalid={gtmError}
+              aria-describedby={gtmError ? "gtm-error" : undefined}
+              aria-invalid={gtmError !== null}
               data-testid="set-an-gtm-id"
             />
             {gtmError && (
-              <div role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-gtm-error">
-                A GTM container ID looks like GTM-XXXXXXX.
+              <div id="gtm-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-gtm-error">
+                {gtmError}
               </div>
             )}
           </div>
@@ -426,12 +441,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               placeholder="1234567890123456"
-              aria-invalid={pixelError}
+              aria-describedby={pixelError ? "pixel-error" : undefined}
+              aria-invalid={pixelError !== null}
               data-testid="set-an-pixel-id"
             />
             {pixelError && (
-              <div role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-pixel-error">
-                Pixel IDs are 15 or 16 digits. Check your Meta Events Manager for the correct ID.
+              <div id="pixel-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-pixel-error">
+                {pixelError}
               </div>
             )}
           </div>
@@ -465,12 +481,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 markDirty();
               }}
               placeholder="abcdefghij"
-              aria-invalid={clarityError}
+              aria-describedby={clarityError ? "clarity-error" : undefined}
+              aria-invalid={clarityError !== null}
               data-testid="set-an-clarity-id"
             />
             {clarityError && (
-              <div role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-clarity-error">
-                A Clarity project ID is a short alphanumeric code (6–15 characters).
+              <div id="clarity-error" role="alert" className={SCREEN_FIELD_ERROR} data-testid="set-an-clarity-error">
+                {clarityError}
               </div>
             )}
           </div>
