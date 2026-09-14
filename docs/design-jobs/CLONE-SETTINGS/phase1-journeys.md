@@ -46,6 +46,7 @@ walk and back to FREE. Site name, custom code and OG image edited live and resto
 | 3737:43652 Edit social profile | out-of-scope | the prototype's stand-in for typing; the real input |
 | 3397:32144 Export (superseded) | record | the sidebar's Export opens the Export modal (`Export site as HTML`) via `ui:open-exporter`; the in-tab screen is gone |
 | doors | verified | Fonts & colours → Brand panel; Members / Billing → `…/dashboard/settings/team` / `billing` in a new tab; `‹ Back to canvas`; Overview `Done` |
+| the door IN (found after the report) | drift-fixed | the full-screen Settings had none of its own — `⋯ → Site settings` and `⌃,` opened board 1172:4867's Project settings modal, only `⋯ → Plugins` reached the shell. Both doors are AquibraStudio's `openProjectSettings`, so `StudioModals` routes that flag to the Settings tab; the modal retires (1172:4867, 183:16) and its Author + Canvas grid (grid size · snap) move to General; live: menu row and ⌃, both land on the Overview, grid 8 + snap on → engine state 8 / true; live-site-menu-settings-door, live-3397-32011-general-canvas |
 
 ## Notes
 
@@ -58,7 +59,7 @@ walk and back to FREE. Site name, custom code and OG image edited live and resto
   click follows the click; Save changes stays enabled on a clean screen (the frame draws it so); the
   robots.txt Sitemap line needs a real host; Members/Billing overlays (`3737:46094` / `46102`) stay
   dashboard deep links (`superseded:code:deep-link` — the founder's default at the S1 go).
-- **Found on the walk, fixed (4):** saved site name not reaching the sidebar/topbar; Save changes
+- **Found on the walk, fixed (5):** the Settings surface had no door (above); saved site name not reaching the sidebar/topbar; Save changes
   not the server's save (the mirror's refusal unobserved — the biggest one); a footer under the
   locked screen; the doubled ✕ in Search. Plus the merge folds (E2's stub → `shared.tsx`,
   `ServerLoadProps` → `types.ts`, the catalog → shared, `LOCKED_COPY`, `set-load-state`).
