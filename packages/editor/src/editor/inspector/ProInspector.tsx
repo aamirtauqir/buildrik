@@ -18,6 +18,8 @@ import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
 import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
+import { EVENTS } from "../../shared/constants/events";
+import type { SectionId } from "./sections/registry";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
@@ -287,6 +289,28 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     container.addEventListener("scroll", handleScroll, { passive: true });
     return () => container.removeEventListener("scroll", handleScroll);
   }, [selectedElement?.id]);
+
+  /* v3 IA Q8 — the canvas context menu's "Add interaction" lands here. A
+     collapsed section stays collapsed on selection, so the door has to open
+     it AND bring it on screen; `toggleSection` is keyed by element type, the
+     same key InspectorTabContent reads. The scroll waits one frame so the
+     expanded body has a height to scroll to. */
+  const selectedType = selectedElement?.type ?? null;
+  React.useEffect(() => {
+    if (!composer || !selectedType) return;
+    const focus = ({ section }: { section: SectionId }) => {
+      if (!expandedSections.has(`${selectedType}:${section}`)) toggleSection(selectedType, section);
+      requestAnimationFrame(() => {
+        contentRef.current
+          ?.querySelector<HTMLElement>(`#inspector-section-${section}`)
+          ?.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
+    };
+    composer.on(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
+    return () => {
+      composer.off(EVENTS.UI_INSPECTOR_FOCUS_SECTION, focus);
+    };
+  }, [composer, selectedType, expandedSections, toggleSection]);
 
   const ElementIcon = selectedElement
     ? getElementIcon(selectedElement.type)

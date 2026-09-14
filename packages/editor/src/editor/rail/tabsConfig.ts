@@ -75,8 +75,10 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     id: "add",
     tool: "insert",
     iconName: "Plus",
-    label: "Insert",
-    ariaLabel: "Insert elements and sections into your page",
+    // v3 IA (docs/plans/2026-09-14-editor-v3-ia.md Q4): "Add" — the verb the
+    // designer thinks in; Blocks and Components live inside this one panel.
+    label: "Add",
+    ariaLabel: "Add elements, blocks and components to your page",
     section: "top",
     pattern: "card-drill-in",
     shortcut: "A",
@@ -115,7 +117,8 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     id: "assets",
     tool: "insert",
     iconName: "Image",
-    label: "Media",
+    // v3 IA Q4: "Assets" — the Webflow/Framer term; the id already said so.
+    label: "Assets",
     ariaLabel: "Upload and manage images, videos, and fonts",
     section: "top",
     pattern: "standalone",
@@ -250,8 +253,11 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     id: "content",
     tool: "site",
     iconName: "LayoutGrid",
-    label: "Content",
-    ariaLabel: "Data sources and collections for dynamic content",
+    // v3 IA Q4: "CMS" — the panel IS the CMS (collections, records, fields,
+    // dynamic pages, sources, {{site.*}} variables). "Content" read as
+    // page copy and nobody looked here for collections (Critical UX-F-01).
+    label: "CMS",
+    ariaLabel: "Collections, records and data sources for dynamic content",
     section: "bottom",
     pattern: "standalone",
     // Keyboard legend 58:215: rail letters are A L P M D B — D opens Content.
@@ -327,6 +333,10 @@ export function getRailTools(): Array<{ tool: RailTool; meta: RailToolMeta }> {
 // rail items in ONE group — no divider, 48px pitch, icon + visible label:
 //
 //   Insert · Layers · Pages · Media · Content · Brand
+//
+// v3 IA (2026-09-14, page 4418:45431): same six ids, three labels renamed —
+// Add · Layers · Pages · Assets · CMS · Brand. The rail component set there
+// (4418:144790) is the visual source; the ids never changed.
 //
 // (The previous 5-item Add/Assets/Components + Layers/Pages reading came from
 // an incomplete fetch of the design file — see feedback_figma_page_list_unreliable.)

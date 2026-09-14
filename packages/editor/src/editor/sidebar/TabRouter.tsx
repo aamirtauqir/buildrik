@@ -70,6 +70,11 @@ export interface TabRouterProps {
    *  because TabRouter mounts one tab at a time, so the listener did not
    *  exist yet when the emit fired from the Pages tab. */
   templatesNewPageMode?: boolean;
+  /** Site menu › Unpublish asked for the confirm before PublishTab existed.
+   *  Same one-tab-at-a-time race as above; same answer — a prop the always-
+   *  mounted sidebar owns, consumed once by the tab it was meant for. */
+  unpublishIntent?: boolean;
+  onUnpublishIntentConsumed?: () => void;
   onCreateComponent: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
@@ -115,6 +120,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onSwitchToAdd,
   onSwitchToTemplates,
   templatesNewPageMode,
+  unpublishIntent,
+  onUnpublishIntentConsumed,
   onCreateComponent,
   projectId,
   publishJob,
@@ -201,6 +208,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           projectId={projectId}
           publishJob={publishJob}
           onVercelPublish={isFeatureEnabled("publish") ? onVercelPublish : undefined}
+          initialUnpublish={unpublishIntent}
+          onUnpublishIntentConsumed={onUnpublishIntentConsumed}
         />
       );
 

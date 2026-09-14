@@ -328,7 +328,7 @@ export function AssetDetailOverlay({
       {/* The drill-in draws the shared panel header itself — the overlay
           covers the drawer, and the board keeps Media's 44h header on every
           drill-in screen. */}
-      <PanelFrame.Header title="Media" onClose={onClose} />
+      <PanelFrame.Header title="Assets" onClose={onClose} />
 
       {/* Back row — ‹ pops one level, exactly like ESC. */}
       <Button

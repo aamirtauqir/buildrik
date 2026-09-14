@@ -216,7 +216,7 @@ export function SlimLauncher(props: SlimLauncherProps) {
           onCancel={onCancelSelection ?? (() => {})}
         />
       ) : null}
-      <PanelFrame.Header title="Media" onClose={onClose} onExpandToggle={props.onExpand} />
+      <PanelFrame.Header title="Assets" onClose={onClose} onExpandToggle={props.onExpand} />
 
       {/* Clone 3584:45522 / 3584:45876 / 3585:23337 — `Manage assets ↗`, a
           full-width quiet button under the header, is the drawer's named

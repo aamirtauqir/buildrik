@@ -372,7 +372,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   return (
     <div className={CONTENT_BODY}>
       <PanelHeader
-        title="Content"
+        // v3 IA Q4 — the panel is the CMS; the rail says so, the header agrees.
+        title="CMS"
         isExpanded={isExpanded}
         onExpandToggle={onExpandToggle}
         onHelpClick={onHelpClick}

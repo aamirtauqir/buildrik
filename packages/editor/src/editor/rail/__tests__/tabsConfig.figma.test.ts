@@ -12,7 +12,9 @@ import {
  *
  * Source of truth: board `S1 · Editor — ASSEMBLED` (g4GzQFqzNYz5sosz1QtZXC
  * node 52:2, rail frame 52:6): SIX rail items in ONE group, no divider,
- * in order Insert · Layers · Pages · Media · Content · Brand.
+ * in order Insert · Layers · Pages · Media · Content · Brand. The v3 IA page
+ * (4418:45431, rail set 4418:144790, 2026-09-14) keeps the six ids and renames
+ * three labels: Add · Layers · Pages · Assets · CMS · Brand.
  *
  * This test guards the "re-route, never delete" rule — the off-rail panels
  * must still exist in GROUPED_TABS_CONFIG (their engine + panel are intact;
@@ -20,14 +22,14 @@ import {
  * contract items in board order.
  */
 describe("tabsConfig — Figma rail", () => {
-  it("rail is exactly Insert · Layers · Pages · Media · Content · Brand, in order", () => {
+  it("rail is exactly Add · Layers · Pages · Assets · CMS · Brand, in order", () => {
     const ordered = getFigmaRailGroups().flatMap((g) => g.tabs.map((t) => t.id));
     expect(ordered).toEqual(["add", "layers", "pages", "assets", "content", "design"]);
   });
 
-  it("rail labels match the board (52:6 item names)", () => {
+  it("rail labels match the v3 board (rail set 4418:144790 item names)", () => {
     const labels = getFigmaRailGroups().flatMap((g) => g.tabs.map((t) => t.label));
-    expect(labels).toEqual(["Insert", "Layers", "Pages", "Media", "Content", "Brand"]);
+    expect(labels).toEqual(["Add", "Layers", "Pages", "Assets", "CMS", "Brand"]);
   });
 
   it("renders as ONE group — the board draws no divider", () => {
