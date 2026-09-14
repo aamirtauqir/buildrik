@@ -210,7 +210,16 @@ export const SettingsTab: React.FC<
     screenFlushHandlerRef.current = handler;
   }, []);
 
-  React.useEffect(() => {
+  /* A LAYOUT effect, deliberately: the screens register their save / flush
+     handlers and report their load in passive effects, and React runs a
+     child's passive effects before its parent's. When Settings reopens on
+     the persisted screen (or a door lands on one), the screen mounts in the
+     same commit as the shell — as a passive effect this reset ran AFTER the
+     screen's register and nulled it: Save flushed nothing and said Settings
+     saved (found live on Redirects' suggester switch). Layout effects run
+     before every passive effect of the commit, so the reset always precedes
+     the register, on mount and on a screen change alike. */
+  React.useLayoutEffect(() => {
     setScreenIsDirty(false);
     setGuardOpen(false);
     setSaveError(null);

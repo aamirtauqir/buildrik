@@ -129,18 +129,27 @@ vi.mock("../components/SearchSettingsModal", () => ({
 
 /* A screen that exercises the shell's load-state and save-error contract
    without a server: SEO stands in. */
+const seoFlushes = vi.hoisted(() => [] as string[]);
 vi.mock("../screens/SeoScreen", () => ({
   SeoScreen: ({
     onLoadStateChange,
     onDirtyChange,
     saveError,
     registerHeaderAction,
+    registerFlushHandler,
   }: {
     onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
     onDirtyChange?: (d: boolean) => void;
     saveError?: string | null;
     registerHeaderAction?: (node: React.ReactNode | null) => void;
-  }) => (
+    registerFlushHandler?: (handler: (() => void) | null) => void;
+  }) => {
+    /* Registered the way the real screens do it — in a mount effect. */
+    React.useEffect(() => {
+      registerFlushHandler?.(() => seoFlushes.push("flushed"));
+      return () => registerFlushHandler?.(null);
+    }, [registerFlushHandler]);
+    return (
     <div data-testid="fake-seo">
       {saveError ? <div data-testid="set-save-error">{saveError}</div> : null}
       <button type="button" onClick={() => registerHeaderAction?.(<button type="button" data-testid="set-head-action">Add thing</button>)}>
@@ -157,7 +166,8 @@ vi.mock("../screens/SeoScreen", () => ({
         go ready
       </button>
     </div>
-  ),
+    );
+  },
 }));
 
 vi.mock("../screens/OverviewScreen", () => ({
@@ -668,5 +678,26 @@ describe("SettingsTab — ui:settings-open lands on a screen with the repair dra
   it("a request without a draft is a plain deep link", async () => {
     render(<SettingsTab composer={asComposer(makeComposer())} openRequest={{ screen: "headers" }} />);
     await waitFor(() => expect(headTitle()).toBe("Advanced / Headers"));
+  });
+});
+
+// ─── Handlers registered in the shell's own mount commit ──────────────────
+
+describe("SettingsTab — a screen mounted with the shell keeps its handlers", () => {
+  it("reopening on the persisted screen: the screen's flush runs on Save (the shell's reset ran before the register)", async () => {
+    /* The nav position persists per project; Settings reopens on it, so the
+       screen mounts in the SAME commit as the shell. React runs a child's
+       effects before its parent's: the screen registered its flush, then the
+       shell's screen-change reset nulled it — Save flushed nothing and said
+       Settings saved (found live on Redirects' suggester switch). */
+    localStorage.setItem("buildrick-nav-settings-panel", JSON.stringify({ currentScreen: "seo" }));
+    seoFlushes.length = 0;
+    const composer = makeComposer();
+    render(<SettingsTab composer={asComposer(composer)} />);
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await waitFor(() => expect(composer.saveProject).toHaveBeenCalled());
+    expect(seoFlushes).toEqual(["flushed"]);
   });
 });
