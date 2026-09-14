@@ -11,6 +11,14 @@ export type PageStatus = "live" | "draft" | "hidden" | "password" | "scheduled" 
 /** Settings drawer tab identifier */
 export type DrawerTab = "seo" | "social" | "advanced";
 
+/** `ui:pages-open-settings` from outside the panel — Settings' saved repair
+ *  card (`Back to <Page> SEO`, Clone 3519:20096) and the Templates success
+ *  modal. Held by StudioPanels while this panel mounts, then handed down. */
+export interface PageSettingsOpenRequest {
+  pageId: string;
+  tab?: DrawerTab;
+}
+
 /** A sidebar-only folder that groups pages. Stored in localStorage, not the engine. */
 export interface FolderItem {
   id: string;

@@ -15,6 +15,7 @@ import type { IconConfig } from "../../shared/types/media";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { FullPageRouter } from "./FullPageRouter";
+import type { SettingsOpenRequest } from "./tabs/settings/types";
 
 export interface FullPageViewProps {
   activeTab: GroupedTabId;
@@ -26,6 +27,8 @@ export interface FullPageViewProps {
   onSwitchToDesign?: () => void;
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
+  /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
+  settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
   onOpenImageEditor?: (
     imageSrc: string,
@@ -47,6 +50,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   onSwitchToDesign,
   projectId,
   onSettingsDirtyChange,
+  settingsOpen,
   onTemplatesSwitchTab,
   onOpenImageEditor,
   onOpenIconPicker,
@@ -77,6 +81,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             onSwitchToDesign={onSwitchToDesign}
             projectId={projectId}
             onSettingsDirtyChange={onSettingsDirtyChange}
+            settingsOpen={settingsOpen}
             onTemplatesSwitchTab={onTemplatesSwitchTab}
           />
         </React.Suspense>

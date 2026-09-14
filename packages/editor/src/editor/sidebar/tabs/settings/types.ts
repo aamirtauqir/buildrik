@@ -27,6 +27,21 @@ export type SettingsNavId =
   | "custom-code" | "headers" | "integrations"
   | "webhooks" | "members" | "billing";
 
+/** The Pages panel's URL-repair draft (Clone 3519:19920): the page whose
+ *  slug just changed, and the move the redirect should cover. */
+export interface RedirectRepair {
+  pageId: string;
+  pageName: string;
+  from: string;
+  to: string;
+}
+
+/** `ui:settings-open` — open Settings on a screen; a repair draft may ride along. */
+export interface SettingsOpenRequest {
+  screen: SettingsNavId;
+  repair?: RedirectRepair | null;
+}
+
 export interface SettingsTabProps {
   composer: Composer | null;
   /** `‹ Back to canvas` / `Done` / a discarded edit — every door out of Settings. */

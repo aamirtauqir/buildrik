@@ -17,6 +17,7 @@ import { getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailG
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
+import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
@@ -74,6 +75,8 @@ export interface LeftSidebarProps {
   /** Settings' unsaved-edit flag, owned by the shell — see the guard below. */
   settingsDirty?: boolean;
   onSettingsDirtyChange?: (dirty: boolean) => void;
+  /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
+  pagesOpen?: PageSettingsOpenRequest | null;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
   onVercelPublish?: () => Promise<void>;
@@ -369,6 +372,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   canvasHoveredId,
   settingsDirty = false,
   onSettingsDirtyChange,
+  pagesOpen,
   projectId,
   publishJob,
   onVercelPublish,
@@ -687,6 +691,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 <TabRouter
                   activeTab={activeTab}
                   activeSubTab={activeSubTab}
+                  pagesOpen={pagesOpen}
                   composer={composer}
                   commonTabProps={commonTabProps}
                   onBlockClick={onBlockClick}

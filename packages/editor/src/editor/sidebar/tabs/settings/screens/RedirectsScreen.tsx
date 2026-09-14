@@ -17,7 +17,7 @@ import {
   Section,
   Select,
 } from "../shared";
-import type { ScreenProps } from "../types";
+import type { ScreenProps, RedirectRepair } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Button, ConfirmDialog } from "@/editor/chrome-ui";
 
@@ -50,7 +50,13 @@ function isValidRedirectTarget(value: string): boolean {
   }
 }
 
-export const RedirectsScreen: React.FC<ScreenProps> = ({
+export const RedirectsScreen: React.FC<
+  ScreenProps & {
+    /** The Pages door's URL-repair draft (3519:19920); the S3 screen draws it. */
+    repair?: RedirectRepair | null;
+    onRepairDone?: () => void;
+  }
+> = ({
   projectId,
   onDirtyChange,
   registerSaveHandler,

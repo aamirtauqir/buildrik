@@ -15,6 +15,7 @@
 import * as React from "react";
 import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame, Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
+import type { PageSettingsOpenRequest } from "./types";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
@@ -37,6 +38,9 @@ export interface PagesTabProps {
   onClose?: () => void;
   /** Called when user clicks "From Template" — parent should switch to Templates tab */
   onRequestTemplates?: () => void;
+  /** `ui:pages-open-settings`, held by StudioPanels while this lazy panel
+   *  mounts (the emit fires before it exists); a fresh object per request. */
+  openSettingsRequest?: PageSettingsOpenRequest | null;
 }
 
 export const PagesTab: React.FC<PagesTabProps> = ({
@@ -46,8 +50,14 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   onHelpClick,
   onClose,
   onRequestTemplates,
+  openSettingsRequest,
 }) => {
   const p = usePages(composer);
+
+  const { openSettings: openPageSettings } = p;
+  React.useEffect(() => {
+    if (openSettingsRequest) openPageSettings(openSettingsRequest.pageId);
+  }, [openSettingsRequest, openPageSettings]);
 
   // Folders — sidebar-only, localStorage-persisted
   /* This read was `(composer as { id?: string })?.id`, and Composer has no

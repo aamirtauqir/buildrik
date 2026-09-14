@@ -27,6 +27,7 @@ import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
+import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import { exportPublishPages } from "../shell/exportPublishPages";
 
@@ -100,6 +101,8 @@ export interface TabRouterProps {
    *  every sub-tab deep link opened the right panel at the wrong screen. Only
    *  History reads it today; other tabs ignore it until they need it. */
   activeSubTab?: string;
+  /** `ui:pages-open-settings`, held by the shell for the Pages panel. */
+  pagesOpen?: PageSettingsOpenRequest | null;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -123,6 +126,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onResendReview,
   onCreateCollection,
   activeSubTab,
+  pagesOpen,
 }) => {
   switch (activeTab) {
     case "add":
@@ -161,6 +165,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           composer={composer}
           {...commonTabProps}
           onRequestTemplates={onSwitchToTemplates}
+          openSettingsRequest={pagesOpen}
         />
       );
 

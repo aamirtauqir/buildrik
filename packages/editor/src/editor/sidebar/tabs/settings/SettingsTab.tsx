@@ -36,6 +36,8 @@ import {
   type SettingsNavDef,
   type SettingsNavGroupId,
   type ScreenLoadState,
+  type SettingsOpenRequest,
+  type RedirectRepair,
   SCREEN_PLAN_REQUIREMENTS,
   SETTINGS_NAV,
   SETTINGS_NAV_GROUPS,
@@ -89,6 +91,8 @@ const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
   domains: "Domain changes were not saved. Your changes are still here. Review the values, then retry.",
   analytics: "Analytics settings were not saved. Your changes are still here. Review the values, then retry.",
   localization: "Localization settings were not saved. Your changes are still here. Review the values, then retry.",
+  redirects: "Redirect changes were not saved. Your changes are still here. Review the values, then retry.",
+  headers: "Header changes were not saved. Your changes are still here. Review the values, then retry.",
 };
 
 /* Screens whose actions apply as they happen — the frame draws them with no
@@ -136,8 +140,11 @@ export const SettingsTab: React.FC<
     onOpenDesignTab?: () => void;
     /** Deep-link screen id from `openLeftPanelToTab("settings", <id>)`. */
     initialScreen?: string;
+    /** `ui:settings-open`, held by StudioPanels — a screen to land on, and
+     *  the Pages panel's URL-repair draft when there is one (3519:19920). */
+    openRequest?: SettingsOpenRequest | null;
   }
-> = ({ composer, initialScreen, onClose, userPlan, projectId: projectIdProp, onDirtyChange, onOpenDesignTab }) => {
+> = ({ composer, initialScreen, openRequest, onClose, userPlan, projectId: projectIdProp, onDirtyChange, onOpenDesignTab }) => {
   // The standalone shell (:5050/?siteId=) never threads projectId through
   // AquibraStudio → StudioPanels; the URL param is the same source
   // BuildrikSyncProvider loads from.
@@ -317,6 +324,27 @@ export const SettingsTab: React.FC<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialScreen]);
 
+  /* The Pages door (3519:19920): land on the named screen with the repair
+     draft. Each request is a new object, so the same page renamed twice
+     opens Redirects twice. The draft is the screen's until it is saved or
+     dropped — `onRepairDone` — and a screen change drops it too. */
+  const [repair, setRepair] = React.useState<RedirectRepair | null>(null);
+  React.useEffect(() => {
+    if (!openRequest) return;
+    setRepair(openRequest.repair ?? null);
+    navigateTo(openRequest.screen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openRequest]);
+  /* Dropped on the way OUT of Redirects — not on mount, where the landing
+     screen is still the persisted one and the request's draft would be
+     cleared in the same batch that set it. */
+  const wasOnRedirects = React.useRef(false);
+  React.useEffect(() => {
+    if (wasOnRedirects.current && currentScreen !== "redirects") setRepair(null);
+    wasOnRedirects.current = currentScreen === "redirects";
+  }, [currentScreen]);
+  const clearRepair = React.useCallback(() => setRepair(null), []);
+
   // Escape is one more door out — guarded like the rest. The dialogs own
   // their own Escape while they are up; an input keeps its own.
   React.useEffect(() => {
@@ -463,7 +491,7 @@ export const SettingsTab: React.FC<
       case "localization":
         return <LocalizationScreen {...common} />;
       case "redirects":
-        return <RedirectsScreen {...common} />;
+        return <RedirectsScreen {...common} repair={repair} onRepairDone={clearRepair} />;
       case "headers":
         return <HeadersScreen {...common} />;
       case "forms":

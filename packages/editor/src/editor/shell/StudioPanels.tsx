@@ -26,6 +26,8 @@ import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
+import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
+import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
@@ -259,6 +261,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      FullPageView mounts the SettingsTab that raises it, and LeftSidebar's
      rail draws the dirty dot and guards the tab switch against it. */
   const [settingsDirty, setSettingsDirty] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = React.useState<SettingsOpenRequest | null>(null);
+  const [pagesOpen, setPagesOpen] = React.useState<PageSettingsOpenRequest | null>(null);
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
@@ -287,13 +291,42 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
 
+    /* Clone 3519:19920 — the Pages panel's `Add redirect` opens Settings ON
+       Redirects with the draft. Held here, not in the tab: Settings mounts
+       on the switch, after the emit, so a listener inside it would miss the
+       request. A fresh object per request → the tab re-navigates each time. */
+    const openSettings = (data: SettingsOpenRequest) => {
+      setSettingsOpen({ screen: data.screen, repair: data.repair ?? null });
+      onLeftPanelTabChange?.("settings");
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+    /* The way back (3519:20096 `Back to <Page> SEO`): the same shape — the
+       Pages panel is lazy and unmounted under the Settings fullpage, so the
+       request waits here for it. */
+    const openPageSettings = (data: PageSettingsOpenRequest) => {
+      setPagesOpen({ pageId: data.pageId, tab: data.tab });
+      onLeftPanelTabChange?.("pages");
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+
     composer.on(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
     composer.on(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
+    composer.on(EVENTS.UI_SETTINGS_OPEN, openSettings);
+    composer.on(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings);
     return () => {
       composer.off(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
       composer.off(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
+      composer.off(EVENTS.UI_SETTINGS_OPEN, openSettings);
+      composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, openPageSettings);
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
+
+  /* A request is one visit's: leaving the tab drops it, so the next plain
+     visit does not land on that screen again. */
+  React.useEffect(() => {
+    if (activeTabId !== "settings") setSettingsOpen(null);
+    if (activeTabId !== "pages") setPagesOpen(null);
+  }, [activeTabId]);
 
   // Listen for tab switch events
   React.useEffect(() => {
@@ -453,6 +486,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             canvasHoveredId={canvasHoveredId}
             settingsDirty={settingsDirty}
             onSettingsDirtyChange={setSettingsDirty}
+            pagesOpen={pagesOpen}
             projectId={projectId}
             publishJob={publishJob}
             onVercelPublish={onVercelPublish}
@@ -549,6 +583,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                dead door. */
             activeSubTab={leftPanelSubTab}
             onSettingsDirtyChange={setSettingsDirty}
+            settingsOpen={settingsOpen}
             projectId={projectId}
             onOpenImageEditor={onOpenImageEditor}
             onOpenIconPicker={onOpenIconPicker}

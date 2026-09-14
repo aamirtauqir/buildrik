@@ -170,6 +170,27 @@ vi.mock("../screens/OverviewScreen", () => ({
   ),
 }));
 
+/* The Redirects screen, reduced to what the shell hands it: the Pages
+   door's repair draft and the `done` it answers with (3519:19920). */
+vi.mock("../screens/RedirectsScreen", () => ({
+  RedirectsScreen: ({
+    repair,
+    onRepairDone,
+  }: {
+    repair?: { pageName: string; from: string; to: string } | null;
+    onRepairDone?: () => void;
+  }) => (
+    <div data-testid="fake-redirects">
+      {repair ? (
+        <div data-testid="fake-repair">
+          Redirect for {repair.pageName} · {repair.from} → {repair.to}
+          <button type="button" onClick={onRepairDone}>repair done</button>
+        </div>
+      ) : null}
+    </div>
+  ),
+}));
+
 import { SettingsTab } from "../SettingsTab";
 import { SETTINGS_MIRROR_ERROR_EVENT } from "@/services/BuildrikSyncProvider";
 
@@ -610,5 +631,42 @@ describe("SettingsTab — Search settings", () => {
     expect(open).toHaveBeenCalledWith(expect.stringContaining("/dashboard/settings/team"), "_blank", "noopener,noreferrer");
     expect(headTitle()).toBe("Settings");
     open.mockRestore();
+  });
+});
+
+// ─── The Pages door (3519:19920) ──────────────────────────────────────────
+
+describe("SettingsTab — ui:settings-open lands on a screen with the repair draft", () => {
+  const request = (from: string) => ({
+    screen: "redirects" as const,
+    repair: { pageId: "p1", pageName: "About", from, to: "/about-us" },
+  });
+
+  it("opens Redirects with the draft; the screen's done drops it", async () => {
+    const composer = asComposer(makeComposer());
+    render(<SettingsTab composer={composer} openRequest={request("/about")} />);
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / Redirects"));
+    expect(screen.getByTestId("fake-repair")).toHaveTextContent("Redirect for About · /about → /about-us");
+    fireEvent.click(screen.getByText("repair done"));
+    expect(screen.queryByTestId("fake-repair")).toBeNull();
+    expect(headTitle()).toBe("SEO & publishing / Redirects");
+  });
+
+  it("leaving Redirects drops the draft; a fresh request brings a fresh one", async () => {
+    const composer = asComposer(makeComposer());
+    const { rerender } = render(<SettingsTab composer={composer} openRequest={request("/about")} />);
+    await waitFor(() => expect(screen.getByTestId("fake-repair")).toBeTruthy());
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    fireEvent.click(screen.getByTestId("set-nav-redirects"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / Redirects"));
+    expect(screen.queryByTestId("fake-repair")).toBeNull();
+    rerender(<SettingsTab composer={composer} openRequest={request("/team")} />);
+    await waitFor(() => expect(screen.getByTestId("fake-repair")).toHaveTextContent("/team → /about-us"));
+  });
+
+  it("a request without a draft is a plain deep link", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} openRequest={{ screen: "headers" }} />);
+    await waitFor(() => expect(headTitle()).toBe("Advanced / Headers"));
   });
 });

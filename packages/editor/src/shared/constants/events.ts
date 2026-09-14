@@ -351,6 +351,11 @@ export const EVENTS = {
    *  leaves Settings for the Export modal, and a toggle emitted with the modal
    *  already up would close it. Handled beside `handleExport` in StudioHeader. */
   UI_OPEN_EXPORTER: "ui:open-exporter",
+  /** Open Settings ON a named screen, with the Pages panel's URL-repair
+   *  draft riding along (Clone 3519:19920). Handled in StudioPanels, which
+   *  is mounted before Settings is — a listener inside the tab would miss an
+   *  emit fired in the same gesture as the tab switch. */
+  UI_SETTINGS_OPEN: "ui:settings-open",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
   UI_TOGGLE_LAYERS: "ui:toggle:layers",
   UI_TOGGLE_ASSETS: "ui:toggle:assets",

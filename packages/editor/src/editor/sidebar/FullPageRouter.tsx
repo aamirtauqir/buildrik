@@ -12,6 +12,7 @@ import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "../../shared/types/media";
 import { Portal } from "@/editor/chrome-ui";
+import type { SettingsOpenRequest } from "./tabs/settings/types";
 
 // Lazy-loaded fullpage tab components
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
@@ -45,6 +46,8 @@ export interface FullPageRouterProps {
   onSwitchToDesign?: () => void;
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
+  /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
+  settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
 }
 
@@ -57,6 +60,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onSwitchToDesign,
   projectId,
   onSettingsDirtyChange,
+  settingsOpen,
   onTemplatesSwitchTab,
 }) => {
   switch (activeTab) {
@@ -110,6 +114,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               composer={composer}
               projectId={projectId}
               onDirtyChange={onSettingsDirtyChange}
+              openRequest={settingsOpen}
               onOpenDesignTab={onSwitchToDesign}
               onClose={commonTabProps.onClose}
             />
