@@ -1,319 +1,427 @@
 /**
- * RedirectsScreen — list/create/delete URL redirects.
- * Server-side rows (Prisma Redirect table); reads via tRPC siteDetail.redirects.
+ * Redirects — Clone 3397:32517 (`SEO & publishing / Redirects`): the site's
+ * redirect rules and the 404 suggester.
+ *
+ * The rows and the suggestions come from `redirects.list` + `redirects
+ * .suggestions` on open, one load (3397:33479 loading, 3397:33573
+ * load-error with Try again). Card **Redirects**: the table `FROM PATH · TO
+ * URL · TYPE` with an `Edit` per row → 4254:75747; none → the card's own
+ * line + `Add redirect` (3397:33526). `Add redirect` in the shell's header
+ * (`registerHeaderAction`) opens 4254:75736. Every row action lands on the
+ * server as it is confirmed — create / update / delete through the dialog,
+ * which keeps a refusal inline — and re-lists. Card **404 suggester**:
+ * `Suggest redirects from 404s` is `projectSettings.redirects
+ * .suggestFrom404s`, the ONE thing the footer saves (composer-backed, the
+ * flush handler); under it one row per suggestion — an old page slug with no
+ * rule, the source being the page slug history, hence `renamed <d MMM>` —
+ * with `Accept` (a 301 at once, the row leaves); off → the rows hide; none →
+ * the empty line. A refused Accept shows the banner (3951:26730).
+ *
+ * The Pages door: the shell passes `repair` after a slug change was saved in
+ * Page settings, and the URL repair draft (3519:19920) sits above the
+ * Redirects card until it is saved (3519:20096 — the rule joins the table,
+ * `Back to <Page> SEO` returns through `ui:pages-open-settings`) or
+ * cancelled; `onRepairDone` tells the shell either way.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { createBuildrikApiClient } from "@/services/api-client";
-import {
-  Field,
-  Input,
-  SCREEN_EMPTY,
-  SCREEN_ERROR,
-  SCREEN_NOTICE,
-  Screen,
-  Section,
-  Select,
-} from "../shared";
-import type { ScreenProps, RedirectRepair } from "../types";
+import { Button, ToggleSwitch } from "@/editor/chrome-ui";
+import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button, ConfirmDialog } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
+import { LoadCard, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
+import { useServerLoad } from "../hooks/useServerLoad";
+import { useSettingsScreen } from "../hooks/useSettingsScreen";
+import type { RedirectRepair, ScreenProps } from "../types";
+import { RedirectDialog, type RedirectDraft } from "../components/RedirectDialog";
+import { RedirectRepairCard } from "../components/RedirectRepairCard";
+import { redirectsApi, type RedirectRow, type RedirectSuggestion } from "./redirectsContract";
 
-interface Redirect {
-  id: string;
-  siteId: string;
-  fromPath: string;
-  toUrl: string;
-  type: string;
-  createdAt: string | Date;
+export interface RedirectsScreenProps extends ScreenProps {
+  /** The Pages door's URL-repair draft (3519:19920), handed down by the shell from `ui:settings-open`; slugs bare or as paths. */
+  repair?: RedirectRepair | null;
+  /** The draft was saved or cancelled — the shell drops `repair`. */
+  onRepairDone?: () => void;
 }
 
-let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
-function getClient() {
-  if (!_client) _client = createBuildrikApiClient(DASHBOARD_URL);
-  return _client;
+/** 3951:26730 — the banner a refused Accept leaves over the cards. */
+export const REDIRECTS_SAVE_ERROR =
+  "Redirect changes were not saved. Your changes are still here. Review the values, then retry.";
+
+const CARD_LINE = "Old URLs sent to new ones, and the 404 suggester.";
+
+const asPath = (slug: string) => (slug.startsWith("/") ? slug : `/${slug}`);
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** `12 Sep` — the day the page was renamed; locale-free so the row reads the same everywhere. */
+export function renamedDay(iso: string): string | null {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : `${d.getDate()} ${MONTHS[d.getMonth()]}`;
 }
 
-// A redirect target is either a same-site path (single leading slash) or an
-// absolute http(s) URL. Everything else — javascript:/data: schemes,
-// protocol-relative "//host", bare domains, free text — is rejected before it
-// can be persisted and later served to a visitor.
-function isValidRedirectTarget(value: string): boolean {
-  if (value.startsWith("/") && !value.startsWith("//")) return true;
-  try {
-    const { protocol } = new URL(value);
-    return protocol === "http:" || protocol === "https:";
-  } catch {
-    return false;
-  }
+type Dialog = { mode: "add" } | { mode: "edit"; row: RedirectRow } | null;
+
+interface RepairCard extends RedirectRepair {
+  saved: { fromPath: string; toUrl: string } | null;
 }
 
-export const RedirectsScreen: React.FC<
-  ScreenProps & {
-    /** The Pages door's URL-repair draft (3519:19920); the S3 screen draws it. */
-    repair?: RedirectRepair | null;
-    onRepairDone?: () => void;
-  }
-> = ({
+// ─── Chrome ──────────────────────────────────────────────────────────────────
+
+/* The same amber strip Domains and Localization draw — each screen carries
+   its own copy until main folds one into shared.tsx. */
+const RESTORE_STRIP =
+  "tw:rounded tw:border tw:border-[var(--bk-warning)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2.5 " +
+  "tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-normal tw:text-[var(--bk-warning-text)]";
+
+/* Label-left rows at the 192 column, as 3397:32517 draws the suggester
+   (the SEO screen's Indexing card has the same shape). */
+const ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
+const ROW_LABEL = "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+
+const TABLE = "tw:w-full tw:border-collapse tw:text-left tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const TH =
+  "tw:h-7 tw:border-b tw:border-[var(--bk-border)] tw:pr-4 tw:text-[length:var(--bk-text-11)] tw:font-medium " +
+  "tw:uppercase tw:leading-4 tw:tracking-[0.06em] tw:text-[var(--bk-ink-muted)]";
+/* 40-high rows: the 32 Edit button plus 4 of air each side. */
+const TD = "tw:h-10 tw:pr-4 tw:align-middle";
+const TD_PATH = `${TD} tw:max-w-0 tw:truncate`;
+
+const LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
+const MUTED = "tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+
+/* `Accept` — the frame draws it as plain ink text at the 192 column, no
+   border or fill; the link recipe (no box, hover underline) in ink. */
+const ACCEPT_BTN = "tw:text-[var(--bk-ink)]";
+
+// ─── Screen ──────────────────────────────────────────────────────────────────
+
+export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
+  composer,
   projectId,
   onDirtyChange,
-  registerSaveHandler,
+  registerFlushHandler,
+  onLoadStateChange,
+  registerRetryLoad,
+  registerHeaderAction,
+  saveError,
+  repair,
+  onRepairDone,
 }) => {
-  const [rows, setRows] = React.useState<Redirect[]>([]);
-  // Deleting is a server mutation with no undo, so the row button opens this
-  // instead of firing it — same ConfirmDialog the tab's own discard guard uses.
-  const [pendingDelete, setPendingDelete] = React.useState<Redirect | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [loadError, setLoadError] = React.useState<string | null>(null);
+  const siteName = composer?.getProjectMetadata?.()?.name ?? "";
 
-  const [fromPath, setFromPath] = React.useState("");
-  const [toUrl, setToUrl] = React.useState("");
-  const [type, setType] = React.useState<"301" | "302">("301");
-  const [submitting, setSubmitting] = React.useState(false);
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
+  // ── The suggester switch: the one thing the footer saves ──
+  const { value: suggestSaved } = useSettingsScreen(composer, (s) => s.redirects?.suggestFrom404s ?? true, true);
+  const [suggest, setSuggest] = React.useState(suggestSaved);
+  React.useEffect(() => setSuggest(suggestSaved), [suggestSaved]);
 
-  // Form is dirty whenever the user has typed *anything* into either input.
-  // Type defaulting to "301" doesn't count — it only means "redirect kind."
-  const dirty = fromPath.trim().length > 0 || toUrl.trim().length > 0;
-
+  /* Dirty is the local switch against the composer's value: a Save flushes
+     the switch in, the composer's value follows, and the next flip is dirty
+     again — where a one-way `markDirty` would stay stuck after the first Save. */
+  const dirty = suggest !== suggestSaved;
   React.useEffect(() => {
     onDirtyChange?.(dirty);
   }, [dirty, onDirtyChange]);
 
-  const reload = React.useCallback(async () => {
-    if (!projectId) {
-      setRows([]);
-      setLoading(false);
+  const suggestRef = React.useRef(suggest);
+  suggestRef.current = suggest;
+  React.useEffect(() => {
+    if (!composer || !registerFlushHandler) return;
+    registerFlushHandler(() => {
+      const current = composer.getProjectSettings();
+      composer.setProjectSettings({
+        ...current,
+        redirects: { ...current.redirects, suggestFrom404s: suggestRef.current },
+      });
+    });
+    return () => registerFlushHandler(null);
+  }, [composer, registerFlushHandler]);
+
+  // ── The server rows ──
+  const [rows, setRows] = React.useState<RedirectRow[]>([]);
+  const [suggestions, setSuggestions] = React.useState<RedirectSuggestion[]>([]);
+  const [dialog, setDialog] = React.useState<Dialog>(null);
+  const [accepting, setAccepting] = React.useState<number | null>(null);
+  const [actionFailed, setActionFailed] = React.useState(false);
+
+  const load = useServerLoad<{ list: RedirectRow[]; suggestions: RedirectSuggestion[] }>(
+    projectId,
+    async (client, siteId) => {
+      const api = redirectsApi(client);
+      const [list, suggested] = await Promise.all([api.list.query({ siteId }), api.suggestions.query({ siteId })]);
+      return { list, suggestions: suggested };
+    },
+    ({ list, suggestions: suggested }) => {
+      setRows(list);
+      setSuggestions(suggested);
+    },
+    { onLoadStateChange, registerRetryLoad },
+  );
+
+  const api = () => redirectsApi(getBuildrikClient(DASHBOARD_URL));
+
+  /* After an action: the rows and the suggestions as the server now has them
+     (a created rule also takes its suggestion away), without the load card
+     in between. A read that fails here goes back through the load path, so
+     the failure is the load-error card and its Try again, not stale rows. */
+  const relist = React.useCallback(async () => {
+    if (!projectId) return;
+    try {
+      const [list, suggested] = await Promise.all([
+        api().list.query({ siteId: projectId }),
+        api().suggestions.query({ siteId: projectId }),
+      ]);
+      setRows(list);
+      setSuggestions(suggested);
+    } catch {
+      load.retry();
+    }
+  }, [projectId, load.retry]);
+
+  const ready = load.state === "ready";
+  const hasRows = rows.length > 0;
+
+  // The header's `Add redirect` (3397:32517) — the shell renders it. On the
+  // empty card the button is the card's own, so the header carries none.
+  React.useEffect(() => {
+    if (!registerHeaderAction) return;
+    if (!ready || !hasRows) {
+      registerHeaderAction(null);
       return;
     }
-    setLoading(true);
-    setLoadError(null);
-    try {
-      const list = await getClient().siteDetail.redirects.list.query({ siteId: projectId });
-      setRows(list as Redirect[]);
-    } catch (e) {
-      // Drop stale rows on reload failure — showing outdated data alongside an
-      // error banner lets users act on rows that may no longer exist server-side.
-      setRows([]);
-      setLoadError(e instanceof Error ? e.message : "Failed to load redirects.");
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
+    registerHeaderAction(
+      <Button type="button" size="xs" className={`${SET_BTN} tw:shrink-0`} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
+        Add redirect
+      </Button>,
+    );
+    return () => registerHeaderAction(null);
+  }, [registerHeaderAction, ready, hasRows]);
 
-  React.useEffect(() => {
-    void reload();
-  }, [reload]);
-
-  const submitDraft = React.useCallback(async () => {
-    if (!projectId) return;
-    setSubmitError(null);
-
-    const trimmedFrom = fromPath.trim();
-    const trimmedTo = toUrl.trim();
-    if (!trimmedFrom.startsWith("/")) {
-      const msg = "From path must start with / (e.g. /old-page)";
-      setSubmitError(msg);
-      throw new Error(msg);
-    }
-    if (!trimmedTo) {
-      const msg = "To URL is required.";
-      setSubmitError(msg);
-      throw new Error(msg);
-    }
-    if (!isValidRedirectTarget(trimmedTo)) {
-      const msg = "To URL must be a path (/new-page) or full URL (https://example.com/new).";
-      setSubmitError(msg);
-      throw new Error(msg);
-    }
-
-    setSubmitting(true);
-    try {
-      await getClient().siteDetail.redirects.create.mutate({
-        siteId: projectId,
-        fromPath: trimmedFrom,
-        toUrl: trimmedTo,
-        type,
-      });
-      setFromPath("");
-      setToUrl("");
-      setType("301");
-      await reload();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to add redirect.";
-      setSubmitError(msg);
-      throw err;
-    } finally {
-      setSubmitting(false);
-    }
-  }, [projectId, fromPath, toUrl, type, reload]);
-
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    void submitDraft().catch(() => {
-      /* error already surfaced via submitError state */
-    });
+  // ── The dialog's three writes: resolve = close + re-list, reject = inline in the dialog ──
+  const submitDialog = async (draft: RedirectDraft) => {
+    if (!projectId || !dialog) return;
+    if (dialog.mode === "edit") await api().update.mutate({ id: dialog.row.id, ...draft });
+    else await api().create.mutate({ siteId: projectId, ...draft });
+    setDialog(null);
+    await relist();
   };
 
-  // Register submitDraft as the central savebar's save handler whenever the
-  // form has draft content. Lets visitors submit either via the inline
-  // "Add redirect" button or via the shared savebar without losing the draft.
-  React.useEffect(() => {
-    if (!registerSaveHandler) return;
-    registerSaveHandler(dirty ? submitDraft : null);
-    return () => registerSaveHandler(null);
-  }, [registerSaveHandler, dirty, submitDraft]);
+  const deleteFromDialog = async () => {
+    if (!dialog || dialog.mode !== "edit") return;
+    await api().delete.mutate({ id: dialog.row.id });
+    setDialog(null);
+    await relist();
+  };
 
-  const handleDelete = async (id: string) => {
-    if (!projectId) return;
+  // ── Accept: a 301 at once; a refusal is the banner ──
+  const accept = async (i: number) => {
+    const s = suggestions[i];
+    if (!projectId || !s) return;
+    setAccepting(i);
+    setActionFailed(false);
     try {
-      await getClient().siteDetail.redirects.delete.mutate({ id });
-      setRows((prev) => prev.filter((r) => r.id !== id));
-    } catch (err) {
-      setLoadError(err instanceof Error ? err.message : "Failed to delete redirect.");
+      await api().create.mutate({ siteId: projectId, fromPath: s.fromPath, toUrl: s.toUrl, type: "301" });
+      await relist();
+    } catch {
+      setActionFailed(true);
+    } finally {
+      setAccepting(null);
     }
+  };
+
+  // ── The Pages door ──
+  const [repairCard, setRepairCard] = React.useState<RepairCard | null>(null);
+  /* Keyed on the door's four values, not the object: a shell that rebuilds
+     the prop each render must not reset a half-edited draft. */
+  const repairRef = React.useRef(repair);
+  repairRef.current = repair;
+  const repairKey = repair ? `${repair.pageId} ${repair.pageName} ${repair.from} ${repair.to}` : null;
+  React.useEffect(() => {
+    const door = repairRef.current;
+    if (!repairKey || !door) return;
+    setRepairCard({ ...door, from: asPath(door.from), to: asPath(door.to), saved: null });
+  }, [repairKey]);
+
+  const saveRepair = async (fromPath: string, toUrl: string) => {
+    if (!projectId) return;
+    await api().create.mutate({ siteId: projectId, fromPath, toUrl, type: "301" });
+    setRepairCard((current) => (current ? { ...current, saved: { fromPath, toUrl } } : current));
+    onRepairDone?.();
+    await relist();
+  };
+
+  const cancelRepair = () => {
+    setRepairCard(null);
+    onRepairDone?.();
+  };
+
+  /* StudioPanels handles this one: it switches to the Pages tab itself and
+     holds the request until the lazy panel mounts, so no `ui:switch-tab`
+     precedes it. */
+  const backToSeo = () => {
+    const pageId = repairCard?.pageId;
+    setRepairCard(null);
+    if (!composer || !pageId) return;
+    composer.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId, tab: "seo" });
   };
 
   if (!projectId) {
     return (
       <Screen>
-        <Section title="Redirects">
-          <div className={SCREEN_EMPTY}>
-            Open this site from the dashboard to manage redirects.
-          </div>
+        <Section title="Redirects" desc="Open a real site to manage its redirects.">
+          <div className={LINE}>The demo project has no redirects.</div>
         </Section>
       </Screen>
     );
   }
 
+  if (load.state !== "ready") {
+    return (
+      <Screen>
+        <LoadCard
+          title="Redirects"
+          line={CARD_LINE}
+          state={load.state}
+          errorLine="Couldn't load your redirects. Check your connection, then try again."
+          onRetry={load.retry}
+        />
+      </Screen>
+    );
+  }
+
+  const banner = saveError ?? (actionFailed ? REDIRECTS_SAVE_ERROR : null);
+  const visibleSuggestions = suggest ? suggestions : [];
+
   return (
     <Screen>
-      <div role="status" className={SCREEN_NOTICE}>
-        <strong className="tw:font-semibold">Saved, not yet live.</strong>{" "}
-        Redirect rules are stored but aren't served on your published site yet —
-        visitors hitting the old URL won't be forwarded until deployment wiring
-        ships. Your rules are safe and will apply automatically once it's live.
+      {banner ? <SaveErrorBanner message={banner} /> : null}
+
+      <div className={RESTORE_STRIP} data-testid="set-rd-restore">
+        Restoring a site version leaves this configuration unchanged.
       </div>
-      <Section
-        title="Add redirect"
-        desc="Send visitors from an old URL to a new one. 301 (permanent) preserves SEO; 302 (temporary) signals a short-term move."
-      >
-        <form onSubmit={handleAdd}>
-          <Field label="From path" hint="Must start with / (e.g. /old-page or /blog/legacy-post)">
-            <Input
-              value={fromPath}
-              onChange={(e) => setFromPath(e.target.value)}
-              placeholder="/old-page"
-              disabled={submitting}
-            />
-          </Field>
-          <Field label="To URL" hint="Absolute (https://example.com/new) or path (/new-page)">
-            <Input
-              value={toUrl}
-              onChange={(e) => setToUrl(e.target.value)}
-              placeholder="/new-page"
-              disabled={submitting}
-            />
-          </Field>
-          <Field label="Type">
-            <Select
-              value={type}
-              onChange={(e) => setType(e.target.value as "301" | "302")}
-              disabled={submitting}
-            >
-              <option value="301">301 — Permanent</option>
-              <option value="302">302 — Temporary</option>
-            </Select>
-          </Field>
-          {submitError && (
-            <div role="alert" className={SCREEN_ERROR}>{submitError}</div>
-          )}
-          <Button type="submit" disabled={submitting} className={ADD_BTN}>
-            {submitting ? "Adding…" : "Add redirect"}
-          </Button>
-        </form>
-      </Section>
 
-      {/* Board 640:2752 heads this card REDIRECTS, flat. The count is the
-          product's own and is left standing; the ANCHOR is pinned so it does
-          not change with the rows. */}
-      <Section
-        title={`Active redirects${rows.length ? ` (${rows.length})` : ""}`}
-        anchor="redirects"
-      >
-        {loading && <div className={SCREEN_EMPTY}>Loading…</div>}
-        {!loading && loadError && (
-          <div role="alert" className={SCREEN_ERROR}>{loadError}</div>
-        )}
-        {!loading && !loadError && rows.length === 0 && (
-          <div className={SCREEN_EMPTY}>No redirects yet. Add one above.</div>
-        )}
-        {!loading && rows.length > 0 && (
-          <ul className={LIST}>
-            {rows.map((r) => (
-              <li key={r.id} className={ROW}>
-                <div className={PATH_COL}>
-                  <div className={`${MONO_CELL} tw:text-[var(--bk-ink)]`}>{r.fromPath}</div>
-                  <div className={`${MONO_CELL} tw:text-[var(--bk-ink-muted)]`}>→</div>
-                  <div className={`${MONO_CELL} tw:text-[var(--bk-ink-soft)]`}>{r.toUrl}</div>
-                </div>
-                <div className="tw:flex tw:flex-none tw:items-center tw:gap-2">
-                  <span className={TYPE_BADGE}>{r.type}</span>
-                  <Button
-                    color="light"
-                    size="xs"
-                    type="button"
-                    onClick={() => setPendingDelete(r)}
-                    aria-label={`Delete redirect from ${r.fromPath}`}
-                    className="tw:px-2 tw:py-1 tw:rounded tw:border tw:border-[var(--bk-border-medium)] tw:bg-transparent tw:text-[11px] tw:font-medium tw:text-[var(--bk-error)]"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
+      {repairCard ? (
+        <RedirectRepairCard
+          pageName={repairCard.pageName}
+          siteName={siteName}
+          from={repairCard.from}
+          to={repairCard.to}
+          saved={repairCard.saved}
+          onSave={saveRepair}
+          onCancel={cancelRepair}
+          onBack={backToSeo}
+        />
+      ) : null}
+
+      <Section title="Redirects">
+        {!hasRows ? (
+          <div className="tw:flex tw:flex-col tw:items-start tw:gap-3" data-testid="set-rd-empty">
+            <div className={LINE}>No redirects yet. Add one to send an old URL to a new one.</div>
+            <Button type="button" size="xs" className={SET_BTN} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
+              Add redirect
+            </Button>
+          </div>
+        ) : (
+          <table className={TABLE} id="rd-rules" aria-label="Redirects" data-testid="set-rd-table">
+            <thead>
+              <tr>
+                <th scope="col" className={`${TH} tw:w-[24%]`}>
+                  From path
+                </th>
+                <th scope="col" className={TH}>
+                  To URL
+                </th>
+                <th scope="col" className={`${TH} tw:w-16`}>
+                  Type
+                </th>
+                <th scope="col" className={`${TH} tw:w-20 tw:pr-0`}>
+                  <span className="tw:sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} data-testid={`set-rd-row-${row.id}`}>
+                  <td className={`${TD_PATH} tw:font-medium`} title={row.fromPath}>
+                    {row.fromPath}
+                  </td>
+                  <td className={`${TD_PATH} tw:text-[var(--bk-ink-soft)]`} title={row.toUrl}>
+                    {row.toUrl}
+                  </td>
+                  <td className={`${TD} tw:text-[var(--bk-ink-soft)]`}>{row.type}</td>
+                  <td className={`${TD} tw:pr-0`}>
+                    <Button
+                      type="button"
+                      size="xs"
+                      variant="secondary"
+                      className={SET_BTN}
+                      onClick={() => setDialog({ mode: "edit", row })}
+                      aria-label={`Edit redirect from ${row.fromPath}`}
+                      data-testid={`set-rd-edit-${row.id}`}
+                    >
+                      Edit
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </Section>
 
-      <ConfirmDialog
-        open={pendingDelete !== null}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={() => {
-          const target = pendingDelete;
-          setPendingDelete(null);
-          if (target) void handleDelete(target.id);
-        }}
-        title="Delete this redirect?"
-        message={
-          pendingDelete
-            ? `${pendingDelete.fromPath} → ${pendingDelete.toUrl} is removed for good. Nothing will forward ${pendingDelete.fromPath} once redirects go live — anyone following that URL lands on a 404. This can't be undone.`
-            : ""
-        }
-        confirmLabel="Delete redirect"
-        tone="destructive"
+      <Section title="404 suggester">
+        <div className={ROW}>
+          <span id="rd-suggest-from-404s-label" className={ROW_LABEL}>
+            Suggest redirects from 404s
+          </span>
+          <ToggleSwitch
+            id="rd-suggest-from-404s"
+            checked={suggest}
+            onChange={setSuggest}
+            aria-labelledby="rd-suggest-from-404s-label"
+            sizing="sm"
+            data-testid="set-rd-suggest-toggle"
+          />
+        </div>
+        {suggest && visibleSuggestions.length === 0 ? (
+          <div className={LINE} data-testid="set-rd-suggest-empty">
+            No suggestions — every renamed page already has a redirect.
+          </div>
+        ) : null}
+        {visibleSuggestions.map((s, i) => {
+          const day = renamedDay(s.changedAt);
+          return (
+            <div key={`${s.pageId}-${s.fromPath}`} className={ROW} data-testid={`set-rd-suggestion-${i}`}>
+              <span className={`${ROW_LABEL} tw:text-[var(--bk-ink)]`}>
+                {s.fromPath} → {s.toUrl}
+                {day ? <span className={MUTED}> renamed {day}</span> : null}
+              </span>
+              <Button
+                type="button"
+                variant="link"
+                className={ACCEPT_BTN}
+                disabled={accepting !== null}
+                onClick={() => void accept(i)}
+                aria-label={`Accept redirect from ${s.fromPath} to ${s.toUrl}`}
+                data-testid={`set-rd-accept-${i}`}
+              >
+                {accepting === i ? "Accepting…" : "Accept"}
+              </Button>
+            </div>
+          );
+        })}
+      </Section>
+
+      <RedirectDialog
+        open={dialog !== null}
+        mode={dialog?.mode ?? "add"}
+        siteName={siteName}
+        initial={dialog?.mode === "edit" ? dialog.row : null}
+        onSubmit={submitDialog}
+        onDelete={dialog?.mode === "edit" ? deleteFromDialog : undefined}
+        onCancel={() => setDialog(null)}
       />
     </Screen>
   );
 };
-
-const ADD_BTN = "tw:mt-2 tw:px-3.5 tw:py-2 tw:rounded-md tw:text-xs tw:font-semibold";
-const LIST = "tw:flex tw:flex-col tw:gap-1.5 tw:list-none tw:m-0 tw:p-0";
-/* Board 640:2759 draws each row on the CARD'S OWN WHITE (--color/bg-panel),
-   12px gap, 6px above and below, with no fill and no border of its own — the
-   rows are a table under a thead, not a stack of tiles. Live drew every row as
-   a bordered bg-subtle tile inside the white card, i.e. a card inside a card,
-   and that wash is what dropped the two 11px strings each row carries under
-   AA: the "→" (--bk-ink-muted) measured 4.39:1 and "Delete" (--bk-error)
-   4.29:1. Both clear on the white the board asked for. */
-const ROW = "tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-1.5";
-const PATH_COL = "tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:min-w-0";
-const MONO_CELL =
-  "tw:whitespace-nowrap tw:overflow-hidden tw:text-ellipsis tw:text-[11px] " +
-  "tw:[font-family:var(--bk-font-mono)]";
-const TYPE_BADGE =
-  "tw:px-1.5 tw:py-0.5 tw:rounded tw:border tw:border-[var(--bk-border-medium)] " +
-  "tw:bg-[var(--bk-bg-panel)] tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:tracking-[0.04em] " +
-  "tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-mono)]";

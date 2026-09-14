@@ -301,6 +301,15 @@ export interface ProjectSettings {
     /** First visit on a default-locale page → `/<browser locale>/…` when enabled. */
     autoRedirect: boolean;
   };
+  /**
+   * Settings · Redirects (Clone 3397:32517) — the 404 suggester's switch.
+   * Absent = on. A per-site preference saved through the shell's Save like
+   * the other composer-backed settings; the redirect rules themselves are
+   * server rows (`siteDetail.redirects.*`), never in here.
+   */
+  redirects?: {
+    suggestFrom404s: boolean;
+  };
 }
 
 /**

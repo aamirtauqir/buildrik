@@ -148,6 +148,18 @@ describe("SETTINGS_SEARCH_INDEX", () => {
     ]);
     for (const e of own.slice(1)) expect(e.group).toBe("Headers");
   });
+
+  it("lists the Redirects fields S3 built on 3397:32517 — the rules table and the 404 suggester's switch — under their anchors", () => {
+    const own = SETTINGS_SEARCH_INDEX.filter((e) => e.screen === "redirects");
+    expect(own[0].fieldId).toBeUndefined();
+    expect(own.slice(1).map((e) => [e.title, e.description, e.fieldId])).toEqual([
+      ["Redirect rules", "From path, to URL and type", "rd-rules"],
+      ["Suggest redirects from 404s", "404 suggester", "rd-suggest-from-404s"],
+    ]);
+    for (const e of own.slice(1)) expect(e.group).toBe("Redirects");
+    /* the dialog's fields are not on the screen, so a result cannot open to them */
+    expect(own.some((e) => e.title === "From path" || e.title === "To URL")).toBe(false);
+  });
 });
 
 describe("searchSettings", () => {
