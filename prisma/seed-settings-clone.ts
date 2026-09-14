@@ -9,8 +9,10 @@
  * an `sclone-` id, so a re-run is a no-op and `--reset` deletes exactly those
  * rows and nothing else. The non-row changes — `fr` and `ar` joining the
  * site's enabled locales, `translations.fr` on two pages, the Google
- * Analytics entry in projectSettings — are undone the same way (removed,
- * never replaced; each carries a marker only this seed writes).
+ * Analytics entry in projectSettings, the `pizza-menu` slug change on a page,
+ * the Site's header columns — are undone the same way (removed, never
+ * replaced; each carries a marker only this seed writes, or is the seed's
+ * own value).
  *
  *   pnpm tsx prisma/seed-settings-clone.ts           # seed (idempotent)
  *   pnpm tsx prisma/seed-settings-clone.ts --reset   # remove what it seeded
@@ -21,7 +23,14 @@
  *   Domains       scratchver.example.com · 1 DNS pending (attention row)
  *                 S2: kind PRIMARY · Force HTTPS on · Namecheap · A + CNAME
  *                 verified, TXT pending
- *   Redirects     3 rules · 2 suggestions
+ *   Redirects     3 rules · 1 suggestion
+ *                 S3: /old-menu carries matchQuery + notes; the second page's
+ *                 slugHistory holds `pizza-menu` with no redirect — the
+ *                 suggester's row and the URL-repair draft's prefill
+ *   Headers       S3: CSP · X-Frame-Options SAMEORIGIN · Referrer-Policy
+ *                 strict-origin-when-cross-origin · HSTS 63072000 — set only
+ *                 when the column is null, so a walk's edits survive a re-run;
+ *                 these plus the redirects are what vercel.json ships
  *   Analytics     receiving (7 daily rows)
  *                 S2: 40 events in the last 24 h + 3 older; Google Analytics
  *                 enabled with G-SCRATCH0001 in projectSettings
@@ -40,7 +49,9 @@ const ID = "sclone-";
 const LOCALES = ["fr", "ar"];
 const TRANSLATED_LOCALE = "fr";
 const TRANSLATED_PAGES = 2;
-const TRANSLATION_SOURCE = "seed-settings-clone";
+// The marker on every JSON entry this seed writes (a translation, a slug
+// change) — reset removes exactly the entries carrying it.
+const SEED_SOURCE = "seed-settings-clone";
 const DOMAIN = "scratchver.example.com";
 const INTEGRATIONS = ["mailchimp", "zapier"];
 // What `connectDomain` writes without a Vercel attachment (domain.service),
@@ -51,17 +62,37 @@ const DNS_RECORDS = [
   { id: `${ID}dns-cname`, type: "CNAME", host: "www", value: "cname.vercel-dns.com", verified: true },
   { id: `${ID}dns-txt`, type: "TXT", host: "_buildrick", value: "brk-verify-sclone", verified: false },
 ];
+// S3 (Clone 4254:75747 Edit redirect): one row carries the dialog's "Match
+// query strings" toggle and Notes, in the frame's shape of copy.
 const REDIRECTS = [
-  { id: `${ID}redirect-menu`, fromPath: "/old-menu", toUrl: "/menu", type: "301" },
-  { id: `${ID}redirect-about`, fromPath: "/about-us", toUrl: "/about", type: "301" },
-  { id: `${ID}redirect-book`, fromPath: "/reservations", toUrl: "/book", type: "302" },
+  {
+    id: `${ID}redirect-menu`,
+    fromPath: "/old-menu",
+    toUrl: "/menu",
+    type: "301",
+    matchQuery: true,
+    notes: "Old menu page retired in March — keeps the campaign links working.",
+  },
+  { id: `${ID}redirect-about`, fromPath: "/about-us", toUrl: "/about", type: "301", matchQuery: false, notes: null },
+  { id: `${ID}redirect-book`, fromPath: "/reservations", toUrl: "/book", type: "302", matchQuery: false, notes: null },
 ];
-// Two renamed slugs no redirect covers — the Overview's "2 suggestions".
-// `oldSlug` is globally unique, hence the prefix.
-const SLUG_HISTORY = [
-  { id: `${ID}slug-lunch`, oldSlug: `${ID}lunch-menu`, newSlug: "menu" },
-  { id: `${ID}slug-story`, oldSlug: `${ID}our-story`, newSlug: "about" },
-];
+// S3 (Clone 3397:32517 "404 suggester", 3519:19920 URL repair): the source is
+// `Page.slugHistory`, the `{ slug, changedAt }` entries the editor appends on
+// a slug change. One old slug on the second page in site order (the first is
+// the home page, whose path is `/`), no redirect for it — the suggester's
+// `/pizza-menu → /<slug>` row. Until S3 the seed wrote `SlugHistory` rows
+// (site renames) for the Overview's count; that table feeds nothing here now,
+// and reset still clears the rows an earlier run left.
+const SLUG_CHANGE = { slug: "pizza-menu", source: SEED_SOURCE };
+const SLUG_CHANGE_DAYS_AGO = 2;
+// S3 (Clone 3397:32602 Headers): the four cards' values, in vercel.json on
+// the next publish. HSTS is the frame's "2 years (recommended)".
+const HEADERS = {
+  cspPolicy: "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
+  xFrameOptions: "SAMEORIGIN",
+  referrerPolicy: "strict-origin-when-cross-origin",
+  hstsMaxAge: 63072000,
+} as const;
 const FORMS = [
   { id: `${ID}form-contact`, name: "Contact", submissions: 20 },
   { id: `${ID}form-booking`, name: "Book a table", submissions: 12 },
@@ -129,8 +160,42 @@ async function seed() {
     if (translations[TRANSLATED_LOCALE]) continue;
     await prisma.page.update({
       where: { id: page.id },
-      data: { translations: { ...translations, [TRANSLATED_LOCALE]: { blocks: page.blocks, source: TRANSLATION_SOURCE } } },
+      data: { translations: { ...translations, [TRANSLATED_LOCALE]: { blocks: page.blocks, source: SEED_SOURCE } } },
     });
+  }
+
+  // The slug change, in the shape PageManager.updatePage appends (`slug` is
+  // the OLD slug) plus the seed's marker. Idempotent: an entry already
+  // carrying the marker is left where it is, date included.
+  const firstTwo = await prisma.page.findMany({
+    where: { siteId: SITE_ID },
+    orderBy: { position: "asc" },
+    take: 2,
+    select: { id: true, slugHistory: true },
+  });
+  const repairPage = firstTwo[1] ?? firstTwo[0];
+  if (repairPage) {
+    const history = Array.isArray(repairPage.slugHistory) ? repairPage.slugHistory : [];
+    if (!history.some((entry) => asRecord(entry).source === SEED_SOURCE)) {
+      await prisma.page.update({
+        where: { id: repairPage.id },
+        data: { slugHistory: [...history, { ...SLUG_CHANGE, changedAt: dayStart(SLUG_CHANGE_DAYS_AGO).toISOString() }] },
+      });
+    }
+  }
+
+  // The Headers screen's columns, only where nothing is set — a value a walk
+  // typed into the screen outlives a re-run. Reset nulls exactly the seed's
+  // values (below).
+  const headerColumns = await prisma.site.findUnique({
+    where: { id: SITE_ID },
+    select: { cspPolicy: true, xFrameOptions: true, referrerPolicy: true, hstsMaxAge: true },
+  });
+  const unsetHeaders = Object.fromEntries(
+    Object.entries(HEADERS).filter(([column]) => headerColumns?.[column as keyof typeof HEADERS] == null),
+  );
+  if (Object.keys(unsetHeaders).length > 0) {
+    await prisma.site.update({ where: { id: SITE_ID }, data: unsetHeaders });
   }
 
   // A hostname is globally unique — never adopt one that belongs elsewhere.
@@ -171,18 +236,12 @@ async function seed() {
     });
   }
 
-  for (const r of REDIRECTS) {
+  // The S3 columns are set on re-run too, so an S1-seeded row picks them up.
+  for (const { id, matchQuery, notes, ...r } of REDIRECTS) {
     await prisma.redirect.upsert({
-      where: { id: r.id },
-      update: {},
-      create: { ...r, siteId: SITE_ID },
-    });
-  }
-  for (const s of SLUG_HISTORY) {
-    await prisma.slugHistory.upsert({
-      where: { id: s.id },
-      update: {},
-      create: { ...s, siteId: SITE_ID },
+      where: { id },
+      update: { matchQuery, notes },
+      create: { id, ...r, matchQuery, notes, siteId: SITE_ID },
     });
   }
 
@@ -340,7 +399,7 @@ async function reset() {
   }
 
   const translated = await prisma.page.findMany({
-    where: { siteId: SITE_ID, translations: { path: [TRANSLATED_LOCALE, "source"], equals: TRANSLATION_SOURCE } },
+    where: { siteId: SITE_ID, translations: { path: [TRANSLATED_LOCALE, "source"], equals: SEED_SOURCE } },
     select: { id: true, translations: true },
   });
   for (const page of translated) {
@@ -351,6 +410,32 @@ async function reset() {
     });
   }
 
+  // The slug change: drop the entries carrying the marker, keep any the
+  // editor recorded around them.
+  const renamed = await prisma.page.findMany({ where: { siteId: SITE_ID }, select: { id: true, slugHistory: true } });
+  let slugChanges = 0;
+  for (const page of renamed) {
+    if (!Array.isArray(page.slugHistory)) continue;
+    const kept = page.slugHistory.filter((entry) => asRecord(entry).source !== SEED_SOURCE);
+    if (kept.length === page.slugHistory.length) continue;
+    slugChanges += page.slugHistory.length - kept.length;
+    await prisma.page.update({ where: { id: page.id }, data: { slugHistory: kept } });
+  }
+
+  // The header columns: null only the ones still holding the seed's value.
+  const headerColumns = await prisma.site.findUnique({
+    where: { id: SITE_ID },
+    select: { cspPolicy: true, xFrameOptions: true, referrerPolicy: true, hstsMaxAge: true },
+  });
+  const seededHeaders = Object.fromEntries(
+    Object.entries(HEADERS)
+      .filter(([column, value]) => headerColumns?.[column as keyof typeof HEADERS] === value)
+      .map(([column]) => [column, null]),
+  );
+  if (Object.keys(seededHeaders).length > 0) {
+    await prisma.site.update({ where: { id: SITE_ID }, data: seededHeaders });
+  }
+
   const removable = LOCALES.filter((l) => site.enabledLocales.includes(l) && site.defaultLocale !== l);
   if (removable.length > 0) {
     await prisma.site.update({
@@ -359,7 +444,11 @@ async function reset() {
     });
   }
 
-  console.log(`Removed settings-clone rows from ${SITE_ID}:`, deleted);
+  console.log(`Removed settings-clone rows from ${SITE_ID}:`, {
+    ...deleted,
+    slugChanges,
+    headerColumns: Object.keys(seededHeaders).length,
+  });
 }
 
 (process.argv.includes("--reset") ? reset() : seed())
