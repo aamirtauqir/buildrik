@@ -124,8 +124,15 @@ describe("SETTINGS_SEARCH_INDEX", () => {
     expect(own.slice(1).every((e) => e.group === "Localization")).toBe(true);
   });
 
-  it("has no Force HTTPS row — the Domains screen has no such control", () => {
-    expect(SETTINGS_SEARCH_INDEX.find((e) => /force https/i.test(e.title))).toBeUndefined();
+  it("lists the Domains fields S2 built on 3397:32206 — Domain, Force HTTPS, DNS records — under their anchors", () => {
+    const own = SETTINGS_SEARCH_INDEX.filter((e) => e.screen === "domains");
+    expect(own[0].fieldId).toBeUndefined();
+    expect(own.slice(1).map((e) => [e.title, e.description, e.fieldId])).toEqual([
+      ["Domain", "Custom domain", "dom-domain"],
+      ["Force HTTPS", "Custom domain", "dom-force-https"],
+      ["DNS records", "Records to add at your registrar", "dom-dns-records"],
+    ]);
+    for (const e of own.slice(1)) expect(e.group).toBe("Domains");
   });
 });
 
@@ -137,9 +144,9 @@ describe("searchSettings", () => {
 
   it("the frame's `domain`: Domains, then its fields, in registry order", () => {
     const hits = searchSettings("domain");
-    expect(titles(hits)).toEqual(["Domains", "Domain", "DNS records"]);
+    expect(titles(hits)).toEqual(["Domains", "Domain", "Force HTTPS", "DNS records"]);
     expect(hits[0].fieldId).toBeUndefined();
-    expect(hits[2]).toMatchObject({ screen: "domains", fieldId: "dns-records", group: "Domains" });
+    expect(hits[3]).toMatchObject({ screen: "domains", fieldId: "dom-dns-records", group: "Domains" });
   });
 
   it("matches case-insensitively over title, description and group", () => {
