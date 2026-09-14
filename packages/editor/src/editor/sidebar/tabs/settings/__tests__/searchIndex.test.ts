@@ -113,6 +113,17 @@ describe("SETTINGS_SEARCH_INDEX", () => {
     }
   });
 
+  it("lists Localization's three fields (3397:32376) under the ids its screen sets, after the section", () => {
+    const own = SETTINGS_SEARCH_INDEX.filter((e) => e.screen === "localization");
+    expect(own[0]).toMatchObject({ id: "localization", title: "Localization", group: "Site setup" });
+    expect(own.slice(1)).toMatchObject([
+      { id: "localization/default-locale", title: "Default locale", description: "Default", fieldId: "default-locale" },
+      { id: "localization/locale-auto-redirect", title: "Auto-redirect by browser", description: "Default", fieldId: "locale-auto-redirect" },
+      { id: "localization/locales", title: "Locales", fieldId: "locales" },
+    ]);
+    expect(own.slice(1).every((e) => e.group === "Localization")).toBe(true);
+  });
+
   it("has no Force HTTPS row — the Domains screen has no such control", () => {
     expect(SETTINGS_SEARCH_INDEX.find((e) => /force https/i.test(e.title))).toBeUndefined();
   });

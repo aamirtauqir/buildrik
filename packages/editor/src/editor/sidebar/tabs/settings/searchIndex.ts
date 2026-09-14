@@ -102,7 +102,11 @@ const SECTIONS: SectionDef[] = [
     title: "Localization",
     description: "Locale claim and preview",
     group: SITE_SETUP,
-    fields: [["Default locale", "Default", "default-locale"]],
+    fields: [
+      ["Default locale", "Default", "default-locale"],
+      ["Auto-redirect by browser", "Default", "locale-auto-redirect"],
+      ["Locales", "Path, pages translated and status", "locales"],
+    ],
   },
   {
     screen: "seo",

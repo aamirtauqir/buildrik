@@ -16,33 +16,43 @@ import type { SettingsNavId } from "./types";
  * `Site Language` select (Clone 3397:32011 — `English (en-US)` is the
  * frame's shape, `<label> (<code>)`). Lived inside LocalizationScreen.tsx
  * until S1 needed it on a second screen.
+ *
+ * `native` is the language's own name — the Add locale dialog (3737:44855)
+ * lists `<label> — <native>` with the code at the right. The codes stay
+ * BARE (`es`, URL prefix `/es`): `enabledLocales` and every page's
+ * `translations` are keyed by them, and the frame's region-coded ids would
+ * re-key every translation (phase2-backend.md §1, recorded on the row).
  */
-export const SITE_LOCALES: ReadonlyArray<{ code: string; label: string }> = [
-  { code: "en", label: "English" },
-  { code: "es", label: "Spanish" },
-  { code: "fr", label: "French" },
-  { code: "de", label: "German" },
-  { code: "it", label: "Italian" },
-  { code: "pt", label: "Portuguese" },
-  { code: "nl", label: "Dutch" },
-  { code: "pl", label: "Polish" },
-  { code: "sv", label: "Swedish" },
-  { code: "da", label: "Danish" },
-  { code: "no", label: "Norwegian" },
-  { code: "fi", label: "Finnish" },
-  { code: "ru", label: "Russian" },
-  { code: "zh", label: "Chinese (Simplified)" },
-  { code: "zh-TW", label: "Chinese (Traditional)" },
-  { code: "ja", label: "Japanese" },
-  { code: "ko", label: "Korean" },
-  { code: "ar", label: "Arabic" },
-  { code: "he", label: "Hebrew" },
-  { code: "hi", label: "Hindi" },
-  { code: "tr", label: "Turkish" },
-  { code: "id", label: "Indonesian" },
-  { code: "vi", label: "Vietnamese" },
-  { code: "th", label: "Thai" },
+export const SITE_LOCALES: ReadonlyArray<{ code: string; label: string; native: string }> = [
+  { code: "en", label: "English", native: "English" },
+  { code: "es", label: "Spanish", native: "Español" },
+  { code: "fr", label: "French", native: "Français" },
+  { code: "de", label: "German", native: "Deutsch" },
+  { code: "it", label: "Italian", native: "Italiano" },
+  { code: "pt", label: "Portuguese", native: "Português" },
+  { code: "nl", label: "Dutch", native: "Nederlands" },
+  { code: "pl", label: "Polish", native: "Polski" },
+  { code: "sv", label: "Swedish", native: "Svenska" },
+  { code: "da", label: "Danish", native: "Dansk" },
+  { code: "no", label: "Norwegian", native: "Norsk" },
+  { code: "fi", label: "Finnish", native: "Suomi" },
+  { code: "ru", label: "Russian", native: "Русский" },
+  { code: "zh", label: "Chinese (Simplified)", native: "简体中文" },
+  { code: "zh-TW", label: "Chinese (Traditional)", native: "繁體中文" },
+  { code: "ja", label: "Japanese", native: "日本語" },
+  { code: "ko", label: "Korean", native: "한국어" },
+  { code: "ar", label: "Arabic", native: "العربية" },
+  { code: "he", label: "Hebrew", native: "עברית" },
+  { code: "hi", label: "Hindi", native: "हिन्दी" },
+  { code: "ur", label: "Urdu", native: "اردو" },
+  { code: "tr", label: "Turkish", native: "Türkçe" },
+  { code: "id", label: "Indonesian", native: "Bahasa Indonesia" },
+  { code: "vi", label: "Vietnamese", native: "Tiếng Việt" },
+  { code: "th", label: "Thai", native: "ไทย" },
 ];
+
+/** Written right-to-left — the Translation checklist (3737:44869) says so before its page list. */
+export const RTL_LOCALES: ReadonlySet<string> = new Set(["ar", "he", "fa", "ur"]);
 
 /** `English` for a known code; the code itself, upper-cased, for one the list does not carry. */
 export function localeLabel(code: string): string {
