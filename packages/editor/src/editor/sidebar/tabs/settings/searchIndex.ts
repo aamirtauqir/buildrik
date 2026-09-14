@@ -149,16 +149,21 @@ const SECTIONS: SectionDef[] = [
     title: "Analytics",
     description: "Google Analytics, Meta Pixel, Clarity, Tag Manager",
     group: VISITORS,
+    // Clone 3397:32295's rows in its card order; each id is the control's
+    // own `id` (the switches included), or the row's `set-field-*` anchor
+    // for the two status lines that have no control.
     fields: [
-      ["Google Analytics ID", "Google Analytics", "google-analytics-id"],
       ["Enable Google Analytics", "Google Analytics", "enable-google-analytics"],
-      ["Pixel ID", "Meta Pixel", "pixel-id"],
-      ["Enable Meta Pixel", "Meta Pixel", "enable-meta-pixel"],
-      ["Clarity Project ID", "Microsoft Clarity", "clarity-project-id"],
-      ["Enable Microsoft Clarity", "Microsoft Clarity", "enable-microsoft-clarity"],
-      ["GTM Container ID", "Google Tag Manager", "gtm-container-id"],
+      ["Google Analytics ID", "Google Analytics", "google-analytics-id"],
+      ["Connection status", "Google Analytics", "connection-status"],
+      ["Last received data", "Google Analytics", "last-received-data"],
       ["Enable Google Tag Manager", "Google Tag Manager", "enable-google-tag-manager"],
-      ["Show cookie banner (stored, not yet shown)", "Consent", "show-cookie-banner-stored-not-yet-shown"],
+      ["GTM Container ID", "Google Tag Manager", "gtm-container-id"],
+      ["Enable Meta Pixel", "Meta Pixel", "enable-meta-pixel"],
+      ["Pixel ID", "Meta Pixel", "pixel-id"],
+      ["Enable Microsoft Clarity", "Microsoft Clarity", "enable-microsoft-clarity"],
+      ["Clarity Project ID", "Microsoft Clarity", "clarity-project-id"],
+      ["Cookie Consent", "Consent", "cookie-consent"],
     ],
   },
   {

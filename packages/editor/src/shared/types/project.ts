@@ -108,11 +108,20 @@ export interface AnalyticsConfig {
     enabled: boolean;
     /** GA4 Measurement ID (e.g., G-XXXXXXXXXX) */
     measurementId: string;
+    /**
+     * ISO timestamp of the last Verify (Settings · Analytics, Clone
+     * 3397:32295): the id's shape checked and the tracker's status read.
+     * Cleared when the id changes. Rides the settings save — no mutation of
+     * its own (phase2-backend §1).
+     */
+    verifiedAt?: string;
   };
   /** Facebook Pixel configuration (P1-2) */
   facebookPixel?: {
     enabled: boolean;
     pixelId: string;
+    /** See `googleAnalytics.verifiedAt`. */
+    verifiedAt?: string;
   };
   /** Google Ads configuration (P1-2) */
   googleAds?: {
@@ -123,11 +132,15 @@ export interface AnalyticsConfig {
   microsoftClarity?: {
     enabled: boolean;
     projectId: string;
+    /** See `googleAnalytics.verifiedAt`. */
+    verifiedAt?: string;
   };
   /** Google Tag Manager — one container for all tags/pixels (head script). */
   googleTagManager?: {
     enabled: boolean;
     containerId: string;
+    /** See `googleAnalytics.verifiedAt`. */
+    verifiedAt?: string;
   };
   /** Cookie consent banner configuration (GDPR) */
   cookieConsent?: {
