@@ -220,16 +220,20 @@ export const SettingsTab: React.FC<
   }, []);
 
   /* A field reached through Search: once its screen has rendered (and, for a
-     server-backed screen, loaded), scroll it into view and focus it. */
+     server-backed screen, loaded), scroll it into view and focus it. The id
+     is the field's label slug — the S1 screens set it on the control; for
+     the rest, the `Field` wrapper's `set-field-<slug>` anchor is the landing. */
   React.useEffect(() => {
     const fieldId = pendingFieldRef.current;
     if (!fieldId || loadState !== "ready") return;
     const frame = requestAnimationFrame(() => {
-      const el = document.getElementById(fieldId);
+      const el =
+        document.getElementById(fieldId) ??
+        document.querySelector<HTMLElement>(`[data-testid="set-field-${fieldId}"]`);
       if (!el) return;
       pendingFieldRef.current = null;
       el.scrollIntoView({ block: "center" });
-      el.focus();
+      (el.matches("input, select, textarea") ? el : el.querySelector<HTMLElement>("input, select, textarea") ?? el).focus();
     });
     return () => cancelAnimationFrame(frame);
   }, [currentScreen, loadState, resetKey]);
@@ -251,6 +255,12 @@ export const SettingsTab: React.FC<
              StudioHeader opens it beside its own Export button. */
           composer?.emit(EVENTS.UI_OPEN_EXPORTER, undefined);
           onClose?.();
+          return;
+        case "members":
+        case "billing":
+          /* The sidebar's rows are links; a Search result or an Overview
+             `Open ›` naming these takes the same door. */
+          window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS[id]}`, "_blank", "noopener,noreferrer");
           return;
         default:
           navigateTo(id);

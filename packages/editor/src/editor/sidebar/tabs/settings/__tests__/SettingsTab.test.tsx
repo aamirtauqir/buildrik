@@ -105,6 +105,12 @@ vi.mock("../components/SearchSettingsModal", () => ({
         <button type="button" data-testid="set-search-row-0" onClick={() => onOpen("seo", "seo-meta-title")}>
           SEO defaults
         </button>
+        <button type="button" data-testid="set-search-row-1" onClick={() => onOpen("general", "site-name")}>
+          Site name
+        </button>
+        <button type="button" data-testid="set-search-row-2" onClick={() => onOpen("members")}>
+          Members
+        </button>
         <button type="button" data-testid="set-search-cancel" onClick={onClose}>
           Cancel
         </button>
@@ -487,5 +493,27 @@ describe("SettingsTab — Search settings", () => {
       await new Promise((r) => requestAnimationFrame(() => r(undefined)));
     });
     expect(document.activeElement).toBe(document.getElementById("seo-meta-title"));
+  });
+
+  it("a field whose control has no id lands on its Field anchor's control", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-search-open"));
+    fireEvent.click(screen.getByTestId("set-search-row-1"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
+    await act(async () => {
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+    });
+    const input = within(screen.getByTestId("set-field-site-name")).getByRole("textbox");
+    expect(document.activeElement).toBe(input);
+  });
+
+  it("a dashboard section takes the same door as its sidebar row", () => {
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-search-open"));
+    fireEvent.click(screen.getByTestId("set-search-row-2"));
+    expect(open).toHaveBeenCalledWith(expect.stringContaining("/dashboard/settings/team"), "_blank", "noopener,noreferrer");
+    expect(headTitle()).toBe("Settings");
+    open.mockRestore();
   });
 });
