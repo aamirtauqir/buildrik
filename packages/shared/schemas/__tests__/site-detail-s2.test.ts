@@ -8,6 +8,7 @@
 import { describe, it, expect } from "vitest";
 import {
   DNS_PROVIDERS,
+  analyticsStatusSchema,
   connectDomainSchema,
   domainAvailabilitySchema,
   domainKindSchema,
@@ -53,5 +54,17 @@ describe("domains", () => {
   it("updateDomainSchema is {id, forceHttps}", () => {
     expect(updateDomainSchema.parse({ id: "dom1", forceHttps: false })).toEqual({ id: "dom1", forceHttps: false });
     expect(updateDomainSchema.safeParse({ id: "dom1" }).success).toBe(false);
+  });
+});
+
+describe("analytics", () => {
+  it("analyticsStatusSchema is an ISO date or null plus a count", () => {
+    expect(analyticsStatusSchema.parse({ lastEventAt: "2026-07-02T19:38:00.000Z", events24h: 1284 })).toEqual({
+      lastEventAt: "2026-07-02T19:38:00.000Z",
+      events24h: 1284,
+    });
+    expect(analyticsStatusSchema.parse({ lastEventAt: null, events24h: 0 }).lastEventAt).toBeNull();
+    expect(analyticsStatusSchema.safeParse({ lastEventAt: "2 Jul 2025", events24h: 1 }).success).toBe(false);
+    expect(analyticsStatusSchema.safeParse({ lastEventAt: null, events24h: -1 }).success).toBe(false);
   });
 });

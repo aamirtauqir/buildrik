@@ -201,6 +201,18 @@ export const settingsOverviewSchema = z.object({
   })),
 });
 
+/**
+ * `siteDetail.analyticsStatus` (Clone 3397:32295 "Last received data",
+ * 4256:26844 "<n> events arrived in the last 24 hours"). The numbers are OUR
+ * tracker's `AnalyticsEvent` rows for the site, not the provider's — GA's own
+ * Data API is OAuth and out of scope. `lastEventAt` is an ISO string (tRPC
+ * carries it as text; the editor formats the date).
+ */
+export const analyticsStatusSchema = z.object({
+  lastEventAt: z.string().datetime().nullable(),
+  events24h: z.number().int().nonnegative(),
+});
+
 export type SiteOverview = z.infer<typeof siteOverviewSchema>;
 export type SettingsOverview = z.infer<typeof settingsOverviewSchema>;
 export type UpdateSiteSettingsInput = z.infer<typeof updateSiteSettingsSchema>;
@@ -211,5 +223,6 @@ export type DnsProviderId = (typeof DNS_PROVIDERS)[number]["id"];
 export type CheckDomainAvailabilityInput = z.infer<typeof checkDomainAvailabilitySchema>;
 export type DomainAvailability = z.infer<typeof domainAvailabilitySchema>;
 export type UpdateDomainInput = z.infer<typeof updateDomainSchema>;
+export type AnalyticsStatus = z.infer<typeof analyticsStatusSchema>;
 export type CreateShareLinkInput = z.infer<typeof createShareLinkSchema>;
 export type SiteAnalyticsQuery = z.infer<typeof siteAnalyticsQuerySchema>;

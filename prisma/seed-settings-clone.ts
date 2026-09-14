@@ -19,12 +19,14 @@
  *                 S2: kind PRIMARY · Force HTTPS on · Namecheap · A + CNAME
  *                 verified, TXT pending
  *   Redirects     3 rules · 2 suggestions
- *   Analytics     receiving (7 daily rows; provider set in the UI)
+ *   Analytics     receiving (7 daily rows)
+ *                 S2: 40 events in the last 24 h + 3 older; Google Analytics
+ *                 enabled with G-SCRATCH0001 in projectSettings
  *   Forms         3 forms · 38 submissions
  *   Integrations  +2 connected (mailchimp, zapier — INTEGRATION_CATALOG ids)
  *   Webhooks      1 endpoint · last delivery failed     (attention row)
  */
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -62,6 +64,19 @@ const FORM_FIELDS = [
   { name: "email", type: "email" },
   { name: "message", type: "textarea" },
 ];
+// S2 Analytics (Clone 3397:32295 "Last received data · <n> events in the last
+// 24 hours"): the beacon's own rows, most of them inside the window and a
+// few outside it so the count is visibly a window, not a total.
+const EVENTS_24H = 40;
+const EVENTS_OLDER_DAYS = [2, 3, 5];
+const EVENT_PATHS = ["/", "/menu", "/about", "/contact", "/book"];
+const GA_MEASUREMENT_ID = "G-SCRATCH0001";
+
+// A JSON column read back, narrowed to an object so it can be spread and
+// written again — the same boundary cast page.service makes on `translations`.
+function asRecord(value: unknown): Prisma.JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value) ? (value as Prisma.JsonObject) : {};
+}
 
 function dayStart(daysAgo: number): Date {
   const d = new Date();
@@ -73,7 +88,7 @@ function dayStart(daysAgo: number): Date {
 async function loadSite() {
   const site = await prisma.site.findUnique({
     where: { id: SITE_ID },
-    select: { id: true, workspaceId: true, defaultLocale: true, enabledLocales: true },
+    select: { id: true, workspaceId: true, defaultLocale: true, enabledLocales: true, projectSettings: true },
   });
   if (!site) throw new Error(`Site ${SITE_ID} not found — open it in the editor once, then re-run.`);
   return site;
@@ -201,6 +216,48 @@ async function seed() {
     });
   }
 
+  // `createdAt` moves on every run (like the webhook delivery above) so the
+  // 40 stay inside the last 24 hours however long ago the seed first ran.
+  const now = Date.now();
+  const events = [
+    ...Array.from({ length: EVENTS_24H }, (_, i) => ({ n: i + 1, createdAt: new Date(now - (i + 1) * 30 * 60_000) })),
+    ...EVENTS_OLDER_DAYS.map((days, i) => ({ n: EVENTS_24H + i + 1, createdAt: new Date(now - days * 24 * 60 * 60_000) })),
+  ];
+  for (const ev of events) {
+    const id = `${ID}event-${String(ev.n).padStart(2, "0")}`;
+    await prisma.analyticsEvent.upsert({
+      where: { id },
+      update: { createdAt: ev.createdAt },
+      create: {
+        id,
+        siteId: SITE_ID,
+        path: EVENT_PATHS[ev.n % EVENT_PATHS.length],
+        referrer: ev.n % 4 === 0 ? "https://www.google.com/" : null,
+        sessionId: `${ID}session-${String(Math.ceil(ev.n / 3)).padStart(2, "0")}`,
+        country: ev.n % 5 === 0 ? "FR" : "GB",
+        viewportWidth: ev.n % 3 === 0 ? 390 : 1440,
+        createdAt: ev.createdAt,
+      },
+    });
+  }
+
+  // The frame's Google Analytics card reads `projectSettings.analytics
+  // .googleAnalytics` (the editor's ProjectSettings JSON). Merged key by key
+  // so every other setting the editor wrote survives; reset removes only a
+  // googleAnalytics entry carrying the seed's id.
+  const current = await prisma.site.findUnique({ where: { id: SITE_ID }, select: { projectSettings: true } });
+  const settings = asRecord(current?.projectSettings);
+  const analytics = asRecord(settings.analytics);
+  await prisma.site.update({
+    where: { id: SITE_ID },
+    data: {
+      projectSettings: {
+        ...settings,
+        analytics: { ...analytics, googleAnalytics: { enabled: true, measurementId: GA_MEASUREMENT_ID } },
+      },
+    },
+  });
+
   for (let daysAgo = 0; daysAgo < 7; daysAgo++) {
     const date = dayStart(daysAgo);
     await prisma.siteAnalytics.upsert({
@@ -228,6 +285,7 @@ async function reset() {
   const ours = { startsWith: ID };
 
   const deleted = {
+    events: (await prisma.analyticsEvent.deleteMany({ where: { siteId: SITE_ID, id: ours } })).count,
     analytics: (await prisma.siteAnalytics.deleteMany({ where: { siteId: SITE_ID, id: ours } })).count,
     integrations: (await prisma.workspaceIntegration.deleteMany({ where: { workspaceId, id: ours } })).count,
     deliveries: (await prisma.webhookDelivery.deleteMany({ where: { id: ours, webhook: { workspaceId } } })).count,
@@ -239,6 +297,16 @@ async function reset() {
     dns: (await prisma.dnsRecord.deleteMany({ where: { id: ours, domain: { siteId: SITE_ID } } })).count,
     domains: (await prisma.domain.deleteMany({ where: { siteId: SITE_ID, id: ours } })).count,
   };
+
+  const settings = asRecord(site.projectSettings);
+  const analytics = asRecord(settings.analytics);
+  if (asRecord(analytics.googleAnalytics).measurementId === GA_MEASUREMENT_ID) {
+    const { googleAnalytics: _seeded, ...rest } = analytics;
+    await prisma.site.update({
+      where: { id: SITE_ID },
+      data: { projectSettings: { ...settings, analytics: rest } },
+    });
+  }
 
   if (site.enabledLocales.includes(LOCALE) && site.defaultLocale !== LOCALE) {
     await prisma.site.update({

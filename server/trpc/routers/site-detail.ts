@@ -19,7 +19,7 @@ import {
 } from "@/server/services/domain.service";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
-import { getSiteAnalytics } from "@/server/services/analytics.service";
+import { getSiteAnalytics, getAnalyticsStatus } from "@/server/services/analytics.service";
 import {
   updateSiteSettingsSchema,
   createRedirectSchema,
@@ -451,5 +451,20 @@ export const siteDetailRouter = router({
       }
       const { siteId, ...params } = input;
       return getSiteAnalytics(siteId, params);
+    }),
+
+  // Settings → Analytics (Clone 3397:32295 "Last received data", 4256:26844).
+  // Top-level because `analytics` above is already a leaf procedure — a
+  // `analytics.status` sub-router would have to replace it.
+  analyticsStatus: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getAnalyticsStatus(input.siteId);
     }),
 });
