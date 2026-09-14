@@ -9,7 +9,7 @@ vi.mock("@/lib/prisma", () => ({
     workspaceMember: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
     formBlock: { findMany: vi.fn() },
-    redirect: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
+    redirect: { findMany: vi.fn(), findFirst: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
     domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn(), findUniqueOrThrow: vi.fn(), count: vi.fn() },
     workspace: { findUnique: vi.fn() },
     shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
@@ -85,6 +85,7 @@ describe("Site Detail Service", () => {
     it("createRedirect adds new redirect", async () => {
       const { createRedirect } = await import("@/server/services/redirect.service");
       vi.mocked(prisma.redirect.count).mockResolvedValue(5);
+      vi.mocked(prisma.redirect.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.redirect.create).mockResolvedValue({
         id: "r2", siteId: "s1", fromPath: "/old", toUrl: "/new", type: "301",
       } as any);
