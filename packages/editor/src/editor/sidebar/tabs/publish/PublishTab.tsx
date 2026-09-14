@@ -39,6 +39,12 @@ export interface PublishTabProps {
   onHelpClick?: () => void;
   /** Close panel callback */
   onClose?: () => void;
+  /** The site menu asked for the unpublish confirm before this tab was
+   *  mounted, so the event it emits could not be heard here. The sidebar
+   *  latched the request; this reads it once on mount and reports it consumed
+   *  so a cancelled confirm does not come back on the next visit. */
+  initialUnpublish?: boolean;
+  onUnpublishIntentConsumed?: () => void;
   /**
    * The canonical publish state machine (shared with the Topbar Publish
    * dropdown). The sidebar is a read-only subscriber to its state.
@@ -144,6 +150,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   onVercelPublish,
   publishedUrl: initialUrl,
   isProjectPublished,
+  initialUnpublish,
+  onUnpublishIntentConsumed,
 }) => {
   // Read-only view of the ONE canonical publish state machine (the same
   // instance the Topbar drives). No second state machine, no second toast.
@@ -192,6 +200,15 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       composer.off(EVENTS.UI_UNPUBLISH_REQUEST, ask);
     };
   }, [composer]);
+  /* The cold-open half. The listener above only serves a panel that is
+     already mounted; on the first click from the site menu it did not exist
+     yet and the confirm never appeared. Verified live 2026-09-15: second click
+     worked, first click opened the panel and nothing else. */
+  React.useEffect(() => {
+    if (!initialUnpublish) return;
+    setConfirmUnpublish(true);
+    onUnpublishIntentConsumed?.();
+  }, [initialUnpublish, onUnpublishIntentConsumed]);
   const runUnpublish = async () => {
     if (!siteId) return;
     setConfirmUnpublish(false);

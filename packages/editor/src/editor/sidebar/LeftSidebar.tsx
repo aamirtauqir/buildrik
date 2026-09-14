@@ -413,6 +413,29 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     if (activeTab !== "templates") setTemplatesNewPage(false);
   }, [activeTab]);
 
+  /* Site menu › Unpublish, same trap as the one above and caught the same way
+     — live, on the first cold click. StudioHeader opens the Publish panel and
+     then emits UI_UNPUBLISH_REQUEST synchronously; PublishTab subscribes in an
+     effect that has not run yet, so on a cold open the event was dropped and
+     the confirm appeared only on the SECOND click. This component is mounted
+     whenever the editor is not in view mode, so its listener is alive at emit
+     time. It latches the intent and hands it down as a prop; PublishTab
+     consumes it once and reports back, so a cancelled confirm cannot re-open
+     on the next visit. Cleared on leaving the tab for the same reason. */
+  const [unpublishIntent, setUnpublishIntent] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const latch = () => setUnpublishIntent(true);
+    composer.on(EVENTS.UI_UNPUBLISH_REQUEST, latch);
+    return () => {
+      composer.off(EVENTS.UI_UNPUBLISH_REQUEST, latch);
+    };
+  }, [composer]);
+  React.useEffect(() => {
+    if (activeTab !== "publish") setUnpublishIntent(false);
+  }, [activeTab]);
+  const consumeUnpublishIntent = React.useCallback(() => setUnpublishIntent(false), []);
+
   const safeTabChange = React.useCallback(
     (tab: GroupedTabId) => {
       if (activeTab === "settings" && settingsDirty) {
@@ -699,6 +722,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                     safeTabChange("templates");
                   }}
                   templatesNewPageMode={templatesNewPage}
+                  unpublishIntent={unpublishIntent}
+                  onUnpublishIntentConsumed={consumeUnpublishIntent}
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   publishJob={publishJob}
