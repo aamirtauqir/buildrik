@@ -22,13 +22,18 @@ function harness(els: El[], opts: { trash?: boolean } = {}) {
     getId: () => e.id,
     getAttribute: (n: string) => (n === "src" ? e.src : undefined),
     getStyle: (p: string) => (p === "background-image" ? e.bg : undefined),
-    setAttribute: (n: string, v: string) => { if (n === "src") e.src = v; },
-    removeAttribute: (n: string) => { if (n === "src") delete e.src; },
-    setStyle: (p: string, v: string) => { if (p === "background-image") e.bg = v; },
+    setAttribute: (n: string, v: string) => { trace.push(`set:${inside ? "untracked" : "TRACKED"}`); if (n === "src") e.src = v; },
+    removeAttribute: (n: string) => { trace.push(`remove:${inside ? "untracked" : "TRACKED"}`); if (n === "src") delete e.src; },
+    setStyle: (p: string, v: string) => { trace.push(`style:${inside ? "untracked" : "TRACKED"}`); if (p === "background-image") e.bg = v; },
   });
   const restore = vi.fn();
   const commit = vi.fn(async () => {});
   const noteUnrecordedAction = vi.fn();
+  /* Records every element write the layer makes and whether it happened
+     inside runWithoutTracking — the property the live defect turned on. */
+  const trace: string[] = [];
+  let inside = 0;
+  const runWithoutTracking = vi.fn((fn: () => void) => { inside++; try { fn(); } finally { inside--; } });
   const composer = {
     elements: {
       findByMediaSrc: (src: string) =>
@@ -39,9 +44,9 @@ function harness(els: El[], opts: { trash?: boolean } = {}) {
         opts.trash === false ? null : { asset: { id: "a1", name: "hero.jpg", src: "blob:hero" }, restore, commit },
       ),
     },
-    history: { noteUnrecordedAction },
+    history: { noteUnrecordedAction, runWithoutTracking },
   } as unknown as Composer;
-  return { layer: new MediaCommandLayer(composer), state, restore, commit, noteUnrecordedAction };
+  return { layer: new MediaCommandLayer(composer), state, restore, commit, noteUnrecordedAction, runWithoutTracking, trace };
 }
 
 describe("MediaCommandLayer.deleteWithGrace", () => {
@@ -95,5 +100,31 @@ describe("MediaCommandLayer.deleteWithGrace", () => {
     const h = harness([{ id: "img", src: "blob:hero" }], { trash: false });
     expect(await h.layer.deleteWithGrace("a1", 60_000)).toBeNull();
     expect(h.state.img.src).toBe("blob:hero");
+  });
+});
+
+/* THE ONE THAT CATCHES THE LIVE DEFECT. Announcing "deleting a file" as
+   unrecorded was already there and it still lost, because the element clears
+   fed the DEBOUNCED recorder, which fired ~1s later and re-armed Undo —
+   pressing it then put a dead blob src back on an <img> whose asset was gone
+   for good. Measured live 2026-09-15. The contract is that every element
+   write this layer makes, on delete AND on its own undo, happens inside
+   runWithoutTracking. A single TRACKED write is the bug. */
+describe("MediaCommandLayer.deleteWithGrace — element writes never reach history", () => {
+  it("clears and restores references without a single tracked write", async () => {
+    const h = harness([
+      { id: "e1", src: "blob:hero" },
+      { id: "e2", bg: "url(blob:hero)" },
+    ]);
+    const g = await h.layer.deleteWithGrace("a1", 60_000);
+    expect(g).not.toBeNull();
+    expect(h.trace.length).toBeGreaterThan(0);
+    expect(h.trace.filter((t) => t.endsWith("TRACKED"))).toEqual([]);
+
+    const before = h.trace.length;
+    g!.undo();
+    expect(h.trace.length).toBeGreaterThan(before);
+    expect(h.trace.filter((t) => t.endsWith("TRACKED"))).toEqual([]);
+    expect(h.runWithoutTracking).toHaveBeenCalledTimes(2);
   });
 });
