@@ -35,10 +35,24 @@ interface Props {
   allPages: PageItem[];
   composer: Composer | null;
   onClose: () => void;
+  /** The tab a door asked for (`ui:pages-open-settings`); SEO otherwise. */
+  initialTab?: DrawerTab;
 }
 
-export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, onClose }) => {
+export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab }) => {
   const s = usePageSettings(composer, page, allPages);
+
+  /* A door's tab lands through the same guarded switch a tab click uses, once
+     the form has settled: on the first render the saved snapshot is still
+     empty and `isDirty` reads true, so switching then would raise the discard
+     modal over a drawer nobody has typed in. */
+  const [askedTab, setAskedTab] = React.useState(initialTab);
+  React.useEffect(() => { setAskedTab(initialTab); }, [initialTab]);
+  React.useEffect(() => {
+    if (!askedTab || s.isDirty) return;
+    s.setActiveTab(askedTab);
+    setAskedTab(undefined);
+  }, [askedTab, s.isDirty, s.setActiveTab]);
 
   // Auto-save: 500ms after any change
   React.useEffect(() => {
@@ -136,7 +150,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
         <div className="bd-pg-drawer-body" data-testid="pg-drawer-body">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
-              <SeoTab s={s} page={page} />
+              <SeoTab s={s} page={page} composer={composer} />
             </div>
           )}
           {s.activeTab === "social" && (

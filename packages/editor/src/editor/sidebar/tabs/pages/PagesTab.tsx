@@ -15,7 +15,8 @@
 import * as React from "react";
 import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, PanelFrame, Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
-import type { PageSettingsOpenRequest } from "./types";
+import { EVENTS } from "@/shared/constants/events";
+import type { DrawerTab, PageSettingsOpenRequest } from "./types";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
@@ -53,11 +54,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   openSettingsRequest,
 }) => {
   const p = usePages(composer);
-
-  const { openSettings: openPageSettings } = p;
-  React.useEffect(() => {
-    if (openSettingsRequest) openPageSettings(openSettingsRequest.pageId);
-  }, [openSettingsRequest, openPageSettings]);
 
   // Folders — sidebar-only, localStorage-persisted
   /* This read was `(composer as { id?: string })?.id`, and Composer has no
@@ -101,6 +97,42 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const settingsPage = p.settingsPageId
     ? p.pages.find((pg) => pg.id === p.settingsPageId) ?? null
     : null;
+
+  /* The way back from Settings › Redirects' saved card — `Back to <Page> SEO`
+     (Clone 3519:20096) — and any other door that names a page and a tab. Two
+     routes into one handler: the prop, which StudioPanels holds while this
+     lazy panel mounts (the emit fires before it exists), and the live event,
+     for a door fired while the panel is already up (the Templates modal). An
+     id this panel does not list opens nothing — `settingsPage` above resolves
+     to null. The tab rides to the drawer as `initialTab` and is forgotten on
+     close, so a later context-menu open is not steered by a door that has
+     already closed. The handler is stable on purpose: the prop stays held for
+     the whole visit, and an effect that re-ran on every page re-sync would
+     reopen a drawer the user had just closed. */
+  const [doorTab, setDoorTab] = React.useState<DrawerTab | undefined>(undefined);
+  const { openSettings, closeSettings: closePageSettings } = p;
+  const onOpen = React.useCallback(
+    ({ pageId, tab }: PageSettingsOpenRequest) => {
+      openSettings(pageId);
+      setDoorTab(tab);
+    },
+    [openSettings],
+  );
+  React.useEffect(() => {
+    if (openSettingsRequest) onOpen(openSettingsRequest);
+  }, [openSettingsRequest, onOpen]);
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.on(EVENTS.UI_PAGES_OPEN_SETTINGS, onOpen);
+    return () => {
+      composer.off(EVENTS.UI_PAGES_OPEN_SETTINGS, onOpen);
+    };
+  }, [composer, onOpen]);
+
+  const closeSettings = React.useCallback(() => {
+    setDoorTab(undefined);
+    closePageSettings();
+  }, [closePageSettings]);
 
   const handleRenameCommit = React.useCallback(
     (pageId: string, name: string) => {
@@ -380,12 +412,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           context menu ("Page settings…") or a Listings row. The per-row gear
           it used to name was deleted with the row action strip. */}
       {settingsPage && (
-        <SettingsErrorBoundary onClose={p.closeSettings}>
+        <SettingsErrorBoundary onClose={closeSettings}>
           <PageSettingsDrawer
             page={settingsPage}
             allPages={p.pages}
             composer={composer}
-            onClose={p.closeSettings}
+            onClose={closeSettings}
+            initialTab={doorTab}
           />
         </SettingsErrorBoundary>
       )}
