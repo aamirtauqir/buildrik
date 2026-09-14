@@ -52,7 +52,7 @@ import {
   AnalyticsScreen,
   AdvancedScreen,
   SeoScreen,
-  IntegrationsHub,
+  IntegrationsScreen,
   RedirectsScreen,
   FormsScreen,
   HeadersScreen,
@@ -85,7 +85,7 @@ const GROUP_ORDER: SettingsNavGroupId[] = ["site-setup", "seo-publishing", "visi
 /* Screens whose actions apply as they happen — the frame draws them with no
    Cancel / Save (3397:32206 Domains: `Actions apply immediately · nothing to
    save here` · Done). */
-const IMMEDIATE_SCREENS = new Set<SettingsNavId>(["domains"]);
+const IMMEDIATE_SCREENS = new Set<SettingsNavId>(["domains", "forms", "integrations"]);
 
 const OVERVIEW_SUBTITLE = " · everything on this page is scoped to this project.";
 
@@ -164,6 +164,10 @@ export const SettingsTab: React.FC<
   const [headerAction, setHeaderAction] = React.useState<React.ReactNode | null>(null);
   const registerHeaderAction = React.useCallback((node: React.ReactNode | null) => setHeaderAction(node), []);
   React.useEffect(() => setHeaderAction(null), [currentScreen]);
+  /* A sub-view's header (`… / Browse all` · its own line) — see ScreenProps.registerHeader. */
+  const [screenHeader, setScreenHeader] = React.useState<{ title?: string; subtitle?: string } | null>(null);
+  const registerHeader = React.useCallback((header: { title?: string; subtitle?: string } | null) => setScreenHeader(header), []);
+  React.useEffect(() => setScreenHeader(null), [currentScreen]);
 
   const [screenIsDirty, setScreenIsDirty] = React.useState(false);
   // Click handlers read the LATEST dirty value synchronously through this
@@ -470,6 +474,7 @@ export const SettingsTab: React.FC<
       onLoadStateChange: setLoadState,
       saveError,
       registerHeaderAction,
+      registerHeader,
     };
     switch (currentScreen as SettingsNavId) {
       case "general":
@@ -481,9 +486,7 @@ export const SettingsTab: React.FC<
       case "custom-code":
         return <AdvancedScreen {...common} />;
       case "integrations":
-        return (
-          <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} registerFlushHandler={registerFlushHandler} />
-        );
+        return <IntegrationsScreen {...common} />;
       case "localization":
         return <LocalizationScreen {...common} />;
       case "redirects":
@@ -501,8 +504,11 @@ export const SettingsTab: React.FC<
     }
   };
 
-  const headTitle = isOverview || !current ? "Settings" : `${SETTINGS_NAV_GROUPS[current.group]} / ${current.title}`;
-  const headSub = isOverview || !current ? `${siteName}${OVERVIEW_SUBTITLE}` : current.subtitle;
+  const headTitle =
+    isOverview || !current
+      ? "Settings"
+      : `${SETTINGS_NAV_GROUPS[current.group]} / ${current.title}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
+  const headSub = isOverview || !current ? `${siteName}${OVERVIEW_SUBTITLE}` : (screenHeader?.subtitle ?? current.subtitle);
 
   const immediate = IMMEDIATE_SCREENS.has(currentScreen as SettingsNavId);
   const footStatus: { text: string; tone: "muted" | "danger" | "warning" } = isOverview

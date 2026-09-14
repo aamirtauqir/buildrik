@@ -12,7 +12,6 @@ export { IntegrationsScreen } from "./IntegrationsScreen";
 export { AdvancedScreen } from "./AdvancedScreen";
 export { LockedScreen, LOCKED_COPY } from "./LockedScreen";
 export { SeoScreen } from "./SeoScreen";
-export { IntegrationsHub } from "./IntegrationsHub";
 export { RedirectsScreen } from "./RedirectsScreen";
 export { FormsScreen } from "./FormsScreen";
 export { HeadersScreen } from "./HeadersScreen";

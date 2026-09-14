@@ -129,6 +129,7 @@ export const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
   localization: "Localization settings were not saved. Your changes are still here. Review the values, then retry.",
   redirects: "Redirect changes were not saved. Your changes are still here. Review the values, then retry.",
   headers: "Header changes were not saved. Your changes are still here. Review the values, then retry.",
+  webhooks: "Couldn't save the webhook. Your endpoint is still here. Check the connection and retry.",
 };
 
 export const WORKSPACE_LINKS: Partial<Record<SettingsNavId, string>> = {

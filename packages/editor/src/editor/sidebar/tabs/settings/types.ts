@@ -100,6 +100,14 @@ export interface ScreenProps {
    * right, where the locked screen's `Upgrade` sits.
    */
   registerHeaderAction?: (node: React.ReactNode | null) => void;
+  /**
+   * A screen with sub-views (Integrations › Browse all / Manage, Clone
+   * 3873:25643 / 3866:25629) renames the shell's header while one is up:
+   * `title` is appended after the nav's `Group / Screen`, `subtitle`
+   * replaces the nav's line. Pass `null` to return to the nav's own header;
+   * the shell clears it on a screen change.
+   */
+  registerHeader?: (header: { title?: string; subtitle?: string } | null) => void;
 }
 
 // ============================================

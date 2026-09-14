@@ -137,12 +137,14 @@ vi.mock("../screens/SeoScreen", () => ({
     saveError,
     registerHeaderAction,
     registerFlushHandler,
+    registerHeader,
   }: {
     onLoadStateChange?: (s: "loading" | "ready" | "error") => void;
     onDirtyChange?: (d: boolean) => void;
     saveError?: string | null;
     registerHeaderAction?: (node: React.ReactNode | null) => void;
     registerFlushHandler?: (handler: (() => void) | null) => void;
+    registerHeader?: (header: { title?: string; subtitle?: string } | null) => void;
   }) => {
     /* Registered the way the real screens do it — in a mount effect. */
     React.useEffect(() => {
@@ -156,6 +158,12 @@ vi.mock("../screens/SeoScreen", () => ({
         register header action
       </button>
       <input id="seo-meta-title" aria-label="Meta title" onChange={() => onDirtyChange?.(true)} />
+      <button type="button" onClick={() => registerHeader?.({ title: "Browse all", subtitle: "All available things" })}>
+        sub-view header
+      </button>
+      <button type="button" onClick={() => registerHeader?.(null)}>
+        own header
+      </button>
       <button type="button" onClick={() => onLoadStateChange?.("loading")}>
         go loading
       </button>
@@ -572,6 +580,20 @@ describe("SettingsTab — a screen's own header action, and screens whose action
     fireEvent.click(screen.getByTestId("set-nav-general"));
     await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
     expect(screen.queryByTestId("set-head-action")).toBeNull();
+  });
+
+  it("a sub-view renames the header (`… / Browse all` + its line) until the screen returns it or changes", async () => {
+    render(<SettingsTab composer={asComposer(makeComposer())} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    fireEvent.click(screen.getByText("sub-view header"));
+    expect(headTitle()).toBe("SEO & publishing / SEO defaults / Browse all");
+    expect(screen.getByTestId("set-head-sub")).toHaveTextContent("All available things");
+    fireEvent.click(screen.getByText("own header"));
+    expect(headTitle()).toBe("SEO & publishing / SEO defaults");
+    fireEvent.click(screen.getByText("sub-view header"));
+    fireEvent.click(screen.getByTestId("set-nav-general"));
+    await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
   });
 
   it("Domains (3397:32206) has no Cancel / Save — `Actions apply immediately · nothing to save here` and Done", async () => {
