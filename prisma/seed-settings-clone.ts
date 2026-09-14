@@ -143,11 +143,14 @@ async function seed() {
   // HTTPS on the row, and the three records it draws — A and CNAME answering,
   // the `_buildrick` TXT still pending (the frame's VERIFIED / VERIFIED /
   // PENDING). The columns are set on re-run too, so an S1-seeded row picks
-  // them up. `status` stays PENDING: that is what `check` computes for
-  // two-of-three, and the Overview's "1 DNS pending" row depends on it.
+  // them up. `status` is PENDING — what `check` computes for two-of-three,
+  // and what the Overview's "1 DNS pending" row depends on — and is put back
+  // on re-run: a walk's `Check DNS` asks the real resolver about
+  // scratchver.example.com and honestly records FAILED, which would otherwise
+  // outlive the walk.
   const domain = await prisma.domain.upsert({
     where: { domain: DOMAIN },
-    update: { kind: "PRIMARY", forceHttps: true, dnsProvider: "namecheap" },
+    update: { kind: "PRIMARY", forceHttps: true, dnsProvider: "namecheap", status: "PENDING", sslStatus: "PENDING", lastCheckedAt: null },
     create: {
       id: `${ID}domain`,
       siteId: SITE_ID,
