@@ -340,6 +340,10 @@ export interface SiteSEO {
   touchIcon?: string;
   /** Default language (e.g., "en") */
   language?: string;
+  /** [Site column] Search engines may index the published site (robots meta + robots.txt) */
+  allowIndexing?: boolean;
+  /** [Site column] Custom robots.txt, shipped verbatim when set; the editor only previews it */
+  robotsTxt?: string;
   /** [Site column] Social media profile links (server: socialLinks JSON) */
   socialLinks?: {
     twitter?: string;

@@ -19,48 +19,13 @@ import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
 import { Field, SCREEN_EMPTY, SCREEN_ERROR, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
+import { SITE_LOCALES, localeLabel } from "../constants";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { Button } from "@/editor/chrome-ui";
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
   if (!_client) _client = createBuildrikApiClient(DASHBOARD_URL);
   return _client;
-}
-
-interface LocaleOption {
-  code: string;
-  label: string;
-}
-
-const COMMON_LOCALES: LocaleOption[] = [
-  { code: "en", label: "English" },
-  { code: "es", label: "Spanish" },
-  { code: "fr", label: "French" },
-  { code: "de", label: "German" },
-  { code: "it", label: "Italian" },
-  { code: "pt", label: "Portuguese" },
-  { code: "nl", label: "Dutch" },
-  { code: "pl", label: "Polish" },
-  { code: "sv", label: "Swedish" },
-  { code: "da", label: "Danish" },
-  { code: "no", label: "Norwegian" },
-  { code: "fi", label: "Finnish" },
-  { code: "ru", label: "Russian" },
-  { code: "zh", label: "Chinese (Simplified)" },
-  { code: "zh-TW", label: "Chinese (Traditional)" },
-  { code: "ja", label: "Japanese" },
-  { code: "ko", label: "Korean" },
-  { code: "ar", label: "Arabic" },
-  { code: "he", label: "Hebrew" },
-  { code: "hi", label: "Hindi" },
-  { code: "tr", label: "Turkish" },
-  { code: "id", label: "Indonesian" },
-  { code: "vi", label: "Vietnamese" },
-  { code: "th", label: "Thai" },
-];
-
-function labelFor(code: string): string {
-  return COMMON_LOCALES.find((l) => l.code === code)?.label ?? code.toUpperCase();
 }
 
 export const LocalizationScreen: React.FC<ScreenProps> = ({
@@ -199,7 +164,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
   }
 
   // Locales not yet enabled (offered in the add dropdown).
-  const addable = COMMON_LOCALES.filter((l) => !enabledLocales.includes(l.code));
+  const addable = SITE_LOCALES.filter((l) => !enabledLocales.includes(l.code));
 
   return (
     <Screen>
@@ -221,7 +186,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
           >
             {enabledLocales.map((code) => (
               <option key={code} value={code}>
-                {code} — {labelFor(code)}
+                {code} — {localeLabel(code)}
               </option>
             ))}
           </Select>
@@ -247,7 +212,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
               <li key={code} style={localeRowStyles}>
                 <div style={localeInfoStyles}>
                   <span style={codeChipStyles}>{code}</span>
-                  <span style={localeLabelStyles}>{labelFor(code)}</span>
+                  <span style={localeLabelStyles}>{localeLabel(code)}</span>
                   {isDefault && <span style={defaultBadgeStyles}>Default</span>}
                 </div>
                 <Button

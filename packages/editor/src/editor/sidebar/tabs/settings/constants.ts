@@ -59,3 +59,42 @@ export const INTEGRATION_CATALOG = [
 
 export type IntegrationId = (typeof INTEGRATION_CATALOG)[number]["id"];
 export type IntegrationCategory = (typeof INTEGRATION_CATALOG)[number]["category"];
+
+/**
+ * The locales the product knows. One list for every place a locale is
+ * picked or named: Localization's default/enabled lists and General's
+ * `Site Language` select (Clone 3397:32011 — `English (en-US)` is the
+ * frame's shape, `<label> (<code>)`). Lived inside LocalizationScreen.tsx
+ * until S1 needed it on a second screen.
+ */
+export const SITE_LOCALES: ReadonlyArray<{ code: string; label: string }> = [
+  { code: "en", label: "English" },
+  { code: "es", label: "Spanish" },
+  { code: "fr", label: "French" },
+  { code: "de", label: "German" },
+  { code: "it", label: "Italian" },
+  { code: "pt", label: "Portuguese" },
+  { code: "nl", label: "Dutch" },
+  { code: "pl", label: "Polish" },
+  { code: "sv", label: "Swedish" },
+  { code: "da", label: "Danish" },
+  { code: "no", label: "Norwegian" },
+  { code: "fi", label: "Finnish" },
+  { code: "ru", label: "Russian" },
+  { code: "zh", label: "Chinese (Simplified)" },
+  { code: "zh-TW", label: "Chinese (Traditional)" },
+  { code: "ja", label: "Japanese" },
+  { code: "ko", label: "Korean" },
+  { code: "ar", label: "Arabic" },
+  { code: "he", label: "Hebrew" },
+  { code: "hi", label: "Hindi" },
+  { code: "tr", label: "Turkish" },
+  { code: "id", label: "Indonesian" },
+  { code: "vi", label: "Vietnamese" },
+  { code: "th", label: "Thai" },
+];
+
+/** `English` for a known code; the code itself, upper-cased, for one the list does not carry. */
+export function localeLabel(code: string): string {
+  return SITE_LOCALES.find((l) => l.code === code)?.label ?? code.toUpperCase();
+}
