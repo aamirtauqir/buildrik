@@ -139,6 +139,33 @@ describe("loadProject", () => {
 
     await expect(loadProject("bad-id")).rejects.toThrow("NOT_FOUND");
   });
+
+  /* The inverse of the dual-save map: the Site row is canonical for these
+     columns, so what it carries beats the project JSON's copy on load. A
+     rename on the dashboard therefore shows up in General on the next open. */
+  it("merges Site.name / favicon / defaultLocale over the project JSON's seo copy", async () => {
+    mocks.sitesGetQuery.mockResolvedValue({
+      id: "s1",
+      name: "Renamed on the dashboard",
+      projectSettings: { seo: { siteName: "Old editor name", language: "en", twitterHandle: "@kept" } },
+    });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({
+      name: "Renamed on the dashboard",
+      favicon: "https://cdn/favicon.ico",
+      defaultLocale: "fr",
+      plan: "FREE",
+    });
+
+    const project = await loadProject("s1");
+
+    expect(project.settings?.seo).toMatchObject({
+      siteName: "Renamed on the dashboard",
+      favicon: "https://cdn/favicon.ico",
+      language: "fr",
+      twitterHandle: "@kept",
+    });
+  });
 });
 
 describe("saveProject", () => {
@@ -488,6 +515,45 @@ describe("saveProject dual-save routing (P0.2b)", () => {
     await expect(
       saveProject("s1", { version: "1.0", pages: [], styles: [], assets: [] } as any)
     ).rejects.toThrow("boom");
+  });
+
+  /* Settings · Clone S1 (2026-09-14): the General screen wrote `seo.siteName`
+     / `seo.favicon` / `seo.language` into the project JSON while `Site.name`,
+     `Site.favicon` and `Site.defaultLocale` — what the dashboard, the publish
+     worker (favicon) and the document `lang` read — never changed. */
+  it("carries the General screen's identity fields to Site.name / favicon / defaultLocale", async () => {
+    await saveProject("s1", {
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: {
+        seo: { siteName: "Bella Cucina", favicon: "https://cdn/favicon.ico", language: "fr" },
+      },
+    } as any);
+
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({
+      id: "s1",
+      name: "Bella Cucina",
+      favicon: "https://cdn/favicon.ico",
+      defaultLocale: "fr",
+    });
+  });
+
+  /* `name` and `defaultLocale` are required columns with no null form — an
+     emptied field cannot clear them, so it is left out rather than sent as
+     "" (which the server refuses and which would take the whole mirror down
+     with it). A cleared favicon IS nullable and clears. */
+  it("leaves name and defaultLocale out when emptied, and nulls a cleared favicon", async () => {
+    await saveProject("s1", {
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: { seo: { siteName: "  ", favicon: "", language: "" } },
+    } as any);
+
+    expect(mocks.siteDetailSettingsUpdateMutate).toHaveBeenCalledWith({ id: "s1", favicon: null });
   });
 
   it("skips the settings call entirely when no mirrored fields are present", async () => {

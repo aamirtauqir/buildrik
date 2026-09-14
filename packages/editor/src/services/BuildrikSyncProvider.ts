@@ -138,6 +138,9 @@ const DEFAULT_ROOT: ElementData = {
  * `siteDetail.settings.get` returns these alongside name/slug/etc.
  */
 interface SiteColumnSettings {
+  name?: string;
+  favicon?: string | null;
+  defaultLocale?: string;
   metaTitle?: string | null;
   metaDescription?: string | null;
   metaTitleTemplate?: string | null;
@@ -155,6 +158,9 @@ interface SiteColumnSettings {
  * null out untouched server values via partial update semantics.
  *
  * Editor → server name mapping:
+ *   settings.seo.siteName           → name
+ *   settings.seo.favicon            → favicon
+ *   settings.seo.language           → defaultLocale
  *   settings.seo.metaTitle          → metaTitle
  *   settings.seo.metaDescription    → metaDescription
  *   settings.seo.metaTitleTemplate  → metaTitleTemplate
@@ -164,6 +170,12 @@ interface SiteColumnSettings {
  *   settings.customCode.headScripts → headCode
  *   settings.customCode.bodyScripts → bodyCode
  *   settings.publishing.publishedPassword → publishedPassword
+ *
+ * The first three joined 2026-09-14 (Settings · Clone S1): the General screen
+ * had written `seo.siteName` / `seo.favicon` / `seo.language` into the
+ * project JSON for months while `Site.name`, `Site.favicon` and
+ * `Site.defaultLocale` — the columns the dashboard, the publish worker and
+ * the document `lang` read — never heard about it.
  */
 /** "" is how a text input says "cleared"; null is how the server hears it. */
 function emptyToNull(value: string | null | undefined): string | null {
@@ -178,6 +190,16 @@ function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
   const customCode = settings.customCode;
   const publishing = settings.publishing;
   const patch: SiteColumnSettings = {};
+  /* `name` and `defaultLocale` are required columns (`z.string().min(2)` /
+     `.min(2)`, no null) — "cleared" cannot be sent, so an empty field leaves
+     the column as it is. A too-short value IS sent: the server refuses it and
+     the screen's banner says so, which is the honest answer to a one-letter
+     site name (the field warns first). */
+  const name = emptyToNull(seo?.siteName);
+  if (name !== null) patch.name = name;
+  if (seo?.favicon !== undefined) patch.favicon = emptyToNull(seo.favicon);
+  const defaultLocale = emptyToNull(seo?.language);
+  if (defaultLocale !== null) patch.defaultLocale = defaultLocale;
   if (seo?.metaTitle !== undefined) patch.metaTitle = emptyToNull(seo.metaTitle);
   if (seo?.metaDescription !== undefined) patch.metaDescription = emptyToNull(seo.metaDescription);
   if (seo?.metaTitleTemplate !== undefined) patch.metaTitleTemplate = emptyToNull(seo.metaTitleTemplate);
@@ -211,6 +233,9 @@ function mergeSiteColumnsIntoSettings(
   const customCode = { ...(settings.customCode ?? { headScripts: "", bodyScripts: "", globalCss: "" }) };
   const publishing = { ...(settings.publishing ?? {}) };
 
+  if (siteCols.name != null) seo.siteName = siteCols.name;
+  if (siteCols.favicon != null) seo.favicon = siteCols.favicon;
+  if (siteCols.defaultLocale != null) seo.language = siteCols.defaultLocale;
   if (siteCols.metaTitle != null) seo.metaTitle = siteCols.metaTitle;
   if (siteCols.metaDescription != null) seo.metaDescription = siteCols.metaDescription;
   if (siteCols.metaTitleTemplate != null) seo.metaTitleTemplate = siteCols.metaTitleTemplate;
