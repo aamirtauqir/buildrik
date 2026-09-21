@@ -33,12 +33,15 @@
  */
 
 import * as React from "react";
-import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Crosshair, MoreHorizontal, Link as LinkIcon } from "lucide-react";
 import {
   Button,
   CommentRow,
   EmptyState,
+  Menu,
+  MenuItem,
   PanelHeader,
+  Popover,
   SkeletonBlock,
   Spinner,
   Textarea,
@@ -155,6 +158,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [detachedIds, setDetachedIds] = React.useState<ReadonlySet<string>>(new Set());
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
+  const [menuForId, setMenuForId] = React.useState<string | null>(null);
   const [compareOpen, setCompareOpen] = React.useState(false);
   const [compareState, setCompareState] = React.useState<LoadState>("loading");
   const [approvedSnap, setApprovedSnap] = React.useState<PublishPage[] | null>(null);
@@ -342,6 +346,114 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       onExpandToggle={onExpandToggle}
       onHelpClick={onHelpClick}
       onClose={onClose}
+    />
+  );
+
+  /* Locate — reuses the next-logic from ReviewBar.tsx (the bar is being
+     retired in C2, but the behaviour is what the comment-pin needs): switch
+     to the comment's page when it differs from the active one, then select
+     the element the pin was on. A comment whose target was deleted is left
+     in the detached group and the ⋯ menu shows no Locate entry. */
+  const locate = React.useCallback(
+    (c: ReviewComment) => {
+      if (!composer) return;
+      if (c.pageId && composer.elements.getActivePage()?.id !== c.pageId) {
+        composer.elements.setActivePage(c.pageId);
+      }
+      const el = c.targetSelector ? composer.elements.getElement(c.targetSelector) : null;
+      if (el) composer.selection.select(el);
+    },
+    [composer],
+  );
+
+  /* Copy link — write the editor's current URL to the clipboard so a reviewer
+     (or the editor themselves) can paste a link to this exact view. The plan
+     row says "puts the URL on the clipboard" without a deep-link obligation;
+     `window.location.href` is the editor's URL for the current site. */
+  const copyLink = React.useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setNotice("Link copied");
+    } catch {
+      setNotice("Couldn't copy the link — copy it from the address bar.");
+    }
+  }, []);
+
+  /* Per-row ⋯ menu (board G1-031). Sits beside the row actions and opens
+     inline via chrome-ui Popover — no portal, no document.body appendChild
+     (Gate 22). Popover is controlled, so the parent owns `menuForId` and the
+     trigger toggles it. */
+  const rowMenu = (c: ReviewComment) => {
+    const canLocate = Boolean(c.targetSelector) && !detachedIds.has(c.id);
+    const open = menuForId === c.id;
+    return (
+      <Popover
+        open={open}
+        onClose={() => setMenuForId(null)}
+        placement="bottom-end"
+        trigger={
+          <Button
+            color="light"
+            size="xs"
+            className={GHOST}
+            aria-label="More actions"
+            aria-expanded={open}
+            aria-haspopup="menu"
+            onClick={() => setMenuForId((p) => (p === c.id ? null : c.id))}
+            data-row-menu-trigger
+          >
+            <MoreHorizontal size={14} aria-hidden="true" />
+          </Button>
+        }
+        label="Comment actions"
+      >
+        <Menu label="Comment actions">
+          <MenuItem
+            icon={<Crosshair size={14} aria-hidden="true" />}
+            disabled={!canLocate}
+            {...(!canLocate ? { title: c.targetSelector ? "This comment lost its anchor." : "No element to locate" } : {})}
+            onClick={() => {
+              setMenuForId(null);
+              locate(c);
+            }}
+            data-row-locate
+          >
+            Locate
+          </MenuItem>
+          <MenuItem
+            icon={<LinkIcon size={14} aria-hidden="true" />}
+            onClick={() => {
+              setMenuForId(null);
+              void copyLink();
+            }}
+            data-row-copy-link
+          >
+            Copy link
+          </MenuItem>
+        </Menu>
+      </Popover>
+    );
+  };
+
+  const row = (c: ReviewComment, extra?: { detachedNote?: string; actions?: React.ReactNode }) => (
+    <CommentRow
+      key={c.id}
+      author={c.authorKind === "client" ? (c.authorName ?? "Client") : "You"}
+      authorKind={c.authorKind === "client" ? "client" : "internal"}
+      body={c.body}
+      meta={rowMeta(c)}
+      resolved={c.status === "RESOLVED"}
+      detachedNote={extra?.detachedNote}
+      data-comment-row
+      data-comment-id={c.id}
+      actions={
+        extra?.actions ?? (
+          <>
+            {rowMenu(c)}
+            {resolveButton(c)}
+          </>
+        )
+      }
     />
   );
 
@@ -559,21 +671,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     <Button color="light" size="xs" onClick={() => void onResolve(c)} className={GHOST}>
       {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
     </Button>
-  );
-
-  const row = (c: ReviewComment, extra?: { detachedNote?: string; actions?: React.ReactNode }) => (
-    <CommentRow
-      key={c.id}
-      author={c.authorKind === "client" ? (c.authorName ?? "Client") : "You"}
-      authorKind={c.authorKind === "client" ? "client" : "internal"}
-      body={c.body}
-      meta={rowMeta(c)}
-      resolved={c.status === "RESOLVED"}
-      detachedNote={extra?.detachedNote}
-      data-comment-row
-      data-comment-id={c.id}
-      actions={extra?.actions ?? resolveButton(c)}
-    />
   );
 
   /* Two kinds of round land here and the boards draw only one. A round
