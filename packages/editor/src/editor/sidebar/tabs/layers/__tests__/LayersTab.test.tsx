@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { LayerSelectionBanner } from "../../../../panels/layers/components/LayerSelectionBanner";
+import { render, screen, fireEvent } from "@testing-library/react";
+import type { Composer } from "../../../../../engine";
 
 // Mock deep dependencies before importing LayersTab
 vi.mock("@/editor/panels/layers/index", () => ({
@@ -54,77 +54,38 @@ describe("LayersTab (no composer)", () => {
   });
 });
 
-// ─── LayerSelectionBanner (Screen R4Pf4 — multi-select action bar) ────────────
+// ─── Header ⋯ panel menu (board 7059:78962) ───────────────────────────────
 
-describe("LayerSelectionBanner", () => {
-  it("renders nothing when count < 2", () => {
-    const { container } = render(
-      <LayerSelectionBanner
-        count={1}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={vi.fn()}
-      />
-    );
-    expect(container.firstChild).toBeNull();
+describe("LayersTab — header ⋯ menu", () => {
+  const composer = () =>
+    ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), isProjectLoading: () => false }) as unknown as Composer;
+
+  it("the toolbar carries only the search box — no ⊞ ⊟ ⚙ glyphs", () => {
+    render(<LayersTab composer={null} />);
+    expect(screen.getByLabelText("Search layers")).toBeTruthy();
+    expect(screen.queryByLabelText("Expand all layers")).toBeNull();
+    expect(screen.queryByLabelText("Layer display settings")).toBeNull();
   });
 
-  it("shows selection count when 2+ layers selected", () => {
-    render(
-      <LayerSelectionBanner
-        count={3}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={vi.fn()}
-      />
-    );
-    expect(screen.getByText("3 selected")).toBeTruthy();
+  it("⋯ opens Expand all · Collapse all · Display settings…", () => {
+    render(<LayersTab composer={null} />);
+    expect(screen.queryByTestId("layers-expand-all")).toBeNull();
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    expect(screen.getByRole("menu", { name: "Layers options" })).toBeTruthy();
+    expect(screen.getByTestId("layers-expand-all")).toHaveTextContent("Expand all");
+    expect(screen.getByTestId("layers-collapse-all")).toHaveTextContent("Collapse all");
+    expect(screen.getByTestId("layers-display-settings-toggle")).toHaveTextContent("Display settings…");
   });
 
-  it("calls onGroup when Group button is clicked", () => {
-    const onGroup = vi.fn();
-    render(
-      <LayerSelectionBanner
-        count={2}
-        onGroup={onGroup}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={vi.fn()}
-      />
-    );
-    screen.getByRole("button", { name: "Group" }).click();
-    expect(onGroup).toHaveBeenCalledTimes(1);
-  });
-
-  it("calls onDelete when Delete button is clicked", () => {
-    const onDelete = vi.fn();
-    render(
-      <LayerSelectionBanner
-        count={2}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={onDelete}
-        onExit={vi.fn()}
-      />
-    );
-    screen.getByRole("button", { name: "Delete" }).click();
-    expect(onDelete).toHaveBeenCalledTimes(1);
-  });
-
-  it("calls onExit when Done button is clicked", () => {
-    const onExit = vi.fn();
-    render(
-      <LayerSelectionBanner
-        count={2}
-        onGroup={vi.fn()}
-        onHide={vi.fn()}
-        onDelete={vi.fn()}
-        onExit={onExit}
-      />
-    );
-    screen.getByRole("button", { name: "Done" }).click();
-    expect(onExit).toHaveBeenCalledTimes(1);
+  it("Expand all / Collapse all reach the tree through the composer, and the menu closes", () => {
+    const c = composer();
+    render(<LayersTab composer={c} />);
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.click(screen.getByTestId("layers-expand-all"));
+    expect(c.emit).toHaveBeenCalledWith("layers:expand-all", {});
+    expect(screen.queryByTestId("layers-expand-all")).toBeNull();
+    fireEvent.click(screen.getByTestId("layers-panel-menu"));
+    fireEvent.click(screen.getByTestId("layers-collapse-all"));
+    expect(c.emit).toHaveBeenCalledWith("layers:collapse-all", {});
   });
 });

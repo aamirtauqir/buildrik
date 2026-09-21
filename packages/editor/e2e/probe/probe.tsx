@@ -1166,7 +1166,6 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           folders={[]}
           pageToFolder={new Map()}
           selectedIds={new Set()}
-          onOpenListings={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
           onSelectPage={() => {}}
@@ -3354,6 +3353,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         onDuplicate={() => {}}
         onDelete={() => {}}
         onSetHomepage={() => {}}
+        onReplaceLayout={() => {}}
         onCopyLink={() => {}}
         onSettings={() => {}}
       />

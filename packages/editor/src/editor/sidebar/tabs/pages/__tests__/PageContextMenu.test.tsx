@@ -21,6 +21,7 @@ const baseProps = {
   onDuplicate: vi.fn(),
   onDelete: vi.fn(),
   onSetHomepage: vi.fn(),
+  onReplaceLayout: vi.fn(),
   onCopyLink: vi.fn(),
   onSettings: vi.fn(),
 };
@@ -138,5 +139,21 @@ describe("PageContextMenu", () => {
     // The surface class ships `absolute`; the menu must stay click-positioned.
     expect(box.className).toContain("tw:!fixed");
     expect(box.style.position).toBe("fixed");
+  });
+});
+
+/* Board 6883:69504 (G2-078): Rename… · Duplicate · Set as homepage · Replace
+   layout with template… · Copy link · Page settings… · Delete page. The
+   replace-layout door existed only in ⌘K. */
+describe("PageContextMenu — Replace layout with template…", () => {
+  it("sits after Set as homepage and invokes onReplaceLayout + onClose", () => {
+    const onReplaceLayout = vi.fn();
+    const onClose = vi.fn();
+    render(<PageContextMenu pageId="p2" {...baseProps} onReplaceLayout={onReplaceLayout} onClose={onClose} />);
+    const labels = screen.getAllByRole("menuitem").map((el) => el.textContent?.trim());
+    expect(labels.indexOf("Replace layout with template…")).toBe(labels.indexOf("Set as homepage") + 1);
+    fireEvent.click(screen.getByTestId("pages-menu-replace-layout"));
+    expect(onReplaceLayout).toHaveBeenCalledWith("p2");
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

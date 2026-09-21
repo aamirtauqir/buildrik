@@ -43,25 +43,39 @@
   border-color: var(--bk-accent);
 }
 
-/* Board 140:7 band: search + the Listings link on one 36h row. */
+/* Board 140:7 band: the search box on one 36h row. */
 .bd-pg-search-wrap {
   display: flex;
   align-items: center;
   gap: var(--bk-space-8);
 }
 
-.bd-pg-listings-link,
 .bd-pg-listings-back {
   flex-shrink: 0;
+  align-self: flex-start;
   border: none;
   background: transparent;
   font: 400 12px/18px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
+  color: var(--bk-accent-text);
   box-shadow: none;
 }
-.bd-pg-listings-back {
-  align-self: flex-start;
-  color: var(--bk-accent-text);
+
+/* Header ⌘K keycap (board 4418:90494): a 26×22 ghost button holding an
+   11px mono chip. */
+.bd-pg-kbd-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 22px;
+  padding: 0;
+}
+.bd-pg-kbd {
+  font: 500 11px var(--bk-font-mono);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--bk-border);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink-muted);
 }
 .bd-pg-search input {
   flex: 1;

@@ -10,18 +10,24 @@ import type { ElementType } from "../../../shared/types";
 import { LayersEmptyState } from "./components/LayersEmptyState";
 import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
 import { LayerBreadcrumb } from "./components/LayerBreadcrumb";
-import { LayerContextMenu } from "./components/LayerContextMenu";
+import { LayerContextMenu, elementsLabel } from "./components/LayerContextMenu";
 import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
-import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
 import { LayersScrollThumb } from "./components/LayersScrollThumb";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import { itemMatches } from "./hooks/useLayerSearch";
+import { getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
-import { Button } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
+
+/** "Heading, Subtitle and Menu previews" — board 6887:78291's sentence. */
+function listNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "the selection";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
 
 export const LayersPanel: React.FC<LayersPanelProps> = ({
   composer,
@@ -77,8 +83,11 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     expandIds(ancestorIds);
   }, [isSearching, filterTree, treeLayers, getAncestorIdsForMatches, expandIds]);
 
-  // Inline confirm state for multi-layer delete (replaces window.confirm)
-  const [pendingBannerDelete, setPendingBannerDelete] = React.useState(false);
+  /* Board 6887:78291 "Delete 3 elements?" — the one confirm the Layers
+     tree asks for, and only for N ≥ 2 (decision 17: one element goes at
+     once with the Undo toast). Opened from the selection's context menu. */
+  const [deleteSelectionOpen, setDeleteSelectionOpen] = React.useState(false);
+  const { addToast } = useToast();
 
   // Feedback message for invalid drop operations (UX improvement)
   const [dropFeedback, setDropFeedback] = React.useState<{
@@ -311,30 +320,40 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     onLayerHover?.(null);
   }, [state, onLayerHover]);
 
-  const handleContextAction = useLayerContextActions(state);
+  const requestDeleteSelection = React.useCallback(() => setDeleteSelectionOpen(true), []);
+  const handleContextAction = useLayerContextActions(state, { requestDeleteSelection });
 
-  const handleBannerGroup = React.useCallback(() => {
-    state.actionsHook.groupLayers([...state.selectionHook.selectedIds], state.treeHook.layers);
-  }, [state.actionsHook, state.selectionHook, state.treeHook]);
+  /* The names the confirm reads out ("This removes Heading, Subtitle and
+     Menu previews."), in tree order. */
+  const selectedNames = React.useMemo(() => {
+    const names: string[] = [];
+    const walk = (items: typeof state.layers) => {
+      for (const item of items) {
+        if (state.selectionHook.selectedIds.has(item.id)) {
+          names.push(getDisplayName(item.id, item.type, state.actionsHook.customNames, item.preview));
+        }
+        walk(item.children);
+      }
+    };
+    walk(state.layers);
+    return names;
+  }, [state.layers, state.selectionHook.selectedIds, state.actionsHook.customNames]);
 
-  const handleBannerHide = React.useCallback(() => {
-    state.actionsHook.hideMultiple([...state.selectionHook.selectedIds]);
-  }, [state.actionsHook, state.selectionHook]);
-
-  const handleBannerDelete = React.useCallback(() => {
+  const confirmDeleteSelection = React.useCallback(() => {
     if (!composer) return;
-    setPendingBannerDelete(true);
-  }, [composer]);
-
-  const confirmBannerDelete = React.useCallback(() => {
-    if (!composer) return;
-    const ids = [...state.selectionHook.selectedIds];
-    composer.beginTransaction("delete-layers");
-    ids.forEach((id) => composer.elements.removeElement(id));
-    composer.endTransaction();
+    const n = selectedCount;
+    /* The engine's own delete: prunes to top-most elements and wraps one
+       transaction, so Undo puts all of them back at once. */
+    composer.commands.run("delete");
     state.selectionHook.clearSelection();
-    setPendingBannerDelete(false);
-  }, [composer, state.selectionHook]);
+    setDeleteSelectionOpen(false);
+    /* Board 6881:71749 "3 elements deleted" + Undo. */
+    addToast({
+      description: `${elementsLabel(n)} deleted`,
+      action: { label: "Undo", onClick: () => composer.history.undo() },
+      duration: 8000,
+    });
+  }, [composer, selectedCount, state.selectionHook, addToast]);
 
   // Filter tree by search only (no category filters in Minimal Tree design)
   const treeFiltered = state.filterTree(state.layers);
@@ -402,20 +421,18 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           {dropFeedback.message}
         </div>
       )}
-      <LayerSelectionBanner
-        count={state.selectionHook.selectedIds.size}
-        onGroup={handleBannerGroup}
-        onHide={handleBannerHide}
-        onDelete={handleBannerDelete}
-        onExit={state.selectionHook.clearSelection}
+      {/* The multi-select banner is gone (audit G2-068): the count line in
+          the LayersTab footer and the selection's context menu carry it. */}
+      <ConfirmDialog
+        open={deleteSelectionOpen && selectedCount >= 2}
+        onClose={() => setDeleteSelectionOpen(false)}
+        onConfirm={confirmDeleteSelection}
+        title={`Delete ${elementsLabel(selectedCount)}?`}
+        message={`This removes ${listNames(selectedNames)}.`}
+        confirmLabel={`Delete ${elementsLabel(selectedCount)}`}
+        tone="destructive"
+        testId="layers-delete-selection"
       />
-      {pendingBannerDelete && state.selectionHook.selectedIds.size > 1 && (
-        <div className="bdc-layers-confirm" role="alert">
-          <span>Delete {state.selectionHook.selectedIds.size} layers?</span>
-          <Button className="bdc-btn bdc-btn-danger" onClick={confirmBannerDelete}>Delete</Button>
-          <Button className="bdc-btn bdc-btn-ghost" onClick={() => setPendingBannerDelete(false)}>Cancel</Button>
-        </div>
-      )}
       {/* Clean Tree View - Maximum space for content. Wrapped so
           LayersScrollThumb (board 1082:4835) can sit OUTSIDE the scrollable
           element — a thumb rendered inside it would scroll away with the
@@ -482,7 +499,8 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           nodeId={state.contextMenu.nodeId}
           hasClipboard={!!composer?.clipboard?.length}
           nodeName={state.contextMenu.nodeName}
-          selectedCount={state.selectionHook.selectedIds.size}
+          selectedCount={selectedCount}
+          inSelection={state.selectionHook.selectedIds.has(state.contextMenu.nodeId)}
           onAction={handleContextAction}
           onClose={state.closeContextMenu}
         />
