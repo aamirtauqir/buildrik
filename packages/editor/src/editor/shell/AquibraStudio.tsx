@@ -805,7 +805,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         selectedElement={selectedElement}
       />
 
-      <PreviewOverlay html={previewHtml} onDone={() => setPreviewHtml(null)} />
+      <PreviewOverlay
+        html={previewHtml}
+        onDone={() => setPreviewHtml(null)}
+        siteId={getSiteIdFromUrl()}
+      />
 
       <UpgradeModal />
 
