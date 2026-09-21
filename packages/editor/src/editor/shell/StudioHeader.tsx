@@ -102,6 +102,10 @@ export interface StudioHeaderProps {
   onOpenComponents?: () => void;
   /** F3 — the review pill is a door, not a label: opens the Review panel. */
   onOpenReview?: () => void;
+  /** B2 — the save pill in its `conflict` state re-opens the recovery
+   *  dialog (B1-01 7563:197963) the shell owns; the shell keeps the
+   *  server's token after the dialog is dismissed so it can. */
+  onOpenConflict?: () => void;
 
   // Core actions
   /** Save now. Resolves with the HONEST outcome — the exit guard branches on it. */
@@ -196,6 +200,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenTemplates,
   onOpenComponents,
   onOpenReview,
+  onOpenConflict,
   onSave,
   onExportHTML,
   onVercelPublish,
@@ -535,6 +540,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             ? "unsaved"
             : "saved";
 
+  /* ── B2 (decision #23) · the save pill's click, by state ─────────────────
+     The pill used to save for `unsaved`/`error` and do nothing otherwise.
+     Board G1-005's dot opens History; the owner kept ⌘S as the save. So:
+       saved · saving · unsaved → History (the timeline the pill summarises)
+       error                    → retry the save (the one state where a
+                                  click IS the fix)
+       conflict                 → the recovery dialog (B1-01), re-opened
+       offline                  → nothing to click; the reason is a tooltip
+     `onSave` stays the save — ⌘S and the exit guard call it directly. */
+  const savePillClick: (() => void) | undefined =
+    save === "error"
+      ? () => void onSave()
+      : save === "conflict"
+        ? onOpenConflict
+        : save === "offline"
+          ? undefined
+          : onOpenHistory;
+  const savePillHint =
+    save === "offline" ? "Offline — changes aren't reaching the server. Reconnect to keep saving." : undefined;
+
   const errorCount = issues.filter((i) => i.type === "error").length;
   const warnCount = issues.filter((i) => i.type === "warning").length;
   // T7/D14: the old errors-noun label ("3 errors" for 1 error + 2 warnings)
@@ -668,9 +693,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         exitLabel={viewMode.readOnlyView ? "‹ Back to editing" : "‹ Exit"}
         save={viewMode.readOnlyView ? undefined : save}
         savedAt={lastSavedAt ?? lastSaved?.getTime()}
-        /* SaveStatus renders as a BUTTON that fires onSave when the state is
-           unsaved or error. A view does not offer a save control. */
-        onSave={viewMode.readOnlyView ? undefined : onSave}
+        /* The pill is a button wherever a click has a destination (B2). A
+           view does not offer one — nothing in it can become unsaved. */
+        onSaveClick={viewMode.readOnlyView ? undefined : savePillClick}
+        saveHint={viewMode.readOnlyView ? undefined : savePillHint}
         review={review}
         tools={tools}
         presence={

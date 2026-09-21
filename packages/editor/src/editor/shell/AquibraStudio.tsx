@@ -357,8 +357,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // 61-conflict: a behind-copy save was rejected by the server. Listen on the
   // window event; idempotent (keep the first) so repeated autosave conflicts
-  // don't stack dialogs while one is open.
-  const [conflict, setConflict] = React.useState<{ serverToken: string } | null>(null);
+  // don't stack dialogs while one is open. `open` is separate from the token:
+  // a dismissed dialog keeps the token, so the save pill's `conflict` state
+  // can re-open it (B2, decision #23) with the same three ways out.
+  const [conflict, setConflict] = React.useState<{ serverToken: string; open: boolean } | null>(null);
 
   // Redesign P4 (51-layers): the footer ⌗ opens the structure tree as a floating
   // popover over the canvas, not the left drawer. Open-only trigger; close via the
@@ -367,7 +369,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   React.useEffect(() => {
     const onConflict = (e: Event) => {
       const token = (e as CustomEvent<{ serverLastEditedAt: string }>).detail?.serverLastEditedAt;
-      if (token) setConflict((c) => c ?? { serverToken: token });
+      if (token) setConflict((c) => (c?.open ? c : { serverToken: token, open: true }));
     };
     window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
     return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
@@ -583,6 +585,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => state.openLeftPanelToTab("review")}
+          onOpenConflict={() => setConflict((c) => (c ? { ...c, open: true } : c))}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
@@ -743,8 +746,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       />
 
       <ConflictModal
-        open={!!conflict}
-        onClose={() => setConflict(null)}
+        open={!!conflict?.open}
+        onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
         onReload={() => window.location.reload()}
         onSaveBackup={() => {
           // Download the local copy so nothing is lost, then take the latest.

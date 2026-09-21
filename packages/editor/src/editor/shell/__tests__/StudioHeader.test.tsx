@@ -268,22 +268,18 @@ describe("StudioHeader", () => {
       expect(screen.getByTestId("bk-announce-assertive").textContent).toBe("");
     });
 
-    it("dirty work can be saved from the pill", () => {
+    /* B2 (decision #23): the pill's click is routed by state — History for the
+       three ordinary states, retry for error, the recovery dialog for a
+       conflict, nothing (a tooltip) offline. ⌘S is the save. The per-state
+       table is StudioHeader.savePill.test.tsx; this keeps the one assert the
+       old "saves from the pill" case protected: the save is still reachable. */
+    it("unsaved work opens History from the pill — ⌘S is the save", () => {
       const onSave = vi.fn();
-      save({ isDirty: true, onSave });
+      const onOpenHistory = vi.fn();
+      save({ isDirty: true, onSave, onOpenHistory });
       fireEvent.click(screen.getByRole("button", { name: /Unsaved changes/ }));
-      expect(onSave).toHaveBeenCalled();
-    });
-
-    it("a settled state is a status, not a button that does nothing", () => {
-      // Asserted on the pill itself: since eng D5 the only role=status in the
-      // tree is the header's announcement region, so querying by role here
-      // would pass no matter what SaveStatus rendered. `getByText("Saved")`
-      // resolves to the pill's own root element — RTL matches on a node's
-      // direct text, excluding its nested dot/stamp elements' contribution.
-      save({ lastSavedAt: Date.now() });
-      expect(screen.getByText("Saved").tagName).toBe("SPAN");
-      expect(screen.queryByRole("button", { name: /Saved/ })).toBeNull();
+      expect(onOpenHistory).toHaveBeenCalledTimes(1);
+      expect(onSave).not.toHaveBeenCalled();
     });
 
     it("clean and saved", () => {
@@ -326,7 +322,9 @@ describe("StudioHeader", () => {
       const btn = screen.getByRole("button", { name: "Publish" });
       expect(btn.getAttribute("aria-disabled")).toBe("true");
       fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toBe("Can't publish while offline");
+      /* Two tooltips exist offline — the save pill carries its own (B2) — so
+         the assert names the CTA's by its text. */
+      expect(screen.getByText("Can't publish while offline").closest('[role="tooltip"]')).not.toBeNull();
     });
 
     it("blocking errors turn it into Publish anyway rather than hiding it", async () => {

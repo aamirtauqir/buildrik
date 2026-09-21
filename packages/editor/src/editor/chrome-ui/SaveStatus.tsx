@@ -14,6 +14,8 @@
  */
 import React from "react";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
+/* The LOCAL Tooltip — see HelpTooltip.tsx. */
+import { Tooltip } from "./Tooltip";
 
 export type SaveState = "saved" | "saving" | "unsaved" | "conflict" | "offline" | "error";
 
@@ -22,11 +24,19 @@ export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Only read for `saved`; the other states carry their own copy. */
   savedAt?: number;
   /**
-   * Save now. Wired up, the pill becomes the button for the two states a user
-   * can act on — a failed save and unsaved work. In every other state it stays
-   * a plain status, because a button that does nothing teaches distrust.
+   * The pill's click. Wired up, the pill is a BUTTON; the CONTAINER decides
+   * what the click does per state (B2, decision #23: saved · saving ·
+   * unsaved → History, error → retry the save, conflict → the recovery
+   * dialog) and withholds it where a click has no honest destination
+   * (offline). Absent, the pill stays a plain status, because a button that
+   * does nothing teaches distrust.
    */
-  onRetry?: () => void;
+  onClick?: () => void;
+  /**
+   * A sentence for the states with nothing to click — offline (B1-07
+   * 7563:233691's tooltip). Rendered as a tooltip on the plain pill.
+   */
+  hint?: string;
 }
 
 /** U1: one relative-time SSOT — seconds granularity preserved for saves.
@@ -101,9 +111,9 @@ const DOT_CLASS: Record<SaveState, string> = {
   error: "tw:bg-[var(--bk-error)]",
 };
 
-export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: SaveStatusProps) {
+export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }: SaveStatusProps) {
   const label = state === "saved" ? "Saved" : COPY[state];
-  const actionable = Boolean(onRetry) && (state === "error" || state === "unsaved");
+  const actionable = Boolean(onClick);
   const classes = [BASE_CLASS, STATE_CLASS[state], className].filter(Boolean).join(" ");
   const dot = (
     <span
@@ -141,18 +151,28 @@ export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: Save
      for exactly the two states that are actionable. */
   if (actionable) {
     return (
-      <button type="button" className={classes} onClick={onRetry} data-testid={`save-status-${state}`} {...rest}>
+      <button type="button" className={classes} onClick={onClick} data-testid={`save-status-${state}`} {...rest}>
         {dot}
         {label}
         {stamp}
       </button>
     );
   }
-  return (
-    <span className={classes} data-testid={`save-status-${state}`} {...rest}>
+  const pill = (
+    <span className={classes} data-testid={`save-status-${state}`} tabIndex={hint ? 0 : undefined} {...rest}>
       {dot}
       {label}
       {stamp}
     </span>
+  );
+  /* Offline has no destination — a click would promise something the
+     connection cannot deliver — so the pill answers with the reason instead.
+     `tabIndex=0` keeps the reason reachable on focus, not only on hover. */
+  return hint ? (
+    <Tooltip content={hint} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+      {pill}
+    </Tooltip>
+  ) : (
+    pill
   );
 }

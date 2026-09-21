@@ -115,8 +115,12 @@ export interface TopbarProps {
       not operating. */
   save?: SaveState;
   savedAt?: number;
-  /** Save now — turns the save pill into a button for the states worth retrying. */
-  onSave?: () => void;
+  /** The save pill's click — the container routes it by state (B2): History
+   *  for saved/saving/unsaved, a retry for error, the recovery dialog for a
+   *  conflict. Omit for offline, where `saveHint` carries the reason. */
+  onSaveClick?: () => void;
+  /** The tooltip on a pill with nothing to click (offline). */
+  saveHint?: string;
   /** The review round's current truth. Omit when no review is in flight. */
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments · IssueChip. */
@@ -179,7 +183,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSave, review, tools, presence,
+  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
   publishBlockedReason, ctaLabel, ctaHint, liveUrl, action, menu,
 }: TopbarProps) {
@@ -223,7 +227,7 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {save ? <SaveStatus state={save} savedAt={savedAt} onRetry={onSave} /> : null}
+      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
 
       {liveUrl ? (
         <a
