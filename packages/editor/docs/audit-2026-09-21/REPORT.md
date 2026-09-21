@@ -1,6 +1,7 @@
 # Code ↔ Figma feature-gap audit — REPORT (2026-09-21)
 
 Owner: Saqib · Author: Claude · Branch `audit/code-figma-gap-2026-09-21` · Figma `g4GzQFqzNYz5sosz1QtZXC` page **Editor v3 · IA** `4418:45431` · Code `packages/editor` (zero `src/` edits).
+Designer page: https://claude.ai/artifact/E9qB9nkEeY6eiKEp2cuojo (private until shared).
 Files: `BRIEF.md` · `01-code-inventory.md` · `02-figma-inventory.md` · `03-gap-matrix.md` · `04-integration-plan.md` · `05-figma-build-log.md` · `06-second-pass.md` · `07-traceability.md` · `dump/` · `screenshots/`.
 
 ## 1. Executive audit summary
