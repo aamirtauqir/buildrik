@@ -51,6 +51,10 @@ export interface MigrationProgressModalProps {
   onRestoreSnapshot?: () => void;
   /** Failure-only: Retry stuck migration. */
   onRetry?: () => void;
+  /** Failure-only: disables Restore and surfaces the reason inline + as a title. */
+  restoreDisabledReason?: string;
+  /** Failure-only: disables Retry and surfaces the reason inline + as a title. */
+  retryDisabledReason?: string;
 }
 
 export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
@@ -64,6 +68,8 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
   stuckAt,
   onRestoreSnapshot,
   onRetry,
+  restoreDisabledReason,
+  retryDisabledReason,
 }) => {
   const completedCount = steps.filter((s) => s.status === "done").length;
   const total = steps.length || 1;
@@ -148,16 +154,32 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                     size="xs"
                     type="button"
                     onClick={onRestoreSnapshot}
+                    disabled={Boolean(restoreDisabledReason)}
+                    aria-disabled={Boolean(restoreDisabledReason) || undefined}
+                    title={restoreDisabledReason}
                   >
                     Restore snapshot
                   </Button>
                 )}
                 {onRetry && stuckAt !== undefined && (
-                  <Button color="light" size="xs" type="button" onClick={onRetry}>
+                  <Button
+                    color="light"
+                    size="xs"
+                    type="button"
+                    onClick={onRetry}
+                    disabled={Boolean(retryDisabledReason)}
+                    aria-disabled={Boolean(retryDisabledReason) || undefined}
+                    title={retryDisabledReason}
+                  >
                     Retry v{stuckAt}
                   </Button>
                 )}
               </div>
+              {(restoreDisabledReason || retryDisabledReason) && (
+                <p className="tw:mt-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+                  {restoreDisabledReason ?? retryDisabledReason}
+                </p>
+              )}
             </>
           )}
         </div>
