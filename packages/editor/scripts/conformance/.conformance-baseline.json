@@ -472,16 +472,6 @@
     "skipped": 0,
     "compared": 12
   },
-  "pages-command-palette-k": {
-    "contrastFailures": 1,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "span.bd-pg-palette-item-home | ⌂ | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
-    },
-    "nonTextPairs": {},
-    "skipped": 1,
-    "compared": 32
-  },
   "history-milestone-suggestion-banner-code-mil": {
     "contrastFailures": 2,
     "nonTextFailures": 0,

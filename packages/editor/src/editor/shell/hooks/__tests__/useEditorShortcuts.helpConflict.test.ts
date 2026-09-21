@@ -1,103 +1,87 @@
 /**
- * useEditorShortcuts.helpConflict.test.ts — PIN §2-B5, resolved: bare "?" has
- * ONE owner.
+ * useEditorShortcuts.helpConflict.test.ts — ONE owner per help chord, ONE
+ * palette (decisions #37 / #38, 2026-09-22).
  *
- * The editor ships two help surfaces on purpose — the shell's
- * KeyboardShortcutsPanel (app-wide chords) and the canvas cheat sheet
- * (gestures and selection) — and the shell panel prints the split itself:
- * "Ctrl+/ · This shortcuts panel", "? · Canvas gestures & selection".
- *
- * Both used to claim "?" from their own window keydown listener, and
- * preventDefault does not stop a sibling listener, so a single press opened
- * both overlays on top of each other. useEditorShortcuts no longer binds "?";
- * useKeyboardCheatSheet is its only owner, and Cmd/Ctrl+/ is the panel's.
+ * Before: the shell's ⌘/ panel and the canvas `?` cheat sheet each bound
+ * their own window listener, and preventDefault does not stop a sibling
+ * listener — so a chord claimed twice opened two overlays. Now `?` and ⌘/
+ * both flip the one sheet state from this hook, ⌘⇧P (the retired canvas
+ * palette's chord) emits the one palette's toggle event, and ⌘P — which the
+ * plan's decision #38 read as "the page palette chord" — is and was the
+ * Preview toggle (printed on the ⌘K Preview row and the Figma legend
+ * 4418:126882); it opens no palette.
  *
  * @license BSD-3-Clause
  */
 
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { EVENTS } from "../../../../shared/constants/events";
 import {
   useEditorShortcuts,
   type UseEditorShortcutsOptions,
 } from "../useEditorShortcuts";
-import { useKeyboardCheatSheet } from "../../../canvas/controls/KeyboardCheatSheet";
 
-function dispatch(key: string, init: KeyboardEventInit = {}) {
+function dispatch(key: string, init: KeyboardEventInit = {}, target: EventTarget = window) {
   const event = new KeyboardEvent("keydown", {
     key,
     cancelable: true,
     bubbles: true,
     ...init,
   });
-  window.dispatchEvent(event);
+  target.dispatchEvent(event);
   return event;
 }
 
 const composer = () =>
-  ({ history: { undo: vi.fn(), redo: vi.fn() } }) as unknown as
-    UseEditorShortcutsOptions["composer"];
+  ({ history: { undo: vi.fn(), redo: vi.fn() }, emit: vi.fn() }) as unknown as NonNullable<
+    UseEditorShortcutsOptions["composer"]
+  >;
 
-describe("PIN §2-B5 — one owner per help chord", () => {
+function mount(c = composer()) {
+  const setShowShortcuts = vi.fn();
+  renderHook(() =>
+    useEditorShortcuts({
+      composer: c,
+      modals: { setShowShortcuts },
+      saveProject: vi.fn(),
+    }),
+  );
+  return { setShowShortcuts, c };
+}
+
+describe("one owner per help chord", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it("'?' opens the canvas cheat sheet and ONLY the canvas cheat sheet", () => {
-    const setShowShortcuts = vi.fn();
-
-    const { result } = renderHook(() => {
-      useEditorShortcuts({
-        composer: composer(),
-        modals: { setShowShortcuts },
-        saveProject: vi.fn(),
-      });
-      return useKeyboardCheatSheet();
-    });
-
-    expect(result.current.isOpen).toBe(false);
-    act(() => {
-      dispatch("?", { shiftKey: true });
-    });
-
-    expect(result.current.isOpen).toBe(true);
-    expect(setShowShortcuts).not.toHaveBeenCalled();
+  it("'?' opens the one sheet", () => {
+    const { setShowShortcuts } = mount();
+    const ev = dispatch("?", { shiftKey: true });
+    expect(setShowShortcuts).toHaveBeenCalledWith(true);
+    expect(ev.defaultPrevented).toBe(true);
   });
 
-  it("Cmd+/ opens the shell panel and leaves the cheat sheet shut", () => {
-    const setShowShortcuts = vi.fn();
-
-    const { result } = renderHook(() => {
-      useEditorShortcuts({
-        composer: composer(),
-        modals: { setShowShortcuts },
-        saveProject: vi.fn(),
-      });
-      return useKeyboardCheatSheet();
-    });
-
-    act(() => {
-      dispatch("/", { metaKey: true });
-    });
-
+  it("⌘/ opens the same sheet", () => {
+    const { setShowShortcuts } = mount();
+    dispatch("/", { metaKey: true });
     expect(setShowShortcuts).toHaveBeenCalledWith(true);
-    expect(result.current.isOpen).toBe(false);
+  });
+
+  it("'?' typed into a text field is the user's, not the sheet's", () => {
+    const { setShowShortcuts } = mount();
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    try {
+      dispatch("?", { shiftKey: true }, input);
+      expect(setShowShortcuts).not.toHaveBeenCalled();
+    } finally {
+      input.remove();
+    }
   });
 
   it("preventDefault does not shield later listeners — which is why one hook may claim a chord", () => {
-    const setShowShortcuts = vi.fn();
-    renderHook(() =>
-      useEditorShortcuts({
-        composer: composer(),
-        modals: { setShowShortcuts },
-        saveProject: vi.fn(),
-      }),
-    );
-
-    // A stand-in for any second listener registered after the hook — it still
-    // receives the event, and defaultPrevented is already true, but nothing
-    // reads that flag. Propagation is not stopped, so two handlers on one key
-    // means two surfaces.
+    const { setShowShortcuts } = mount();
     const secondListener = vi.fn();
     window.addEventListener("keydown", secondListener);
     const ev = dispatch("/", { metaKey: true });
@@ -107,26 +91,38 @@ describe("PIN §2-B5 — one owner per help chord", () => {
     expect(ev.defaultPrevented).toBe(true);
     expect(secondListener).toHaveBeenCalledTimes(1);
   });
+});
 
-  it("repeated '?' toggles the cheat sheet without ever reaching the shell panel", () => {
-    const setShowShortcuts = vi.fn();
-    const { result } = renderHook(() => {
-      useEditorShortcuts({
-        composer: composer(),
-        modals: { setShowShortcuts },
-        saveProject: vi.fn(),
-      });
-      return useKeyboardCheatSheet();
-    });
+describe("one palette", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
 
-    act(() => {
-      dispatch("?", { shiftKey: true });
-    });
-    act(() => {
-      dispatch("?", { shiftKey: true });
-    });
-
-    expect(result.current.isOpen).toBe(false);
+  it("⌘⇧P is an alias of ⌘K — it emits the palette toggle and nothing else", () => {
+    const { c, setShowShortcuts } = mount();
+    const ev = dispatch("p", { metaKey: true, shiftKey: true });
+    expect(c.emit).toHaveBeenCalledTimes(1);
+    expect(c.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {});
+    expect(ev.defaultPrevented).toBe(true);
     expect(setShowShortcuts).not.toHaveBeenCalled();
+  });
+
+  it("⌘P opens no palette: it is the Preview toggle, as the ⌘K row and the legend print", () => {
+    const { c, setShowShortcuts } = mount();
+    const ev = dispatch("p", { metaKey: true });
+    expect(c.emit).toHaveBeenCalledTimes(1);
+    expect(c.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_PREVIEW, {});
+    expect(c.emit).not.toHaveBeenCalledWith(EVENTS.UI_TOGGLE_COMMAND_PALETTE, expect.anything());
+    expect(setShowShortcuts).not.toHaveBeenCalled();
+    // The browser's print dialog must not open over the editor.
+    expect(ev.defaultPrevented).toBe(true);
+  });
+
+  it("⌘K is not this hook's — StudioHeader owns it", () => {
+    const { c, setShowShortcuts } = mount();
+    const ev = dispatch("k", { metaKey: true });
+    expect(c.emit).not.toHaveBeenCalled();
+    expect(setShowShortcuts).not.toHaveBeenCalled();
+    expect(ev.defaultPrevented).toBe(false);
   });
 });

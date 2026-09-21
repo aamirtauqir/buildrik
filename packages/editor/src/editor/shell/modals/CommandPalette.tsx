@@ -1,7 +1,14 @@
 /**
- * CommandPalette — Studio-level Command Palette
- * Triggered by Ctrl+K / ⌘+K
+ * CommandPalette — the editor's ONE command palette.
+ * Triggered by Ctrl+K / ⌘+K; ⌘⇧P is an alias (audit G1-093, decision #38).
  * PRD §17.1
+ *
+ * The canvas used to carry a second palette behind ⌘⇧P
+ * (`canvas/controls/CommandPalette.tsx` + `useCanvasCommandPalette`), and the
+ * Pages panel a third behind its own ⌘K (`PageCommandPalette`). Both are
+ * gone: their rows live in the engine registry (`defaultCommands.ts`, and the
+ * page rows the Pages panel registers while it is mounted), which this
+ * palette reads on every open.
  *
  * @module editor/shell/modals/CommandPalette
  * @license BSD-3-Clause
@@ -10,8 +17,11 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
+import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
+import { isFeatureEnabled } from "../../../shared/utils/featureFlags";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
 import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
+import { formatChord } from "../../canvas/controls/keyboardSheetRows";
 import { Button, TextInput } from "@/editor/chrome-ui";
 // =============================================================================
 // TYPES
@@ -27,6 +37,8 @@ interface PaletteCommand {
   group: string;
   shortcut?: string;
   icon?: string;
+  /** Registry `keywords` — matched by the filter beside the label. */
+  keywords?: string[];
   handler: () => void;
   /** Board 166:58 — a command you cannot run is still worth seeing. Disabled
    *  rows render muted with the reason and don't close the palette. */
@@ -130,9 +142,13 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     },
     {
       id: "view-fit",
-      label: "Fit to view",
+      /* "Zoom to fit" on Ctrl+1 — the flyout's own row and chord
+         (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). This printed
+         "Fit to view · Ctrl+0" — the one chord the audit flagged as wrong
+         (G1-093 / SH-90), and the last surface still calling it that. */
+      label: "Zoom to fit",
       group: "View",
-      shortcut: "Ctrl+0",
+      shortcut: "Ctrl+1",
       handler: () => { composer.emit(EVENTS.ZOOM_FIT, {}); onClose(); },
     }
   );
@@ -163,7 +179,9 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     {
       id: "templates-replace-layout",
       label: "Replace page layout with template…",
-      group: "Pages",
+      /* "Templates", not "Pages": the PAGES band is the Pages panel's context
+         section and exists only while that panel is open. */
+      group: "Templates",
       handler: () => { composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {}); onClose(); },
     },
     {
@@ -174,6 +192,24 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       handler: () => { composer.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); onClose(); },
     },
   );
+
+  /* Carried over from the canvas palette, flag-gated the same way
+     StudioHeader gates the Collaborate CTA (G2-038: "collab row stays
+     flag-gated"). Not a registry command: it needs the site id from the URL,
+     which lives in services/ and engine/ may not import. */
+  if (isFeatureEnabled("collab")) {
+    commands.push({
+      id: "start-collab",
+      label: "Start collaboration session",
+      group: "Tools",
+      keywords: ["collaborate", "team", "real-time", "multiplayer", "share"],
+      handler: () => {
+        const siteId = getSiteIdFromUrl();
+        if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
+        onClose();
+      },
+    });
+  }
 
   // 5. Registry-backed commands (S3.14 B8 fix). The CommandCenter holds ~39
   // commands the hardcoded list never surfaced — Export HTML/JSON, Open
@@ -191,37 +227,33 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
      this — its command list is built once at startup, while the selection
      changes under it — so the reason is computed here, where the list is built
      each time the palette opens. Same treatment Undo and Delete already got. */
-  const registryGuard = (id: string): string | undefined => {
-    if (id === "group") return selectedCount < 2 ? "select two or more" : undefined;
-    if (id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
+  const registryGuard = (cmd: { id: string; requiresSelection?: boolean }): string | undefined => {
+    if (cmd.id === "group") return selectedCount < 2 ? "select two or more" : undefined;
+    if (cmd.id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
     /* `paste` reads composer.clipboard and returns silently when it is empty —
-       the same shape as the nudges below, and the same reason it is guarded. */
-    if (id === "paste") return composer.clipboard?.length ? undefined : "nothing copied";
-    if (
-      id === "copy" ||
-      id === "delete" ||
-      id === "duplicate" ||
-      id === "cut" ||
-      id.startsWith("nudge-") ||
-      id === "bring-forward" ||
-      id === "send-backward" ||
-      id === "bring-to-front" ||
-      id === "send-to-back"
-    ) {
-      return selectedCount === 0 ? "nothing selected" : undefined;
-    }
+       the same shape as the selection-bound rows, and the same reason it is
+       guarded. */
+    if (cmd.id === "paste") return composer.clipboard?.length ? undefined : "nothing copied";
+    /* The registry says which rows need a selection (`requiresSelection`);
+       this used to be a hand-kept id list here that the registry could
+       silently outgrow. */
+    if (cmd.requiresSelection) return selectedCount === 0 ? "nothing selected" : undefined;
     return undefined;
   };
   for (const cmd of registry) {
     const label = cmd.label ?? cmd.id;
     if (seenLabels.has(label.toLowerCase())) continue;
     seenLabels.add(label.toLowerCase());
-    const reason = registryGuard(cmd.id);
+    const reason = registryGuard(cmd);
     commands.push({
       id: `cmd-${cmd.id}`,
       label,
-      group: "Commands",
+      /* The registry's own group decides the band: "Navigation" lands under
+         GO TO with the panel rows, "Pages" (registered by the Pages panel
+         while it is open) under PAGES, everything else under ACTIONS. */
+      group: cmd.group ?? "Commands",
       shortcut: cmd.shortcut,
+      keywords: cmd.keywords,
       disabled: reason !== undefined,
       disabledReason: reason,
       handler: () => { composer.commands.run(cmd.id); onClose(); },
@@ -238,10 +270,7 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
 const ShortcutBadge: React.FC<{ shortcut: string; testId?: string }> = ({ shortcut, testId }) => {
   const isMac =
     typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-  const display = shortcut
-    .replace(/Ctrl/g, isMac ? "⌘" : "Ctrl")
-    .replace(/Shift/g, isMac ? "⇧" : "Shift")
-    .replace(/Alt/g, isMac ? "⌥" : "Alt");
+  const display = formatChord(shortcut, isMac);
 
   return (
     /* Boards 166:9 / 166:14 / 166:17 / 303:1984 draw the chord as bare mono
@@ -265,8 +294,11 @@ const ShortcutBadge: React.FC<{ shortcut: string; testId?: string }> = ({ shortc
 /** One id for the listbox, so the input can point at it and at its rows. */
 const LIST_ID = "bk-cmdk-list";
 
-/** Fixed strip order — see `bands` below for why it cannot be emission order. */
-const BAND_ORDER = ["Recent", "Suggested", "Actions", "Go to"];
+/** Fixed strip order — see `bands` below for why it cannot be emission order.
+ *  PAGES is the context band: it exists only while the Pages panel is open
+ *  (it registers those rows on mount) and sits under RECENT so a jump is one
+ *  arrow away, ahead of the generic SUGGESTED head. */
+const BAND_ORDER = ["Recent", "Pages", "Suggested", "Actions", "Go to"];
 
 /** Band name -> test-id suffix ("Go to" -> "go-to"). */
 const bandSlug = (band: string) => band.toLowerCase().replace(/\s+/g, "-");
@@ -308,7 +340,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     const q = query.toLowerCase().trim();
     if (!q) return commands;
     return commands.filter((cmd) =>
-      (cmd.label + " " + cmd.group).toLowerCase().includes(q)
+      [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q)
     );
   }, [commands, query]);
 
@@ -363,6 +395,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
      reading the list. */
   const bandFor = React.useCallback((cmd: PaletteCommand, index: number): string => {
     if (cmd.group === "Recent") return "Recent";
+    if (cmd.group === "Pages") return "Pages";
     if (!query.trim()) return index < SUGGESTED_COUNT ? "Suggested" : cmd.group === "Navigation" ? "Go to" : "Actions";
     return cmd.group === "Navigation" ? "Go to" : "Actions";
   }, [query]);
@@ -376,7 +409,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     const groups = new Map<string, PaletteCommand[]>();
     let nonRecent = 0;
     for (const cmd of displayCommands) {
-      const band = bandFor(cmd, cmd.group === "Recent" ? -1 : nonRecent++);
+      /* Pages rows do not consume a SUGGESTED slot — they have their own band. */
+      const band = bandFor(cmd, cmd.group === "Recent" || cmd.group === "Pages" ? -1 : nonRecent++);
       const list = groups.get(band);
       if (list) list.push(cmd);
       else groups.set(band, [cmd]);

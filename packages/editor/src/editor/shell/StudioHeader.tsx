@@ -273,6 +273,22 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     return () => document.removeEventListener("keydown", onKey);
   }, [viewMode.readOnlyView]);
 
+  /* The palette's non-keystroke door — ⌘⇧P (useEditorShortcuts, alias of ⌘K
+     since the canvas palette was retired) and the Pages panel's ⌘K keycap
+     emit UI_TOGGLE_COMMAND_PALETTE. Same guards as the chord above. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const onToggle = () => {
+      if (viewMode.readOnlyView) return;
+      if (isModalOpen()) return;
+      setCmdOpen((v) => !v);
+    };
+    composer.on(EVENTS.UI_TOGGLE_COMMAND_PALETTE, onToggle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_COMMAND_PALETTE, onToggle);
+    };
+  }, [composer, viewMode.readOnlyView]);
+
   /* S5.2: the persistent review pill. Starts at UNKNOWN — `state: "none"`, so
      it still renders nothing, but with the two flags null rather than asserting
      "reviews are on and publishing is ungated" before anyone has asked. A

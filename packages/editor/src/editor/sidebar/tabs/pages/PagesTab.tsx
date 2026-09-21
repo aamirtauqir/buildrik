@@ -17,7 +17,6 @@ import { ConfirmDialog, EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStat
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { DrawerTab, PageSettingsOpenRequest } from "./types";
-import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
 import { SiteStructureTree } from "./components/SiteStructureTree";
@@ -26,6 +25,7 @@ import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
+import { usePageCommands } from "./usePageCommands";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useFolders } from "./useFolders";
 import { useBulkSelect } from "./useBulkSelect";
@@ -84,8 +84,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // Name conflict error state (Screen GoEJk)
   const [nameError, setNameError] = React.useState<string | null>(null);
 
-  // ⌘K command palette
-  const [paletteOpen, setPaletteOpen] = React.useState(false);
+  /* The panel's rows in the one ⌘K palette (New page · Go to <page>), live
+     while this panel is mounted. The panel-local palette and its own ⌘K
+     listener are gone — decision #38, TODOS.md:393. */
+  usePageCommands(composer, p.pages, p.selectPage, p.addPage);
 
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
@@ -163,16 +165,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     setDeleteTargetId(pageId); // show confirm dialog
   };
 
-  // ⌘K / Ctrl+K shortcut — open command palette; Escape — clear bulk selection
+  // Escape — clear bulk selection
   React.useEffect(() => {
+    if (!bulk.hasSelection) return;
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setPaletteOpen((open) => !open);
-      }
-      if (e.key === "Escape" && bulk.hasSelection) {
-        bulk.clearSelection();
-      }
+      if (e.key === "Escape") bulk.clearSelection();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -269,7 +266,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           color="light"
           size="xs"
           style={{ display: "inline-grid", placeItems: "center", width: 26, height: 22, padding: 0 }}
-          onClick={() => setPaletteOpen(true)}
+          /* The header keycap (G2-070) opens THE palette — the shell's ⌘K,
+             which bands this panel's rows under PAGES. */
+          onClick={() => composer?.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {})}
           aria-label="Open command palette" className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
         >
           <span style={{ font: "500 11px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
@@ -400,14 +399,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         }}
       />
 
-      {/* ⌘K command palette */}
-      {paletteOpen && (
-        <PageCommandPalette
-          pages={p.pages}
-          onSelect={p.selectPage}
-          onClose={() => setPaletteOpen(false)}
-        />
-      )}
       {/* Page settings drawer — opened via openSettings, from the row's
           context menu ("Page settings…") or a Listings row. The per-row gear
           it used to name was deleted with the row action strip. */}

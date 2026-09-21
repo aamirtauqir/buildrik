@@ -349,9 +349,14 @@ export const EVENTS = {
    *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
    *  other way to reach a collapsed section. */
   UI_INSPECTOR_FOCUS_SECTION: "ui:inspector-focus-section",
-  /** Toggle the keyboard cheat sheet. It lives in Canvas behind the `?` key
-   *  only; ⌘K "Keyboard shortcuts" needs a door that is not a keystroke. */
+  /** Toggle the one keyboard sheet (StudioModals). `?` and ⌘/ flip the same
+   *  state directly; this is the door for rows that are not a keystroke —
+   *  the ⌘K "Keyboard shortcuts" row, the site menu, the footer help button. */
   UI_TOGGLE_CHEAT_SHEET: "ui:toggle:cheat-sheet",
+  /** Toggle the one ⌘K command palette (StudioHeader owns its state). ⌘⇧P —
+   *  the retired canvas palette's chord — and the Pages panel's ⌘K keycap
+   *  come in through here. */
+  UI_TOGGLE_COMMAND_PALETTE: "ui:toggle:command-palette",
   /** The site menu asked to take the site down. The Publish panel owns the
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */

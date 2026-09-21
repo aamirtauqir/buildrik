@@ -13,7 +13,7 @@ import { SaveTemplate } from "../../templates/SaveTemplate";
 import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
-import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
+import { KeyboardCheatSheet } from "../canvas/controls/KeyboardCheatSheet";
 import { useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
@@ -37,7 +37,9 @@ export interface StudioModalsProps {
   showExporter: boolean;
   onCloseExporter: () => void;
 
-  // Keyboard shortcuts
+  /** The one keyboard sheet (board 7575:195538). State is
+   *  `useGlobalModals.showShortcuts`; `?`, ⌘/, the ⌘K row, the site-menu row
+   *  and the footer help button all flip it. */
   showShortcuts: boolean;
   onCloseShortcuts: () => void;
 
@@ -174,8 +176,9 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
       {/* Export Modal */}
       <ExportModal isOpen={showExporter} onClose={onCloseExporter} composer={composer} />
 
-      {/* Keyboard Shortcuts */}
-      <KeyboardShortcutsPanel isOpen={showShortcuts} onClose={onCloseShortcuts} />
+      {/* Keyboard shortcuts — mounted here, not on the canvas, so the sheet
+          answers from every view the shell renders. */}
+      <KeyboardCheatSheet isOpen={showShortcuts} onClose={onCloseShortcuts} composer={composer} />
 
       {/* Media Library */}
       <MediaLibraryPanel

@@ -453,3 +453,49 @@ describe("device presets carry no shortcut", () => {
     }
   });
 });
+
+/* B7 (2026-09-22): the canvas ⌘⇧P palette folded into this registry, so it is
+   the ONE command list the shell ⌘K reads. Two rules follow. */
+describe("one registry — ids are unique, the merged canvas rows are here", () => {
+  it("registers every id once", () => {
+    const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("carries the Insert and Tools rows the canvas palette used to own", () => {
+    for (const [id, event, payload] of [
+      ["add-text", EVENTS.ELEMENT_QUICK_ADD, { type: "text" }],
+      ["add-image", EVENTS.ELEMENT_QUICK_ADD, { type: "image" }],
+      ["add-button", EVENTS.ELEMENT_QUICK_ADD, { type: "button" }],
+      ["add-container", EVENTS.ELEMENT_QUICK_ADD, { type: "container" }],
+      ["cms-records", EVENTS.CMS_MANAGE_RECORDS, {}],
+      ["save-template", EVENTS.TEMPLATE_SAVE_REQUESTED, {}],
+      ["open-analytics", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }],
+      ["open-export-settings", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }],
+      ["open-integrations", EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }],
+    ] as const) {
+      composer.emit.mockClear();
+      run(id);
+      expect(composer.emit, id).toHaveBeenCalledWith(event, payload);
+    }
+  });
+
+  it("replace-media asks the media drawer for the selected element, and does nothing without one", () => {
+    run("replace-media");
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:media-selection-request", expect.anything());
+    composer.selection.getSelected.mockReturnValue(makeElement("img-1", "image"));
+    run("replace-media");
+    expect(composer.emit).toHaveBeenCalledWith("ui:media-selection-request", { elementId: "img-1", label: "Image" });
+  });
+
+  it("marks the rows that quietly return without a selection, so the palette can say so", () => {
+    const flagged = buildDefaultCommands(composer as unknown as Composer)
+      .filter((c) => c.requiresSelection)
+      .map((c) => c.id);
+    for (const id of ["delete", "duplicate", "copy", "cut", "nudge-up", "bring-forward", "send-to-back", "replace-media"]) {
+      expect(flagged).toContain(id);
+    }
+    expect(flagged).not.toContain("paste");
+    expect(flagged).not.toContain("select-all");
+  });
+});

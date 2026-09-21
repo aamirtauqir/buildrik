@@ -371,3 +371,20 @@ describe("AUDIT — command registry reachability", () => {
       "in the palette, and palette entries bypass command:before/run/error telemetry events.",
   );
 });
+
+describe("register — one id, one command (B7)", () => {
+  it("refuses a second registration of an id instead of silently replacing the first", () => {
+    const { center } = makeCenter();
+    center.register({ id: "twice", label: "First", run: vi.fn() });
+    expect(() => center.register({ id: "twice", label: "Second", run: vi.fn() })).toThrow(/already registered/);
+    expect(center.get("twice")?.label).toBe("First");
+  });
+
+  it("accepts the id again once it has been unregistered", () => {
+    const { center } = makeCenter();
+    center.register({ id: "again", label: "First", run: vi.fn() });
+    center.unregister("again");
+    expect(() => center.register({ id: "again", label: "Second", run: vi.fn() })).not.toThrow();
+    expect(center.get("again")?.label).toBe("Second");
+  });
+});
