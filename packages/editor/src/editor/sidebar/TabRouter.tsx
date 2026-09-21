@@ -27,6 +27,7 @@ import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
+import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import { exportPublishPages } from "../shell/exportPublishPages";
@@ -78,7 +79,9 @@ export interface TabRouterProps {
   onCreateComponent: () => void;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
+  /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
+  nextMove?: NextMove | null;
+  onRequestPublish?: () => void;
   onTemplatesSwitchTab?: (tab: string) => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
@@ -125,7 +128,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onCreateComponent,
   projectId,
   publishJob,
-  onVercelPublish,
+  nextMove,
+  onRequestPublish,
   onTemplatesSwitchTab,
   onOpenLibrary,
   onOpenImageEditor,
@@ -199,15 +203,16 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "publish":
-      // onVercelPublish gated on the same flag as the Topbar Publish dropdown
-      // so the sidebar action only lights up when publishing is enabled.
+      // The publish door is gated on the same flag as the topbar CTA, so the
+      // sidebar action only lights up when publishing is enabled.
       return (
         <PublishTab
           composer={composer}
           {...commonTabProps}
           projectId={projectId}
           publishJob={publishJob}
-          onVercelPublish={isFeatureEnabled("publish") ? onVercelPublish : undefined}
+          nextMove={nextMove ?? null}
+          onRequestPublish={isFeatureEnabled("publish") ? onRequestPublish : undefined}
           initialUnpublish={unpublishIntent}
           onUnpublishIntentConsumed={onUnpublishIntentConsumed}
         />

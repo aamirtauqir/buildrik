@@ -9,19 +9,11 @@
   "steps": [
     {
       "action": "waitFor",
-      "testId": "publish-rollback-open"
+      "testId": "publish-republish-5"
     },
     {
       "action": "click",
-      "testId": "publish-rollback-open"
-    },
-    {
-      "action": "waitFor",
-      "testId": "publish-rollback-picker"
-    },
-    {
-      "action": "click",
-      "testId": "publish-rollback-continue"
+      "testId": "publish-republish-5"
     },
     {
       "action": "waitFor",

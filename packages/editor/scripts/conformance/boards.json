@@ -5,18 +5,18 @@
  "generatedAt": "2026-08-14",
  "counts": {
   "total": 632,
-  "active": 521,
+  "active": 519,
   "designAhead": 41,
   "outOfScope": 57,
   "activeFamilies": 36,
   "verifiedActive": {
    "match": 97,
-   "drift-fixed": 362,
+   "drift-fixed": 360,
    "unreachable": 46,
    "drift-open": 3,
    "driven": 13
   },
-  "retired": 13
+  "retired": 15
  },
  "activeFamilies": [
   "AI",
@@ -1059,11 +1059,11 @@
    "state": "Published · roll-back confirm",
    "width": 1440,
    "height": 900,
-   "status": "active",
+   "status": "retired",
    "authority": "code:cites-board",
-   "recipe": "history-published-roll-back-confirm",
-   "verified": "drift-fixed",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe history-published-roll-back-confirm): 47 properties. BOARD won. Modal was kind=form (560) against a modal/440 board. The LIVE picker row was painted gray-100 with a transparent edge by flowbite's disabled: — the one row that says what is live was the only grey one in a list of white bands. The selected row carried an accent border the board does not draw (reads as focus, not choice). The progress track was gray-200/full-pill and its fill was bg-primary-600 = #1C64F2, blue-600, ONE STEP OFF the single accent (measured rgb(28,100,242) → rgb(26,86,219)). Outcome sentences were the body's own ink-soft 13px, so the line naming what is live and its footnote were the same weight. The 24 gutter: five boards in this family inset their modal body 24; MODAL_BODY_CLASS gives 16, so the extra 8 went on these bodies (MODAL_INSET) and the eight-board chassis was left alone. OPEN: 184:2's rows name the publisher ('published 2d ago · Ali') and PublishHistoryRow carries no author."
+   "recipe": null,
+   "verified": "unreachable",
+   "verifiedNote": "RETIRED 2026-09-22 (code-gap B4, G1-052 / owner decision 8): the version picker this board drew is deleted — the v3 IA puts 'Republish vN…' ON the row (6881:70883 / 6881:71292) and the confirm (184:24) opens from it directly; the four sibling recipes now drive through publish-republish-5. Was: conformed + measured 2026-09-08 (recipe history-published-roll-back-confirm): 47 properties. BOARD won. Modal was kind=form (560) against a modal/440 board. The LIVE picker row was painted gray-100 with a transparent edge by flowbite's disabled: — the one row that says what is live was the only grey one in a list of white bands. The selected row carried an accent border the board does not draw (reads as focus, not choice). The progress track was gray-200/full-pill and its fill was bg-primary-600 = #1C64F2, blue-600, ONE STEP OFF the single accent (measured rgb(28,100,242) → rgb(26,86,219)). Outcome sentences were the body's own ink-soft 13px, so the line naming what is live and its footnote were the same weight. The 24 gutter: five boards in this family inset their modal body 24; MODAL_BODY_CLASS gives 16, so the extra 8 went on these bodies (MODAL_INSET) and the eight-board chassis was left alone. OPEN: 184:2's rows name the publisher ('published 2d ago · Ali') and PublishHistoryRow carries no author."
   },
   {
    "nodeId": "162:2",
@@ -2191,11 +2191,11 @@
    "state": "Confirm",
    "width": 520,
    "height": 361,
-   "status": "active",
+   "status": "retired",
    "authority": "board:914-4507",
-   "recipe": "publish-confirm",
-   "verified": "drift-fixed",
-   "verifiedNote": "conformed + measured 2026-09-08 (recipe publish-confirm): 59 properties, board won on five. BLOCKED: #FFF7EB (publish warning band) is a raw hex with no token, held by Gate 16's hex ratchet."
+   "recipe": null,
+   "verified": "unreachable",
+   "verifiedNote": "RETIRED 2026-09-22 (code-gap B4, owner decision G1-043): the stepped wizard this board drew (Review → Confirm) is deleted; the ONE facts confirm both doors open is B3-10 7574:193972 on the v3 IA page (PublishConfirmModal). Was: conformed + measured 2026-09-08 (recipe publish-confirm), 59 properties, board won on five."
   },
   {
    "nodeId": "784:4403",
@@ -8378,6 +8378,6 @@
    "verifiedNote": "Clone S3 walk 2026-09-14 (unified editor, worktree on localhost:3001, scratch-ver seeded, migration settings_s3_redirects applied locally with migrate deploy, the walk's rows and slug history removed and the seed reset and re-run after). X-Frame-Options → DENY, Max age → 1 year: footer `Unsaved changes`, Save changes; Cancel → Unsaved settings. live-3397-34227-headers-unsaved."
   }
  ],
- "coveredFloor": 9,
+ "coveredFloor": 204,
  "sourceOfTruthFlippedAt": "2026-09-15"
 }

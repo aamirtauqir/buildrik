@@ -356,6 +356,11 @@ export const EVENTS = {
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */
   UI_UNPUBLISH_REQUEST: "ui:unpublish-request",
+  /** Open the Issues panel. Its only door was the topbar Issues chip, which
+   *  decision 11 (2026-09-21) removes; the Publish panel's open-errors gate,
+   *  the site menu and a ⌘K command reach it through this instead. Handled
+   *  in AquibraStudio, which owns the panel. */
+  UI_OPEN_ISSUES: "ui:open-issues",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   /** Settings' `Export` row (Clone 3397:32011) — OPEN, not toggle: the row
@@ -914,6 +919,7 @@ export interface EventPayloads {
   [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
+  [EVENTS.UI_OPEN_ISSUES]: void;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };

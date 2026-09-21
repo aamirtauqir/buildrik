@@ -17,6 +17,7 @@ import { getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailG
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
+import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
 import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
@@ -79,7 +80,9 @@ export interface LeftSidebarProps {
   pagesOpen?: PageSettingsOpenRequest | null;
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
+  /** The site's ONE next move + the ONE publish door (B4) — see StudioPanels. */
+  nextMove?: NextMove | null;
+  onRequestPublish?: () => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** P4.2 — opens the CMS collection-setup modal from the Content tab (data-first). */
@@ -375,7 +378,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   pagesOpen,
   projectId,
   publishJob,
-  onVercelPublish,
+  nextMove,
+  onRequestPublish,
   onOpenLibrary,
   onCreateCollection,
   onResendReview,
@@ -732,7 +736,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   publishJob={publishJob}
-                  onVercelPublish={onVercelPublish}
+                  nextMove={nextMove}
+                  onRequestPublish={onRequestPublish}
                   onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}

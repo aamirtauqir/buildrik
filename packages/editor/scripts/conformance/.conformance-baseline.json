@@ -377,14 +377,6 @@
     "contrastPairs": {},
     "nonTextPairs": {}
   },
-  "publish-confirm": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 2,
-    "compared": 60
-  },
   "review-panel-older-round": {
     "contrastFailures": 7,
     "nonTextFailures": 0,
@@ -600,16 +592,6 @@
     "nonTextPairs": {},
     "skipped": 0,
     "compared": 33
-  },
-  "history-published-roll-back-confirm": {
-    "contrastFailures": 1,
-    "nonTextFailures": 0,
-    "contrastPairs": {
-      "span.tw:text-[11px].tw:font-normal | published 7w ago | rgb(107, 114, 128) | rgb(235, 245, 255)": 4.38
-    },
-    "nonTextPairs": {},
-    "skipped": 1,
-    "compared": 47
   },
   "history-published-restore-confirm": {
     "contrastFailures": 2,

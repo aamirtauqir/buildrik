@@ -36,7 +36,7 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
-import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal";
+import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
@@ -98,10 +98,16 @@ export interface StudioPanelsProps {
   isFullPageMode?: boolean;
   /** Drawer width in pixels for the active tab (derived from useStudioState) */
   drawerWidth?: number;
-  /** Canonical publish state machine (shared with the Topbar) + its fire
-   *  handler, forwarded to the sidebar PublishTab so both drive ONE flow. */
+  /** Canonical publish state machine (shared with the Topbar), forwarded to
+   *  the sidebar PublishTab so both drive ONE flow. */
   publishJob?: UsePublishJobResult;
-  onVercelPublish?: () => Promise<void>;
+  /** The site's ONE next move (`useLifecycle`, derived once in
+   *  AquibraStudio) — the same object the topbar CTA reads. The Publish
+   *  panel's footer, its gate banner and its CTA read `nextMove.gate`. */
+  nextMove?: NextMove | null;
+  /** The ONE publish door — AquibraStudio's `requestPublish`, which routes on
+   *  `nextMove.gate`. Absent = no publish path is wired (flag off). */
+  onRequestPublish?: () => void;
 }
 
 // ============================================================================
@@ -182,7 +188,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   isFullPageMode = false,
   drawerWidth,
   publishJob,
-  onVercelPublish,
+  nextMove = null,
+  onRequestPublish,
 }) => {
   /* The site whose brand/tokens/publish state these panels edit.
      This was a prop, and `AquibraStudio` never passed it — so every consumer
@@ -200,11 +207,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // carry these next to its own second implementation of those shortcuts; the
   // implementations are gone and the feedback follows the commands' events.
   useClipboardToasts(composer, addToast);
-  /* Narrowed once, here, so the JSX below reads as one fact rather than a
-     type-guard expression: `stale-approval` is the fourth block reason and
-     keeps StaleApprovalModal. */
-  const blockedReason = publishJob?.blockedReason ?? null;
-  const publishGate = isPublishGateReason(blockedReason) ? blockedReason : null;
   const { handleBlockClick } = useBlockInsertion(composer);
   useAltTextAutoTrigger(composer);
 
@@ -489,7 +491,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             pagesOpen={pagesOpen}
             projectId={projectId}
             publishJob={publishJob}
-            onVercelPublish={onVercelPublish}
+            nextMove={nextMove}
+            onRequestPublish={onRequestPublish}
             onOpenLibrary={handleOpenLibrary}
             onCreateCollection={onOpenCreateCollection}
             onResendReview={onResendReview}
@@ -591,17 +594,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.FullPage>
         )}
       </LayoutShell>
-
-      {/* S5.4's three approval gates (307:2193 · 307:2203 · 307:2213). They are
-          driven from `publishJob`, which arrives here already for the Publish
-          panel, and their one action is "open the Review panel" — this
-          component's own `ui:switch-tab` contract. The gate belongs where the
-          door it offers is answered. */}
-      <PublishGateModal
-        reason={publishGate}
-        composer={composer}
-        onClose={() => publishJob?.dismissBlock()}
-      />
 
       {/* Clone 3686:42317 — Site fonts. Mounted once, here, and opened by
           `ui:site-fonts` from every door (the rail's Manage font, the

@@ -118,7 +118,7 @@ import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 import { PageTabBar } from "@/editor/shell/PageTabBar";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { TemplateUsageDrawer } from "@/editor/sidebar/tabs/templates/components/TemplateUsageDrawer";
-import { PublishWizard } from "@/editor/sidebar/tabs/publish/PublishWizard";
+import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
 import { PageCommandPalette } from "@/editor/sidebar/tabs/pages/components/PageCommandPalette";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
@@ -3025,7 +3025,8 @@ const CASES: Record<string, () => React.ReactElement> = {
         <PublishTab
           composer={null}
           onClose={() => {}}
-          onVercelPublish={async () => {}}
+          nextMove={null}
+          onRequestPublish={() => {}}
           publishJob={PUBLISH_JOB({
             uiState: "publishing",
             jobId: "job-1",
@@ -3310,30 +3311,20 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
     </div>
   ),
-  /* Board 914:4507 — the publish wizard's Confirm step. Reached the way a
-     person reaches it: mount the wizard, let it land on Review, click through.
-     The facts underneath are the real PublishConfirmFacts over the real
-     services; with no composer and no site the reads fail closed, which is a
-     STATE of those rows, not a stand-in for them. */
+  /* Board B3-10 7574:193972 — the ONE facts confirm both publish doors open
+     (the stepped wizard it replaced is gone, code-gap B4). The facts are the
+     real PublishConfirmFacts over the real services; with no composer and no
+     site the reads fail closed, which is a STATE of those rows, not a stand-in
+     for them. */
   "publish-confirm": () => (
     <div data-probe="publish-confirm">
-      <PublishWizard
-        open
-        onClose={() => {}}
-        onPublish={() => {}}
-        checkState="ready"
-        checks={{
-          ready: true,
-          checks: [
-            { label: "Vercel connected", status: "pass", detail: "Connected." },
-            { label: "Pages present", status: "pass", detail: "3 pages." },
-          ],
-        } as never}
-        onRetryChecks={() => {}}
+      <PublishConfirmModal
+        isOpen
         composer={null}
         publishedUrl="https://bellacucina.com"
         isPublished
-        rollbackTo={14}
+        onConfirm={() => {}}
+        onClose={() => {}}
       />
     </div>
   ),
@@ -3765,7 +3756,8 @@ const CASES: Record<string, () => React.ReactElement> = {
             composer={null}
             projectId="probe-site"
             onClose={() => {}}
-            onVercelPublish={async () => {}}
+            nextMove={null}
+            onRequestPublish={() => {}}
             publishJob={PUBLISH_JOB()}
           />
         </ToastProvider>

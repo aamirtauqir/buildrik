@@ -19,6 +19,10 @@ import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { SessionExpiredModal } from "./modals/SessionExpiredModal";
 import { PublishConfirmModal } from "./modals/PublishConfirmModal";
+import { PublishErrorsConfirmModal } from "./modals/PublishErrorsConfirmModal";
+import { PublishGateModal, isPublishGateReason } from "./modals/PublishGateModal";
+import { gateFromBlockReason, type PublishGate } from "./lifecycle";
+import { useLifecycle } from "./hooks/useLifecycle";
 import { PreviewOverlay } from "./PreviewOverlay";
 import { ReviewBar } from "./ReviewBar";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
@@ -159,7 +163,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
      lands (the watcher below), or by an explicit Keep editing. */
   const [authExpired, setAuthExpired] = React.useState(false);
   const onAuthExpired = React.useCallback(() => setAuthExpired(true), []);
-  // P3: the Issues panel (the topbar issue pill opens it — was a settings stub).
+  // P3: the Issues panel. Its doors: the Publish panel's open-errors gate,
+  // the site menu and ⌘K, all through `UI_OPEN_ISSUES` (the topbar chip that
+  // used to open it is gone — owner decision 11).
   const [issuesOpen, setIssuesOpen] = React.useState(false);
 
   // In-shell preview (shell state 7) — sanitized page HTML below the topbar.
@@ -186,6 +192,16 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     onLoadError: setLoadError,
     onAuthExpired,
   });
+
+  /* The Issues panel's one door (owner decision 11 removed the topbar chip). */
+  React.useEffect(() => {
+    if (!composer) return;
+    const open = () => setIssuesOpen(true);
+    composer.on(EVENTS.UI_OPEN_ISSUES, open);
+    return () => {
+      composer.off(EVENTS.UI_OPEN_ISSUES, open);
+    };
+  }, [composer]);
 
   /**
    * "Preview" from anywhere opens board 65:211, not just the topbar eye.
@@ -382,12 +398,58 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setExportLoading: modals.setExportLoading,
   });
 
-  // Publishing replaces the live site for every visitor, and the only gate that
-  // existed (StaleApprovalModal) fires *after* the server rejects a stale
-  // approval — so the common path shipped with no stop at all. Both publish
-  // entry points (topbar dropdown + sidebar Publish panel) are routed through
-  // one confirm here rather than each growing its own.
-  const [publishConfirmOpen, setPublishConfirmOpen] = React.useState(false);
+  /* ── The site's ONE next move, derived once (B4, decision #34) ────────────
+     `useLifecycle` owns the review-status reads and the one call to
+     `deriveLifecycleState`. The topbar (StudioHeader) and the Publish panel
+     (StudioPanels → PublishTab) receive the same `nextMove`, so the CTA, the
+     panel footer, its gate banner and the dialog below all read one gate. */
+  const errorCount = React.useMemo(
+    () => state.issues.filter((i) => i.type === "error").length,
+    [state.issues],
+  );
+  const { reviewStatus, nextMove, gateAfterErrors } = useLifecycle({
+    composer,
+    addToast,
+    isDirty: state.isDirty,
+    lastSavedAt: state.saveState.lastSavedAt,
+    // "offline" is the browser being offline OR the dashboard sync being
+    // disconnected — the same rule the save pill uses.
+    offline: isOffline || state.syncStatus === "offline",
+    errorCount,
+    publishedUrl: publishJob.publishedUrl,
+    lastPublishedAt: publishJob.lastPublishedAt,
+    serverHasUnpublishedChanges: publishJob.hasUnpublishedChanges,
+    serverBlock: publishJob.blockedReason,
+  });
+
+  /* ── The publish door (B4 — ONE confirm door, both entrances) ─────────────
+     `publishDoor` is the dialog the user asked for by pressing a publish verb,
+     routed on `nextMove.gate`. The server's post-click refusal
+     (`publishJob.blockedReason`) lands on the same enum, so each dialog's
+     `open` is "the user asked for this door OR the server sent them to it";
+     closing does both — clears the ask and dismisses the block.
+
+       open-errors        → "Publish with N open errors?" (B1-11), whose
+                            Publish anyway continues to `gateAfterErrors`
+       changes-requested  → the changes-requested gate (B1-09)
+       stale-approval     → StaleApprovalModal (B1-10) — its Publish anyway
+                            ships with `acknowledgeStale`
+       confirm            → the four-facts confirm (B3-10)
+       waiting · none     → nothing opens; the CTA was disabled with its reason
+
+     Publishing replaces the live site for every visitor. The stop on the
+     common path is the facts confirm; StaleApprovalModal used to be the only
+     gate, and it fires after the server has already refused. */
+  const [publishDoor, setPublishDoor] = React.useState<PublishGate>("none");
+  const serverGate = gateFromBlockReason(publishJob.blockedReason);
+  const doorOpen = React.useCallback(
+    (gate: PublishGate) => publishDoor === gate || serverGate === gate,
+    [publishDoor, serverGate],
+  );
+  const closeDoor = React.useCallback(() => {
+    setPublishDoor("none");
+    publishJob.dismissBlock();
+  }, [publishJob]);
   /* Review panel re-send. `TabRouter` declares `onResendReview` and forwards it
      to `ReviewTab` as `onResend`, and NOTHING supplied it — the chain simply
      stopped at the shell. ReviewTab renders its "Re-send" button
@@ -421,11 +483,16 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     return outcome;
   }, [composer]);
 
-  const requestPublish = React.useCallback(async () => {
-    setPublishConfirmOpen(true);
-  }, []);
+  /* Routes on the GATE, not the kind: `changes-requested` is a publish door
+     even though the topbar's own verb there is "Open feedback" — the panel's
+     "Publish to production" still has to answer with the gate modal. */
+  const requestPublish = React.useCallback(() => {
+    const gate = nextMove?.gate ?? "none";
+    if (gate === "waiting" || gate === "none") return;
+    setPublishDoor(gate);
+  }, [nextMove]);
   const confirmPublish = React.useCallback(async () => {
-    setPublishConfirmOpen(false);
+    setPublishDoor("none");
     await handleVercelPublish();
   }, [handleVercelPublish]);
 
@@ -523,8 +590,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}
-          lastPublishedAt={publishJob.lastPublishedAt}
-          serverHasUnpublishedChanges={publishJob.hasUnpublishedChanges}
+          reviewStatus={reviewStatus}
+          nextMove={nextMove}
           addToast={addToast}
         />
       </header>
@@ -586,19 +653,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
         publishJob={publishJob}
-        /*
-          The PANEL gets the deploy itself, not `requestPublish`.
-
-          `requestPublish` opens PublishConfirmModal, which is the TOPBAR's
-          gate — the topbar publishes in one click, so it needs one. The
-          panel's CTA already opens PublishWizard, whose second step IS board
-          914:4507: the same four facts, the same warning band, the same
-          "Publish now". Handing the panel `requestPublish` chained them, so
-          walking the boarded flow ended with the confirm shown twice in a
-          row, the second time titled "Update the live site?" and reached from
-          a button already labelled "Publish now". Two gates, one board.
-        */
-        onVercelPublish={handleVercelPublish}
+        /* The panel's CTA is the SAME door as the topbar's: `requestPublish`
+           routes on `nextMove.gate` and opens one dialog. The panel used to
+           open its own two-step wizard whose second step duplicated the
+           facts confirm — two gates for one board (B3-10). */
+        nextMove={nextMove}
+        onRequestPublish={requestPublish}
       />
 
       {/* P3: Issues panel — opened by the topbar issue pill */}
@@ -754,10 +814,50 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           changed after the client approved it. The modal itemizes the changed
           pages, offers a fresh review round, or ships the changes deliberately. */}
       <StaleApprovalModal
-        isOpen={publishJob.blockedReason === "stale-approval"}
+        isOpen={doorOpen("stale-approval")}
         composer={composer}
-        onClose={publishJob.dismissBlock}
-        onPublishAnyway={handlePublishAcknowledged}
+        onClose={closeDoor}
+        onPublishAnyway={() => {
+          setPublishDoor("none");
+          void handlePublishAcknowledged();
+        }}
+      />
+
+      {/* The changes-requested gate (B1-09), by name from the pre-click door.
+          `no-review` / `review-pending` are `waiting` — a shut door, never a
+          dialog — EXCEPT when the server is the one saying so: then the
+          pre-click derivation was stale (a round sent from another tab), the
+          CTA was enabled, and a silent refusal is the defect this flow was
+          fixed for. The server's own reason opens its board (307:2193 /
+          307:2213) while `useLifecycle` re-reads the round so the CTA and the
+          panel catch up. */}
+      <PublishGateModal
+        reason={
+          publishDoor === "changes-requested"
+            ? "changes-requested"
+            : isPublishGateReason(publishJob.blockedReason)
+              ? publishJob.blockedReason
+              : null
+        }
+        composer={composer}
+        onClose={closeDoor}
+      />
+
+      {/* B1-11 — the open-errors confirm. "Publish anyway" continues to the
+          next door for the same site (the facts confirm, or the stale
+          acknowledgement when the approval is also stale). */}
+      <PublishErrorsConfirmModal
+        open={doorOpen("open-errors")}
+        issues={state.issues}
+        reviewerInRound={
+          reviewStatus.state === "none" ? null : (reviewStatus.reviewerName ?? "your reviewer")
+        }
+        onFixFirst={() => {
+          closeDoor();
+          setIssuesOpen(true);
+        }}
+        onPublishAnyway={() => setPublishDoor(gateAfterErrors)}
+        onClose={closeDoor}
       />
 
       <SessionExpiredModal
@@ -768,11 +868,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onKeepEditing={() => setAuthExpired(false)}
       />
 
-      {/* Confirm before an irreversible deploy. Runs BEFORE the publish call, so
-          the stale-approval gate above still fires afterwards if the server
-          rejects — the two are sequential, not alternatives. */}
+      {/* B3-10 — the four-facts confirm before an irreversible deploy. Runs
+          BEFORE the publish call, so a server refusal the pre-click gate could
+          not see (a revision that went stale between paint and click) still
+          lands in its dialog afterwards — sequential, not alternatives. */}
       <PublishConfirmModal
-        isOpen={publishConfirmOpen}
+        isOpen={doorOpen("confirm")}
         composer={composer}
         /* So the confirm can ask `runPrePublishChecks` whether this workspace
            can deploy at all — the panel path has always asked; this one
@@ -781,7 +882,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         isPublished={publishJob.uiState === "published" || !!publishJob.publishedUrl}
         publishedUrl={publishJob.publishedUrl}
         onConfirm={confirmPublish}
-        onClose={() => setPublishConfirmOpen(false)}
+        onClose={closeDoor}
       />
     </div>
   );

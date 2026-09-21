@@ -20,17 +20,16 @@ import { fetchPrePublishChecks } from "@/services/PublishService";
 import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 
-/* Board 914:4519/4523/4531/4535 draw each fact as a 34-high row at gap 10,
-   with the KEY at 12 in ink-muted and the VALUE at 13 Medium in ink. It
-   shipped as a 12px row for both halves at gap 16 on 7/7 padding, which made
-   the answer the same size as the question.
+/* Board B3-10 (7574:193972) draws the four facts as a two-column table on a
+   25 pitch: the KEY in a fixed left column at 12 ink-muted, the VALUE beside
+   it at 13 ink, LEFT-aligned — a ledger, read top to bottom. The older board
+   (914:4507) right-aligned the values at gap 10; both doors now open this
+   dialog, so it follows the newer board.
 
    `min-h`, not `h`: two of the four values are sentences (the approval line,
-   the Vercel block) and wrap at this width; a fixed 34 would clip them. The
-   board's 34 is what a one-line row measures. */
-const ROW =
-  "tw:flex tw:justify-between tw:items-center tw:gap-2.5 tw:min-h-[34px] tw:py-[7px] tw:text-[12px]";
-const KEY = "tw:flex-none tw:text-[12px] tw:text-[var(--bk-ink-muted)]";
+   the Vercel block) and wrap at this width; a fixed pitch would clip them. */
+const ROW = "tw:flex tw:items-start tw:gap-3 tw:min-h-[25px] tw:py-[3px]";
+const KEY = "tw:w-[88px] tw:flex-none tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* `min-w-0` is the whole fix for ledger row R12 ("the value column runs into
    the right border and clips — 'your connected Vercel projec[t]'"). A flex
    item's min-width defaults to `auto`, which is its CONTENT width, so a long
@@ -39,7 +38,7 @@ const KEY = "tw:flex-none tw:text-[12px] tw:text-[var(--bk-ink-muted)]";
    truncate — these are facts someone is reading before they publish, so
    nothing here may be hidden behind an ellipsis. */
 const VAL =
-  "tw:min-w-0 tw:[overflow-wrap:anywhere] tw:text-right tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]";
+  "tw:min-w-0 tw:flex-1 tw:[overflow-wrap:anywhere] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 /** Board 914:4507 prints "Approved 2 Jul"; the real line names who, too. */
 function approvalLine(round: CurrentRound | null, loading: boolean): string {
@@ -175,7 +174,9 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
         </span>
       </div>
       <div className={ROW}>
-        <span className={KEY} data-testid="publish-fact-key-approval">Client approval</span>
+        {/* "Approval", the newer board's word (B3-10); 914:4507 said "Client
+            approval". The value still names who. */}
+        <span className={KEY} data-testid="publish-fact-key-approval">Approval</span>
         <span className={VAL} data-testid="publish-fact-val-approval">{approvalLine(round, loadingRound)}</span>
       </div>
       <div className={ROW}>
