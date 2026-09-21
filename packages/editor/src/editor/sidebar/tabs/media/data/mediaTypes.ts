@@ -103,6 +103,18 @@ export interface ConfirmDeletePayload {
   isBulk: boolean;
 }
 
+/**
+ * P0 — folder delete confirmation. Distinct payload because the actor is a
+ * folder, not assets, and the modal's secondary action (Move files…) has no
+ * counterpart in the asset flow. SSOT: one source per domain.
+ */
+export interface ConfirmFolderDeletePayload {
+  folderId: string;
+  folderName: string;
+  assetCount: number;
+  subFolderCount: number;
+}
+
 // --- Upload failure tracking ---
 
 export interface FailedUpload {

@@ -17,6 +17,7 @@ import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
 import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceModal";
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
+import { ConfirmFolderDeleteModal } from "../sidebar/tabs/media/components/ConfirmFolderDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { ImportUrlModal } from "./components/ImportUrlModal";
 import { fetchUrlAsFile } from "./fetchUrlAsFile";
@@ -75,6 +76,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const dragDepth = React.useRef(0);
   const searchRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  /* P0 — folder delete confirm. Distinct from `state.confirmDelete` (assets)
+     because the payload is different (no in-use list, has sub-folder count)
+     and the secondary action (Move files…) belongs to the move picker, not
+     the asset delete. SSOT per type — see `ConfirmFolderDeletePayload`. */
+  const [folderConfirm, setFolderConfirm] = React.useState<{
+    folderId: string;
+    folderName: string;
+    assetCount: number;
+    subFolderCount: number;
+  } | null>(null);
 
   // Keyboard shortcuts
   React.useEffect(() => {
@@ -352,7 +363,21 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           libraryItems={state.libraryItems}
           setLibrarySearch={state.setLibrarySearch}
           createFolder={state.createFolder}
-          deleteFolder={state.deleteFolder}
+          deleteFolder={async (folderId: string) => {
+            /* P0 — close the silent-refusal gap. The hook rejects non-empty
+               folders unless force:true, and the old wrapper passed the bare
+               `state.deleteFolder` straight through: a non-empty click
+               threw FOLDER_NOT_EMPTY into the void, an empty click deleted
+               with no confirm. Inspect first → ALWAYS open the confirm modal
+               (plan §A1: empty → "Delete \"<name>\"?" with no Move files…;
+               non-empty → counts + warning + Move files…). The modal itself
+               decides whether to render the warning via isEmpty; the wrapper
+               never force-deletes silently. */
+            const folder = state.folders.find((f) => f.id === folderId);
+            const folderName = folder?.name ?? "Untitled";
+            const { assetCount, subFolderCount } = state.inspectFolder(folderId);
+            setFolderConfirm({ folderId, folderName, assetCount, subFolderCount });
+          }}
           onTrashClick={() =>
             addToast({ description: "Trash coming soon", tone: "info" })
           }
@@ -489,6 +514,33 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           payload={state.confirmDelete}
           onConfirm={state.executeDelete}
           onCancel={state.cancelDelete}
+        />
+      )}
+      {folderConfirm && (
+        <ConfirmFolderDeleteModal
+          payload={folderConfirm}
+          onCancel={() => setFolderConfirm(null)}
+          onConfirm={async () => {
+            /* Failure path: any throw here is NOT FOLDER_NOT_EMPTY (the
+               inspector already ran), so surface it via toast and KEEP the
+               folder. The ConfirmDeleteModal pattern is the same — execute
+               always closes the modal, success tells the toast. */
+            try {
+              await state.deleteFolder(folderConfirm.folderId, { force: true });
+              setFolderConfirm(null);
+            } catch {
+              setFolderConfirm(null);
+              addToast({ description: "Could not delete folder", tone: "error" });
+            }
+          }}
+          onMoveFiles={() => {
+            /* Drop into the existing move picker by surfacing the empty
+               "Move to…" picker on the asset grid's bulk action. The board
+               intended this entry to be discoverable; routing through
+               setCurrentFolderId scopes the picker to this folder. */
+            setFolderConfirm(null);
+            addToast({ description: "Pick a destination folder for the files, then come back.", tone: "info" });
+          }}
         />
       )}
       {state.ctxMenu && (
