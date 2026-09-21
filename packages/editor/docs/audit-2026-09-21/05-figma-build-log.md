@@ -144,3 +144,7 @@ Figma calls this build: ≈ 75 (write + read-back + 4 screenshots); day total �
 | 20–21 | note | 04 §4 rows 10–11 and this log's B1-10 row corrected to the real sources / destinations; 03 G1-045/046 left as the agents wrote them (their citation error is recorded here and in 06) | docs |
 
 Final evidence: `dump/redump-003.json` (compact, post-fix). Figma calls, day total ≈ **125/200**.
+
+## OD-1 resolved — owner (artifact thread, 2026-09-21 14:51): "sab se new design implement karna hai" → Brand workspace `7315:80955` is the single design
+
+One write call: area index `4418:147492` Brand card `4418:71408` → `7315:80955` (1 reaction) · old launcher `4418:71408` renamed `ARCHIVE · STATES · Brand · every designed state — superseded 21 Sep 2026 · Brand workspace 7315:80955 (owner decision)` + hidden · v3 launcher `4428:150081`: the three cards → `4428:146069` / `146338` / `146607` hidden (ARCHIVE-prefixed) · workspace back-links retargeted: `4418:168885` Preview card ×2 and `4418:176596` Back → `7315:80955`, `4418:175027` Classes usage → `7316:83357`. `4428:149324` Apply already → `7316:80949` (EP-10). Live page now reaches one Brand design. Code rebuild (drawer → full page) = plan doc §16 Tier 3 rows, not started. Figma calls, day total ≈ 127/200.

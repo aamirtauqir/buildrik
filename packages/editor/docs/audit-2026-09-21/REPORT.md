@@ -51,7 +51,7 @@ Comments had no door (fixed: topbar toggle, `C`); view mode had no menu row (fix
 Same job → different pattern: delete (instant+Undo vs modal), save (autosave vs Done/Cancel; pill vs Save button), confirm copy ("Reload saved version" vs "Reload latest"), success feedback (toast vs modal in Settings), typed-DELETE scope, "Hidden from publish" vs "Won't publish", three prefixes for the image editor, "Assets" vs "Media" vs "Content/CMS" labels, three wrappers (Wrap in container / section / Group), size copy 10 MB vs 50 MB (fixed), n/p chords printed but unbound (fixed). Library gaps: no warning/dark toast tone, no chip tone variant, IconButton has no pressed state.
 
 ## 14. Recommended architecture changes
-1. One Brand design (OD-1 — workspace wins by default); hide the two parked designs and retarget their launchers (deferred hides listed in `dump/hide-plan.json`).
+1. One Brand design — **decided by the owner 2026-09-21 (artifact thread): the full-screen workspace `7315:80955`**; the old launcher is archived, the three v3 launcher cards hidden, four back-links retargeted (05 "OD-1 resolved"). Code rebuild = plan doc §16 Tier 3.
 2. One confirm before deploy; one delete pattern (instant + Undo on canvas/Layers, modal only for masters / N > 1); one save model per surface (autosave in editors, Done/Cancel in Settings and page settings).
 3. Fold the review bar into chip + panel; one ⌘K (merge ⌘⇧P), one shortcut sheet (W-3), one Brand colour picker (swatches + hex + alpha).
 4. Comments as a first-class topbar mode with canvas re-pin; orphan announcement as a modal (code) — toast variant only if the owner prefers.
