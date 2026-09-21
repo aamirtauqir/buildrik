@@ -124,6 +124,6 @@ describe("undo toasts say what was undone", () => {
     const toast = addToast.mock.calls[0][0] as { description: string; title?: string; tone?: string };
     expect(toast.description).toBe("Redo: Deleted element");
     expect(toast.title).toBeUndefined();
-    expect(toast.tone).toBe("dark");
+    expect(toast.tone).toBe("neutral");
   });
 });

@@ -271,6 +271,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     getTabMode(activeTabId) === "fullpage" ||
     (activeTabId === "assets" && mediaFullPage);
 
+  /* The toast viewport anchors to the CANVAS region's bottom-right, not the
+     window's (plan 2026-09-21 decision #35): it adds `--bk-inspector-w` to its
+     `right`. Written on the document root, not `.bd-studio`, because the
+     overlay root is a sibling of the shell, not a descendant. */
+  const inspectorOpen = !readOnlyView && !effectiveFullPageMode && inspectorShown;
+  React.useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--bk-inspector-w", inspectorOpen ? "var(--bk-size-inspector)" : "0px");
+    return () => {
+      root.style.removeProperty("--bk-inspector-w");
+    };
+  }, [inspectorOpen]);
+
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
     if (activeTabId !== "assets" && mediaFullPage) {
@@ -468,7 +481,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
-        inspectorOpen={!readOnlyView && !effectiveFullPageMode && inspectorShown}
+        inspectorOpen={inspectorOpen}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel. Absent in view mode. */}
