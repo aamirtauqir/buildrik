@@ -114,6 +114,15 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   // is not on any board and is gone with it.
   const isInstance = !!composer?.components?.isInstance?.(layer.id);
 
+  /* Display settings (board 4418:84113, decision 18). A dimmed row leaves the
+     list when "Show dimmed layers" is off — its children go with it, since a
+     dimmed parent dims them on the canvas too. */
+  if (isHidden && !displayPrefs.showDimmed) return null;
+  const isCmsBound =
+    displayPrefs.highlightCmsBound &&
+    !!composer &&
+    (composer.cms.bindings.getBindings(layer.id).length > 0 || composer.cms.bindings.hasCollectionBinding(layer.id));
+
   /* Board 1082:4640's indent ladder, read off the frame: chevrons sit at
      12 / 28 / 44 / 60 / 76 and labels at 40 / 56 / 72 — base 12, step 16.
      This was `16 + depth * 14`, so every row started 4px too far in and each
@@ -129,6 +138,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     isSelected ? "bdc-sel" : "",
     isCanvasHovered ? "bdc-canvas-hover" : "",
     isHidden ? "bdc-hidden" : "",
+    isCmsBound ? "bdc-cms-bound" : "",
     isEditing ? "bdc-editing" : "",
     isDragging ? "is-dragging" : "",
     hasChildren ? "" : "bdc-leaf",
@@ -268,13 +278,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             {displayPrefs.showHtmlBadges && (
               <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
             )}
-            {displayPrefs.showElementIds && (
-              // 8-char slice truncates IDs with shared prefix (e.g. multiple
-              // elements born from one createElement burst share `el-mpebx*`
-              // and diverge only in the trailing 4 chars). Bumping to 12 +
-              // exposing the full id via title disambiguates the layer
-              // tree without ballooning row width.
-              <span className="bdc-lr-id" title={layer.id} aria-hidden>#{layer.id.slice(0, 12)}</span>
+            {isCmsBound && (
+              <span className="bdc-lr-tag" title="Bound to CMS" role="img" aria-label="Bound to CMS" data-testid={`layer-cms-badge-${layer.id}`}>
+                CMS
+              </span>
             )}
             {layer.breakpointOverrides?.mobile?.hidden && (
               <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>
@@ -326,6 +333,9 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
           </svg>
         </Button>
 
+        {/* "Show lock badges" off hides the control on rows that are not
+            locked; a locked row keeps it, or it could never be unlocked. */}
+        {(displayPrefs.showLockBadges || isLocked) && (
         <Button
           type="button"
           className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
@@ -348,6 +358,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             )}
           </svg>
         </Button>
+        )}
       </div>
       {isExpanded && hasChildren && layer.children.map((child) => (
         <LayerTreeItem key={child.id} {...props} layer={child} />

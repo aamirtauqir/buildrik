@@ -768,7 +768,7 @@ function layerRow(layer: LayerItem) {
       onSelect={noop}
       onContextMenu={noop}
       getVisibleLayerIds={() => ["l0", "l1"]}
-      displayPrefs={{ showHtmlBadges: false, showElementIds: false, treeDensity: "compact" }}
+      displayPrefs={{ showDimmed: true, showLockBadges: true, treeDensity: "compact", highlightCmsBound: false, showHtmlBadges: false }}
     />
   );
 }

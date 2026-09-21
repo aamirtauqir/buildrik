@@ -69,6 +69,8 @@
 /* Board 143:179: a hidden layer is the WHOLE row at .45 — not five parts recoloured
    (the icon used to get a grey square painted behind its glyph). */
 .bdc-lr.bdc-hidden { opacity: 0.45; }
+/* "Highlight CMS-bound" (board 4418:84113): a tint on the row. */
+.bdc-lr.bdc-cms-bound { background: var(--bk-accent-tint); }
 
 .bdc-lr-chev {
   width: 12px;
@@ -154,9 +156,8 @@
   color: var(--bk-ink);
 }
 
-/* Inline tag/id/class/component/bp badges (display-settings controlled) */
-.bdc-lr-tag,
-.bdc-lr-id {
+/* Inline tag/CMS/component/bp badges (display-settings controlled) */
+.bdc-lr-tag {
   font: 500 var(--bk-text-11) var(--bk-font-mono);
   color: var(--bk-ink-muted);
   padding: 0 3px;

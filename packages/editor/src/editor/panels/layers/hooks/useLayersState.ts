@@ -31,8 +31,10 @@ import { useLayerTree, type UseLayerTreeReturn } from "./useLayerTree";
 const DISPLAY_PREFS_KEY = "buildrick-layers-display-prefs";
 
 const defaultPrefs: LayerDisplayPrefs = {
+  showDimmed: true,
+  showLockBadges: true,
+  highlightCmsBound: false,
   showHtmlBadges: false,
-  showElementIds: false,
   /* Compact by default — founder call, 2026-08-28. Three things agree: DESIGN.md
      names "compact density" as the chrome's stance, board 1082:4527 draws the
      tree at 28 (`--bk-size-row-dense`), and at the drawer's 732px a compact
