@@ -48,10 +48,6 @@ vi.mock("../tabs/history/HistoryTab", () => ({
 vi.mock("../tabs/ai/AITab", () => ({
   AITab: () => <div data-testid="tab-ai" />,
 }));
-vi.mock("@/editor/design-system/ui/DesignSystemTab", () => ({
-  default: () => <div data-testid="tab-design" />,
-}));
-
 const noop = vi.fn();
 
 function renderRouter(activeTab: GroupedTabId, extra: Partial<TabRouterProps> = {}) {
@@ -80,7 +76,6 @@ describe("TabRouter — tab id → panel component mapping", () => {
     ["assets", "tab-assets"],
     ["publish", "tab-publish"],
     ["history", "tab-history"],
-    ["design", "tab-design"],
   ];
 
   it.each(cases)("activeTab=%s renders %s", async (tabId, testId) => {
@@ -100,6 +95,15 @@ describe("TabRouter — tab id → panel component mapping", () => {
      against leaving Settings mid-edit never fired. FullPageRouter owns it. */
   it("renders nothing for settings — that surface belongs to FullPageRouter", () => {
     const { container } = renderRouter("settings");
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  /* Brand graduated the same way on 2026-09-22 (C1 (i)): the 280/700 drawer is
+     retired for the full-canvas workspace (Figma 7315:80955), which
+     FullPageRouter mounts. A drawer copy here would be a second, invisible
+     BrandWorkspace with its own load effect and dirty announcement. */
+  it("renders nothing for design — the Brand workspace belongs to FullPageRouter", () => {
+    const { container } = renderRouter("design");
     expect(container).toBeEmptyDOMElement();
   });
 });

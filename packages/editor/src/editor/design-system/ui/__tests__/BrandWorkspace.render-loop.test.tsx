@@ -1,14 +1,14 @@
 /**
  * Regression test for the "Maximum update depth exceeded" infinite loop that
- * fires when DesignSystemTab mounts with a composer whose project already has
+ * fires when BrandWorkspace mounts with a composer whose project already has
  * saved designTokens (length > 0).
  *
- * The full integration repro (rendering DesignSystemTab with non-empty
+ * The full integration repro (rendering BrandWorkspace with non-empty
  * designTokens under StrictMode) hangs the test process in a sync render
  * loop — the assertion below pins the *root cause* directly: the identity
  * of `useResetAllKinds` must remain stable across re-renders of the
  * provider, otherwise any consumer that puts it in a useCallback dep array
- * (DesignSystemTab.loadFromComposer + the effect that calls it
+ * (BrandWorkspace.loadFromComposer + the effect that calls it
  * synchronously) will recreate its own callback every render, re-fire the
  * effect, re-fire setState, and pin the React update queue.
  *
@@ -55,7 +55,7 @@ describe("useResetAllKinds / useResetAllPresets identity stability", () => {
     // those 14 registries in the useCallback deps would make this callable
     // rotate identity every render, which destabilises every downstream
     // useCallback / useEffect that lists it as a dependency. The
-    // DesignSystemTab loadFromComposer effect synchronously calls this
+    // BrandWorkspace loadFromComposer effect synchronously calls this
     // callable; instability there triggers an unbounded render loop.
     expect(second).toBe(first);
     expect(third).toBe(first);

@@ -6,6 +6,7 @@
  * Walked live: the Brand panel's
  * Tokens screen printed the instruction in bold, and no such control was on
  * screen. Both now read one constant, so the next rename moves them together.
+ * (The hint lives on the Brand workspace's first-run card since C1 (i).)
  *
  * @license BSD-3-Clause
  */
@@ -19,7 +20,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 describe("Brand — the apply action is named once", () => {
   it("the tokens hint points at the footer's real label", () => {
-    const tab = readFileSync(join(here, "..", "DesignSystemTab.tsx"), "utf8");
+    const tab = readFileSync(join(here, "..", "BrandWorkspace.tsx"), "utf8");
     const hint = tab.match(/default design tokens[\s\S]{0,220}?to go live/);
     expect(hint, "the first-load tokens hint").not.toBeNull();
     /* It must interpolate the constant, not spell a name of its own. */

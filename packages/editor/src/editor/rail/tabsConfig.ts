@@ -183,7 +183,10 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     section: "bottom",
     pattern: "standalone",
     shortcut: "B",
-    mode: "panel",
+    // C1 (i), 2026-09-22: the drawer is retired for the full-canvas Brand
+    // workspace (Figma 7315:80955 — the owner's single Brand design, OD-1).
+    // FullPageRouter mounts it edge-to-edge the way it mounts Settings.
+    mode: "fullpage",
     zone: "config",
   },
   {

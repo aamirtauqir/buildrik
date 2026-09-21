@@ -84,7 +84,7 @@ import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import {
-  DesignSystemTab,
+  BrandWorkspace,
   TokenRegistryProvider,
   StylePresetRegistryProvider,
 } from "@/editor/design-system";
@@ -674,16 +674,16 @@ const DETACH_COMPOSER = {
 } as unknown as React.ComponentProps<typeof ComponentDetailScreen>["composer"];
 
 /**
- * Brand · load-error fixture (board 781:4311).
+ * Brand · load-error fixture (board 781:4311; the drawer it drew is archived —
+ * the surface is the Brand workspace since C1 (i), 2026-09-22).
  *
- * The state is the `error` branch of `DesignSystemTab`, and nothing a user can
+ * The state is the `error` branch of `BrandWorkspace`, and nothing a user can
  * click produces it: `loadFromComposer` only sets `error` when reading the
  * project's own settings THROWS. So the composer here throws from
  * `getProjectSettings`, which is the one call that branch depends on, and the
- * panel under measurement is the real one — real PanelHeader, real
- * PanelErrorState, real copy, mounted under the same three providers
- * `StudioPanels.tsx:405-407` wraps it in. Nothing about the error block is
- * re-drawn here.
+ * surface under measurement is the real one — real PanelErrorState, real
+ * copy, mounted under the same three providers `StudioPanels.tsx:405-407`
+ * wraps it in. Nothing about the error block is re-drawn here.
  */
 const BRAND_ERROR_COMPOSER = {
   on: () => {},
@@ -711,7 +711,7 @@ const BRAND_ERROR_COMPOSER = {
     },
     tokenUsage: null,
   },
-} as unknown as React.ComponentProps<typeof DesignSystemTab>["composer"];
+} as unknown as React.ComponentProps<typeof BrandWorkspace>["composer"];
 
 /**
  * Layers · component-instance fixture (board 1082:4739).
@@ -2428,16 +2428,14 @@ const CASES: Record<string, () => React.ReactElement> = {
   "brand-load-error": () => (
     <div data-probe="brand-load-error">
       <ToastProvider>
-        {/* 280 x 812, the board's own frame. `onExpandToggle` + `onClose` are
-            what make PanelHeader draw the two 16px controls 781:4312 shows. */}
-        <div className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+        {/* 1440 x 900, the workspace's own frame (7315:80955). */}
+        <div className="tw:flex tw:h-[900px] tw:w-[1440px] tw:flex-col tw:overflow-hidden tw:bg-white">
           <DSModeProvider>
             <TokenRegistryProvider projectId="probe" composer={undefined}>
               <StylePresetRegistryProvider projectId="probe">
-                <DesignSystemTab
+                <BrandWorkspace
                   composer={BRAND_ERROR_COMPOSER}
                   projectId="probe"
-                  onExpandToggle={() => {}}
                   onClose={() => {}}
                 />
               </StylePresetRegistryProvider>
