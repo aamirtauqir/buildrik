@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { Crosshair, CornerLeftUp, Link } from "lucide-react";
+import { Crosshair, CornerLeftUp, Link, X } from "lucide-react";
 import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
@@ -428,6 +428,19 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               onRequestDelete={() => setShowDeleteConfirm(true)}
             />
           )}
+          {/* G2-037: the inspector's own way to give the canvas its 300px
+              back. The shell listens; ⌘K's `toggle-inspector` brings it
+              back (the footer word bar's Inspector toggle is gone). */}
+          <Button
+            type="button"
+            className="bdi-icon-btn"
+            title="Hide inspector"
+            aria-label="Hide inspector"
+            data-testid="inspector-hide"
+            onClick={() => composer?.emit(EVENTS.UI_TOGGLE_INSPECTOR)}
+          >
+            <X size={12} aria-hidden="true" />
+          </Button>
         </div>
         <DeleteConfirmModal
           isOpen={showDeleteConfirm}

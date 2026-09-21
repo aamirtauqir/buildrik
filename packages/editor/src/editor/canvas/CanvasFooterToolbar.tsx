@@ -1,21 +1,29 @@
 /**
- * CanvasFooterToolbar - Canvas Overlays & Zoom Controls
- * Bottom toolbar for canvas overlay toggles and zoom controls (IA Redesign 2026)
+ * CanvasFooterToolbar - the canvas status bar's edit + view controls.
  *
  * CONTROLS:
- * - Overlay toggles: Guides, Spacing, Grid, Badges, X-Ray
- * - Zoom controls: [-] 100% [+]
+ * - Undo / Redo + the device switcher (moved off the topbar)
+ * - ONE "View ▾" menu holding the six overlay toggles — board 5930:44801
+ *   (Canvas · View menu): Snap guides · Spacing · Grid · Rulers · Badges ·
+ *   X-Ray as check rows, each with its chord (G2-037: "one contextual
+ *   selector", not a word bar). The chords themselves stay bound below.
+ * - Help ?
+ *
+ * The Inspector toggle that sat at the end of the word bar has no home on the
+ * board; it is a ⌘K row now (`toggle-inspector`, registry owned by the
+ * commands lane) plus the ✕ in the inspector's own header, both of which emit
+ * EVENTS.UI_TOGGLE_INSPECTOR for the shell to act on.
  *
  * Layout:
- * ┌─────────────────────────────────────────────────────────────────────────────────────┐
- * │  [📐 Guides ✓] [📏 Spacing ✓] [⊞ Grid] [🏷️ Badges] [🔍 X-Ray]  │  [−] 100% [+]   │
- * └─────────────────────────────────────────────────────────────────────────────────────┘
+ * ┌────────────────────────────────────────────────────────────────┐
+ * │  [↶] [↷] [W D T M]  │  [View ▾]  │  [?]                          │
+ * └────────────────────────────────────────────────────────────────┘
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { BreakpointSwitcher, Button, isModalOpen, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuItem, Popover, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
 import { ZOOM_PRESETS } from "./shared";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
@@ -64,20 +72,6 @@ export interface CanvasFooterToolbarProps {
   onUndo?: () => void;
   /** Perform redo. */
   onRedo?: () => void;
-
-  /* Inspector visibility. The inspector is 300 of a 1440 viewport and the
-     canvas lane is 752 with both panels open — 52.2%, under the plan's own
-     >=58% — so the customer's 1024 page frame needs horizontal scrolling for
-     27% of its width. Collapsing it by DEFAULT is not an option: the
-     no-selection inspector is a drawn board, and StudioPanels records that
-     gating it on `selectedElement` collapsed the column to 1px and rendered
-     that drawn state off-viewport. A control the user operates respects the
-     drawn default and still gives the space back on demand. Sits with the
-     other view toggles because that is what it is. */
-  /** Whether the inspector column is showing. Renders the toggle when provided. */
-  inspectorOpen?: boolean;
-  /** Show or hide the inspector column. */
-  onToggleInspector?: () => void;
 }
 
 // ============================================
@@ -146,50 +140,23 @@ const GROUP = "tw:flex tw:items-center tw:gap-1";
 const DIVIDER = "tw:w-px tw:h-5 tw:mx-1 tw:bg-[var(--bk-gray-200)]";
 
 // ============================================
-// Overlay Button Component
+// View menu rows — board 5930:44801, in its order, with its chords
 // ============================================
 
-interface OverlayButtonProps {
-  label: string;
-  shortcut?: string;
-  active: boolean;
-  onClick: () => void;
-}
+const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: string }[] = [
+  { key: "guides", label: "Snap guides", kbd: "⌘;" },
+  { key: "spacing", label: "Spacing", kbd: "⌘⇧;" },
+  { key: "grid", label: "Grid", kbd: "⌘'" },
+  { key: "rulers", label: "Rulers", kbd: "⌘R" },
+  { key: "badges", label: "Badges", kbd: "⌘B" },
+  { key: "xray", label: "X-Ray", kbd: "⌘⇧X" },
+];
 
-const OverlayButton: React.FC<OverlayButtonProps> = ({
-  label,
-  shortcut,
-  active,
-  onClick,
-}) => (
-  <Tooltip
-    content={shortcut ? `${label} · ${shortcut}` : label}
-    placement="bottom"
-    arrow={false}
-    className="tw:max-w-[280px] tw:whitespace-normal"
-  >
-    {/* Board 199:205 draws these as WORDS, not icons: "Snap Guides · Spacing ·
-        Grid · Rulers · Badges · X-Ray", the active one in a grey pill with the
-        text gone semibold — no border, no tick. They were icon-only because the
-        bar also carried the zoom group and overflowed under the inspector; board
-        817:4723 puts zoom in the footer's bottom-right corner instead, and with
-        it gone the words fit the canvas column's 760px with room to spare. */}
-    <Button
-      type="button"
-      color="light"
-      className={`tw:inline-flex tw:items-center tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap ${
-        active
-          ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:font-semibold"
-          : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]"
-      }`}
-      onClick={onClick}
-      aria-pressed={active}
-      aria-label={label}
-    >
-      {label}
-    </Button>
-  </Tooltip>
-);
+/* The trigger reads like the words it replaces: a grey pill while any overlay
+   is on, plain otherwise, so the bar still says at a glance that something is
+   drawn over the canvas. */
+const VIEW_TRIGGER =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap";
 
 // ============================================
 // Main Component
@@ -199,8 +166,6 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   overlays,
   zoom,
   onOverlayChange,
-  inspectorOpen,
-  onToggleInspector,
   onZoomChange,
   onHelpClick,
   onFitToScreen,
@@ -280,6 +245,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   }, [overlays, onOverlayChange, onZoomChange, onFitToScreen, onZoomToSelection, zoom]);
 
   const showEditGroup = Boolean(onUndo || onRedo || (device && onDeviceChange));
+  const [viewOpen, setViewOpen] = React.useState(false);
+  const activeOverlays = VIEW_ROWS.filter((row) => overlays[row.key]).length;
 
   return (
     <div className={BAR}>
@@ -334,55 +301,51 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           <div className={DIVIDER} />
         </>
       )}
-      {/* Overlay Toggles */}
+      {/* View menu — board 5930:44801. Opens upward: the bar sits at the
+          bottom of the canvas. A row click toggles its overlay and closes
+          (the board's SV + CLOSE). */}
       <div className={GROUP}>
-        <OverlayButton
-          label="Snap Guides"
-          shortcut="⌘;"
-          active={overlays.guides}
-          onClick={() => onOverlayChange("guides", !overlays.guides)}
-        />
-        <OverlayButton
-          label="Spacing"
-          shortcut="⌘⇧;"
-          active={overlays.spacing}
-          onClick={() => onOverlayChange("spacing", !overlays.spacing)}
-        />
-        <OverlayButton
-          label="Grid"
-          shortcut="⌘'"
-          active={overlays.grid}
-          onClick={() => onOverlayChange("grid", !overlays.grid)}
-        />
-        <OverlayButton
-          label="Rulers"
-          shortcut="⌘R"
-          active={overlays.rulers}
-          onClick={() => onOverlayChange("rulers", !overlays.rulers)}
-        />
-        <OverlayButton
-          label="Badges"
-          shortcut="⌘B"
-          active={overlays.badges}
-          onClick={() => onOverlayChange("badges", !overlays.badges)}
-        />
-        <OverlayButton
-          label="X-Ray"
-          shortcut="⌘⇧X"
-          active={overlays.xray}
-          onClick={() => onOverlayChange("xray", !overlays.xray)}
-        />
-        {/* Inspector is 300 of 1440; hiding it takes the canvas lane from 752
-            to 1052, which clears the 1024 page frame and removes the
-            horizontal scroll. Active = showing, matching every other toggle
-            here (pressed means the thing is ON). */}
-        {onToggleInspector && (
-          <OverlayButton
-            label="Inspector"
-            active={inspectorOpen ?? true}
-            onClick={onToggleInspector}
-          />
-        )}
+        <Popover
+          open={viewOpen}
+          onClose={() => setViewOpen(false)}
+          placement="top"
+          label="View"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              className={`${VIEW_TRIGGER} ${
+                activeOverlays > 0
+                  ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:font-semibold"
+                  : "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]"
+              }`}
+              aria-haspopup="menu"
+              aria-expanded={viewOpen}
+              aria-label="View"
+              data-testid="canvas-view-menu-trigger"
+              onClick={() => setViewOpen((v) => !v)}
+            >
+              View{activeOverlays > 0 ? ` · ${activeOverlays}` : ""} ▾
+            </Button>
+          }
+        >
+          <Menu label="View" data-testid="canvas-view-menu">
+            {VIEW_ROWS.map((row) => (
+              <MenuItem
+                key={row.key}
+                selected={overlays[row.key]}
+                kbd={row.kbd}
+                data-testid={`canvas-view-${row.key}`}
+                onClick={() => {
+                  onOverlayChange(row.key, !overlays[row.key]);
+                  setViewOpen(false);
+                }}
+              >
+                {row.label}
+              </MenuItem>
+            ))}
+          </Menu>
+        </Popover>
       </div>
       {/* Help Button */}
       {onHelpClick && (

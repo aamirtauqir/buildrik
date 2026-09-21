@@ -69,8 +69,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer,
       device,
       zoom,
-      inspectorOpen,
-      onToggleInspector,
       onAIRequest,
       showComponentView = false,
       showSpacing = false,
@@ -738,6 +736,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             <CanvasEmptyCTA
               started={startedBlank}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
+              /* Board 4428:44164's two new doors reuse the seams that already
+                 exist: the Add drawer opened on BLOCKS (the canvas menu's
+                 "Replace with block…" does the same), and the AI panel (the
+                 inspector's ✦ chip). */
+              onAddBlock={() => {
+                composer?.emit("ui:switch-tab", { tab: "add" });
+                composer?.emit(EVENTS.UI_INSERT_OPEN_GROUP, { group: "blocks" });
+              }}
+              onDescribe={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
               onStartBlank={() => {
                 setStartedBlank(true);
                 composer?.emit("ui:switch-tab", { tab: "add" });
@@ -826,8 +833,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
               onHelpClick={openCheatSheet}
-              inspectorOpen={inspectorOpen}
-              onToggleInspector={onToggleInspector}
               device={device === "watch" ? "mobile" : device}
               onDeviceChange={onDeviceChange}
               canUndo={canUndo}

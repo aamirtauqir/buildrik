@@ -13,6 +13,7 @@ import type { FlatElEntry } from "../catalog/types";
 import { searchInsert, type InsertSearchHit } from "../utils/search";
 import { blockRows, componentRows } from "../catalog/groups";
 import { getBlockDefinitions } from "../../../../../blocks";
+import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 
@@ -62,6 +63,15 @@ const ls = {
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export type DragStartFn = (e: React.DragEvent, el: FlatElEntry) => void;
+export type BlockDragStartFn = (e: React.DragEvent, block: BlockDefinition) => void;
+
+/** The one payload the canvas drop reads (`dropOperations.handleBlockDrop`
+ *  → `getBlockById(id)`); an element row and a block card write the same. */
+function setBlockPayload(e: React.DragEvent, payload: { id: string; label: string; category?: string }) {
+  e.dataTransfer.setData("block", JSON.stringify(payload));
+  e.dataTransfer.setData("text/plain", payload.id);
+  e.dataTransfer.effectAllowed = "copy";
+}
 export type ElClickFn = (el: FlatElEntry) => void;
 export type ToggleFavFn = (name: string) => void;
 
@@ -90,6 +100,8 @@ export interface UseBuildTabReturn {
   tipNext: () => void;
   tipSetAt: (i: number) => void;
   handleDragStart: DragStartFn;
+  /** Board 4428:140817's `grip/⠿ drag to place` — a block card is a drag source too. */
+  handleBlockDragStart: BlockDragStartFn;
   handleElClick: ElClickFn;
   /** Describes where the next clicked element will be inserted */
   insertionContext: { type: string; label: string } | null;
@@ -185,12 +197,11 @@ export function useBuildTab(
   }, []);
 
   const handleDragStart: DragStartFn = React.useCallback((e, el) => {
-    e.dataTransfer.setData(
-      "block",
-      JSON.stringify({ id: el.blockId, label: el.name, category: el.catId })
-    );
-    e.dataTransfer.setData("text/plain", el.blockId);
-    e.dataTransfer.effectAllowed = "copy";
+    setBlockPayload(e, { id: el.blockId, label: el.name, category: el.catId });
+  }, []);
+
+  const handleBlockDragStart: BlockDragStartFn = React.useCallback((e, block) => {
+    setBlockPayload(e, { id: block.id, label: block.label, category: block.category });
   }, []);
 
   const handleElClick: ElClickFn = React.useCallback(
@@ -296,6 +307,7 @@ export function useBuildTab(
     tipNext,
     tipSetAt,
     handleDragStart,
+    handleBlockDragStart,
     handleElClick,
     insertionContext,
   };

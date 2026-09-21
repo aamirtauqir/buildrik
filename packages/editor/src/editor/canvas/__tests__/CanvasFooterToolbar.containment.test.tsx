@@ -58,7 +58,7 @@ function pill(): HTMLElement {
   render();
   // the bar is the toggle's nearest ancestor carrying the containment
   // utilities — the toggle itself has radius+padding but never these
-  let n: HTMLElement | null = screen.getByRole("button", { name: "Snap Guides" });
+  let n: HTMLElement | null = screen.getByTestId("canvas-view-menu-trigger");
   while (n && !CONTAINMENT.every((c) => n!.classList.contains(c))) n = n.parentElement;
   if (!n) throw new Error("toolbar container not found");
   return n;

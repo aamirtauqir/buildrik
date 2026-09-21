@@ -42,8 +42,12 @@ export const componentRows: BlockDefinition[] = componentBlockDefinitions;
 
 const componentIds = new Set(componentRows.map((c) => c.id));
 
-/** BLOCKS — the rest of the registry, inserted via the existing insertBlock path. */
-export const blockRows: BlockDefinition[] = getBlockDefinitions().filter((b) => !componentIds.has(b.id));
+/** BLOCKS — sections only (board 4428:140817, G2-110 / G2-107): the registry's
+ *  `Sections` folder, inserted via the existing insertBlock path. The rest of
+ *  the registry was 40 rows that duplicated ELEMENTS one for one. */
+export const blockRows: BlockDefinition[] = getBlockDefinitions().filter(
+  (b) => b.category === "Sections" && !componentIds.has(b.id),
+);
 
 export function buildInsertGroups(mineCount: number | null): InsertGroup[] {
   return [

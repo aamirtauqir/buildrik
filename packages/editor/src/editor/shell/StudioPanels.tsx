@@ -253,6 +253,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       return next;
     });
   }, []);
+  /* The toggle's doors are the inspector's own ✕ and the ⌘K row
+     (`toggle-inspector`, commands registry) — both emit this event (G2-037:
+     the footer word bar's Inspector toggle had no home on the board). */
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.on(EVENTS.UI_TOGGLE_INSPECTOR, toggleInspector);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_INSPECTOR, toggleInspector);
+    };
+  }, [composer, toggleInspector]);
 
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
@@ -517,8 +527,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
-              inspectorOpen={inspectorShown}
-              onToggleInspector={toggleInspector}
               ref={canvasRef as React.Ref<CanvasRef>}
               /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
                  tools, so they go with the rest of the editing chrome. */
