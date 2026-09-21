@@ -290,7 +290,7 @@ existed in this table until 2026-08-16.
 | `NEXT_PUBLIC_FEATURE_PUBLISH` | Publish dropdown + publish flow in the shipping editor. Must be set alongside `VITE_FEATURE_PUBLISH`, which only serves the standalone demo. | Yes once publishing is live |
 | ~~`NEXT_PUBLIC_FEATURE_COMPONENTS_V2`~~ | **Deleted 2026-08-16.** It selected between two Components panels, and because only the `NEXT_PUBLIC_` half ships, it only ever meant "the port-5050 demo shows `ComponentsPanelV2`, every real user sees `ComponentsTab`". `ComponentsTab` is the one built to board 641:2546, so `ComponentsPanelV2` and the flag are gone. | — |
 | `NEXT_PUBLIC_FEATURE_DS_AI` | AI entry points in the Brand / design-system panel. | No |
-| `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration. **Leave off** — collab is demo-only (last-write-wins, 6 known OT bugs). | No — never in production |
+| `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration (presence avatars, connection pill, remote cursors). Merge model today is last-write-wins. | No — enable when the collab arc ships |
 
 `scripts/check-prod-env.mjs` checks none of these. A flag that is silently false in
 production looks exactly like a feature that was never built — the same shape as the
