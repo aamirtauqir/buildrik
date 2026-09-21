@@ -67,7 +67,7 @@
       },
       {
         "path": "src/editor/design-system/ui/ExportDropdown.tsx",
-        "line": 26,
+        "line": 29,
         "severity": "minor",
         "message": "Dead export \"ExportDropdown\" — not imported anywhere",
         "suggestion": "Delete unused export; rely on git history if needed later."

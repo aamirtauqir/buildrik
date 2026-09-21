@@ -108,6 +108,13 @@ export interface StudioHeaderProps {
   // Core actions
   /** Save now. Resolves with the HONEST outcome — the exit guard branches on it. */
   onSave: () => Promise<SaveOutcome>;
+  /**
+   * Open the save-conflict dialog when the user clicks the save pill in
+   * `conflict` state. Plan row B2: the conflict dialog is reached from the
+   * pill, not from anywhere else; the click destination is decided by the
+   * pill's per-state handler, which routes here.
+   */
+  onOpenConflict?: () => void;
 
   /** Export HTML as zip download */
   onExportHTML?: () => void;
@@ -198,6 +205,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenComponents,
   onOpenReview,
   onSave,
+  onOpenConflict,
   onExportHTML,
   onVercelPublish,
   publishLoading,
@@ -569,6 +577,20 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             ? "unsaved"
             : "saved";
 
+  /* Per-state click destination (plan row B2, decision #23). The pill is a
+     different button in each state; the per-state decision is what lets one
+     control route to three doors without confusing the user. `offline`
+     intentionally yields no handler — the pill carries a tooltip instead, so
+     the affordance does not promise a click that would lie. */
+  const onSavePillClick =
+    save === "offline"
+      ? undefined
+      : save === "error"
+        ? onSave
+        : save === "conflict"
+          ? onOpenConflict
+          : onOpenHistory;
+
   const errorCount = issues.filter((i) => i.type === "error").length;
   const warnCount = issues.filter((i) => i.type === "warning").length;
   // T7/D14: the old errors-noun label ("3 errors" for 1 error + 2 warnings)
@@ -751,6 +773,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         /* SaveStatus renders as a BUTTON that fires onSave when the state is
            unsaved or error. A view does not offer a save control. */
         onSave={viewMode.readOnlyView ? undefined : onSave}
+        /* History door for the settled states; conflict + offline reach their
+           own doors (the conflict dialog, the offline tooltip). */
+        onOpenSaveMenu={viewMode.readOnlyView ? undefined : onSavePillClick}
         review={review}
         tools={tools}
         presence={

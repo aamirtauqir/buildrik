@@ -516,6 +516,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => state.openLeftPanelToTab("review")}
           onOpenShortcuts={modals.toggleShortcuts}
+          onOpenConflict={() => setConflict({ serverToken: "" })}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
           onVercelPublish={requestPublish}
