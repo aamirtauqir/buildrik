@@ -122,6 +122,9 @@ function renderTab(opts: {
       onToggleSection={vi.fn()}
       advancedState={NO_OP_ADVANCED}
       devMode={opts.devMode ?? false}
+      tier="pro"
+      showAll={false}
+      onShowAllChange={vi.fn()}
     />
   );
 }
@@ -223,11 +226,19 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("container shows Effects + Animation + Visibility", () => {
-    renderTab({ tabId: "effects", elementType: "container" });
+  it("container's Effects tab shows Effects + Animation + Interactions; Visibility lives on Settings", () => {
+    /* Board 4428:142686 (Effects) draws OPACITY · SHADOW · BLUR ·
+       INTERACTIONS; board 4428:141642 (Settings) opens with VISIBILITY. */
+    const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
     expect(screen.getByRole("button", { name: /Effects section/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Animation section/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Interactions section/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Visibility section/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Layout section/i })).not.toBeInTheDocument();
+    unmount();
+    renderTab({ tabId: "element", elementType: "container" });
     expect(screen.getByRole("button", { name: /Visibility section/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Effects section/i })).not.toBeInTheDocument();
   });
 
   it("button shows Link (linkable)", () => {
@@ -266,6 +277,9 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
         onToggleSection={vi.fn()}
         advancedState={NO_OP_ADVANCED}
         devMode={true}
+        tier="pro"
+        showAll={false}
+        onShowAllChange={vi.fn()}
       />
     );
     expect(screen.getByRole("button", { name: /All CSS section/i })).toBeInTheDocument();

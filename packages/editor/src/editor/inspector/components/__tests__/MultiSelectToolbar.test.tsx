@@ -159,3 +159,52 @@ describe("MultiSelectToolbar — board 159:134 Distribute is one row, not stacke
     expect(distribute.style.flexDirection).not.toBe("column");
   });
 });
+
+describe("MultiSelectToolbar — board 4418:114523 context header (G2-140)", () => {
+  function renderWithMembers(sameParent = true) {
+    const root = makeMockElement({ id: "root", type: "container" });
+    const other = makeMockElement({ id: "other", type: "container" });
+    const a = makeMockElement({ id: "a", type: "button", parent: root });
+    const b = makeMockElement({ id: "b", type: "heading", parent: root });
+    const c = makeMockElement({ id: "c", type: "link", parent: sameParent ? root : other });
+    const composer = makeMockComposer({ element: a, elements: [root, other, a, b, c], allSelected: [a, b, c] });
+    render(<MultiSelectToolbar selectedIds={["a", "b", "c"]} composer={composer as never} />);
+    return { composer, a, b, c };
+  }
+
+  it("lists every member by name, in selection order", () => {
+    renderWithMembers();
+    const rows = screen.getAllByTestId(/^multiselect-member-/);
+    expect(rows.map((r) => r.textContent)).toEqual(["Button", "Heading", "Link"]);
+  });
+
+  it("a member row narrows the selection to that member", () => {
+    const { composer, b } = renderWithMembers();
+    fireEvent.click(screen.getByTestId("multiselect-member-b"));
+    expect(composer.selection.select).toHaveBeenCalledWith(b);
+  });
+
+  it("Group runs the engine's group command when the members are siblings", () => {
+    const { composer } = renderWithMembers();
+    expect(screen.getByTestId("multiselect-group").getAttribute("aria-disabled")).toBe("false");
+    fireEvent.click(screen.getByTestId("multiselect-group"));
+    expect(composer.commands.run).toHaveBeenCalledWith("group");
+  });
+
+  it("Group is disabled with the reason when the members do not share a parent", () => {
+    const { composer } = renderWithMembers(false);
+    const group = screen.getByTestId("multiselect-group");
+    expect(group.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(group);
+    expect(composer.commands.run).not.toHaveBeenCalledWith("group");
+  });
+
+  it("Delete on N > 1 confirms first (decision #17), then runs the delete command", () => {
+    const { composer } = renderWithMembers();
+    fireEvent.click(screen.getByTestId("multiselect-delete"));
+    expect(composer.commands.run).not.toHaveBeenCalledWith("delete");
+    expect(screen.getByRole("dialog").textContent).toContain("Delete 3 elements?");
+    fireEvent.click(screen.getByRole("button", { name: /^Delete 3 elements$/ }));
+    expect(composer.commands.run).toHaveBeenCalledWith("delete");
+  });
+});

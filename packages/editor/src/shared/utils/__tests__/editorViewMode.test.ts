@@ -18,37 +18,38 @@ function setSearch(s: string) {
 afterEach(() => setSearch("/"));
 
 describe("getEditorViewMode (F1/E3/E4 SSOT)", () => {
-  it("defaults to the Figma-contract rail + full density (F1 supersedes E3)", () => {
+  it("defaults to the Figma-contract rail (F1 supersedes E3)", () => {
     setSearch("/");
     expect(getEditorViewMode()).toEqual({
       railMode: "figma",
       fourToolRail: false,
-      density: "full",
       readOnlyView: false,
     });
   });
 
   it("?rail=e3 → the 4-tool E3 rail escape hatch (fourToolRail derived true)", () => {
     setSearch("?rail=e3");
-    expect(getEditorViewMode()).toMatchObject({ railMode: "e3", fourToolRail: true, density: "full" });
+    expect(getEditorViewMode()).toMatchObject({ railMode: "e3", fourToolRail: true });
   });
 
-  it("?rail=legacy → the old 11-tab rail (deepest escape hatch), full density", () => {
+  it("?rail=legacy → the old 11-tab rail (deepest escape hatch)", () => {
     setSearch("?rail=legacy");
-    expect(getEditorViewMode()).toMatchObject({ railMode: "legacy", fourToolRail: false, density: "full" });
+    expect(getEditorViewMode()).toMatchObject({ railMode: "legacy", fourToolRail: false });
   });
 
-  it("?density=fewer → trimmed inspector, rail stays Figma", () => {
+  /* Retired 2026-09-22 (decision #29): the inspector's Beginner / Pro tier is
+     a per-user preference (useInspectorTier), not a URL. The parameter is
+     ignored, and nothing in the view mode carries a density any more. */
+  it("?density=fewer is no longer read", () => {
     setSearch("?density=fewer");
-    expect(getEditorViewMode()).toMatchObject({ railMode: "figma", fourToolRail: false, density: "fewer" });
+    expect(getEditorViewMode()).toEqual({ railMode: "figma", fourToolRail: false, readOnlyView: false });
   });
 
-  it("?view=readonly → view mode: Figma rail AND fewer density", () => {
+  it("?view=readonly → view mode: Figma rail", () => {
     setSearch("?view=readonly");
     expect(getEditorViewMode()).toEqual({
       railMode: "figma",
       fourToolRail: false,
-      density: "fewer",
       readOnlyView: true,
     });
   });

@@ -566,7 +566,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             composer={composer}
             selectedElement={selectedElement}
             currentBreakpoint={device}
-            onBreakpointChange={onDeviceChange}
             onDelete={handleDelete}
             onOpenMediaLibrary={onOpenMediaLibrary}
             onOpenIconPicker={onOpenIconPicker}

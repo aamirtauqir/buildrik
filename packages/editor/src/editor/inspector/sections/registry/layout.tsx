@@ -14,6 +14,8 @@ import { SpacingSection } from "../SpacingSection";
 
 export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   layout: defineSection({
+    tab: "style",
+    tier: "advanced",
     Component: LayoutSection,
     advancedKey: "layout",
     /* Extracted from this section's own advanced block, not from a registry
@@ -29,6 +31,7 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   size: defineSection({
+    tab: "style",
     Component: SizeSection,
     advancedKey: "size",
     /* Extracted from this section's own advanced block, not from a registry
@@ -44,6 +47,7 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   spacing: defineSection({
+    tab: "style",
     Component: SpacingSection,
     advancedKey: "spacing",
     /* Extracted from this section's own advanced block, not from a registry
@@ -60,6 +64,8 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   flex: defineSection({
+    tab: "style",
+    tier: "advanced",
     Component: FlexboxSection,
     styleKeys: ["display", "flex-direction", "flex-wrap", "justify-content", "align-items", "align-content", "align-self", "order", "flex-grow", "flex-shrink", "flex-basis", "gap"],
     adaptProps: (ctx) => ({
@@ -75,6 +81,8 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   grid: defineSection({
+    tab: "style",
+    tier: "advanced",
     Component: GridSection,
     styleKeys: ["grid-template-columns", "grid-template-rows", "grid-auto-flow", "grid-column", "grid-row", "gap", "row-gap", "column-gap", "justify-items", "justify-content", "justify-self", "align-items", "align-content", "align-self"],
     adaptProps: (ctx) => ({

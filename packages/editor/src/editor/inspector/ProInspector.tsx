@@ -11,7 +11,6 @@ import * as React from "react";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingBanner, useElementBinding } from "./components/BindingBanner";
 import { BindingPopover } from "./components/BindingPopover";
-import { BreakpointPill } from "./components/BreakpointPill";
 import { ScopeDropdown } from "./components/ScopeDropdown";
 import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StateDropdown, pseudoStateLabel } from "./components/StateDropdown";
@@ -19,8 +18,7 @@ import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
 import { EVENTS } from "../../shared/constants/events";
-import type { SectionId } from "./sections/registry";
-import { getEditorViewMode } from "../../shared/utils/editorViewMode";
+import type { SectionId, TabId } from "./sections/registry";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
@@ -30,22 +28,28 @@ import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorLoading } from "./components/InspectorLoading";
-import { BreakpointOverrides, useBreakpointOverrides } from "./components/BreakpointOverrides";
+import { BreakpointOverrides } from "./components/BreakpointOverrides";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
-import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
+import { useInspectorState, useStyleHandlers, useInspectorSections, useInspectorTier } from "./hooks";
 import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
 import { MediaSourceRow } from "./sections/MediaSourceRow";
-import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/registry";
+import { buildAdvancedPropsMapFromRegistry, INSPECTOR_TABS, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { computeStatesWithOverrides } from "./config/pseudoOverrides";
 import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Tabs } from "@/editor/chrome-ui";
+
+/** Footer switch, board 4428:141170 / 141406 — the two tiers by name. */
+const TIER_TABS = [
+  { id: "beginner", label: "Beginner" },
+  { id: "pro", label: "Pro" },
+] as const;
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -58,7 +62,6 @@ export interface ProInspectorProps {
   } | null;
   composer?: Composer | null;
   currentBreakpoint?: DeviceType;
-  onBreakpointChange?: (bp: BreakpointId) => void;
   onDelete?: (id: string) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -81,7 +84,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   selectedElement,
   composer,
   currentBreakpoint: currentBreakpointProp = "desktop",
-  onBreakpointChange,
   onDelete,
   onOpenMediaLibrary,
   onOpenIconPicker,
@@ -162,16 +164,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     reachPeerIds
   );
 
-  // Breakpoint override indicator — same reading the strip below the scope row
-  // shows, from the same subscription, so the dot and the list can never
-  // disagree about whether this breakpoint changes anything.
-  const breakpointOverrides = useBreakpointOverrides(
-    composer,
-    selectedElement?.id,
-    currentBreakpoint
-  );
-  const breakpointHasOverride = breakpointOverrides.length > 0;
-
   // Pseudo-states with overrides — breakpoint-qualified so mobile/tablet
   // pseudo rules light up the indicator pills at the active zoom level.
   // Logic extracted for testability; see config/pseudoOverrides.ts.
@@ -187,8 +179,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     styles: styles_state,
   });
 
-  // E3 per-user density (acceptance #4) — from the shared editor view-mode SSOT.
-  const inspectorDensity = React.useMemo(() => getEditorViewMode().density, []);
+  /* Boards 4428:141170 / 141642 / 142686 — the strip. The tab survives a
+     selection change (the board's SET_VARIABLE is file-wide); Beginner's
+     "Show all" does not, it is a look, not a setting. */
+  const [activeTab, setActiveTab] = React.useState<TabId>("style");
+  const [tier, setTier] = useInspectorTier();
+  const [showAll, setShowAll] = React.useState(false);
+  React.useEffect(() => {
+    setShowAll(false);
+  }, [selectedElement?.id, activeTab]);
 
   const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
   const advancedState = useAdvancedSettings({
@@ -440,9 +439,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           elementLabel={elementLabel}
         />
       </div>
-      {/* Figma 32-2 pill row: `This ▾ · Desktop ▾ · Base ▾` (scope · breakpoint ·
-          state), three compact dropdowns on one line. S3.9: no tab strip — the
-          body below is one flat scrolling column ordered per element profile. */}
+      {/* Pill row: `This ▾ · Base ▾` (scope · state). The breakpoint pill that
+          sat between them is gone (G2-142, §11/F6): the canvas status bar is
+          the one breakpoint selector, and what THIS breakpoint overrides is
+          still listed below, with its way back. */}
       <div className="bdi-bpr" data-testid="inspector-context-row">
         <ScopeDropdown
           composer={composer}
@@ -450,11 +450,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           reachAll={reachAll}
           onReachAllChange={setReachAll}
           onWholeSite={() => setWholeSite(true)}
-        />
-        <BreakpointPill
-          current={currentBreakpoint}
-          onChange={onBreakpointChange}
-          hasOverride={breakpointHasOverride}
         />
         <StateDropdown
           current={currentPseudoState}
@@ -468,6 +463,19 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
+      {/* Boards 4428:141170 / 141642 / 142686 — Style · Settings · Effects.
+          The sections each tab holds are the registry's `tab` tags; the strip
+          only picks which set the body renders. */}
+      {!wholeSite && !agentRun.running && (
+        <Tabs
+          tabs={INSPECTOR_TABS}
+          value={activeTab}
+          onChange={(id) => setActiveTab(id as TabId)}
+          label="Inspector tabs"
+          data-testid="inspector-tab-strip"
+          className="tw:border-b tw:border-[var(--bk-border)]"
+        />
+      )}
       {/* Every banner below annotates THE CONTROLS BELOW IT — which scope a
           write lands on, which breakpoint it overrides, which instance it
           follows. The two takeovers (whole-site, and an AI run) replace those
@@ -603,10 +611,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <div className="bdi-body">
           {/* Clone 3721:45178 / 3724:43815 / 3724:44339 — a media element's
               source is the first thing in its inspector, above SIZE. */}
-          <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
+          {activeTab === "style" && (
+            <MediaSourceRow composer={composer} selectedElement={selectedElement} onOpenMediaLibrary={onOpenMediaLibrary} />
+          )}
           <InspectorErrorBoundary>
             <InspectorTabContent
-              tabId="style"
+              tabId={activeTab}
               composer={composer}
               selectedElement={selectedElement}
               styles={styles_state}
@@ -620,12 +630,33 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               onOpenMediaLibrary={onOpenMediaLibrary}
               onOpenIconPicker={onOpenIconPicker}
               devMode={devMode}
-              density={inspectorDensity}
+              tier={tier}
+              showAll={showAll}
+              onShowAllChange={setShowAll}
             />
-
           </InspectorErrorBoundary>
         </div>
       </div>
+      )}
+      {/* Board 4428:141170's footer — Beginner / Pro, remembered per user
+          (decision #29). Below the scroll so it is reachable on every
+          profile, however long the column above it runs. */}
+      {!wholeSite && !agentRun.running && (
+        <footer
+          className="tw:flex tw:items-center tw:justify-between tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-1.5"
+          data-testid="inspector-footer"
+        >
+          <span className="tw:text-[11px] tw:font-normal tw:text-[var(--bk-ink-muted)]">Controls</span>
+          <Tabs
+            tabs={TIER_TABS}
+            value={tier}
+            onChange={(id) => setTier(id === "pro" ? "pro" : "beginner")}
+            label="Inspector tier"
+            data-testid="inspector-tier-toggle"
+            className="tw:p-0"
+            tabClassName="tw:h-6 tw:px-2 tw:text-[11px]"
+          />
+        </footer>
       )}
     </div>
   );

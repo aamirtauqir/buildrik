@@ -14,6 +14,7 @@ import { USE_SCHEMA_BORDER } from "../../renderer/featureFlags";
 
 export const VISUAL_SECTIONS: Record<string, AnySectionEntry> = {
   background: defineSection({
+    tab: "style",
     Component: BackgroundSection,
     advancedKey: "background",
     /* Extracted from this section's own advanced block, not from a registry
@@ -29,6 +30,7 @@ export const VISUAL_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   border: defineSection({
+    tab: "style",
     // Feature-flagged: localStorage.setItem("buildrick:schema-border", "1")
     // + reload to render the schema-driven version. Default path remains
     // the hand-written BorderSection until the schema reaches full parity
@@ -48,6 +50,8 @@ export const VISUAL_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   "corner-radius": defineSection({
+    tab: "style",
+    tier: "advanced",
     Component: CornerRadiusSection,
     styleKeys: [
       "border-radius",

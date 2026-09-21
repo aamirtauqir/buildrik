@@ -5,6 +5,7 @@
 
 import { GSAPEngine } from "../../../../engine/animations";
 import type { InteractionAnimationConfig } from "../../../../engine/interactions/types";
+import type { SectionTier } from "../../shared/controls/Section";
 
 // ============================================================================
 // TYPES
@@ -59,7 +60,7 @@ export interface InteractionsSectionProps {
   onToggle?: (open: boolean) => void;
   /** Visual weight tier — threaded from the registry-driven renderer.
    *  Defaults to "tertiary" to match Phase 2 visual hierarchy. */
-  tier?: "primary" | "secondary" | "tertiary";
+  tier?: SectionTier;
 }
 
 // ============================================================================

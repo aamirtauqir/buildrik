@@ -23,7 +23,6 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
   getEditorViewMode: vi.fn(() => ({
     railMode: "figma",
     fourToolRail: false,
-    density: "full",
     readOnlyView: false,
   })),
 }));
@@ -130,7 +129,6 @@ function setViewMode(partial: Partial<ReturnType<typeof getEditorViewMode>>) {
   vi.mocked(getEditorViewMode).mockReturnValue({
     railMode: "figma",
     fourToolRail: false,
-    density: "full",
     readOnlyView: false,
     ...partial,
   });

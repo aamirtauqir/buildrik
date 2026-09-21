@@ -3,7 +3,7 @@
  *   - no selection, project still loading → InspectorLoading (board 159:102)
  *   - no selection → InspectorEmptyState
  *   - 2+ selected  → MultiSelectToolbar (single-element inspector body skipped)
- *   - 1 selected   → full inspector body (flat tab content, no tab strip)
+ *   - 1 selected   → full inspector body (Style · Settings · Effects strip)
  *
  * The heavy children are mocked as probes (same pattern as
  * ProInspector.createCollectionThreading.test.tsx) so we assert which branch
@@ -118,8 +118,8 @@ describe("ProInspector — branch selection", () => {
       />
     );
     expect(screen.getByTestId("tab-content")).toBeInTheDocument();
-    // S3.9: inspector flattened — no tab strip; body is one scrolling region.
-    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+    // Boards 4428:141170 / 141642 / 142686 — the strip is back (B11).
+    expect(screen.getByRole("tablist", { name: "Inspector tabs" })).toBeInTheDocument();
     expect(screen.queryByTestId("multi-toolbar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
   });
