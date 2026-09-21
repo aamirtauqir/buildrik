@@ -8,6 +8,7 @@ import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { PreviewOverlay } from "../PreviewOverlay";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 afterEach(() => cleanup());
 
@@ -64,5 +65,29 @@ describe("PreviewOverlay", () => {
     // The editor's own device control is under the overlay, so the preview has
     // to carry one or the responsive check cannot be done here at all.
     expect(screen.getByRole("group", { name: "Breakpoint" })).toBeInTheDocument();
+  });
+
+  /* G1-022: in-editor Share button on the preview bar. Hidden when siteId is
+     null (preview launched without a site hand-off). Opens the share modal
+     with the public /share/<siteId> URL. */
+  it("hides Share button when siteId is null", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId={null} />);
+    expect(screen.queryByTestId("preview-share-button")).toBeNull();
+  });
+
+  it("Share button opens modal with share URL built from siteId + DASHBOARD_URL", () => {
+    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
+    render(
+      <ToastProvider>
+        <PreviewOverlay
+          html="<p>x</p>"
+          onDone={vi.fn()}
+          siteId="site-abc"
+        />
+      </ToastProvider>
+    );
+    fireEvent.click(screen.getByTestId("preview-share-button"));
+    const link = screen.getByTestId("preview-share-link");
+    expect(link.textContent).toContain("/share/site-abc");
   });
 });
