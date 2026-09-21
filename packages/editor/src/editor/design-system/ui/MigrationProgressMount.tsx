@@ -12,35 +12,45 @@
  *                        failed, populate error + stuck-at fields
  *   migration:skipped  → no-op (already at target version)
  *
- * Restore + Retry (Phase F.2 / Tier-1 wireframe S13, A2):
- *   Per plan Decision #36 (EUREKA-lite): BOTH handlers re-invoke the same
- *   pre-import load path the original load used — `composer.migration.run`
- *   — rather than patching the imported project post-load. One write path,
- *   one invariant.
- *   · Restore reads localStorage["ds-migration-backup-<siteId>"], JSON.parses
- *     with a guard, and re-runs the runner with that snapshot as `project`
- *     and the snapshot's marker (original fromVersion) as `currentVersion`.
- *     Snapshot missing or corrupt → Restore stays aria-disabled with a
- *     reason line, the modal stays in failed state.
- *   · Retry re-runs the runner with the in-flight project + the version
- *     immediately before the stuck step (`stuckAt - 1`). Runner preserves
- *     the existing snapshot + marker when marker matches, so a Retry
- *     chain re-applies the same migrations (each `up`/`validate` is
- *     idempotent at its toVersion, per ProjectMigration contract).
+ * Restore + Retry (A2, boards B1-14 `7564:185480` · B1-15 `7564:185497`;
+ * plan decisions #22, #36, #44):
+ *   Both go through `importMigratedProject` — the same run-then-import step
+ *   the load uses — so the migrated tokens LAND in the engine. The runner is
+ *   pure and only emits events; an earlier version called it and discarded
+ *   the result, so the modal said "complete" while nothing changed.
+ *   · Retry re-runs from the version the failed load started at
+ *     (`fromVersion`), on the project the engine holds now. The failed load
+ *     imported the payload as-is at that version, so every step must run
+ *     again (they are idempotent by contract); starting at `stuckAt - 1`
+ *     would skip the earlier steps AND make the runner overwrite the
+ *     snapshot with a later marker. On failure nothing is imported and the
+ *     events keep the modal in its failed view with the new error.
+ *   · Restore reads localStorage["ds-migration-backup-<siteId>"] (+ the
+ *     marker = the version it was taken at), and re-runs the load path with
+ *     the snapshot as input — the board's Restore → running. If the update
+ *     still fails, the snapshot is imported as-is, exactly the load's own
+ *     fallback, so the project is back to the state from before the update.
+ *     Missing snapshot → Restore is `aria-disabled` (focusable, per #19) with
+ *     "No snapshot on this device"; corrupt JSON → its own reason, never a
+ *     silent fall-through (#44).
  *
  * Wires:
- *   - composer.migration (A.1) — event source + runner entrypoint
+ *   - composer.migration (A.1) — event source
+ *   - importMigratedProject — the one write path into the engine
  *   - PROJECT_MIGRATIONS + TARGET_PROJECT_VERSION — step labels + range
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
+import type { ProjectData } from "../../../shared/types";
 import {
   PROJECT_MIGRATIONS,
   TARGET_PROJECT_VERSION,
 } from "../../../engine/designSystem/migrations/projectMigrations";
 import type { ProjectPayload } from "../../../engine/designSystem/migrations/projectMigrations/types";
+import { importMigratedProject } from "../migrations/importMigratedProject";
 import { MigrationProgressModal, type MigrationStep } from "./MigrationProgressModal";
 
 interface MigrationStartedPayload {
@@ -63,7 +73,9 @@ interface MigrationFailedPayload {
 const COMPLETE_HOLD_MS = 600;
 const SNAPSHOT_MISSING_REASON = "No snapshot on this device";
 const SNAPSHOT_CORRUPT_REASON = "Snapshot not found — reload the site";
+const RESTORED_TITLE = "Restored the snapshot from before the update";
 
+/** Keys the runner writes (`projectMigrations/runner.ts`). */
 function snapshotKey(siteId: string): string {
   return `ds-migration-backup-${siteId}`;
 }
@@ -80,17 +92,27 @@ function safeRead(key: string): string | null {
   }
 }
 
-function safeParse(raw: string | null): ProjectPayload | null {
-  if (raw === null) return null;
+type SnapshotProbe =
+  | { payload: ProjectPayload; version: number }
+  | { reason: string };
+
+function readSnapshot(siteId: string): SnapshotProbe {
+  const raw = safeRead(snapshotKey(siteId));
+  if (raw === null) return { reason: SNAPSHOT_MISSING_REASON };
+  let parsed: unknown;
   try {
-    const parsed = JSON.parse(raw) as unknown;
-    if (parsed && typeof parsed === "object" && "tokens" in parsed) {
-      return parsed as ProjectPayload;
-    }
-    return null;
+    parsed = JSON.parse(raw);
   } catch {
-    return null;
+    return { reason: SNAPSHOT_CORRUPT_REASON };
   }
+  if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as ProjectPayload).tokens)) {
+    return { reason: SNAPSHOT_CORRUPT_REASON };
+  }
+  // The marker is the version the snapshot was taken at. The runner writes
+  // both together and clears both together; a snapshot without its marker
+  // restores from v0, which is safe because every step is idempotent.
+  const marker = Number.parseInt(safeRead(markerKey(siteId)) ?? "", 10);
+  return { payload: parsed as ProjectPayload, version: Number.isFinite(marker) ? marker : 0 };
 }
 
 function buildSteps(fromVersion: number): MigrationStep[] {
@@ -112,6 +134,7 @@ export interface MigrationProgressMountProps {
 }
 
 export const MigrationProgressMount: React.FC<MigrationProgressMountProps> = ({ composer }) => {
+  const { addToast } = useToast();
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState<"running" | "failed">("running");
   const [steps, setSteps] = React.useState<MigrationStep[]>([]);
@@ -119,22 +142,35 @@ export const MigrationProgressMount: React.FC<MigrationProgressMountProps> = ({ 
   const [failureMessage, setFailureMessage] = React.useState<string | undefined>();
   const [stuckAt, setStuckAt] = React.useState<number | undefined>();
   const [siteId, setSiteId] = React.useState<string | null>(null);
-  // When `failureMessage` is reset by a Retry attempt, this surfaces the
-  // snapshot-parse failure as the modal's banner text instead of disappearing
-  // it (the snapshot may be missing only for Restore; Retry still proceeds).
-  const [restoreBlocked, setRestoreBlocked] = React.useState<string | undefined>();
+  const [snapshot, setSnapshot] = React.useState<SnapshotProbe | null>(null);
+  // Counts `migration:started`. A Retry that fails again flips
+  // running → failed inside one click, which React batches into "no change"
+  // — the probe below keys on this so it re-reads for every run.
+  const [runSeq, setRunSeq] = React.useState(0);
+  // `migration:complete` fires before the import that follows it; if that
+  // import throws, the close it scheduled must not hide the failed view.
+  const closeTimer = React.useRef<number | null>(null);
+
+  const cancelClose = React.useCallback(() => {
+    if (closeTimer.current !== null) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
 
   React.useEffect(() => {
     if (!composer) return;
 
     const onStarted = (payload: unknown) => {
       const p = payload as MigrationStartedPayload;
+      cancelClose();
       setFromVersion(p.fromVersion);
-      setSiteId(p.siteId ?? null);
+      setSiteId(p.siteId);
       setSteps(buildSteps(p.fromVersion));
       setFailureMessage(undefined);
       setStuckAt(undefined);
-      setRestoreBlocked(undefined);
+      setSnapshot(null);
+      setRunSeq((n) => n + 1);
       setState("running");
       setOpen(true);
     };
@@ -147,7 +183,8 @@ export const MigrationProgressMount: React.FC<MigrationProgressMountProps> = ({ 
         )
       );
       // Brief hold so user sees the green checks before close.
-      window.setTimeout(() => setOpen(false), COMPLETE_HOLD_MS);
+      cancelClose();
+      closeTimer.current = window.setTimeout(() => setOpen(false), COMPLETE_HOLD_MS);
     };
 
     const onFailed = (payload: unknown) => {
@@ -168,84 +205,70 @@ export const MigrationProgressMount: React.FC<MigrationProgressMountProps> = ({ 
     composer.on("migration:complete", onComplete);
     composer.on("migration:failed", onFailed);
     return () => {
+      cancelClose();
       composer.off("migration:started", onStarted);
       composer.off("migration:complete", onComplete);
       composer.off("migration:failed", onFailed);
     };
-  }, [composer]);
+  }, [composer, cancelClose]);
 
-  // Probe snapshot presence on demand. We re-check at click time (not on
-  // failure mount) because the snapshot is small, the failure state can
-  // persist across re-renders, and the snapshot itself can be cleared by
-  // an intervening successful migration.
-  const probeSnapshot = React.useCallback((): { present: boolean; reason?: string } => {
-    if (!siteId) return { present: false, reason: SNAPSHOT_MISSING_REASON };
-    const raw = safeRead(snapshotKey(siteId));
-    if (raw === null) return { present: false, reason: SNAPSHOT_MISSING_REASON };
-    if (safeParse(raw) === null) return { present: false, reason: SNAPSHOT_CORRUPT_REASON };
-    return { present: true };
-  }, [siteId]);
-
-  // Snapshot presence is also probed lazily so the button starts in the
-  // correct aria-disabled state when the modal first flips to failed.
-  // `restoreBlocked` reflects the probe result and is reset whenever a new
-  // migration:started arrives (Restore becomes irrelevant on a fresh run).
+  // Probe the snapshot whenever the modal lands in its failed view, so
+  // Restore opens in the right state (aria-disabled + reason, or the
+  // "Snapshot saved" row with the version it restores to).
   React.useEffect(() => {
     if (state !== "failed" || !siteId) return;
-    const probe = probeSnapshot();
-    setRestoreBlocked(probe.present ? undefined : probe.reason);
-  }, [state, siteId, probeSnapshot]);
+    setSnapshot(readSnapshot(siteId));
+  }, [state, siteId, runSeq]);
+
+  const fail = React.useCallback(
+    (err: unknown) => {
+      cancelClose();
+      setFailureMessage(err instanceof Error ? err.message : String(err));
+      setState("failed");
+    },
+    [cancelClose]
+  );
 
   const handleRestoreSnapshot = React.useCallback(() => {
     if (!composer || !siteId) return;
-    const raw = safeRead(snapshotKey(siteId));
-    const parsed = safeParse(raw);
-    if (parsed === null) {
-      const reason = raw === null ? SNAPSHOT_MISSING_REASON : SNAPSHOT_CORRUPT_REASON;
-      setRestoreBlocked(reason);
+    // Re-read at click time: an intervening run may have cleared it.
+    const probe = readSnapshot(siteId);
+    if ("reason" in probe) {
+      setSnapshot(probe);
       return;
     }
-    // Per Decision #36: Restore re-runs the same load path the original
-    // migration used, with the snapshot as input. The runner preserves the
-    // existing marker + snapshot when marker matches currentVersion, so a
-    // pre-existing crash-resume snapshot survives the round-trip.
-    const markerRaw = safeRead(markerKey(siteId));
-    const snapshotVersion = markerRaw !== null ? Number.parseInt(markerRaw, 10) : 0;
-    const currentVersion = Number.isFinite(snapshotVersion) ? snapshotVersion : 0;
+    const data: ProjectData = {
+      ...composer.exportProject(),
+      styles: probe.payload.tokens as unknown as ProjectData["styles"],
+      dsSchemaVersion: probe.version,
+    };
     try {
-      composer.migration.run({
-        project: parsed,
-        currentVersion,
-        siteId,
+      importMigratedProject(composer, data, siteId);
+      addToast({
+        tone: "success",
+        title: RESTORED_TITLE,
+        description: "The project update then completed.",
       });
-      // Successful run will emit migration:complete and clear the modal —
-      // no extra setOpen(false) needed.
     } catch (err) {
-      // Re-run also failed — keep modal in failed state, surface the new
-      // error in the banner via failureMessage so the user sees what happened.
-      setFailureMessage(err instanceof Error ? err.message : String(err));
+      composer.importProject(data);
+      fail(err);
+      addToast({
+        tone: "warning",
+        title: RESTORED_TITLE,
+        description: "The update still fails. The project is loaded as it was before it.",
+      });
     }
-  }, [composer, siteId]);
+  }, [composer, siteId, addToast, fail]);
 
   const handleRetry = React.useCallback(() => {
-    if (!composer || siteId === null || stuckAt === undefined) return;
-    // Per Decision #36: Retry re-runs the load from the in-flight state
-    // through the same pre-import path. We need a ProjectPayload, but the
-    // pre-import input only carries tokens (the runner's surface is minimal
-    // — see RunnerInput). Passing `{ tokens: [] }` re-runs the migrations
-    // against empty tokens, which is the same first-import shape and lets
-    // the existing migration:* events drive the modal.
-    const currentVersion = Math.max(0, stuckAt - 1);
+    if (!composer || !siteId || fromVersion === null) return;
+    const data: ProjectData = { ...composer.exportProject(), dsSchemaVersion: fromVersion };
     try {
-      composer.migration.run({
-        project: { tokens: [] },
-        currentVersion,
-        siteId,
-      });
+      importMigratedProject(composer, data, siteId);
     } catch (err) {
-      setFailureMessage(err instanceof Error ? err.message : String(err));
+      fail(err);
     }
-  }, [composer, siteId, stuckAt]);
+  }, [composer, siteId, fromVersion, fail]);
 
   if (!composer) return null;
 
@@ -253,6 +276,7 @@ export const MigrationProgressMount: React.FC<MigrationProgressMountProps> = ({ 
     fromVersion !== null
       ? `Schema v${fromVersion} → v${TARGET_PROJECT_VERSION} · ${steps.length} migration${steps.length === 1 ? "" : "s"}`
       : undefined;
+  const failed = state === "failed";
 
   return (
     <MigrationProgressModal
@@ -262,10 +286,11 @@ export const MigrationProgressMount: React.FC<MigrationProgressMountProps> = ({ 
       steps={steps}
       rangeLabel={rangeLabel}
       failureMessage={failureMessage}
+      snapshotLabel={failed && snapshot && "payload" in snapshot ? `Schema v${snapshot.version}` : undefined}
       stuckAt={stuckAt}
-      onRestoreSnapshot={state === "failed" ? handleRestoreSnapshot : undefined}
-      onRetry={state === "failed" ? handleRetry : undefined}
-      restoreDisabledReason={state === "failed" ? restoreBlocked : undefined}
+      onRestoreSnapshot={failed ? handleRestoreSnapshot : undefined}
+      onRetry={failed ? handleRetry : undefined}
+      restoreDisabledReason={failed && snapshot && "reason" in snapshot ? snapshot.reason : undefined}
     />
   );
 };

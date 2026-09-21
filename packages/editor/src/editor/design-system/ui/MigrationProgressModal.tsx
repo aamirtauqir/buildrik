@@ -12,8 +12,10 @@
  *   - useComposerInit currently surfaces failures via toast (B.0). This modal
  *     supersedes the toast for in-flight + failure visibility.
  *
+ * Restore snapshot / Retry are wired by `MigrationProgressMount` (A2, boards
+ * B1-14 `7564:185480` · B1-15 `7564:185497`).
+ *
  * Out-of-scope:
- *   - Snapshot restore action wiring (consumer handles localStorage snapshot)
  *   - Email export of stuck project (Phase F.2)
  *   - Resume-on-reload prompt (Phase F.2)
  *
@@ -51,10 +53,12 @@ export interface MigrationProgressModalProps {
   onRestoreSnapshot?: () => void;
   /** Failure-only: Retry stuck migration. */
   onRetry?: () => void;
-  /** Failure-only: disables Restore and surfaces the reason inline + as a title. */
+  /**
+   * Failure-only: Restore stays focusable but `aria-disabled` (decision #19 —
+   * a keyboard user must be able to reach the why), with the reason as the
+   * button's title and as a line under the action row.
+   */
   restoreDisabledReason?: string;
-  /** Failure-only: disables Retry and surfaces the reason inline + as a title. */
-  retryDisabledReason?: string;
 }
 
 export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
@@ -69,7 +73,6 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
   onRestoreSnapshot,
   onRetry,
   restoreDisabledReason,
-  retryDisabledReason,
 }) => {
   const completedCount = steps.filter((s) => s.status === "done").length;
   const total = steps.length || 1;
@@ -154,30 +157,22 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                     size="xs"
                     type="button"
                     onClick={onRestoreSnapshot}
-                    disabled={Boolean(restoreDisabledReason)}
-                    aria-disabled={Boolean(restoreDisabledReason) || undefined}
+                    aria-disabled={restoreDisabledReason ? "true" : undefined}
                     title={restoreDisabledReason}
+                    className="tw:aria-disabled:bg-[var(--bk-bg-subtle)] tw:aria-disabled:text-[var(--bk-ink-muted)] tw:aria-disabled:shadow-none"
                   >
                     Restore snapshot
                   </Button>
                 )}
                 {onRetry && stuckAt !== undefined && (
-                  <Button
-                    color="light"
-                    size="xs"
-                    type="button"
-                    onClick={onRetry}
-                    disabled={Boolean(retryDisabledReason)}
-                    aria-disabled={Boolean(retryDisabledReason) || undefined}
-                    title={retryDisabledReason}
-                  >
+                  <Button color="light" size="xs" type="button" onClick={onRetry}>
                     Retry v{stuckAt}
                   </Button>
                 )}
               </div>
-              {(restoreDisabledReason || retryDisabledReason) && (
+              {restoreDisabledReason && (
                 <p className="tw:mt-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
-                  {restoreDisabledReason ?? retryDisabledReason}
+                  {restoreDisabledReason}
                 </p>
               )}
             </>

@@ -15,7 +15,7 @@ import { EVENTS } from "../../../shared/constants/events";
 import type { SaveState } from "./useStudioState";
 import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "../../../shared/types";
-import type { DesignToken } from "@/editor/design-system";
+import { importMigratedProject } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
   loadCurrentUserId,
@@ -190,24 +190,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // writes a localStorage snapshot/marker for crash-resume. Failure
             // surfaces a toast and falls through with un-migrated data so the
             // editor still loads — DS migrations are forward-fix, not load-gating.
-            const fromVersion = data.dsSchemaVersion ?? 0;
-            let toImport: ProjectData = data;
+            // The run-then-import step is shared with the migration modal's
+            // Restore / Retry (A2), so a re-run lands tokens the way this does.
             try {
-              const result = instance.migration.run({
-                project: { tokens: (data.styles ?? []) as unknown as DesignToken[] },
-                currentVersion: fromVersion,
-                siteId,
-              });
-              if (result.newVersion !== fromVersion) {
-                toImport = {
-                  ...data,
-                  styles: result.project.tokens as unknown as ProjectData["styles"],
-                  dsSchemaVersion: result.newVersion,
-                };
-              }
-              instance.aliasResolver.validate(
-                (toImport.styles ?? []) as unknown as DesignToken[]
-              );
+              importMigratedProject(instance, data, siteId);
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
               addToastRef.current({
@@ -215,8 +201,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 description: "Could not update design system schema. Loaded as-is.",
                 tone: "warning",
               });
+              instance.importProject(data);
             }
-            instance.importProject(toImport);
             // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
             // instead of "Not saved" on fresh load. The just-loaded state IS
             // the persisted state; without this seed lastSavedAt stays null
