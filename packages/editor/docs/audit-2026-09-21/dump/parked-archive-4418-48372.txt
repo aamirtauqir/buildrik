@@ -1,0 +1,11 @@
+# ARCHIVE · Superseded designs (4418:48372) — STATE boards dumped once, treated as PARKED (their drawers are named "ARCHIVE · …")
+4418:49448|STATE · Brand · root|drawer rows: Tokens Presets Starters Classes Components Typography Colour mode Lint Import/export
+4418:49685|STATE · Brand · empty|"No brand set." Browse starters · Import
+4418:49915|STATE · S2.1 · brief · empty|AI draft: Industry / Pages you need / Tone Warm Bold Minimal / Generate
+4418:50158|STATE · S2.1 · brief · typing
+4418:50400|STATE · S2.3 · result · regen
+4418:50629|STATE · S2.2 · generating · slow|AI steps RUNNING 2 OF 3, Stop, "Still working — longer than usual"
+4418:50877|STATE · S2.5 · chat · reject|3 changes proposed, Discard/Apply, "Apply lands as ONE undo step"
+4418:51135|STATE · S2.2 · generating · cancel-confirm|"Stop generating?" Keep going
+4418:51390|STATE · Inspector · single-selection|Layers tree sample
+4418:51627|STATES · Archive · superseded designs (reference only)|launcher: 31 archived states incl S1.6 viewer read-only chrome, S1.5b session-expired, Shell 1280 pin auto-released, Compare restore-confirm, S1.3 new-page loading/error, S3.7 page-settings SEO, S2.0 ai-chat-model, Modal submitting/error, S7.0 nav drill-in, S2.1 submit, S2.3 preview/accepted, S2.4 generic-error, S2.2 streaming
