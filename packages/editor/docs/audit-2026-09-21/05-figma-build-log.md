@@ -21,7 +21,7 @@ Library reused (page 🧩 Components): Toast `7197:79545` (Lines 1/2 × neutral/
 | B1-07 | 7563:233691 | CURRENT DESIGN · Shell · offline | 4418:123573 | Topbar variant Publish=disabled; status/dot State=offline; history link copy "Offline — changes not saved"; Tooltip "Offline — reconnect to publish"; btn/exit → 4418:125427 ✓ |
 | B1-08 | 7563:242038 | CURRENT DESIGN · Exit · stranded mirrors | 4418:125416 | title "3 changes are still syncing" + count body; Stay → CLOSE · Leave anyway → 4418:125151 · Save & leave → 4418:125919 (inherited) ✓ |
 | B1-09 | 7563:269384 | CURRENT DESIGN · Publish gate · changes were requested | 4418:120066 | title/body replaced; Open Review → 4418:115784 (retarget to B3-05 when built) · Cancel → CLOSE. Source has no "Publish anyway" (lock-on path) — matches code |
-| B1-10 | 7563:269398 | CURRENT DESIGN · Publish · stale approval | **4418:97031** (G1 cited 4418:97050 — that is the issues-confirm; corrected from parked-index) | Request fresh review → 4418:121372 ✓ · Publish current draft → 4418:97118 ✓ |
+| B1-10 | 7563:269398 | CURRENT DESIGN · Publish · stale approval | **4418:97031** (G1 cited 4418:97050 — that is the issues-confirm; corrected from parked-index) | Request fresh review → 7570:190578 (B3-02; the first pass wired 4418:121372, then the parked 4418:135911 surfaced in the re-dump — both replaced) · Publish current draft → 4418:97118 ✓ |
 | B1-11 | 7563:269418 | CURRENT DESIGN · Publish · open errors confirm | **4418:97050** (G1 cited 4418:148648 = PROPOSED · Publish · Options) | Fix issues first → 4418:147641 ✓ · Publish anyway → 4418:97118 ✓ |
 | B1-12 | 7564:185450 | CURRENT DESIGN · Assets · delete folder? | 4418:155926 | Delete → 4418:58292 ✓ · Cancel → 4418:58292 ✓ |
 | B1-13 | 7564:185465 | CURRENT DESIGN · Assets · delete folder · not empty | B1-12 | Move files… → 4418:149891 ✓ · Cancel → 4418:58292 ✓ |
@@ -119,3 +119,28 @@ B3-03 footer relabelled Copy link (no destination) · Open ↗ → 4418:122048 �
 - **Batch 8 deferred set** (38 boards) — untouched pending the owner; `dump/hide-plan.json`.
 
 Figma calls this build: ≈ 75 (write + read-back + 4 screenshots); day total ≈ 114/200.
+
+## Post-second-pass fixes (06 §F, 2026-09-21 19:1x–19:3x · 6 write calls + 2 screenshots + 1 re-dump)
+
+| 06 # | Sev | Fix applied | Read-back |
+|---|---|---|---|
+| 1 | major | **EP-9 reverted** — "50 MB" → "10 MB" on 4418:149160 ×2, 149235, 160621, 160887, 6883:72820, 6883:72901. Verified in code: `MEDIA_SIZE_LIMITS.MAX_IMAGE_SIZE = 10 MB` (`src/shared/constants/media.ts:21`); 50 MB is audio-only. 03 G3-061's "fix to the code limits" was misread by the builder | 7 text nodes |
+| 2 | major | B2-02 and B3-10 **re-screenshotted after the fixes** (`screenshots/B2-02-draft-popover.png`, `B3-10-publish-confirm.png`, 19:21): popover 245 px with textarea/counter/buttons; fact rows single-line, dialog 338 px | eye |
+| 3 | major | L-1 cards for the six scrim-wrapped dialog boards (B1-08, B1-09, B1-12, B1-13, B1-14, B1-15) → **OVERLAY**, so Stay/Cancel/dismiss/Esc (CLOSE) work from the launcher; B3-09 stays NAVIGATE (full shell, shell returns apply) | `redump-003.json` launcher row |
+| 4 | major | Shell entries added where the source routing is not variable-gated: B2-01 canvas hotspot 7587:193624 → B2-02; B2-02 Post → **CONDITIONAL `commentSendSucceeds` (VariableID:3781:25558) EQUALS true → B2-01, else → B2-03** (the file's own expression shape); `4418:58292` folder-row trash hotspot 7587:194972 (over `row/📁 Icons`, board-level ABSOLUTE — rows are instances) → OVERLAY B1-12; B1-12/13 copy → "Icons" / 6 files. **Still launcher-only by design:** B1-01 (system-initiated on 409), B1-08 (exit routing is dirty/offline-variable driven), B1-09/10/11 (the publish chain is routed by `reviewApproved`/`approvalLockEnabled`; a third reason needs a new variable — plan §15, OD-2), B3-09 (state sheet) | ✓ |
+| 5 | major | B1-01 safe exit: Save a backup → 4418:123573, **Esc → 4418:123573** | ✓ |
+| 6 | major | W-7: 10 colour rows hidden (8 spacing rows stay), colour-picker buttons unwired; **`nav/Spacing` 7587:193626 added to the Brand workspace `7315:80955` → W-7** (entry-point edit); W-7's own nav/Spacing 7587:193632 unwired (selected) | ✓ |
+| 7 | major | `dump/hide-safe.json` rewritten as `{id,name}` ×43 incl. `4418:80697` and the now-hidden `4418:122932` | file |
+| 8 | minor | Naming: B1-09/10/11 and B3-10 kept `CURRENT DESIGN ·` — the live file names its own publish gates that way; code rows are FLAGGED-VIABLE (publish flag). **Owner call**: rename to `PLANNED ·` or keep the family's convention (recorded, not changed) | — |
+| 9 | minor | Self-loops = **3** (B2-04, B3-05, B3-10 — inherited CONDITIONAL branch re-pointed to the clone), not 1 as first logged; left as-is (same class as their sources) | — |
+| 10 | minor | B3-02 Esc → 4418:81300 added; width 360 kept (three fields; DESIGN-RULES ≤ 320 noted) | ✓ |
+| 11 | minor | B3-10 header ✕ → 4418:97118; the underlying panel state ("Blocks publish · Waiting on Sara") contradicts the modal's "Approved by Sara" — copy on the clone's panel is inherited sample data, recorded not changed | ✓ |
+| 12 | minor | B1-03 copy no longer offers a Discard action the library toast cannot show | ✓ |
+| 13 | minor | `4418:122932` (two-action conflict, 0 inbound) hidden with ARCHIVE stamp — superseded by B1-01 | ✓ |
+| 14–16 | minor | Duplicate topbar reaction lines are inherited from the sources (rail/Brand ×2 etc.) — not touched; "(removed)" markers were annotations in redump-001, the Figma reactions are gone; W-5 grid stays a 40-px stand-in (captioned) | — |
+| 17 | minor | `pin/comment` master moved to `4418:144789 LIBRARY · Clone-owned editor components` (x 2012) | ✓ |
+| 18 | note | 40 L-1 card layers renamed `card/<key · title>` | ✓ |
+| 19 | note | B1-14 AFTER_TIMEOUT 2.5 s → B1-15 | ✓ |
+| 20–21 | note | 04 §4 rows 10–11 and this log's B1-10 row corrected to the real sources / destinations; 03 G1-045/046 left as the agents wrote them (their citation error is recorded here and in 06) | docs |
+
+Final evidence: `dump/redump-003.json` (compact, post-fix). Figma calls, day total ≈ **125/200**.

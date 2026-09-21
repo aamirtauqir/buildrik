@@ -1,1 +1,174 @@
-["4418:109146", "4418:156180", "4418:156186", "4418:156198", "4418:156204", "4418:156210", "4418:156216", "4418:156222", "4418:156228", "4418:157589", "4418:157797", "4418:157803", "4418:158011", "4418:158231", "4418:158439", "4418:158445", "4418:158653", "4418:158659", "4418:158867", "4418:158873", "4418:159081", "4418:159087", "4418:159295", "4418:159301", "4418:159509", "4418:163352", "4418:163359", "4418:163364", "4418:163377", "4418:163384", "4418:165473", "6466:10", "6466:6", "6881:70660", "6881:70678", "6881:70696", "6881:72971", "6881:72988", "6881:73005", "6881:73022", "6881:73039"]
+[
+{
+"id": "4418:109146",
+"name": "CD·Bind content · Menu / Price / choose record"
+},
+{
+"id": "4418:156180",
+"name": "Assets · Rename · menu-cover.png"
+},
+{
+"id": "4418:156186",
+"name": "Assets · Rename · chef-intro.mp4"
+},
+{
+"id": "4418:156198",
+"name": "Assets · Rename · logo-mark.svg"
+},
+{
+"id": "4418:156204",
+"name": "Assets · Rename · pasta-closeup.jpg"
+},
+{
+"id": "4418:156210",
+"name": "Assets · Rename · grand-opening.mp4"
+},
+{
+"id": "4418:156216",
+"name": "Assets · Rename · star-icon.svg"
+},
+{
+"id": "4418:156222",
+"name": "Assets · Rename · Inter-Var.woff2"
+},
+{
+"id": "4418:156228",
+"name": "Assets · Rename · terrace-night.jpg"
+},
+{
+"id": "4418:157589",
+"name": "CD·Assets · Deleted · menu-cover.png"
+},
+{
+"id": "4418:157797",
+"name": "Assets · Confirm delete · menu-cover.png"
+},
+{
+"id": "4418:157803",
+"name": "CD·Assets · Deleted · chef-intro.mp4"
+},
+{
+"id": "4418:158011",
+"name": "Assets · Confirm delete · chef-intro.mp4"
+},
+{
+"id": "4418:158231",
+"name": "CD·Assets · Deleted · logo-mark.svg"
+},
+{
+"id": "4418:158439",
+"name": "Assets · Confirm delete · logo-mark.svg"
+},
+{
+"id": "4418:158445",
+"name": "CD·Assets · Deleted · pasta-closeup.jpg"
+},
+{
+"id": "4418:158653",
+"name": "Assets · Confirm delete · pasta-closeup.jpg"
+},
+{
+"id": "4418:158659",
+"name": "CD·Assets · Deleted · grand-opening.mp4"
+},
+{
+"id": "4418:158867",
+"name": "Assets · Confirm delete · grand-opening.mp4"
+},
+{
+"id": "4418:158873",
+"name": "CD·Assets · Deleted · star-icon.svg"
+},
+{
+"id": "4418:159081",
+"name": "Assets · Confirm delete · star-icon.svg"
+},
+{
+"id": "4418:159087",
+"name": "CD·Assets · Deleted · Inter-Var.woff2"
+},
+{
+"id": "4418:159295",
+"name": "Assets · Confirm delete · Inter-Var.woff2"
+},
+{
+"id": "4418:159301",
+"name": "CD·Assets · Deleted · terrace-night.jpg"
+},
+{
+"id": "4418:159509",
+"name": "Assets · Confirm delete · terrace-night.jpg"
+},
+{
+"id": "4418:163352",
+"name": "Video · Replace chef source"
+},
+{
+"id": "4418:163359",
+"name": "Video · Replacement completed"
+},
+{
+"id": "4418:163364",
+"name": "Video · No references to replace"
+},
+{
+"id": "4418:163377",
+"name": "Video · Replace grand-opening source"
+},
+{
+"id": "4418:163384",
+"name": "Video · Chef no references"
+},
+{
+"id": "4418:165473",
+"name": "CD·Settings could not save"
+},
+{
+"id": "6466:10",
+"name": "[not-implemented] · Brand · Error (placeholder — note/error lives in STATE · Brand · load-error)"
+},
+{
+"id": "6466:6",
+"name": "[not-implemented] · Brand · Loading (placeholder — skeleton lives in STATE · Brand · loading)"
+},
+{
+"id": "6881:70660",
+"name": "CD·Media · File deleted (toast) · menu-cover.png"
+},
+{
+"id": "6881:70678",
+"name": "CD·Media · File deleted (toast) · chef-intro.mp4"
+},
+{
+"id": "6881:70696",
+"name": "CD·Media · File deleted (toast) · logo-mark.svg"
+},
+{
+"id": "6881:72971",
+"name": "CD·Media · File deleted (toast) · pasta-closeup.jpg"
+},
+{
+"id": "6881:72988",
+"name": "CD·Media · File deleted (toast) · grand-opening.mp4"
+},
+{
+"id": "6881:73005",
+"name": "CD·Media · File deleted (toast) · star-icon.svg"
+},
+{
+"id": "6881:73022",
+"name": "CD·Media · File deleted (toast) · Inter-Var.woff2"
+},
+{
+"id": "6881:73039",
+"name": "CD·Media · File deleted (toast) · terrace-night.jpg"
+},
+{
+"id": "4418:80697",
+"name": "SUPERSEDED · Layers · expanded (old document, unwired rows) — replaced by SA-fix 6918:74311"
+},
+{
+"id": "4418:122932",
+"name": "CD·Shell state 11 · Saving → conflict"
+}
+]

@@ -338,8 +338,8 @@ Batch 8 ledger: ≈ 130 hides + 4 retargets in 2 scripts + 1 read-back; re-dump 
 | 7 | B1-07 | CURRENT DESIGN · Shell · offline | 4418:123573 | G1-005, G1-083 | P0 | 1 | L-1 | exit → 4418:125427 |
 | 8 | B1-08 | CURRENT DESIGN · Exit · stranded mirrors | 4418:125416 | G1-003 | P0 | 1 | btn/exit (chained) | Stay → opener |
 | 9 | B1-09 | CURRENT DESIGN · Publish gate · changes were requested | 4418:120066 | G1-045 | P0 | 1 | btn/publish (3rd reason, chained) | Open Review → B3-05 |
-| 10 | B1-10 | CURRENT DESIGN · Publish · stale approval | 4418:97050 | G1-045 | P0 | 1 | btn/publish (approved-edited) | Request fresh review → B3-02 |
-| 11 | B1-11 | CURRENT DESIGN · Publish · open errors confirm | 4418:148648 | G1-046 | P0 | 1 | btn/publish (errors > 0) | Fix issues first → 4418:147641 |
+| 10 | B1-10 | CURRENT DESIGN · Publish · stale approval | 4418:97031 (03 cited 4418:97050 — corrected in build) | G1-045 | P0 | 1 | btn/publish (approved-edited) | Request fresh review → B3-02 |
+| 11 | B1-11 | CURRENT DESIGN · Publish · open errors confirm | 4418:97050 (03 cited 4418:148648 = PROPOSED · Publish · Options — corrected in build) | G1-046 | P0 | 1 | btn/publish (errors > 0) | Fix issues first → 4418:147641 |
 | 12 | B1-12 | CURRENT DESIGN · Assets · delete folder? | 4418:155926 | G3-039 | P0 | 1 | folder row trash on 4418:58292 | Cancel → 4418:58292 |
 | 13 | B1-13 | CURRENT DESIGN · Assets · delete folder · not empty | B1-12 | G3-039 | P0 | 1 | folder row trash (non-empty) | Move… → 4418:149891 |
 | 14 | B1-14 | CURRENT DESIGN · Brand · project update · running | 4418:154608 | G3-153 | P0 | 1 | L-1 (automatic) | done → 7315:80955 |
@@ -392,7 +392,7 @@ Untouched by design: rail set `4418:144790`; every master on `🧩 Components`; 
 - **P2 rows not reached by the waterfall** (03: G3-008 pick-mode consolidation beyond the Batch 8 hides, G3-069/071/081 clone collapses — done as hides, no new boards).
 - **Any C-class control** beyond an annotation card (Q12): no COMING SOON rebuilds, no hiding for status.
 - **Dashboard-side surfaces** (viewer page, activity page, share handoff) — Q1.
-- **Code** — `src/` untouched (Q8); the "Required code change" column (94 non-none cells) is appended to `../plans/2026-09-14-editor-v3-ia.md` as Tier 2/3 rows after the build.
+- **Code** — `src/` untouched (Q8); the "Required code change" column (243 non-none cells) is appended to `../plans/2026-09-14-editor-v3-ia.md` as Tier 2/3 rows after the build.
 
 ## 8. Call budget (Phase 16 + 17)
 
