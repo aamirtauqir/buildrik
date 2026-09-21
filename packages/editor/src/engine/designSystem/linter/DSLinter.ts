@@ -7,6 +7,13 @@ export interface LintIssue {
   severity: LintSeverity;
   tokenId: string;
   message: string;
+  /**
+   * What `Composer.designSystem.applyAutoFix` should do to the token's value —
+   * the `darken-22` / `lighten-22` grammar `contrastFix.ts` understands. Set
+   * only by rules whose repair is mechanical (pure-black, contrast); absent
+   * where the fix is a decision (banned-hue, missing-dark). B9 / SH-64.
+   */
+  autoFixHint?: string;
 }
 
 export type LintRuleId =
@@ -124,13 +131,15 @@ export class DSLinter {
         });
       }
 
-      // pure-black: #000 / #000000
+      // pure-black: #000 / #000000. Mechanical fix: lift L off zero — one
+      // step towards the ink scale, which is what the rule asks for.
       if (isPureBlack(t.value)) {
         issues.push({
           rule: "pure-black",
           severity: "error",
           tokenId: t.id,
           message: `Token "${t.id}" is pure black. DESIGN.md NO BLACK rule — use the ink scale (#111827) or the accent instead.`,
+          autoFixHint: "lighten-22",
         });
       }
       if (t.darkValue !== undefined && isPureBlack(t.darkValue)) {

@@ -619,11 +619,18 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             issues={state.issues}
             activePageId={activePageId}
             onClose={() => setIssuesOpen(false)}
-            // Jump-to-element is a refinement: an Issue id is the issue's id,
-            // not reliably an element id (lint/link/alt issues aren't 1:1 with
-            // a node), so v1 just closes. Wiring a real jump needs each issue
-            // to carry its target elementId — a follow-up.
-            onSelectElement={() => setIssuesOpen(false)}
+            /* B9 / SH-63 — a row click lands on the canvas: the element the
+               issue names, else the first element that uses its token (the
+               engine's usage tracker knows), else the Brand panel where the
+               token lives. Never a dead click. */
+            onSelectElement={(issue) => {
+              const refs = issue.tokenId ? composer.designSystem.tokenUsage.getBreakdown(issue.tokenId) : [];
+              const ids = [issue.elementId, ...refs.map((r) => r.elementId)].filter((id): id is string => Boolean(id));
+              const target = ids.map((id) => composer.elements.getElement(id)).find((el) => el != null);
+              setIssuesOpen(false);
+              if (target) composer.selection.select(target);
+              else composer.emit("ui:switch-tab", { tab: "design" });
+            }}
             // applyAutoFix already wraps the rewrite in one transaction, which
             // is what lets the panel promise a single undo step. It returns
             // null when it will not touch the token — the panel shows that as

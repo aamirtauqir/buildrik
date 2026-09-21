@@ -51,11 +51,11 @@ describe("IssuesPanel", () => {
     expect(screen.getByText(/no issues/i)).toBeInTheDocument();
   });
 
-  it("jumps to the element when a row is clicked", () => {
+  it("hands the clicked issue to the locate handler (B9 / SH-63)", () => {
     const onSelectElement = vi.fn();
     renderPanel({ onSelectElement });
     fireEvent.click(screen.getByText(/Broken link/));
-    expect(onSelectElement).toHaveBeenCalledWith("i1");
+    expect(onSelectElement).toHaveBeenCalledWith(ISSUES[0]);
   });
 
   // ── T10 page scope (topbar plan, eng D17) ──────────────────────────────────

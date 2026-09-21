@@ -32,8 +32,9 @@ export interface IssuesPanelProps {
    * identical views (today's DS-lint issues are all site-wide).
    */
   activePageId?: string | null;
-  /** Jump to the element/target an issue points at (its id). */
-  onSelectElement?: (id: string) => void;
+  /** Jump to what the issue points at — the element it names, or the first
+   *  element using its token (SH-63, board 4418:147641's row → element). */
+  onSelectElement?: (issue: Issue) => void;
   /**
    * Attempt the mechanical repair. Resolves to the new value, or null when the
    * engine declined — the panel renders that null as fix-failed rather than
@@ -266,7 +267,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                     size="tall"
                     interactive
                     className="tw:flex-1 tw:min-w-0"
-                    onClick={() => onSelectElement?.(i.id)}
+                    onClick={() => onSelectElement?.(i)}
                   >
                     <span className={`tw:flex-none tw:mt-px ${TONE[i.type].className}`}>{TONE[i.type].icon}</span>
                     <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">

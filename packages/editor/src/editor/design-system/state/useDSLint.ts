@@ -60,10 +60,9 @@ export function useDSLint(composer: Composer | null | undefined): readonly LintI
       const byToken = new Map<string, StoredLintIssue[]>();
       for (const issue of found) {
         const list = byToken.get(issue.tokenId);
-        if (list) list.push({ type: issue.rule, severity: issue.severity, message: issue.message });
-        else byToken.set(issue.tokenId, [
-          { type: issue.rule, severity: issue.severity, message: issue.message },
-        ]);
+        const stored: StoredLintIssue = { type: issue.rule, severity: issue.severity, message: issue.message, autoFixHint: issue.autoFixHint };
+        if (list) list.push(stored);
+        else byToken.set(issue.tokenId, [stored]);
       }
       composer.designSystem?.lintState?.setAllIssues(byToken);
     }, DEBOUNCE_MS);

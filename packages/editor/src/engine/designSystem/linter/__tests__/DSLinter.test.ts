@@ -281,3 +281,24 @@ describe("DSLinter.errors", () => {
       "debounce contract is enforced nowhere.",
   );
 });
+
+describe("autoFixHint — the rules that can be fixed mechanically say how (B9 / SH-64)", () => {
+  it("pure-black carries lighten-22, the one-step move off #000", () => {
+    const linter = new DSLinter();
+    const issues = linter.lint([
+      { id: "color-ink", name: "Ink", kind: "color", category: "colors", value: "#000000" } as never,
+    ]);
+    const black = issues.find((i) => i.rule === "pure-black");
+    expect(black?.autoFixHint).toBe("lighten-22");
+  });
+
+  it("banned-hue carries no hint — which colour replaces purple is a decision, not a step", () => {
+    const linter = new DSLinter();
+    const issues = linter.lint([
+      { id: "color-accent", name: "Accent", kind: "color", category: "colors", value: "#8B5CF6" } as never,
+    ]);
+    const hue = issues.find((i) => i.rule === "banned-hue");
+    expect(hue).toBeDefined();
+    expect(hue?.autoFixHint).toBeUndefined();
+  });
+});

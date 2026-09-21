@@ -16,7 +16,7 @@
  */
 import type { LintIssue } from "../../../engine/designSystem/linter";
 import type { DesignToken } from "../types";
-import { calcWcagLevel } from "./colorUtils";
+import { calcWcagLevel, hexToRgb, relativeLuminance } from "./colorUtils";
 
 /**
  * Resolved from the customer's own background token, honouring their colour
@@ -69,13 +69,27 @@ export const contrastFails = (
   return calcWcagLevel(shown, surfaceBg) === "fail";
 };
 
-/** The rule, in the linter's vocabulary — what useDSLint merges in. */
+/** Which way the engine's one-step fix should push the token: away from the
+ *  surface. A token darker than the page darkens further; one lighter than
+ *  the page lightens. `applyAutoFix` rewrites `value`, so the direction is
+ *  read off the light value against the light surface. */
+export function contrastFixHint(tokenValue: string, surfaceBg: string): "darken-22" | "lighten-22" {
+  const t = hexToRgb(tokenValue);
+  const s = hexToRgb(surfaceBg);
+  if (!t || !s) return "darken-22";
+  return relativeLuminance(t.r, t.g, t.b) < relativeLuminance(s.r, s.g, s.b) ? "darken-22" : "lighten-22";
+}
+
+/** The rule, in the linter's vocabulary — what useDSLint merges in. Each
+ *  finding carries the hint `applyAutoFix` needs (B9 / SH-64), so the Issues
+ *  panel's Fix › has a producer. */
 export function buildContrastIssues(
   tokens: readonly DesignToken[],
   mode: "light" | "dark",
 ): LintIssue[] {
   const surfaceToken = findSurfaceToken(tokens);
   const surfaceBg = resolveSurface(surfaceToken, mode);
+  const lightSurface = resolveSurface(surfaceToken, "light");
   return tokens
     .filter((t) => contrastFails(t, surfaceBg, mode, surfaceToken?.id))
     .map((t) => ({
@@ -83,5 +97,6 @@ export function buildContrastIssues(
       severity: "warning" as const,
       tokenId: t.id,
       message: `${t.name || t.id} fails WCAG AA against the page background`,
+      autoFixHint: contrastFixHint(t.value, lightSurface),
     }));
 }

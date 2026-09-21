@@ -89,6 +89,9 @@ export interface Issue {
    */
   tokenId?: string;
   autoFixHint?: string;
+  /** The element the issue is about, when a producer knows one (broken link,
+   *  missing alt). Token issues resolve theirs through token usage instead. */
+  elementId?: string;
   /** Where the issue lives, e.g. "Brand › color.accent". Shown under the message. */
   location?: string;
   /**
