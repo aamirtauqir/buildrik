@@ -170,5 +170,35 @@
 {
 "id": "4418:122932",
 "name": "CD·Shell state 11 · Saving → conflict"
+},
+{
+"id": "4418:172794",
+"name": "CD·Open Osteria notification?",
+"why": "owner decisions 2026-09-21"
+},
+{
+"id": "4418:172799",
+"name": "CD·Osteria · Publish failed",
+"why": "owner decisions 2026-09-21"
+},
+{
+"id": "4418:107044",
+"name": "CD·Inspector · profile · CONTAINER (fallback)",
+"why": "owner decisions 2026-09-21"
+},
+{
+"id": "4418:96273",
+"name": "S·Pages · tree · homepage by position (of 140:2)",
+"why": "owner decisions 2026-09-21"
+},
+{
+"id": "4418:54271",
+"name": "CD·Templates · Replace Home with Restaurant / confirm",
+"why": "owner decisions 2026-09-21"
+},
+{
+"id": "4418:71408",
+"name": "SS·Brand · every designed state",
+"why": "owner decisions 2026-09-21"
 }
 ]

@@ -148,3 +148,32 @@ Final evidence: `dump/redump-003.json` (compact, post-fix). Figma calls, day tot
 ## OD-1 resolved — owner (artifact thread, 2026-09-21 14:51): "sab se new design implement karna hai" → Brand workspace `7315:80955` is the single design
 
 One write call: area index `4418:147492` Brand card `4418:71408` → `7315:80955` (1 reaction) · old launcher `4418:71408` renamed `ARCHIVE · STATES · Brand · every designed state — superseded 21 Sep 2026 · Brand workspace 7315:80955 (owner decision)` + hidden · v3 launcher `4428:150081`: the three cards → `4428:146069` / `146338` / `146607` hidden (ARCHIVE-prefixed) · workspace back-links retargeted: `4418:168885` Preview card ×2 and `4418:176596` Back → `7315:80955`, `4418:175027` Classes usage → `7316:83357`. `4428:149324` Apply already → `7316:80949` (EP-10). Live page now reaches one Brand design. Code rebuild (drawer → full page) = plan doc §16 Tier 3 rows, not started. Figma calls, day total ≈ 127/200.
+
+## Owner decisions closed (2026-09-21, chat) — 36 decisions, 6 answered one by one, 30 by "apply all recommendations"; 7 Figma calls, day total ≈ 134/200
+
+| Decision | Answer | Figma change (read back) |
+|---|---|---|
+| 1 Publish gate (plan §15) | add variable + route + coherent defaults | new BOOLEAN `reviewChangesRequested` `VariableID:7592:193270` (default false, collection 3476:15922); `publishOpacity` default 100 → **40**; on **523** live shells `btn/publish`'s Waiting block became `(lock ∧ ¬approved) ∧ sent ∧ ¬changesRequested` and a 4th CONDITIONAL `… ∧ changesRequested → OVERLAY 7563:269384` was appended (137 boards skipped: no gate on their CTA; 0 errors). B1-09 now has a shell entry |
+| 2 CTA verbs | build | **C-01** `7593:193270` `CURRENT DESIGN · Topbar · CTA verbs` from 4418:123573 — topbar CTA relabelled "Send for review", strip of 6 Button states (5 verbs + disabled) + Tooltip "Waiting on Sara — approval lock is on" + caption; launcher card wired (slot 41) |
+| 3 Review bar | fold into chip + panel | no board; code Tier 3 retire `ReviewBar` (plan doc §16) |
+| 4 Client feedback shape | located pins | **C-03** `7593:193511` `CURRENT DESIGN · Client sign-off · pin on snapshot` from 4418:121903 — pins 7593:193546/193548 + draft popover 7593:193550 + caption; launcher card wired (slot 42); AUDIT · DESIGN-ONLY chip 7593:193569 beside the notes list 4418:121999 |
+| 5 Naming | keep `CURRENT DESIGN ·` for publish boards | none |
+| 6 Clone boards | "Figma mein jaisa hai woh use karo" — leave the 22 | none (deferred list closed as "keep") |
+| 7 Flag-off publish copy | code's actionable copy | 4418:99386: "Connect Vercel to publish" · body explains the per-workspace connection · link "Connect Vercel ›" |
+| 8 Republish through the gate | code rule (admin-only) | 4418:73440 `btn/Roll back` → SV×4 + NAVIGATE 4418:73452 (two gate CONDITIONALs dropped) |
+| 9 Notification scope | this site | 4418:140492 "Note · Publish failed" → 4418:140587 (Activity); header "Notifications — all sites" → "Notifications"; 4418:172794 + 4418:172799 archived |
+| 10 ⌘K no-results | Ask AI | 4418:141188 row copy "Ask AI about ‘qqp’ →" → CLOSE + NAVIGATE 4418:104454 |
+| 11 Live / Issues topbar chips | Figma (removed) | code Tier 3 |
+| 12 Exit interstitials | keep | none |
+| 13 Pre-publish checks | code's six | 4418:97118 `Check · Favicon` hidden |
+| 14 Page-tab context menu | Figma (tabs switch only) | code Tier 3 |
+| 15 "Request a new link" | annotate | AUDIT · NOT IMPLEMENTED chip 7593:193571 beside 4418:122159 |
+| 16–26, 28, 29, 33 | Figma direction wins (insert toast+Undo · delete pattern hybrid · Layers options · New-page modal · page-settings Done/Cancel · Advanced fields · both AI doors · plan/run AI · full-canvas Templates · History backup · delete 4 features · Brand auto-draft · typed-DELETE only for irreversible+wide · site-level forms) | code Tier 3 rows (plan doc §16); no Figma change |
+| 27 Copy-fix batch | do it | "Soon" hidden on 7052:78361 (×2) and 7063:78923; `item/Fill container` + `item/Hug contents` hidden on 6964:80863; 4418:107044 and 4418:96273 archived (their openers: STATES · Inspector card 4418:115470 hidden; 4418:96009 + 4418:96768 → 4418:90494); ⌘K "Replace layout with template…" 4418:141220 → 4428:149355 (old confirm 4418:54271 archived). Not done: 375/390 on 4428:140088 and the 4418:107268 self-contradiction (need a read of the intended values — recorded) |
+| 30 Export scope copy | shape, not sample | 4418:97069 "HTML · all 7 pages · one ZIP (current page only as a single file)" |
+| 31 Delete token | replace-then-delete | 4418:173732 copy: "Replace before deleting — token is in use" · body · Cancel · "Choose replacement…" |
+| 32 Members / Billing | direct dashboard link | 4418:165988 / 4418:165995 primary → URL action (app.buildrick.io/settings/members · /billing, new tab) |
+| 34 Swatch `#7E3AF2` | drop | 7318:80982 and 6771:63832 hidden |
+| 35 Autosave interval | inventory fix | `src/shared/constants/config.ts:112-113`: `AUTOSAVE_INTERVAL 5000` + `AUTOSAVE_DEBOUNCE 1000` — both rows were right (EN-36 = debounce, ST-92 = interval); noted, no product decision |
+
+`dump/hide-safe.json` now 49 entries (43 + 172794 · 172799 · 107044 · 96273 · 54271 · 71408). 07 regenerated: **0 ✗ Missing** (code 1,020: Represented 672 · Combined 152 · Internal 81 · Planned-later 61 · Deprecated 32 · Hidden 22); Figma 1,140 (1,098 + 42): ✓ Code 404 · △ 612 · ✗ Dummy 114 · ○ 8.

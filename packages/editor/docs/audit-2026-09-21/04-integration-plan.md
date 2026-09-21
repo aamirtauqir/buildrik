@@ -34,6 +34,8 @@ Observed on the live page 2026-09-21 (dump `dump/live-all.json`):
 
 ## 2. Owner decisions that gate a build item
 
+> **All closed 2026-09-21** (chat, after the build): OD-1 workspace · OD-2 variable + route + defaults · OD-3 one confirm · OD-4 modal · OD-5 site scope (cross-site boards archived) · OD-6 pins → C-03 built · OD-7 fold · OD-8 keep · OD-9 Ask AI (copy edit) · OD-10 done · OD-11 one card · OD-12 done · OD-13 done · OD-14 done; the 22 remaining clones stay ("Figma mein jaisa hai") · OD-15 visible. C-01 and C-03 were built as slots 41–42. Details: 05 "Owner decisions closed".
+
 Each row names the default the build will assume **if the go comes without an answer**. Defaults follow BRIEF precedence (behaviour → code; visual/IA → Figma) and the bias "remove · merge · simplify". A "no" on a default strikes or reshapes the items in the last column; nothing is invented to fill the hole.
 
 | # | Decision | Options | Default assumed at the go | Gates |

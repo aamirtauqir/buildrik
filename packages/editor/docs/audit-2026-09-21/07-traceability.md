@@ -1,32 +1,28 @@
 # 07 — Traceability (Phase 19) · generated 2026-09-21 by `dump/build-07.mjs`
 
-Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` row → one of the seven Phase-19 statuses, with the 05 build outcome applied. Figma side: every live board of `02-figma-inventory.md` (1,098) plus the 40 built boards → one of the four Phase-19 statuses, derived from the gap type(s) of the rows that cite the board.
+Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` row → one of the seven Phase-19 statuses, with the 05 build outcome applied. Figma side: every live board of `02-figma-inventory.md` (1,098) plus the 42 built boards (40 + C-01/C-03 after the owner closed the decisions) → one of the four Phase-19 statuses, derived from the gap type(s) of the rows that cite the board.
 
 ## Totals
 
 | Code rows (1020) | Count |
 |---|---|
-| ✓ Represented | 670 |
+| ✓ Represented | 672 |
 | ✓ Combined | 152 |
 | ✓ Internal | 81 |
 | ✓ Planned for later | 61 |
 | ✓ Deprecated | 32 |
 | ✓ Hidden | 22 |
-| ✗ Missing | 2 |
 
-| Figma boards (1138 = 1,098 live + 40 new) | Count |
+| Figma boards (1140 = 1,098 live + 42 new) | Count |
 |---|---|
-| △ Partial | 617 |
-| ✓ Code | 405 |
-| ✗ Dummy | 108 |
+| △ Partial | 612 |
+| ✓ Code | 406 |
+| ✗ Dummy | 114 |
 | ○ Planned | 8 |
 
-## Remaining gaps (the only ✗ Missing allowed — BRIEF done-condition 6)
+## Remaining gaps
 
-| Row | Code rows | Why not built | Path |
-|---|---|---|---|
-| G1-013 | SH-24 | C-01 CTA verbs — gated on plan §15 (1)(2) (OD-2); node-ready spec in 03 | owner decision → one board from 04 §4 slots (spec in 03) |
-| G1-066 | ST-64 | C-03 viewer pins — dashboard surface (Q1 out of scope; OD-6) | owner decision → one board from 04 §4 slots (spec in 03) |
+None — the two owner-gated rows (G1-013 CTA verbs, G1-066 client pins) were built on 2026-09-21 after the owner closed all open decisions (C-01 7593:193270, C-03 7593:193511).
 
 ## Code → Figma (1020 rows)
 
@@ -55,7 +51,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | SH-21 | Issues chip (count + severity icon) | SHIPPED | G1-010 | ✓ Planned for later |  |
 | SH-22 | Presence avatars + connection pill | FLAGGED-VIABLE | G1-011 | ✓ Represented | B3-06, B3-07 (PLANNED) |
 | SH-23 | Notifications bell (+ unread dot) | SHIPPED | G1-012 | ✓ Represented |  |
-| SH-24 | Primary CTA (state-dependent verb: Send for review / Publish | FLAGGED-VIABLE | G1-013 | ✗ Missing | C-01 CTA verbs — gated on plan §15 (1)(2) (OD-2); node-ready spec in 03 |
+| SH-24 | Primary CTA (state-dependent verb: Send for review / Publish | FLAGGED-VIABLE | G1-013 | ✓ Represented | C-01 7593:193270 (owner decision 2) |
 | SH-25 | Screen-reader live regions (save + publish announcements) | SHIPPED | G1-005 | ✓ Represented | B1-07 |
 | SH-26 | Compact topbar (<1200px drops save timestamp) | SHIPPED | G1-005 | ✓ Represented | B1-07 |
 | SH-27 | ⋯ Site menu (popover container, grouped rows) | SHIPPED | G1-014 | ✓ Represented |  |
@@ -83,7 +79,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | SH-49 | "Publish with N open errors?" dialog | FLAGGED-VIABLE | G1-046 | ✓ Represented | B1-11 |
 | SH-50 | Exit guard dialogs (Dirty / Risky / Stranded) | SHIPPED | G1-003 | ✓ Represented | B1-08 |
 | SH-51 | Browser `beforeunload` guard | SHIPPED | G1-003 | ✓ Represented | B1-08 |
-| SH-52 | Review bar (44px strip, status sentence) | SHIPPED | G1-029 | ✓ Combined | folded into chip + panel (OD-7) |
+| SH-52 | Review bar (44px strip, status sentence) | SHIPPED | G1-029 | ✓ Combined | folded into chip + panel (OD-7, owner-confirmed 2026-09-21) |
 | SH-53 | Review bar › Next › (step through open comments) | SHIPPED | G1-030 | ✓ Represented |  |
 | SH-54 | Review bar › Compare | SHIPPED | G1-061 | ✓ Combined |  |
 | SH-55 | Review bar › Re-send | SHIPPED | G1-058 | ✓ Represented |  |
@@ -119,24 +115,24 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | SH-85 | Onboarding chip slot in the footer | SHIPPED | G1-027 | ✓ Planned for later |  |
 | SH-86 | Preview overlay (Desktop · Tablet · Mobile strip, bezel stag | SHIPPED | G1-086 | ✓ Represented |  |
 | SH-87 | Preview overlay › "Share preview" button | DUPLICATE | G1-022 | ✓ Combined | DUPLICATE (Q3) — same job traced through its twin |
-| SH-88 | Command palette (⌘K) container (search row, list, footer hin | SHIPPED | G1-093 | ✓ Represented |  |
-| SH-89 | Palette › GO TO band ("Open <panel> panel" ×13) | SHIPPED | G1-093 | ✓ Represented |  |
-| SH-90 | Palette › shell ACTIONS (Undo · Redo · Preview · Zoom in/out | SHIPPED | G1-093 | ✓ Represented |  |
+| SH-88 | Command palette (⌘K) container (search row, list, footer hin | SHIPPED | G1-093 | ✓ Represented | 4418:141188 → Ask AI (decision 10) |
+| SH-89 | Palette › GO TO band ("Open <panel> panel" ×13) | SHIPPED | G1-093 | ✓ Represented | 4418:141188 → Ask AI (decision 10) |
+| SH-90 | Palette › shell ACTIONS (Undo · Redo · Preview · Zoom in/out | SHIPPED | G1-093 | ✓ Represented | 4418:141188 → Ask AI (decision 10) |
 | SH-91 | Palette › engine registry commands (Save · Delete · Group ·  | DUPLICATE | G1-092 | ✓ Combined |  |
-| SH-92 | Palette › RECENT / SUGGESTED bands (last 5 commands, remembe | SHIPPED | G1-093 | ✓ Represented |  |
-| SH-93 | Palette › no-results → Ask AI (one-word / multi-word / engin | SHIPPED | G1-093 | ✓ Represented |  |
-| SH-94 | Palette › disabled-with-reason rows ("nothing to undo", "not | SHIPPED | G1-093 | ✓ Represented |  |
+| SH-92 | Palette › RECENT / SUGGESTED bands (last 5 commands, remembe | SHIPPED | G1-093 | ✓ Represented | 4418:141188 → Ask AI (decision 10) |
+| SH-93 | Palette › no-results → Ask AI (one-word / multi-word / engin | SHIPPED | G1-093 | ✓ Represented | 4418:141188 → Ask AI (decision 10) |
+| SH-94 | Palette › disabled-with-reason rows ("nothing to undo", "not | SHIPPED | G1-093 | ✓ Represented | 4418:141188 → Ask AI (decision 10) |
 | SH-95 | Keyboard Shortcuts sheet (⌘/; search; Panels · Edit · View g | SHIPPED | G1-026 | ✓ Represented | EP-6 (copy) — annotation not placed |
 | SH-96 | Global shortcuts owned by the shell (⌘K · ⌘S · ⌘Z · ⌘⇧Z/⌘Y · | SHIPPED | G1-091 | ✓ Represented | EP-6 |
 | SH-97 | F6 / ⇧F6 region cycling (7 regions, skips hidden) | SHIPPED | G1-091 | ✓ Represented | EP-6 |
 | SH-98 | Publish confirm dialog (Target · Pages · Client approval · R | FLAGGED-VIABLE | G1-043 | ✓ Represented | B3-10 + 4418:97118 Panel footer |
-| SH-99 | Publish gate dialogs (No review sent · Waiting on approval · | FLAGGED-VIABLE | G1-045 | ✓ Represented | B1-09, B1-10 |
-| SH-100 | Stale-approval dialog (CHANGED SINCE APPROVAL list; Request  | FLAGGED-VIABLE | G1-045 | ✓ Represented | B1-09, B1-10 |
+| SH-99 | Publish gate dialogs (No review sent · Waiting on approval · | FLAGGED-VIABLE | G1-045 | ✓ Represented | B1-09 + 4th gate route on 523 shells + reviewChangesRequested (decision 1) |
+| SH-100 | Stale-approval dialog (CHANGED SINCE APPROVAL list; Request  | FLAGGED-VIABLE | G1-045 | ✓ Represented | B1-09 + 4th gate route on 523 shells + reviewChangesRequested (decision 1) |
 | SH-101 | Publish outcome toasts (Published — site is live · Vercel no | FLAGGED-VIABLE | G1-048 | ✓ Represented |  |
 | SH-102 | Silent home-page thumbnail capture at publish | FLAGGED-VIABLE | G1-048 | ✓ Represented |  |
-| SH-103 | Publish history list (History › Published: loading/error/emp | SHIPPED | G1-052 | ✓ Represented |  |
-| SH-104 | Rollback flow (picker modal → confirm → progress → success / | SHIPPED | G1-052 | ✓ Represented |  |
-| SH-105 | Publish diff view ("Compare": ‹ Versions, summary, per-page  | SHIPPED | G1-052 | ✓ Represented |  |
+| SH-103 | Publish history list (History › Published: loading/error/emp | SHIPPED | G1-052 | ✓ Represented | 4418:73440 gate dropped (decision 8) |
+| SH-104 | Rollback flow (picker modal → confirm → progress → success / | SHIPPED | G1-052 | ✓ Represented | 4418:73440 gate dropped (decision 8) |
+| SH-105 | Publish diff view ("Compare": ‹ Versions, summary, per-page  | SHIPPED | G1-052 | ✓ Represented | 4418:73440 gate dropped (decision 8) |
 | SH-106 | Recovered-work banner (Discard & reload / Keep changes) | SHIPPED | G1-077 | ✓ Represented | B1-04 |
 | SH-107 | Load-error banner (Session expired · Network · Site not foun | SHIPPED | G1-078 | ✓ Represented | B1-05, B1-06 |
 | SH-108 | Session-expired dialog (changes at risk; Keep editing / Try  | SHIPPED | G1-079 | ✓ Represented |  |
@@ -483,9 +479,9 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | PG-10 | Page row anatomy (checkbox slot, drag grip, home/external gl | SHIPPED | G2-071 | ✓ Represented |  |
 | PG-11 | Add page (footer "+ Add page", empty-state, one-page note; d | SHIPPED | G2-074 | ✓ Represented |  |
 | PG-12 | Inline rename (double-click / F2 / menu "Rename…"; Enter com | SHIPPED | G2-075 | ✓ Represented |  |
-| PG-13 | Duplicate page (menu, ⌘D hint; deep copy " Copy") | SHIPPED | G2-077 | ✓ Represented |  |
-| PG-14 | Set as homepage (hidden when already home; external-link gua | SHIPPED | G2-077 | ✓ Represented |  |
-| PG-15 | Copy page link (`https://{domain}/{slug}`; "No address yet"  | SHIPPED | G2-077 | ✓ Represented |  |
+| PG-13 | Duplicate page (menu, ⌘D hint; deep copy " Copy") | SHIPPED | G2-077 | ✓ Represented | 4418:96273 hidden (decision 27) |
+| PG-14 | Set as homepage (hidden when already home; external-link gua | SHIPPED | G2-077 | ✓ Represented | 4418:96273 hidden (decision 27) |
+| PG-15 | Copy page link (`https://{domain}/{slug}`; "No address yet"  | SHIPPED | G2-077 | ✓ Represented | 4418:96273 hidden (decision 27) |
 | PG-16 | Page context menu (Rename… F2 · Duplicate ⌘D · Set as homepa | SHIPPED | G2-078 | ✓ Represented |  |
 | PG-17 | Delete a page (guards: only page / home page → amber toasts; | SHIPPED | G2-079 | ✓ Represented |  |
 | PG-18 | Reorder pages by drag (drop on a page row → placed after it; | SHIPPED | G2-080 | ✓ Represented |  |
@@ -515,7 +511,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | PG-42 | Advanced: Custom `<head>` code (6-row mono textarea; unclose | SHIPPED | G2-089 | ✓ Represented |  |
 | PG-43 | Routing rules a user can see (lower-case; leading "/"; no tr | SHIPPED | G2-085 | ✓ Represented |  |
 | PG-44 | Template catalogue (10 built-in single-page HTML templates;  | SHIPPED | G2-093 | ✓ Represented |  |
-| PG-45 | Templates tab doors (shortcut T; ⌘K "Browse templates"; Page | SHIPPED | G2-090 | ✓ Represented |  |
+| PG-45 | Templates tab doors (shortcut T; ⌘K "Browse templates"; Page | SHIPPED | G2-090 | ✓ Represented | ⌘K Replace layout → 4428:149355 (decision 27) |
 | PG-46 | Compact drawer gallery (280): always-visible search, "PAGE T | SHIPPED | G2-094 | ✓ Combined |  |
 | PG-47 | "SECTION TEMPLATES" group (drawer) and "Sections" filter pil | STUB | G2-094 | ✓ Combined |  |
 | PG-48 | Saved-templates sync-failed block ("Couldn't load templates. | SHIPPED | G2-094 | ✓ Combined |  |
@@ -763,7 +759,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | ST-06 | Remembered last screen per site | SHIPPED | G3-092 | ✓ Internal |  |
 | ST-07 | Plan lock (Pro pill on rows · Locked screen · Upgrade → Bill | SHIPPED | G3-093 | ✓ Planned for later |  |
 | ST-08 | Doors that leave Settings (Fonts & colours → Brand panel · E | SHIPPED | G3-094 | ✓ Represented |  |
-| ST-09 | Members / Billing external rows (new tab to dashboard) | SHIPPED | G3-095 | ✓ Represented |  |
+| ST-09 | Members / Billing external rows (new tab to dashboard) | SHIPPED | G3-095 | ✓ Represented | Members/Billing → URL exit (decision 32) |
 | ST-10 | Overview screen (five group cards with live summaries) | SHIPPED | G3-096 | ✓ Represented |  |
 | ST-11 | "Needs attention" block (items with Open ›) | SHIPPED | G3-096 | ✓ Represented |  |
 | ST-12 | Search settings modal (sections + fields; jump & focus) | SHIPPED | G3-097 | ✓ Represented |  |
@@ -788,24 +784,24 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | ST-31 | Integrations screen (six link-out rows · COMING SOON badge · | STUB | G3-111 | ✓ Internal | STUB — no user door today (Q3 report-only) |
 | ST-32 | Webhooks screen (Connect endpoint · events · signing secret  | SHIPPED | G3-112 | ✓ Represented |  |
 | ST-33 | Settings deep links (site menu Site settings · "Plugins" → I | SHIPPED | G3-087 | ✓ Represented |  |
-| ST-34 | Publish panel (ENVIRONMENT · SINCE LAST DEPLOY · LAST DEPLOY | FLAGGED-VIABLE | G1-042 | ✓ Represented |  |
+| ST-34 | Publish panel (ENVIRONMENT · SINCE LAST DEPLOY · LAST DEPLOY | FLAGGED-VIABLE | G1-042 | ✓ Represented | copy edit 4418:99386 (decision 7) |
 | ST-35 | "Publish to production" CTA (flag-gated; opens wizard) | FLAGGED-VIABLE | G1-043 | ✓ Represented | B3-10 + 4418:97118 Panel footer |
-| ST-36 | Flag-off state ("Connect Vercel to publish." + "Connect Verc | LIMITED | G1-042 | ✓ Represented |  |
-| ST-37 | Publish wizard step 1 — Pre-Publish Checklist (six server ch | FLAGGED-VIABLE | G1-044 | ✓ Represented |  |
-| ST-38 | Check-row fixes ("Fix ›" → Pages / Settings tab · "Connect"  | FLAGGED-VIABLE | G1-044 | ✓ Represented |  |
+| ST-36 | Flag-off state ("Connect Vercel to publish." + "Connect Verc | LIMITED | G1-042 | ✓ Represented | copy edit 4418:99386 (decision 7) |
+| ST-37 | Publish wizard step 1 — Pre-Publish Checklist (six server ch | FLAGGED-VIABLE | G1-044 | ✓ Represented | Favicon check hidden (decision 13) |
+| ST-38 | Check-row fixes ("Fix ›" → Pages / Settings tab · "Connect"  | FLAGGED-VIABLE | G1-044 | ✓ Represented | Favicon check hidden (decision 13) |
 | ST-39 | Publish wizard step 2 — Confirm (Target · Pages · Client app | FLAGGED-VIABLE | G1-043 | ✓ Represented | B3-10 + 4418:97118 Panel footer |
 | ST-40 | Wizard "Options" step (environment · note · scheduler) | STUB | G1-050 | ✓ Internal | STUB — no user door today (Q3 report-only) |
 | ST-41 | Publishing progress block (step name · step N of 4 · started | FLAGGED-VIABLE | G1-047 | ✓ Represented |  |
 | ST-42 | Just-published state (Published to production · vN · live ·  | FLAGGED-VIABLE | G1-048 | ✓ Represented |  |
 | ST-43 | Publish-failed state (Publish failed · message · Try again · | FLAGGED-VIABLE | G1-049 | ✓ Represented |  |
-| ST-44 | Deploy service unreachable state (Couldn't reach the deploy  | FLAGGED-VIABLE | G1-042 | ✓ Represented |  |
+| ST-44 | Deploy service unreachable state (Couldn't reach the deploy  | FLAGGED-VIABLE | G1-042 | ✓ Represented | copy edit 4418:99386 (decision 7) |
 | ST-45 | Unpublish site (red button · confirm · toasts) | SHIPPED | G1-051 | ✓ Represented |  |
-| ST-46 | Publish history list (versions · completed time · rollbackab | DUPLICATE | G1-052 | ✓ Combined | DUPLICATE (Q3) — same job traced through its twin |
-| ST-47 | Rollback to a prior version | DUPLICATE | G1-052 | ✓ Combined | DUPLICATE (Q3) — same job traced through its twin |
-| ST-48 | Publish diff (page-by-page added / removed / changed / same  | DUPLICATE | G1-052 | ✓ Combined | DUPLICATE (Q3) — same job traced through its twin |
+| ST-46 | Publish history list (versions · completed time · rollbackab | DUPLICATE | G1-052 | ✓ Combined | 4418:73440 gate dropped (decision 8) |
+| ST-47 | Rollback to a prior version | DUPLICATE | G1-052 | ✓ Combined | 4418:73440 gate dropped (decision 8) |
+| ST-48 | Publish diff (page-by-page added / removed / changed / same  | DUPLICATE | G1-052 | ✓ Combined | 4418:73440 gate dropped (decision 8) |
 | ST-49 | Cancel an in-flight publish | UNREACHABLE | G1-047 | ✓ Internal | UNREACHABLE — no user door today (Q3 report-only) |
 | ST-50 | Custom domain for the live site | DUPLICATE | G1-053 | ✓ Combined |  |
-| ST-51 | Legal line (Privacy policy · Terms of service links) | SHIPPED | G1-042 | ✓ Represented |  |
+| ST-51 | Legal line (Privacy policy · Terms of service links) | SHIPPED | G1-042 | ✓ Represented | copy edit 4418:99386 (decision 7) |
 | ST-52 | Topbar publish button + publish confirm modal | DUPLICATE | G1-043 | ✓ Combined | B3-10 + 4418:97118 Panel footer |
 | ST-53 | Review panel frame + states (loading · load error · never se | SHIPPED | G1-054 | ✓ Represented | B3-05 |
 | ST-54 | Send for review popover (Client email · What changed? · Note | SHIPPED | G1-031 | ✓ Represented | B3-02, B3-03, B3-04 + 4418:121372 Re-send |
@@ -818,7 +814,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | ST-61 | Viewer opens the review link (read-only site + comment mode) | SHIPPED | G1-063 | ✓ Represented |  |
 | ST-62 | Viewer approves | SHIPPED | G1-064 | ✓ Represented |  |
 | ST-63 | Viewer rejects / requests changes | SHIPPED | G1-065 | ✓ Represented |  |
-| ST-64 | Viewer comments (pins on canvas + rows in panel) | SHIPPED | G1-066 | ✗ Missing | C-03 viewer pins — dashboard surface (Q1 out of scope; OD-6) |
+| ST-64 | Viewer comments (pins on canvas + rows in panel) | SHIPPED | G1-066 | ✓ Represented | C-03 7593:193511 (owner decision 4) |
 | ST-65 | Comment thread list (Open groups per page with counts · Reso | SHIPPED | G1-055 | ✓ Represented |  |
 | ST-66 | Reply composer ("Reply to the client…" internal note; Send) | SHIPPED | G1-056 | ✓ Represented |  |
 | ST-67 | Resolve / Reopen a comment | SHIPPED | G1-057 | ✓ Represented | EP-4 |
@@ -826,16 +822,16 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | ST-69 | Comment filter | LIMITED | G1-055 | ✓ Represented |  |
 | ST-70 | Progress block (green track · "resolved of total") + sent me | SHIPPED | G1-055 | ✓ Represented |  |
 | ST-71 | Compare with approved (list in drawer · split / overlay at 1 | SHIPPED | G1-061 | ✓ Combined |  |
-| ST-72 | Approval lock gating publish (send-for-review move · waiting | SHIPPED | G1-045 | ✓ Represented | B1-09, B1-10 |
+| ST-72 | Approval lock gating publish (send-for-review move · waiting | SHIPPED | G1-045 | ✓ Represented | B1-09 + 4th gate route on 523 shells + reviewChangesRequested (decision 1) |
 | ST-73 | Viewer-role gating (Viewers can't send for review — ask an e | SHIPPED | G1-062 | ✓ Represented | B2-07 + AN-04 |
 | ST-74 | Review notifications (bell: actor · message · action link ·  | SHIPPED | G1-033 | ✓ Represented | B3-09 + EP-3 |
-| ST-75 | Topbar review bar (status pill · Send for review · Compare) | DUPLICATE | G1-029 | ✓ Combined | folded into chip + panel (OD-7) |
-| ST-76 | Export modal (HTML · ZIP · React formats; title/description  | SHIPPED | G3-113 | ✓ Represented |  |
-| ST-77 | "Vue" · "Next.js" format pills with "Soon" tag | STUB | G3-113 | ✓ Internal | STUB — no user door today (Q3 report-only) |
-| ST-78 | Preview tab (Desktop 1440 · Tablet 768 · Mobile 375 frames) | SHIPPED | G3-113 | ✓ Represented |  |
-| ST-79 | Code tab (HTML / CSS sub-tabs · line count · Copy) | SHIPPED | G3-113 | ✓ Represented |  |
-| ST-80 | Options tab (Page Title · CSS Style · Minify / reset / meta  | SHIPPED | G3-113 | ✓ Represented |  |
-| ST-81 | Downloads (index.html · Download CSS · Download All · <title | SHIPPED | G3-113 | ✓ Represented |  |
+| ST-75 | Topbar review bar (status pill · Send for review · Compare) | DUPLICATE | G1-029 | ✓ Combined | folded into chip + panel (OD-7, owner-confirmed 2026-09-21) |
+| ST-76 | Export modal (HTML · ZIP · React formats; title/description  | SHIPPED | G3-113 | ✓ Represented | export copy (decision 30) |
+| ST-77 | "Vue" · "Next.js" format pills with "Soon" tag | STUB | G3-113 | ✓ Internal | export copy (decision 30) · STUB — no user door today (Q3 report-only) |
+| ST-78 | Preview tab (Desktop 1440 · Tablet 768 · Mobile 375 frames) | SHIPPED | G3-113 | ✓ Represented | export copy (decision 30) |
+| ST-79 | Code tab (HTML / CSS sub-tabs · line count · Copy) | SHIPPED | G3-113 | ✓ Represented | export copy (decision 30) |
+| ST-80 | Options tab (Page Title · CSS Style · Minify / reset / meta  | SHIPPED | G3-113 | ✓ Represented | export copy (decision 30) |
+| ST-81 | Downloads (index.html · Download CSS · Download All · <title | SHIPPED | G3-113 | ✓ Represented | export copy (decision 30) |
 | ST-82 | Export doors (topbar Export button · Settings → Export row) | SHIPPED | G3-094 | ✓ Represented |  |
 | ST-83 | Exported / published page contents (SEO head · JSON-LD · fon | SHIPPED | G3-114 | ✓ Internal |  |
 | ST-84 | "Set Up Products Collection" modal (Include sample products  | SHIPPED | G3-115 | ✓ Represented |  |
@@ -907,9 +903,9 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | IN-34 | "More settings" disclosure | SHIPPED | G2-146 | ✓ Represented |  |
 | IN-35 | Standard property row (override dot, (i) helper, mixed dot,  | SHIPPED | G2-146 | ✓ Represented |  |
 | IN-36 | Section order per element type | SHIPPED | G2-137 | ✓ Planned for later |  |
-| IN-37 | Layout: Display | SHIPPED | G2-147 | ✓ Represented |  |
-| IN-38 | Layout: Position + offsets + z-index | SHIPPED | G2-147 | ✓ Represented |  |
-| IN-39 | Layout: Overflow / box-sizing / Visibility / Float / Clear | SHIPPED | G2-147 | ✓ Represented |  |
+| IN-37 | Layout: Display | SHIPPED | G2-147 | ✓ Represented | Fill/Hug items hidden (decision 27) |
+| IN-38 | Layout: Position + offsets + z-index | SHIPPED | G2-147 | ✓ Represented | Fill/Hug items hidden (decision 27) |
+| IN-39 | Layout: Overflow / box-sizing / Visibility / Float / Clear | SHIPPED | G2-147 | ✓ Represented | Fill/Hug items hidden (decision 27) |
 | IN-40 | Flexbox: Enable Flex prompt | SHIPPED | G2-148 | ✓ Combined |  |
 | IN-41 | Flexbox container controls | SHIPPED | G2-148 | ✓ Combined |  |
 | IN-42 | Flexbox: linked gap control | SHIPPED | G2-148 | ✓ Combined |  |
@@ -967,14 +963,14 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | IN-94 | CSS classes section | SHIPPED | G2-160 | ✓ Represented |  |
 | IN-95 | All CSS section | UNREACHABLE | G2-160 | ✓ Internal | UNREACHABLE — no user door today (Q3 report-only) |
 | IN-96 | Number-with-unit field | LIMITED | G2-161 | ✓ Represented |  |
-| IN-97 | Colour row (swatch, hex, bound / unlink / relink) | SHIPPED | G3-156 | ✓ Represented |  |
-| IN-98 | Colour row eye toggle | STUB | G3-156 | ✓ Internal | STUB — no user door today (Q3 report-only) |
+| IN-97 | Colour row (swatch, hex, bound / unlink / relink) | SHIPPED | G3-156 | ✓ Represented | purple swatch hidden (decision 34) |
+| IN-98 | Colour row eye toggle | STUB | G3-156 | ✓ Internal | purple swatch hidden (decision 34) · STUB — no user door today (Q3 report-only) |
 | IN-99 | Token picker popover — Tokens tab | SHIPPED | G3-155 | ✓ Represented |  |
 | IN-100 | Token picker popover — Custom tab | SHIPPED | G3-140 | ✓ Represented | EP-10 |
 | IN-101 | Eyedropper | STUB | G3-155 | ✓ Internal | STUB — no user door today (Q3 report-only) |
 | IN-102 | Token picker Brand / Recent quick rows | STUB | G3-155 | ✓ Internal | STUB — no user door today (Q3 report-only) |
-| IN-103 | Design-system binding chip (green "token") | LIMITED | G3-156 | ✓ Represented |  |
-| IN-104 | Off-DS amber chip + "Bind to token" (Beginner) / blue preset | UNREACHABLE | G3-156 | ✓ Internal | UNREACHABLE — no user door today (Q3 report-only) |
+| IN-103 | Design-system binding chip (green "token") | LIMITED | G3-156 | ✓ Represented | purple swatch hidden (decision 34) |
+| IN-104 | Off-DS amber chip + "Bind to token" (Beginner) / blue preset | UNREACHABLE | G3-156 | ✓ Internal | purple swatch hidden (decision 34) · UNREACHABLE — no user door today (Q3 report-only) |
 | IN-105 | Breakpoint / state cascade + one-undo-step writes | SHIPPED | G2-166 | ✓ Internal |  |
 | IN-106 | Disabled-reason strings | SHIPPED | G2-146 | ✓ Represented |  |
 | IN-107 | Colour mode in inspector (Light / Dark toggle, per-mode valu | STUB | G3-157 | ✓ Internal | STUB — no user door today (Q3 report-only) |
@@ -1017,7 +1013,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | BR-34 | Token detail: Auto-fix | STUB | G3-136 | ✓ Internal | STUB — no user door today (Q3 report-only) |
 | BR-35 | Token detail: "Replace value" → inline colour picker | SHIPPED | G3-136 | ✓ Represented |  |
 | BR-36 | Token detail: Rename ID | LIMITED | G3-137 | ✓ Represented |  |
-| BR-37 | Token detail: Delete token (+ Replace token modal) | LIMITED | G3-138 | ✓ Represented |  |
+| BR-37 | Token detail: Delete token (+ Replace token modal) | LIMITED | G3-138 | ✓ Represented | token-lock copy (decision 31) |
 | BR-38 | Beginner "Delete blocked" notice | SHIPPED | G3-136 | ✓ Represented |  |
 | BR-39 | Inline colour picker (canvas, hue, alpha, hex, contrast badg | LIMITED | G3-140 | ✓ Represented | EP-10 |
 | BR-40 | Font family picker (token detail) | SHIPPED | G3-135 | ✓ Represented |  |
@@ -1053,7 +1049,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | BR-70 | Silent token-schema migration v1→v5 | SHIPPED | G3-153 | ✓ Represented | B1-14, B1-15 |
 | BR-71 | Legacy canvas-overlay tokens (kit §B15) | DUPLICATE | G3-154 | ✓ Deprecated |  |
 
-## Figma → Code (1138 boards)
+## Figma → Code (1140 boards)
 
 | Board | Name | Phase-19 status | Rows / note |
 |---|---|---|---|
@@ -1137,7 +1133,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 6883:70626 | CD·Media · filtered · icon | △ Partial | G3-005 D |
 | 6883:70986 | CD·Build · Choose media · more loaded | ✓ Code | G3-014 A |
 | 7093:78271 | CD·Media · fullpage · library · details expanded | ✓ Code | G3-032 A |
-| 4418:71408 | SS·Brand · every designed state | ✗ Dummy | G3-158 F |
+| 4418:71408 | SS·Brand · every designed state | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:73440 | CD·History · Published · restore-confirm | △ Partial | G1-052 D · G2-177 A |
 | 4418:73452 | CD·History · Published · redeploying | △ Partial | G1-052 D · G2-177 A |
 | 4418:73462 | CD·History · Published · restored | △ Partial | G1-052 D · G2-177 A |
@@ -1175,7 +1171,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:80042 | CD·Layers · locked | △ Partial | G2-006 D · G2-065 A |
 | 4418:80250 | CD·Layers · renaming | ✓ Code | G2-061 A |
 | 4418:80489 | CD·Layers · dragging | ✓ Code | G2-066 A |
-| 4418:80697 | SUPERSEDED · Layers · expanded (old document, unwired rows) — replaced | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:80697 | SUPERSEDED · Layers · expanded (old document, unwired rows) — replaced | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:80984 | CD·Layers · scroll-overflow | ✓ Code | G2-058 A |
 | 4418:81300 | CD·Editor · Bella Cucina / Home / Layers | △ Partial | G1-001 D · G1-090 A (widths UNVERIFIED) · G2-001 A |
 | 4418:81536 | CD·Layers · Heading deleted | △ Partial | G2-067 D |
@@ -1242,7 +1238,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:95333 | S·Pages · no-results | ✓ Code | G2-072 A |
 | 4418:95789 | S·Pages · structure | △ Partial | G2-074 D · G2-085 A |
 | 4418:96009 | S·Pages · tree · drag · drop indicator (of 140:2) | ✓ Code | G2-080 A |
-| 4418:96273 | S·Pages · tree · homepage by position (of 140:2) | ✓ Code | G2-077 A (+ E inside Figma) |
+| 4418:96273 | S·Pages · tree · homepage by position (of 140:2) | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:96537 | S·Pages · bulk · one toast per action (of 141:78) | ✓ Code | G2-081 A |
 | 4418:96768 | SS·Pages · every designed state | △ Partial | G1-120 — (scaffold) |
 | 6700:71154 | CD·Pages · New page created | △ Partial | G2-018 D · G2-074 D |
@@ -1318,7 +1314,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:106671 | CD·Use AI · quota reached | ✓ Code | G1-108 A (G3) · G2-133 A |
 | 4418:106796 | CD·Connect AI provider | △ Partial | G1-025 F · G1-122 A (cross-ref) · G2-127 E (code) · G2-133 A |
 | 4418:106919 | CD·Use AI · provider unavailable | ✓ Code | G2-133 A |
-| 4418:107044 | CD·Inspector · profile · CONTAINER (fallback) | △ Partial | G2-168 E (Figma) |
+| 4418:107044 | CD·Inspector · profile · CONTAINER (fallback) | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:107268 | S·AI · scoped-multi | ✓ Code | G2-131 A (+ E inside Figma) |
 | 4418:107408 | SS·AI · every designed state | △ Partial | G1-120 — (scaffold) |
 | 6881:63035 | CD·AI · Hero › Draft · typed | △ Partial | G2-128 A · G2-132 D |
@@ -1345,7 +1341,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:108108 | CD·Edit button link · Home / Menu button | ✓ Code | G2-156 A (+ E code) |
 | 4418:108695 | CD·Bind content · Menu / Price | △ Partial | G2-020 D · G2-144 E (Figma) · D · G3-078 D · E |
 | 4418:108916 | CD·Bind content · Menu / Price / no records | △ Partial | G2-144 E (Figma) · D · G3-078 D · E |
-| 4418:109146 | CD·Bind content · Menu / Price / choose record | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:109146 | CD·Bind content · Menu / Price / choose record | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:109376 | CD·Motion · list · preserves selected element | △ Partial | G1-115 A (G3) · G2-157 A (+ E both sides) · G3-117 D · E |
 | 4418:109525 | CD·Motion · add · preserves selected element | △ Partial | G2-157 A (+ E both sides) · G3-117 D · E |
 | 4418:109686 | CD·Motion · edit · preserves selected element | △ Partial | G2-157 A (+ E both sides) · G3-117 D · E |
@@ -1423,7 +1419,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:122159 | CD·Client sign-off · F · dead-link · new link requested · 1280 | △ Partial | G1-067 C · UNKNOWN (dashboard) |
 | 4418:122170 | CD·Client sign-off · C · change request not sent / notes retained · 12 | ✓ Code | G1-065 A (UNVERIFIED) |
 | 4418:122315 | CD·Shell state 12 · Loading | △ Partial | G1-001 D · G1-078 D · G2-001 A |
-| 4418:122932 | CD·Shell state 11 · Saving → conflict | △ Partial | G1-080 D |
+| 4418:122932 | CD·Shell state 11 · Saving → conflict | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:123152 | CD·Shell state 2 · Returning (default) | △ Partial | G1-001 D |
 | 4418:123573 | CD·Editor · Home / drawer closed | △ Partial | G1-001 D · G1-004 D · G1-090 A (widths UNVERIFIED) · G2-001 A |
 | 4418:124664 | CD·Exit · Workspace (leaves the editor) | △ Partial | G1-003 D · G1-023 D · G1-028 C · NOT IMPLEMENTED (editor) |
@@ -1591,15 +1587,15 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:156787 | Assets · List · Inter-Var.woff2 selected | ✓ Code | G3-048 A · E · G3-054 A |
 | 4418:156971 | Assets · List · terrace-night.jpg selected | ✓ Code | G3-048 A · E |
 | 4418:157375 | CD·Assets · Deleted · hero-dark.jpg | ✓ Code | G3-053 A · E |
-| 4418:157589 | CD·Assets · Deleted · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:157803 | CD·Assets · Deleted · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:157589 | CD·Assets · Deleted · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:157803 | CD·Assets · Deleted · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:158017 | CD·Assets · Deleted · team-photo.jpg | ✓ Code | G3-053 A · E |
-| 4418:158231 | CD·Assets · Deleted · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:158445 | CD·Assets · Deleted · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:158659 | CD·Assets · Deleted · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:158873 | CD·Assets · Deleted · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:159087 | CD·Assets · Deleted · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:159301 | CD·Assets · Deleted · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:158231 | CD·Assets · Deleted · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:158445 | CD·Assets · Deleted · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:158659 | CD·Assets · Deleted · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:158873 | CD·Assets · Deleted · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:159087 | CD·Assets · Deleted · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:159301 | CD·Assets · Deleted · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:159544 | Assets · 2 columns · no selection | ✓ Code | G3-044 A |
 | 4418:159752 | Assets · 4 columns · no selection | ✓ Code | G3-044 A |
 | 6879:65473 | CD·Assets · Products · folder/scope · Name A–Z | ✓ Code | G3-038 A |
@@ -1743,8 +1739,8 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 7075:79085 | CD·Inspector · Effects · BLUR expanded | ✓ Code | G2-155 B |
 | 4428:150081 | SS·v3 · Brand | ✗ Dummy | G3-158 F |
 | 4418:168885 | CD·Brand workspace · Import / export | ✓ Code | G3-148 A |
-| 6466:6 | [not-implemented] · Brand · Loading (placeholder — skeleton lives in S | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6466:10 | [not-implemented] · Brand · Error (placeholder — note/error lives in S | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 6466:6 | [not-implemented] · Brand · Loading (placeholder — skeleton lives in S | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6466:10 | [not-implemented] · Brand · Error (placeholder — note/error lives in S | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 7315:80955 | CD·Brand workspace · Colours | △ Partial | G3-094 A · G3-120 D · E · G3-121 D · G3-128 D · G3-131 A · G3-134 D · G3-136 D |
 | 7316:80949 | CD·Brand workspace · Colour mode | △ Partial | G1-106 A (EN-13) · F (EN-14, EN-15) · G3-146 D |
 | 7316:81551 | CD·Brand workspace · Fonts & type styles | △ Partial | G3-135 D · E |
@@ -1760,14 +1756,14 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:154613 | CD·Assets · discard | ✓ Code | G3-059 A · E |
 | 4418:157583 | Assets · Confirm delete · hero-dark.jpg | △ Partial | G3-030 D · E |
 | 4418:158225 | Assets · Confirm delete · team-photo.jpg | △ Partial | G3-030 D · E |
-| 4418:157797 | Assets · Confirm delete · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:158011 | Assets · Confirm delete · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:158439 | Assets · Confirm delete · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:158653 | Assets · Confirm delete · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:158867 | Assets · Confirm delete · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:159081 | Assets · Confirm delete · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:159295 | Assets · Confirm delete · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:159509 | Assets · Confirm delete · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:157797 | Assets · Confirm delete · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:158011 | Assets · Confirm delete · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:158439 | Assets · Confirm delete · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:158653 | Assets · Confirm delete · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:158867 | Assets · Confirm delete · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:159081 | Assets · Confirm delete · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:159295 | Assets · Confirm delete · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:159509 | Assets · Confirm delete · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:156160 | Assets · Delete selected files confirmation | △ Partial | G3-030 D · E |
 | 4418:60734 | CD·Media · Replacement file selected · confirm upload | ✓ Code | G3-016 A |
 | 4418:59209 | CD·Media · modal · replace-across-site | △ Partial | G3-027 D · G3-053 A · E |
@@ -1819,14 +1815,14 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:156140 | Assets · Rename asset | ✓ Code | G3-052 A · E |
 | 4418:155713 | Assets · Move · Products selected | ✓ Code | G3-058 A |
 | 4418:155719 | Assets · Move · Hero shots selected | ✓ Code | G3-058 A |
-| 4418:156180 | Assets · Rename · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:156186 | Assets · Rename · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:156198 | Assets · Rename · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:156204 | Assets · Rename · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:156210 | Assets · Rename · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:156216 | Assets · Rename · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:156222 | Assets · Rename · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:156228 | Assets · Rename · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:156180 | Assets · Rename · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:156186 | Assets · Rename · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:156198 | Assets · Rename · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:156204 | Assets · Rename · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:156210 | Assets · Rename · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:156216 | Assets · Rename · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:156222 | Assets · Rename · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:156228 | Assets · Rename · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:155725 | Assets · Move · failed | ✓ Code | G3-058 A |
 | 4418:155926 | Assets · Folder name error | ✓ Code | G3-038 A |
 | 4418:156146 | Assets · Rename complete | ✓ Code | G3-052 A · E |
@@ -1844,11 +1840,11 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:162327 | Assets · Asset URL | ✗ Dummy | G3-065 F |
 | 4418:162332 | Assets · Alt text | ✗ Dummy | G3-065 F |
 | 4418:162337 | Assets · No site references | ✗ Dummy | G3-065 F |
-| 4418:163352 | Video · Replace chef source | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:163384 | Video · Chef no references | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:163377 | Video · Replace grand-opening source | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:163364 | Video · No references to replace | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 4418:163359 | Video · Replacement completed | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:163352 | Video · Replace chef source | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:163384 | Video · Chef no references | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:163377 | Video · Replace grand-opening source | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:163364 | Video · No references to replace | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:163359 | Video · Replacement completed | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:160495 | CMS · Margherita dynamic page preview · saved record | △ Partial | G3-069 D · E |
 | 4418:61914 | CD·Media · Browse icons | △ Partial | G3-028 A · G3-060 D · E |
 | 6823:59907 | S·Assets · Stock assets · no results | △ Partial | G3-036 D |
@@ -1861,14 +1857,14 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 6881:64282 | CD·Media · Files deleted (toast) · drawer bulk | △ Partial | G3-013 D |
 | 6881:70624 | CD·Media · File deleted (toast) · hero-dark.jpg | ✓ Code | G3-053 A · E |
 | 6881:70642 | CD·Media · File deleted (toast) · team-photo.jpg | ✓ Code | G3-053 A · E |
-| 6881:70660 | CD·Media · File deleted (toast) · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6881:70678 | CD·Media · File deleted (toast) · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6881:70696 | CD·Media · File deleted (toast) · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6881:72971 | CD·Media · File deleted (toast) · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6881:72988 | CD·Media · File deleted (toast) · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6881:73005 | CD·Media · File deleted (toast) · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6881:73022 | CD·Media · File deleted (toast) · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
-| 6881:73039 | CD·Media · File deleted (toast) · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 6881:70660 | CD·Media · File deleted (toast) · menu-cover.png | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6881:70678 | CD·Media · File deleted (toast) · chef-intro.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6881:70696 | CD·Media · File deleted (toast) · logo-mark.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6881:72971 | CD·Media · File deleted (toast) · pasta-closeup.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6881:72988 | CD·Media · File deleted (toast) · grand-opening.mp4 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6881:73005 | CD·Media · File deleted (toast) · star-icon.svg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6881:73022 | CD·Media · File deleted (toast) · Inter-Var.woff2 | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 6881:73039 | CD·Media · File deleted (toast) · terrace-night.jpg | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 6881:73056 | CD·Media · Files deleted (toast) · bulk 2 · list | ✓ Code | G3-053 A · E |
 | 6881:74018 | CD·Media · Files deleted (toast) · bulk 6 · list | ✓ Code | G3-053 A · E |
 | 6881:74033 | Assets · Delete 6 selected files confirmation | △ Partial | G3-013 D · G3-030 D · E |
@@ -1908,7 +1904,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:126882 | CD·Keyboard legend | △ Partial | G1-009 B · G1-026 D · E · G1-089 D · G1-091 D · G2-037 D · G2-039 D · G2-047 D · G2-091 A |
 | 4418:165478 | CD·Unsaved settings | △ Partial | G1-090 A (widths UNVERIFIED) · G3-090 D |
 | 4418:165469 | CD·Settings saved | ✓ Code | G3-091 A |
-| 4418:165473 | CD·Settings could not save | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 — zero inbound refs / superseded) |
+| 4418:165473 | CD·Settings could not save | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:165483 | CD·Edit social profile | ✓ Code | G3-098 A |
 | 4418:165492 | CD·Add a domain | ✓ Code | G3-102 A |
 | 4418:165501 | CD·Verify www.bellacucina.com | ✓ Code | G3-102 A |
@@ -1940,7 +1936,7 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:98036 | CD·Site menu · Unpublished (modal · 560) | △ Partial | G1-051 D · G1-017 D |
 | 4418:54252 | CD·Templates · Create Menu 2 / confirm | ✓ Code | G2-101 A |
 | 4418:54262 | CD·Templates · Create Landing page / confirm | ✓ Code | G2-101 A |
-| 4418:54271 | CD·Templates · Replace Home with Restaurant / confirm | △ Partial | G2-098 D |
+| 4418:54271 | CD·Templates · Replace Home with Restaurant / confirm | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:54284 | CD·Templates · Replace Home with Bistro Menu / confirm | △ Partial | G2-098 D |
 | 4418:56203 | CD·Templates · Replace Home with Bistro Landing / confirm | △ Partial | G2-098 D |
 | 4418:56225 | CD·Templates · Create Autumn menu layout page / confirm | ✓ Code | G2-101 A |
@@ -1987,8 +1983,8 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 4418:98009 | CD·Reconnect Vercel · Workspace | ✓ Code | G1-049 A |
 | 4418:172783 | CD·Bella Cucina · Published | △ Partial | G1-033 D |
 | 4418:172789 | CD·Bella Cucina · Form submission | △ Partial | G1-033 D |
-| 4418:172794 | CD·Open Osteria notification? | △ Partial | G1-033 D |
-| 4418:172799 | CD·Osteria · Publish failed | △ Partial | G1-033 D |
+| 4418:172794 | CD·Open Osteria notification? | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
+| 4418:172799 | CD·Osteria · Publish failed | ✗ Dummy | hidden 21 Sep 2026 (Batch 8 zero-inbound clones, or owner decisions — dump/hide-safe.json) |
 | 4418:173685 | CD·Brand · Rename token | △ Partial | G3-137 D |
 | 4418:173707 | CD·Brand · Token renamed | △ Partial | G3-137 D |
 | 4418:173718 | CD·Brand · Delete token? | △ Partial | G3-138 D |
@@ -2195,3 +2191,5 @@ Code side: every `01-code-inventory.md` row → its owning `03-gap-matrix.md` ro
 | 7576:194517 | CURRENT DESIGN · Canvas · grid overlay | ✓ Code | built 21 Sep 2026 (05 ledger) |
 | 7576:194856 | CURRENT DESIGN · Canvas · spacing overlay | ✓ Code | built 21 Sep 2026 (05 ledger) |
 | 7576:197036 | CURRENT DESIGN · Brand workspace · Spacing | ✓ Code | built 21 Sep 2026 (05 ledger) |
+| 7593:193270 | CURRENT DESIGN · Topbar · CTA verbs | ✓ Code | built 21 Sep 2026 (05 ledger) |
+| 7593:193511 | CURRENT DESIGN · Client sign-off · pin on snapshot | ✓ Code | built 21 Sep 2026 (05 ledger) |
