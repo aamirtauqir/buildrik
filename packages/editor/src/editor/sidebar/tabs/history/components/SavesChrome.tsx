@@ -127,17 +127,18 @@ export const SavesApproval: React.FC<{ composer: Composer | null }> = ({ compose
               .join(" · ")}
           </div>
         )}
-        {/* Routed, not rebuilt: UI_PANEL_OPEN carries a `screen`, TabRouter maps
-            `activeSubTab === "compare"` to ReviewTab's `initialCompare`, and
-            ReviewTab opens straight into ApprovedCompareView. A second copy of
-            that view here would need its own snapshot + live-export plumbing
-            and would drift from the one the boards describe. */}
+        {/* B8 — routed, not rebuilt: UI_PANEL_OPEN carries a `screen`, TabRouter
+            maps `activeSubTab === "session"` to HistoryTab's `initialView="session"
+            initialBaseline="approved"`, and SessionView's picker lands on
+            Approved directly. A second copy of that view here would need its
+            own snapshot + live-export plumbing and would drift from the one
+            the boards describe. */}
         <Button
           color="light"
           size="xs"
           className={BAND_ACTION}
           onClick={() =>
-            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "review", screen: "compare" })
+            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "history", screen: "session" })
           }
         >
           Compare with current
