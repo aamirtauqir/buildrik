@@ -22,7 +22,7 @@ import type { Composer } from "../../../../engine";
  * `backups` is drawn in Figma but deliberately absent — 7 `[design-ahead]`
  * boards with no backing service.
  */
-export type HistoryView = "saves" | "published";
+export type HistoryView = "saves" | "published" | "activity";
 
 /** Which list the Saves pane shows. `changes` is the old Changes tab. */
 export type SavesFilter = "milestones" | "changes";
@@ -58,4 +58,14 @@ export interface ActivityViewProps {
   error?: string | null;
   /** Retry callback for the error state */
   onRetry?: () => void;
+}
+
+/** B6 (code-gap plan) — Activity tab reads site-scoped rows from the
+ *  dashboard activity log; the shape mirrors the dashboard-side reader
+ *  so editor + dashboard use the same vocabulary. */
+export interface ActivityLogViewProps {
+  /** Site the rows are scoped to — comes from `TabRouter`'s resolved projectId
+   *  or the URL fallback. Null = opened without a project; the view renders
+   *  a banner and not a query. */
+  siteId: string | null;
 }
