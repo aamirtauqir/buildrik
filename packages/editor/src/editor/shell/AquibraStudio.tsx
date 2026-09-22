@@ -519,7 +519,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenConflict={() => setConflict({ serverToken: "" })}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
-          onVercelPublish={requestPublish}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}

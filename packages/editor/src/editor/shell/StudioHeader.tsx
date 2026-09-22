@@ -23,7 +23,7 @@ import * as React from "react";
 import type { SaveState as StudioSaveState } from "./hooks/useStudioState";
 import type { ReviewPillState } from "@buildrik/shared/schemas/reviews";
 import { deriveLifecycleState } from "./lifecycle";
-import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, plural, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
+import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
@@ -119,8 +119,7 @@ export interface StudioHeaderProps {
   /** Export HTML as zip download */
   onExportHTML?: () => void;
 
-  /** Vercel publish flow — when present, replaces fallback handleExport on Publish click */
-  onVercelPublish?: () => void;
+  /** Vercel publish flow lives in the Publish panel — topbar only routes. */
   /** True while a publish job is in flight */
   publishLoading?: boolean;
   /** Live URL after successful publish */
@@ -207,7 +206,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onSave,
   onOpenConflict,
   onExportHTML,
-  onVercelPublish,
   publishLoading,
   publishedUrl,
   publishOutcome = null,
@@ -677,36 +675,22 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // alone never confirm — the chip already carried that signal. Gate
   // precedence (D9): this fires only when publish isn't `disabled` (the
   // blocked reasons above win); the SERVER approval gate can still reject the
-  // attempt afterwards — its acknowledge flow owns that path, not this modal.
-  const [pubConfirm, setPubConfirm] = React.useState(false);
-  // `onVercelPublish` is a plain useCallback in AquibraStudio, so it is never
-  // undefined and the two fallbacks below are unreachable in the shipping
-  // editor. That is fine for `handleExport`, but it silently made the Publish
-  // PANEL (board 641:2652) undiscoverable — this was its only wire. The panel
-  // now has its own door in SiteMenu; the chain stays as a degraded path for a
-  // build with publishing switched off.
-  const publishNow = onVercelPublish ?? onOpenPublish ?? handleExport;
-  /* One control, so one handler. Both review verbs land on the Review panel —
-     the door that already owns SendForReview and the feedback thread — so a
-     state-dependent CTA adds no surface, only a destination. */
+  // Both review verbs land on the Review panel — the door that already owns
+  // SendForReview and the feedback thread — so a state-dependent CTA adds no
+  // surface, only a destination.
+  /* One confirm door for publish (board 833:4518 / 914:4507): the topbar
+     never hosts its own confirm anymore — it asks the Publish panel to open
+     its wizard, which owns "publish anyway" inline so the words in the dialog
+     match the panel's own. The panel publishes, not this menu — this handler
+     only routes. */
   const handleCtaClick = React.useCallback(() => {
     if (nextMove && nextMove.kind !== "publish") {
       onOpenReview?.();
       return;
     }
-    if (errorCount > 0) {
-      setPubConfirm(true);
-      return;
-    }
-    publishNow();
-  }, [nextMove, onOpenReview, errorCount, publishNow]);
-  // D12: top-3 concrete rows, errors first — real messages from the shipped
-  // Issue shape, never invented categories.
-  const confirmRows = issues
-    .filter((i) => i.type !== "info")
-    .sort((a, b) => (a.type === b.type ? 0 : a.type === "error" ? -1 : 1))
-    .slice(0, 3);
-  const confirmMore = errorCount + warnCount - confirmRows.length;
+    onOpenPublish?.();
+    composer?.emit(EVENTS.UI_PUBLISH_WIZARD_REQUEST, undefined);
+  }, [nextMove, onOpenReview, onOpenPublish, composer]);
 
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. View mode is itself a preview,
@@ -838,13 +822,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             }
             /* Board 1172:4825 is a MODAL — format chips, a preview, a code
                view, options — and it had no door. `handleExport` opens it, but
-               `handleExport` is third in `onVercelPublish ?? onOpenPublish ??
-               handleExport`, and the first is never undefined, so it was as
-               unreachable as the Publish panel was. Meanwhile this row fired
-               `onExportHTML`, which downloads a zip on the spot: the one
-               screen for CHOOSING a format was skipped by the only control
-               that mentions exporting. The row opens the modal; the immediate
-               zip is what the modal's own ZIP button does. */
+               this row fired `onExportHTML`, which downloads a zip on the
+               spot: the one screen for CHOOSING a format was skipped by the
+               only control that mentions exporting. The row opens the modal;
+               the immediate zip is what the modal's own ZIP button does. */
             onExportCode={viewMode.readOnlyView ? undefined : handleExport}
             onOpenTemplates={viewMode.readOnlyView ? undefined : onOpenTemplates}
             onOpenComponents={viewMode.readOnlyView ? undefined : onOpenComponents}
@@ -880,98 +861,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
       {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} /> : null}
 
-      {/* T4 publish-anyway confirm — the missing frame (TODOS.md founder
-          decision, resolved D12/D13). Focus opens on the safe door (F26);
-          ModalRoot's trap returns focus to Publish on close. */}
-      {pubConfirm ? (
-        <ModalRoot open onOpenChange={(o) => !o && setPubConfirm(false)}>
-          <ModalContent size="question" aria-labelledby="bk-pubconfirm-title">
-            <ModalTitle id="bk-pubconfirm-title">
-              {/* Board 1168:4732 says "open errors", not "errors" — the word
-                  is doing work: these are errors the user has already been
-                  shown and left, not ones this dialog is reporting. */}
-              Publish with {errorCount} open {errorCount === 1 ? "error" : "errors"}?
-            </ModalTitle>
-            {/* Board 1168:4732 states the consequence, not the options — the
-                options are the two buttons. */}
-            <ModalDescription>
-              These will ship to every visitor exactly as they are now.
-              {reviewStatus.state !== "none"
-                ? ` A review round is open — ${reviewStatus.reviewerName ?? "your reviewer"} will see the published site.`
-                : ""}
-            </ModalDescription>
-            <div className="bk-pubconfirm__list">
-              {confirmRows.map((i) => (
-                /* Each row carries its OWN severity tint. They used to share
-                   one amber box with only the text colour differing, which
-                   dressed an error as a warning — the single distinction the
-                   modal exists to make. */
-                <p
-                  key={i.id}
-                  className={`tw:m-0 tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-8)] tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-12)] tw:leading-[var(--bk-leading-normal)] ${
-                    i.type === "error"
-                      ? "tw:text-[var(--bk-error-text)] tw:bg-[var(--bk-error-tint)]"
-                      : "tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]"
-                  }`}
-                >
-                  <span aria-hidden="true">{i.type === "error" ? "●" : "▲"}</span>{" "}
-                  {/* `location` is the human "where" the Issue shape already
-                      carries ("Brand › color.accent"); `pageId` is an id and
-                      would print as one. */}
-                  {i.location ? `${i.location} · ` : ""}
-                  {i.message || `A ${i.type} will go live exactly as it looks now.`}
-                </p>
-              ))}
-              {confirmMore > 0 ? (
-                <Button
-                  color="light"
-                  size="xs"
-                  onClick={() => {
-                    setPubConfirm(false);
-                    onOpenIssues?.();
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-                >
-                  +{plural(confirmMore, "more warning")}
-                </Button>
-              ) : null}
-            </div>
-            {/* Board 1168:4732 makes "Fix issues first" the strong primary and
-                "Publish anyway" the amber secondary. This footer had it exactly
-                backwards: the safe action carried `color="light"` PLUS a
-                transparent/ghost class string, while the risky one was a bare
-                `<Button>` — which buttonTheme.ts documents as already being the
-                brand accent. So the destructive choice was the solid blue CTA
-                and the safe one read as a faint text link, on a dialog opened
-                *because* the site has unresolved errors. Same amber treatment
-                as StaleApprovalModal's "Publish anyway", which was already
-                right. autoFocus stays on the safe action. */}
-            <ModalFooter>
-              <Button
-                autoFocus
-                onClick={() => {
-                  setPubConfirm(false);
-                  onOpenIssues?.();
-                }}
-              >
-                Fix issues first
-              </Button>
-              <Button
-                /* Same properties flowbite sets, so twMerge drops its accent
-                   fill for the warning tone. Utilities rather than a `style`
-                   object — the ratchet counts inline styles, and this value is
-                   authored, not measured. */
-                className="tw:bg-[var(--bk-warning)] tw:border-[var(--bk-warning)] tw:hover:bg-[var(--bk-warning)]"
-                onClick={() => {
-                  setPubConfirm(false);
-                  publishNow();
-                }}
-              >
-                Publish anyway
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </ModalRoot>
-      ) : null}
+      {/* The publish-anyway confirm lives in the Publish panel (board
+          833:4518) — the topbar event UI_PUBLISH_WIZARD_REQUEST opens it, so
+          the same dialog handles Publish from both doors and the words never
+          drift. */}
 
       {/* F1 exit dialog — dialog A ("dirty": save is a real option) vs
           dialog B ("risky": offline/conflict, a save here would be a lie). */}

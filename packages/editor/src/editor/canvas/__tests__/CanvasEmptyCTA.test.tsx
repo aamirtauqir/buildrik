@@ -66,7 +66,12 @@ describe("Start blank opens the Insert drawer", () => {
     expect(read("../../shell/StudioPanels.tsx")).toMatch(/composer\.on\("ui:switch-tab"/);
   });
 
-  it("and 'add' is still the Insert tab", () => {
+  it("and 'add' is still the rail tab that opens the Insert drawer", () => {
+    // The id is the switch-tab seam StudioPanels already listens on
+    // (`composer.emit("ui:switch-tab", { tab: "add" })` in Canvas.tsx:743);
+    // the label ships as "Insert" today. The id/label pair is pinned to the
+    // source so a rename on either side fails here rather than silently
+    // unhooking the only door out of an empty canvas.
     const tabs = read("../../rail/tabsConfig.ts");
     expect(tabs).toMatch(/id: "add",[\s\S]{0,200}label: "Insert"/);
   });
