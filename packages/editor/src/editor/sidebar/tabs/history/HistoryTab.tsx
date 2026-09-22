@@ -18,6 +18,7 @@ import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
 import { ActivityLogView } from "./components/ActivityLogView";
+import { SessionView } from "./components/SessionView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import { TimeTravelIcon } from "./icons";
@@ -30,12 +31,14 @@ const VIEW_LABEL: Record<HistoryView, string> = {
   saves: "Saves",
   published: "Published",
   activity: "Activity",
+  session: "This session",
 };
 
 const HELPER_TEXT: Record<HistoryView, string> = {
   saves: "Named milestones",
   published: "What's live",
   activity: "Edits, comments, publishes",
+  session: "Compare your draft against approved, published, or saved versions",
 };
 
 const FILTER_LABEL: Record<SavesFilter, string> = {
@@ -101,6 +104,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
   initialView,
+  initialBaseline,
   rollbackJob = null,
   onRollbackStarted,
   isExpanded,
@@ -224,7 +228,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       />
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view">
-        {(["saves", "published", "activity"] as const).map((view) => (
+        {(["saves", "published", "activity", "session"] as const).map((view) => (
           <Button
             key={view}
             type="button"
@@ -375,6 +379,14 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           ))}
 
         {activeView === "activity" && <ActivityLogView siteId={siteId} />}
+
+        {activeView === "session" && (
+          <SessionView
+            composer={composer}
+            siteId={siteId}
+            initialBaseline={initialBaseline}
+          />
+        )}
         </div>
 
         {activeView === "saves" && savesSettled && <SavesPruneNote composer={composer} />}

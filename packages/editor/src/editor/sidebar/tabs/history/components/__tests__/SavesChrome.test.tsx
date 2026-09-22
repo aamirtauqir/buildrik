@@ -171,10 +171,10 @@ describe("SavesApproval — what changed, and the way to look at it", () => {
     expect(screen.queryByText("old")).toBeNull();
   });
 
-  it("opens Review straight into Compare, rather than rebuilding it here", async () => {
+  it("opens History · This session with approved baseline, rather than rebuilding it here", async () => {
     reviewState.value = { state: "approved", reviewerName: "Sara Khan", at: APPROVED_AT };
     render(<SavesApproval composer={labelledComposer()} />);
     (await screen.findByRole("button", { name: "Compare with current" })).click();
-    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "review", screen: "compare" });
+    expect(emit).toHaveBeenCalledWith("panel:open", { panel: "history", screen: "session" });
   });
 });

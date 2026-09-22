@@ -131,12 +131,14 @@ describe("HistoryTab shell", () => {
   });
   afterEach(cleanup);
 
-  it("renders Saves by default, with Published as the only sibling tab", () => {
+  it("renders Saves by default, with Published, Activity, This session as siblings", () => {
     renderTab();
     const tabs = screen.getAllByRole("tab");
-    expect(tabs).toHaveLength(2);
+    expect(tabs).toHaveLength(4);
     expect(tabs[0]).toHaveTextContent(/Saves/);
     expect(tabs[1]).toHaveTextContent(/Published/);
+    expect(tabs[2]).toHaveTextContent(/Activity/);
+    expect(tabs[3]).toHaveTextContent(/This session/);
     expect(tabs[0].getAttribute("aria-selected")).toBe("true");
     // Changes is a filter now — it must not be reachable as a tab.
     expect(screen.queryByRole("tab", { name: /Changes/ })).toBeNull();
