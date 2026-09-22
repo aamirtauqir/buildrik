@@ -46,6 +46,7 @@ import {
   Spinner,
   Textarea,
   Toolbar,
+  useToast,
 } from "@/editor/chrome-ui";
 import { SendForReview } from "@/editor/shell/SendForReview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
@@ -354,6 +355,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      to the comment's page when it differs from the active one, then select
      the element the pin was on. A comment whose target was deleted is left
      in the detached group and the ⋯ menu shows no Locate entry. */
+  const { addToast } = useToast();
   const locate = React.useCallback(
     (c: ReviewComment) => {
       if (!composer) return;
@@ -361,9 +363,20 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         composer.elements.setActivePage(c.pageId);
       }
       const el = c.targetSelector ? composer.elements.getElement(c.targetSelector) : null;
-      if (el) composer.selection.select(el);
+      if (el) {
+        composer.selection.select(el);
+      } else if (c.targetSelector) {
+        /* Comment had an anchor but the element is gone — pin survives in
+           detached, the menu item stays enabled (so reviewers don't have to
+           re-open the ⋯ on a different row just to learn why), and a toast
+           tells them why nothing happened. */
+        addToast({
+          tone: "warning",
+          description: "This comment lost its anchor — the element it was on has been removed.",
+        });
+      }
     },
-    [composer],
+    [composer, addToast],
   );
 
   /* Copy link — write the editor's current URL to the clipboard so a reviewer
