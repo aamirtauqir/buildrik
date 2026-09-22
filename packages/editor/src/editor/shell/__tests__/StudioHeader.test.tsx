@@ -91,7 +91,6 @@ import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
 import { submitForReview, fetchReviewStatus, fetchReviewStatusOrNull } from "../../../services/ReviewService";
 import type { ReviewStatus } from "../../../services/ReviewService";
-import { EVENTS } from "@/shared/constants/events";
 
 /* ReviewStatus gained two flag fields — whether reviews exist here at all, and
    whether publishing is gated on an approval — because `state: "none"` could
@@ -289,25 +288,15 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("tooltip").textContent).toMatch(/isn't switched on/);
     });
 
-    it("flag on: Publish is live and asks the Publish panel to open its confirm (no direct publish)", async () => {
+    it("flag on: Publish is live and fires the publish job", async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
-      const onOpenPublish = vi.fn();
-      const emit = vi.fn();
-      const composer = {
-        on: vi.fn(),
-        off: vi.fn(),
-        emit,
-        getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
-      } as unknown as StudioHeaderProps["composer"];
-      render(<StudioHeader {...makeProps({ composer, onOpenPublish })} />);
+      const onVercelPublish = vi.fn();
+      render(<StudioHeader {...makeProps({ onVercelPublish })} />);
       /* The CTA holds a disabled in-flight state until reviews.status answers —
          clicking on the first paint is clicking the loading state. */
       await act(async () => {});
       fireEvent.click(screen.getByRole("button", { name: "Publish" }));
-      await waitFor(() =>
-        expect(emit).toHaveBeenCalledWith(EVENTS.UI_PUBLISH_WIZARD_REQUEST, undefined),
-      );
-      expect(onOpenPublish).toHaveBeenCalled();
+      expect(onVercelPublish).toHaveBeenCalled();
     });
 
     it("offline blocks publish with the reason reachable on focus", () => {
@@ -330,10 +319,103 @@ describe("StudioHeader", () => {
     });
   });
 
-  // Publish-anyway confirm lives in the Publish panel now (PublishTab owns
-  // the one wizard — board 833:4518 / 914:4507). The topbar only routes by
-  // emitting UI_PUBLISH_WIZARD_REQUEST, so its tests cover the routing edge.
-  // Confirm-dialog content + reviewer note live in PublishTab tests.
+  // ── T4 publish-anyway confirm (plan §5, D12/D13, eng D9) ──────────────────
+  describe("publish-anyway confirm modal", () => {
+    const err = (id: string, message: string) => ({ id, type: "error" as const, message });
+    const warn = (id: string, message: string) => ({ id, type: "warning" as const, message });
+    /* async, and every caller awaits it: the CTA is state-dependent now, and
+       until `reviews.status` answers the shell holds an in-flight control
+       rather than guessing a verb. Asserting on the first paint would be
+       asserting on the loading state. */
+    const setup = async (issues: unknown[], extra: Partial<StudioHeaderProps> = {}) => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      const onVercelPublish = vi.fn();
+      const onOpenIssues = vi.fn();
+      render(
+        <StudioHeader
+          {...makeProps({
+            onVercelPublish,
+            onOpenIssues,
+            issues: issues as StudioHeaderProps["issues"],
+            ...extra,
+          })}
+        />,
+      );
+      await act(async () => {});
+      return { onVercelPublish, onOpenIssues };
+    };
+
+    it("errors > 0 opens the confirm instead of publishing in one click", async () => {
+      const { onVercelPublish } = await setup([err("1", "Broken link — Home / CTA")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(onVercelPublish).not.toHaveBeenCalled();
+      expect(screen.getByRole("dialog")).toBeTruthy();
+      // Board 1168:4732 words it "open errors" — the errors were already
+      // surfaced on the chip and left; this dialog is not reporting them anew.
+      expect(screen.getByText("Publish with 1 open error?")).toBeTruthy();
+      expect(screen.getByText("Broken link — Home / CTA")).toBeTruthy();
+    });
+
+    it("warnings alone publish directly — the chip already carried the signal", async () => {
+      const { onVercelPublish } = await setup([warn("1", "Missing alt")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish" }));
+      expect(onVercelPublish).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+
+    it("shows at most three rows, errors first, and +N more opens the panel", async () => {
+      const { onOpenIssues } = await setup([
+        warn("w1", "warn one"),
+        err("e1", "error one"),
+        warn("w2", "warn two"),
+        warn("w3", "warn three"),
+        err("e2", "error two"),
+      ]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(screen.getByText("error one")).toBeTruthy();
+      expect(screen.getByText("error two")).toBeTruthy();
+      expect(screen.getByText("warn one")).toBeTruthy();
+      expect(screen.queryByText("warn three")).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "+2 more warnings" }));
+      expect(onOpenIssues).toHaveBeenCalled();
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+
+    it("an open review round adds the D13 note", async () => {
+      vi.mocked(fetchReviewStatus).mockResolvedValueOnce(reviewStatus({
+        state: "pending",
+        reviewerName: "Sana",
+        at: null,
+      }));
+      await setup([err("1", "x")]);
+      await screen.findByText("In review");
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(screen.getByText(/A review round is open — Sana will see the published site/)).toBeTruthy();
+    });
+
+    it("no review round, no note", async () => {
+      await setup([err("1", "x")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      expect(screen.queryByText(/review round is open/)).toBeNull();
+    });
+
+    /* Board 1168:4732 names the door by what it does: "Fix issues first". */
+    it("'Fix issues first' is the safe door — panel opens, nothing publishes", async () => {
+      const { onVercelPublish, onOpenIssues } = await setup([err("1", "x")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      fireEvent.click(screen.getByRole("button", { name: "Fix issues first" }));
+      expect(onOpenIssues).toHaveBeenCalled();
+      expect(onVercelPublish).not.toHaveBeenCalled();
+    });
+
+    it("confirming publishes", async () => {
+      const { onVercelPublish } = await setup([err("1", "x")]);
+      fireEvent.click(screen.getByRole("button", { name: "Publish anyway" }));
+      fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Publish anyway" }));
+      expect(onVercelPublish).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+  });
 
   // ── T5 publish outcome (plan D10, eng D10/D11) ────────────────────────────
   describe("publish outcome flash", () => {

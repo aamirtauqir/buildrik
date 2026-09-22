@@ -216,18 +216,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const siteName = composer?.getProjectMetadata?.()?.name ?? "This site";
   /* Board 833:4518 / 914:4507: publishing runs through a stepped modal, so the
      panel's CTA opens the gate rather than firing the deploy. */
-  /* Topbar publish-anyway fires UI_PUBLISH_WIZARD_REQUEST — the panel owns
-     the one confirm wizard (board 833:4518 / 914:4507), so the menu opens
-     the panel and asks it rather than hosting a second dialog with drifting
-     words. */
-  React.useEffect(() => {
-    if (!composer) return;
-    const ask = () => setWizardOpen(true);
-    composer.on(EVENTS.UI_PUBLISH_WIZARD_REQUEST, ask);
-    return () => {
-      composer.off(EVENTS.UI_PUBLISH_WIZARD_REQUEST, ask);
-    };
-  }, [composer]);
   const [wizardOpen, setWizardOpen] = React.useState(false);
   /* Board 784:4326 is the just-published panel: the result leads and the
      "what would go out" sections are empty by definition. */
@@ -532,18 +520,6 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               {startedAgo ? ` · started ${startedAgo} ago` : ""}
             </p>
             <Progress progress={publishJob?.progress ?? 0} size="sm" />
-            {publishJob?.jobId && (
-              <div className="tw:mt-1">
-                <Button
-                  color="light"
-                  size="xs"
-                  onClick={() => publishJob.cancel()}
-                  className="tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-ink-muted)]"
-                >
-                  Cancel publish
-                </Button>
-              </div>
-            )}
           </section>
         )}
 

@@ -27,18 +27,6 @@ export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
    * a plain status, because a button that does nothing teaches distrust.
    */
   onRetry?: () => void;
-  /**
-   * Navigate to the save-history affordance (plan row B2 — "Save pill →
-   * History"). Wired up, the pill becomes a button for the three states whose
-   * click destination IS the history panel: `saved`, `saving`, `unsaved`. For
-   * `error` the existing `onRetry` wins (a retry belongs on the same control);
-   * for `conflict` callers pass either `onRetry` (retry save) or a dedicated
-   * conflict handler (the plan's preferred door — opens the conflict dialog);
-   * for `offline` the pill stays non-interactive and surfaces a tooltip
-   * explaining why clicking would lie. The handler is omitted when the
-   * destination is the same as no-op.
-   */
-  onOpenSaveMenu?: () => void;
 }
 
 /** U1: one relative-time SSOT — seconds granularity preserved for saves. */
@@ -89,29 +77,9 @@ const DOT_CLASS: Record<SaveState, string> = {
   error: "tw:bg-red-600",
 };
 
-const OFFLINE_TITLE =
-  "You're offline — changes won't save until you reconnect";
-
-export function SaveStatus({
-  state,
-  savedAt,
-  onRetry,
-  onOpenSaveMenu,
-  className,
-  ...rest
-}: SaveStatusProps) {
+export function SaveStatus({ state, savedAt, onRetry, className, ...rest }: SaveStatusProps) {
   const label = state === "saved" ? "Saved" : COPY[state];
-  /* Two action paths: retry (error / unsaved) and navigate-to-history
-     (saved / saving / unsaved — `unsaved` is dual-purpose: retry wins so
-     clicking the pill does the more useful thing — actually save the work
-     — rather than opening history). `conflict` and `offline` stay
-     non-interactive on the pill; `conflict` is reached through the
-     dedicated dialog handler wired by the caller; `offline` only carries
-     a tooltip explaining why a click would lie. */
-  const retryable = Boolean(onRetry) && (state === "error" || state === "unsaved");
-  const navigable =
-    Boolean(onOpenSaveMenu) && (state === "saved" || state === "saving");
-  const offline = state === "offline";
+  const actionable = Boolean(onRetry) && (state === "error" || state === "unsaved");
   const classes = [BASE_CLASS, STATE_CLASS[state], className].filter(Boolean).join(" ");
   const dot = (
     <span
@@ -133,22 +101,9 @@ export function SaveStatus({
       <span className="tw:@max-[1200px]:hidden">{ago(savedAt)}</span>
     ) : null;
 
-  if (retryable || navigable) {
-    const onClick = retryable ? onRetry : onOpenSaveMenu;
-    /* aria-label must distinguish "save now" from "open history" because
-       the visual copy ("Unsaved changes") is the same for both paths. */
-    const ariaLabel =
-      state === "saved"
-        ? "Saved — open save history"
-        : state === "saving"
-          ? "Saving — open save history"
-          : state === "error"
-            ? "Save failed — retry save now"
-            : state === "unsaved"
-              ? "Unsaved changes — save now"
-              : "Open save history";
+  if (actionable) {
     return (
-      <button type="button" className={classes} onClick={onClick} aria-label={ariaLabel}>
+      <button type="button" className={classes} onClick={onRetry}>
         {dot}
         {label}
         {stamp}
@@ -156,7 +111,7 @@ export function SaveStatus({
     );
   }
   return (
-    <span className={classes} title={offline ? OFFLINE_TITLE : undefined} {...rest}>
+    <span className={classes} {...rest}>
       {dot}
       {label}
       {stamp}

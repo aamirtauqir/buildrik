@@ -112,15 +112,6 @@ export interface TopbarProps {
   savedAt?: number;
   /** Save now — turns the save pill into a button for the states worth retrying. */
   onSave?: () => void;
-  /**
-   * Open the save-history affordance (plan row B2 — "Save pill → History").
-   * Wired up, the pill becomes a button for the two settled states — `saved`
-   * and `saving` — and for `unsaved` only when no `onSave` was passed (a
-   * user with no retry available still has a way to reach history). Conflict
-   * and offline intentionally stay non-interactive on the pill; their doors
-   * are the conflict dialog and the offline tooltip.
-   */
-  onOpenSaveMenu?: () => void;
   /** The review round's current truth. Omit when no review is in flight. */
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments · IssueChip. */
@@ -183,9 +174,9 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSave, onOpenSaveMenu,
-  review, tools, presence, unreadCount = 0, onOpenNotifications,
-  publish = "ready", publishBusy, onPublish, publishBlockedReason, ctaLabel, ctaHint, liveUrl, action, menu,
+  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSave, review, tools, presence,
+  unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
+  publishBlockedReason, ctaLabel, ctaHint, liveUrl, action, menu,
 }: TopbarProps) {
   const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments || tools.issues));
   return (
@@ -221,14 +212,7 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {save ? (
-        <SaveStatus
-          state={save}
-          savedAt={savedAt}
-          onRetry={onSave}
-          onOpenSaveMenu={onOpenSaveMenu}
-        />
-      ) : null}
+      {save ? <SaveStatus state={save} savedAt={savedAt} onRetry={onSave} /> : null}
 
       {liveUrl ? (
         <a

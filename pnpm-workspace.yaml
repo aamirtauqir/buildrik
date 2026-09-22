@@ -1,2 +1,25 @@
 packages:
   - "packages/*"
+
+# Moved here from package.json's `pnpm.onlyBuiltDependencies` (2026-09-09).
+# pnpm 11 stopped reading that field — it warns "The pnpm field in package.json
+# is no longer read by pnpm" and then REFUSES the install with
+# ERR_PNPM_IGNORED_BUILDS. Because `verify:ds` and the pre-push hook both begin
+# with a dependency check, every gate died before it ran: the hook printed
+# "BLOCK: push refused" while the log showed no gate failure at all, only four
+# identical pnpm errors. A gate that cannot run is worse than one that fails,
+# because a failure names itself and this did not.
+#
+# The key is `allowBuilds`, not `onlyBuiltDependencies` — the latter is the
+# package.json spelling and pnpm 11 ignores it here too, which is worth stating
+# because trying it is the obvious first move and it fails identically.
+#
+# `@sentry/cli` is in this list and was not in the old one: it appeared in the
+# ignored-builds error, so on its own it would have kept the block alive.
+allowBuilds:
+  "@prisma/client": true
+  "@prisma/engines": true
+  "@sentry/cli": true
+  prisma: true
+  esbuild: true
+  sharp: true

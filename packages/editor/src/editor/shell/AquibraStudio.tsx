@@ -516,9 +516,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => state.openLeftPanelToTab("review")}
           onOpenShortcuts={modals.toggleShortcuts}
-          onOpenConflict={() => setConflict({ serverToken: "" })}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
+          onVercelPublish={requestPublish}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}
@@ -735,11 +735,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         selectedElement={selectedElement}
       />
 
-      <PreviewOverlay
-        html={previewHtml}
-        onDone={() => setPreviewHtml(null)}
-        siteId={getSiteIdFromUrl()}
-      />
+      <PreviewOverlay html={previewHtml} onDone={() => setPreviewHtml(null)} />
 
       <UpgradeModal />
 

@@ -345,10 +345,6 @@ export const EVENTS = {
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */
   UI_UNPUBLISH_REQUEST: "ui:unpublish-request",
-  /** The topbar asked to publish. The Publish panel owns the one confirm
-   *  wizard (board 833:4518 / 914:4507), so the menu opens the panel and
-   *  asks it rather than hosting a second dialog. */
-  UI_PUBLISH_WIZARD_REQUEST: "ui:publish-wizard-request",
   UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   UI_TOGGLE_INSPECTOR: "ui:toggle:inspector",
@@ -898,7 +894,6 @@ export interface EventPayloads {
   [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
   [EVENTS.BRAND_APPLIED]: void;
   [EVENTS.UI_UNPUBLISH_REQUEST]: void;
-  [EVENTS.UI_PUBLISH_WIZARD_REQUEST]: void;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };
