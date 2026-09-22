@@ -17,6 +17,7 @@ import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
+import { ActivityLogView } from "./components/ActivityLogView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import { TimeTravelIcon } from "./icons";
@@ -28,11 +29,13 @@ import { useVersionHistory } from "@/shared/hooks/useVersionHistory";
 const VIEW_LABEL: Record<HistoryView, string> = {
   saves: "Saves",
   published: "Published",
+  activity: "Activity",
 };
 
 const HELPER_TEXT: Record<HistoryView, string> = {
   saves: "Named milestones",
   published: "What's live",
+  activity: "Edits, comments, publishes",
 };
 
 /* Boards 163:64 / 163:269 / 163:220 (nodes 1657:7158 / 1657:7160, redrawn
@@ -238,7 +241,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       />
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view" data-testid="history-view-switcher">
-        {(["saves", "published"] as const).map((view) => (
+        {(["saves", "published", "activity"] as const).map((view) => (
           <Button
             key={view}
             type="button"
@@ -418,6 +421,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                This fires only when the editor was opened without one. */
             <div className={HISTORY_EMPTY}>Open this site from the dashboard to see its publish history.</div>
           ))}
+
+        {activeView === "activity" && <ActivityLogView siteId={siteId} />}
         </div>
 
         {activeView === "saves" && savesSettled && (
