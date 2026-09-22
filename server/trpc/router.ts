@@ -32,7 +32,6 @@ import { siteVersionsRouter } from "./routers/site-version";
 import { siteComponentsRouter } from "./routers/site-component";
 import { userTemplatesRouter } from "./routers/user-template";
 import { marketplaceRouter } from "./routers/marketplace";
-import { activityRouter } from "./routers/activity";
 
 export const appRouter = router({
   auth: authRouter,
@@ -68,9 +67,6 @@ export const appRouter = router({
   siteComponents: siteComponentsRouter,
   userTemplates: userTemplatesRouter,
   marketplace: marketplaceRouter,
-  // B6 (code-gap plan) — dashboard reader is a needs-dashboard gap; stub returns []
-  // (see server/trpc/routers/activity.ts header).
-  activity: activityRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -254,3 +254,25 @@ export interface PublishDiff {
 export async function fetchPublishDiff(siteId: string, fromJobId: string, toJobId: string): Promise<PublishDiff> {
   return getClient().sites.publishDiff.query({ siteId, fromJobId, toJobId });
 }
+
+/** The pages a prior publish job shipped — the "published side" of B8's
+ *  Compare picker. Throws on transport failure (DF5: a dropped read must
+ *  surface as a retryable error, never a fake-empty diff). A real `null`
+ *  means the job has no stored snapshot — Compare renders that state
+ *  explicitly rather than guessing.
+ *
+ *  `sites.publishedSnapshot` is a planned tRPC procedure (code-gap plan B8).
+ *  It is not yet registered in the dashboard `AppRouter`, so the call is
+ *  `any`-cast at the service boundary — the same pattern ActivityService and
+ *  ReviewService use for planned-but-not-yet-wired procedures. */
+export async function fetchPublishedSnapshot(
+  siteId: string,
+  jobId: string,
+): Promise<PublishPagePayload[] | null> {
+  const proc = (getClient() as any).sites?.publishedSnapshot;
+  if (typeof proc?.query !== "function") {
+    throw new Error("publishedSnapshot procedure not available");
+  }
+  const pages = await proc.query({ siteId, jobId });
+  return (pages as PublishPagePayload[] | null) ?? null;
+}

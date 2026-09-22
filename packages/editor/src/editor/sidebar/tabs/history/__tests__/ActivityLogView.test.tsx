@@ -23,8 +23,6 @@ vi.mock("@/services/ActivityService", () => ({
 const SAMPLE_ROWS: ActivityEntry[] = [
   {
     id: "r1",
-    siteId: "site_1",
-    actorId: "u_sara",
     kind: "edit",
     actorName: "Sara",
     summary: "Edited the hero headline.",
@@ -33,8 +31,6 @@ const SAMPLE_ROWS: ActivityEntry[] = [
   },
   {
     id: "r2",
-    siteId: "site_1",
-    actorId: "u_tom",
     kind: "comment",
     actorName: "Tom",
     summary: "Asked about the menu layout.",
@@ -43,8 +39,6 @@ const SAMPLE_ROWS: ActivityEntry[] = [
   },
   {
     id: "r3",
-    siteId: "site_1",
-    actorId: "u_sara",
     kind: "publish",
     actorName: "Sara",
     summary: "Published v7 to production.",

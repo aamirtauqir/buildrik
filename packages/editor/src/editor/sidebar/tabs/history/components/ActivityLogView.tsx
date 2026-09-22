@@ -252,7 +252,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
                   <span aria-hidden="true">·</span>
                   <span>{r.actorName ?? "Unknown"}</span>
                   <span aria-hidden="true">·</span>
-                  <time dateTime={r.createdAt}>
+                  <time dateTime={typeof r.createdAt === "string" ? r.createdAt : r.createdAt.toISOString()}>
                     {formatDate(r.createdAt)}
                   </time>
                 </div>
@@ -278,8 +278,8 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
   );
 };
 
-function formatDate(input: string): string {
-  const d = new Date(input);
+function formatDate(input: string | Date): string {
+  const d = typeof input === "string" ? new Date(input) : input;
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleString(undefined, {
     month: "short",

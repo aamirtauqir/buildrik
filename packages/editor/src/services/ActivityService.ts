@@ -1,68 +1,54 @@
 /**
- * ActivityService — Editor → dashboard activity log bridge.
+ * ActivityService — editor → dashboard site-activity bridge (B6, code-gap plan).
  *
- * B6 (code-gap plan) reader for the Activity tab. Mirrors the dashboard
- * activity log the SiteMenu deep-links into today, so the editor's copy
- * and the dashboard's copy use the same vocabulary.
+ * Site-scoped activity rows (edits, comments, publish events) live in the
+ * dashboard server. The editor reads them cross-origin via the dashboard tRPC
+ * client, same pattern as NotificationService.
  *
- * Editor half built against the `activity.recent` tRPC procedure shape
- * (plan §P5: "packages/editor alone is enough | ACCEPT with a named gap").
- * The dashboard procedure does not exist yet — when it lands the call
- * site does not change. The dashboard half is logged as a needs-dashboard
- * gap in the code-gap plan; this file is the editor-side reader.
+ * Throws on user-visible lists (B6 plan #31) so the view can show
+ * "couldn't load · Retry" instead of a fake-empty list (DF5 rule from
+ * NotificationService). Filter narrowing is server-side — passing the chosen
+ * filter does not filter client-side.
  *
- * THROWS on a fetch error so the view can show "couldn't load · Retry"
- * rather than a fake-empty list (DF5 — same rule as `fetchPublishHistory`).
- * Permission failures (401/403) come back as `Error` too; the view's
- * permission-state machine pattern-matches the message to decide whether
- * to show the deep-link.
+ * The `activity.recent` tRPC procedure is the planned endpoint (code-gap
+ * plan B6). It is not yet registered in the dashboard `AppRouter`, so the
+ * call is `any`-cast at the service boundary. The view renders an error
+ * state — not a fake success — when the procedure is absent.
  *
  * @license BSD-3-Clause
  */
 
-import { createBuildrikApiClient } from "./api-client";
+import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 
-let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
-function getClient() {
-  if (!_client) _client = createBuildrikApiClient(DASHBOARD_URL);
-  return _client;
-}
-
-/** Filter chip on the activity log. */
 export type ActivityFilter = "all" | "edits" | "comments" | "publish";
 
-/** One row of the activity log. */
+export type ActivityKind = "edit" | "comment" | "publish";
+
 export interface ActivityEntry {
   id: string;
-  /** Site the row is scoped to — used by the view for client-side filtering
-   *  and for the "Open in dashboard" deep-link. */
-  siteId: string;
-  /** What happened. The view's filter chip is "all + this", so the list
-   *  is a tag-driven UI, not a per-kind render. */
-  kind: "edit" | "comment" | "publish";
-  /** Short human-readable line — the row's primary text. */
+  kind: ActivityKind;
+  actorName: string | null;
   summary: string;
-  /** Actor's user id (server-side actor reference). */
-  actorId: string;
-  /** Display name for the actor. */
-  actorName: string;
-  /** ISO timestamp; the view formats this for display. */
-  createdAt: string;
-  /** Optional deep-link to the dashboard view that shows the same row.
-   *  Nullable on purpose — the comment row in the unit test sets it to
-   *  `null` and the view hides the "View in dashboard" link when missing. */
-  actionUrl?: string | null;
+  actionUrl: string | null;
+  createdAt: string | Date;
 }
 
-/**
- * Fetch the recent activity rows for a site, optionally filtered.
- * Throws on a transport failure (DF5 — dropped reads must surface as a
- * retryable error, never a fake-empty list).
- */
+/** siteId may be null when the editor is opened without a project (rare). */
 export async function fetchRecentActivity(
-  siteId: string,
+  siteId: string | null | undefined,
   filter: ActivityFilter,
 ): Promise<ActivityEntry[]> {
-  return getClient().activity.recent.query({ siteId, filter });
+  if (!siteId) return [];
+  // activity.recent is the planned procedure; not yet present in AppRouter — see code-gap plan B6.
+  const proc = (getBuildrikClient(DASHBOARD_URL) as any).activity?.recent;
+  const rows = await proc.query({ siteId, filter });
+  return (rows as ActivityEntry[]).map((r) => ({
+    id: r.id,
+    kind: r.kind,
+    actorName: r.actorName ?? null,
+    summary: r.summary,
+    actionUrl: r.actionUrl ?? null,
+    createdAt: r.createdAt,
+  }));
 }
