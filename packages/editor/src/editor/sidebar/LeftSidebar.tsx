@@ -19,6 +19,7 @@ import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import type { NextMove } from "../shell/lifecycle";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
+import { useHistoryChip } from "../../shared/hooks/useHistoryChip";
 import { ConfirmDialog, Button, HintTooltip, useToast } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
@@ -112,6 +113,12 @@ const ZONES: TabZone[] = ["creation", "structure", "config"];
 const EMPTY_SET: ReadonlySet<string> = new Set();
 // Stable set for when settings tab has unsaved changes
 const SETTINGS_DIRTY_SET: ReadonlySet<string> = new Set(["settings"]);
+// B8 — history chip sets. Stable so the rail/sub-nav props keep identity
+// across renders; flipping between EMPTY_SET and HISTORY_CHIP_SET is what
+// tells RailZone/FourToolRail/ToolSubNav to (re)render the chip dot.
+const HISTORY_CHIP_SET: ReadonlySet<string> = new Set(["history"]);
+const EMPTY_SET_TOOL: ReadonlySet<RailTool> = new Set<RailTool>();
+const SITE_CHIP_SET: ReadonlySet<RailTool> = new Set<RailTool>(["site"]);
 
 function RailZone({
   zone,
@@ -120,6 +127,7 @@ function RailZone({
   drawerOpen,
   onBtnClick,
   dirtyTabIds,
+  chipTabIds,
   showLabels = false,
 }: {
   zone: TabZone;
@@ -129,6 +137,8 @@ function RailZone({
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
   dirtyTabIds?: ReadonlySet<string>;
+  /** B8 — tabs whose rail button gets the accent-tinted "has history" chip. */
+  chipTabIds?: ReadonlySet<string>;
   /** Figma 52:2 rail items carry a visible label under the icon. */
   showLabels?: boolean;
 }) {
@@ -145,6 +155,7 @@ function RailZone({
         const isSelectedTab = tab.id === activeTab;
         const isVisibleActive = isSelectedTab && drawerOpen;
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
+        const hasChip = chipTabIds?.has(tab.id) ?? false;
 
         return (
           <HintTooltip
@@ -184,6 +195,13 @@ function RailZone({
                 />
               )}
               {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
+              {hasChip && (
+                <span
+                  className="ls-btn__history-chip"
+                  aria-hidden="true"
+                  data-testid="rail-history-chip"
+                />
+              )}
               <Icon size={20} />
               {showLabels && <span className="ls-btn__label">{tab.label}</span>}
             </Button>
@@ -208,11 +226,13 @@ function FigmaRail({
   drawerOpen,
   onBtnClick,
   dirtyTabIds,
+  chipTabIds,
 }: {
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
   dirtyTabIds?: ReadonlySet<string>;
+  chipTabIds?: ReadonlySet<string>;
 }) {
   const groups = React.useMemo(() => getFigmaRailGroups(), []);
   return (
@@ -226,6 +246,7 @@ function FigmaRail({
             drawerOpen={drawerOpen}
             onBtnClick={onBtnClick}
             dirtyTabIds={dirtyTabIds}
+            chipTabIds={chipTabIds}
             showLabels
           />
           {i < groups.length - 1 && <div className="ls-divider" />}
@@ -255,10 +276,16 @@ function FourToolRail({
   activeTab,
   drawerOpen,
   onBtnClick,
+  chipTools,
 }: {
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
+  /** B8 — tools whose rail button gets the accent-tinted "has history" chip.
+   *  Site folds Settings/Publish/History under one tool, so the chip on Site
+   *  reaches the History sub-tab the same way the rail button does in legacy
+   *  mode. */
+  chipTools?: ReadonlySet<RailTool>;
 }) {
   const activeTool = getTabConfig(activeTab)?.tool;
   return (
@@ -268,6 +295,7 @@ function FourToolRail({
         if (!Icon) return null;
         const isSelected = tool === activeTool;
         const isVisibleActive = isSelected && drawerOpen;
+        const hasChip = chipTools?.has(tool) ?? false;
         return (
           <HintTooltip
             key={tool}
@@ -296,6 +324,13 @@ function FourToolRail({
                   className="ls-btn-bar tw:absolute tw:top-0 tw:bottom-0 tw:w-[3px] tw:rounded-r-[2px] tw:bg-[var(--bk-accent)] tw:left-[calc(-1*(var(--layout-rail-width,60px)-var(--bk-size-header))/2)]"
                 />
               )}
+              {hasChip && (
+                <span
+                  className="ls-btn__history-chip"
+                  aria-hidden="true"
+                  data-testid="rail-history-chip"
+                />
+              )}
               <Icon size={20} />
             </Button>
           </HintTooltip>
@@ -312,9 +347,14 @@ function FourToolRail({
 function ToolSubNav({
   activeTab,
   onSubTabChange,
+  chipSubTabIds,
 }: {
   activeTab: GroupedTabId;
   onSubTabChange: (id: GroupedTabId) => void;
+  /** B8 — sub-tabs whose label gets a trailing accent dot — same affordance
+   *  as the rail chip, in panel-mode where the rail itself is the 4-tool
+   *  composite. */
+  chipSubTabIds?: ReadonlySet<string>;
 }) {
   const tool = getTabConfig(activeTab)?.tool;
   const subs = tool ? getTabsByTool(tool) : [];
@@ -332,6 +372,7 @@ function ToolSubNav({
     >
       {subs.map((t) => {
         const active = t.id === activeTab;
+        const hasChip = chipSubTabIds?.has(t.id) ?? false;
         return (
           <Button
             key={t.id}
@@ -349,7 +390,16 @@ function ToolSubNav({
               background: active ? "var(--bk-accent-subtle)" : "transparent",
             }}
           >
-            {t.label}
+            <span className="tw:inline-flex tw:items-center tw:gap-1">
+              {t.label}
+              {hasChip && (
+                <span
+                  className="ls-subnav__chip"
+                  aria-hidden="true"
+                  data-testid="subnav-history-chip"
+                />
+              )}
+            </span>
           </Button>
         );
       })}
@@ -389,6 +439,20 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const navRef = React.useRef<HTMLElement>(null);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
+
+  /* B8 — history chip. Stable Set refs so the rail/sub-nav props do not
+     change identity on every render (RailZone/FourToolRail/ToolSubNav are
+     memo-irrelevant but stable ids keep the diff trivial). */
+  const { hasHistory } = useHistoryChip(composer);
+  const chipTabIds = React.useMemo<ReadonlySet<string>>(
+    () => (hasHistory ? HISTORY_CHIP_SET : EMPTY_SET),
+    [hasHistory],
+  );
+  const chipTools = React.useMemo<ReadonlySet<RailTool>>(
+    () => (hasHistory ? SITE_CHIP_SET : EMPTY_SET_TOOL),
+    [hasHistory],
+  );
+  const chipSubTabIds = chipTabIds;
 
   // Expand state (board 16:6 header action): 280 ↔ 700 drawer width.
   // Collapsed by default — the boards draw the 280 drawer (redrawn 2026-09-02). Controlled or
@@ -659,6 +723,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             activeTab={activeTab}
             drawerOpen={drawerOpen}
             onBtnClick={handleBtnClick}
+            chipTools={chipTools}
           />
         ) : railMode === "figma" ? (
           <FigmaRail
@@ -666,6 +731,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             drawerOpen={drawerOpen}
             onBtnClick={handleBtnClick}
             dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
+            chipTabIds={chipTabIds}
           />
         ) : (
           ZONES.map((zone, i) => (
@@ -676,6 +742,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 drawerOpen={drawerOpen}
                 onBtnClick={handleBtnClick}
                 dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
+                chipTabIds={chipTabIds}
               />
               {i < ZONES.length - 1 && <div className="ls-divider" />}
             </React.Fragment>
@@ -705,7 +772,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             Tabs without a PanelHeader (Layers, Add) can be closed by re-clicking
             the active rail icon, which now toggles drawerOpen. */}
         <div ref={panelContentRef} className="ls-panel-content ls-panel-content--no-padding" tabIndex={-1}>
-          {useFourToolRail && <ToolSubNav activeTab={activeTab} onSubTabChange={handleBtnClick} />}
+          {useFourToolRail && (
+            <ToolSubNav
+              activeTab={activeTab}
+              onSubTabChange={handleBtnClick}
+              chipSubTabIds={chipSubTabIds}
+            />
+          )}
           <InspectorErrorBoundary
             key={errorKey}
             fallback={<SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />}

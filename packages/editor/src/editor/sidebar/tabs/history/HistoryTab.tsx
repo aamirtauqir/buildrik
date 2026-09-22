@@ -18,7 +18,6 @@ import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
 import { PublishHistory } from "../../../shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
 import { ActivityLogView } from "./components/ActivityLogView";
-import { SessionView } from "./components/SessionView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import { TimeTravelIcon } from "./icons";
@@ -31,14 +30,15 @@ const VIEW_LABEL: Record<HistoryView, string> = {
   saves: "Saves",
   published: "Published",
   activity: "Activity",
-  session: "This session",
 };
 
+/* Activity has no helper — the filter chips below the tab are the affordance
+   (B6 plan). Saves/Published keep the helper sentence because the panel
+   context alone is not enough. */
 const HELPER_TEXT: Record<HistoryView, string> = {
   saves: "Named milestones",
   published: "What's live",
-  activity: "Edits, comments, publishes",
-  session: "Compare your draft against approved, published, or saved versions",
+  activity: "Site activity",
 };
 
 /* Boards 163:64 / 163:269 / 163:220 (nodes 1657:7158 / 1657:7160, redrawn
@@ -121,7 +121,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
   projectId,
   initialView,
-  initialBaseline,
   rollbackJob = null,
   onRollbackStarted,
   isExpanded,
@@ -171,7 +170,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
   const [activeView, setActiveView] = React.useState<HistoryView>(() => {
     if (initialView) return initialView; // deep link wins for this mount
-    return stored === "published" ? "published" : "saves";
+    if (stored === "published") return "published";
+    if (stored === "activity") return "activity";
+    return "saves";
   });
 
   const [savesFilter, setSavesFilter] = React.useState<SavesFilter>(() =>
@@ -191,12 +192,19 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   } = useAutoMilestone(composer);
 
   /* Written back in the SAME vocabulary the key already used ("saves" |
-     "changes" | "published"), so a downgrade to a build without M1 still reads
-     a value it understands instead of choking on a new enum. */
+     "changes" | "published" | "activity"), so a downgrade to a build
+     without M1 / B6 still reads a value it understands instead of choking on
+     a new enum. */
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     const persisted =
-      activeView === "published" ? "published" : savesFilter === "changes" ? "changes" : "saves";
+      activeView === "published"
+        ? "published"
+        : activeView === "activity"
+          ? "activity"
+          : savesFilter === "changes"
+            ? "changes"
+            : "saves";
     try {
       window.localStorage.setItem(storageKey, persisted);
     } catch {
@@ -245,7 +253,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
       />
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view" data-testid="history-view-switcher">
-        {(["saves", "published", "activity", "session"] as const).map((view) => (
+        {(["saves", "published", "activity"] as const).map((view) => (
           <Button
             key={view}
             type="button"
@@ -375,6 +383,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
         {activeView === "saves" && savesSettled && <SavesApproval composer={composer} />}
 
+
         {/* The lists scroll; the approval band above and the prune note below
             are panel chrome and stay put (SavesChrome's own contract). Without
             this region the whole column was `overflow: hidden` and simply cut
@@ -426,14 +435,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
             <div className={HISTORY_EMPTY}>Open this site from the dashboard to see its publish history.</div>
           ))}
 
-        {activeView === "activity" && <ActivityLogView siteId={siteId} />}
-
-        {activeView === "session" && (
-          <SessionView
-            composer={composer}
-            siteId={siteId}
-            initialBaseline={initialBaseline}
-          />
+        {activeView === "activity" && (
+          /* Site-scoped activity log (B6). The list owns its own chrome
+             (filter chips + role=status region) — Saves' approval band /
+             prune note are Saves-only. */
+          <ActivityLogView siteId={siteId ?? null} />
         )}
         </div>
 

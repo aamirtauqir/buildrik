@@ -22,17 +22,7 @@ import type { Composer } from "../../../../engine";
  * `backups` is drawn in Figma but deliberately absent — 7 `[design-ahead]`
  * boards with no backing service.
  */
-export type HistoryView = "saves" | "published" | "activity" | "session";
-
-/**
- * B8 — the four canonical Compare baselines. `current` is the working draft
- * and is always present, so the picker treats it as the constant peer of
- * whichever historical baseline the user picks. `approved` / `published` are
- * site-scoped and live on the dashboard; `saved` is composer-scoped
- * (IndexedDB on this device). The picker disables each option with a reason
- * when the baseline does not exist (Decision 31, board 4418:115592 shape).
- */
-export type CompareBaseline = "approved" | "published" | "saved" | "current";
+export type HistoryView = "saves" | "published" | "activity";
 
 /** Which list the Saves pane shows. `changes` is the old Changes tab. */
 export type SavesFilter = "milestones" | "changes";
@@ -46,11 +36,10 @@ export interface HistoryTabProps {
    *  Wins over the stored preference for one mount, so the ⋯ menu's "Publish
    *  history" lands on Published instead of wherever the user last was. */
   initialView?: HistoryView;
-  /** B8 (code-gap plan) — when `initialView === "session"`, preselect the
-   *  Compare picker to this baseline. Falls back to the first enabled
-   *  baseline in SessionView if the requested one doesn't exist. Ignored
-   *  when `initialView` is anything other than `"session"`. */
-  initialBaseline?: CompareBaseline;
+  /** B8 — the Compare chip on the History view surfaces a Compare sub-tab
+   *  from the same SiteMenu / ⋯ menu. Same one-mount precedence as
+   *  initialView: this is a session deep-link, never a persisted preference. */
+  initialCompare?: boolean;
   /** The shell's publish job, forwarded to the Published view so boards
    *  184:37 / 184:45 / 453:4064 can run off one state. Null = no feed. */
   rollbackJob?: { state: "publishing" | "published" | "failed"; progress: number } | null;
@@ -66,18 +55,6 @@ export interface HistoryTabProps {
   onClose?: () => void;
 }
 
-export interface ActivityViewProps {
-  composer: Composer | null;
-  searchQuery?: string;
-  /** Error message to display in the error state */
-  error?: string | null;
-  /** Retry callback for the error state */
-  onRetry?: () => void;
-}
-
-/** B6 (code-gap plan) — Activity tab reads site-scoped rows from the
- *  dashboard activity log; the shape mirrors the dashboard-side reader
- *  so editor + dashboard use the same vocabulary. */
 export interface ActivityLogViewProps {
   /** Site the rows are scoped to — comes from `TabRouter`'s resolved projectId
    *  or the URL fallback. Null = opened without a project; the view renders
@@ -85,27 +62,11 @@ export interface ActivityLogViewProps {
   siteId: string | null;
 }
 
-/** B8 (code-gap plan) — Session tab. The composer is the working draft, so
- *  the diff is always against `current`; the picker chooses the OTHER side. */
-export interface SessionViewProps {
+export interface ActivityViewProps {
   composer: Composer | null;
-  /** Site the approved/published baselines are scoped to. Null = opened
-   *  without a project; the picker disables approved/published with reasons
-   *  and the saved-only path still works (composer-saved is per-device). */
-  siteId: string | null;
-  /** Preselect a baseline when one of the three Compare doors opened us. The
-   *  picker falls back to the first ENABLED option if the requested one
-   *  doesn't exist — a deep link can never strand the user on a dead chip. */
-  initialBaseline?: CompareBaseline;
-}
-
-/** B8 (code-gap plan) — picker for the four Compare baselines. Disabled
- *  state carries a reason per Decision 31 (board 4418:115592). */
-export interface ComparePickerProps {
-  /** Which baselines are available on this site/device. The picker disables
-   *  any baseline missing from this object and renders its reason. */
-  availability: Record<CompareBaseline, { available: boolean; reason?: string }>;
-  /** Currently selected baseline. `current` is always selectable. */
-  value: CompareBaseline;
-  onChange: (next: CompareBaseline) => void;
+  searchQuery?: string;
+  /** Error message to display in the error state */
+  error?: string | null;
+  /** Retry callback for the error state */
+  onRetry?: () => void;
 }
