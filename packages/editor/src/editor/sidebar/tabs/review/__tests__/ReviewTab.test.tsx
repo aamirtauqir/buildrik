@@ -38,6 +38,7 @@ vi.mock("../../../../../services/ReviewService", () => ({
 
 import { fetchRounds } from "../../../../../services/ReviewService";
 import { ReviewTab } from "../ReviewTab";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 const ROUND = {
   id: "r1",
@@ -59,7 +60,11 @@ const COMMENTS = [
 ];
 
 function renderTab(props = {}) {
-  return render(<ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />);
+  return render(
+    <ToastProvider>
+      <ReviewTab onResend={vi.fn(() => Promise.resolve())} {...props} />
+    </ToastProvider>,
+  );
 }
 
 beforeEach(() => {
