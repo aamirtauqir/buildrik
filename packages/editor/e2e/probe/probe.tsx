@@ -879,7 +879,7 @@ function LayersProbe({ select }: { select?: string[] }) {
        own error boundary renders the load-error block instead. */
     <ToastProvider>
       <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
-        <LayersTab composer={c} onExpandToggle={() => {}} onClose={() => {}} />
+        <LayersTab composer={c} onClose={() => {}} />
       </div>
     </ToastProvider>
   );

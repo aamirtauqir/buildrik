@@ -180,8 +180,9 @@
   flex-shrink: 0;
 }
 
-/* Eye + lock — board 244:1580 draws them ALWAYS, at gray-300; hover/state
-   darkens. (Was hover-reveal, which the board contradicts.) */
+/* Eye + lock — v3 board 4418:81300 draws NONE at rest; row hover (7059:78941)
+   reveals them. A row whose layer IS dimmed or locked keeps its control, or
+   the state could not be seen or undone. (V1 board 244:1580 drew them always.) */
 .bdc-lr-comp {
   font-size: var(--bk-text-11);
   line-height: 16px;
@@ -229,6 +230,12 @@
 
 .bdc-lr:hover .bdc-lr-eye,
 .bdc-lr.bdc-sel .bdc-lr-eye { color: var(--bk-ink); }
+.bdc-lr .bdc-lr-eye:not(.bdc-off),
+.bdc-lr .bdc-lr-lock:not(.bdc-on) { visibility: hidden; }
+.bdc-lr:hover .bdc-lr-eye,
+.bdc-lr:hover .bdc-lr-lock,
+.bdc-lr:focus-within .bdc-lr-eye,
+.bdc-lr:focus-within .bdc-lr-lock { visibility: visible; }
 
 /* Board 143:179 dims a hidden row ONCE — 245:1837 carries `opacity-45` and
    none of its five children carries an opacity of its own. This rule stacked
@@ -329,44 +336,6 @@
   color: var(--bk-ink);
 }
 
-/* ==========================================================================
-   Breadcrumb (single-select ancestor chain)
-   ========================================================================== */
-
-.bdc-layers-crumb {
-  display: flex;
-  height: var(--bk-size-row); align-items: center;
-  gap: var(--bk-space-4);
-  padding: 6px 10px;
-  overflow-x: auto;
-  border-bottom: 1px solid var(--bk-border);
-  /* Navigation labels are Inter — Geist Mono is data-only (DESIGN.md). */
-  font: 400 11px/16px var(--bk-font-ui);
-}
-
-.bdc-layers-crumb button {
-  height: 20px; min-height: 0; background: transparent;
-  border: none;
-  padding: 1px var(--bk-space-4);
-  border-radius: 3px;
-  color: var(--bk-ink-muted);
-  font: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.bdc-layers-crumb button:hover {
-  color: var(--bk-ink);
-  background: var(--bk-bg-subtle);
-}
-.bdc-layers-crumb button.bdc-on {
-  color: var(--bk-accent);
-  font-weight: 600;
-}
-
-.bdc-layers-crumb-sep {
-  color: var(--bk-ink-muted);
-  flex-shrink: 0;
-}
 
 /* ==========================================================================
    Context menu
@@ -396,7 +365,7 @@
   height: 28px;
   /* 5/12 — 1082:4565. A 0 vertical pad let the 28px height do all the work,
      which is the same thing right up until a label wraps. */
-  padding: 5px var(--bk-space-12);
+  padding: 7px var(--bk-space-12);
   border-radius: 0;
   background: transparent;
   border: none;
@@ -569,10 +538,11 @@
   font: 500 11px var(--bk-font-ui);
 }
 
-/* Board 142:58 Count footer — 28h, 12px muted, 16px inset. */
+/* Count footer — v3 board 4418:81300 "Count footer" (7420:128318) is 32 tall
+   (was 28 off V1 142:58). */
 .bdc-lcount {
   flex-shrink: 0;
-  height: var(--bk-size-row-dense);
+  height: var(--bk-size-row);
   display: flex;
   align-items: center;
   /* 12, not 16: board 1082:4638 is the only Layers board that states the

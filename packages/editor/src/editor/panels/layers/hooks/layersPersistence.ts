@@ -24,6 +24,15 @@ export function getStorageKey(
   return `${STORAGE_PREFIX}-${pageId}-${type}`;
 }
 
+/** Whether this page has a stored set of that type at all (vs. an empty one). */
+export function hasStoredSet(pageId: string, type: "hidden" | "expanded"): boolean {
+  try {
+    return localStorage.getItem(getStorageKey(pageId, type)) !== null;
+  } catch {
+    return false;
+  }
+}
+
 /** Safely load Set from localStorage */
 export function loadSetFromStorage(
   pageId: string,
