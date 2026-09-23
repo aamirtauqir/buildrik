@@ -46,8 +46,6 @@ const canvasKeyboardSrc = readFileSync(join(CANVAS, "hooks", "useCanvasKeyboard.
 /* Every chrome tooltip that prints a chord after the "·" separator. Same
    promise as the menu column, made on hover instead. */
 const TOOLTIP_FILES = [
-  "controls/toolbar/ToolbarActionsSection.tsx",
-  "controls/toolbar/ToolbarNavSection.tsx",
   "CanvasFooterToolbar.tsx",
 ];
 const GLYPHS: Record<string, string> = {
@@ -151,7 +149,9 @@ describe("context menu shortcut column", () => {
      and ← is the one that selects the parent — so following the tooltip moved
      the element in the tree. */
   it("prints no tooltip chord the app does not honour as printed", () => {
-    expect(tooltipChords.length).toBeGreaterThan(4);
+    // The selection toolbar (5936:44788) prints no chords in tooltips; the
+    // footer toolbar still does.
+    expect(tooltipChords.length).toBeGreaterThan(2);
     const wrong = tooltipChords
       .map((t) => ({ ...t, chord: keys.normalizeShortcut(chordFromGlyphs(t.raw)) }))
       .map((t) => ({ ...t, commandId: keys.findCommandId(t.chord) }))

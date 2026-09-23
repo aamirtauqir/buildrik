@@ -568,11 +568,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       handleSelectAncestor,
       handleToolbarDuplicate,
       handleToolbarDelete,
-      handleToolbarCopy,
-      handleToolbarWrap,
-      handleToolbarMoveUp,
-      handleToolbarMoveDown,
-      handleToolbarUndo,
     } = useCanvasToolbarActions({ composer, selectedId, addToast, select });
 
     // Expose ref methods
@@ -797,11 +792,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             onSelectAncestor={handleSelectAncestor}
             onDuplicate={handleToolbarDuplicate}
             onDelete={handleToolbarDelete}
-            onCopy={handleToolbarCopy}
-            onWrap={handleToolbarWrap}
-            onMoveUp={handleToolbarMoveUp}
-            onMoveDown={handleToolbarMoveDown}
-            onUndo={handleToolbarUndo}
+            onOpenElementMenu={(elementId, point) => setContextMenu({ x: point.x, y: point.y, elementId })}
             shouldShowHover={shouldShowHover}
             hoveredElementId={hoveredElementId}
             cursorState={cursorState}

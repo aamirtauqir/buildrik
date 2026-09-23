@@ -75,11 +75,9 @@ export interface CanvasOverlayGroupProps {
    * layer reachable by a single click.
    */
   readOnly?: boolean;
-  onCopy: () => void;
-  onWrap: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  onUndo: () => void;
+  /** Opens the element (right-click) menu at a viewport point — the
+   *  selection toolbar's ⋯ (G2-024). */
+  onOpenElementMenu: (elementId: string, point: { x: number; y: number }) => void;
 
   // Hover
   shouldShowHover: boolean;
@@ -155,11 +153,7 @@ export function CanvasOverlayGroup({
   onDuplicate,
   onDelete,
   readOnly = false,
-  onCopy,
-  onWrap,
-  onMoveUp,
-  onMoveDown,
-  onUndo,
+  onOpenElementMenu,
   shouldShowHover,
   hoveredElementId,
   isInspectorEnabled,
@@ -295,15 +289,9 @@ export function CanvasOverlayGroup({
               composer={composer}
               elementId={selectedId}
               canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
-              onSelectParent={onSelectParent}
-              onSelectAncestor={onSelectAncestor}
               onDuplicate={onDuplicate}
               onDelete={onDelete}
-              onCopy={onCopy}
-              onWrap={onWrap}
-              onMoveUp={onMoveUp}
-              onMoveDown={onMoveDown}
-              onUndo={onUndo}
+              onOpenMenu={onOpenElementMenu}
             />
           )}
           {/* The canvas-anchored align toolbar + count badge were REMOVED here

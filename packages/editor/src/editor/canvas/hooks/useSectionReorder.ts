@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
@@ -65,6 +66,10 @@ export function useSectionReorder({
   enabled = true,
   addToast,
 }: UseSectionReorderOptions): UseSectionReorderResult {
+  /* Held in a ref: the toast function is not a reason to rebuild the drag
+     callbacks (their identity feeds the canvas overlay's effects). */
+  const addToastRef = React.useRef(addToast);
+  addToastRef.current = addToast;
   const [boundaries, setBoundaries] = React.useState<SectionBoundary[]>([]);
   const [dragState, setDragState] = React.useState<SectionDragState | null>(null);
   const [hoveredBoundary, setHoveredBoundary] = React.useState<string | null>(null);
@@ -89,6 +94,7 @@ export function useSectionReorder({
     }
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
+    const zs = canvasScale(canvasRef.current);
     const newBoundaries: SectionBoundary[] = [];
 
     children.forEach((child, index) => {
@@ -101,9 +107,9 @@ export function useSectionReorder({
         sectionId: id,
         index,
         rect: {
-          top: elRect.top - canvasRect.top,
-          left: elRect.left - canvasRect.left,
-          width: elRect.width,
+          top: (elRect.top - canvasRect.top) / zs,
+          left: (elRect.left - canvasRect.left) / zs,
+          width: elRect.width / zs,
         },
       });
     });
@@ -162,7 +168,8 @@ export function useSectionReorder({
       if (!dragState || boundaries.length === 0 || !canvasRef.current) return;
 
       const canvasRect = canvasRef.current.getBoundingClientRect();
-      const relativeY = clientY - canvasRect.top;
+      const zs = canvasScale(canvasRef.current);
+      const relativeY = (clientY - canvasRect.top) / zs;
 
       // Find the closest boundary position to determine target index
       let targetIndex = 0;
@@ -206,7 +213,7 @@ export function useSectionReorder({
       try {
         composer.elements.moveElement(sectionId, page.root.id, adjustedIndex);
         composer.endTransaction();
-        addToast?.({
+        addToastRef.current?.({
           description: toIndex > fromIndex ? "Moved down" : "Moved up",
           action: { label: "Undo", onClick: () => composer.history.undo() },
         });
@@ -219,7 +226,7 @@ export function useSectionReorder({
 
     // Recompute boundaries after move
     requestAnimationFrame(computeBoundaries);
-  }, [dragState, composer, computeBoundaries, addToast]);
+  }, [dragState, composer, computeBoundaries]);
 
   const cancelDrag = React.useCallback(() => {
     setDragState(null);
