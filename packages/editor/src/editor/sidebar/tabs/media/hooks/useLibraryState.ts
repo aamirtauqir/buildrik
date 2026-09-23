@@ -285,6 +285,12 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
    * call is rejected — caller should call `inspectFolder` first, prompt the
    * user with their preferred dialog, and re-call with `force: true` on confirm.
    * This keeps UI dialog logic out of the hook (testable, SSR-safe).
+   *
+   * `force` deletes the folder WITH its contents — every asset in it and in
+   * its sub-folders, then the sub-folders (deepest first), then the folder.
+   * That is what the confirm says (board B1-13 7564:185465: "Deleting this
+   * folder will remove its contents along with it"); the engine's own
+   * deleteFolder moves a folder's assets to root, which left the files behind.
    */
   const deleteFolder = useCallback(
     async (id: string, opts: { force?: boolean } = {}) => {
@@ -295,8 +301,24 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
             "FOLDER_NOT_EMPTY: call inspectFolder first, prompt the user, retry with force:true",
           );
         }
+        await composer.media.deleteFolder(id);
+        return;
       }
-      await composer.media.deleteFolder(id);
+      const order: string[] = [];
+      const walk = (folderId: string) => {
+        if (order.includes(folderId)) return;
+        order.push(folderId);
+        for (const sub of composer.media.getFolders(folderId)) walk(sub.id);
+      };
+      walk(id);
+      for (const folderId of order) {
+        for (const asset of composer.media.getAssets({ folderId })) {
+          await composer.media.deleteAsset(asset.id);
+        }
+      }
+      for (const folderId of [...order].reverse()) {
+        await composer.media.deleteFolder(folderId);
+      }
     },
     [composer, inspectFolder],
   );

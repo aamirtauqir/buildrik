@@ -76,14 +76,20 @@ describe("NewPageModal", () => {
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
   });
 
-  it("From template → creates the page and opens the templates catalogue on it", () => {
+  /* QA 2026-09-24: From template created a blank page before the catalogue
+     opened, so leaving the catalogue (Back to canvas) left that page behind.
+     Now nothing is created until a template is chosen; the typed name rides
+     along for the catalogue's Create page. */
+  it("From template → opens the catalogue with the name, and creates nothing yet", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
     request();
+    fireEvent.change(screen.getByLabelText("Page name"), { target: { value: "Our menu" } });
     fireEvent.click(screen.getByTestId("new-page-create"));
-    expect(composer.elements.createPage).toHaveBeenCalledWith("About");
-    expect(composer.elements.setActivePage).toHaveBeenCalledWith("p2");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, {});
+    expect(composer.elements.createPage).not.toHaveBeenCalled();
+    expect(composer.elements.setActivePage).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, { newPageName: "Our menu" });
+    expect(screen.queryByTestId("new-page-modal")).toBeNull();
   });
 
   it("an empty name cannot be created; Cancel creates nothing", () => {

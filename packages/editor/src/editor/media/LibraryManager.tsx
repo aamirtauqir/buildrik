@@ -390,6 +390,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
      modal for that ONE file; it creates no selection. */
   const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
+  /* A1 / QA 2026-09-24: the folder-delete confirm's "Move files…" hands the
+     folder's files to the same Move modal (board B1-13 7564:185465). */
+  const [folderMoveItems, setFolderMoveItems] = React.useState<LibraryItem[] | null>(null);
   /* Clone 3721:45960 — a menu move's receipt is the count line (`Products ·
      team-photo.jpg moved`), not the rail, which keeps whatever it showed. It
      clears on the next scope or filter change. */
@@ -411,7 +414,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     async (keys: string[], folderId: string | null, from: MoveDoor = "selection") => {
       setAssetDrag(null);
       const items = keys
-        .map((k) => state.libraryItems.find((i) => i.key === k))
+        .map((k) => state.allLibraryItems.find((i) => i.key === k))
         .filter((i): i is LibraryItem => i !== undefined);
       const wasHere = new Set(items.filter((i) => (i.folderId ?? null) === folderId).map((i) => i.key));
       try {
@@ -1109,12 +1112,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             }
           }}
           onMoveFiles={() => {
-            /* Drop into the existing move picker by surfacing the empty
-               "Move to…" picker on the asset grid's bulk action. The board
-               intended this entry to be discoverable; routing through
-               setCurrentFolderId scopes the picker to this folder. */
+            /* The folder's files go straight into the Move modal; the folder
+               itself stays until the user deletes it (now empty). */
+            const inFolder = state.allLibraryItems.filter((i) => (i.folderId ?? null) === folderConfirm.folderId);
             setFolderConfirm(null);
-            addToast({ description: "Pick a destination folder for the files, then come back.", tone: "info" });
+            setFolderMoveItems(inFolder);
           }}
         />
       )}
@@ -1229,18 +1231,21 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       {/* One Move modal for both doors: the checked set (3683:19950) or the
           card menu's one file (3721:45952). */}
       <MoveAssetsModal
-        open={moveModalOpen || menuMoveTarget !== null}
-        items={menuMoveTarget ? [menuMoveTarget] : checkedItems}
+        open={moveModalOpen || menuMoveTarget !== null || folderMoveItems !== null}
+        items={menuMoveTarget ? [menuMoveTarget] : (folderMoveItems ?? checkedItems)}
         folders={state.allFolders}
         onClose={() => {
           setMoveModalOpen(false);
           setMenuMoveTarget(null);
+          setFolderMoveItems(null);
         }}
-        onMove={(folderId) =>
-          void (menuMoveTarget
-            ? runMove([menuMoveTarget.key], folderId, "menu")
-            : runMove(checkedItems.map((i) => i.key), folderId))
-        }
+        onMove={(folderId) => {
+          if (menuMoveTarget) void runMove([menuMoveTarget.key], folderId, "menu");
+          else if (folderMoveItems) {
+            setFolderMoveItems(null);
+            void runMove(folderMoveItems.map((i) => i.key), folderId);
+          } else void runMove(checkedItems.map((i) => i.key), folderId);
+        }}
       />
       <MoveFailedModal
         open={moveFailure !== null}

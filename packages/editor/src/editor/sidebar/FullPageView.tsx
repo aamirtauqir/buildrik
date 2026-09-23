@@ -30,6 +30,7 @@ export interface FullPageViewProps {
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
+  templatesNewPageName?: string;
   onOpenImageEditor?: (
     imageSrc: string,
     onSave: (editedSrc: string, edits: EditsSnapshot) => void | Promise<void>,
@@ -52,6 +53,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
+  templatesNewPageName,
   onOpenImageEditor,
   onOpenIconPicker,
 }) => {
@@ -83,6 +85,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             onSettingsDirtyChange={onSettingsDirtyChange}
             settingsOpen={settingsOpen}
             onTemplatesSwitchTab={onTemplatesSwitchTab}
+            templatesNewPageName={templatesNewPageName}
           />
         </React.Suspense>
       </InspectorErrorBoundary>

@@ -58,8 +58,6 @@ export interface ReplaceModalProps {
   template: TemplateItem;
   currentPageName?: string;
   currentPageCount: number;
-  resetGlobalStyles: boolean;
-  onResetChange: (v: boolean) => void;
   /** P2 fix (codex A4): backup current page as new page before replacing. */
   backupCurrentPage: boolean;
   onBackupChange: (v: boolean) => void;
@@ -71,8 +69,6 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   template,
   currentPageName,
   currentPageCount,
-  resetGlobalStyles,
-  onResetChange,
   backupCurrentPage,
   onBackupChange,
   onCancel,
@@ -119,17 +115,6 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
       onChange={onBackupChange}
       title="Save the current page as a backup version first"
       hint="Keeps your work as a version in History › Saves."
-    />
-    {/* Not on the board, kept because it does something the board's sentence
-        does not cover: it clears the project's global styles outright.
-        The sentence above used to claim brand tokens resolve automatically
-        either way — they do not; the ten built-in templates hardcode over a
-        hundred hex values and reference no design token. */}
-    <Option
-      checked={resetGlobalStyles}
-      onChange={onResetChange}
-      title="Reset global styles to template defaults"
-      hint="Overrides your brand colours with the template's."
     />
   </Modal>
 );

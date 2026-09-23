@@ -6,8 +6,9 @@
  * 6752:59365 (Blank selected): Page name · Blank "Empty canvas" · From
  * template "Pick from N layouts" · Cancel · Create page. Create on Blank lands
  * on the new, empty page with "Page created" (6700:71154); Create on From
- * template creates the page and opens the templates catalogue on it
- * (4418:54134), where a template is applied to the active page.
+ * template opens the templates catalogue (4418:54134) carrying the name, and
+ * creates nothing until a template is chosen there — leaving the catalogue
+ * must leave no blank page behind (QA 2026-09-24).
  *
  * The board's "Add to site navigation" checkbox is not drawn: the product has
  * no navigation-element contract to write to (audit G2-074).
@@ -61,6 +62,11 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
   const create = () => {
     const trimmed = name.trim();
     if (!composer || !trimmed) return;
+    if (source === "template") {
+      setOpen(false);
+      composer.emit(EVENTS.UI_BROWSE_TEMPLATES, { newPageName: trimmed });
+      return;
+    }
     let pageId: string;
     try {
       pageId = composer.elements.createPage(trimmed).id;
@@ -71,8 +77,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     }
     composer.elements.setActivePage(pageId);
     setOpen(false);
-    if (source === "template") composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {});
-    else addToast({ title: "Page created", description: `‘${trimmed}’ is ready.`, tone: "success" });
+    addToast({ title: "Page created", description: `‘${trimmed}’ is ready.`, tone: "success" });
   };
 
   const card = (value: Source, title: string, hint: string) => (
