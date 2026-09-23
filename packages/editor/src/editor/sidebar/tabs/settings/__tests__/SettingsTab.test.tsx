@@ -6,7 +6,7 @@
  *   Shell: the persistent sidebar (Back to canvas · Settings · site · Overview
  *     · five groups · Pro on locked rows · ↗ dashboard rows), the pane header
  *     per screen, the footer per state, the deep link.
- *   Doors: Fonts & colours → the Brand panel · Export → `ui:open-exporter` and
+ *   Doors: Brand ↗ → the Brand workspace · Export → `ui:open-exporter` and
  *     out · Back / Done / Cancel / Escape → out.
  *   Guard: every door and every nav click while dirty raises Unsaved
  *     settings; Keep editing keeps; Discard rolls composer back and finishes
@@ -270,7 +270,7 @@ describe("SettingsTab — the shell", () => {
     expect(labels).toEqual([
       { id: "set-nav-overview", text: "Overview" },
       { id: "set-nav-general", text: "General" },
-      { id: "set-nav-branding", text: "Fonts & colours" },
+      { id: "set-nav-branding", text: "Brand ↗" },
       { id: "set-nav-localization", text: "Localization" },
       { id: "set-nav-seo", text: "SEO defaults" },
       { id: "set-nav-domains", text: "Domains" },
@@ -378,7 +378,7 @@ describe("SettingsTab — the shell", () => {
 // ─── Doors ────────────────────────────────────────────────────────────────
 
 describe("SettingsTab — doors", () => {
-  it("Fonts & colours opens the Brand panel and stays where it was", () => {
+  it("Brand ↗ opens the Brand workspace and stays where it was", () => {
     const onOpenDesignTab = vi.fn();
     render(<SettingsTab composer={asComposer(makeComposer())} onOpenDesignTab={onOpenDesignTab} />);
     fireEvent.click(screen.getByTestId("set-nav-branding"));

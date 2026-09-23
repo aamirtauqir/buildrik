@@ -16,9 +16,8 @@
  * took #EEEEEE to #B6B6B6 (still ~2:1) and left the finding standing.
  * Open goes to the token's own page with its card open.
  *
- * Departure, recorded: the board's header "Run checks" is not drawn. The
- * checks run by themselves on every staged edit (useDSLint, debounced), and
- * there is no re-run entry on that hook (state/ is read-only for C1).
+ * The header's "Run checks" (the workspace's page action) re-runs them now;
+ * they also run by themselves on every staged edit (useDSLint, debounced).
  *
  * @license BSD-3-Clause
  */

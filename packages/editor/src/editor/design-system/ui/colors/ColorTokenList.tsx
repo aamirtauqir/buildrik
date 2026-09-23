@@ -61,7 +61,7 @@ export function displayValue(value: string): string {
 }
 
 // Heuristic — if RGB sum > ~600, treat as "light" for border decoration.
-export function isLikelyLightValue(hex: string): boolean {
+function isLikelyLightValue(hex: string): boolean {
   if (!hex.startsWith("#")) return false;
   const h = hex.length === 4 ? hex.slice(1).split("").map((c) => c + c).join("") : hex.slice(1);
   if (h.length !== 6) return false;
@@ -73,7 +73,7 @@ export function isLikelyLightValue(hex: string): boolean {
 }
 
 /** The 16px round swatch on the gutter; light values get a visible edge. */
-export const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, isDirty }) => (
+const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, isDirty }) => (
   <span
     aria-hidden="true"
     data-testid="brand-color-swatch"
@@ -120,7 +120,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               Beginner mode is hiding {hiddenByModeCount}{" "}
               {hiddenByModeCount === 1 ? "color" : "colors"}.
             </div>
-            <div className="tw:mt-1 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+            <div className="tw:mt-1 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">
               They are primitives. Switch to Pro to see them.
             </div>
           </>

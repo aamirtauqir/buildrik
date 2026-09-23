@@ -94,13 +94,13 @@ export interface SettingsNavDef {
  *  same groups out as cards in its own order (see OverviewScreen). */
 export const SETTINGS_NAV: SettingsNavDef[] = [
   { id: "general", title: "General", subtitle: "Manage your site identity, language and social profiles.", group: "site-setup", kind: "screen" },
-  { id: "branding", title: "Fonts & colours", subtitle: "Site fonts and colour tokens", group: "site-setup", kind: "door" },
+  { id: "branding", title: "Brand ↗", subtitle: "Colours, fonts, spacing and presets", group: "site-setup", kind: "door" },
   { id: "localization", title: "Localization", subtitle: "Locale claim and preview", group: "site-setup", kind: "screen" },
   { id: "seo", title: "SEO defaults", subtitle: "Search & social preview", group: "seo-publishing", kind: "screen" },
   { id: "domains", title: "Domains", subtitle: "Custom domain + DNS", group: "seo-publishing", kind: "screen" },
   { id: "redirects", title: "Redirects", subtitle: "301 / 302 + 404 suggester", group: "seo-publishing", kind: "screen" },
   { id: "export", title: "Export", subtitle: "HTML, ZIP or React", group: "seo-publishing", kind: "door" },
-  { id: "analytics", title: "Analytics", subtitle: "GA4, Plausible, PostHog, Pixel", group: "visitors", kind: "screen" },
+  { id: "analytics", title: "Analytics", subtitle: "Google Analytics, Meta Pixel, Clarity, Tag Manager", group: "visitors", kind: "screen" },
   { id: "forms", title: "Forms", subtitle: "Submissions inbox + config", group: "visitors", kind: "screen" },
   { id: "custom-code", title: "Custom code", subtitle: "Head, body, CSS injections", group: "advanced", kind: "screen" },
   { id: "headers", title: "Headers", subtitle: "CSP, HSTS, security policy", group: "advanced", kind: "screen" },
