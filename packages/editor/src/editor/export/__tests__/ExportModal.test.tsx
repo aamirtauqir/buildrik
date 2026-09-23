@@ -316,3 +316,24 @@ describe("ExportModal — download flows", () => {
     expect(clicked).toEqual([{ download: "export.html", href: expect.stringContaining("blob:") }]);
   });
 });
+
+describe("ExportModal — the outcome is a toast (C5 G3-113)", () => {
+  it("a download says Export ready with the file it wrote", async () => {
+    renderModal();
+    const btn = screen.getByTestId("export-primary") as HTMLButtonElement;
+    await waitFor(() => expect(btn.disabled).toBe(false));
+    fireEvent.click(btn);
+    await waitFor(() => expect(screen.getByText(/Export ready — .+ downloaded/)).toBeTruthy());
+  });
+
+  it("a failed ZIP says Export failed", async () => {
+    mocks.generateZip.mockRejectedValue(new Error("disk full"));
+    renderModal();
+    const zip = await waitFor(() => screen.getByText(/ZIP/));
+    fireEvent.click(zip);
+    const btn = screen.getByTestId("export-primary") as HTMLButtonElement;
+    await waitFor(() => expect(btn.disabled).toBe(false));
+    fireEvent.click(btn);
+    await waitFor(() => expect(screen.getByText("Export failed — disk full")).toBeTruthy());
+  });
+});

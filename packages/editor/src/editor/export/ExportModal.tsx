@@ -11,7 +11,7 @@ import { resolvePageTitle } from "../../engine/export/SEOInjector";
 import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
-import { Button, ModalBody, ModalClose, ModalContent, ModalDescription, ModalRoot, ModalTitle, Spinner, Tabs, plural } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalDescription, ModalRoot, ModalTitle, Spinner, Tabs, plural, useToast } from "@/editor/chrome-ui";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
@@ -54,6 +54,13 @@ const FOOT_PRIMARY =
 // ============================================================================
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, composer }) => {
+  /* C5 G3-113: the export's outcome was invisible — a download started (or
+     silently did not). Ready and failed are toasts, as the boards turn
+     4418:165727 / 165733 into. */
+  const { addToast } = useToast();
+  const ready = (file: string) => addToast({ description: `Export ready — ${file} downloaded`, tone: "success" });
+  const failed = (error: unknown) =>
+    addToast({ description: `Export failed — ${error instanceof Error ? error.message : "try again"}`, tone: "error" });
   const [activeTab, setActiveTab] = React.useState<ExportTab>("preview");
   const [previewDevice, setPreviewDevice] = React.useState<PreviewDevice>("desktop");
   const [config, setConfig] = React.useState<ExportConfig>(DEFAULT_EXPORT_CONFIG);
@@ -116,11 +123,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
   const handleDownloadHTML = () => {
     if (!result?.html) return;
     downloadFile(result.html, "index.html", "text/html");
+    ready("index.html");
   };
 
   const handleDownloadCSS = () => {
     if (!result?.css) return;
     downloadFile(result.css, "styles.css", "text/css");
+    ready("styles.css");
   };
 
   const handleDownloadAll = () => {
@@ -130,6 +139,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
         ? result.html
         : result.html.replace("</head>", '<link rel="stylesheet" href="styles.css">\n</head>');
     downloadFile(fullHTML, "export.html", "text/html");
+    ready(config.cssStyle === "external" && result.css ? "export.html + styles.css" : "export.html");
 
     if (config.cssStyle === "external" && result.css) {
       setTimeout(() => downloadFile(result.css!, "styles.css", "text/css"), 100);
@@ -150,8 +160,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      ready(a.download);
     } catch (error) {
       devError("ExportModal", "Failed to generate ZIP", error);
+      failed(error);
     } finally {
       setZipLoading(false);
     }
@@ -171,8 +183,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      ready(a.download);
     } catch (error) {
       devError("ExportModal", "React export failed", error);
+      failed(error);
       setResult({
         success: false,
         error: error instanceof Error ? error.message : "Export failed",
