@@ -14,7 +14,6 @@ const LABELS: Record<PageStatus, string> = {
   draft: "Draft",
   scheduled: "Scheduled",
   hidden: "Hidden",
-  password: "Password",
   external: "External",
   error: "Error",
 };

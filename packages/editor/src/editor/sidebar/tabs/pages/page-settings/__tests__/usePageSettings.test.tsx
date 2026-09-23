@@ -71,11 +71,11 @@ describe("usePageSettings seed", () => {
     expect(result.current.seoTitle).toBe("About Us");
   });
 
-  /* Decision #21: no Password option. A legacy password page reads as Hidden —
-     both are left out of the deploy, so saving it cannot publish it. */
-  it("reads a legacy password page as hidden", () => {
+  /* #21 / #26: a legacy password page arrives as "hidden" (usePages maps it —
+     see usePages.test "legacy password pages"); the drawer reads it Hidden. */
+  it("reads a hidden page as hidden", () => {
     const composer = createMockComposer({});
-    const { result } = setup(composer, page({ status: "password" }));
+    const { result } = setup(composer, page({ status: "hidden" }));
     expect(result.current.visibility).toBe("hidden");
   });
 

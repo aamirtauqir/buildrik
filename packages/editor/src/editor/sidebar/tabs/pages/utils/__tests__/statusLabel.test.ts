@@ -1,5 +1,5 @@
 /**
- * statusLabel — 7-variant + unknown-guard.
+ * statusLabel — 6-variant + unknown-guard. C4 #26: no Password status.
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
@@ -12,7 +12,6 @@ describe("getStatusLabel", () => {
     ["draft", "Draft"],
     ["scheduled", "Scheduled"],
     ["hidden", "Hidden"],
-    ["password", "Password"],
     ["external", "External"],
     ["error", "Error"],
   ])("maps %s to %s", (status, expected) => {
@@ -21,6 +20,10 @@ describe("getStatusLabel", () => {
 
   it("returns null for unknown status (defensive — never crash UI)", () => {
     expect(getStatusLabel("fnord" as PageStatus)).toBeNull();
+  });
+
+  it("has no Password label — C4 #26 removed Password pages", () => {
+    expect(getStatusLabel("password" as PageStatus)).toBeNull();
   });
 
   it("returns null for undefined", () => {

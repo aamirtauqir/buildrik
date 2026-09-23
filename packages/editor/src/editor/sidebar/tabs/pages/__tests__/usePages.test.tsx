@@ -126,6 +126,20 @@ describe("the status the panel shows agrees with what the exporter ships", () =>
   }
 });
 
+/* C4 #26 — Password pages are gone. A page saved as "password" before #21
+   stays unpublished (isPageLive fails closed) and reads as Hidden everywhere
+   in the panel: no "Password" status, no "Password" chip. */
+describe("usePages — legacy password pages", () => {
+  it('maps visibility "password" to the Hidden status and label', () => {
+    const composer = createMockComposer({
+      pages: [pg("p1", "Secret", { settings: { visibility: "password" } } as never)],
+    });
+    const { result } = setup(composer);
+    expect(result.current.pages[0].status).toBe("hidden");
+    expect(getStatusLabel(result.current.pages[0].status)).toBe("Hidden");
+  });
+});
+
 // ── PROJECT_CHANGED filtering ────────────────────────────────────────────────
 
 describe("usePages PROJECT_CHANGED handler", () => {

@@ -6,7 +6,9 @@
 import type { PageSEO } from "../../../../shared/types";
 
 /** Visibility/publication state of a page — stored in page.settings.visibility */
-export type PageStatus = "live" | "draft" | "hidden" | "password" | "scheduled" | "error" | "external";
+/* No "password" (C4 #26): Password pages are removed; a page saved as one
+   before decision #21 reads as "hidden" (usePages). */
+export type PageStatus = "live" | "draft" | "hidden" | "scheduled" | "error" | "external";
 
 /** Settings drawer tab identifier */
 export type DrawerTab = "seo" | "social" | "advanced";
