@@ -80,8 +80,39 @@ export const BreakpointOverrides: React.FC<BreakpointOverridesProps> = ({
   const breakpointName = BREAKPOINTS[breakpoint]?.name ?? breakpoint;
   const base = composer?.elements?.getElement(elementId)?.getStyles?.() ?? {};
 
+  /* Board 4418:113785 — "⚠ 6 tablet overrides · Revert all": one line that
+     says how much this breakpoint changes and one control that drops the lot,
+     above the per-property rows (G2-142). One transaction, one undo step. */
+  const revertAll = () => {
+    composer?.beginTransaction?.(`revert-all-${breakpoint}`);
+    try {
+      for (const [property] of overrides) {
+        composer?.styles?.removeBreakpointStyleProperty(elementId, breakpoint, property);
+      }
+    } finally {
+      composer?.endTransaction?.();
+    }
+  };
+
   return (
     <div className="tw:flex tw:flex-col" data-testid="breakpoint-overrides">
+      <div
+        className="tw:flex tw:items-center tw:justify-between tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-1.5 tw:text-[11px]/[16px] tw:text-[var(--bk-warning-text)]"
+        data-testid="breakpoint-overrides-summary"
+      >
+        <span>
+          ⚠ {overrides.length} {breakpointName.toLowerCase()} override{overrides.length === 1 ? "" : "s"}
+        </span>
+        <Button
+          color="light"
+          size="xs"
+          data-testid="breakpoint-overrides-revert-all"
+          className="tw:h-6 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:px-1 tw:text-[11px] tw:font-medium tw:text-[var(--bk-warning-text)] tw:hover:text-[var(--bk-ink)]"
+          onClick={revertAll}
+        >
+          Revert all
+        </Button>
+      </div>
       {overrides.map(([property, value]) => (
         <div key={property} data-testid={`breakpoint-override-${property}`}>
           {/* Board 160:305 uses the SAME 96px-label / 1fr-control grid every

@@ -18,7 +18,9 @@ import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
+import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BatchStylePanel } from "./BatchStylePanel";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { Button, Tooltip } from "@/editor/chrome-ui";
 // ============================================================================
 // TYPES
@@ -216,6 +218,31 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
   const isDisabled = !alignmentHandler || selectedIds.length < 2;
   const distributeDisabled = isDisabled || selectedIds.length < 3;
 
+  /* Board 4418:114523 — the context header lists the members by icon and
+     name, then Group · Delete. A row click narrows the selection to that
+     member, the way a Layers row does. Delete on N > 1 confirms first
+     (decision #17: instant + Undo for one element, a confirm for many) and
+     then runs the same `delete` command the keyboard does, so the toast and
+     the single undo step come from the one place that owns them. */
+  const members = React.useMemo(
+    () =>
+      selectedIds.map((id) => {
+        const el = composer?.elements?.getElement?.(id);
+        const type = el?.getType?.() ?? "element";
+        return { id, type, label: type.charAt(0).toUpperCase() + type.slice(1), el };
+      }),
+    [composer, selectedIds]
+  );
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+  /* The engine groups SIBLINGS only (`groupElements` returns null otherwise);
+     a Group button that silently did nothing would be the dead click this
+     panel exists to avoid, so the reason rides on the disabled control. */
+  const sameParent = React.useMemo(() => {
+    const parents = members.map((m) => m.el?.getParent?.()?.getId?.() ?? null);
+    return parents.length > 1 && parents.every((id) => id !== null && id === parents[0]);
+  }, [members]);
+  const groupReason = !composer ? "No composer available" : sameParent ? "Group" : "Group needs elements that share a parent";
+
   // Generate helpful tooltip text based on disabled state
   const getAlignTooltip = (action: string) => {
     if (!alignmentHandler) return `${action} (no composer available)`;
@@ -250,6 +277,63 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
           </Button>
         )}
       </div>
+
+      <ul className="tw:m-0 tw:list-none tw:p-0" data-testid="multiselect-members">
+        {members.map(({ id, type, label, el }) => {
+          const Icon = getElementIcon(type);
+          return (
+            <li key={id} className="tw:m-0 tw:p-0">
+              <Button
+                color="light"
+                size="xs"
+                data-testid={`multiselect-member-${id}`}
+                className="tw:h-7 tw:w-full tw:justify-start tw:gap-2 tw:rounded-none tw:border-transparent tw:bg-transparent tw:px-4 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)]"
+                onClick={() => {
+                  if (el) composer?.selection?.select(el);
+                }}
+              >
+                <Icon size="sm" />
+                <span className="tw:min-w-0 tw:truncate">{label}</span>
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+      <div className="tw:flex tw:gap-2 tw:px-4 tw:pb-2" data-testid="multiselect-actions">
+        <Tooltip content={groupReason} placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
+          <Button
+            color="light"
+            size="xs"
+            data-testid="multiselect-group"
+            className="tw:h-7 tw:rounded-md tw:px-2 tw:text-[12px] tw:font-medium tw:border-[var(--bk-gray-200)] tw:bg-white tw:text-[var(--bk-ink)] tw:aria-disabled:text-[var(--bk-ink-disabled)] tw:aria-disabled:cursor-not-allowed"
+            aria-disabled={!composer || !sameParent}
+            onClick={() => {
+              if (composer && sameParent) composer.commands.run("group");
+            }}
+          >
+            Group
+          </Button>
+        </Tooltip>
+        <Button
+          color="light"
+          size="xs"
+          data-testid="multiselect-delete"
+          className="tw:h-7 tw:rounded-md tw:px-2 tw:text-[12px] tw:font-medium tw:border-[var(--bk-gray-200)] tw:bg-white tw:text-[var(--bk-error-text)]"
+          disabled={!composer}
+          onClick={() => setConfirmDelete(true)}
+        >
+          Delete
+        </Button>
+      </div>
+      <DeleteConfirmModal
+        isOpen={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          setConfirmDelete(false);
+          composer?.commands?.run("delete");
+        }}
+        elementLabel={`${selectedIds.length} elements`}
+      />
 
       {/* Board 159:123 bands them once: ALIGN carries all six, DISTRIBUTE
           carries its two on the right. Live split ALIGN in two ("Align

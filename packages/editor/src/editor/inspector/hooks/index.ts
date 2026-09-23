@@ -23,3 +23,6 @@ export type {
 
 export { useBatchStyleHandler } from "./useBatchStyleHandler";
 export type { UseBatchStyleHandlerResult } from "./useBatchStyleHandler";
+
+export { useInspectorTier } from "./useInspectorTier";
+export type { InspectorTier } from "./useInspectorTier";

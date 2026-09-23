@@ -255,6 +255,16 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       return next;
     });
   }, []);
+  /* The toggle's doors are the inspector's own ✕ and the ⌘K row
+     (`toggle-inspector`, commands registry) — both emit this event (G2-037:
+     the footer word bar's Inspector toggle had no home on the board). */
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.on(EVENTS.UI_TOGGLE_INSPECTOR, toggleInspector);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_INSPECTOR, toggleInspector);
+    };
+  }, [composer, toggleInspector]);
 
   // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
   const [mediaFullPage, setMediaFullPage] = React.useState(false);
@@ -272,6 +282,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     isFullPageMode ||
     getTabMode(activeTabId) === "fullpage" ||
     (activeTabId === "assets" && mediaFullPage);
+
+  /* The toast viewport anchors to the CANVAS region's bottom-right, not the
+     window's (plan 2026-09-21 decision #35): it adds `--bk-inspector-w` to its
+     `right`. Written on the document root, not `.bd-studio`, because the
+     overlay root is a sibling of the shell, not a descendant. */
+  const inspectorOpen = !readOnlyView && !effectiveFullPageMode && inspectorShown;
+  React.useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--bk-inspector-w", inspectorOpen ? "var(--bk-size-inspector)" : "0px");
+    return () => {
+      root.style.removeProperty("--bk-inspector-w");
+    };
+  }, [inspectorOpen]);
 
   // Reset media fullpage override when switching away from assets tab
   React.useEffect(() => {
@@ -470,7 +493,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
-        inspectorOpen={!readOnlyView && !effectiveFullPageMode && inspectorShown}
+        inspectorOpen={inspectorOpen}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel. Absent in view mode. */}
@@ -507,8 +530,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
-              inspectorOpen={inspectorShown}
-              onToggleInspector={toggleInspector}
               ref={canvasRef as React.Ref<CanvasRef>}
               /* The overlay toggles (Grid / Rulers / Badges / X-Ray) are build
                  tools, so they go with the rest of the editing chrome. */
@@ -556,7 +577,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             composer={composer}
             selectedElement={selectedElement}
             currentBreakpoint={device}
-            onBreakpointChange={onDeviceChange}
             onDelete={handleDelete}
             onOpenMediaLibrary={onOpenMediaLibrary}
             onOpenIconPicker={onOpenIconPicker}

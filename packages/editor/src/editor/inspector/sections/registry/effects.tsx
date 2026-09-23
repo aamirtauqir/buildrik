@@ -14,12 +14,15 @@ import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   effects: defineSection({
+    tab: "effects",
     Component: EffectsSection,
     styleKeys: ["opacity", "box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
     adaptProps: adaptBaseStyleProps,
   }),
 
   animation: defineSection({
+    tab: "effects",
+    tier: "advanced",
     Component: AnimationSection,
     styleKeys: [],
     adaptProps: (ctx) => {
@@ -77,6 +80,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   interactions: defineSection({
+    tab: "effects",
     Component: InteractionsSection,
     styleKeys: [],
     adaptProps: (ctx) => {
@@ -126,6 +130,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   visibility: defineSection({
+    tab: "element",
     /* The THREE keys this section reads, and only those. It declared
        `display`, `visibility`, `opacity` and `pointer-events` — none of which
        VisibilitySection touches — and omitted the `--hide-<breakpoint>` custom

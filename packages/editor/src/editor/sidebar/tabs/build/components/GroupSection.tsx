@@ -14,8 +14,9 @@ import type { FlatElEntry } from "../catalog/types";
 import type { BlockDefinition } from "../../../../../blocks/blockRegistry";
 import type { ComponentDefinition } from "../../../../../shared/types/components";
 import type { InsertGroup } from "../catalog/groups";
-import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
+import type { BlockDragStartFn, DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { Button, Tooltip } from "@/editor/chrome-ui";
+import { BlockThumb } from "./BlockThumb";
 
 interface GroupSectionProps {
   group: InsertGroup;
@@ -28,6 +29,8 @@ interface GroupSectionProps {
   /** MINE (board 1069:4970): the user's own components as plain rows. */
   mine?: ComponentDefinition[];
   onDragStart: DragStartFn;
+  /** Board 4428:140817's grip — a block card drags onto the canvas too. */
+  onBlockDragStart?: BlockDragStartFn;
   onElClick: ElClickFn;
   onBlockInsert?: (block: BlockDefinition) => void;
   onMineInsert?: (component: ComponentDefinition) => void;
@@ -194,7 +197,7 @@ export const Row: React.FC<{
 };
 
 export const GroupSection: React.FC<GroupSectionProps> = ({
-  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onElClick, onBlockInsert, onMineInsert,
+  group, isOpen, onToggle, elements, blocks, components, mine, onDragStart, onBlockDragStart, onElClick, onBlockInsert, onMineInsert,
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
@@ -252,35 +255,63 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
         the card width cannot lose that way, and it earns the expanded drawer
         (560/700) more columns instead of two marooned cards. */}
     {isOpen && group.id === "blocks" && (
-      <div data-testid="insert-blocks-grid" className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
-        {blocks?.map((b) => (
-          <div
-            key={b.id}
-            role="button"
-            tabIndex={0}
-            className="tw:flex tw:flex-col tw:gap-[6px] tw:min-w-0 tw:cursor-pointer tw:select-none"
-            data-testid={`insert-block-${b.id}`}
-            onClick={() => onBlockInsert?.(b)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onBlockInsert?.(b); }
-            }}
-          >
-            {b.preview ? (
-              <img
-                src={b.preview}
-                alt=""
-                className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:object-cover"
-                data-testid={`insert-block-thumb-${b.id}`}
-              />
-            ) : (
-              <div className="tw:h-[80px] tw:w-[136px] tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)]" data-testid={`insert-block-thumb-${b.id}`} aria-hidden="true" />
-            )}
-            <p data-testid={`insert-block-label-${b.id}`} className="tw:m-0 tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-soft)] tw:truncate">
-              {b.label}
-            </p>
-          </div>
-        ))}
-      </div>
+      <>
+        <div data-testid="insert-blocks-grid" className="tw:grid tw:grid-cols-[repeat(auto-fill,minmax(128px,1fr))] tw:gap-[8px] tw:px-[var(--bk-space-16)] tw:py-[var(--bk-space-4)]">
+          {/* Board 4428:140817 / 4428:145110: a card is its thumbnail over its
+              name; hovered, it names what it is and offers "Add <name>" or the
+              drag. The card IS the drag source — the board's grip is a hint,
+              not a separate handle. */}
+          {blocks?.map((b) => (
+            <div
+              key={b.id}
+              role="button"
+              tabIndex={0}
+              draggable={Boolean(onBlockDragStart)}
+              className="tw:group tw:flex tw:flex-col tw:gap-[6px] tw:min-w-0 tw:cursor-pointer tw:select-none tw:rounded-[var(--bk-radius-md)] tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
+              data-testid={`insert-block-${b.id}`}
+              aria-label={`Add ${b.label}`}
+              title={b.description ? `${b.description} — click to add, or drag it onto the canvas` : `Click to add ${b.label}, or drag it onto the canvas`}
+              onClick={() => onBlockInsert?.(b)}
+              onDragStart={onBlockDragStart ? (e) => onBlockDragStart(e, b) : undefined}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onBlockInsert?.(b); }
+              }}
+            >
+              {b.preview ? (
+                <img
+                  src={b.preview}
+                  alt=""
+                  className="tw:h-[80px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:object-cover tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
+                  data-testid={`insert-block-thumb-${b.id}`}
+                />
+              ) : (
+                <BlockThumb
+                  blockId={b.id}
+                  className="tw:h-[80px] tw:w-full tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-border)] tw:group-hover:border-[var(--bk-accent)]"
+                />
+              )}
+              <div className="tw:flex tw:items-center tw:justify-between tw:gap-1 tw:min-w-0">
+                <p data-testid={`insert-block-label-${b.id}`} className="tw:m-0 tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-soft)] tw:truncate tw:group-hover:text-[var(--bk-ink)]">
+                  {b.label}
+                </p>
+                {/* The board's Insert pill, hover-revealed (DESIGN.md anti-slop
+                    12: actions reveal on hover, never a per-row strip). */}
+                <span
+                  aria-hidden="true"
+                  data-testid={`insert-block-pill-${b.id}`}
+                  className="tw:hidden tw:group-hover:inline-flex tw:h-4 tw:shrink-0 tw:items-center tw:rounded-full tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[10px] tw:font-medium tw:text-[var(--bk-accent-text)]"
+                >
+                  Add
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Board 4428:140817's footnote under the grid. */}
+        <p data-testid="insert-blocks-note" className="tw:m-0 tw:px-[var(--bk-space-16)] tw:pb-[var(--bk-space-8)] tw:text-[11px] tw:leading-[16px] tw:text-[var(--bk-ink-muted)]">
+          Blocks use your Brand colours and fonts.
+        </p>
+      </>
     )}
   </div>
 );

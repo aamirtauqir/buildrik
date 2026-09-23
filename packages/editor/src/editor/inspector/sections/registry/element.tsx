@@ -13,6 +13,7 @@ import { LinkSection } from "../LinkSection";
 
 export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   link: defineSection({
+    tab: "element",
     Component: LinkSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
@@ -30,6 +31,7 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   "element-properties": defineSection({
+    tab: "element",
     Component: ElementPropertiesSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
@@ -48,6 +50,8 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   "css-classes": defineSection({
+    tab: "element",
+    tier: "advanced",
     Component: CSSClassesSection,
     styleKeys: [],
     adaptProps: (ctx) => ({
@@ -61,6 +65,8 @@ export const ELEMENT_SECTIONS: Record<string, AnySectionEntry> = {
   }),
 
   "all-css": defineSection({
+    tab: "element",
+    tier: "advanced",
     Component: AllCSSSection,
     styleKeys: [],
     adaptProps: (ctx) => ({

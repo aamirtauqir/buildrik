@@ -235,6 +235,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 components={g.id === "components" ? componentRows : undefined}
                 mine={g.id === "mine" ? mine : undefined}
                 onDragStart={tab.handleDragStart}
+                onBlockDragStart={tab.handleBlockDragStart}
                 onElClick={tab.handleElClick}
                 onBlockInsert={(b) => onBlockClick?.(b)}
                 onMineInsert={(c) => void insertMine(c)}

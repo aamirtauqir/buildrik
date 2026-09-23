@@ -7,7 +7,7 @@
  * the dropdown picks :hover / :focus / :active / :disabled. States that carry
  * overrides at the active breakpoint show an accent dot.
  *
- * Dropdown mechanics mirror BreakpointPill (pointerdown outside-click, listbox).
+ * Dropdown mechanics: pointerdown outside-click, listbox.
  *
  * @license BSD-3-Clause
  */

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 /**
- * CanvasFooterToolbar — overlay toggles and the help button. (The undo/redo/
+ * CanvasFooterToolbar — the View menu and the help button. (The undo/redo/
  * device edit group is covered separately in
  * CanvasFooterToolbar.editgroup.test.tsx.)
  *
@@ -57,49 +57,55 @@ beforeAll(() => {
   }
 });
 
-describe("CanvasFooterToolbar — overlay toggles", () => {
-  it("renders all six overlay toggle buttons", () => {
+describe("CanvasFooterToolbar — the View menu (board 5930:44801)", () => {
+  const openMenu = () => fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+
+  it("replaces the six words with one View trigger; the rows live in the menu", () => {
     renderToolbar();
-    for (const name of ["Snap Guides", "Spacing", "Grid", "Rulers", "Badges", "X-Ray"]) {
-      expect(screen.getByRole("button", { name })).toBeTruthy();
+    for (const name of ["Snap guides", "Spacing", "Grid", "Rulers", "Badges", "X-Ray"]) {
+      expect(screen.queryByRole("button", { name })).toBeNull();
     }
+    expect(screen.queryByRole("menu")).toBeNull();
+    openMenu();
+    const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/⌘.*$/, "").trim());
+    expect(rows).toEqual(["Snap guides", "Spacing", "Grid", "Rulers", "Badges", "X-Ray"]);
   });
 
-  it("reflects active overlay state via aria-pressed", () => {
+  it("reflects active overlay state as a checked row, and counts it on the trigger", () => {
     renderToolbar({ overlays: { ...ALL_OFF, grid: true } });
-    expect(screen.getByRole("button", { name: "Grid" }).getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByRole("button", { name: "Spacing" }).getAttribute("aria-pressed")).toBe(
-      "false"
-    );
+    expect(screen.getByTestId("canvas-view-menu-trigger").textContent).toContain("View · 1");
+    openMenu();
+    expect(screen.getByTestId("canvas-view-grid").getAttribute("aria-checked")).toBe("true");
+    expect(screen.getByTestId("canvas-view-spacing").getAttribute("aria-checked")).toBe("false");
   });
 
-  it("toggles an off overlay ON (negates current value)", () => {
+  it("a row toggles its overlay (negates the current value) and closes the menu", () => {
     const { onOverlayChange } = renderToolbar();
-    fireEvent.click(screen.getByRole("button", { name: "Grid" }));
+    openMenu();
+    fireEvent.click(screen.getByTestId("canvas-view-grid"));
     expect(onOverlayChange).toHaveBeenCalledWith("grid", true);
+    expect(screen.queryByRole("menu")).toBeNull();
   });
 
-  it("toggles an on overlay OFF (negates current value)", () => {
+  it("toggles an on overlay OFF", () => {
     const { onOverlayChange } = renderToolbar({ overlays: { ...ALL_OFF, xray: true } });
-    fireEvent.click(screen.getByRole("button", { name: "X-Ray" }));
+    openMenu();
+    fireEvent.click(screen.getByTestId("canvas-view-xray"));
     expect(onOverlayChange).toHaveBeenCalledWith("xray", false);
   });
 
-  /* Board 199:205 draws these as words. They were icon-only for a while
-     because the bar overflowed under the inspector; the label IS the control
-     now, so a regression back to glyphs shows up here rather than in a
-     screenshot nobody re-takes. */
-  it("prints each toggle's name in the bar, not just in its tooltip", () => {
+  it("prints each row's chord, so the menu is where the chords are documented", () => {
     renderToolbar();
-    for (const name of ["Snap Guides", "Spacing", "Grid", "Rulers", "Badges", "X-Ray"]) {
-      expect(screen.getByRole("button", { name }).textContent).toBe(name);
-    }
+    openMenu();
+    expect(screen.getByTestId("canvas-view-rulers").textContent).toContain("⌘R");
+    expect(screen.getByTestId("canvas-view-xray").textContent).toContain("⌘⇧X");
   });
 
   /* Board 817:4649 prints ⌘R against Rulers. The chord was the one on that
      board never bound — it is the browser's reload. Only the PLAIN chord is
-     taken; ⌘⇧R must still reach the browser. */
-  it("⌘R toggles rulers, and ⌘⇧R is left to the browser", () => {
+     taken; ⌘⇧R must still reach the browser. The chords survive the move
+     into a menu (CV-85). */
+  it("⌘R toggles rulers with the menu closed, and ⌘⇧R is left to the browser", () => {
     const { onOverlayChange } = renderToolbar();
     fireEvent.keyDown(window, { key: "r", metaKey: true });
     expect(onOverlayChange).toHaveBeenCalledWith("rulers", true);
@@ -107,6 +113,11 @@ describe("CanvasFooterToolbar — overlay toggles", () => {
     onOverlayChange.mockClear();
     fireEvent.keyDown(window, { key: "r", metaKey: true, shiftKey: true });
     expect(onOverlayChange).not.toHaveBeenCalled();
+  });
+
+  it("no Inspector toggle in the bar — it is a ⌘K row and the inspector's ✕ now", () => {
+    renderToolbar();
+    expect(screen.queryByRole("button", { name: "Inspector" })).toBeNull();
   });
 });
 

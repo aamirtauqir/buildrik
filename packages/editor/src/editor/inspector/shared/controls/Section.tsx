@@ -11,7 +11,9 @@ import * as React from "react";
 // TYPES
 // ============================================================================
 
-export type SectionTier = "primary" | "secondary" | "tertiary";
+/** Positional weight, or `"advanced"` — a registry tag the Beginner tier hides
+ *  behind "Show all (N more)" (board 4428:141170, decision #29). */
+export type SectionTier = "primary" | "secondary" | "tertiary" | "advanced";
 
 export interface SectionProps {
   title: string;

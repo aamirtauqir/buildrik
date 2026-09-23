@@ -19,7 +19,9 @@
  *
  *   Both rail escape hatches resolve to "figma" in a production bundle — see
  *   resolveRailMode below (IA-14). They are comparison tools, not user-facing.
- *   ?density=fewer → trimmed inspector
+ *   (`?density=fewer` — a trimmed inspector — was retired 2026-09-22; the
+ *   inspector's Beginner / Pro tier is a per-user preference now, see
+ *   editor/inspector/hooks/useInspectorTier.ts, decision #29.)
  *   ?view=readonly → a read-only VIEW, the way Figma's is: no rail, no drawer,
  *                    no inspector, no owner controls, and a Composer that runs
  *                    no mutating command. Founder call, 2026-08-23.
@@ -54,7 +56,6 @@ export interface EditorViewMode {
   railMode: RailMode;
   /** Derived back-compat flag: true ONLY for the E3 escape hatch (?rail=e3). */
   fourToolRail: boolean;
-  density: "full" | "fewer";
   readOnlyView: boolean;
 }
 
@@ -76,7 +77,7 @@ function resolveRailMode(raw: string | null): RailMode {
 
 export function getEditorViewMode(): EditorViewMode {
   if (typeof window === "undefined") {
-    return { railMode: "figma", fourToolRail: false, density: "full", readOnlyView: false };
+    return { railMode: "figma", fourToolRail: false, readOnlyView: false };
   }
   const q = new URLSearchParams(window.location.search);
   const readOnlyView = q.get("view") === "readonly";
@@ -86,11 +87,6 @@ export function getEditorViewMode(): EditorViewMode {
     // E3 is the only mode that puts AI in the topbar (✨) and Layers in the
     // footer (⌗); Figma + legacy both keep them elsewhere, so this stays false.
     fourToolRail: railMode === "e3",
-    /* `readOnlyView ||` is unobservable now — the inspector is density's only
-       consumer and it does not render in view mode. Kept anyway: removing it
-       is a behaviour change with three tests to rewrite and nothing to show for
-       it, and it stays correct if an inspector ever returns to this mode. */
-    density: readOnlyView || q.get("density") === "fewer" ? "fewer" : "full",
     readOnlyView,
   };
 }

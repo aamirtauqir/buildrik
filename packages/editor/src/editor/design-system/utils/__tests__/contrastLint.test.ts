@@ -20,7 +20,7 @@
 import { describe, it, expect } from "vitest";
 import { DEFAULT_TOKENS } from "../../constants";
 import type { DesignToken } from "../../types";
-import { buildContrastIssues, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
+import { buildContrastIssues, contrastFixHint, findSurfaceToken, resolveSurface, contrastFails } from "../contrastLint";
 
 const colors = DEFAULT_TOKENS.filter((t) => t.category === "colors") as DesignToken[];
 
@@ -81,5 +81,22 @@ describe("contrast lint — the page colour is findable under its semantic name"
 
   it("still prefers color-background when both are present", () => {
     expect(findSurfaceToken(colors)?.id).toBe("color-background");
+  });
+});
+
+describe("contrast findings carry the engine's fix hint (B9 / SH-64)", () => {
+  it("a token lighter than the page darkens; one darker than the page lightens", () => {
+    expect(contrastFixHint("#DDDDDD", "#FFFFFF")).toBe("darken-22");
+    expect(contrastFixHint("#333333", "#111111")).toBe("lighten-22");
+  });
+
+  it("every contrast issue carries a hint the Issues panel's Fix can act on", () => {
+    const tokens = [
+      { id: "color-background", name: "Background", kind: "color", category: "colors", value: "#FFFFFF" },
+      { id: "color-faint", name: "Faint", kind: "color", category: "colors", value: "#EEEEEE" },
+    ] as never;
+    const issues = buildContrastIssues(tokens, "light");
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatchObject({ tokenId: "color-faint", autoFixHint: "darken-22" });
   });
 });

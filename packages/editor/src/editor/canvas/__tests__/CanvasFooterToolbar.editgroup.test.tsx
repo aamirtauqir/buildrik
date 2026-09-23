@@ -99,7 +99,7 @@ describe("CanvasFooterToolbar — edit + viewport group", () => {
     expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Redo" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Device breakpoint" })).toBeNull();
-    // overlay controls still render — the toolbar itself is intact
-    expect(screen.getByRole("button", { name: "Snap Guides" })).toBeTruthy();
+    // the View menu still renders — the toolbar itself is intact
+    expect(screen.getByRole("button", { name: "View" })).toBeTruthy();
   });
 });

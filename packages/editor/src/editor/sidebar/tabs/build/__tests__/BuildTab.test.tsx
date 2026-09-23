@@ -140,3 +140,52 @@ describe("BuildTab — search", () => {
     );
   });
 });
+
+/* Board 4428:140817 (Add · Blocks): a 2-column card grid of SECTIONS with
+   thumbnails, hover Insert pill, drag-to-place, and the "Blocks use your
+   Brand colours and fonts." footnote (G2-110). The 40 rows that duplicated
+   ELEMENTS are gone from the group (G2-107). */
+describe("BuildTab — BLOCKS as section cards (board 4428:140817)", () => {
+  const openBlocks = () => fireEvent.click(screen.getByTestId("insert-group-blocks"));
+
+  it("lists the registry's sections and nothing that duplicates an element", () => {
+    renderTab();
+    openBlocks();
+    const ids = Array.from(document.querySelectorAll('[data-testid^="insert-block-"]'))
+      .map((el) => el.getAttribute("data-testid")!)
+      .filter((t) => /^insert-block-[a-z-]+$/.test(t) && !/thumb|label|pill/.test(t))
+      .map((t) => t.replace("insert-block-", ""));
+    expect(ids).toEqual(["hero", "features", "footer", "navbar", "cta"]);
+    expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("5");
+  });
+
+  it("draws a thumbnail on every card — no blank grey box", () => {
+    renderTab();
+    openBlocks();
+    for (const id of ["hero", "features", "footer", "navbar", "cta"]) {
+      const thumb = screen.getByTestId(`insert-block-thumb-${id}`);
+      expect(thumb.tagName.toLowerCase()).toBe("svg");
+      expect(thumb.getAttribute("data-shape")).toBe(id);
+      expect(thumb.querySelectorAll("rect").length).toBeGreaterThan(2);
+    }
+    expect(screen.getByTestId("insert-blocks-note").textContent).toBe("Blocks use your Brand colours and fonts.");
+  });
+
+  it("a card is a drag source writing the payload the canvas drop reads", () => {
+    renderTab();
+    openBlocks();
+    const card = screen.getByTestId("insert-block-hero");
+    expect(card.getAttribute("draggable")).toBe("true");
+    const data: Record<string, string> = {};
+    const dataTransfer = {
+      setData: (k: string, v: string) => {
+        data[k] = v;
+      },
+      effectAllowed: "",
+    };
+    fireEvent.dragStart(card, { dataTransfer });
+    expect(JSON.parse(data.block)).toMatchObject({ id: "hero", label: "Hero Section", category: "Sections" });
+    expect(data["text/plain"]).toBe("hero");
+    expect(dataTransfer.effectAllowed).toBe("copy");
+  });
+});

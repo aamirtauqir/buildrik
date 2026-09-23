@@ -46,7 +46,7 @@ export type {
   ShouldRenderContext,
   TabId,
 } from "./_shared";
-export { adaptBaseStyleProps, defineSection, EMPTY_MIXED_KEYS } from "./_shared";
+export { adaptBaseStyleProps, defineSection, EMPTY_MIXED_KEYS, INSPECTOR_TABS } from "./_shared";
 
 // ============================================================================
 // THE REGISTRY — composed from per-family fragments

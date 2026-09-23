@@ -44,8 +44,17 @@ function pickKeys<T extends Record<string, unknown>>(
 // TAB & SECTION IDS
 // ============================================================================
 
-/** Three tabs — concept axis, not CSS-category axis. */
+/** Three tabs — concept axis, not CSS-category axis. Boards 4428:141170
+ *  (Style), 4428:141642 (Settings — the `element` id, kept for the profile
+ *  and test fixtures that already spell it) and 4428:142686 (Effects). */
 export type TabId = "style" | "element" | "effects";
+
+/** The strip's labels, in board order. `element` reads "Settings" on screen. */
+export const INSPECTOR_TABS: readonly { id: TabId; label: string }[] = [
+  { id: "style", label: "Style" },
+  { id: "element", label: "Settings" },
+  { id: "effects", label: "Effects" },
+];
 
 /**
  * The complete set of section ids that can appear in any inspector tab.
@@ -161,6 +170,14 @@ export type ShouldRenderContext = Omit<
 export interface SectionEntry<P extends object = object> {
   Component: React.ComponentType<P>;
   adaptProps: (ctx: SectionContext) => P;
+  /** Which strip tab renders this section (boards 4428:141170 / 141642 / 142686). */
+  tab: TabId;
+  /**
+   * `"advanced"` tags a section the Beginner tier hides behind "Show all
+   * (N more)" (board 4428:141170; decision #29). Untagged sections take the
+   * positional primary / secondary / tertiary weight the renderer computes.
+   */
+  tier?: "advanced";
   /** Pre-render predicate. Runs BEFORE position/tier computation. */
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
   /**
@@ -213,6 +230,10 @@ export interface SectionEntry<P extends object = object> {
 export interface AnySectionEntry {
   render: (ctx: SectionContext) => React.ReactElement | null;
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
+  /** Strip tab this section belongs to — mirrors SectionEntry.tab. */
+  tab: TabId;
+  /** ADVANCED tag — mirrors SectionEntry.tier. */
+  tier?: "advanced";
   advancedKey?: string;
   /** CSS properties this section's advanced block renders. See SectionEntry. */
   advancedProps?: readonly string[];
@@ -244,6 +265,8 @@ export function defineSection<P extends object>(
       return <Component {...props} />;
     },
     shouldRender: entry.shouldRender,
+    tab: entry.tab,
+    tier: entry.tier,
     advancedKey: entry.advancedKey,
     advancedProps: entry.advancedProps,
     styleKeys: entry.styleKeys,

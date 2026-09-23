@@ -146,8 +146,14 @@ describe("useBlockInsertion", () => {
       3 // root child count
     );
     expect(composer.selection.select).toHaveBeenCalledWith(elements.get("new-1"));
+    /* Decision #16 / board 4428:145642: "Hero added" with an Undo that
+       reverts the insert's own transaction. */
     expect(mocks.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ tone: "success", description: "Inserted: Hero" })
+      expect.objectContaining({
+        tone: "success",
+        description: "Hero added",
+        action: expect.objectContaining({ label: "Undo" }),
+      })
     );
     expect(composer.endTransaction).toHaveBeenCalled();
   });
