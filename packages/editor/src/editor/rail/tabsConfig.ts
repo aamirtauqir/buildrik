@@ -110,7 +110,9 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // Components for IA symmetry in CREATION zone.
     pattern: "card-drill-in",
     shortcut: "T",
-    mode: "panel",
+    // Decision #24 (2026-09-21): a full-canvas view, not a 280/700 drawer
+    // plus a preview modal (board 4418:54134).
+    mode: "fullpage",
     zone: "creation",
   },
   {

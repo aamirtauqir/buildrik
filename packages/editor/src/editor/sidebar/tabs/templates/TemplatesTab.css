@@ -723,3 +723,56 @@
 .tpl-detail-preview-retry:hover {
   background: var(--bk-accent-tint);
 }
+
+/* ── Full-canvas view (decision #24; board 4418:54134) ─────────────────────
+   FullPageRouter mounts the view edge-to-edge; the 256 sidebar is the view's
+   own, the catalogue fills the rest. The drawer's two-column grid becomes as
+   many columns as the pane holds. */
+.tpl-ws {
+  display: flex;
+  height: 100%;
+  background: var(--bk-bg-panel);
+  font-family: var(--bk-font-ui);
+}
+.tpl-ws-side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 256px;
+  flex-shrink: 0;
+  padding: var(--bk-space-16) var(--bk-space-12);
+  border-right: 1px solid var(--bk-border);
+  overflow-y: auto;
+}
+.tpl-ws-side .tpl-ws-back {
+  justify-content: flex-start;
+  margin-bottom: var(--bk-space-12);
+  padding: 0 var(--bk-space-8);
+}
+.tpl-ws-title {
+  padding: 0 var(--bk-space-8);
+  font: 600 14px var(--bk-font-ui);
+  color: var(--bk-ink);
+}
+.tpl-ws-label {
+  padding: var(--bk-space-16) var(--bk-space-8) var(--bk-space-4);
+  font: 600 11px var(--bk-font-ui);
+  letter-spacing: 0.04em;
+  color: var(--bk-ink-muted);
+}
+.tpl-ws-side .tpl-ws-row {
+  justify-content: flex-start;
+  height: 32px;
+  min-height: 0;
+  padding: 0 var(--bk-space-8);
+  border: 0;
+  border-radius: var(--bk-radius-md);
+  background: transparent;
+  font: 400 13px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
+  text-align: left;
+}
+.tpl-ws-side .tpl-ws-row:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
+.tpl-ws-side .tpl-ws-row[aria-current="true"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); font-weight: 500; }
+.tpl-ws .tpl-ws-main { flex: 1; min-width: 0; }
+.tpl-ws .tpl-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }

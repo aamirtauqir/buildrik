@@ -65,14 +65,24 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onTemplatesSwitchTab,
 }) => {
   switch (activeTab) {
+    /* Decision #24 — board 4418:54134 is edge-to-edge like Settings: the
+       view's own sidebar carries `‹ Back to canvas`. Same portal, same reason
+       (the view owns its Escape and its dialogs). */
     case "templates":
       return (
-        <TemplatesTab
-          composer={composer}
-          onTemplateUsed={onSwitchToAdd}
-          onSwitchTab={onTemplatesSwitchTab}
-          {...commonTabProps}
-        />
+        <Portal>
+          <div
+            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
+            data-testid="tpl-host"
+          >
+            <TemplatesTab
+              composer={composer}
+              onTemplateUsed={onSwitchToAdd}
+              onSwitchTab={onTemplatesSwitchTab}
+              onClose={commonTabProps.onClose}
+            />
+          </div>
+        </Portal>
       );
 
     /* Clone 3695:45155 — the Asset library is edge-to-edge: no rail, no
