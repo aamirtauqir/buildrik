@@ -64,15 +64,12 @@ describe("Templates — add as new page", () => {
     const { calls, composer } = makeComposer();
     render(<TemplatesTab composer={composer as never} />);
 
-    // Open a template's detail, then choose the new-page route.
+    // Open a template's preview, then choose the new-page route.
     const first = SITE_TEMPLATES[0];
     /* The name is also a sidebar row (decision #24) — pick the grid card. */
     fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
-    /* Two buttons carry that name: the detail pane's action and the "Add as
-       new page instead?" nudge under the replace warning. The action is the
-       first. */
-    const [addAsNewPage] = await screen.findAllByRole("button", { name: /^add as new page$/i });
-    fireEvent.click(addAsNewPage);
+    /* The card opens the preview (decision #24); Create page is the new-page route. */
+    fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
 
     await waitFor(() => expect(calls).toContain("import"));
 

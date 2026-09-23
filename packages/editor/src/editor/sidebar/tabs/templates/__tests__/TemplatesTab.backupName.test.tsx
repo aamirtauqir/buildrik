@@ -65,10 +65,8 @@ async function applyWithBackup() {
   const first = SITE_TEMPLATES[0];
   /* The name is also a sidebar row (decision #24) — pick the grid card. */
   fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
-  /* The detail pane labels it "Apply to current page (<name>)"; the fullpage
-     surface labels the same action "Apply template". */
-  const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
-  fireEvent.click(applyBtn);
+  /* The card opens the preview (decision #24); its Replace page… is the apply. */
+  fireEvent.click(await screen.findByRole("button", { name: "Replace page…" }));
   /* Assert the state, do not toggle blindly. The box now DEFAULTS ON — board
      1169:4713 draws it checked, because applying a template replaces the page
      and the safe option belongs on the default. This helper used to click it
@@ -95,8 +93,7 @@ describe("Templates — the backup is named what the checkbox promises", () => {
     const first = SITE_TEMPLATES[0];
     /* The name is also a sidebar row (decision #24) — pick the grid card. */
     fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
-    const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
-    fireEvent.click(applyBtn);
+    fireEvent.click(await screen.findByRole("button", { name: "Replace page…" }));
     const label = await screen.findByText(/save the current page as a backup version first/i);
     const input = (label.closest("label") ?? label).querySelector('input[type="checkbox"]') as HTMLInputElement | null;
     expect(input, "backup checkbox not found").not.toBeNull();

@@ -4,6 +4,7 @@
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import * as React from "react";
 import { TemplateCard } from "../components/TemplateCard";
 import type { TemplateItem } from "../templatesData";
@@ -26,10 +27,21 @@ describe("TemplateCard", () => {
     expect(screen.getByText("Hero Landing")).toBeInTheDocument();
   });
 
-  it("renders a formatted category label", () => {
-    render(<TemplateCard template={makeTemplate({ category: "landing-page" as never })} onClick={() => {}} />);
-    // category "landing-page" → "Landing page"
-    expect(screen.getByText("Landing page")).toBeInTheDocument();
+  /* Board 4418:54134 card meta: "N sections · Built-in" / "Saved", then
+     "Preview template →". The old category line ("Landing page · Free") and
+     the catalogue's "with N pages" claim are gone (G2-093). */
+  it("reads N sections · Built-in, and Preview template →", () => {
+    render(<TemplateCard template={makeTemplate({ html: "<section></section><section></section>" })} onClick={() => {}} />);
+    expect(screen.getByTestId("tpl-card-meta-tmpl-hero")).toHaveTextContent("2 sections · Built-in");
+    expect(screen.getByText("Preview template →")).toBeInTheDocument();
+    expect(screen.queryByText(/Landing page|pages\b/)).toBeNull();
+  });
+
+  it("marks a saved template Saved, and a premium one Pro", () => {
+    render(<TemplateCard template={makeTemplate({ id: "mine", category: "my-templates" as never })} onClick={() => {}} />);
+    expect(screen.getByTestId("tpl-card-meta-mine")).toHaveTextContent("1 section · Saved");
+    render(<TemplateCard template={makeTemplate({ id: "pro", status: "premium" })} onClick={() => {}} />);
+    expect(screen.getByTestId("tpl-card-meta-pro")).toHaveTextContent("1 section · Built-in · Pro");
   });
 
   it("applies tpl-card class to the card element", () => {

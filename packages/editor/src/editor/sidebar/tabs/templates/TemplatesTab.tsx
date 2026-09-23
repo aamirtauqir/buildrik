@@ -5,7 +5,7 @@
  *
  * Left: the view's own sidebar — ‹ Back to canvas · Templates · PAGE
  * TEMPLATES · All page templates · N · one row per page template. Right: the
- * catalogue (search, pills, grid, inline detail, pagination) or, when a
+ * catalogue (search + one flat grid of built-in and saved templates) or, when a
  * template is picked, its preview in place with Create page · Replace page….
  * @license BSD-3-Clause
  */
@@ -15,8 +15,7 @@ import { PanelFrame, useToast, Button, TextField, openUpgrade } from "@/editor/c
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { DrillInHeader } from "../../shared/DrillInHeader";
-import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType, DEFAULT_TEMPLATE_VERSION } from "./templatesData";
+import { type TemplateItem, SITE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
@@ -26,9 +25,6 @@ import { useTemplatePersistence } from "./hooks/useTemplatePersistence";
 import { useTemplateApply } from "./hooks/useTemplateApply";
 import { useTemplateSelection } from "./hooks/useTemplateSelection";
 import { TemplateCard } from "./components/TemplateCard";
-import { TemplateDetail } from "./components/TemplateDetail";
-import { TemplatePagination } from "./components/TemplatePagination";
-import { TemplateUsageDrawer } from "./components/TemplateUsageDrawer";
 import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
 import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
@@ -107,27 +103,17 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const [backupCurrentPage, setBackupCurrentPage] = React.useState(true);
 
   // ── Derived ──
-  const detailTemplate = sel.detailId
-    ? SITE_TEMPLATES.find((t) => t.id === sel.detailId) ?? null
-    : null;
+  /* G2-103: saved templates are first-class — listed, previewed, applied —
+     beside the built-ins. Read once per visit; a save happens outside the view. */
+  const catalogue = React.useMemo<TemplateItem[]>(() => [...PAGE_TEMPLATES, ...getMyTemplates()], []);
+  const findTemplate = (id: string | null) => (id ? catalogue.find((t) => t.id === id) ?? null : null);
+  const visible = sel.searchQ.trim()
+    ? catalogue.filter((t) => t.name.toLowerCase().includes(sel.searchQ.trim().toLowerCase()))
+    : catalogue;
 
-  // S9: aggregate usage across pages from page.meta.appliedTemplates.
+  // S9: which pages each template was applied to (page.meta.appliedTemplates).
   const usageMap = useTemplateUsageMap(composer);
-  const [usageDrawerOpen, setUsageDrawerOpen] = React.useState(false);
-  const detailUsage = detailTemplate ? usageMap.get(detailTemplate.id) : [];
-
-  // prototype-v3 §2: surface current page name + applied-here state to TemplateDetail.
   const activePageInfo = composer?.elements?.getActivePage?.();
-  const detailAppliedToCurrent =
-    !!activePageInfo && !!detailUsage?.some((u) => u.pageId === activePageInfo.id);
-
-  const handleJumpToPage = React.useCallback(
-    (pageId: string) => {
-      composer?.elements.setActivePage?.(pageId);
-      setUsageDrawerOpen(false);
-    },
-    [composer]
-  );
 
   // Track whether apply is "add as new page" mode
   const addAsNewPageRef = React.useRef(false);
@@ -144,23 +130,21 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   // ── Handlers ──
   function handleApplyToCurrent(id: string) {
     if (denyApply()) return;
-    const t = SITE_TEMPLATES.find((x) => x.id === id);
+    const t = findTemplate(id);
     if (!t) return;
     if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = false;
     pendingId.current = id;
-    sel.setDetailId(null);
     hasExistingContent ? sel.setShowReplace(true) : startApply();
   }
 
   function handleAddAsNewPage(id: string) {
     if (denyApply()) return;
-    const t = SITE_TEMPLATES.find((x) => x.id === id);
+    const t = findTemplate(id);
     if (!t) return;
     if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = true;
     pendingId.current = id;
-    sel.setDetailId(null);
     startApply();
   }
 
@@ -216,7 +200,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   async function runApply() {
     const id = pendingId.current;
     if (!id) return;
-    const t = SITE_TEMPLATES.find((x) => x.id === id);
+    const t = findTemplate(id);
     if (!t) return;
     // P2 fix (codex A6): capture newPageMode flag BEFORE null reset; needed for
     // success/error modal routing below.
@@ -344,10 +328,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   }, [showProgress]);
 
   // ── Render ──
-  const tName = pendingId.current
-    ? (SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Template")
-    : "Template";
-  const previewTemplate = sel.previewId ? SITE_TEMPLATES.find((t) => t.id === sel.previewId) ?? null : null;
+  const tName = findTemplate(pendingId.current)?.name ?? "Template";
+  const previewTemplate = findTemplate(sel.previewId);
 
   return (
     <div className="tpl-ws" data-testid="tpl-workspace">
@@ -373,9 +355,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           aria-current={previewTemplate ? undefined : "true"}
           onClick={() => sel.setPreviewId(null)}
         >
-          All page templates · {PAGE_TEMPLATES.length}
+          All page templates · {catalogue.length}
         </Button>
-        {PAGE_TEMPLATES.map((t) => (
+        {catalogue.map((t) => (
           <Button
             key={t.id}
             className="tpl-ws-row tpl-ws-row--item"
@@ -396,21 +378,14 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onCreatePage={(t) => handleAddAsNewPage(t.id)}
           onReplacePage={(t) => handleApplyToCurrent(t.id)}
           onBack={() => sel.setPreviewId(null)}
+          usedOn={(usageMap.get(previewTemplate.id) ?? []).map((u) => ({ id: u.pageId, name: u.pageName }))}
+          onOpenPage={(pageId) => {
+            composer?.elements.setActivePage?.(pageId);
+            onClose?.();
+          }}
         />
       ) : (
       <>
-      {detailTemplate ? (
-        <DrillInHeader
-          title={detailTemplate.name}
-          parentName="Templates"
-          breadcrumb={[
-            (detailTemplate.category || "Templates").replace(/-/g, " "),
-            detailTemplate.name,
-          ]}
-          onBack={() => sel.setDetailId(null)}
-          onClose={onClose}
-        />
-      ) : (
         <PanelFrame.Header
           title="Templates"
           subtitle="Preview a template, then create a page or replace this one."
@@ -424,155 +399,50 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             <Search size={16} />
           </Button>
         </PanelFrame.Header>
-      )}
-      {showSearch && (
-        <div className="tpl-search-wrap">
-          <div className="tpl-search-input-box">
-            <Search size={16} className="tpl-search-icon" />
-            <TextField
-              className="tpl-search-input"
-              placeholder="Search templates..."
-              value={sel.searchQ}
-              onChange={(e) => sel.setSearchQ(e.target.value)}
-              aria-label="Search templates"
-              autoFocus
-            />
-            {sel.searchQ.length > 0 && (
-              <Button
-                className="tpl-search-clear"
-                onClick={() => sel.setSearchQ("")}
-                aria-label="Clear search"
-              >
-                <X size={14} />
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-      <>
-
-      {/* Filter pills — two-stage */}
-      {sel.templateType === null ? (
-        <div className="tpl-pills" role="tablist" aria-label="Template categories">
-          {SITE_CATEGORY_PILLS.map((pill) => (
-            <Button
-              key={pill.id}
-              className={`tpl-pill${sel.activeFilter === pill.id ? " tpl-pill--active" : ""}`}
-              onClick={() => sel.setActiveFilter(pill.id)}
-              role="tab"
-              aria-selected={sel.activeFilter === pill.id}
-            >
-              {pill.label}
-            </Button>
-          ))}
-        </div>
-      ) : (
-        <>
-          {/* Type toggle — Page Templates / Section Templates */}
-          <div className="tpl-pills" role="tablist" aria-label="Template type">
-            {TEMPLATE_TYPE_PILLS.map((pill) => (
-              <Button
-                key={pill.id}
-                className={`tpl-pill${sel.templateType === pill.id ? " tpl-pill--active" : ""}`}
-                onClick={() => sel.setTemplateType(pill.id)}
-                role="tab"
-                aria-selected={sel.templateType === pill.id}
-              >
-                {pill.label}
-              </Button>
-            ))}
-          </div>
-          {/* Sub-category tags */}
-          <div className="tpl-tags">
-            {SUB_CATEGORY_TAGS.map((tag) => (
-              <Button
-                key={tag.id}
-                className={`tpl-tag${sel.subCategory === tag.id ? " tpl-tag--active" : ""}`}
-                onClick={() => sel.setSubCategory(sel.subCategory === tag.id ? null : tag.id)}
-              >
-                {tag.label}
-              </Button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Content area */}
-      <div className="tpl-content">
-        {sel.paginatedTemplates.length === 0 ? (
-          <div className="tpl-empty">
-            <Search size={32} className="tpl-empty-icon" />
-            <p className="tpl-empty-text">
-              {sel.searchQ.trim()
-                ? `No templates found for "${sel.searchQ}"`
-                : "No templates in this category"}
-            </p>
-            <Button className="tpl-empty-btn" onClick={sel.clearAll}>
-              {sel.searchQ.trim() ? "Clear search" : "Show all templates"}
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className={`tpl-detail-layout${detailTemplate ? " tpl-detail-layout--split" : ""}`}>
-              <div className="tpl-grid-area">
-                {sel.searchQ.trim() && (
-                  <div className="tpl-search-results-count" aria-live="polite">
-                    {sel.filteredTemplates.length} result{sel.filteredTemplates.length === 1 ? "" : "s"} for &ldquo;{sel.searchQ.trim()}&rdquo;
-                  </div>
-                )}
-                <div className="tpl-grid" role="listbox" aria-label="Available templates">
-                  {sel.paginatedTemplates.map((tpl) => (
-                    <TemplateCard
-                      key={tpl.id}
-                      template={tpl}
-                      isSelected={sel.detailId === tpl.id}
-                      isApplied={appliedId === tpl.id}
-                      onClick={(id) => sel.setDetailId(sel.detailId === id ? null : id)}
-                      highlightQuery={sel.searchQ.trim() || undefined}
-                    />
-                  ))}
-                </div>
-              </div>
-              {detailTemplate && (
-                <TemplateDetail
-                  template={detailTemplate}
-                  onApplyToCurrent={handleApplyToCurrent}
-                  onAddAsNewPage={handleAddAsNewPage}
-                  onPreview={(id) => sel.setPreviewId(id)}
-                  usageCount={detailUsage.length}
-                  onShowUsage={() => setUsageDrawerOpen(true)}
-                  currentPageName={activePageInfo?.name}
-                  appliedToCurrentPage={detailAppliedToCurrent}
-                />
+        {showSearch && (
+          <div className="tpl-search-wrap">
+            <div className="tpl-search-input-box">
+              <Search size={16} className="tpl-search-icon" />
+              <TextField
+                className="tpl-search-input"
+                placeholder="Search templates..."
+                value={sel.searchQ}
+                onChange={(e) => sel.setSearchQ(e.target.value)}
+                aria-label="Search templates"
+                autoFocus
+              />
+              {sel.searchQ.length > 0 && (
+                <Button className="tpl-search-clear" onClick={() => sel.setSearchQ("")} aria-label="Clear search">
+                  <X size={14} />
+                </Button>
               )}
             </div>
-            {detailTemplate && (
-              <TemplateUsageDrawer
-                open={usageDrawerOpen}
-                onOpenChange={setUsageDrawerOpen}
-                templateId={detailTemplate.id}
-                templateName={detailTemplate.name}
-                usage={detailUsage}
-                onJumpToPage={handleJumpToPage}
-                currentVersion={detailTemplate.version ?? DEFAULT_TEMPLATE_VERSION}
-                onOpenPreview={() => {
-                  setUsageDrawerOpen(false);
-                  sel.setPreviewId(detailTemplate.id);
-                }}
-              />
-            )}
-          </>
+          </div>
         )}
-      </div>
-
-      {/* Pagination */}
-      <TemplatePagination
-        currentPage={sel.currentPage}
-        totalPages={sel.totalPages}
-        onChange={sel.setCurrentPage}
-      />
-
-      </>
+        {/* G2-095: board 4418:54134 is one flat list — no pills, tags or pages. */}
+        <div className="tpl-content">
+          {visible.length === 0 ? (
+            <div className="tpl-empty">
+              <Search size={32} className="tpl-empty-icon" />
+              <p className="tpl-empty-text">No templates found for &ldquo;{sel.searchQ.trim()}&rdquo;</p>
+              <Button className="tpl-empty-btn" onClick={() => sel.setSearchQ("")}>
+                Clear search
+              </Button>
+            </div>
+          ) : (
+            <div className="tpl-grid" role="listbox" aria-label="Available templates">
+              {visible.map((tpl) => (
+                <TemplateCard
+                  key={tpl.id}
+                  template={tpl}
+                  isApplied={appliedId === tpl.id}
+                  onClick={(id) => sel.setPreviewId(id)}
+                  highlightQuery={sel.searchQ.trim() || undefined}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </>
       )}
       </PanelFrame>
@@ -603,7 +473,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         const elementCount = activePageElement?.getDescendants?.()?.length ?? 0;
         return (
         <ReplaceModal
-          template={SITE_TEMPLATES.find((t) => t.id === pendingId.current) ?? SITE_TEMPLATES[0]}
+          template={findTemplate(pendingId.current) ?? SITE_TEMPLATES[0]}
           currentPageName={activePage?.name}
           currentPageCount={elementCount}
           resetGlobalStyles={resetStyles}

@@ -8,7 +8,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import type { Composer } from "@/engine";
-import userEvent from "@testing-library/user-event";
 import * as React from "react";
 
 vi.mock("@/editor/chrome-ui", async () => {
@@ -23,20 +22,13 @@ vi.mock("@/editor/chrome-ui", async () => {
 import { TemplatesTab } from "../TemplatesTab";
 
 describe("TemplatesTab — new-design IA (S1)", () => {
-  it("the catalogue keeps top-level pills: All, Site Pages, Sections, My Templates", () => {
+  /* G2-095: board 4418:54134 is one flat list — no category, type or tag
+     pills, no pagination; every page template is on the grid. */
+  it("the catalogue is one flat grid — no pills, no pagination", () => {
     render(<TemplatesTab composer={null} />);
-    expect(screen.getByRole("tab", { name: "All" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Site Pages" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Sections" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "My Templates" })).toBeInTheDocument();
-  });
-
-  it("clicking 'Site Pages' reveals Page Templates / Section Templates type pills", async () => {
-    const user = userEvent.setup();
-    render(<TemplatesTab composer={null} />);
-    await user.click(screen.getByRole("tab", { name: "Site Pages" }));
-    expect(screen.getByRole("tab", { name: /Page Templates/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /Section Templates/ })).toBeInTheDocument();
+    expect(screen.queryAllByRole("tab")).toHaveLength(0);
+    expect(screen.queryByRole("navigation", { name: /pagination/i })).toBeNull();
+    expect(screen.getAllByRole("option").length).toBeGreaterThanOrEqual(10);
   });
 
   it("does NOT show industry-vertical pills (Landing/Portfolio/SaaS/Blog/E-comm) at top level", () => {
