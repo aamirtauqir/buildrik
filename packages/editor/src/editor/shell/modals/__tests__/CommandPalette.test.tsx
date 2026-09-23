@@ -279,6 +279,19 @@ describe("CommandPalette", () => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
+    /* B7 follow-up after decision #24: Templates is a full-canvas view, so its
+       row says "Open Templates", once — no "panel", and no second row from the
+       engine's dead ui-open-templates (its event had no listener). */
+    it("lists one Open Templates row for the full-canvas view, and it opens it", () => {
+      const { composer } = renderPalette();
+      fireEvent.change(searchInput(), { target: { value: "open templates" } });
+      const rows = commandButtons().map((b) => b.textContent ?? "").filter((t) => /open templates/i.test(t));
+      expect(rows).toHaveLength(1);
+      expect(rows[0]).toMatch(/^Open Templates(?! panel)/);
+      fireEvent.click(screen.getByText("Open Templates"));
+      expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "templates" });
+    });
+
     it("navigation commands close cleanly even without a composer", () => {
       const { onClose } = renderPalette(null);
       fireEvent.click(screen.getByText("Open Pages panel"));

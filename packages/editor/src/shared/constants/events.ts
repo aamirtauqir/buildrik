@@ -369,7 +369,6 @@ export const EVENTS = {
    *  the site menu and a ⌘K command reach it through this instead. Handled
    *  in AquibraStudio, which owns the panel. */
   UI_OPEN_ISSUES: "ui:open-issues",
-  UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   /** Settings' `Export` row (Clone 3397:32011) — OPEN, not toggle: the row
    *  leaves Settings for the Export modal, and a toggle emitted with the modal

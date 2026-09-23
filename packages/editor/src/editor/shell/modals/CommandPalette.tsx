@@ -63,7 +63,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     if (!tab.shortcut) continue;
     commands.push({
       id: `nav-${tab.id}`,
-      label: `Open ${tab.label} panel`,
+      /* A fullpage tab (Templates, Brand, Settings) is a view, not a panel. */
+      label: tab.mode === "fullpage" ? `Open ${tab.label}` : `Open ${tab.label} panel`,
       group: "Navigation",
       shortcut: tab.shortcut,
       handler: () => {
