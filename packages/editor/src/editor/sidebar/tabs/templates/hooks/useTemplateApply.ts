@@ -29,13 +29,11 @@ export interface UseTemplateApplyReturn {
   /** Template ID being applied */
   pendingId: React.MutableRefObject<string | null>;
 
-  // Legacy compat — expose showProgress/resetStyles for existing TemplatesTab code
+  // Legacy compat — expose showProgress for existing TemplatesTab code
   showProgress: boolean;
   setShowProgress: React.Dispatch<React.SetStateAction<boolean>>;
   canRetry: boolean;
   setCanRetry: React.Dispatch<React.SetStateAction<boolean>>;
-  resetStyles: boolean;
-  setResetStyles: React.Dispatch<React.SetStateAction<boolean>>;
   setApplyError: React.Dispatch<React.SetStateAction<string | null>>;
 
   /** Begin confirm dialog (IDLE → CONFIRMING) */
@@ -63,7 +61,6 @@ export function useTemplateApply(composer: Composer | null): UseTemplateApplyRet
   const [applyError, setApplyError] = React.useState<string | null>(null);
   const [progress, setProgress] = React.useState(0);
   const [canRetry, setCanRetry] = React.useState(false);
-  const [resetStyles, setResetStyles] = React.useState(false);
   const [canvasElementCount, setCanvasElementCount] = React.useState(0);
   const pendingId = React.useRef<string | null>(null);
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -202,8 +199,6 @@ export function useTemplateApply(composer: Composer | null): UseTemplateApplyRet
     setShowProgress,
     canRetry,
     setCanRetry,
-    resetStyles,
-    setResetStyles,
     setApplyError,
 
     // State machine transitions

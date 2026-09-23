@@ -85,7 +85,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     showProgress, setShowProgress,
     applyError, setApplyError,
     canRetry, setCanRetry,
-    resetStyles, setResetStyles,
     hasExistingContent,
     pendingId,
     startApply,
@@ -248,7 +247,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         const created = composer.elements.createPage(newPageName ?? t.name);
         composer.elements.setActivePage?.(created.id);
       }
-      if (resetStyles) composer.styles.clear();
       setApplyCancellable(false);
       setImportedSections([]);
       composer.elements.importHTMLToActivePage(resolvedHtml, (label, done, total) => {
@@ -289,8 +287,21 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     setAppliedId(null);
     requestAnimationFrame(() => {
       setAppliedId(id);
-      setResetStyles(false);
-      addToast({ description: `"${t.name}" applied successfully`, tone: "success" });
+      /* Board 4428:150147 — a replace says what it replaced and offers Undo
+         (the apply is one history step); the backup line names where the
+         auto-version went (#25). The board's second action, View backup,
+         needs a two-action toast chrome-ui does not have. */
+      const replacedName = composer?.elements.getActivePage()?.name;
+      if (!wasNewPageMode && replacedName) {
+        addToast({
+          tone: "success",
+          title: `${replacedName} replaced`,
+          description: backupCurrentPage ? "Backup saved in History › Saves." : `“${t.name}” applied.`,
+          action: { label: "Undo", onClick: () => composer?.history.undo() },
+        });
+      } else {
+        addToast({ description: `"${t.name}" applied successfully`, tone: "success" });
+      }
       recordTemplateApplied(t);
       saveAppliedId(id);
       // Phase -1: persist applied-template state on Page.meta so it survives reload
@@ -494,8 +505,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           template={findTemplate(pendingId.current) ?? SITE_TEMPLATES[0]}
           currentPageName={activePage?.name}
           currentPageCount={elementCount}
-          resetGlobalStyles={resetStyles}
-          onResetChange={setResetStyles}
           backupCurrentPage={backupCurrentPage}
           onBackupChange={setBackupCurrentPage}
           onCancel={() => sel.setShowReplace(false)}
@@ -508,7 +517,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                is about to lose. A failed snapshot must not cost the apply
                the user asked for; the version list simply lacks the row. */
             if (backupCurrentPage && composer?.versions) {
-              const t = SITE_TEMPLATES.find((t) => t.id === pendingId.current) ?? SITE_TEMPLATES[0];
+              const t = findTemplate(pendingId.current) ?? SITE_TEMPLATES[0];
               await composer.versions.autoCheckpoint(`Before template “${t.name}”`).catch(() => null);
             }
             startApply();

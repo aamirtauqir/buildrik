@@ -13,11 +13,12 @@ import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-li
 import "@testing-library/jest-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const addToast = vi.hoisted(() => vi.fn());
 vi.mock("@/editor/chrome-ui", async () => {
   const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
   return {
     ...actual,
-    useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),
+    useToast: () => ({ addToast, removeToast: vi.fn(), toasts: [] }),
     ToastProvider: ({ children }: { children: React.ReactNode }) => children,
   };
 });
@@ -39,6 +40,7 @@ function makeComposer() {
       recordAppliedTemplate: vi.fn(),
       getElement: vi.fn(() => null),
     },
+    history: { undo: vi.fn() },
     styles: { clear: vi.fn() },
     on: vi.fn(),
     off: vi.fn(),
@@ -130,5 +132,22 @@ describe("Templates — full-canvas view (decision #24)", () => {
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  /* G2-099 (board 4428:150147): a replace toasts "<Page> replaced" with Undo
+     — one history step — and says where the #25 backup went. */
+  it("Replace page… ends in '<Page> replaced' with Undo", async () => {
+    addToast.mockClear();
+    const composer = makeComposer();
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} />);
+    const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
+    fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
+    fireEvent.click(screen.getByText("Replace page…"));
+    /* recordAppliedTemplate runs in the same frame, right after the toast. */
+    await waitFor(() => expect(composer.elements.recordAppliedTemplate).toHaveBeenCalled(), { timeout: 5000 });
+    /* The last one: an earlier test's apply can land its toast late. */
+    const toast = addToast.mock.calls.filter((c) => c[0].title === "Home replaced").at(-1)![0];
+    toast.action.onClick();
+    expect(composer.history.undo).toHaveBeenCalledTimes(1);
   });
 });
