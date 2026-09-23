@@ -59,10 +59,10 @@ const SECTION_HEAD =
    153:147, 60 tall) still fits its longer reason line. */
 const FORMAT_ROW =
   "tw:flex tw:items-center tw:gap-2 tw:min-h-12 tw:py-1.5 " +
-  "tw:text-[13px] tw:text-[var(--bk-ink)]";
+  "tw:text-[length:var(--bk-text-14)] tw:text-[var(--bk-ink)]";
 const CHIP = "tw:ml-auto tw:whitespace-nowrap tw:px-1.5 tw:py-0.5 tw:rounded-full tw:border tw:text-[length:var(--bk-text-11)] tw:font-medium";
 const PREVIEW =
-  "tw:m-0 tw:p-3 tw:max-h-80 tw:overflow-auto tw:whitespace-pre tw:rounded-md tw:border " +
+  "tw:m-0 tw:p-3 tw:max-h-40 tw:overflow-auto tw:whitespace-pre tw:rounded-md tw:border " +
   "tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-subtle)] tw:text-[11px] tw:leading-relaxed " +
   "tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)]";
 const RADIO_LABEL = "tw:inline-flex tw:items-center tw:gap-1.5 tw:cursor-pointer";
@@ -239,7 +239,14 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
     /* `px-4`, not `px-1`: this leaned on the 12px pad `SECTION_BODY` used to
        add, and that pad is gone (the boards inset list rows 16 from the panel
        edge, not 28). Same 16px result, stated where it can be read. */
-    <div className="tw:flex tw:flex-col tw:gap-3 tw:px-4 tw:py-3">
+    /* 4418:168885: ONE bordered panel — Dark strategy, EXPORT, IMPORT — with
+       the stats and the preview under it. The import band used to sit below
+       a 320-tall preview, off the bottom of a 900px screen. */
+    <div className="tw:flex tw:flex-col tw:gap-4">
+      <div
+        className="tw:flex tw:flex-col tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:pb-4"
+        data-testid="brand-io-card"
+      >
       {/* Board 153:120 leads with the one decision that changes every export —
           how dark values are written — as a single row with its value at the
           right. It used to be three radio rows buried under the CSS format,
@@ -252,9 +259,8 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
           for exactly this (SelectRow's dropdown pill), so the treatment comes
           from the design system rather than from a hardcoded height. */}
       <div className="tw:flex tw:h-[var(--bk-size-row)] tw:items-center tw:gap-2" data-testid="brand-export-dark-row">
-        {/* 12/18 — 153:128. It ran at 13, which is the LIST row size; this is a
-            field label above a value, and the board sizes it as one. */}
-        <span data-testid="brand-export-dark-label" className="tw:flex-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">Dark strategy</span>
+        {/* 14/20, the workspace row label (4418:168885). */}
+        <span data-testid="brand-export-dark-label" className="tw:flex-1 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">Dark strategy</span>
         <Select
           theme={BK_SELECT_BARE_VALUE_THEME}
           className="tw:flex-none"
@@ -307,7 +313,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                       description under the title, and at this width `truncate`
                       was rendering "Custom prope…" — a subtitle that stops
                       before it says anything is worse than a second line. */}
-                  <span data-testid={`brand-format-desc-${id}`} className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" title={desc}>
+                  <span data-testid={`brand-format-desc-${id}`} className="tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" title={desc}>
                     {desc}
                     {id === "tailwind" && droppedCount > 0 ? ` · ${droppedCount} dropped` : ""}
                   </span>
@@ -332,8 +338,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
                       downloadForFormat(allTokens, id, buildPreview(allTokens, id, darkStrategy));
                       onExported?.(label);
                     }}
-                    /* 11/16 in `--color/accent-text` — 153:136. */
-                    variant="link" className="tw:font-normal tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]"
+                    variant="link" className="tw:font-normal tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-accent-text)]"
                   >
                     Download
                   </Button>
@@ -343,22 +348,26 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
             );
           })}
         </div>
+      </div>
 
-        <div data-testid="export-stats" className="tw:mt-2.5 tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
+      <ImportCard onOutcome={onImportOutcome} />
+      </div>
+
+      <div className="tw:flex tw:flex-col tw:gap-2.5">
+        <div data-testid="export-stats" className="tw:text-[11px] tw:text-[var(--bk-ink-muted)]">
           {statsLine}
         </div>
 
         {format === "tailwind" && (
           <div
             data-testid="tailwind-warning"
-            className="tw:mt-2.5 tw:px-2.5 tw:py-2 tw:rounded tw:border-l-[3px] tw:border-l-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink)]"
+            className="tw:px-2.5 tw:py-2 tw:rounded tw:border-l-[3px] tw:border-l-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink)]"
           >
             <strong>Tailwind warning:</strong>{" "}
             {tailwindDropped} tokens drop because Tailwind doesn&apos;t model dark variants per token.
             Dark mode disabled on round-trip — banner surfaces this before commit.
           </div>
         )}
-
       </div>
 
       <div className={CARD}>
@@ -390,7 +399,6 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
             before taking it is real capability, not decoration. */}
       </div>
 
-      <ImportCard onOutcome={onImportOutcome} />
     </div>
   );
 };

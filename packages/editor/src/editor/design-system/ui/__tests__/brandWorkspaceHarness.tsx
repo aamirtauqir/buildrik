@@ -96,12 +96,23 @@ export function openPage(utils: ReturnType<typeof render>, id: BrandPageId) {
   fireEvent.click(row);
 }
 
-/** The workspace on the Radius page with its "Small radius" control resolved. */
-export async function renderOnRadius(composer: ComposerProp) {
-  const utils = renderWorkspace(composer);
+/** The workspace on the Radius page with "Small" (radius-sm) selected and its
+ *  card's value field open — the non-colour / type / spacing kind that proves
+ *  the 14-registry aggregation. C1 (ii): values are edited on the card
+ *  (row → Change), not inline in the table. */
+export async function renderOnRadius(
+  composer: ComposerProp,
+  props: Partial<React.ComponentProps<typeof BrandWorkspace>> = {},
+) {
+  const utils = renderWorkspace(composer, props);
   openPage(utils, "kind-radius");
-  const radiusInput = (await waitFor(
-    () => utils.getByLabelText("Small radius value") as HTMLInputElement,
-  ))!;
+  const row = (await waitFor(() => {
+    const el = utils.container.querySelector<HTMLElement>('[data-token-row="radius-sm"]');
+    if (!el) throw new Error("radius-sm row not rendered");
+    return el;
+  }))!;
+  fireEvent.click(row);
+  fireEvent.click(utils.getByTestId("brand-token-action-replace"));
+  const radiusInput = (await waitFor(() => utils.getByLabelText("Value") as HTMLInputElement))!;
   return { ...utils, radiusInput };
 }

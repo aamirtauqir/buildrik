@@ -128,3 +128,23 @@ describe("ColorPicker — alpha warning", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+/* QA 2026-09-24: opening the picker on #1A56DB showed 1A57DB — the HSB round
+   trip is lossy, so Set color without touching anything saved a new colour. */
+describe("ColorPicker — an untouched value is saved exactly", () => {
+  it.each(["#1A56DB", "#76A9FA", "#C81E1E", "#F9FAFB", "#111827"])("opens and saves %s unchanged", (hex) => {
+    const onSave = vi.fn();
+    render(<ColorPicker initialHex={hex} onChange={vi.fn()} onCancel={vi.fn()} onSave={onSave} />);
+    expect((screen.getByLabelText("Hex color value") as HTMLInputElement).value).toBe(hex.slice(1));
+    fireEvent.click(screen.getByText("Set color"));
+    expect(onSave).toHaveBeenCalledWith(hex);
+  });
+
+  it("a typed hex is saved as typed", () => {
+    const onSave = vi.fn();
+    render(<ColorPicker initialHex="#000000" onChange={vi.fn()} onCancel={vi.fn()} onSave={onSave} />);
+    fireEvent.change(screen.getByLabelText("Hex color value"), { target: { value: "1a56db" } });
+    fireEvent.click(screen.getByText("Set color"));
+    expect(onSave).toHaveBeenCalledWith("#1A56DB");
+  });
+});
