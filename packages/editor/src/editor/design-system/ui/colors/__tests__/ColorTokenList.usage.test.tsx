@@ -22,11 +22,6 @@ function makeToken(id: string, name: string, value: string, group = "brand"): De
 
 const baseProps = {
   pendingDiff: {} as Record<string, TokenDiff>,
-  onColorChange: vi.fn(),
-  onUndo: vi.fn(),
-  onRedo: vi.fn(),
-  canUndo: () => false,
-  canRedo: () => false,
   onAddToken: vi.fn(),
 };
 

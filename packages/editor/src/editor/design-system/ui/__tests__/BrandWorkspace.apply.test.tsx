@@ -68,7 +68,8 @@ describe("BrandWorkspace — pages", () => {
   it("lists the board's nav in its order, Styles omitted, the undesigned kinds behind a disclosure", () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    const labels = Array.from(utils.container.querySelectorAll("[data-section-id]")).map(
+    /* The label cell only — Colours carries its palette count beside it. */
+    const labels = Array.from(utils.container.querySelectorAll('[data-testid^="brand-row-label-"]')).map(
       (r) => r.textContent?.trim(),
     );
     expect(labels).toEqual([
