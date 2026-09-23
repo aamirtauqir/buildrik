@@ -72,10 +72,12 @@ vi.mock("../components/UnsavedSettingsDialog", () => ({
     open,
     onKeepEditing,
     onDiscard,
+    onSaveAndContinue,
   }: {
     open: boolean;
     onKeepEditing: () => void;
     onDiscard: () => void;
+    onSaveAndContinue: () => void;
   }) =>
     open ? (
       <div role="dialog" data-testid="set-unsaved">
@@ -83,7 +85,10 @@ vi.mock("../components/UnsavedSettingsDialog", () => ({
           Keep editing
         </button>
         <button type="button" data-testid="set-unsaved-discard" onClick={onDiscard}>
-          Discard and return to canvas
+          Discard changes
+        </button>
+        <button type="button" data-testid="set-unsaved-save" onClick={onSaveAndContinue}>
+          Save and continue
         </button>
       </div>
     ) : null,
@@ -465,6 +470,30 @@ describe("SettingsTab — Unsaved settings", () => {
     await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.queryByTestId("set-foot-status")).toBeNull();
+  });
+
+  it("Save and continue (4418:165478) saves, then finishes the nav that raised the guard", async () => {
+    const composer = makeComposer();
+    render(<SettingsTab composer={asComposer(composer)} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
+    expect(composer.saveProject).toHaveBeenCalledTimes(1);
+    // No "Settings saved" dialog on the way through — the nav is the answer.
+    expect(screen.queryByTestId("set-saved")).toBeNull();
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+  });
+
+  it("Save and continue on the way out saves, then leaves", async () => {
+    const composer = makeComposer();
+    const onClose = vi.fn();
+    render(<SettingsTab composer={asComposer(composer)} onClose={onClose} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-back"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(composer.saveProject).toHaveBeenCalledTimes(1);
   });
 
   it("a door while dirty is guarded too", async () => {

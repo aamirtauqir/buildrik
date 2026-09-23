@@ -405,7 +405,9 @@ export const SettingsTab: React.FC<
   const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
   const isOverview = currentScreen === "overview";
 
-  const handleSave = React.useCallback(() => {
+  /* `then` runs after a save succeeds: the Saved dialog after the footer's
+     Save, the pending nav / exit after the guard's Save and continue. */
+  const handleSave = React.useCallback((then?: () => void) => {
     if (saving) return;
     const failed = (err: unknown) => {
       console.error("[settings] save failed", err);
@@ -416,7 +418,9 @@ export const SettingsTab: React.FC<
       if (composer) screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
       setSaveError(null);
       setScreenIsDirty(false);
-      setSavedOpen(true);
+      screenIsDirtyRef.current = false;
+      if (then) then();
+      else setSavedOpen(true);
     };
     const screenHandler = screenSaveHandlerRef.current;
     let run: Promise<void> | void;
@@ -460,6 +464,19 @@ export const SettingsTab: React.FC<
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
   }, [composer, current, currentScreen, saving, projectId]);
+
+  /* The guard's Save and continue (4418:165478): save, then finish whatever
+     raised the guard. A failed save leaves the dialog down and the screen's
+     save-error banner up, with the edits still there. */
+  const handleSaveAndContinue = React.useCallback(() => {
+    const pending = pendingRef.current;
+    handleSave(() => {
+      pendingRef.current = null;
+      setGuardOpen(false);
+      if (!pending || pending.kind === "leave") leave();
+      else performNav(pending.id);
+    });
+  }, [handleSave, leave, performNav]);
 
   const openBilling = React.useCallback(() => {
     window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`, "_blank", "noopener,noreferrer");
@@ -715,7 +732,7 @@ export const SettingsTab: React.FC<
                 size="xs"
                 className={SET_BTN}
                 disabled={loadState !== "ready" || saving}
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 data-testid="set-foot-save"
               >
                 {saveError ? "Retry save" : "Save changes"}
@@ -726,7 +743,14 @@ export const SettingsTab: React.FC<
         )}
       </div>
 
-      <UnsavedSettingsDialog open={guardOpen} siteName={siteName} onKeepEditing={handleKeepEditing} onDiscard={handleDiscard} />
+      <UnsavedSettingsDialog
+        open={guardOpen}
+        siteName={siteName}
+        onKeepEditing={handleKeepEditing}
+        onDiscard={handleDiscard}
+        onSaveAndContinue={handleSaveAndContinue}
+        saving={saving}
+      />
       <SettingsSavedDialog open={savedOpen} siteName={siteName} onReturn={() => setSavedOpen(false)} />
       <SearchSettingsModal
         open={searchOpen}
