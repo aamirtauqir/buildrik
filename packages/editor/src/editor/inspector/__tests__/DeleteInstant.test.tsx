@@ -32,36 +32,27 @@ const makeComposer = () => ({
 
 const selectedElement = { id: "abc12345678", type: "container", tag: "div" };
 
-// Helper: open the element actions menu then click Delete. Replaces the old
-// direct "delete selected element" button that was absorbed into the overflow
-// menu in Phase 5.
-const openDeleteConfirmation = () => {
+// Helper: open the element actions menu then click Delete.
+const clickMenuDelete = () => {
   fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
   fireEvent.click(screen.getByRole("menuitem", { name: /^delete$/i }));
 };
 
-describe("Delete confirmation modal — copy", () => {
-  it("does NOT say 'cannot be undone'", () => {
+/* Decision #17 (plan 2026-09-21): one element deletes at once, with the Undo
+   toast the shell's handler raises. The confirm modal that stood here is for
+   N > 1 (MultiSelectToolbar) and component masters (the Components panel). */
+describe("Inspector ⋯ Delete — instant, no confirm for one element", () => {
+  it("calls onDelete straight from the menu item, without a dialog", () => {
+    const onDelete = vi.fn();
     renderWithToast(
       <ProInspector
         selectedElement={selectedElement as never}
         composer={makeComposer() as never}
-        onDelete={vi.fn()}
+        onDelete={onDelete}
       />
     );
-    openDeleteConfirmation();
-    expect(screen.queryByText(/cannot be undone/i)).not.toBeInTheDocument();
-  });
-
-  it("mentions Ctrl+Z undo hint", () => {
-    renderWithToast(
-      <ProInspector
-        selectedElement={selectedElement as never}
-        composer={makeComposer() as never}
-        onDelete={vi.fn()}
-      />
-    );
-    openDeleteConfirmation();
-    expect(screen.getByRole("alert")).toHaveTextContent(/ctrl\+z/i);
+    clickMenuDelete();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(onDelete).toHaveBeenCalledWith("abc12345678");
   });
 });

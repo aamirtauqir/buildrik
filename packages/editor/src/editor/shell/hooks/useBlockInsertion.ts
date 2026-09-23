@@ -152,7 +152,14 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
             }, 100);
           }
 
-          addToast({ description: `Inserted: ${block.label}`, tone: "success", duration: 2000 });
+          /* Decision #16 / board 4428:145642 — "Hero added" with Undo. The
+             toast store keeps one transient, so ten fast inserts show one
+             toast whose Undo is the last insert. */
+          addToast({
+            description: `${block.label} added`,
+            tone: "success",
+            action: { label: "Undo", onClick: () => composer.history.undo() },
+          });
         } else {
           // Build contextual nesting error message
           const parentEl = composer.elements.getElement(parentId);

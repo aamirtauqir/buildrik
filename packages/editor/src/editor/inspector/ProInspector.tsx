@@ -24,7 +24,6 @@ import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
-import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorLoading } from "./components/InspectorLoading";
@@ -201,7 +200,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
   const previousElementIdRef = React.useRef<string | null>(null);
 
-  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [pickActive, setPickActive] = React.useState(false);
 
   // Canvas signals pick completion/cancellation — clear pickActive so the
@@ -421,11 +419,14 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               <Link size={10} aria-hidden="true" /> Bound
             </span>
           )}
+          {/* Decision #17: one element deletes at once, with the Undo toast the
+              shell's handler raises — a confirm is for N > 1 (the multi-select
+              header) and for component masters (the Components panel). */}
           {onDelete && (
             <InspectorElementMenu
               composer={composer}
               selectedElementId={selectedElement.id}
-              onRequestDelete={() => setShowDeleteConfirm(true)}
+              onRequestDelete={() => onDelete(selectedElement.id)}
             />
           )}
           {/* G2-037: the inspector's own way to give the canvas its 300px
@@ -442,15 +443,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             <X size={12} aria-hidden="true" />
           </Button>
         </div>
-        <DeleteConfirmModal
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={() => {
-            onDelete?.(selectedElement.id);
-            setShowDeleteConfirm(false);
-          }}
-          elementLabel={elementLabel}
-        />
       </div>
       {/* Pill row: `This ▾ · Base ▾` (scope · state). The breakpoint pill that
           sat between them is gone (G2-142, §11/F6): the canvas status bar is

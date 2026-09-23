@@ -122,17 +122,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [addToast]
     );
 
-    /* Announced, not toasted.
-       Every successful drop raised a toast — "Inserted: Heading" — and building
-       a page of thirty elements meant thirty of them stacking over the canvas.
-       It also said nothing the canvas had not already said louder: the element
-       appears, `animateDropSuccess` flashes it, and it is auto-selected, which
-       moves the inspector.
-
-       Deleting it outright would have taken the one channel that DID reach a
-       screen reader, since the toast viewport is the editor's `role="status"`
-       region. So the message survives in a visually-hidden live region and the
-       visual noise goes. Walked live 2026-08-24: one routine drop, one toast. */
+    /* Selection is announced through one polite region. Insert feedback is
+       a toast again (decision #16, board 4428:145642 "Hero added" + Undo):
+       thirty drops used to mean thirty toasts, which is why it became a
+       hidden announcement in 2026-08 — the toast store now keeps ONE
+       transient on screen (newest replaces, Undo = the last drop), so the
+       toast is the SR channel as well as the visual one. */
     const [announcement, setAnnouncement] = React.useState({ text: "", seq: 0 });
     const announce = React.useCallback((text: string) => {
       /* The seq is load-bearing. A plain string skips the DOM mutation when the
@@ -146,17 +141,20 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     const handleDropSuccess = React.useCallback(
       (success: DropSuccess) => {
-        announce(`Inserted: ${success.elementLabel}`);
         /* An async drop is PROGRESS, not completion — an OS image drop reports
-           "Uploading file.png..." before the upload finishes. Removing its
-           visible signal made a slow upload look like an ignored drop, which
-           invites a second attempt and makes the eventual error read as
-           spurious. Completion stays silent; work-in-flight does not. */
+           "Uploading file.png..." before the upload finishes; that one has
+           nothing to undo yet. */
         if (success.pending) {
           addToast({ description: success.elementLabel, tone: "info", duration: 4000 });
+          return;
         }
+        addToast({
+          description: `${success.elementLabel} added`,
+          tone: "success",
+          action: { label: "Undo", onClick: () => composer?.history.undo() },
+        });
       },
-      [announce, addToast]
+      [addToast, composer]
     );
 
     // Core hooks

@@ -83,9 +83,20 @@ export function useLayerContextActions(state: UseLayersStateReturn) {
         case "unlock":
           actionsHook.toggleLock(nodeId, syntheticEvent);
           break;
-        case "delete":
+        case "delete": {
+          /* Decision #17: a Layers delete is instant, with the same Undo toast
+             the canvas gives — never a confirm for one row. */
+          const node = findById(treeHook.layers, nodeId);
+          const type = actionsHook.customNames.get(nodeId) ?? node?.type ?? "Element";
+          const label = type.charAt(0).toUpperCase() + type.slice(1);
           actionsHook.deleteLayer(nodeId, treeHook.layers, () => selectionHook.clearSelection());
+          addToast({
+            description: `${label} deleted`,
+            tone: "info",
+            action: { label: "Undo", onClick: () => composer?.history.undo() },
+          });
           break;
+        }
         case "group":
           actionsHook.groupLayers([...selectionHook.selectedIds], treeHook.layers);
           break;
