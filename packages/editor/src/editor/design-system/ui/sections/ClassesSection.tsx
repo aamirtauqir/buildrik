@@ -1,5 +1,13 @@
 /**
- * ClassesSection — board 153:2 (Brand · Classes).
+ * ClassesSection — Brand › Classes, board 7316:83357 (C1 (ii); was the
+ * drawer's 153:2).
+ *
+ * One bordered card, a 48px row per class: `.name` in 14px ink over
+ * "used N×". Departures, recorded: the board's "+ Add class" and per-row ›
+ * have no code behind them — a class exists only on the elements that carry
+ * it (there is no site-level class registry, see below) and there is no class
+ * detail — so neither is drawn. Classes in the engine's own `buildrick-`
+ * namespace (the page root's) are not the site's and are not listed.
  *
  * Every CSS class the pages actually carry, and how many elements carry it.
  * The brand panel had no such screen: classes could be typed onto elements one
@@ -22,6 +30,9 @@ export interface ClassesSectionProps {
   composer?: Composer | null;
 }
 
+/** The engine's own class namespace — `buildrick-page-root` is on every page. */
+const ENGINE_PREFIX = "buildrick-";
+
 /** `.name` → how many elements carry it, most-used first. */
 function tally(composer: Composer | null | undefined): [string, number][] {
   const all = composer?.elements?.getAllElements?.() ?? [];
@@ -29,7 +40,7 @@ function tally(composer: Composer | null | undefined): [string, number][] {
   for (const el of all) {
     for (const cls of el.getClasses?.() ?? []) {
       const name = String(cls).trim();
-      if (!name) continue;
+      if (!name || name.startsWith(ENGINE_PREFIX)) continue;
       counts.set(name, (counts.get(name) ?? 0) + 1);
     }
   }
@@ -55,7 +66,7 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
 
   if (rows.length === 0) {
     return (
-      <p className="tw:m-0 tw:px-3 tw:py-3 tw:text-xs tw:leading-normal tw:text-[var(--bk-ink-muted)]">
+      <p className="tw:m-0 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
         No classes yet. A class is a name you put on elements so they can share
         one rule — add one from an element&apos;s Classes section.
       </p>
@@ -63,31 +74,30 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
   }
 
   return (
-    <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0" data-testid="brand-classes">
+    <ul
+      className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-0"
+      data-testid="brand-classes"
+      aria-label="Classes"
+    >
       {rows.map(([name, count]) => (
-        /* 44 tall, 16 in, 11/16 both lines, and NO rule between rows —
-           153:9..153:27 draw five of these flush against each other. The
-           divider made a two-line row look like a table; the board separates
-           them by the 16px line rhythm alone. */
+        /* 7316:83357: 48 tall, 16 in, 14px ink over 13px muted, no rules. */
         <li
           key={name}
           data-testid={`brand-class-${name}`}
-          className="tw:flex tw:h-11 tw:flex-col tw:justify-center tw:px-4 tw:text-[11px] tw:leading-4"
+          className="tw:flex tw:h-12 tw:flex-col tw:justify-center tw:pl-4 tw:pr-3"
         >
           <span
             data-testid={`brand-class-name-${name}`}
-            className="tw:font-medium tw:[font-family:var(--bk-font-mono)] tw:text-[var(--bk-ink)]"
+            className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]"
           >
             {`.${name}`}
           </span>
           <span
             data-testid={`brand-class-usage-${name}`}
-            className="tw:text-[var(--bk-ink-muted)]"
+            className="tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
           >
-            {/* One text node, not three. `used {count}&times;` split into
-                "used" / "1" / "×", and check-board-copy.mjs compares TEXT
-                NODES — so the board's `used 12×` had nothing to match and read
-                as copy the product does not render. */}
+            {/* One text node, not three — check-board-copy.mjs compares text
+                nodes, so `used {count}&times;` split three ways never matched. */}
             {`used ${count}\u00d7`}
           </span>
         </li>
