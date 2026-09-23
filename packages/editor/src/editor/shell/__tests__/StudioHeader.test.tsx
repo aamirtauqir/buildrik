@@ -217,6 +217,18 @@ describe("StudioHeader", () => {
       expect(bar.textContent).not.toContain("x.vercel.app");
     });
 
+    /* C5 G1-004 (boards 4418:126034 / :90494 / :123573): "Site › Page" —
+       the site crumb opens the Pages panel; the page crumb is where you are. */
+    it("the breadcrumb: site opens Pages, page is the current crumb", () => {
+      const onOpenPages = vi.fn();
+      const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
+      render(<StudioHeader {...makeProps({ onOpenPages, composer: composer as never, siteName: "Bella Cucina" })} />);
+      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
+      expect(screen.getByTestId("topbar-crumb-page").getAttribute("aria-current")).toBe("page");
+      fireEvent.click(screen.getByTestId("topbar-crumb-site"));
+      expect(onOpenPages).toHaveBeenCalled();
+    });
+
     /* B6 / G1-019: the activity log opens in the editor (History ·
        Activity), not a dashboard tab. */
     it("the site menu's Activity log opens History · Activity in the editor", () => {
@@ -1010,6 +1022,20 @@ describe("T8 status grammar", () => {
     // rest of the bar are aria-hidden, so this can't over-count).
     expect(within(screen.getByRole("banner")).getAllByRole("img")).toHaveLength(2);
     expect(screen.getByLabelText("2 more")).toBeTruthy();
+  });
+
+  /* C5 G1-011 / CI-84: a session that DROPPED says "Offline" (the copy
+     existed in Presence; the header mapped `disconnected` to nothing). A
+     session never joined — or deliberately left — shows no pill. */
+  it("a dropped session shows the Offline pill; no session shows none", () => {
+    vi.mocked(isFeatureEnabled).mockReturnValue(true);
+    collab.current = { ...COLLAB_IDLE, users: [{ id: "u1", name: "Sara" }], currentUser: { id: "u1", name: "Sara" }, room: { id: "room-1" } } as never;
+    render(<StudioHeader {...makeProps()} />);
+    expect(within(screen.getByRole("banner")).getByText("Offline")).toBeTruthy();
+    cleanup();
+    collab.current = { ...COLLAB_IDLE, room: null } as never;
+    render(<StudioHeader {...makeProps()} />);
+    expect(within(screen.getByRole("banner")).queryByText("Offline")).toBeNull();
   });
 
   /* D7 rule 6 demoted the review chip beside an amber save AND an amber
