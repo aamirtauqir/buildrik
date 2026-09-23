@@ -17,8 +17,6 @@ import type { Composer } from "../../../engine";
 // TYPES
 // =============================================================================
 
-type ContentType = "articles" | "products" | "team" | "custom";
-
 type FieldType = "Text" | "Number" | "Image" | "Date" | "Boolean";
 
 interface FieldRow {
@@ -37,14 +35,16 @@ export interface CMSCollectionSetupModalProps {
 // CONSTANTS
 // =============================================================================
 
-const CONTENT_TYPES: { value: ContentType; label: string }[] = [
-  { value: "articles", label: "Articles" },
-  { value: "products", label: "Products" },
-  { value: "team", label: "Team Members" },
-  { value: "custom", label: "Custom" },
-];
-
 const FIELD_TYPES: FieldType[] = ["Text", "Number", "Image", "Date", "Boolean"];
+
+/** Board 4418:88263's "Use Menu items 2": the first `<name> N` (N ≥ 2) that
+ *  no collection holds yet. Compared case-insensitively, as the clash is. */
+function nextFreeName(name: string, taken: Set<string>): string {
+  for (let n = 2; ; n++) {
+    const candidate = `${name} ${n}`;
+    if (!taken.has(candidate.toLowerCase())) return candidate;
+  }
+}
 
 function makeId(): string {
   return Math.random().toString(36).slice(2, 9);
@@ -127,7 +127,9 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
 }) => {
   const [step, setStep] = React.useState<1 | 2>(1);
   const [name, setName] = React.useState("");
-  const [contentType, setContentType] = React.useState<ContentType>("articles");
+  /* Board 4418:88263 — set when Next/Create met a name that already exists;
+     cleared by any edit to the name. */
+  const [clashShown, setClashShown] = React.useState(false);
   const [description, setDescription] = React.useState("");
   const [fields, setFields] = React.useState<FieldRow[]>([
     { id: makeId(), name: "title", type: "Text" },
@@ -149,7 +151,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
       const t = setTimeout(() => {
         setStep(1);
         setName("");
-        setContentType("articles");
+        setClashShown(false);
         setDescription("");
         setFields([{ id: makeId(), name: "title", type: "Text" }]);
         setCreating(false);
@@ -166,6 +168,25 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   }, [isOpen]);
 
   const canProceed = name.trim().length > 0;
+  /* Names are compared case-insensitively: "menu items" beside "Menu items"
+     is the same collection to a reader, and the slug would collide too. */
+  const takenNames = React.useMemo(
+    () =>
+      new Set(
+        isOpen ? (composer?.cms?.collections?.getAllCollections() ?? []).map((c) => c.name.trim().toLowerCase()) : [],
+      ),
+    [isOpen, composer],
+  );
+  const clashes = takenNames.has(name.trim().toLowerCase());
+  const editName = (value: string) => {
+    setName(value);
+    setClashShown(false);
+  };
+  /** Advance only past a free name; a taken one shows the clash notice. */
+  const guardClash = (then: () => void) => () => {
+    if (clashes) setClashShown(true);
+    else then();
+  };
 
   const addField = React.useCallback(() => {
     setFields((prev) => [...prev, { id: makeId(), name: "", type: "Text" }]);
@@ -254,7 +275,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           size="xs"
           className={FOOT_BTN}
           disabled={!canProceed}
-          onClick={() => setStep(2)}
+          onClick={guardClash(() => setStep(2))}
           data-testid="cms-setup-next"
         >
           Next: Add Fields
@@ -264,7 +285,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           size="xs"
           className={FOOT_BTN}
           disabled={!canProceed || creating}
-          onClick={handleCreate}
+          onClick={guardClash(() => void handleCreate())}
           aria-busy={creating || undefined}
           data-testid="cms-setup-create"
         >
@@ -328,7 +349,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             type="text"
             placeholder="Blog Posts"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => editName(e.target.value)}
             autoFocus
             onFocus={(e) => {
               (e.currentTarget as HTMLInputElement).style.borderColor =
@@ -339,22 +360,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                 "var(--bk-border)";
             }}
           />
-        </div>
-
-        {/* Content type */}
-        <div>
-          <label className={LABEL}>Content type</label>
-          <Select
-            className="tw:w-full"
-            value={contentType}
-            onChange={(e) => setContentType(e.target.value as ContentType)}
-          >
-            {CONTENT_TYPES.map((ct) => (
-              <option key={ct.value} value={ct.value}>
-                {ct.label}
-              </option>
-            ))}
-          </Select>
         </div>
 
         {/* Description */}
@@ -388,7 +393,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             className="tw:w-full"
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => editName(e.target.value)}
           />
         </div>
 
@@ -483,6 +488,23 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             Collection "{name}" created successfully!
           </div>
         )}
+      </div>
+    )}
+    {clashShown && (
+      <div role="alert" className={ERROR_BANNER} data-testid="cms-setup-clash">
+        <p className="tw:m-0 tw:font-semibold">Collection name already exists</p>
+        <p className="tw:mt-1 tw:mb-2">A collection named “{name.trim()}” already exists.</p>
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          variant="link"
+          className={BOARD_LINK}
+          data-testid="cms-setup-clash-use"
+          onClick={() => editName(nextFreeName(name.trim(), takenNames))}
+        >
+          Use {nextFreeName(name.trim(), takenNames)}
+        </Button>
       </div>
     )}
         </ModalBody>

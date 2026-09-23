@@ -10,7 +10,7 @@
  * with Portfolio, and Page 1 came back as Portfolio.
  */
 import * as React from "react";
-import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 /* Same boundary the other TemplatesTab suites stub: the panel calls useToast
@@ -62,11 +62,12 @@ afterEach(cleanup);
 describe("Templates — add as new page", () => {
   it("switches to the page it created BEFORE importing into it", async () => {
     const { calls, composer } = makeComposer();
-    render(<TemplatesTab composer={composer as never} isExpanded />);
+    render(<TemplatesTab composer={composer as never} />);
 
     // Open a template's detail, then choose the new-page route.
     const first = SITE_TEMPLATES[0];
-    fireEvent.click(await screen.findByText(first.name));
+    /* The name is also a sidebar row (decision #24) — pick the grid card. */
+    fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
     /* Two buttons carry that name: the detail pane's action and the "Add as
        new page instead?" nudge under the replace warning. The action is the
        first. */

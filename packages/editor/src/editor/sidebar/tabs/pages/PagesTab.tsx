@@ -99,7 +99,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   /* The panel's rows in the one ⌘K palette (New page · Go to <page>), live
      while this panel is mounted. The panel-local palette and its own ⌘K
      listener are gone — decision #38, TODOS.md:393. */
-  usePageCommands(composer, p.pages, p.selectPage, p.addPage);
+  /* Every Add-page door asks for the New-page modal (decision #19). */
+  const requestNewPage = React.useCallback(() => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), [composer]);
+  usePageCommands(composer, p.pages, p.selectPage, requestNewPage);
 
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
@@ -394,7 +396,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             folders={f.folders}
             pageToFolder={f.pageToFolder}
             selectedIds={bulk.selectedIds}
-            onAddPage={p.addPage}
+            onAddPage={requestNewPage}
             onAddFolder={() => f.createFolder("New Folder")}
             onSelectPage={p.selectPage}
             onToggleSelect={handleToggleSelect}

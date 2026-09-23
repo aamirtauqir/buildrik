@@ -648,25 +648,15 @@
   font-size: 14px;
 }
 .bd-pg-drawer-body textarea { border-radius: var(--bk-radius-lg); font-size: 14px; }
-/* Save-error retry row — only rendered on saveState=error; the board draws
-   no save chrome (autosave owns persistence). */
-.bd-pg-drawer-errrow {
+/* Decision #20 foot — Cancel · Done, right-aligned, under a hairline
+   (boards 6887:73809 / 73848 / 73882). */
+.bd-pg-drawer-foot {
   display: flex;
-  align-items: center;
+  justify-content: flex-end;
   gap: var(--bk-space-8);
-  padding: var(--bk-space-8) var(--bk-space-28) var(--bk-space-16);
-  font: 500 12px var(--bk-font-ui);
-  color: var(--bk-error);
+  padding: var(--bk-space-12) var(--bk-space-28);
+  border-top: 1px solid var(--bk-border);
   flex-shrink: 0;
-}
-.bd-pg-drawer-errrow-retry {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  font: 600 12px var(--bk-font-ui);
-  color: var(--bk-error);
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 /* ─── ORPHAN DRAWER TABS REMOVED 2026-05-24 ───────────────────────────────

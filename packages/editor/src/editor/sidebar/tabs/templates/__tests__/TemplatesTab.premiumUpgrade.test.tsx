@@ -60,7 +60,7 @@ const premium = () => {
 const renderTab = () =>
   render(
     <>
-      <TemplatesTab composer={makeComposer() as never} isExpanded />
+      <TemplatesTab composer={makeComposer() as never} />
       <UpgradeModal />
     </>,
   );
@@ -90,7 +90,7 @@ describe("Templates — a premium template reaches the boarded prompt", () => {
     const composer = makeComposer();
     render(
       <>
-        <TemplatesTab composer={composer as never} isExpanded />
+        <TemplatesTab composer={composer as never} />
         <UpgradeModal />
       </>,
     );

@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/editor/chrome-ui", async () => {
@@ -63,7 +63,8 @@ function makeComposer(existingNames: string[] = ["Home"]) {
 
 async function applyWithBackup() {
   const first = SITE_TEMPLATES[0];
-  fireEvent.click(await screen.findByText(first.name));
+  /* The name is also a sidebar row (decision #24) — pick the grid card. */
+  fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
   /* The detail pane labels it "Apply to current page (<name>)"; the fullpage
      surface labels the same action "Apply template". */
   const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
@@ -90,9 +91,10 @@ describe("Templates — the backup is named what the checkbox promises", () => {
        checked: apply REPLACES the current page, so opting out of the backup
        has to be a deliberate act. */
     const { composer } = makeComposer(["Home"]);
-    render(<TemplatesTab composer={composer as never} isExpanded />);
+    render(<TemplatesTab composer={composer as never} />);
     const first = SITE_TEMPLATES[0];
-    fireEvent.click(await screen.findByText(first.name));
+    /* The name is also a sidebar row (decision #24) — pick the grid card. */
+    fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
     const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
     fireEvent.click(applyBtn);
     const label = await screen.findByText(/save the current page as a backup version first/i);
@@ -103,7 +105,7 @@ describe("Templates — the backup is named what the checkbox promises", () => {
 
   it('renames the duplicate to "<page> (backup)"', async () => {
     const { renames, composer } = makeComposer();
-    render(<TemplatesTab composer={composer as never} isExpanded />);
+    render(<TemplatesTab composer={composer as never} />);
     await applyWithBackup();
     await waitFor(() => expect(renames).toHaveLength(1));
     expect(renames[0]).toEqual({ id: "page-dup", name: "Home (backup)" });
@@ -111,7 +113,7 @@ describe("Templates — the backup is named what the checkbox promises", () => {
 
   it("numbers the suffix when a backup of that name already exists", async () => {
     const { renames, composer } = makeComposer(["Home", "Home (backup)"]);
-    render(<TemplatesTab composer={composer as never} isExpanded />);
+    render(<TemplatesTab composer={composer as never} />);
     await applyWithBackup();
     await waitFor(() => expect(renames).toHaveLength(1));
     expect(renames[0].name).toBe("Home (backup 2)");
