@@ -1,6 +1,7 @@
 import * as React from "react";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
-import type { AIModel, AIScope, DiffEdit } from "../types";
+import type { AIModel, DiffEdit } from "../types";
+import { aiErrorKind, AI_RECONNECT_BUDGET, type AiErrorKind } from "./runPromptOnce";
 
 interface StartArgs {
   prompt: string;
@@ -40,16 +41,10 @@ interface UseStreamPromptResult {
    *  line — the server already distinguishes it (PRECONDITION_FAILED from
    *  assertProviderConfigured), and the panel used to flatten every failure
    *  into one grey sentence. */
-  errorKind: "not-configured" | "quota" | "other" | null;
+  errorKind: AiErrorKind | null;
   start: (args: StartArgs) => void;
   stop: () => void;
   reset: () => void;
-}
-
-export function toServerScope(scope: AIScope): ServerScope | null {
-  if (scope.kind === "element") return { kind: "element", id: scope.id };
-  if (scope.kind === "page") return { kind: "page" };
-  return null;
 }
 
 function toDiffEdit(serverEdit: ServerEdit): DiffEdit {
@@ -62,25 +57,9 @@ export function useStreamPrompt(): UseStreamPromptResult {
   const [streaming, setStreaming] = React.useState(false);
   const [stopped, setStopped] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-  const [errorKind, setErrorKind] = React.useState<
-    "not-configured" | "quota" | "other" | null
-  >(null);
+  const [errorKind, setErrorKind] = React.useState<AiErrorKind | null>(null);
   const subRef = React.useRef<{ unsubscribe: () => void } | null>(null);
-  /**
-   * Reconnect budget for one prompt.
-   *
-   * tRPC's SSE client treats INTERNAL_SERVER_ERROR as RETRYABLE
-   * (`retryableRpcCodes` in @trpc/server) and silently reconnects instead of
-   * calling `onError`. Every provider failure reaches us as that code — the
-   * generator rethrows whatever OpenAI/Ollama threw — so a provider outage
-   * left this panel on "Thinking…" forever while the browser reopened the
-   * stream every ~440ms. Measured against a real dev server: one EventSource,
-   * five opens, five errors, zero data, sixteen seconds, no error on screen.
-   *
-   * A genuine network blip deserves a retry; a provider that is down does not
-   * deserve an unbounded loop. Two attempts, then the error is surfaced.
-   */
-  const RECONNECT_BUDGET = 2;
+  /* Reconnect budget for one prompt — see AI_RECONNECT_BUDGET. */
   const retriesRef = React.useRef(0);
 
   const stop = React.useCallback(() => {
@@ -132,14 +111,7 @@ export function useStreamPrompt(): UseStreamPromptResult {
         /* tRPC types `data` as Maybe<…> (it can be null), so the parameter is
            typed the way the client actually hands it over. */
         onError: (err: { message?: string; data?: { code?: string } | null }) => {
-          const code = err.data?.code;
-          setErrorKind(
-            code === "PRECONDITION_FAILED"
-              ? "not-configured"
-              : code === "TOO_MANY_REQUESTS"
-                ? "quota"
-                : "other",
-          );
+          setErrorKind(aiErrorKind(err.data?.code));
           setError(err.message ?? "Stream failed");
           setStreaming(false);
           subRef.current = null;
@@ -150,7 +122,7 @@ export function useStreamPrompt(): UseStreamPromptResult {
         onConnectionStateChange: (state: { state: string; error?: { message?: string } | null }) => {
           if (state.state !== "connecting" || !state.error) return;
           retriesRef.current += 1;
-          if (retriesRef.current < RECONNECT_BUDGET) return;
+          if (retriesRef.current < AI_RECONNECT_BUDGET) return;
           subRef.current?.unsubscribe();
           subRef.current = null;
           setErrorKind("other");

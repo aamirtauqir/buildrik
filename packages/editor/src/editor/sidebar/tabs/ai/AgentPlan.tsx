@@ -161,6 +161,17 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   return (
     <div className="bd-ai-agent">
       <div className={BAND} data-testid="ai-run-band">{bandLabel(phase, steps, currentIndex, stoppedByUser)}</div>
+      {/* Board 170:29 / 4418:104577 — "Thinking…" while the plan is being
+          drawn up. It lived on the chat bubble until decision #23 retired the
+          chat; every prompt now waits here. */}
+      {phase === "planning" ? (
+        <p
+          data-testid="ai-thinking"
+          className="tw:m-0 tw:flex tw:h-14 tw:items-center tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
+        >
+          Thinking…
+        </p>
+      ) : null}
 
       <ol className="bd-ai-agent-steps">
         {steps.map((s, i) => (

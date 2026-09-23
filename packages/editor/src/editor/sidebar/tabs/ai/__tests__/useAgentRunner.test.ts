@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 
 const runPromptOnce = vi.fn();
-vi.mock("../hooks/runPromptOnce", () => ({
+vi.mock("../hooks/runPromptOnce", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../hooks/runPromptOnce")>()),
   runPromptOnce: (...a: unknown[]) => runPromptOnce(...a),
 }));
 const applyAiEdit = vi.fn();
@@ -13,6 +14,7 @@ vi.mock("@/services/ai/adoptionTracker", () => ({
 }));
 
 import { useAgentRunner } from "../hooks/useAgentRunner";
+import { AiRunError } from "../hooks/runPromptOnce";
 
 const composer = {
   elements: {
@@ -196,5 +198,31 @@ describe("useAgentRunner", () => {
        suite did not. */
     expect(trackAgentRun).toHaveBeenCalledTimes(1);
     expect(trackAgentRun.mock.calls[0][0]).toMatchObject({ stepsFailed: 1 });
+  });
+
+  /* Decision #23: an element-scoped prompt is a one-step plan on that element
+     — no server planner call (it only plans pages), and it runs at once. */
+  it("runs an element-scoped prompt as a one-step plan without calling the planner", async () => {
+    runPromptOnce.mockResolvedValue({ plan: null, edit: editWithRows(1), text: "" });
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    await act(async () => { result.current.start("make it bold", { id: "a" }); });
+    await waitFor(() => expect(result.current.steps[0]?.status).toBe("awaiting"));
+    expect(result.current.steps).toHaveLength(1);
+    expect(runPromptOnce).toHaveBeenCalledTimes(1);
+    expect(runPromptOnce.mock.calls[0][0]).toMatchObject({
+      intent: "style-command",
+      scope: { kind: "element", id: "a" },
+      prompt: "make it bold",
+    });
+  });
+
+  it("carries the failure kind so the panel can draw not-configured / quota", async () => {
+    runPromptOnce.mockRejectedValue(new AiRunError("AI provider not configured", "not-configured"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
+    await act(async () => { result.current.start("x"); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+    expect(result.current.errorKind).toBe("not-configured");
+    act(() => { result.current.reset(); });
+    expect(result.current.errorKind).toBeNull();
   });
 });
