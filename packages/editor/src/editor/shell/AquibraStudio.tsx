@@ -490,7 +490,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
      "Publish to production" still has to answer with the gate modal. */
   const requestPublish = React.useCallback(() => {
     const gate = nextMove?.gate ?? "none";
-    if (gate === "waiting" || gate === "none") return;
+    if (gate === "waiting" || gate === "unchecked" || gate === "none") return;
     setPublishDoor(gate);
   }, [nextMove]);
   const confirmPublish = React.useCallback(async () => {

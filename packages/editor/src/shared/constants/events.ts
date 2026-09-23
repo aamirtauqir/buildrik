@@ -530,6 +530,9 @@ export const EVENTS = {
   BRAND_DIRTY_CHANGED: "brand:dirty-changed",
   /** A review round went out (send or re-send, any of the three send sites). */
   REVIEW_SENT: "review:sent",
+  /** Re-ask `reviews.status` after a failed read — the Publish panel's
+   *  "Retry ›" on the unchecked gate. `useLifecycle` listens. */
+  REVIEW_STATUS_RETRY: "review:status-retry",
 
   // ============================================
   // Device/Zoom Events
@@ -931,6 +934,7 @@ export interface EventPayloads {
   [EVENTS.UI_COMPARE_OPEN]: import("../types/compare").CompareRequest;
   [EVENTS.BRAND_DIRTY_CHANGED]: { dirty: boolean };
   [EVENTS.REVIEW_SENT]: { invitedEmail: string | null };
+  [EVENTS.REVIEW_STATUS_RETRY]: void;
   [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };
 }
 

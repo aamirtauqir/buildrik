@@ -398,13 +398,15 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      Otherwise it opens the door `nextMove.gate` names — the errors confirm,
      the changes-requested gate, the stale acknowledgement, or the facts
      confirm — through the same `requestPublish` the topbar uses. */
-  const gateShut = nextMove === null || nextMove.gate === "waiting" || nextMove.blockedReason !== null;
+  /* `waiting` and `unchecked` print their own reason in the gate banner. */
+  const gateSpeaks = nextMove?.gate === "waiting" || nextMove?.gate === "unchecked";
+  const gateShut = nextMove === null || gateSpeaks || nextMove.blockedReason !== null;
   const ctaDisabled = isPublishing || justPublished || snapshot.error || blockedByChecks || gateShut;
   const ctaReason: string | null = isPublishing
     ? `${isPublished ? "Update" : "Publishing"} in progress — please wait.`
     : nextMove === null
       ? "Nothing has changed since the last deploy."
-      : nextMove.gate !== "waiting" && nextMove.blockedReason
+      : !gateSpeaks && nextMove.blockedReason
         ? nextMove.blockedReason
         : null;
 
