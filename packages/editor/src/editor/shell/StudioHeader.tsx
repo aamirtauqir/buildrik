@@ -26,7 +26,7 @@
 import * as React from "react";
 import type { SaveState as StudioSaveState } from "./hooks/useStudioState";
 import type { NextMove } from "./lifecycle";
-import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, Button, type PublishState, type ReviewPill, type ReviewTone, type SaveState, type ToastInput } from "@/editor/chrome-ui";
+import { Topbar, ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalFooter, isModalOpen, Button, type PublishState, type ReviewPill, type SaveState, type ToastInput, formatIssueSummary } from "@/editor/chrome-ui";
 import type { SaveOutcome } from "./hooks/useSaveCallback";
 import type { Composer } from "../../engine";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
@@ -245,7 +245,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 }) => {
   const { users, currentUser, state: collaborationState, isConnected } = useCollaboration(composer);
   const editorRole = useEditorRole();
-  const isViewer = editorRole === "VIEWER";
   /* Unpublish is ADMIN on the server (sites.ts:425) and the row was shown to
      every role, so a VIEWER or EDITOR could open it and collect a 403. The
      `!== false` keeps the house rule: an unknown role still asks the server,
@@ -610,8 +609,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   const errorCount = issues.filter((i) => i.type === "error").length;
   const warnCount = issues.filter((i) => i.type === "warning").length;
-  // T7/D14: the old errors-noun label ("3 errors" for 1 error + 2 warnings)
-  // is gone — the IssueChip owns count copy via formatIssueSummary.
+  // T7/D14: the count copy is `formatIssueSummary` — now on the site menu's
+  // Issues row, the chip that carried it having left the bar (C3).
 
   /* ── The site's ONE next move (wireframes §2) ─────────────────────────────
      Arrives as a prop. `useLifecycle` (AquibraStudio) is the one caller of
@@ -681,8 +680,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. View mode is itself a preview,
-  // so it gets Comments only; viewers keep the chip with the fix door
-  // labelled shut.
+  // so it gets Comments only.
   const toggleComments = composer ? () => composer.emit("ui:comment-mode", {}) : undefined;
   const tools = viewMode.readOnlyView
     ? { commentsPressed: commentsOn, onToggleComments: toggleComments }
@@ -691,26 +689,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         previewBusy: previewLoading,
         commentsPressed: commentsOn,
         onToggleComments: toggleComments,
-        issues: {
-          errors: errorCount,
-          warnings: warnCount,
-          onClick: onOpenIssues,
-          readOnlyReason: isViewer ? "ask an editor to fix these" : undefined,
-        },
       };
 
   const pill = reviewChip(reviewStatus, openCommentCount);
-  // T8/D7 rule 6 — at most two amber signals at once. Offline-or-unsaved save
-  // and an amber Issues chip are both about *this* publish; a warning review
-  // chip is about the last one, so it is the signal that steps back. Demoted
-  // to `info` (neutral) — the copy still says "Changes requested", it just
-  // stops shouting alongside two louder ambers.
-  const amberElsewhere = (save === "offline" || save === "unsaved") && warnCount > 0;
-  const tone: ReviewTone = pill?.tone === "warning" && amberElsewhere ? "info" : (pill?.tone ?? "info");
   const review: ReviewPill | null = pill
     ? {
         ...pill,
-        tone,
         // F3: every review state opens the same door — the Review panel.
         onClick: onOpenReview,
       }
@@ -771,7 +755,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         publishBlockedReason={nextMove?.blockedReason ?? undefined}
         ctaLabel={nextMove?.label}
         ctaHint={nextMove?.hint}
-        liveUrl={viewMode.readOnlyView ? null : publishedUrl}
         onPublish={handleCtaClick}
         /* SendForReview used to render ONLY in view mode, from when
            ?view=client (now ?view=readonly) meant "invited content editor". It is a viewer now
@@ -792,6 +775,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             onOpenReview={viewMode.readOnlyView ? undefined : onOpenReview}
             onOpenPublish={viewMode.readOnlyView ? undefined : onOpenPublish}
             onOpenPublishHistory={viewMode.readOnlyView ? undefined : onOpenPublishHistory}
+            /* C3: the Issues chip left the bar; this row and ⌘K's "Show
+               issues" are the panel's doors, and the count rides in the title. */
+            onOpenIssues={viewMode.readOnlyView ? undefined : onOpenIssues}
+            issuesTitle={formatIssueSummary(errorCount, warnCount)}
             onUnpublish={
               viewMode.readOnlyView || !publishedUrl || !canUnpublish
                 ? undefined

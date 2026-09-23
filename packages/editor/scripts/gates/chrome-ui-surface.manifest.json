@@ -66,8 +66,6 @@
     "IntegrationRow": "local",
     "IntegrationRowProps": "local",
     "IntegrationStatus": "local",
-    "IssueChip": "local",
-    "IssueChipProps": "local",
     "Kbd": "local",
     "KbdProps": "local",
     "Label": "flowbite-reexport",

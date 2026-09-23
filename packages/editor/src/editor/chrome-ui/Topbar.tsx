@@ -11,8 +11,9 @@
  *
  * The ten children below ARE the component — exit, name, save, review,
  * spacer, tools, presence, notifications, publish, menu — in that order.
- * `tools` is the ONE bounded cluster (plan §2: Quick preview · Comments ·
- * IssueChip, typed as data props). There is deliberately no `extra` node
+ * `tools` is the ONE bounded cluster (plan §2: Quick preview · Comments,
+ * typed as data props; the IssueChip and the Live chip left the bar in C3 —
+ * Issues opens from the site menu and ⌘K, the live URL is a site-menu row). There is deliberately no `extra` node
  * slot: one existed for a day and the deleted shell topbar's Preview /
  * Comment / Colour-mode buttons walked straight back in through it. A bar
  * that can be extended per call site is a bar that drifts.
@@ -24,7 +25,6 @@ import { Button } from "flowbite-react";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
 import { IconButton } from "./Icon";
-import { IssueChip } from "./IssueChip";
 import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
 
@@ -75,7 +75,7 @@ export type PublishState = "ready" | "disabled" | "anyway" | "published" | "hidd
  * The tool cluster (plan §2, eng D12) — DATA props, never a node: the deleted
  * `extra` slot let arbitrary buttons walk back into the bar within a day.
  * Role/view branching lives in the CONTAINER: it composes which fields to
- * pass (view mode: comments only; viewer: read-only-labelled issues); the
+ * pass (view mode: comments only); the
  * bar renders exactly what it receives and learns no roles.
  */
 export interface TopbarTools {
@@ -83,12 +83,6 @@ export interface TopbarTools {
   previewBusy?: boolean;
   commentsPressed?: boolean;
   onToggleComments?: () => void;
-  issues?: {
-    errors: number;
-    warnings: number;
-    onClick?: () => void;
-    readOnlyReason?: string;
-  };
 }
 
 /** Five review states share one pill; only the copy and tone differ. */
@@ -123,7 +117,7 @@ export interface TopbarProps {
   saveHint?: string;
   /** The review round's current truth. Omit when no review is in flight. */
   review?: ReviewPill | null;
-  /** The daily-loop cluster: Quick preview · Comments · IssueChip. */
+  /** The daily-loop cluster: Quick preview · Comments. */
   tools?: TopbarTools | null;
   presence?: PresenceProps | null;
   unreadCount?: number;
@@ -147,31 +141,10 @@ export interface TopbarProps {
   ctaLabel?: string;
   /** One sentence naming the site's position, as the button's title. */
   ctaHint?: string;
-  /**
-   * The live site, when there is one. Rendered as `● Live · domain` beside the
-   * save pill — the settled half of the CTA's story.
-   *
-   * Load-bearing next to `ctaLabel`: on a site that is live with nothing
-   * waiting, the derivation returns no next move and the CTA disappears. Without
-   * this chip, "your site is live" would have no representation in the shell at
-   * all, and a finished site would look identical to one that was never
-   * published.
-   */
-  liveUrl?: string | null;
   /** Replaces the built-in Publish button — e.g. an editor who sends for review instead. */
   action?: React.ReactNode;
   /** The ⋯ site menu — a node that owns its own trigger (SiteMenu). */
   menu?: React.ReactNode;
-}
-
-/** The host, for the live chip. A URL the server never validated must not
- *  throw inside a render — an unparseable one falls back to itself. */
-function hostOf(url: string): string {
-  try {
-    return new URL(url).host;
-  } catch {
-    return url;
-  }
 }
 
 const PUBLISH_LABEL: Record<PublishState, string> = {
@@ -185,9 +158,9 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 export function Topbar({
   siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
-  publishBlockedReason, ctaLabel, ctaHint, liveUrl, action, menu,
+  publishBlockedReason, ctaLabel, ctaHint, action, menu,
 }: TopbarProps) {
-  const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments || tools.issues));
+  const hasTools = Boolean(tools && (tools.onPreview || tools.onToggleComments));
   return (
     <header
       // Conformance anchor. The bar wears only utility classes, so any selector
@@ -229,26 +202,6 @@ export function Topbar({
           omitted there rather than rendering a permanently-green pill. */}
       {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
 
-      {liveUrl ? (
-        <a
-          href={liveUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          /* The domain, not the URL: `https://bella-cucina.vercel.app/` in a
-             56px bar pushes the site name out of it. The href keeps the whole
-             thing, and the title says where it goes. */
-          title={`Open the live site — ${liveUrl}`}
-          className={
-            "tw:inline-flex tw:flex-none tw:items-center tw:gap-1.5 tw:h-6 tw:px-2 tw:rounded " +
-            "tw:text-[12px] tw:text-[var(--bk-ink-soft)] tw:no-underline tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)] " +
-            "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] tw:focus-visible:outline-none"
-          }
-        >
-          <span className="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-green-600" aria-hidden="true" />
-          <span className="tw:sr-only">Live at </span>
-          {hostOf(liveUrl)}
-        </a>
-      ) : null}
 
       {review ? (
         <ReviewBadge {...review} />
@@ -274,7 +227,6 @@ export function Topbar({
               <CommentIcon />
             </IconButton>
           ) : null}
-          {tools.issues ? <IssueChip {...tools.issues} /> : null}
         </span>
       ) : null}
 

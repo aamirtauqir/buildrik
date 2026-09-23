@@ -192,10 +192,10 @@ describe("StudioHeader", () => {
       },
     );
 
-    // Topbar redesign D6/D14: the IssueChip is a permanent bar anchor with the
-    // honest total+breakdown copy (the old errors-noun label mislabelled
-    // 1 error + 2 warnings as "3 errors" — regression-critical).
-    it("carries the IssueChip with total count and severity breakdown", () => {
+    /* C3 (§16.1 row 11): the topbar carries only the Figma master's
+       controls. The Issues chip and the Live chip are gone; Issues opens from
+       the site menu and ⌘K, the live URL lives in the site menu. */
+    it("carries no Issues chip, whatever the count", () => {
       render(
         <StudioHeader
           {...makeProps({
@@ -203,33 +203,38 @@ describe("StudioHeader", () => {
             issues: [
               { id: "1", type: "error", message: "x" },
               { id: "2", type: "warning", message: "y" },
-              { id: "3", type: "warning", message: "z" },
             ] as StudioHeaderProps["issues"],
           })}
         />,
       );
-      const chip = screen.getByRole("button", { name: "3 issues, 1 error" });
-      expect(chip.textContent).toBe("3");
+      expect(screen.queryByRole("button", { name: /issue/i })).toBeNull();
     });
 
-    it("the chip stays visible at zero issues — the all-clear anchor (D6)", () => {
-      render(<StudioHeader {...makeProps({ onOpenIssues: vi.fn(), issues: [] })} />);
-      expect(screen.getByRole("button", { name: "No issues" })).toBeTruthy();
+    it("carries no Live chip on a published site", () => {
+      render(<StudioHeader {...makeProps({ publishedUrl: "https://x.vercel.app" })} />);
+      const bar = screen.getByTestId("topbar");
+      expect(within(bar).queryByRole("link")).toBeNull();
+      expect(bar.textContent).not.toContain("x.vercel.app");
     });
 
-    it("viewers get the chip with the fix door labelled shut", () => {
-      roleState.role = "VIEWER";
+    it("the site menu's Issues row opens the panel and names the count", () => {
+      const onOpenIssues = vi.fn();
       render(
         <StudioHeader
           {...makeProps({
-            onOpenIssues: vi.fn(),
-            issues: [{ id: "1", type: "warning", message: "x" }] as StudioHeaderProps["issues"],
+            onOpenIssues,
+            issues: [
+              { id: "1", type: "error", message: "x" },
+              { id: "2", type: "warning", message: "y" },
+            ] as StudioHeaderProps["issues"],
           })}
         />,
       );
-      expect(
-        screen.getByRole("button", { name: /1 issue, 1 warning — ask an editor to fix these/ }),
-      ).toBeTruthy();
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      const row = screen.getByRole("menuitem", { name: /^Issues/ });
+      expect(row.getAttribute("title")).toBe("2 issues · 1 error, 1 warning — review before publish");
+      fireEvent.click(row);
+      expect(onOpenIssues).toHaveBeenCalled();
     });
   });
 
@@ -560,6 +565,8 @@ describe("StudioHeader", () => {
         // chord that actually works there (the handler takes ctrl OR meta).
         "Site settingsCtrl ,",
         "Version historyCtrl H",
+        /* C3: Issues came into the menu when its topbar chip left the bar. */
+        "Issues",
         "Publish history",
         "Export code",
         "Templates",
@@ -968,22 +975,6 @@ describe("T8 status grammar", () => {
     expect(isWarningTone(label)).toBe(true);
   });
 
-  it("D7 rule 6: with an amber save AND amber issues, the review pill steps back", async () => {
-    render(
-      <StudioHeader
-        {...makeProps({
-          reviewStatus: changesRequested(),
-          isDirty: true, // save → unsaved (amber)
-          issues: [{ id: "i1", type: "warning", message: "Missing alt text" }],
-        })}
-      />,
-    );
-    const label = await screen.findByText("Changes requested");
-    // Demoted, not hidden — the copy is unchanged, only the shouting stops.
-    expect(toneOf(label)).toContain("tw:bg-[var(--bk-gray-100)]");
-    expect(isWarningTone(label)).toBe(false);
-  });
-
   // T8 compact tier 3: two faces then "+N", so a crowded room cannot push the
   // publish action off the bar.
   it("presence shows two avatars and counts the rest", () => {
@@ -1006,13 +997,16 @@ describe("T8 status grammar", () => {
     expect(screen.getByLabelText("2 more")).toBeTruthy();
   });
 
-  it("errors do not spend the amber budget — an error chip is red, not amber", async () => {
+  /* D7 rule 6 demoted the review chip beside an amber save AND an amber
+     Issues chip. C3 took the Issues chip off the bar, so there is no second
+     amber for it to step back from. */
+  it("keeps the warning tone beside an unsaved save — no Issues chip competes (C3)", async () => {
     render(
       <StudioHeader
         {...makeProps({
           reviewStatus: changesRequested(),
           isDirty: true,
-          issues: [{ id: "i1", type: "error", message: "Broken link" }],
+          issues: [{ id: "i1", type: "warning", message: "Missing alt text" }],
         })}
       />,
     );
