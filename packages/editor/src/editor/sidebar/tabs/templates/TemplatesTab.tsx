@@ -44,6 +44,8 @@ export interface TemplatesTabProps {
   onTemplateUsed?: () => void;
   onSwitchTab?: (tab: string) => void;
   onClose?: () => void;
+  /** The New-page modal's name (#19): Create page makes the page under it. */
+  newPageName?: string;
 }
 
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
@@ -51,6 +53,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   onTemplateUsed,
   onSwitchTab,
   onClose,
+  newPageName,
 }) => {
   const { addToast } = useToast();
   const [showSearch, setShowSearch] = React.useState(false);
@@ -242,7 +245,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
            page replaced the page they were on, and left the new one empty.
            Walked live — Page 1 held "SaaS Landing", "Add as new page" with
            Portfolio, and Page 1 came back as Portfolio. */
-        const created = composer.elements.createPage(t.name);
+        const created = composer.elements.createPage(newPageName ?? t.name);
         composer.elements.setActivePage?.(created.id);
       }
       if (resetStyles) composer.styles.clear();
@@ -326,6 +329,21 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     // fire once per window, so the dep list is deliberately just the flag.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showProgress]);
+
+  /* QA 2026-09-24: Escape leaves the full-canvas view. The preview owns
+     Escape first (back to the catalogue, capture phase); the replace confirm,
+     an apply and its outcome dialogs keep theirs. `defaultPrevented` is not
+     a guard: the canvas's own Escape (clear selection) prevents default under
+     the view, and that swallowed this one live. */
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (sel.previewId || sel.showReplace || showProgress || createResult) return;
+      onClose?.();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [sel.previewId, sel.showReplace, showProgress, createResult, onClose]);
 
   // ── Render ──
   const tName = findTemplate(pendingId.current)?.name ?? "Template";

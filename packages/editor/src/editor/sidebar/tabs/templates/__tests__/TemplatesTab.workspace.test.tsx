@@ -107,4 +107,28 @@ describe("Templates — full-canvas view (decision #24)", () => {
     await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled());
     expect(composer.elements.createPage).not.toHaveBeenCalled();
   });
+
+  /* #19 follow-up: the New-page modal's name reaches the catalogue's Create page. */
+  it("Create page uses the name the New-page modal carried", async () => {
+    const composer = makeComposer();
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} newPageName="Our menu" />);
+    const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
+    fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    await waitFor(() => expect(composer.elements.importHTMLToActivePage).toHaveBeenCalled());
+    expect(composer.elements.createPage).toHaveBeenCalledWith("Our menu");
+  });
+
+  /* QA 2026-09-24: Escape did not close the view. From the catalogue it goes
+     back to the canvas; from a preview it goes back to the catalogue first. */
+  it("Escape leaves the view from the catalogue, and a preview first", () => {
+    const onClose = vi.fn();
+    render(<TemplatesTab composer={makeComposer() as never} onClose={onClose} />);
+    fireEvent.click(screen.getByTestId(`tpl-ws-item-${PAGE_TEMPLATES[0].id}`));
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("tpl-ws-preview")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

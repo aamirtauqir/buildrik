@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/editor/chrome-ui", async () => {
@@ -63,10 +63,10 @@ function makeComposer(existingNames: string[] = ["Home"]) {
 
 async function applyWithBackup() {
   const first = SITE_TEMPLATES[0];
-  /* The name is also a sidebar row (decision #24) — pick the grid card. */
-  fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
+  /* The sidebar row opens the same preview as the grid card (decision #24). */
+  fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
   /* The card opens the preview (decision #24); its Replace page… is the apply. */
-  fireEvent.click(await screen.findByRole("button", { name: "Replace page…" }));
+  fireEvent.click(await screen.findByText("Replace page…"));
   /* Assert the state, do not toggle blindly. The box now DEFAULTS ON — board
      1169:4713 draws it checked, because applying a template replaces the page
      and the safe option belongs on the default. This helper used to click it
@@ -91,9 +91,11 @@ describe("Templates — the backup is named what the checkbox promises", () => {
     const { composer } = makeComposer(["Home"]);
     render(<TemplatesTab composer={composer as never} />);
     const first = SITE_TEMPLATES[0];
-    /* The name is also a sidebar row (decision #24) — pick the grid card. */
-    fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
-    fireEvent.click(await screen.findByRole("button", { name: "Replace page…" }));
+    /* The sidebar row opens the same preview as the grid card (decision #24).
+       Test ids, not role queries: role + accessible-name resolution over the
+       whole catalogue took ~8 s and timed this test out under load. */
+    fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
+    fireEvent.click(await screen.findByText("Replace page…"));
     const label = await screen.findByText(/save the current page as a backup version first/i);
     const input = (label.closest("label") ?? label).querySelector('input[type="checkbox"]') as HTMLInputElement | null;
     expect(input, "backup checkbox not found").not.toBeNull();

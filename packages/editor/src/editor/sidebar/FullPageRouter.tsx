@@ -50,6 +50,8 @@ export interface FullPageRouterProps {
   /** `ui:settings-open` — the screen (and repair draft) Settings opens on. */
   settingsOpen?: SettingsOpenRequest | null;
   onTemplatesSwitchTab?: (tab: string) => void;
+  /** New-page modal → From template: the name Create page uses (#19). */
+  templatesNewPageName?: string;
 }
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({
@@ -63,6 +65,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onSettingsDirtyChange,
   settingsOpen,
   onTemplatesSwitchTab,
+  templatesNewPageName,
 }) => {
   switch (activeTab) {
     /* Decision #24 — board 4418:54134 is edge-to-edge like Settings: the
@@ -79,6 +82,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               composer={composer}
               onTemplateUsed={onSwitchToAdd}
               onSwitchTab={onTemplatesSwitchTab}
+              newPageName={templatesNewPageName}
               onClose={commonTabProps.onClose}
             />
           </div>

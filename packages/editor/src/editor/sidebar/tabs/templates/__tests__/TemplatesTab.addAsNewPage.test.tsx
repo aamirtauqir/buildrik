@@ -10,7 +10,7 @@
  * with Portfolio, and Page 1 came back as Portfolio.
  */
 import * as React from "react";
-import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 /* Same boundary the other TemplatesTab suites stub: the panel calls useToast
@@ -66,12 +66,14 @@ describe("Templates — add as new page", () => {
 
     // Open a template's preview, then choose the new-page route.
     const first = SITE_TEMPLATES[0];
-    /* The name is also a sidebar row (decision #24) — pick the grid card. */
-    fireEvent.click(within(await screen.findByRole("listbox", { name: "Available templates" })).getByText(first.name));
+    /* The sidebar row opens the same preview as the grid card (decision #24).
+       Test ids, not role queries: role + accessible-name resolution over the
+       whole catalogue took ~8 s and timed this test out under load. */
+    fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
     /* The card opens the preview (decision #24); Create page is the new-page route. */
-    fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
+    fireEvent.click(await screen.findByText("Create page"));
 
-    await waitFor(() => expect(calls).toContain("import"));
+    await waitFor(() => expect(calls).toContain("import"), { timeout: 5000 });
 
     expect(calls).toEqual(["createPage", "setActivePage:page-new", "import"]);
     // The import must never run while the old page is still the active one.
