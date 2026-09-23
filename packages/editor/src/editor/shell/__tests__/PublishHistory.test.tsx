@@ -74,15 +74,23 @@ describe("P6 republish role gating", () => {
     renderIt();
     expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
     const entry = screen.getByTestId("publish-republish-2");
-    expect(entry).toBeDisabled();
-    expect(entry).toHaveAttribute("title", "Ask an admin to republish");
+    /* Decision #19: aria-disabled + tooltip, never `disabled` — the control
+       stays focusable so the reason is reachable by keyboard (QA 2026-09-24). */
+    expect(entry).toHaveAttribute("aria-disabled", "true");
+    expect(entry).not.toBeDisabled();
+    expect(entry).not.toHaveAttribute("title");
+    expect(screen.getAllByText("Ask an admin to republish").length).toBeGreaterThan(0);
+    fireEvent.click(entry);
+    expect(screen.queryByText(/^Republish v2 as/)).toBeNull();
   });
 
   it("ADMIN keeps republish enabled on rollbackable versions", async () => {
     roleState.role = "ADMIN";
     renderIt();
     expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
-    expect(screen.getByTestId("publish-republish-2")).toBeEnabled();
+    const entry = screen.getByTestId("publish-republish-2");
+    expect(entry).toBeEnabled();
+    expect(entry).not.toHaveAttribute("aria-disabled");
   });
 });
 
@@ -125,8 +133,11 @@ describe("republish", () => {
   it("a version whose snapshot is gone is disabled with the reason", async () => {
     renderIt();
     const pruned = await screen.findByTestId("publish-republish-1");
-    expect(pruned).toBeDisabled();
-    expect(pruned).toHaveAttribute("title", "This version's snapshot is no longer stored");
+    expect(pruned).toHaveAttribute("aria-disabled", "true");
+    expect(pruned).not.toBeDisabled();
+    expect(screen.getByText("This version's snapshot is no longer stored")).toBeInTheDocument();
+    fireEvent.click(pruned);
+    expect(screen.queryByText(/^Republish v1 as/)).toBeNull();
   });
 
   it("republishing an older version confirms then re-publishes it", async () => {

@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { ConfirmDialog, EmptyState, Modal, Progress, Spinner, Button, VersionRow } from "@/editor/chrome-ui";
+import { ConfirmDialog, EmptyState, Modal, Progress, Spinner, Button, Tooltip, VersionRow } from "@/editor/chrome-ui";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import { domainOf } from "@/editor/sidebar/tabs/publish/usePublishSnapshot";
@@ -342,23 +342,29 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
                     Disabled-with-reason, never hidden, for a pruned snapshot
                     and for a role below ADMIN (P6; owner decision 8). */}
                 {!isLive ? (
-                  <Button
-                    color="light"
-                    size="xs"
-                    disabled={!canRollback || !r.rollbackable}
-                    title={
-                      !canRollback
-                        ? "Ask an admin to republish"
-                        : r.rollbackable
-                          ? undefined
-                          : "This version's snapshot is no longer stored"
-                    }
-                    onClick={() => setConfirm(r)}
-                    className={ROW_LINK}
-                    data-testid={`publish-republish-${r.version}`}
-                  >
-                    Republish v{r.version}…
-                  </Button>
+                  (() => {
+                    /* Decision #19: disabled-with-reason is aria-disabled + a
+                       tooltip, never `disabled` — the control stays focusable
+                       so the reason is reachable by keyboard. */
+                    const why = !canRollback
+                      ? "Ask an admin to republish"
+                      : r.rollbackable
+                        ? null
+                        : "This version's snapshot is no longer stored";
+                    const button = (
+                      <Button
+                        color="light"
+                        size="xs"
+                        aria-disabled={why ? "true" : undefined}
+                        onClick={why ? undefined : () => setConfirm(r)}
+                        className={`${ROW_LINK}${why ? " tw:opacity-50 tw:cursor-not-allowed" : ""}`}
+                        data-testid={`publish-republish-${r.version}`}
+                      >
+                        Republish v{r.version}…
+                      </Button>
+                    );
+                    return why ? <Tooltip content={why}>{button}</Tooltip> : button;
+                  })()
                 ) : null}
               </>
             }
