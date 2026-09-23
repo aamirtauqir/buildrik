@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
+import { EVENTS } from "../../../shared/constants/events";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ContextAction, ActionContext } from "./contextMenuRegistry";
 import { MenuItem } from "./MenuItem";
@@ -34,6 +35,26 @@ export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
   const submenuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useClickOutside(menuRef, onClose, { closeOnEscape: true });
+
+  /* G2-050: the menu's rows are built for the element it opened on. If the
+     selection moves off it (a chord, Layers, another tab) or it is deleted,
+     the rows would act on the wrong thing — close instead of going stale. */
+  const { composer, element } = context;
+  React.useEffect(() => {
+    const id = element.getId();
+    const onSelection = (payload: { selected: string[] }) => {
+      if (!payload.selected.includes(id)) onClose();
+    };
+    const onDeleted = () => {
+      if (!composer.elements.getElement(id)) onClose();
+    };
+    composer.on(EVENTS.SELECTION_CHANGED, onSelection);
+    composer.on(EVENTS.ELEMENT_DELETED, onDeleted);
+    return () => {
+      composer.off(EVENTS.SELECTION_CHANGED, onSelection);
+      composer.off(EVENTS.ELEMENT_DELETED, onDeleted);
+    };
+  }, [composer, element, onClose]);
 
   // Flatten actions into ordered list for keyboard navigation
   const mainItems = React.useMemo(() => actions.filter((a) => a.group === "main"), [actions]);
