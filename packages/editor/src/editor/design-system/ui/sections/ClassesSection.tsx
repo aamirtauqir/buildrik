@@ -25,6 +25,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
+import { BrandCard, BrandRow } from "../BrandCard";
 
 export interface ClassesSectionProps {
   composer?: Composer | null;
@@ -74,35 +75,18 @@ export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
   }
 
   return (
-    <ul
-      className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-0"
-      data-testid="brand-classes"
-      aria-label="Classes"
-    >
+    <BrandCard label="Classes" data-testid="brand-classes">
       {rows.map(([name, count]) => (
-        /* 7316:83357: 48 tall, 16 in, 14px ink over 13px muted, no rules. */
-        <li
+        <BrandRow
           key={name}
           data-testid={`brand-class-${name}`}
-          className="tw:flex tw:h-12 tw:flex-col tw:justify-center tw:pl-4 tw:pr-3"
-        >
-          <span
-            data-testid={`brand-class-name-${name}`}
-            className="tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]"
-          >
-            {`.${name}`}
-          </span>
-          <span
-            data-testid={`brand-class-usage-${name}`}
-            className="tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-          >
-            {/* One text node, not three — check-board-copy.mjs compares text
-                nodes, so `used {count}&times;` split three ways never matched. */}
-            {`used ${count}\u00d7`}
-          </span>
-        </li>
+          name={<span data-testid={`brand-class-name-${name}`}>{`.${name}`}</span>}
+          /* One text node, not three — check-board-copy.mjs compares text
+             nodes, so `used {count}&times;` split three ways never matched. */
+          sub={<span data-testid={`brand-class-usage-${name}`}>{`used ${count}\u00d7`}</span>}
+        />
       ))}
-    </ul>
+    </BrandCard>
   );
 };
 

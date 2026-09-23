@@ -47,7 +47,7 @@ describe("ColourModeSection", () => {
       ),
     );
     const card = getByTestId("brand-colour-mode-list");
-    const rows = [...card.children];
+    const rows = [...card.querySelectorAll("[data-no-dark-row],[data-dark-row]")];
     expect(rows.length).toBe(reg!.tokens.length);
     const firstPaired = rows.findIndex((r) => r.hasAttribute("data-dark-row"));
     const lastMissing = rows.map((r) => r.hasAttribute("data-no-dark-row")).lastIndexOf(true);

@@ -35,12 +35,7 @@ import { useColorRegistry } from "../../state/TokenRegistryContext";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { filterTokensByMode } from "../../utils/semanticKind";
 import { displayValue } from "../colors/ColorTokenList";
-
-/* 7316:80949: 48 tall, 16 in on the left, 12 on the right; 14px ink name over
-   a 13px muted line; the action in accent. */
-const ROW = "tw:flex tw:h-12 tw:items-center tw:gap-3 tw:pl-4 tw:pr-3";
-const NAME = "tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
-const SUB = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+import { BrandCard, BrandRow } from "../BrandCard";
 
 export const ColourModeSection: React.FC = () => {
   const color = useColorRegistry();
@@ -76,11 +71,7 @@ export const ColourModeSection: React.FC = () => {
   }
 
   return (
-    <ul
-      className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-0"
-      aria-label="Colour mode"
-      data-testid="brand-colour-mode-list"
-    >
+    <BrandCard label="Colour mode" data-testid="brand-colour-mode-list">
       {/*
         The id, not the display name — the board draws ids, and the live
         palette holds both `Text` and `Text Primary`, so a name cannot say
@@ -88,57 +79,59 @@ export const ColourModeSection: React.FC = () => {
         the title so it is still reachable.
       */}
       {missing.map((t) => (
-        <li key={t.id} data-no-dark-row={t.id} data-testid={`brand-nodark-row-${t.id}`} className={ROW}>
-          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-            <span data-testid={`brand-nodark-name-${t.id}`} className={NAME} title={t.name}>
-              {t.id}
-            </span>
-            <span className={SUB}>No dark value</span>
-          </div>
-          {editing === t.id ? (
-            <TextInput
-              autoFocus
-              value={draft}
-              aria-label={`Dark value for ${t.name}`}
-              className="tw:w-28 tw:[font-family:var(--bk-font-mono)]"
-              onChange={(e) => setDraft(e.target.value)}
-              onBlur={() => commit(t.id, t.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") commit(t.id, t.value);
-                if (e.key === "Escape") setEditing(null);
-              }}
-            />
-          ) : (
-            <Button
-              size="xs"
-              variant="link"
-              data-set-dark={t.id}
-              data-testid={`brand-nodark-set-${t.id}`}
-              onClick={() => {
-                setDraft(t.value);
-                setEditing(t.id);
-              }}
-              className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-accent-text)]"
-            >
-              Set
-            </Button>
-          )}
-        </li>
+        <BrandRow
+          key={t.id}
+          data-no-dark-row={t.id}
+          data-testid={`brand-nodark-row-${t.id}`}
+          name={<span data-testid={`brand-nodark-name-${t.id}`} title={t.name}>{t.id}</span>}
+          sub="No dark value"
+          trailing={
+            editing === t.id ? (
+              <TextInput
+                autoFocus
+                value={draft}
+                aria-label={`Dark value for ${t.name}`}
+                className="tw:w-28 tw:[font-family:var(--bk-font-mono)]"
+                onChange={(e) => setDraft(e.target.value)}
+                onBlur={() => commit(t.id, t.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commit(t.id, t.value);
+                  if (e.key === "Escape") setEditing(null);
+                }}
+              />
+            ) : (
+              <Button
+                size="xs"
+                variant="link"
+                data-set-dark={t.id}
+                data-testid={`brand-nodark-set-${t.id}`}
+                onClick={() => {
+                  setDraft(t.value);
+                  setEditing(t.id);
+                }}
+                className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:text-[var(--bk-accent-text)]"
+              >
+                Set
+              </Button>
+            )
+          }
+        />
       ))}
       {paired.map((t) => (
-        <li key={t.id} data-dark-row={t.id} data-testid={`brand-dark-row-${t.id}`} className={ROW}>
-          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-            <span className={NAME} title={t.name}>
-              {t.id}
-            </span>
-            <span className={SUB} data-testid={`brand-dark-pair-${t.id}`}>
+        <BrandRow
+          key={t.id}
+          data-dark-row={t.id}
+          data-testid={`brand-dark-row-${t.id}`}
+          name={<span title={t.name}>{t.id}</span>}
+          sub={
+            <span data-testid={`brand-dark-pair-${t.id}`}>
               {displayValue(t.value)} → {displayValue(t.darkValue ?? "")}
             </span>
-          </div>
-          <Check size={12} aria-label="Has a dark value" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />
-        </li>
+          }
+          trailing={<Check size={12} aria-label="Has a dark value" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />}
+        />
       ))}
-    </ul>
+    </BrandCard>
   );
 };
 

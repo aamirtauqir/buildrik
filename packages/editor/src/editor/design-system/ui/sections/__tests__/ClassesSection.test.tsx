@@ -18,7 +18,7 @@ const composerWith = (classLists: string[][]) =>
 describe("Brand › Classes", () => {
   it("one card, a row per class, most-used first, `.name` over `used N×`", () => {
     render(<ClassesSection composer={composerWith([["card"], ["card", "btn-primary"], ["card"]])} />);
-    const rows = [...screen.getByTestId("brand-classes").children];
+    const rows = [...screen.getByTestId("brand-classes").querySelectorAll('[data-testid^="brand-class-"]:not([data-testid*="-name-"]):not([data-testid*="-usage-"])')];
     expect(rows.map((r) => r.getAttribute("data-testid"))).toEqual(["brand-class-card", "brand-class-btn-primary"]);
     expect(screen.getByTestId("brand-class-name-card").textContent).toBe(".card");
     expect(screen.getByTestId("brand-class-usage-card").textContent).toBe("used 3×");

@@ -35,6 +35,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DEFAULT_TOKENS } from "../../constants";
 import type { DesignToken } from "../../types";
+import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
 
 export interface TypographySectionProps {
   composer?: Composer | null;
@@ -76,12 +77,7 @@ export function fontsCaption(tokens: readonly DesignToken[]): string {
   return `${roles} role${roles === 1 ? "" : "s"} · ${families.size} active font${families.size === 1 ? "" : "s"}`;
 }
 
-/* 7316:81551: 48 tall, 16 in, 14px ink over 13px muted, a muted › on the right. */
-const ROW =
-  "tw:flex tw:h-12 tw:w-full tw:cursor-pointer tw:items-center tw:gap-3 tw:pl-4 tw:pr-3 tw:text-left tw:outline-none " +
-  "tw:focus-visible:[box-shadow:inset_var(--bk-shadow-focus)]";
-const NAME = "tw:truncate tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
-const SUB = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+
 
 /** `"Inter Tight"` and `Inter Tight, sans-serif` both name the same family. */
 function familyOf(value: string): string {
@@ -199,70 +195,45 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
     );
   }
 
-  const row = (id: string, name: React.ReactNode, sub: React.ReactNode, kind: "role" | "style") => (
-    <li key={id}>
-      <div
-        role="button"
-        tabIndex={0}
-        aria-pressed={selectedTokenId === id}
-        data-testid={`brand-type-row-${id}`}
-        data-type-row={kind}
-        onClick={() => onSelectToken?.(id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onSelectToken?.(id);
-          }
-        }}
-        className={`${ROW} ${selectedTokenId === id ? "tw:bg-[var(--bk-accent-tint)]" : "tw:hover:bg-[var(--bk-bg-subtle)]"}`}
-      >
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-          {name}
-          {sub}
-        </div>
-        <span aria-hidden="true" className="tw:flex-none tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-          ›
-        </span>
-      </div>
-    </li>
-  );
-
   return (
-    <ul
-      data-testid="brand-typography"
-      aria-label="Fonts and type styles"
-      className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-0"
-    >
-      {rows.map((r) =>
-        row(
-          r.id,
-          <span className={NAME}>{r.title}</span>,
-          <span className={SUB}>
-            {/* The family is set IN the face it names — you can see the font
-                without leaving the page. */}
-            <span data-testid={`brand-font-family-${r.id}`} style={{ fontFamily: `${r.family}, sans-serif` }}>{r.family}</span>
-            {" · "}
-            <span data-testid={`brand-font-role-${r.id}`}>{r.role}</span>
-            {" · "}
-            <span data-font-weights>
-              {r.weights === 0 ? "not used yet" : `${r.weights} weight${r.weights === 1 ? "" : "s"}`}
-            </span>
-          </span>,
-          "role",
-        ),
-      )}
-      {styles.map((st) =>
-        row(
-          st.id,
-          <span className={NAME}>{st.name}</span>,
-          <span className={SUB}>
-            {st.family ? `${st.family} · ` : ""}
-            {st.size}
-          </span>,
-          "style",
-        ),
-      )}
-    </ul>
+    <BrandCard label="Fonts and type styles" data-testid="brand-typography">
+      {rows.map((r) => (
+        <BrandRow
+          key={r.id}
+          data-testid={`brand-type-row-${r.id}`}
+          data-type-row="role"
+          selected={selectedTokenId === r.id}
+          onSelect={() => onSelectToken?.(r.id)}
+          trailing={<BrandChevron />}
+          name={r.title}
+          sub={
+            <>
+              {/* The family is set IN the face it names — you can see the font
+                  without leaving the page. */}
+              <span data-testid={`brand-font-family-${r.id}`} style={{ fontFamily: `${r.family}, sans-serif` }}>{r.family}</span>
+              {" · "}
+              <span data-testid={`brand-font-role-${r.id}`}>{r.role}</span>
+              {" · "}
+              <span data-font-weights>
+                {r.weights === 0 ? "not used yet" : `${r.weights} weight${r.weights === 1 ? "" : "s"}`}
+              </span>
+            </>
+          }
+        />
+      ))}
+      {styles.map((st) => (
+        <BrandRow
+          key={st.id}
+          data-testid={`brand-type-row-${st.id}`}
+          data-type-row="style"
+          selected={selectedTokenId === st.id}
+          onSelect={() => onSelectToken?.(st.id)}
+          trailing={<BrandChevron />}
+          name={st.name}
+          sub={`${st.family ? `${st.family} · ` : ""}${st.size}`}
+        />
+      ))}
+    </BrandCard>
   );
 };
 
