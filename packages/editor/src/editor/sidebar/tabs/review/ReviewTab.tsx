@@ -33,11 +33,12 @@
  */
 
 import * as React from "react";
-import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, MoreHorizontal, Link as LinkIcon } from "lucide-react";
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, MoreHorizontal } from "lucide-react";
 import {
   Button,
   CommentRow,
   EmptyState,
+  ConfirmDialog,
   Menu,
   MenuItem,
   PanelHeader,
@@ -100,11 +101,10 @@ const FOOT = "tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-3 tw:flex t
 const ROUND_STRIP =
   "tw:flex tw:items-center tw:justify-center tw:h-8 tw:bg-[var(--bk-bg-subtle)] " +
   "tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
-/** Both confirms (revoke, re-send) are inline panels on the boards, not modals. */
-const CONFIRM =
-  "tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-3 tw:bg-[var(--bk-warning-tint)] " +
-  "tw:border-b tw:border-[var(--bk-border)]";
 const COMPOSER = "tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:py-2.5 tw:flex tw:flex-col tw:gap-2";
+/* Board 4418:115784's "Locate ›": accent text, no chrome, 12/18. */
+const LOCATE =
+  "tw:h-auto tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent)] tw:hover:underline";
 const GHOST = "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
 /** "2d" / "3h" / "12m" — the boards' scale, which is shorter than relTime's. */
@@ -152,11 +152,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [replyError, setReplyError] = React.useState(false);
   const [confirmRevoke, setConfirmRevoke] = React.useState(false);
   const [confirmResend, setConfirmResend] = React.useState(false);
+  const [roundMenuOpen, setRoundMenuOpen] = React.useState(false);
   // Orphaned pins (element deleted) — announced by the canvas CommentLayer.
   const [detachedIds, setDetachedIds] = React.useState<ReadonlySet<string>>(new Set());
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
-  const [menuForId, setMenuForId] = React.useState<string | null>(null);
   /* The banner's walk (retired ReviewBar's "Next ›"): steps through the OPEN
      comments in server order, switching page and selecting each anchor via
      `locateComment` (C2, #39). */
@@ -309,9 +309,60 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     }
   };
 
+  /* Board 7071:79114 — the round's own actions live in a panel ⋯ menu
+     (G1-058/059). Only the rows this code can back are drawn: "Open current
+     review link" needs the token the dashboard does not send (needs
+     dashboard), and Compare / Round history have their own doors below. */
+  const roundMenu =
+    round && !round.revoked ? (
+      <Popover
+        open={roundMenuOpen}
+        onClose={() => setRoundMenuOpen(false)}
+        placement="bottom-end"
+        label="Review actions"
+        trigger={
+          <Button
+            color="light"
+            size="xs"
+            className={GHOST}
+            aria-label="Review actions"
+            aria-haspopup="menu"
+            aria-expanded={roundMenuOpen}
+            onClick={() => setRoundMenuOpen((v) => !v)}
+            data-testid="review-round-menu"
+          >
+            <MoreHorizontal size={14} aria-hidden="true" />
+          </Button>
+        }
+      >
+        <Menu label="Review actions">
+          {onResend ? (
+            <MenuItem
+              onClick={() => {
+                setRoundMenuOpen(false);
+                setConfirmResend(true);
+              }}
+            >
+              Re-send review link
+            </MenuItem>
+          ) : null}
+          <MenuItem
+            danger
+            onClick={() => {
+              setRoundMenuOpen(false);
+              setConfirmRevoke(true);
+            }}
+          >
+            {round.invitedEmail !== null ? "Revoke link" : "Withdraw request"}
+          </MenuItem>
+        </Menu>
+      </Popover>
+    ) : null;
+
   const header = (
     <PanelHeader
       title="Review"
+      actions={roundMenu}
       isExpanded={isExpanded}
       onExpandToggle={onExpandToggle}
       onHelpClick={onHelpClick}
@@ -348,49 +399,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       setNotice("Couldn't copy the link — copy it from the address bar.");
     }
   }, []);
-
-  /* Per-row ⋯ menu (board G1-031). Sits beside the row actions and opens
-     inline via chrome-ui Popover — no portal, no document.body appendChild
-     (Gate 22). Popover is controlled, so the parent owns `menuForId` and the
-     trigger toggles it. */
-  const rowMenu = (c: ReviewComment) => {
-    const open = menuForId === c.id;
-    return (
-      <Popover
-        open={open}
-        onClose={() => setMenuForId(null)}
-        placement="bottom-end"
-        trigger={
-          <Button
-            color="light"
-            size="xs"
-            className={GHOST}
-            aria-label="More actions"
-            aria-expanded={open}
-            aria-haspopup="menu"
-            onClick={() => setMenuForId((p) => (p === c.id ? null : c.id))}
-            data-row-menu-trigger
-          >
-            <MoreHorizontal size={14} aria-hidden="true" />
-          </Button>
-        }
-        label="Comment actions"
-      >
-        <Menu label="Comment actions">
-          <MenuItem
-            icon={<LinkIcon size={14} aria-hidden="true" />}
-            onClick={() => {
-              setMenuForId(null);
-              void copyLink(c);
-            }}
-            data-row-copy-link
-          >
-            Copy link
-          </MenuItem>
-        </Menu>
-      </Popover>
-    );
-  };
 
   /* Board 1138:4527: the loading state is the shape of the list to come, not a
      spinner in an empty panel. */
@@ -641,22 +649,31 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       detachedNote={extra?.detachedNote}
       data-comment-row
       data-comment-id={c.id}
+      /* Board 4418:115784: the trailing slot is Locate › alone (accent);
+         Resolve sits on its own line under the row. Copy link (B3) rides
+         beside it rather than a per-row ⋯ that squeezed the comment to a
+         few characters in the 280 drawer. */
       actions={
-        extra?.actions ?? (
+        extra?.actions ??
+        (c.targetSelector && c.status !== "RESOLVED" ? (
+          <Button color="light" size="xs" onClick={() => locate(c)} className={LOCATE} data-row-locate>
+            Locate ›
+          </Button>
+        ) : undefined)
+      }
+      footer={
+        extra?.actions ? undefined : (
           <>
-            {c.targetSelector && c.status !== "RESOLVED" ? (
-              <Button
-                color="light"
-                size="xs"
-                onClick={() => locate(c)}
-                className={GHOST}
-                data-row-locate
-              >
-                Locate ›
-              </Button>
-            ) : null}
-            {rowMenu(c)}
             {resolveButton(c)}
+            <Button
+              color="light"
+              size="xs"
+              onClick={() => void copyLink(c)}
+              className={GHOST}
+              data-row-copy-link
+            >
+              Copy link
+            </Button>
           </>
         )
       }
@@ -780,33 +797,29 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       {header}
       {roundBanner}
 
-      {/* Board 158:105: revoke asks at the top of the panel, in the panel. */}
-      {confirmRevoke && (
-        <div
-          className={CONFIRM}
-          role="alertdialog"
-          aria-label={hasClientLink ? "Revoke this review link?" : "Withdraw this review request?"}
-        >
-          <span className="tw:text-[12px] tw:text-[var(--bk-error-text)]">
-            {hasClientLink ? "Revoke this review link?" : "Withdraw this review request?"}
-          </span>
-          <span className={META}>
-            {hasClientLink
-              ? `${round.reviewerName ?? "The reviewer"} will lose access immediately. You can send a new link any time.`
-              : "The request stops waiting for a reply. You can send it again any time."}
-          </span>
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:pt-1">
-            <Button color="light" size="xs" className="tw:h-7" onClick={() => setConfirmRevoke(false)}>
-              Cancel
-            </Button>
-            {/* `red`, not `failure` — ConfirmDialog:49 is the precedent, and
-                flowbite's "failure" rendered a neutral grey button here. */}
-            <Button color="red" size="xs" className="tw:h-7 tw:bg-[var(--bk-error)] tw:hover:bg-[var(--bk-error-text)]" onClick={() => void onRevoke()}>
-              Revoke
-            </Button>
+      {/* Board 6879:67202 — revoke is a modal, opened from the ⋯ menu. */}
+      <ConfirmDialog
+        open={confirmRevoke}
+        onClose={() => setConfirmRevoke(false)}
+        onConfirm={() => void onRevoke()}
+        title={hasClientLink ? "Revoke this review link?" : "Withdraw this review request?"}
+        confirmLabel={hasClientLink ? "Revoke link" : "Withdraw request"}
+        testId="review-revoke-confirm"
+        message={
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <span>
+              {hasClientLink
+                ? `${round.reviewerName ?? "The reviewer"} will lose access immediately. Existing comments keep their current status. You can send a new link any time.`
+                : "The request stops waiting for a reply. Existing comments keep their current status. You can send it again any time."}
+            </span>
+            <span className={META}>
+              {hasClientLink ? "Current link" : "Current request"} · Round {round.roundNumber}
+              {round.reviewerName ? ` · ${round.reviewerName}` : ""}
+            </span>
+            <span className={META}>Revoking does not change the approval lock or any comment.</span>
           </div>
-        </div>
-      )}
+        }
+      />
 
       {progress}
 
@@ -993,7 +1006,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Reply to the client…"
+          placeholder="Add an internal note…"
           rows={2}
           maxLength={2000}
         />
@@ -1012,29 +1025,31 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {compareButton}
       </div>
 
-      {/* Board 158:2 — the confirm REPLACES the primary button rather than
-          sitting above it. Two live re-send affordances at once is how you get
-          a client's link invalidated by the wrong click. */}
-      {confirmResend ? (
-        <div className={CONFIRM} role="alertdialog" aria-label="Re-send anyway?">
-          <span className="tw:text-[14px] tw:text-[var(--bk-warning-text)]">
-            {openComments.length} comment{openComments.length === 1 ? " is" : "s are"} still open.
-            Re-send anyway?
-          </span>
-          <span className={META}>
-            {round.reviewerName ?? "The reviewer"} gets a NEW link. The old one stops working
-            immediately.
-          </span>
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:pt-1">
-            <Button color="light" size="sm" onClick={() => setConfirmResend(false)}>
-              Cancel
-            </Button>
-            <Button size="sm" onClick={() => void doResend()}>
-              Re-send
-            </Button>
+      {/* Board 4418:120052 — the re-send confirm is a modal (G1-058), from the
+          footer's primary and the ⋯ menu alike. */}
+      <ConfirmDialog
+        open={confirmResend}
+        onClose={() => setConfirmResend(false)}
+        onConfirm={() => void doResend()}
+        title={`Send a new review to ${round.reviewerName ?? "your reviewer"}?`}
+        confirmLabel="Send new review"
+        testId="review-resend-confirm"
+        message={
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <span>
+              Current draft snapshot. Existing comments keep their current statuses.
+              {hasClientLink
+                ? ` ${round.reviewerName ?? "Your reviewer"} receives a new link; the previous link stops working.`
+                : ""}
+              {openComments.length > 0
+                ? ` ${openComments.length} comment${openComments.length === 1 ? " is" : "s are"} still open.`
+                : ""}
+            </span>
+            <span className={META}>Round {round.roundNumber + 1}</span>
+            <span className={META}>Sending starts the next review round.</span>
           </div>
-        </div>
-      ) : (
+        }
+      />
         <div className="tw:px-3 tw:pb-3 tw:flex tw:flex-col tw:gap-2">
           <Button
             className="tw:w-full tw:justify-center"
@@ -1043,10 +1058,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             title={!onResend ? "Re-send isn't available here" : undefined}
             aria-busy={resending || undefined}
             onClick={() => {
-              /* Open comments earn the confirm; a clean round does not — the
-                 re-send invalidates the client's current link either way,
-                 which is what the confirm says out loud. */
-              if (openComments.length > 0 && !round.revoked) setConfirmResend(true);
+              /* A live round always asks (4418:121372 → 4418:120052): the
+                 re-send starts a new round and kills the client's current
+                 link, open comments or not. A revoked round has no link left
+                 to kill, so it sends. */
+              if (!round.revoked) setConfirmResend(true);
               else void doResend();
             }}
           >
@@ -1081,18 +1097,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               />
             </div>
           )}
-          {!round.revoked && (
-            <Button
-              color="light"
-              size="xs"
-              className={`${GHOST} tw:self-center`}
-              onClick={() => setConfirmRevoke(true)}
-            >
-              {hasClientLink ? "Revoke link" : "Withdraw request"}
-            </Button>
-          )}
         </div>
-      )}
     </div>
   );
 };
