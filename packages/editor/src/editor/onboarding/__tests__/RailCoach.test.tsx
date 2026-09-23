@@ -34,6 +34,19 @@ describe("RailCoach", () => {
     expect(screen.getByRole("button", { name: "Got it" })).toBeInTheDocument();
   });
 
+  /* QA (integration 5e0d47902): the coach mark was a --bk-ink bubble,
+     rgb(17,24,39) — DESIGN.md's NO BLACK RULE (decision #25) bans near-black
+     chrome surfaces. It takes the tooltip surface: white, hairline, ink-soft. */
+  it("uses the light tooltip surface, not an ink fill", () => {
+    mountRail();
+    render(<RailCoach onDismiss={() => {}} />);
+    const note = screen.getByTestId("rail-coach");
+    expect(note.className).not.toMatch(/bg-\[var\(--bk-ink\)\]/);
+    expect(note.className).toMatch(/tw:bg-white/);
+    expect(note.className).toMatch(/tw:border-\[var\(--bk-gray-200\)\]/);
+    expect(note.innerHTML).not.toMatch(/--bk-ink\)\]/);
+  });
+
   it("renders nothing when the rail is not in the DOM", () => {
     render(<RailCoach onDismiss={() => {}} />);
     expect(screen.queryByRole("note")).toBeNull();

@@ -63,30 +63,34 @@ export const RailCoach: React.FC<RailCoachProps> = ({ onDismiss }) => {
         role="note"
         aria-label="Rail introduction"
         data-testid="rail-coach"
-        /* Board 65:208 is a dark bubble at 240, radius 6, 12px padding — not a
-           light card. It sits over the canvas, and an elevated-surface card on an
-           elevated surface had nothing to separate it from what it points at. */
-        className="tw:fixed tw:z-[var(--bk-z-popover)] tw:flex tw:flex-col tw:gap-1.5 tw:w-60 tw:rounded-md tw:bg-[var(--bk-ink)] tw:p-3 tw:shadow-[var(--bk-shadow-overlay)]"
+        /* Board 65:208 draws a dark bubble at 240, radius 6, 12px padding. The
+           size and shape stay; the ink fill does not — DESIGN.md's NO BLACK
+           RULE (decision #25) bans near-black chrome surfaces, and the founder
+           settled board-vs-DESIGN.md for bubbles in DESIGN.md's favour on
+           2026-08-27 (chrome-ui/tooltipTheme.ts). Same surface as the tooltip:
+           white, gray-200 hairline, ink-soft text; the overlay shadow lifts it
+           off the canvas it sits over. */
+        className="tw:fixed tw:z-[var(--bk-z-popover)] tw:flex tw:flex-col tw:gap-1.5 tw:w-60 tw:rounded-md tw:border tw:border-[var(--bk-gray-200)] tw:bg-white tw:p-3 tw:shadow-[var(--bk-shadow-overlay)]"
         style={{ top: pos.top, left: pos.left }}
       >
         {/* Arrow toward the rail */}
         <div
           aria-hidden="true"
-          className="tw:absolute tw:top-4 tw:-left-[5px] tw:h-2.5 tw:w-2.5 tw:rotate-45 tw:bg-[var(--bk-ink)]"
+          className="tw:absolute tw:top-4 tw:-left-[6px] tw:h-2.5 tw:w-2.5 tw:rotate-45 tw:border-b tw:border-l tw:border-[var(--bk-gray-200)] tw:bg-white"
         />
-        <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-bg-card)]">
+        <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink-soft)]">
           Everything you build lives behind these six.
         </p>
         {/* The board draws one body line; this second one explains what the six
             actually are, which is the whole point of a coach mark. Kept. */}
-        <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-bg-card)]">
+        <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
           Insert sections, manage layers and pages, add media and content, and
           set your brand — all from this rail.
         </p>
         <Button
           size="xs"
           variant="link"
-          className="tw:h-auto tw:min-h-6 tw:self-start tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-bg-card)]"
+          className="tw:h-auto tw:min-h-6 tw:self-start tw:p-0 tw:text-[11px] tw:leading-4 tw:font-normal tw:text-[var(--bk-accent-text)]"
           onClick={dismiss}
           data-testid="rail-coach-got-it"
         >
