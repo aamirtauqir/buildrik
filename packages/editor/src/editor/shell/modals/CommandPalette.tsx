@@ -49,6 +49,8 @@ interface PaletteCommand {
 export interface CommandPaletteProps {
   onClose: () => void;
   composer: Composer | null;
+  /** A panel's "Search everywhere for …" hand-off (G2-059) opens on its query. */
+  initialQuery?: string;
 }
 
 // =============================================================================
@@ -313,8 +315,8 @@ const BAND_ORDER = ["Recent", "Pages", "Suggested", "Actions", "Go to"];
 /** Band name -> test-id suffix ("Go to" -> "go-to"). */
 const bandSlug = (band: string) => band.toLowerCase().replace(/\s+/g, "-");
 
-export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, composer }) => {
-  const [query, setQuery] = React.useState("");
+export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, composer, initialQuery = "" }) => {
+  const [query, setQuery] = React.useState(initialQuery);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);

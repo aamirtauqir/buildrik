@@ -21,6 +21,7 @@ import { getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { ConfirmDialog, useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
 
 /** "Heading, Subtitle and Menu previews" — board 6887:78291's sentence. */
@@ -451,6 +452,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <LayersNoResults
             search={state.search}
             onClear={() => (onSearchChange ? onSearchChange("") : setSearch(""))}
+            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
           />
         )}
 

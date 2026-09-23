@@ -613,3 +613,11 @@ describe("CommandPalette — registry commands say when they cannot run", () => 
     }
   });
 });
+
+/* C5 G2-059: a panel's "Search everywhere for …" opens the palette on its query. */
+describe("CommandPalette — initialQuery", () => {
+  it("starts with the handed query in the search box", () => {
+    render(<CommandPalette onClose={vi.fn()} composer={null} initialQuery="pages" />);
+    expect(screen.getByPlaceholderText("Type a command or search…")).toHaveValue("pages");
+  });
+});

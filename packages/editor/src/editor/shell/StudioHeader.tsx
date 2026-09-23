@@ -276,6 +276,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   const collabOn = isFeatureEnabled("collab");
 
   const [cmdOpen, setCmdOpen] = React.useState(false);
+  const [cmdQuery, setCmdQuery] = React.useState("");
   const [notifOpen, setNotifOpen] = React.useState(false);
   // T6 (read path): the bar MIRRORS comment-mode state — CommentLayer owns it
   // and broadcasts ui:comment-mode-changed on every change including its
@@ -317,6 +318,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         // the palette on top of it would stack two focus traps.
         if (isModalOpen()) return;
         e.preventDefault();
+        setCmdQuery("");
         setCmdOpen((v) => !v);
       }
     };
@@ -329,9 +331,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      emit UI_TOGGLE_COMMAND_PALETTE. Same guards as the chord above. */
   React.useEffect(() => {
     if (!composer) return;
-    const onToggle = () => {
+    const onToggle = (payload?: { query?: string }) => {
       if (viewMode.readOnlyView) return;
       if (isModalOpen()) return;
+      /* A "Search everywhere for …" hand-off (G2-059) opens on its query. */
+      if (payload?.query) {
+        setCmdQuery(payload.query);
+        setCmdOpen(true);
+        return;
+      }
+      setCmdQuery("");
       setCmdOpen((v) => !v);
     };
     composer.on(EVENTS.UI_TOGGLE_COMMAND_PALETTE, onToggle);
@@ -854,7 +863,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         </div>
       ) : null}
 
-      {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} /> : null}
+      {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} initialQuery={cmdQuery} /> : null}
 
       {/* F1 exit dialog — dialog A ("dirty": save is a real option) vs
           dialog B ("risky": offline/conflict, a save here would be a lie). */}
