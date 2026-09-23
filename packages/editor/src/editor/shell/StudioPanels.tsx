@@ -554,6 +554,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
         {/* Canvas Area — main editing surface */}
         <LayoutShell.Canvas>
+          {/* Board 4418:123573: the page tabs head the canvas column. */}
+          <PageTabBar composer={composer} />
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
@@ -581,9 +583,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               canRedo={canRedo}
             />
           </div>
-          {/* Board 435:2348: the tab bar sits at the canvas FOOT — the
-              context menu opens upward from it. */}
-          <PageTabBar composer={composer} readOnly={readOnlyView} />
         </LayoutShell.Canvas>
 
         {/* Right Inspector — element properties, or the AI drill-in that
