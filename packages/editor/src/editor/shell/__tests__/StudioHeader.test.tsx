@@ -178,12 +178,10 @@ describe("StudioHeader", () => {
       expect(screen.getByRole("button", { name: "Site menu" })).toBeTruthy();
     });
 
-    // The Figma component has nine children: exit, name, save, review, spacer,
-    // presence, notifications, publish, menu. The first build of this container
-    // pushed the deleted shell topbar's Preview / Comment / Colour-mode buttons
-    // back into it through an `extra` slot; that slot is gone and these assert
-    // it stays gone.
-    it.each(["Preview", "Comment mode", "Color mode", "Ask AI", "Collaborate"])(
+    // The shell topbar on board 4418:123573 draws Preview (a text button, from
+    // the tools cluster); the deleted shell topbar's Comment-mode / Colour-mode
+    // / Ask AI / Collaborate buttons stay gone.
+    it.each(["Comment mode", "Color mode", "Ask AI", "Collaborate"])(
       "does not carry %s — not in the design",
       (name) => {
         render(<StudioHeader {...makeProps()} />);
@@ -218,14 +216,18 @@ describe("StudioHeader", () => {
 
     /* C5 G1-004 (boards 4418:126034 / :90494 / :123573): "Site › Page" —
        the site crumb opens the Pages panel; the page crumb is where you are. */
-    it("the breadcrumb: site opens Pages, page is the current crumb", () => {
+    it("the breadcrumb: site opens Pages, page is the current crumb and closes the drawer", () => {
       const onOpenPages = vi.fn();
+      const onCloseDrawer = vi.fn();
       const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
-      render(<StudioHeader {...makeProps({ onOpenPages, composer: composer as never })} />);
+      render(<StudioHeader {...makeProps({ onOpenPages, onCloseDrawer, composer: composer as never })} />);
       expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
       expect(screen.getByTestId("topbar-crumb-page").getAttribute("aria-current")).toBe("page");
       fireEvent.click(screen.getByTestId("topbar-crumb-site"));
       expect(onOpenPages).toHaveBeenCalled();
+      expect(onCloseDrawer).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByTestId("topbar-crumb-page"));
+      expect(onCloseDrawer).toHaveBeenCalled();
     });
 
     /* B6 / G1-019: the activity log opens in the editor (History ·
@@ -621,7 +623,7 @@ describe("StudioHeader", () => {
         getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
       } as unknown as StudioHeaderProps["composer"];
       render(<StudioHeader {...makeProps({ ...menuProps, composer })} />);
-      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
+      fireEvent.click(screen.getByTestId("topbar-preview"));
       // F7-B2: the emit runs a tick later so the loading state can paint.
       await waitFor(() => expect(emit).toHaveBeenCalledWith("ui:toggle:preview", {}));
     });
@@ -1152,7 +1154,7 @@ describe("F7 perf pair", () => {
           {...makeProps({ composer: asComposer(composer), onSetPreviewLoading })}
         />,
       );
-      fireEvent.click(screen.getByRole("button", { name: "Quick preview" }));
+      fireEvent.click(screen.getByTestId("topbar-preview"));
       expect(onSetPreviewLoading).toHaveBeenCalledWith(true);
       expect(emitSpy).not.toHaveBeenCalledWith("ui:toggle:preview", {});
       act(() => {

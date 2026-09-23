@@ -106,6 +106,8 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
         trigger={
           <IconButton
             label="Site menu"
+            /* Board 4418:123573: the ⋯ is 28, not the 32 icon default. */
+            className="tw:h-7 tw:w-7"
             data-testid="site-menu-trigger"
             aria-haspopup="menu"
             aria-expanded={open}

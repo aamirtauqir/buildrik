@@ -94,6 +94,8 @@ export interface StudioHeaderProps {
   onOpenShortcuts?: () => void;
   /** The site crumb's door — the Pages panel (C5 G1-004). */
   onOpenPages?: () => void;
+  /** The page crumb — back to the base shell, drawer closed (4418:123573). */
+  onCloseDrawer?: () => void;
   /** History · Activity (B6) — the site menu's "Activity log" stays in the editor. */
   onOpenActivity?: () => void;
   /** F3 — the review pill is a door, not a label: opens the Review panel. */
@@ -222,6 +224,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenShortcuts,
   onOpenActivity,
   onOpenPages,
+  onCloseDrawer,
   onOpenReview,
   onOpenConflict,
   onSave,
@@ -729,6 +732,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         siteName={siteName}
         pageName={pageName}
         onOpenPages={viewMode.readOnlyView ? undefined : onOpenPages}
+        onPageCrumb={viewMode.readOnlyView ? undefined : onCloseDrawer}
+        /* Board 4418:123573's shell search is the ⌘K door. */
+        onOpenSearch={composer ? () => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, {}) : undefined}
         /* In view mode the leftmost control leaves the MODE. It used to
            leave the product — the loudest button on a preview took you to the
            dashboard, while returning to the editor was buried in ⋯. */

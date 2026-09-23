@@ -66,7 +66,8 @@ afterEach(cleanup);
 describe("the save pill's click, by state", () => {
   it("saved → History", () => {
     const p = mount({ lastSavedAt: Date.now() });
-    fireEvent.click(screen.getByRole("button", { name: /^Saved/ }));
+    /* Board 4418:123573: the settled pill reads "History ›". */
+    fireEvent.click(screen.getByRole("button", { name: /^History ›/ }));
     expect(p.onOpenHistory).toHaveBeenCalledTimes(1);
     expect(p.onSave).not.toHaveBeenCalled();
   });
