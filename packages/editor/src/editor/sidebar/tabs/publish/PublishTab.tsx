@@ -236,6 +236,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      site with a hydrated URL and nothing in flight, and `changeCount` is 0 on
      every load because HistoryManager empties the undo stack when a project
      opens. A job id is what says a publish actually ran in this session. */
+  const simulated = Boolean(publishedUrl?.includes(".dev-simulated.invalid"));
   const justPublished =
     publishJob?.jobId != null && publishJob.uiState === "published" && snapshot.changeCount === 0;
   const hasFailed = publishJob?.uiState === "failed" && !!error;
@@ -617,15 +618,34 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             to see it, and what changed against the version it replaced. */}
         {justPublished && (
           <section className={SECTION} aria-label="Publish result">
-            <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-success-text)]">
-              Published to production.
-            </h2>
-            <p className={META}>
-              {snapshot.lastDeploy ? `v${snapshot.lastDeploy.version} · live · ` : ""}
-              {snapshot.lastDeploy ? relativeShort(snapshot.lastDeploy.rawAt) : "just now"}
-            </p>
+            {/* Board 4418:99089 (C5 G1-048): a dev simulation says so. The
+                worker gives it a `.dev-simulated.invalid` URL, which is how
+                the panel knows — and why it offers no "View live site". */}
+            {simulated ? (
+              <>
+                <h2
+                  className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-success-text)]"
+                  data-testid="publish-simulated"
+                >
+                  Simulated publish — nothing was deployed.
+                </h2>
+                <p className={META}>
+                  PUBLISH_ALLOW_SIMULATION is on. The URL is on .dev-simulated.invalid and can never resolve.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-success-text)]">
+                  Published to production.
+                </h2>
+                <p className={META}>
+                  {snapshot.lastDeploy ? `v${snapshot.lastDeploy.version} · live · ` : ""}
+                  {snapshot.lastDeploy ? relativeShort(snapshot.lastDeploy.rawAt) : "just now"}
+                </p>
+              </>
+            )}
             <div className="tw:mt-1 tw:flex tw:items-center tw:gap-4">
-              {publishedUrl && (
+              {publishedUrl && !simulated && (
                 <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline">
                   View live site
                 </a>

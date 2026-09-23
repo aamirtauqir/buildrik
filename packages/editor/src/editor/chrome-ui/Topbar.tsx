@@ -96,6 +96,12 @@ export interface ReviewPill {
 
 export interface TopbarProps {
   siteName: string;
+  /** The page being edited — the crumb after the site (board 4418:123573:
+   *  "Bella Cucina › Home"). Omit for no page crumb. */
+  pageName?: string | null;
+  /** The site crumb's click — board 4418:126034's hotspot/crumb-site opens
+   *  the Pages panel (4418:90494). Omit and the site name is plain text. */
+  onOpenPages?: () => void;
   onExit?: () => void;
   /**
    * What the leftmost control says and does. In view mode it leaves the MODE,
@@ -147,6 +153,10 @@ export interface TopbarProps {
   menu?: React.ReactNode;
 }
 
+const CRUMB_CLASS =
+  "tw:h-auto tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
+  "tw:font-medium tw:text-[var(--bk-accent)] tw:hover:underline tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
 const PUBLISH_LABEL: Record<PublishState, string> = {
   ready: "Publish",
   disabled: "Publish",
@@ -156,7 +166,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
+  siteName, pageName, onOpenPages, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
   publishBlockedReason, ctaLabel, ctaHint, action, menu,
 }: TopbarProps) {
@@ -189,12 +199,42 @@ export function Topbar({
           200 column at 14/20. It shipped 13px in a 120..200 elastic box, so
           the site's own name read at the size of the controls around it and
           the whole bar re-laid itself when the name changed length. */}
+      {/* The breadcrumb (C5 G1-004): the site in accent opens the Pages
+          panel; the page is where you are, in ink, not a link. Same fixed
+          200 column the site name held. */}
       <span
-        className="tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)] tw:w-[200px] tw:shrink tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap"
-        title={siteName}
+        className="tw:flex tw:items-center tw:gap-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:w-[200px] tw:shrink tw:min-w-0 tw:whitespace-nowrap"
         data-testid="topbar-site-name"
       >
-        {siteName}
+        {onOpenPages ? (
+          <Button
+            color="light"
+            size="xs"
+            onClick={onOpenPages}
+            className={CRUMB_CLASS}
+            title={siteName}
+            data-testid="topbar-crumb-site"
+          >
+            {siteName}
+          </Button>
+        ) : (
+          <span className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]" title={siteName}>
+            {siteName}
+          </span>
+        )}
+        {pageName ? (
+          <>
+            <span aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]">›</span>
+            <span
+              aria-current="page"
+              className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]"
+              title={pageName}
+              data-testid="topbar-crumb-page"
+            >
+              {pageName}
+            </span>
+          </>
+        ) : null}
       </span>
 
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"

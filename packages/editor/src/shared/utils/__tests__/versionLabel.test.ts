@@ -25,6 +25,12 @@ describe("versionDisplayName", () => {
     expect(versionDisplayName({ name: "Auto: element:added", isAutoCheckpoint: true })).toBe("Auto-save");
   });
 
+  it("an auto-version that marks a moment shows its title (the template backup, #25)", () => {
+    expect(
+      versionDisplayName({ name: "Before template “Portfolio”", isAutoCheckpoint: true, title: "Before template “Portfolio”" }),
+    ).toBe("Before template “Portfolio”");
+  });
+
   it("leaves a name a person chose alone", () => {
     expect(versionDisplayName({ name: "before the rebrand", isAutoCheckpoint: false })).toBe("before the rebrand");
     expect(versionDisplayName({ name: "v2 launch", isAutoCheckpoint: false })).toBe("v2 launch");

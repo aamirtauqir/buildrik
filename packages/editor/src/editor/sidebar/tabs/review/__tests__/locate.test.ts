@@ -80,6 +80,23 @@ describe("locateComment", () => {
     vi.useRealTimers();
   });
 
+  /* QA 2026-09-24: under load the page took longer than the old 60 ms beat
+     to render, and the target stayed below the fold. */
+  it("waits for a slow page render before scrolling", () => {
+    vi.useFakeTimers();
+    const { composer } = makeComposer("page-9");
+    locateComment(composer, { pageId: "page-1", targetSelector: "el-1" });
+    vi.advanceTimersByTime(800); // the page has not rendered yet
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", "el-1");
+    node.scrollIntoView = vi.fn();
+    document.body.appendChild(node);
+    vi.advanceTimersByTime(100);
+    expect(node.scrollIntoView).toHaveBeenCalledWith({ block: "center" });
+    node.remove();
+    vi.useRealTimers();
+  });
+
   it("an unpinned comment moves the page and selects nothing", () => {
     const { composer, api } = makeComposer("page-9");
     const outcome = locateComment(composer, { pageId: "page-1", targetSelector: null });

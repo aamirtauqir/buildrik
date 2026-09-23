@@ -40,6 +40,9 @@ export interface CommentRowProps extends Omit<RowProps, "children" | "size"> {
   detachedNote?: string;
   /** Per-comment controls (Resolve, Reattach), in the row's trailing slot. */
   actions?: React.ReactNode;
+  /** Secondary controls on their own line under the meta — board
+   *  4418:115784 puts Resolve there, leaving the trailing slot to Locate ›. */
+  footer?: React.ReactNode;
   /**
    * Position in the rendered list. The row's body and meta carry
    * `review-comment-body-<index>` / `review-comment-meta-<index>` so a single
@@ -68,6 +71,7 @@ export function CommentRow({
   resolved,
   detachedNote,
   actions,
+  footer,
   index = 0,
   className,
   style,
@@ -134,6 +138,7 @@ export function CommentRow({
           {meta ? ` · ${meta}` : ""}
           {resolved ? " · resolved" : ""}
         </span>
+        {footer ? <span className="tw:flex tw:items-center tw:gap-3 tw:pt-1">{footer}</span> : null}
       </span>
       {actions ? (
         <span className="tw:flex tw:flex-none tw:items-center tw:gap-1">{actions}</span>

@@ -29,6 +29,9 @@
 export function versionDisplayName(version: {
   name: string;
   isAutoCheckpoint?: boolean;
+  title?: string;
 }): string {
-  return version.isAutoCheckpoint ? "Auto-save" : version.name;
+  /* An auto-version that marks a moment says which (`title`, e.g. the
+     template backup); a plain auto-save stays "Auto-save". */
+  return version.isAutoCheckpoint ? (version.title ?? "Auto-save") : version.name;
 }

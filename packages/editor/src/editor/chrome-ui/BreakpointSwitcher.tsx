@@ -23,6 +23,9 @@ export interface BreakpointSwitcherProps
   onChange: (next: Breakpoint) => void;
   /** When true, renders full breakpoint names instead of short glyphs. */
   labelled?: boolean;
+  /** Muted text after each labelled cell's name — the preview draws the
+   *  width it renders at ("Desktop 1320px", board 4418:165611). */
+  sublabels?: Partial<Record<Breakpoint, string>>;
   /** When true, prepends a "wide" (1920+) cell ahead of desktop/tablet/mobile. */
   includeWide?: boolean;
   /** Optional glyph map for a richer icon set (overrides default text glyphs). */
@@ -86,7 +89,7 @@ const BTN_BASE_CLASS =
 
 export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwitcherProps>(
   function BreakpointSwitcher(
-    { value, onChange, labelled = false, includeWide = false, glyphs, className, ...rest },
+    { value, onChange, labelled = false, sublabels, includeWide = false, glyphs, className, ...rest },
     ref,
   ) {
     const entries: ReadonlyArray<BreakpointEntry> = includeWide
@@ -117,6 +120,9 @@ export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwi
             onClick={() => onChange(bp.id)}
           >
             {labelled ? bp.label : (glyphs?.[bp.id] ?? bp.glyph)}
+            {labelled && sublabels?.[bp.id] ? (
+              <span className="tw:ml-1 tw:font-normal tw:opacity-70">{sublabels[bp.id]}</span>
+            ) : null}
           </button>
         ))}
       </div>
