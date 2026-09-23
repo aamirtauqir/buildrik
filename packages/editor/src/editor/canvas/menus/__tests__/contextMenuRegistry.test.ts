@@ -67,9 +67,9 @@ describe("getContextMenuActions — removed rows (C5 G2-052…056)", () => {
       "insert-before", "insert-after", "insert-inside-first", "insert-inside-last",
       "layout-flex-row", "layout-flex-column", "layout-grid", "layout-center", "layout-space-between",
       "style-padding", "style-margin", "style-border", "style-background", "style-shadow", "style-reset",
-      "reveal-in-layers", "select-parent",
+      "reveal-in-layers", "select-parent", "wrap-section",
     ]) expect(ids).not.toContain(gone);
-    expect(ids).toEqual(expect.arrayContaining(["wrap-section", "bring-to-front", "copy-styles", "paste-styles", "delete"]));
+    expect(ids).toEqual(expect.arrayContaining(["wrap-container", "bring-to-front", "copy-styles", "paste-styles", "delete"]));
   });
 });
 

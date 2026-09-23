@@ -11,6 +11,7 @@ import * as React from "react";
 import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "../../../engine";
 import type { Element } from "../../../engine/elements/Element";
+import { wrapInContainer } from "../utils/wrapInContainer";
 
 interface UseCanvasToolbarActionsParams {
   composer: Composer | null;
@@ -100,8 +101,8 @@ export function useCanvasToolbarActions({
   const handleToolbarWrap = React.useCallback(() => {
     if (!composer || !selectedId) return;
     const element = composer.elements.getElement(selectedId);
-    element?.wrap?.("container");
-  }, [composer, selectedId]);
+    if (element) wrapInContainer(composer, element, addToast);
+  }, [composer, selectedId, addToast]);
 
   const handleToolbarMoveUp = React.useCallback(() => {
     if (!composer) return;

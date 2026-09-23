@@ -1,5 +1,5 @@
 /**
- * Insert Submenu Actions — Wrap, Unwrap.
+ * Insert Submenu Actions — Wrap in container, Unwrap.
  * Insert before/after/inside were deleted (G2-052): each dropped a
  * "New element" placeholder container, and one of the four was a silent no-op;
  * inserting is the Add panel's job.
@@ -7,16 +7,17 @@
  */
 
 import type { ContextAction } from "../contextMenuRegistry";
+import { wrapInContainer } from "../../utils/wrapInContainer";
 
 export const insertSubmenu: ContextAction[] = [
   {
-    id: "wrap-section",
-    label: "Wrap in section",
+    id: "wrap-container",
+    label: "Wrap in container",
     icon: "box",
     group: "Insert",
-    isVisible: (ctx) => ctx.element.canBeWrapped(),
-    handler: ({ element }) => {
-      element.wrap("section");
+    isVisible: ({ isRoot }) => !isRoot,
+    handler: ({ composer, element, addToast }) => {
+      wrapInContainer(composer, element, addToast);
     },
   },
   {
