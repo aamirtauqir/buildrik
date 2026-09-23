@@ -114,6 +114,19 @@ describe("BrandWorkspace › ‹ Back to canvas with a draft (7317:80979)", () =
     expect(await utils.findByText("1 change discarded")).toBeTruthy();
   });
 
+  it("Escape that closes an open menu does not also leave the workspace", async () => {
+    const composer = makeFakeComposer();
+    const onClose = vi.fn();
+    const utils = await renderOnRadius(composer, { onClose });
+    fireEvent.click(utils.getByTestId("brand-token-menu"));
+    expect(document.querySelector('[role="menu"]')).toBeTruthy();
+    act(() => {
+      fireEvent.keyDown(document.body, { key: "Escape" });
+    });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("brand-discard")).toBeNull();
+  });
+
   it("Escape is the same door, guarded the same way", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();

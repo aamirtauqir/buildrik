@@ -36,7 +36,7 @@ describe("Clone 3737:46109 · Search settings", () => {
     expect(document.activeElement).toBe(screen.getByTestId("set-search-input"));
     expect(screen.getByLabelText("Search")).toBe(screen.getByTestId("set-search-input"));
     expect(rowTitles()).toHaveLength(SECTION_COUNT);
-    expect(rowTitles().slice(0, 3)).toEqual(["General", "Fonts & colours", "Localization"]);
+    expect(rowTitles().slice(0, 3)).toEqual(["General", "Brand", "Localization"]);
     expect(screen.getByTestId("set-search-count")).toHaveTextContent(`${SECTION_COUNT} sections`);
     /* Nothing to clear yet: no ✕ in the field, the foot's Clear search inert. */
     expect(screen.queryByTestId("set-search-clear-x")).toBeNull();

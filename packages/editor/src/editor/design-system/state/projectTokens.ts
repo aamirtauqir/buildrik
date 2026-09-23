@@ -33,6 +33,11 @@ export function mergeProjectTokens(
       : (incoming as DesignToken[]);
   return DEFAULT_TOKENS.map((def) => {
     const hit = saved.find((t) => (t.id ? t.id === def.id : t.name === def.name));
-    return hit ? { ...def, value: hit.value } : def;
+    /* The dark variant rides along. Only `value` was copied, so a dark value
+       saved through Brand's Apply reached projectSettings and was dropped
+       here on the next load — measured live 2026-09-24: #76A9FA saved, "—"
+       after reload. A saved row without one keeps the seed's. */
+    if (!hit) return def;
+    return hit.darkValue ? { ...def, value: hit.value, darkValue: hit.darkValue } : { ...def, value: hit.value };
   });
 }

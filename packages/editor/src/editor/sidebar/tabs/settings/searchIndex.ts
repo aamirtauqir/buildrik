@@ -95,7 +95,7 @@ const SECTIONS: SectionDef[] = [
       ["Snap to grid", "Canvas", "canvas-snap"],
     ],
   },
-  { screen: "branding", title: "Fonts & colours", description: "Site fonts and colour tokens", group: SITE_SETUP },
+  { screen: "branding", title: "Brand", description: "Colours, fonts, spacing and presets", group: SITE_SETUP },
   {
     screen: "localization",
     title: "Localization",

@@ -97,15 +97,15 @@ describe("BrandWorkspace › Import / export", () => {
     });
   });
 
-  /* Board 153:120 names Figma and greys it, with no Copy and no Download —
-     the board refusing to hand over a file it cannot make. */
-  it("names Figma Variables but offers no way to take it", async () => {
+  /* C5 G3-149: the greyed "Figma Variables JSON — Coming soon" row is gone
+     (4418:168885 omits it); the three live formats each keep a Download. */
+  it("offers three formats and no Figma row", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     openPage(utils, "export");
 
-    await waitFor(() => expect(utils.container.textContent).toMatch(/Figma Variables JSON/));
-    expect(utils.container.textContent).toMatch(/Coming soon/);
+    await waitFor(() => expect(utils.getByTestId("format-row-css")).toBeTruthy());
+    expect(utils.container.textContent).not.toMatch(/Figma Variables JSON|Coming soon/);
     expect(utils.container.querySelector('[data-download-format="figma"]')).toBeNull();
     for (const id of ["css", "json", "tailwind"]) {
       expect(utils.container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();

@@ -33,6 +33,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
+import { getDefaultStyles } from "../../../../shared/constants/defaultStyles";
 import { DEFAULT_TOKENS } from "../../constants";
 import type { DesignToken } from "../../types";
 import { BrandCard, BrandChevron, BrandRow } from "../BrandCard";
@@ -56,16 +57,34 @@ const FONT_SLOTS: Array<{ id: string; title: string; role: string }> = [
    them, largest first (7316:81551 lists "Heading XL" above "Body text"). The
    family is the one the site's CSS gives that role: headings take the display
    face, the rest the body face — the same split `slotForType` makes. */
-const STYLE_NAMES: Record<string, { name: string; slot: "font-heading" | "font-body" }> = {
-  "font-size-4xl": { name: "Heading 1", slot: "font-heading" },
-  "font-size-3xl": { name: "Heading 2", slot: "font-heading" },
-  "font-size-2xl": { name: "Heading 3", slot: "font-heading" },
-  "font-size-xl": { name: "Sub-heading", slot: "font-body" },
-  "font-size-lg": { name: "Body large", slot: "font-body" },
-  "font-size-base": { name: "Body text", slot: "font-body" },
-  "font-size-sm": { name: "Caption", slot: "font-body" },
-  "font-size-xs": { name: "Caption XS", slot: "font-body" },
+const STYLE_NAMES: Record<string, { name: string; slot: "font-heading" | "font-body"; element: string }> = {
+  "font-size-4xl": { name: "Heading 1", slot: "font-heading", element: "h1" },
+  "font-size-3xl": { name: "Heading 2", slot: "font-heading", element: "h2" },
+  "font-size-2xl": { name: "Heading 3", slot: "font-heading", element: "h3" },
+  "font-size-xl": { name: "Sub-heading", slot: "font-body", element: "h5" },
+  "font-size-lg": { name: "Body large", slot: "font-body", element: "paragraph" },
+  "font-size-base": { name: "Body text", slot: "font-body", element: "paragraph" },
+  "font-size-sm": { name: "Caption", slot: "font-body", element: "text" },
+  "font-size-xs": { name: "Caption XS", slot: "font-body", element: "text" },
 };
+
+const WEIGHT_NAMES: Record<string, string> = {
+  "300": "Light", "400": "Regular", "500": "Medium", "600": "Semi Bold", "700": "Bold", "800": "Extra Bold",
+};
+
+/**
+ * "<Family> <Weight> <size>/<line>" — 7316:81551's type-style line. The size
+ * is the token's; the weight and line-height are what the canvas gives the
+ * element that role names (DEFAULT_ELEMENT_STYLES), the line rounded to px.
+ */
+export function typeStyleLine(family: string, size: string, element: string): string {
+  const d = getDefaultStyles(element);
+  const px = parseFloat(size);
+  const weight = WEIGHT_NAMES[d["font-weight"] ?? "400"] ?? d["font-weight"];
+  const lh = parseFloat(d["line-height"] ?? "");
+  const line = Number.isFinite(px) && Number.isFinite(lh) ? `${Math.round(px)}/${Math.round(px * lh)}` : size;
+  return [family, weight, line].filter(Boolean).join(" ");
+}
 
 /** "N roles · M active fonts" — the page header's caption. */
 export function fontsCaption(tokens: readonly DesignToken[]): string {
@@ -183,7 +202,11 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       .map((t) => {
         const known = STYLE_NAMES[t.id];
         const family = familyOf(String(source.find((f) => f.id === (known?.slot ?? "font-body"))?.value ?? ""));
-        return { id: t.id, name: known?.name ?? t.friendlyName ?? t.name, family, size: t.value };
+        return {
+          id: t.id,
+          name: known?.name ?? t.friendlyName ?? t.name,
+          line: typeStyleLine(family, t.value, known?.element ?? "text"),
+        };
       });
   }, [source]);
 
@@ -230,7 +253,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
           onSelect={() => onSelectToken?.(st.id)}
           trailing={<BrandChevron />}
           name={st.name}
-          sub={`${st.family ? `${st.family} · ` : ""}${st.size}`}
+          sub={st.line}
         />
       ))}
     </BrandCard>

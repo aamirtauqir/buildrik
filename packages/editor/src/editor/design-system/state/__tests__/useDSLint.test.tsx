@@ -66,3 +66,22 @@ describe("useDSLint — publishing to the engine store", () => {
     expect(lintState.getIssues("color-9")).toHaveLength(0);
   });
 });
+
+describe("useDSLint — Run checks (7316:84555)", () => {
+  it("brand:checks-run lints now, without waiting for the edit debounce", () => {
+    const lintState = new LintState();
+    const handlers: Record<string, () => void> = {};
+    const composer = {
+      ...makeComposer(lintState),
+      on: vi.fn((e: string, h: () => void) => { handlers[e] = h; }),
+      off: vi.fn(),
+    } as unknown as Composer;
+    renderHook(() => useDSLint(composer), { wrapper });
+    act(() => void vi.advanceTimersByTime(600));
+    const lint = (composer as unknown as { dsLinter: { lint: ReturnType<typeof vi.fn> } }).dsLinter.lint;
+    const before = lint.mock.calls.length;
+    act(() => handlers["brand:checks-run"]());
+    act(() => void vi.advanceTimersByTime(1));
+    expect(lint.mock.calls.length).toBe(before + 1);
+  });
+});
