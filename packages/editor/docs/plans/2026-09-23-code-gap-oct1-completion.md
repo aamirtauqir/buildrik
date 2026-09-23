@@ -257,3 +257,15 @@ Pull the 209 rows from spec §16 / `docs/audit-2026-09-21/03-gap-matrix.md` (Tie
 
 1. **Lane B reconcile rule** above (lane wins where both built; B's B1/B3/B6/B8 cherry-picked). Default is as written.
 2. **C5 carryover accepted in the `/goal`?** Default yes, because 209 live-verified rows in 6 days is not realistic alongside the named items. The alternative is "all 209 done", which will likely miss Oct 1.
+
+## Remaining work — after Oct 1 (owner-approved carryovers)
+
+Items deliberately NOT in the Oct 1 scope. Each has an owner decision or a named dependency. `/ship`'s PR body links this list.
+
+| # | Item | Why deferred | Found by | Next step |
+|---|---|---|---|---|
+| R1 | **Canvas elements store a hex, not the brand token.** A Button inserted from Add gets `background-color: #1A56DB` written in directly, so Brand colour edits and the Light/Dark switch never repaint canvas content. Only the Brand preview (`--color-action`) follows the token. | Owner 2026-09-24: option (b), defer. It is an engine/insert change (element defaults → `var(--token)` references plus a migration for existing elements) and too risky before Oct 1. | L4 C1 (ii) final pass | Own plan after Oct 1: `engine/` element defaults + `defaultStyles.ts` → token refs; decide how existing hex values on published sites migrate (auto-bind known brand hexes vs leave them) |
+| R2 | `activity.recent` tRPC procedure (B6 Activity tab has only the editor half) | Needs a dashboard change; the dashboard is out of scope (spec §Non-goals) | L1 B6 | Dashboard procedure. Until it exists the tab shows its "not in the editor yet" state |
+| R3 | Published-snapshot procedure (B8: compare a published version with the draft) | Published HTML never leaves the server | L1 B8 | Dashboard procedure |
+| R4 | Review token in `currentRound` (B3: a real client-link Copy) | Needs the dashboard | L1 B3 | Dashboard returns the token |
+| R5 | CMS Records as a table workspace + side sheet (`4428:143182`) instead of a modal | Full CMS workspace is Tier 3 scope | L3 B13 / owner "Figma wins" | Own item after Oct 1, unless L3 lands it as a small change |
