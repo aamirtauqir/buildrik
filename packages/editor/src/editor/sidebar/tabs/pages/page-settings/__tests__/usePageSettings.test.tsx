@@ -205,19 +205,22 @@ describe("usePageSettings save", () => {
     expect(lastToast()).toMatchObject({ tone: "warning" });
   });
 
-  it("sets saveState=error and offers Retry when updatePage rejects", async () => {
+  /* #20: Done is the retry — the failure toast carries no Retry action. */
+  it("sets saveState=error, resolves false and offers no Retry when updatePage rejects", async () => {
     const composer = createMockComposer({});
     (composer.elements.updatePage as unknown as Mock).mockRejectedValueOnce(new Error("boom"));
     const { result } = setup(composer, page());
 
+    let ok: boolean | undefined;
     await act(async () => {
-      await result.current.save();
+      ok = await result.current.save();
     });
 
     await waitFor(() => expect(result.current.saveState).toBe("error"));
+    expect(ok).toBe(false);
     const toast = lastToast();
     expect(toast).toMatchObject({ tone: "error" });
-    expect(toast?.action?.label).toBe("Retry");
+    expect(toast?.action).toBeUndefined();
   });
 });
 

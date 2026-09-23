@@ -67,9 +67,6 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     discard: vi.fn(),
     showDiscardConfirm: false,
     setShowDiscardConfirm: vi.fn(),
-    pendingTabChange: null,
-    confirmTabChange: vi.fn(),
-    cancelTabChange: vi.fn(),
     ...over,
   };
 }

@@ -62,14 +62,12 @@ export interface UsePageSettingsReturn {
 
   saveState: SaveState;
   isDirty: boolean;
-  save: () => Promise<void>;
+  /** Resolves true once the page is written; false when blocked or failed. */
+  save: () => Promise<boolean>;
   discard: () => void;
 
   showDiscardConfirm: boolean;
   setShowDiscardConfirm: (v: boolean) => void;
-  pendingTabChange: DrawerTab | null;
-  confirmTabChange: () => void;
-  cancelTabChange: () => void;
 }
 
 function validateHeadCode(code: string): string | null {
@@ -123,8 +121,9 @@ export function usePageSettings(
   allPages: PageItem[]
 ): UsePageSettingsReturn {
   const { addToast } = useToast();
-  const [activeTab, _setActiveTab] = React.useState<DrawerTab>("seo");
-  const [pendingTabChange, setPendingTabChange] = React.useState<DrawerTab | null>(null);
+  /* Decision #20: the three tabs are one form saved on Done, so a tab switch
+     keeps every edit — it is no longer guarded. */
+  const [activeTab, setActiveTab] = React.useState<DrawerTab>("seo");
   const [showDiscardConfirm, setShowDiscardConfirm] = React.useState(false);
 
   const [seoTitle, setSeoTitle] = React.useState("");
@@ -219,45 +218,21 @@ export function usePageSettings(
     [page?.id, allPages]
   );
 
-  const setActiveTab = React.useCallback(
-    (tab: DrawerTab) => {
-      if (isDirty || saveState === "error") {
-        setPendingTabChange(tab);
-        setShowDiscardConfirm(true);
-        return;
-      }
-      _setActiveTab(tab);
-    },
-    [isDirty, saveState]
-  );
-
-  const confirmTabChange = React.useCallback(() => {
-    if (pendingTabChange) _setActiveTab(pendingTabChange);
-    setPendingTabChange(null);
-    setShowDiscardConfirm(false);
-    setSaveState("clean");
-  }, [pendingTabChange]);
-
-  const cancelTabChange = React.useCallback(() => {
-    setPendingTabChange(null);
-    setShowDiscardConfirm(false);
-  }, []);
-
-  const save = React.useCallback(async () => {
-    if (!composer || !page) return;
+  const save = React.useCallback(async (): Promise<boolean> => {
+    if (!composer || !page) return false;
     if (slugError) {
       addToast({ description: "Fix slug error before saving", tone: "warning" });
-      return;
+      return false;
     }
     const codeErr = validateHeadCode(customHead);
     if (codeErr) {
       setHeadCodeError(codeErr);
       addToast({ description: codeErr, tone: "warning" });
-      return;
+      return false;
     }
     if (visibility === "password" && !password.trim()) {
       addToast({ description: "Set an access password before saving", tone: "warning" });
-      return;
+      return false;
     }
     setSaveState("saving");
     try {
@@ -297,14 +272,12 @@ export function usePageSettings(
         customHead,
       });
       addToast({ description: "Page settings saved", tone: "success" });
+      return true;
     } catch {
+      /* The dialog stays open with the edits; Done is the retry (#20). */
       setSaveState("error");
-      addToast({
-        description: "Save failed — your changes are still here.",
-        tone: "error",
-        duration: 0,
-        action: { label: "Retry", onClick: () => save() },
-      });
+      addToast({ description: "Save failed — your changes are still here.", tone: "error" });
+      return false;
     }
   }, [
     composer,
@@ -400,8 +373,5 @@ export function usePageSettings(
     discard,
     showDiscardConfirm,
     setShowDiscardConfirm,
-    pendingTabChange,
-    confirmTabChange,
-    cancelTabChange,
   };
 }
