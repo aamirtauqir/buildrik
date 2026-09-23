@@ -17,6 +17,13 @@
 import * as React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.mock("@/services/api-client", () => ({
+  getBuildrikClient: () => ({
+    siteDetail: { sharing: { list: { query: () => new Promise(() => {}) }, create: { mutate: vi.fn() } } },
+  }),
+}));
+
+import { ToastProvider } from "@/editor/chrome-ui";
 import { SiteMenu } from "../SiteMenu";
 
 afterEach(cleanup);
@@ -102,25 +109,24 @@ describe("SiteMenu — the Review panel's door", () => {
 });
 
 /*
-  Board 642:3401 lists "Share preview link" in the site menu. The flow exists —
-  the dashboard's ShareDraftModal, on `siteDetail.sharing.create`, which mints a
-  private link to the current DRAFT — and the editor had no way to reach it. A
-  live URL is a different thing: it only exists after a publish, and it is
-  public.
+  Board 642:3401 lists "Share preview link" in the site menu. B1 (G1-022,
+  board 4418:126034 → 4418:165739): the row opens the in-editor share modal —
+  link · Open ↗ · Copy link — instead of handing off to the dashboard.
 */
 describe("SiteMenu — board 642:3401's share preview link", () => {
-  it("hands off to the dashboard's share flow for this site", () => {
+  it("opens the in-editor share modal, not the dashboard", async () => {
     const open = vi.fn();
     vi.stubGlobal("open", open);
-    render(<SiteMenu siteId="site_42" />);
+    render(
+      <ToastProvider>
+        <SiteMenu siteId="site_42" />
+      </ToastProvider>,
+    );
     openMenu();
 
     fireEvent.click(screen.getByRole("menuitem", { name: "Share preview link" }));
-    expect(open).toHaveBeenCalledWith(
-      expect.stringContaining("/dashboard/sites/site_42?share=1"),
-      "_blank",
-      "noopener,noreferrer",
-    );
+    expect(await screen.findByTestId("preview-share-modal")).toHaveTextContent("Share preview");
+    expect(open).not.toHaveBeenCalled();
     vi.unstubAllGlobals();
   });
 

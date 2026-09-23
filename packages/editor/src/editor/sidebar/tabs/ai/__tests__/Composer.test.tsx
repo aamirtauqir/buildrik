@@ -33,7 +33,7 @@ describe("Composer", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it("send button disabled when text is empty", () => {
+  it("Plan changes is disabled when text is empty", () => {
     render(
       <Composer
         onSubmit={vi.fn()}
@@ -41,7 +41,7 @@ describe("Composer", () => {
         streaming={false}
       />,
     );
-    const sendBtn = screen.getByLabelText(/send/i) as HTMLButtonElement;
+    const sendBtn = screen.getByLabelText("Plan changes") as HTMLButtonElement;
     expect(sendBtn.disabled).toBe(true);
   });
 

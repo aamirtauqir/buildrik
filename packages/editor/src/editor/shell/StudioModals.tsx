@@ -19,6 +19,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
+import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
 
 // ============================================================================
 // TYPES
@@ -172,6 +173,9 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         html={composer?.exportHTML().combined}
         onSave={onSaveTemplate}
       />
+
+      {/* New page (decision #19) — opens on UI_NEW_PAGE_REQUESTED from any Add-page door. */}
+      <NewPageModal composer={composer} />
 
       {/* Export Modal */}
       <ExportModal isOpen={showExporter} onClose={onCloseExporter} composer={composer} />

@@ -21,17 +21,6 @@ export interface DiffEdit {
   state: "pending" | "applied" | "rejected" | "invalid";
 }
 
-export interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  text: string;
-  streaming?: boolean;
-  stopped?: boolean;
-  edit?: DiffEdit;
-  error?: string;
-  createdAt: number;
-}
-
 export type DrillInScreen = "a11y" | "layout" | "color" | null;
 
 export interface QuickAction {

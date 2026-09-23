@@ -89,3 +89,20 @@ describe("IssuesPanel", () => {
     });
   });
 });
+
+/* QA (integration 5e0d47902): the lint's long messages ("Color token
+   "color-primary" missing darkValue. Will fall back…") wrapped to three lines
+   inside the fixed 56-tall row (board 164:28), pushing the location line
+   11 px past the row into the next one. One line each, the full text kept in
+   the DOM and in the title. */
+describe("IssuesPanel — a long message stays inside its 56 row", () => {
+  it("message and location are single truncated lines, with the full message as the title", () => {
+    const long = 'Color token "color-primary" missing darkValue. Will fall back to the light value in dark mode.';
+    renderPanel({ issues: [{ id: "l1", type: "warning" as const, message: long, location: "Brand › color-primary" }] });
+    const msg = screen.getByTestId("issue-message-0");
+    expect(msg.textContent).toBe(long);
+    expect(msg.className).toMatch(/tw:truncate/);
+    expect(msg.getAttribute("title")).toBe(long);
+    expect(screen.getByTestId("issue-location-0").className).toMatch(/tw:truncate/);
+  });
+});

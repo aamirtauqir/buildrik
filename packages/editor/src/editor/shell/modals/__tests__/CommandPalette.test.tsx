@@ -49,6 +49,15 @@ describe("CommandPalette", () => {
     delete (document as unknown as Record<string, unknown>).execCommand;
   });
 
+  // ── C3: the Issues panel's ⌘K door ───────────────────────────────────────
+  it("Show issues opens the Issues panel (the topbar chip is gone — C3)", () => {
+    const { composer, onClose } = renderPalette();
+    fireEvent.change(searchInput(), { target: { value: "issues" } });
+    fireEvent.click(screen.getByText("Show issues"));
+    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_OPEN_ISSUES, undefined);
+    expect(onClose).toHaveBeenCalled();
+  });
+
   // ── the command list ─────────────────────────────────────────────────────
   describe("command list", () => {
     /* The §2-B8 pin here said "registry bypass — commands hardcoded, not from a
@@ -73,10 +82,12 @@ describe("CommandPalette", () => {
        registry's `delete` and, like it, removed exactly one element.
        21 -> 23 with the v3 IA doors ("Replace page layout with template…",
        "Keyboard shortcuts") — this pin sat red on main from then until the
-       B7 merge (2026-09-22). The Insert tab is labelled "Add" now. */
-    it("with a composer: exactly 23 hardcoded commands, banded the way the boards band them", () => {
+       B7 merge (2026-09-22). The Insert tab is labelled "Add" now.
+       23 -> 24 with "Show issues" (C3): the topbar Issues chip is gone and
+       ⌘K is one of the panel's doors. */
+    it("with a composer: exactly 24 hardcoded commands, banded the way the boards band them", () => {
       renderPalette();
-      expect(commandButtons()).toHaveLength(23);
+      expect(commandButtons()).toHaveLength(24);
       expect(screen.getByText("Suggested")).toBeInTheDocument();
       for (const internal of ["Navigation", "Edit", "View", "History"]) {
         expect(screen.queryByText(internal)).toBeNull();
@@ -149,7 +160,7 @@ describe("CommandPalette", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       fireEvent.change(searchInput(), { target: { value: "" } });
-      expect(commandButtons()).toHaveLength(23);
+      expect(commandButtons()).toHaveLength(24);
     });
   });
 

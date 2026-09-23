@@ -408,18 +408,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     pendingTab: GroupedTabId | null;
   }>({ open: false, pendingTab: null });
 
-  /* Pages › "From template" opens Templates in NEW-PAGE mode. A prop, not an
-     event: the old UI_TEMPLATES_NEWPAGE_ON emit could never be heard —
-     TabRouter mounts one tab at a time, so TemplatesTab's listener did not
-     exist yet when the emit fired from the Pages tab, and the panel always
-     opened in gallery mode, whose apply REPLACES the current page. Found
-     live 2026-08-28 the first time the door was actually walked. Reset when
-     the visit leaves Templates — new-page mode belongs to the visit that
-     asked for it. */
-  const [templatesNewPage, setTemplatesNewPage] = React.useState(false);
-  React.useEffect(() => {
-    if (activeTab !== "templates") setTemplatesNewPage(false);
-  }, [activeTab]);
 
   /* Site menu › Unpublish, same trap as the one above and caught the same way
      — live, on the first cold click. StudioHeader opens the Publish panel and
@@ -595,34 +583,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   React.useEffect(() => {
     if (activeTab !== "assets") setMediaPanelOverride(null);
   }, [activeTab]);
-  // prototype-v3 §2 — templates tab supports runtime width override
-  // (320 ↔ 700) via ui:templates-panel-width composer event when detail
-  // card opens. Other tabs ignore the event.
-  const [templatesPanelOverride, setTemplatesPanelOverride] = React.useState<number | null>(null);
-  React.useEffect(() => {
-    if (!composer) return;
-    const handler = (payload: unknown) => {
-      const p = payload as { width?: number | null };
-      setTemplatesPanelOverride(typeof p?.width === "number" ? p.width : null);
-    };
-    composer.on("ui:templates-panel-width", handler);
-    return () => {
-      composer.off("ui:templates-panel-width", handler);
-    };
-  }, [composer]);
-  // Reset override when leaving templates tab.
-  React.useEffect(() => {
-    if (activeTab !== "templates") setTemplatesPanelOverride(null);
-  }, [activeTab]);
-  // Header expand (board 16:6) widens ANY drawer to 700; the media/templates
-  // runtime overrides keep winning on their tabs — they carry flow-specific
-  // widths (560 detail, 700 gallery) the generic toggle must not fight.
+  // Header expand (board 16:6) widens ANY drawer to 700; the media runtime
+  // override keeps winning on its tab — it carries a flow-specific width
+  // (560 detail) the generic toggle must not fight.
   // `null` means "no flow width" — the default comes from `--bk-size-drawer`
   // in LeftSidebar.css, so the generated token is the single source.
   const panelWidthOverride = activeTab === "assets" && mediaPanelOverride !== null
     ? mediaPanelOverride
-    : activeTab === "templates" && templatesPanelOverride !== null
-    ? templatesPanelOverride
     : isExpanded
     ? 700
     : null;
@@ -725,12 +692,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToAdd={() => safeTabChange("add")}
-                  onSwitchToTemplates={() => {
-                    /* Boards 807:7252 and 1169:4725 — the new-page flow. */
-                    setTemplatesNewPage(true);
-                    safeTabChange("templates");
-                  }}
-                  templatesNewPageMode={templatesNewPage}
+                  onSwitchToTemplates={() => safeTabChange("templates")}
                   unpublishIntent={unpublishIntent}
                   onUnpublishIntentConsumed={consumeUnpublishIntent}
                   onCreateComponent={handleCreateComponent}
@@ -738,7 +700,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   publishJob={publishJob}
                   nextMove={nextMove}
                   onRequestPublish={onRequestPublish}
-                  onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}
                   onOpenIconPicker={onOpenIconPicker}

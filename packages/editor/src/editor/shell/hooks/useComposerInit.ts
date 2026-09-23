@@ -52,7 +52,6 @@ export interface UseComposerInitParams {
   setDevice: (d: DeviceType) => void;
   setZoom: (z: number) => void;
   setShowExporter: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowComponentView: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDirty: (dirty: boolean) => void;
   /* Was this shape spelled out inline — a fourth copy of SaveState, and an
      anonymous one, so no duplicate-name scan could see it. Widening the union
@@ -82,7 +81,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setDevice,
     setZoom,
     setShowExporter,
-    setShowComponentView,
     setIsDirty,
     setSaveState,
     openCollectionSetup,
@@ -427,7 +425,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens
     // for ui:switch-tab) instead of the removed AIAssistant modal.
     const toggleAIHandler = () => instance.emit("ui:switch-tab", { tab: "ai" });
-    const toggleComponentViewHandler = () => setShowComponentView((v) => !v);
     const deviceChangedHandler = (d: DeviceType) => setDevice(d);
     const zoomChangedHandler = (z: number) => setZoom(z);
 
@@ -438,7 +435,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("ui:toggle:templates", toggleTemplatesHandler);
     instance.on("ui:toggle:exporter", toggleExporterHandler);
     instance.on("ui:toggle:ai", toggleAIHandler);
-    instance.on("ui:toggle:component-view", toggleComponentViewHandler);
     /* The engine names these BREAKPOINT_CHANGED and VIEWPORT_ZOOM (Viewport.ts
        :70,:87). Listening for "device:changed" / "zoom:changed" meant nothing
        the engine did to zoom ever reached React — and the canvas transform is
@@ -463,7 +459,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("ui:toggle:templates", toggleTemplatesHandler);
       instance.off("ui:toggle:exporter", toggleExporterHandler);
       instance.off("ui:toggle:ai", toggleAIHandler);
-      instance.off("ui:toggle:component-view", toggleComponentViewHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
       instance.off(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
       instance.destroy();

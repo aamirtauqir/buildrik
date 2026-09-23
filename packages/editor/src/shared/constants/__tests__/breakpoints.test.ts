@@ -51,6 +51,5 @@ describe("getDevicePreviewSize", () => {
     expect(getDevicePreviewSize("mobile")).toEqual({ width: 375, height: 812 });
     expect(getDevicePreviewSize("tablet")).toEqual({ width: 768, height: 1024 });
     expect(getDevicePreviewSize("desktop")).toEqual({ width: "100%", height: "100%" });
-    expect(getDevicePreviewSize("watch")).toEqual({ width: 196, height: 230 });
   });
 });

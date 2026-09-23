@@ -71,7 +71,6 @@ export interface StudioPanelsProps {
   showGuides?: boolean;
   showGrid?: boolean;
   showRulers?: boolean;
-  showComponentView?: boolean;
   showXRay?: boolean;
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
   devMode?: boolean;
@@ -173,7 +172,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   showGuides = true,
   showGrid = false,
   showRulers = false,
-  showComponentView = false,
   showXRay = false,
   devMode = false,
   onOverlayChange,
@@ -543,7 +541,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGuides={showGuides}
               showGrid={showGrid}
               showRulers={showRulers}
-              showComponentView={showComponentView}
               showXRay={showXRay}
               devMode={devMode}
               onAIRequest={onAIRequest}
@@ -600,6 +597,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onClose={handleFullPageClose}
             onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
             onSwitchToDesign={() => onLeftPanelTabChange?.("design")}
+            /* Templates' "Open page settings" after Create page. */
+            onTemplatesSwitchTab={(tab) => onLeftPanelTabChange?.(tab)}
             /* The deep-link sub-tab reached the DRAWER and stopped there. Every
                fullpage tab — Settings above all — got nothing, so the site
                menu's "Plugins" landed on the Settings root and looked like a

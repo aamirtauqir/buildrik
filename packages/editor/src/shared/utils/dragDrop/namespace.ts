@@ -19,7 +19,6 @@ import * as keyboardSupport from "./keyboardSupport";
 import * as positioning from "./positioning";
 import * as session from "./session";
 import * as sortable from "./sortable";
-import * as touchSupport from "./touchSupport";
 
 export const dragDropHelpers = {
   // Utilities
@@ -86,13 +85,6 @@ export const dragDropHelpers = {
   // Auto-scroll
   startAutoScroll: autoScroll.startAutoScroll,
   stopAutoScroll: autoScroll.stopAutoScroll,
-
-  // Touch support
-  createTouchDragState: touchSupport.createTouchDragState,
-  hasTouchMoved: touchSupport.hasTouchMoved,
-  startLongPressDetection: touchSupport.startLongPressDetection,
-  cancelLongPressDetection: touchSupport.cancelLongPressDetection,
-  preventTouchDefaults: touchSupport.preventTouchDefaults,
 
   // Keyboard support
   handleKeyboardDrag: keyboardSupport.handleKeyboardDrag,

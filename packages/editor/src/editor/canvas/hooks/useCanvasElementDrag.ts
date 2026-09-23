@@ -12,7 +12,6 @@
  * Features:
  * - Ctrl/Cmd+Drag: Clone/duplicate element instead of moving
  * - Smart guides during drag (snap lines)
- * - Touch support with long-press to initiate
  * - Multi-element drag for selected elements
  * - Auto-scroll when dragging near canvas edges
  * - Drop zone preview highlighting with validation
@@ -32,7 +31,6 @@ import {
   type AxisConstraint,
   type DragModifiers,
 } from "./elementDragTypes";
-import { useTouchDrag } from "./drag";
 import { useElementDragAutoScroll } from "./useElementDragAutoScroll";
 import { useElementDragDomSync } from "./useElementDragDomSync";
 
@@ -70,16 +68,6 @@ export function useCanvasElementDrag({
 
   // Store current rootId in ref - updated on page changes (fixes stale rootId issue)
   const rootIdRef = React.useRef<string | null>(null);
-
-  // Touch drag handling via dedicated hook
-  const { touchHandlers } = useTouchDrag({
-    composer,
-    canvasRef,
-    rootIdRef,
-    showGuides,
-    onDraggingChange,
-    onSnapLinesChange,
-  });
 
   // Drag modifiers state (Alt, Shift, Ctrl)
   const modifiersRef = React.useRef<DragModifiers>({
@@ -479,22 +467,12 @@ export function useCanvasElementDrag({
     canvas.addEventListener("drag", handleDrag);
     canvas.addEventListener("dragend", handleDragEnd);
 
-    // Touch events for mobile/tablet support (via useTouchDrag hook)
-    canvas.addEventListener("touchstart", touchHandlers.onTouchStart, { passive: true });
-    canvas.addEventListener("touchmove", touchHandlers.onTouchMove, { passive: false });
-    canvas.addEventListener("touchend", touchHandlers.onTouchEnd);
-    canvas.addEventListener("touchcancel", touchHandlers.onTouchCancel);
-
     return () => {
       canvas.removeEventListener("mousedown", handleMouseDown, { capture: true });
       canvas.removeEventListener("mouseup", handleMouseUp);
       canvas.removeEventListener("dragstart", handleDragStart);
       canvas.removeEventListener("drag", handleDrag);
       canvas.removeEventListener("dragend", handleDragEnd);
-      canvas.removeEventListener("touchstart", touchHandlers.onTouchStart);
-      canvas.removeEventListener("touchmove", touchHandlers.onTouchMove);
-      canvas.removeEventListener("touchend", touchHandlers.onTouchEnd);
-      canvas.removeEventListener("touchcancel", touchHandlers.onTouchCancel);
     };
-  }, [composer, canvasRef, showGuides, onDraggingChange, onSnapLinesChange, touchHandlers]);
+  }, [composer, canvasRef, showGuides, onDraggingChange, onSnapLinesChange]);
 }

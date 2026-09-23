@@ -71,7 +71,7 @@ function params(setCanUndo: ReturnType<typeof vi.fn>, setCanRedo: ReturnType<typ
     addToast: vi.fn().mockReturnValue("t"),
     setCanUndo, setCanRedo,
     setDevice: vi.fn(), setZoom: vi.fn(), setShowExporter: vi.fn(),
-    setShowComponentView: vi.fn(), setIsDirty: vi.fn(), setSaveState: vi.fn(),
+    setIsDirty: vi.fn(), setSaveState: vi.fn(),
   } as unknown as UseComposerInitParams;
 }
 

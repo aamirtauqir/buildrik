@@ -45,7 +45,6 @@ describe("useStudioState", () => {
     it("overlay defaults: guides + suggestions on, everything else off", () => {
       const { result } = renderHook(() => useStudioState());
       expect(result.current.overlays).toEqual({
-        showComponentView: false,
         showXRay: false,
         showSpacingIndicators: false,
         showBadges: false,
@@ -201,7 +200,6 @@ describe("useStudioState", () => {
   // Overlays -------------------------------------------------------------------
   describe("overlay toggles", () => {
     const ALL_OVERLAYS: (keyof OverlayState)[] = [
-      "showComponentView",
       "showXRay",
       "showSpacingIndicators",
       "showBadges",
@@ -226,7 +224,7 @@ describe("useStudioState", () => {
       expect(result.current.overlays[key]).toBe(before[key]);
     });
 
-    it("toggleDevMode ON enables grid/guides/spacing/badges/componentView", () => {
+    it("toggleDevMode ON enables grid/guides/spacing/badges", () => {
       const { result } = renderHook(() => useStudioState());
       act(() => result.current.toggleDevMode());
       expect(result.current.overlays).toMatchObject({
@@ -235,7 +233,6 @@ describe("useStudioState", () => {
         showGuides: true,
         showSpacingIndicators: true,
         showBadges: true,
-        showComponentView: true,
       });
     });
 
@@ -249,7 +246,6 @@ describe("useStudioState", () => {
         showGuides: false,
         showSpacingIndicators: false,
         showBadges: false,
-        showComponentView: false,
       });
     });
   });

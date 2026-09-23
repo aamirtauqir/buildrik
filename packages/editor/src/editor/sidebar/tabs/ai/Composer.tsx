@@ -55,7 +55,7 @@ export const Composer: React.FC<ComposerProps> = ({
           <Button
             type="button"
             className="bd-ai-composer-send"
-            aria-label="Send"
+            aria-label="Plan changes"
             disabled={!trimmed}
             onClick={submit}
           >↑</Button>

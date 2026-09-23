@@ -13,6 +13,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { BuildTab, type BuildTabProps } from "../BuildTab";
+import { requestInsertGroup } from "../insertGroupRequest";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 beforeEach(() => {
@@ -187,5 +188,40 @@ describe("BuildTab — BLOCKS as section cards (board 4428:140817)", () => {
     expect(JSON.parse(data.block)).toMatchObject({ id: "hero", label: "Hero Section", category: "Sections" });
     expect(data["text/plain"]).toBe("hero");
     expect(dataTransfer.effectAllowed).toBe("copy");
+  });
+});
+
+/* QA (integration 5e0d47902): "Add a block" with Layers open switched to Add
+   and emitted the open-group event in the same tick — before BuildTab had
+   mounted to hear it — so BLOCKS stayed closed. A request made while the
+   panel is not mounted must still land when it mounts. */
+describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
+  it("opens BLOCKS on mount when the request came first", () => {
+    const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [], getSelected: () => null, getAllSelected: () => [] }, elements: { getElement: () => null, getActivePage: () => null } };
+    requestInsertGroup(composer as never, "blocks");
+    render(
+      <ToastProvider>
+        <BuildTab composer={composer as never} onBlockClick={vi.fn()} />
+      </ToastProvider>,
+    );
+    expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "true");
+    expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
+  });
+
+  it("the request is consumed once — the next mount is back to ELEMENTS only", () => {
+    const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [], getSelected: () => null, getAllSelected: () => [] }, elements: { getElement: () => null, getActivePage: () => null } };
+    requestInsertGroup(composer as never, "blocks");
+    const first = render(
+      <ToastProvider>
+        <BuildTab composer={composer as never} onBlockClick={vi.fn()} />
+      </ToastProvider>,
+    );
+    first.unmount();
+    render(
+      <ToastProvider>
+        <BuildTab composer={composer as never} onBlockClick={vi.fn()} />
+      </ToastProvider>,
+    );
+    expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "false");
   });
 });

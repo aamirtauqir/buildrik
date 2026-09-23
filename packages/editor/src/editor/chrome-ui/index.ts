@@ -17,7 +17,7 @@
  *      `forwardRef` that applies its `BK_*_THEME` default and deep-merges
  *      (`mergeTheme.ts`) a caller-supplied `theme` on top. A third wrapper
  *      fails the gate until this list is deliberately amended.
- *  (c) The 45 editor-specific components already here (Topbar, IssueChip,
+ *  (c) The 45 editor-specific components already here (Topbar,
  *      Modal, Toast, etc.) — unchanged.
  *  (d) Non-component symbols: `CustomFlowbiteTheme` (type-only) and every
  *      `BK_*` theme/class constant, so deep `chrome-ui/<name>Theme` imports
@@ -36,7 +36,7 @@ export { TextField, type TextFieldProps } from "./TextField";
 export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./Skeleton";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
-export { IssueChip, formatIssueSummary, plural, type IssueChipProps } from "./IssueChip";
+export { formatIssueSummary, plural } from "./issueCopy";
 export { Chip, type ChipProps } from "./Chip";
 export { SkeletonBlock, type SkeletonBlockProps } from "./Skeleton";
 export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";

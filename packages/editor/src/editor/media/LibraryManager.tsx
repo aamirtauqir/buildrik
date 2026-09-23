@@ -35,7 +35,8 @@ import { ApplyVersionModal } from "./components/ApplyVersionModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "../../shared/constants/media";
-import { useToast, Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import { useToast, Button, IconButton, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
 import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import type { EditsSnapshot, IconConfig, MediaAsset } from "../../shared/types/media";
@@ -108,6 +109,16 @@ type MoveDoor = "selection" | "menu";
 
 export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIconPicker }: LibraryManagerProps) {
   const state = useMediaState(composer);
+  /* Audit G3-064 (B5): a viewer's Import URL and Upload stay on show,
+     aria-disabled, with the reason on a tooltip. The rest of the media gate
+     lives in the grid, folder rail, details and menu components. */
+  const mediaWrite = useMediaWriteAccess();
+  const viewOnlyTip = (control: React.ReactElement) =>
+    mediaWrite.canWrite ? control : (
+      <Tooltip content={mediaWrite.reason("upload")} placement="bottom">
+        {control}
+      </Tooltip>
+    );
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
@@ -821,21 +832,32 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         {/* Upload is the primary — it is the action the library exists for.
             Stock was primary here until the Clone walk. */}
         <div className="mgr-right">
-          <Button
-            className="mgr-btn"
-            data-testid="mgr-btn-import"
-            onClick={() => {
-              setImportDraft("");
-              setImportUrlOpen(true);
-            }}
-          >
-            <Download size={14} />
-            Import URL
-          </Button>
-          <Button className="mgr-btn-primary" data-testid="mgr-btn-upload" onClick={handleUploadClick}>
-            <Upload size={14} />
-            Upload
-          </Button>
+          {viewOnlyTip(
+            <Button
+              className={mediaWrite.canWrite ? "mgr-btn" : "mgr-btn tw:opacity-55"}
+              data-testid="mgr-btn-import"
+              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+              onClick={() => {
+                if (!mediaWrite.canWrite) return;
+                setImportDraft("");
+                setImportUrlOpen(true);
+              }}
+            >
+              <Download size={14} />
+              Import URL
+            </Button>,
+          )}
+          {viewOnlyTip(
+            <Button
+              className={mediaWrite.canWrite ? "mgr-btn-primary" : "mgr-btn-primary tw:opacity-55"}
+              data-testid="mgr-btn-upload"
+              aria-disabled={mediaWrite.canWrite ? undefined : "true"}
+              onClick={() => mediaWrite.canWrite && handleUploadClick()}
+            >
+              <Upload size={14} />
+              Upload
+            </Button>,
+          )}
           <Button className="mgr-btn" data-testid="mgr-btn-stock" onClick={() => setStockModalOpen(true)}>
             <Plus size={14} />
             Add from stock

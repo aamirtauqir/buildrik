@@ -7,6 +7,7 @@
 import { EVENTS } from "../../../../shared/constants/events";
 import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 /** Element types a block can stand in for — the section-shaped ones. */
 const SECTION_TYPES = new Set([
@@ -31,7 +32,7 @@ export const standaloneActions: ContextAction[] = [
     handler: ({ composer, element }) => {
       composer.selection.select(element as never);
       composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });
-      composer.emit(EVENTS.UI_INSERT_OPEN_GROUP, { group: "blocks" });
+      requestInsertGroup(composer, "blocks");
     },
   },
   {

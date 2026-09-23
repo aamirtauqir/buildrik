@@ -1,11 +1,10 @@
 /**
- * The backup checkbox must produce the page it names.
+ * C4 #25 — the template backup is a History auto-version (owner decision 25).
  *
- * The hint under it reads `Keeps your work as “Home (backup)”`, but the handler
- * called `duplicatePage`, which names its output "Home Copy" — the same name
- * the Pages menu's Duplicate produces, so a backup was indistinguishable from
- * an ordinary duplicate. Walked live: applying Portfolio over a page called
- * Home left "Home Copy" at /-copy holding the original heading.
+ * It used to duplicate the page as "Home (backup)", which left a stray page in
+ * the sitemap (and, before that, one called "Home Copy"). The backup is now an
+ * auto-version in History › Saves, taken BEFORE the template replaces the
+ * page, and no page is created.
  *
  * @license BSD-3-Clause
  */
@@ -25,7 +24,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 import { TemplatesTab } from "../TemplatesTab";
 import { SITE_TEMPLATES } from "../templatesData";
 
-function makeComposer(existingNames: string[] = ["Home"]) {
+function makeComposer(existingNames: string[] = ["Home"], order: string[] = []) {
   const renames: Array<{ id: string; name: string }> = [];
   const pages = existingNames.map((name, i) => ({ id: `page-${i + 1}`, name }));
   return {
@@ -44,7 +43,9 @@ function makeComposer(existingNames: string[] = ["Home"]) {
         }),
         createPage: vi.fn(() => ({ id: "page-new", name: "New" })),
         setActivePage: vi.fn(),
-        importHTMLToActivePage: vi.fn(),
+        importHTMLToActivePage: vi.fn(() => {
+          order.push("apply");
+        }),
         recordAppliedTemplate: vi.fn(),
         /* `getChildCount` is what drives `hasExistingContent`, and that is what
            decides whether the replace confirm (and its backup checkbox) opens
@@ -54,6 +55,12 @@ function makeComposer(existingNames: string[] = ["Home"]) {
         ),
       },
       styles: { clear: vi.fn() },
+      versions: {
+        autoCheckpoint: vi.fn(async (label: string) => {
+          order.push(`checkpoint:${label}`);
+          return { id: "v1" };
+        }),
+      },
       on: vi.fn(),
       off: vi.fn(),
       emit: vi.fn(),
@@ -84,13 +91,13 @@ async function applyWithBackup() {
 
 afterEach(cleanup);
 
-describe("Templates — the backup is named what the checkbox promises", () => {
+describe("Templates — the backup is a History auto-version (C4 #25)", () => {
   it("defaults the backup box ON — applying replaces the page", async () => {
     /* The default itself, not just the naming. Board 1169:4713 draws it
        checked: apply REPLACES the current page, so opting out of the backup
        has to be a deliberate act. */
     const { composer } = makeComposer(["Home"]);
-    render(<TemplatesTab composer={composer as never} isExpanded />);
+    render(<TemplatesTab composer={composer as never} />);
     const first = SITE_TEMPLATES[0];
     fireEvent.click(await screen.findByText(first.name));
     const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
@@ -101,19 +108,27 @@ describe("Templates — the backup is named what the checkbox promises", () => {
     expect(input!.checked).toBe(true);
   });
 
-  it('renames the duplicate to "<page> (backup)"', async () => {
-    const { renames, composer } = makeComposer();
-    render(<TemplatesTab composer={composer as never} isExpanded />);
+  it("takes a History auto-version before the apply, and makes no backup page", async () => {
+    const order: string[] = [];
+    const { renames, composer } = makeComposer(["Home"], order);
+    render(<TemplatesTab composer={composer as never} />);
     await applyWithBackup();
-    await waitFor(() => expect(renames).toHaveLength(1));
-    expect(renames[0]).toEqual({ id: "page-dup", name: "Home (backup)" });
+    const first = SITE_TEMPLATES[0];
+    await waitFor(() =>
+      expect(composer.versions.autoCheckpoint).toHaveBeenCalledWith(`Before template “${first.name}”`),
+    );
+    expect(composer.elements.duplicatePage).not.toHaveBeenCalled();
+    expect(renames).toHaveLength(0);
+    await waitFor(() => expect(order).toContain("apply"));
+    expect(order.indexOf(`checkpoint:Before template “${first.name}”`)).toBeLessThan(order.indexOf("apply"));
   });
 
-  it("numbers the suffix when a backup of that name already exists", async () => {
-    const { renames, composer } = makeComposer(["Home", "Home (backup)"]);
-    render(<TemplatesTab composer={composer as never} isExpanded />);
-    await applyWithBackup();
-    await waitFor(() => expect(renames).toHaveLength(1));
-    expect(renames[0].name).toBe("Home (backup 2)");
+  it("says where the backup lives", async () => {
+    const { composer } = makeComposer();
+    render(<TemplatesTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText(SITE_TEMPLATES[0].name));
+    const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
+    fireEvent.click(applyBtn);
+    expect(await screen.findByText("Keeps your work as a version in History › Saves.")).toBeTruthy();
   });
 });

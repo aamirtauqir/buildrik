@@ -327,8 +327,12 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
   const { left, top, width, height } = displayRect;
 
   return (
+    /* A positioning layer the size of the canvas, NOT the selection box: the
+       box is the bordered child below. It carried `.bd-selection-box`, whose
+       Canvas.css rule (fill, border, focus shadow) painted this layer — one
+       opaque accent sheet over the whole page on every selection. */
     <div
-      className="bd-selection-box"
+      className="bd-selection-layer"
       style={{
         position: "absolute",
         left: 0,

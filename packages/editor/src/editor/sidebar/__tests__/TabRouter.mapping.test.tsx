@@ -26,11 +26,6 @@ vi.mock("../tabs/layers/LayersTab", () => ({
 vi.mock("../tabs/pages/PagesTab", () => ({
   default: () => <div data-testid="tab-pages" />,
 }));
-vi.mock("../tabs/templates/TemplatesTab", () => ({
-  TemplatesTab: (props: { onSwitchTab?: (tab: string) => void }) => (
-    <div data-testid="tab-templates" data-switch={props.onSwitchTab ? "wired" : "none"} />
-  ),
-}));
 vi.mock("../tabs/ComponentsTab", () => ({
   default: () => <div data-testid="tab-components-legacy" />,
 }));
@@ -70,7 +65,6 @@ beforeEach(() => {
 describe("TabRouter — tab id → panel component mapping", () => {
   const cases: Array<[GroupedTabId, string]> = [
     ["add", "tab-build"],
-    ["templates", "tab-templates"],
     ["layers", "tab-layers"],
     ["pages", "tab-pages"],
     ["assets", "tab-assets"],
@@ -108,20 +102,12 @@ describe("TabRouter — tab id → panel component mapping", () => {
   });
 });
 
-describe("TabRouter — templates switch-tab wiring", () => {
-  // Regression: onTemplatesSwitchTab was declared on TabRouterProps but never
-  // destructured or forwarded, so TemplatesTab's "Go to page" success button
-  // (which calls onSwitchTab("pages")) was dead. The router must forward it.
-  it("forwards onTemplatesSwitchTab to TemplatesTab as onSwitchTab", async () => {
-    renderRouter("templates", { onTemplatesSwitchTab: vi.fn() });
-    const tab = await screen.findByTestId("tab-templates");
-    expect(tab.getAttribute("data-switch")).toBe("wired");
-  });
-
-  it("leaves onSwitchTab undefined when no switch handler is provided", async () => {
-    renderRouter("templates");
-    const tab = await screen.findByTestId("tab-templates");
-    expect(tab.getAttribute("data-switch")).toBe("none");
+/* Decision #24: Templates is a full-canvas view FullPageRouter mounts; a
+   drawer copy here would be a second, invisible catalogue. */
+describe("TabRouter — templates", () => {
+  it("renders nothing for templates — the view belongs to FullPageRouter", () => {
+    const { container } = renderRouter("templates");
+    expect(container).toBeEmptyDOMElement();
   });
 });
 

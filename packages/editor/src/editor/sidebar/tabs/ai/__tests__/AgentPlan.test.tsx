@@ -184,3 +184,25 @@ describe("agent run", () => {
     expect(screen.queryByText(/changes applied/)).not.toBeInTheDocument();
   });
 });
+/* Decision #23: the chat bubble that carried "Thinking…" (board 170:29) is
+   gone; the plan call is where every prompt now waits. */
+describe("agent run — Thinking band", () => {
+  it("shows while planning and not once the run has steps", () => {
+    const { rerender } = renderPlan({ phase: "planning", steps: [] });
+    expect(screen.getByTestId("ai-thinking")).toHaveTextContent("Thinking…");
+    rerender(
+      <AgentPlan
+        phase="running"
+        steps={[step("One", "running")]}
+        currentIndex={0}
+        error={null}
+        autoApply={false}
+        onAutoApplyChange={vi.fn()}
+        onApprove={vi.fn()}
+        onSkip={vi.fn()}
+        onStop={vi.fn()}
+      />,
+    );
+    expect(screen.queryByTestId("ai-thinking")).not.toBeInTheDocument();
+  });
+});

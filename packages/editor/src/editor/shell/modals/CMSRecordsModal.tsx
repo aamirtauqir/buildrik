@@ -14,7 +14,8 @@ import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import { CMSValidationError } from "../../../engine/cms/CollectionManager";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
-import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Select, TextInput, Textarea } from "@/editor/chrome-ui";
+import { Button, Checkbox, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, Progress, Select, TextInput, Textarea } from "@/editor/chrome-ui";
+import { parseRecordsJson, type SkippedRow } from "./parseRecordsJson";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -112,6 +113,15 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   /* The edit form needs its OWN error slot: publishError is keyed by row id and
      rendered in the list, and a new record has no row yet (editingId === ""). */
   const [saveError, setSaveError] = React.useState<string | null>(null);
+  /* B13 Import JSON (decision #31): progress while rows are written, then
+     either the file's refusal or an "N of M" result with the skipped rows. */
+  const importInputRef = React.useRef<HTMLInputElement>(null);
+  const [importProgress, setImportProgress] = React.useState<{ done: number; total: number } | null>(null);
+  const [importOutcome, setImportOutcome] = React.useState<
+    | { kind: "error"; reason: string }
+    | { kind: "result"; imported: number; total: number; skipped: SkippedRow[] }
+    | null
+  >(null);
 
   const collection = collections.find((c) => c.id === collectionId) ?? null;
   /* Columns follow the collection's field order, which is the order the user
@@ -207,6 +217,35 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     } finally {
       setBusy(false);
     }
+  };
+
+  /* Each usable row goes through createContentItem, the same write Add record
+     makes; a row the engine refuses is skipped with its reason, not fatal. */
+  const importFile = async (file: File) => {
+    if (!composer || !collection) return;
+    setImportOutcome(null);
+    const parsed = parseRecordsJson(await file.text(), collection.fields);
+    if (!parsed.ok) {
+      setImportOutcome({ kind: "error", reason: parsed.reason });
+      return;
+    }
+    const skipped = [...parsed.invalid];
+    let imported = 0;
+    setImportProgress({ done: 0, total: parsed.rows.length });
+    for (const [i, { row, data }] of parsed.rows.entries()) {
+      try {
+        const created = await composer.cms.collections.createContentItem(collection.id, data);
+        if (created) imported++;
+        else skipped.push({ row, reason: "not saved" });
+      } catch (e) {
+        skipped.push({ row, reason: e instanceof Error ? e.message : "not saved" });
+      }
+      setImportProgress({ done: i + 1, total: parsed.rows.length });
+    }
+    setImportProgress(null);
+    skipped.sort((a, b) => a.row - b.row);
+    setImportOutcome({ kind: "result", imported, total: parsed.rows.length + parsed.invalid.length, skipped });
+    await reloadItems();
   };
 
   const setField = (slug: string, value: unknown) => setForm((p) => ({ ...p, [slug]: value }));
@@ -458,17 +497,57 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                     </tbody>
                   </table>
 
-                  {/* Footer actions, right-aligned as the board draws them.
-                      `Import JSON` sits beside Add record on the board and is
-                      NOT built: the engine exposes createContentItem one record
-                      at a time and has no bulk or JSON import path, so the
-                      button would have nothing to call. Parsing, validating and
-                      fanning a file out over N creates is a feature, not this
-                      modal's layout. */}
-                  {/* 1170:4775 — gap 8, because the board's foot holds TWO
-                      controls; the second (Import JSON) is not built and says
-                      so at the note below. */}
+                  {importProgress && (
+                    <div className="tw:pt-3" data-testid="cms-records-import-progress">
+                      <Progress
+                        progress={importProgress.total ? Math.round((importProgress.done / importProgress.total) * 100) : 0}
+                        size="sm"
+                        aria-label={`Importing ${importProgress.done} of ${importProgress.total} records`}
+                        theme={{ color: { default: "tw:bg-[var(--bk-accent)]" } }}
+                      />
+                    </div>
+                  )}
+                  {importOutcome?.kind === "error" && (
+                    <p role="alert" className="tw:mt-3 tw:mb-0 tw:text-xs tw:text-[var(--bk-error)]" data-testid="cms-records-import-error">
+                      {importOutcome.reason}
+                    </p>
+                  )}
+                  {importOutcome?.kind === "result" && (
+                    <div role="status" className="tw:mt-3 tw:text-xs tw:text-[var(--bk-ink-soft)]" data-testid="cms-records-import-result">
+                      <p className="tw:m-0">
+                        Imported {importOutcome.imported} of {importOutcome.total} record{importOutcome.total === 1 ? "" : "s"}
+                      </p>
+                      {importOutcome.skipped.map((r) => (
+                        <p key={r.row} className="tw:m-0 tw:text-[var(--bk-warning-text)]">
+                          Row {r.row}: {r.reason}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  {/* 1170:4775 — Import JSON beside Add record, gap 8. */}
                   <div className="tw:flex tw:justify-end tw:gap-2 tw:pt-3" data-testid="cms-records-foot">
+                    <TextInput
+                      ref={importInputRef}
+                      type="file"
+                      accept="application/json,.json"
+                      className="tw:hidden"
+                      data-testid="cms-records-import-input"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (file) void importFile(file);
+                      }}
+                    />
+                    <Button
+                      color="light"
+                      size="xs"
+                      className="tw:px-3 tw:py-[7px] tw:rounded-md tw:text-[11px] tw:font-normal"
+                      onClick={() => importInputRef.current?.click()}
+                      disabled={!collection || importProgress !== null}
+                      data-testid="cms-records-import"
+                    >
+                      Import JSON
+                    </Button>
                     <Button
                       size="xs"
                       /* 1170:4773/4774 — 12/7 insets, radius 6, an 11px label.

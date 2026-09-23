@@ -65,6 +65,7 @@ function makeComposer(initialPages: PageData[]) {
     off: (ev: string, fn: EventHandler) => {
       handlers.get(ev)?.delete(fn);
     },
+    emit: vi.fn(emit),
     history: { undo: vi.fn() },
     elements,
   };
@@ -169,11 +170,14 @@ describe("PageTabBar", () => {
     });
   });
 
-  it("'+' adds a page with the smart default name", () => {
+  /* Decision #19: "+" opens the New-page modal like every Add-page door; it
+     no longer creates a page by itself. */
+  it("'+' asks for the New-page modal and creates nothing", () => {
     const { composer, elements } = makeComposer(TWO_PAGES);
     renderBar(composer);
     fireEvent.click(screen.getByRole("button", { name: "Add new page" }));
-    expect(elements.createPage).toHaveBeenCalledWith("Page 3");
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_NEW_PAGE_REQUESTED, {});
+    expect(elements.createPage).not.toHaveBeenCalled();
   });
 
 });

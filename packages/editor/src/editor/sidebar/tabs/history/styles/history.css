@@ -44,11 +44,17 @@
   padding: 0 var(--bk-space-12);
 }
 
+/* Board 4418:73791 — four plain labels (Session · Saves · Published, plus
+   B6's Activity) sharing the drawer's width. The 16 inset and the helper
+   line under each label were the two-tab design; with four they ran
+   Activity off the 280 drawer. */
 .view-tab {
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 11px var(--bk-space-16) 0;
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--bk-space-4);
   font-size: 13px;
   line-height: normal;
   font-weight: 400;
@@ -71,21 +77,6 @@
   font-weight: 600;
   color: var(--bk-ink);
   border-bottom-color: var(--bk-accent);
-}
-
-.tab-helper {
-  display: block;
-  font-size: 11px;
-  line-height: normal;
-  font-weight: 400;
-  /* NOT the board's colour, deliberately. 1657:7153/7156 paint this `var(--bk-gray-400)`
-     (gray-400), which is 2.54:1 on the panel's white — a WCAG AA failure at
-     11px, measured by the conformance run the moment it was adopted. Board
-     wins on visuals, but not into an accessibility regression: ink-muted is
-     the nearest token that clears 4.5 (4.83). Flagged for the founder in the
-     2026-09-08 conformance report; the fix is in Figma, not here. */
-  color: var(--bk-ink-muted);
-  margin-top: 0;
 }
 
 /* 1657:7162 — 53 tall, which is 8 + the 36 box + 8 + the rule. It was 46,

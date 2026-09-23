@@ -44,6 +44,9 @@ vi.mock("../modals/CMSRecordsModal", () => ({
   CMSRecordsModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-cms-records" /> : null,
 }));
+vi.mock("@/editor/sidebar/tabs/pages/components/NewPageModal", () => ({
+  NewPageModal: () => null,
+}));
 vi.mock("../modals/CreateComponentModal", () => ({
   CreateComponentModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-create-component" /> : null,
