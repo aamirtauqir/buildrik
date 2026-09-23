@@ -109,3 +109,21 @@ describe("editActions — paste reports its outcome", () => {
     expect(addToast).not.toHaveBeenCalled();
   });
 });
+
+/* G2-051 (CI-13): menu Delete is the engine delete — whole selection, one
+   transaction, #17's confirm for N > 1, one toast from useHistoryFeedback. */
+describe("editActions — delete runs the engine command", () => {
+  it("delete runs composer.commands.run('delete') and removes nothing itself", () => {
+    const run = vi.fn();
+    const removeElement = vi.fn();
+    const del = editSubmenu.find((a) => a.id === "delete")!;
+    del.handler!({
+      composer: { commands: { run }, elements: { removeElement } } as never,
+      element: {} as never,
+      isRoot: false,
+    });
+    expect(run).toHaveBeenCalledWith("delete");
+    expect(removeElement).not.toHaveBeenCalled();
+  });
+});
+

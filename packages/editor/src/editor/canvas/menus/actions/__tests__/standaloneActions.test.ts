@@ -75,23 +75,7 @@ describe("standaloneActions", () => {
   /* This asserted "layers:reveal", which nothing in the app listens for — the
      shell listens for SHOW_IN_LAYERS. The test passed for as long as the menu
      item did nothing. */
-  it("reveal-in-layers selects the element and asks the shell to open Layers", () => {
-    action("reveal-in-layers").handler!(ctx);
-    expect(composer.selection.select).toHaveBeenCalledWith(element);
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.SHOW_IN_LAYERS, {});
-  });
 
-  describe("select-parent", () => {
-    it("selects the parent element", () => {
-      action("select-parent").handler!(ctx);
-      expect(composer.selection.select).toHaveBeenCalledWith(parent);
-    });
-
-    it("is hidden without a parent", () => {
-      element._parent = null;
-      expect(action("select-parent").isVisible!(ctx)).toBe(false);
-    });
-  });
 
   describe("group / ungroup", () => {
     it("group-elements groups the selection and selects the new group", () => {

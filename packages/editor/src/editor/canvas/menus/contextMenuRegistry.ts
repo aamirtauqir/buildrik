@@ -27,8 +27,6 @@ export type ActionContext = {
   element: Element;
   isRoot: boolean;
   openAI?: () => void;
-  /** Stack of element IDs at click position (for "Select from stack" feature) */
-  elementStack?: string[];
   /** Toast function for showing undo notifications */
   addToast?: AddToastFn;
 };
