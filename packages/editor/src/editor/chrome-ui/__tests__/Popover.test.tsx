@@ -8,6 +8,7 @@
  *
  * @license BSD-3-Clause
  */
+import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Popover, Menu, MenuItem, MenuGroup, MenuLabel } from "../index";
@@ -34,6 +35,46 @@ describe("Popover", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     fireEvent.pointerDown(document.body);
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  /* QA (integration 5e0d47902, a11y): Enter on the Layers ⋯ opens the menu
+     and focuses its first item; Escape closed it and left focus on <body>.
+     WAI-ARIA menu button: Escape returns focus to the trigger. */
+  it("Escape from inside the panel hands focus back to the trigger", () => {
+    function Stateful() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <Popover open={open} onClose={() => setOpen(false)} trigger={<Button>Open</Button>} label="Options">
+          <Menu label="Options">
+            <MenuItem onClick={() => {}}>First</MenuItem>
+          </Menu>
+        </Popover>
+      );
+    }
+    render(<Stateful />);
+    expect(document.activeElement).toBe(screen.getByRole("menuitem", { name: "First" }));
+    fireEvent.keyDown(document.activeElement as Element, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Open" }));
+  });
+
+  it("Escape with focus elsewhere does not steal it", () => {
+    function Stateful() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <>
+          <input aria-label="elsewhere" />
+          <Popover open={open} onClose={() => setOpen(false)} trigger={<Button>Open</Button>} label="Options">
+            <p>panel</p>
+          </Popover>
+        </>
+      );
+    }
+    render(<Stateful />);
+    const other = screen.getByLabelText("elsewhere");
+    other.focus();
+    fireEvent.keyDown(other, { key: "Escape" });
+    expect(document.activeElement).toBe(other);
   });
 
   it("a click inside does not close it", () => {
