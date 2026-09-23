@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * usePageSettings — drawer state hook: seed-from-page, dirty tracking, save
- * (calls elements.updatePage), and save guards (slug error, empty password,
+ * (calls elements.updatePage), and save guards (slug error,
  * head-code validation). Also corroborates the score algorithm: indexing is
  * an all-or-nothing gate on the numeric score (SeoTab now labels it "Required",
  * not the former fictional "+40 pts").
@@ -71,10 +71,12 @@ describe("usePageSettings seed", () => {
     expect(result.current.seoTitle).toBe("About Us");
   });
 
-  it("maps password status to visibility=password", () => {
+  /* Decision #21: no Password option. A legacy password page reads as Hidden —
+     both are left out of the deploy, so saving it cannot publish it. */
+  it("reads a legacy password page as hidden", () => {
     const composer = createMockComposer({});
     const { result } = setup(composer, page({ status: "password" }));
-    expect(result.current.visibility).toBe("password");
+    expect(result.current.visibility).toBe("hidden");
   });
 
   it("exposes the project domain from composer metadata", () => {
@@ -172,21 +174,6 @@ describe("usePageSettings save", () => {
     expect(composer.elements.updatePage).not.toHaveBeenCalled();
     expect(lastToast()).toMatchObject({
       description: "Fix slug error before saving",
-      tone: "warning",
-    });
-  });
-
-  it("blocks save and warns when password visibility has no password", async () => {
-    const composer = createMockComposer({});
-    const { result } = setup(composer, page({ status: "password" }));
-
-    await act(async () => {
-      await result.current.save();
-    });
-
-    expect(composer.elements.updatePage).not.toHaveBeenCalled();
-    expect(lastToast()).toMatchObject({
-      description: "Set an access password before saving",
       tone: "warning",
     });
   });

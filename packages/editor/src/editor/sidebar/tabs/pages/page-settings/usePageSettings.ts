@@ -39,12 +39,10 @@ export interface UsePageSettingsReturn {
   ogImageUrl: string | null;
   setOgImageUrl: (url: string | null) => void;
 
-  visibility: "live" | "hidden" | "password";
-  setVisibility: (v: "live" | "hidden" | "password") => void;
-  password: string;
-  setPassword: (v: string) => void;
-  showPassword: boolean;
-  setShowPassword: (v: boolean) => void;
+  /** Decision #21: Live · Hidden. Password is gone until the published-site
+   *  middleware exists to enforce it. */
+  visibility: "live" | "hidden";
+  setVisibility: (v: "live" | "hidden") => void;
   allowIndex: boolean;
   setAllowIndex: (v: boolean) => void;
   allowFollow: boolean;
@@ -52,7 +50,6 @@ export interface UsePageSettingsReturn {
   customHead: string;
   setCustomHead: (v: string) => void;
   headCodeError: string | null;
-  copyPassword: () => void;
 
   domain: string | null;
   /** The site's live URL, or null when it has never been published. Gates the
@@ -88,18 +85,18 @@ interface PersistedState {
   ogTitle: string;
   ogDesc: string;
   ogImageUrl: string | null;
-  visibility: "live" | "hidden" | "password";
-  password: string;
+  visibility: "live" | "hidden";
   allowIndex: boolean;
   allowFollow: boolean;
   customHead: string;
 }
 
 function getPersistedState(page: PageItem): PersistedState {
-  const settings = (page as { settings?: { password?: string } }).settings;
   const seoFlags = page.seo as { noIndex?: boolean; noFollow?: boolean } | undefined;
+  /* A legacy password page reads as Hidden: both are left out of the deploy,
+     so saving one here can never publish it unprotected. */
   const visibility: PersistedState["visibility"] =
-    page.status === "password" ? "password" : page.status === "hidden" ? "hidden" : "live";
+    page.status === "hidden" || page.status === "password" ? "hidden" : "live";
   return {
     seoTitle: page.seo?.metaTitle ?? page.name,
     seoDesc: page.seo?.metaDescription ?? "",
@@ -108,7 +105,6 @@ function getPersistedState(page: PageItem): PersistedState {
     ogDesc: page.seo?.ogDescription ?? "",
     ogImageUrl: page.seo?.ogImage ?? null,
     visibility,
-    password: settings?.password ?? "",
     allowIndex: !seoFlags?.noIndex,
     allowFollow: !seoFlags?.noFollow,
     customHead: page.head ?? "",
@@ -133,9 +129,7 @@ export function usePageSettings(
   const [ogTitle, setOgTitle] = React.useState("");
   const [ogDesc, setOgDesc] = React.useState("");
   const [ogImageUrl, setOgImageUrl] = React.useState<string | null>(null);
-  const [visibility, setVisibility] = React.useState<"live" | "hidden" | "password">("live");
-  const [password, setPassword] = React.useState("");
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [visibility, setVisibility] = React.useState<"live" | "hidden">("live");
   const [allowIndex, setAllowIndex] = React.useState(true);
   const [allowFollow, setAllowFollow] = React.useState(true);
   const [customHead, setCustomHead] = React.useState("");
@@ -154,8 +148,6 @@ export function usePageSettings(
     setOgDesc(state.ogDesc);
     setOgImageUrl(state.ogImageUrl);
     setVisibility(state.visibility);
-    setPassword(state.password);
-    setShowPassword(false);
     setAllowIndex(state.allowIndex);
     setAllowFollow(state.allowFollow);
     setCustomHead(state.customHead);
@@ -180,7 +172,6 @@ export function usePageSettings(
       ogDesc,
       ogImageUrl,
       visibility,
-      password,
       allowIndex,
       allowFollow,
       customHead,
@@ -195,7 +186,6 @@ export function usePageSettings(
     ogDesc,
     ogImageUrl,
     visibility,
-    password,
     allowIndex,
     allowFollow,
     customHead,
@@ -230,10 +220,6 @@ export function usePageSettings(
       addToast({ description: codeErr, tone: "warning" });
       return false;
     }
-    if (visibility === "password" && !password.trim()) {
-      addToast({ description: "Set an access password before saving", tone: "warning" });
-      return false;
-    }
     setSaveState("saving");
     try {
       // slugManuallySet=true: any slug saved from the settings form is a
@@ -244,7 +230,6 @@ export function usePageSettings(
         slugManuallySet: slug !== (page.slug ?? "") ? true : undefined,
         settings: {
           visibility,
-          password: visibility === "password" ? password : undefined,
           head: customHead || undefined,
           seo: {
             metaTitle: seoTitle || undefined,
@@ -266,7 +251,6 @@ export function usePageSettings(
         ogDesc,
         ogImageUrl,
         visibility,
-        password,
         allowIndex,
         allowFollow,
         customHead,
@@ -289,7 +273,6 @@ export function usePageSettings(
     ogDesc,
     ogImageUrl,
     visibility,
-    password,
     allowIndex,
     allowFollow,
     customHead,
@@ -315,13 +298,6 @@ export function usePageSettings(
     indexingOn: allowIndex,
     descSet: seoDesc.length >= 50,
   };
-
-  const copyPassword = React.useCallback(() => {
-    if (!password) return;
-    navigator.clipboard?.writeText?.(password).catch(() => {
-      addToast({ description: "Could not copy password", tone: "error" });
-    });
-  }, [password, addToast]);
 
   // A4 parity with usePages.copyPageLink: domain lives in ProjectData metadata,
   // NOT on `composer.project.domain` (that property doesn't exist on Composer
@@ -353,10 +329,6 @@ export function usePageSettings(
     setOgImageUrl,
     visibility,
     setVisibility,
-    password,
-    setPassword,
-    showPassword,
-    setShowPassword,
     allowIndex,
     setAllowIndex,
     allowFollow,
@@ -364,7 +336,6 @@ export function usePageSettings(
     customHead,
     setCustomHead,
     headCodeError,
-    copyPassword,
     domain,
     publishedUrl,
     saveState,
