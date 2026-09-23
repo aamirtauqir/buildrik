@@ -275,7 +275,7 @@ describe("SettingsTab — the shell", () => {
       { id: "set-nav-seo", text: "SEO defaults" },
       { id: "set-nav-domains", text: "Domains" },
       { id: "set-nav-redirects", text: "Redirects" },
-      { id: "set-nav-export", text: "Export" },
+      { id: "set-nav-export", text: "Export…" },
       { id: "set-nav-analytics", text: "Analytics" },
       { id: "set-nav-forms", text: "Forms" },
       { id: "set-nav-custom-code", text: "Custom code" },
@@ -302,9 +302,11 @@ describe("SettingsTab — the shell", () => {
 
   it("keeps the Pro badge on the locked rows for a starter plan", () => {
     render(<SettingsTab composer={asComposer(makeComposer())} userPlan="starter" />);
-    expect(within(screen.getByTestId("set-nav-custom-code")).getByText("Pro")).toBeTruthy();
-    expect(within(screen.getByTestId("set-nav-integrations")).getByText("Pro")).toBeTruthy();
-    expect(within(screen.getByTestId("set-nav-general")).queryByText("Pro")).toBeNull();
+    /* 4418:127313 draws no "Pro" pill on a row; the lock is still known to
+       the row and the screen says it with its own Upgrade. */
+    expect(within(screen.getByTestId("set-nav-custom-code")).queryByText("Pro")).toBeNull();
+    expect(screen.getByTestId("set-nav-custom-code").querySelector("[data-locked]")).toBeTruthy();
+    expect(screen.getByTestId("set-nav-general").querySelector("[data-locked]")).toBeNull();
   });
 
   it("lands on the Overview: its header, the Search field, and a Done footer that is Back to canvas", () => {
@@ -340,9 +342,9 @@ describe("SettingsTab — the shell", () => {
     expect(row.getAttribute("aria-current")).toBe("page");
     expect(row.className).toContain("tw:bg-[var(--bk-accent-tint)]");
     expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBeNull();
-    expect(footStatus()).toBe("All changes saved");
-    expect(screen.getByTestId("set-foot-cancel").textContent).toBe("Cancel");
-    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save changes");
+    // 4418:127313: a clean screen draws no footer.
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
     expect(screen.queryByTestId("set-search-open")).toBeNull();
     expect(screen.getByTestId("set-card-site-identity")).toBeTruthy();
   });
@@ -361,7 +363,7 @@ describe("SettingsTab — the shell", () => {
     fireEvent.click(screen.getByTestId("set-nav-custom-code"));
     await waitFor(() => expect(headTitle()).toBe("Advanced / Custom code"));
     expect(screen.queryByTestId("set-head-upgrade")).toBeNull();
-    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save changes");
+    expect(screen.queryByText(/Custom code is a Pro feature/)).toBeNull();
   });
 
   it("deep-links: 'plugins' opens Integrations; an id that names no screen stays on the Overview", async () => {
@@ -401,13 +403,14 @@ describe("SettingsTab — doors", () => {
     fireEvent.click(screen.getByTestId("set-nav-general"));
     await waitFor(() => expect(headTitle()).toBe("Site setup / General"));
     fireEvent.click(screen.getByTestId("set-back"));
-    fireEvent.click(screen.getByTestId("set-foot-cancel"));
     fireEvent.keyDown(document.body, { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(3);
+    expect(onClose).toHaveBeenCalledTimes(2);
+    // A clean screen has no footer, so no Cancel (4418:127313).
+    expect(screen.queryByTestId("set-foot-cancel")).toBeNull();
     // An input keeps its own Escape.
     const input = await screen.findByLabelText("Site name");
     fireEvent.keyDown(input, { key: "Escape" });
-    expect(onClose).toHaveBeenCalledTimes(3);
+    expect(onClose).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -461,7 +464,7 @@ describe("SettingsTab — Unsaved settings", () => {
     fireEvent.click(screen.getByTestId("set-unsaved-discard"));
     await waitFor(() => expect(headTitle()).toBe("SEO & publishing / SEO defaults"));
     expect(onClose).not.toHaveBeenCalled();
-    expect(footStatus()).toBe("All changes saved");
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
   });
 
   it("a door while dirty is guarded too", async () => {
@@ -487,7 +490,8 @@ describe("SettingsTab — Save changes", () => {
     expect(composer.saveProject).toHaveBeenCalledTimes(1);
     const saved = await screen.findByTestId("set-saved");
     expect(saved.textContent).toContain("Bella Cucina");
-    expect(footStatus()).toBe("All changes saved");
+    // Settled: nothing left to save, so the footer is gone.
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
     fireEvent.click(screen.getByTestId("set-saved-return"));
     expect(screen.queryByTestId("set-saved")).toBeNull();
   });
@@ -513,7 +517,7 @@ describe("SettingsTab — Save changes", () => {
     await screen.findByTestId("set-saved");
     expect(composer.saveProject).toHaveBeenCalledTimes(2);
     expect(screen.queryByTestId("set-save-error")).toBeNull();
-    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save changes");
+    expect(screen.queryByTestId("set-foot-save")).toBeNull();
     errorSpy.mockRestore();
   });
 });
@@ -622,8 +626,8 @@ describe("SettingsTab — the footer follows the screen's load", () => {
     expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go ready"));
-    expect(footStatus()).toBe("All changes saved");
-    expect(save().disabled).toBe(false);
+    // Ready and clean: no footer (4418:127313).
+    expect(screen.queryByTestId("set-foot-status")).toBeNull();
   });
 });
 

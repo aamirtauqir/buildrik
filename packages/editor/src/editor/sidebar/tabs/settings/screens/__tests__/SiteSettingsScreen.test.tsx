@@ -100,8 +100,8 @@ describe("SiteSettingsScreen — the frame's two cards, filled from the Site row
   it("draws Site identity and Social links, with the field ids the walk drives", async () => {
     setup();
     await loaded();
-    expect(screen.getByTestId("set-card-site-identity")).toHaveTextContent("Site identity");
-    expect(screen.getByTestId("set-card-social-links")).toHaveTextContent("Social links");
+    expect(screen.getByTestId("set-card-site-identity")).toHaveTextContent("Site Identity");
+    expect(screen.getByTestId("set-card-social-links")).toHaveTextContent("Social Links");
     expect(siteName().id).toBe("site-name");
     expect(favicon().id).toBe("favicon-url");
     expect(language().id).toBe("site-language");
@@ -169,7 +169,7 @@ describe("SiteSettingsScreen — loading and load-error (3953:26363 / 3953:26503
     setup({ onLoadStateChange });
 
     expect(screen.getByTestId("set-load-card")).toBeInTheDocument();
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Site identity");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Site Identity");
     expect(screen.getByTestId("set-load-card")).toHaveTextContent("Site name, favicon, language and social profiles.");
     expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
     expect(screen.queryByTestId("set-load-retry")).toBeNull();
