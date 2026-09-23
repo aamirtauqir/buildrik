@@ -222,18 +222,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <HistoryTab
           composer={composer}
           projectId={projectId}
-          /* B8 — the Compare doors now live behind History · This session.
-             Sub-tab "session" → SessionView; the Approved door's deep link
-             also passes `initialBaseline="approved"` so the picker lands on
-             Approved directly. The Published sub-tab keeps its own path. */
-          initialView={
-            activeSubTab === "published"
-              ? "published"
-              : activeSubTab === "session"
-              ? "session"
-              : undefined
-          }
-          initialBaseline={activeSubTab === "session" ? "approved" : undefined}
+          initialView={activeSubTab === "published" ? "published" : undefined}
           /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
              panel polls — one source, two surfaces. */
           rollbackJob={

@@ -36,10 +36,6 @@ export interface HistoryTabProps {
    *  Wins over the stored preference for one mount, so the ⋯ menu's "Publish
    *  history" lands on Published instead of wherever the user last was. */
   initialView?: HistoryView;
-  /** B8 — the Compare chip on the History view surfaces a Compare sub-tab
-   *  from the same SiteMenu / ⋯ menu. Same one-mount precedence as
-   *  initialView: this is a session deep-link, never a persisted preference. */
-  initialCompare?: boolean;
   /** The shell's publish job, forwarded to the Published view so boards
    *  184:37 / 184:45 / 453:4064 can run off one state. Null = no feed. */
   rollbackJob?: { state: "publishing" | "published" | "failed"; progress: number } | null;
