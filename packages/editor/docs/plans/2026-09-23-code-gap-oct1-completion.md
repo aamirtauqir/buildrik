@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Deadline: `/ship` PR opened by **2026-10-01**. New work stops **2026-09-29 23:59**. 09-30 is verification only.
+- Deadline: `/ship` PR opened by **2026-10-01**. C5 work stops **2026-09-26 23:59**. **27 Sep** is the `/edit/:id` walk. **28–29** are fixes only. Code freeze **2026-09-29 23:59**. 30 Sep is gates + re-walk.
 - Every item is done only when its done-condition has been **observed in the running editor** (spec §Verification contract). The probe reads state (`getComputedStyle`, DOM text, network). A screenshot is evidence, not proof.
 - Per item: `npx tsc --noEmit` + `npx vitest run <touched dirs>` green. Tests protecting the old design are rewritten in the same commit.
 - Commit message: `feat(editor): <item id> — <what>`. Body lists boards, **verified**, and **NOT verified**.
@@ -55,17 +55,21 @@
 ## Recommended flow
 
 ```
-23 Sep  Task 1  Freeze + commit WIP in L1–L4         (coordinator)
-        Task 2  Reconcile lane B → owning lanes        (coordinator)
-        → then, SAME DAY, all in parallel:
-23–29   Task 4  Lanes run their queues                 (4 lane agents)
-        Task 5  C5 family batches + carryover file     (lanes, after their named items)
+23 Sep  Task 1  Freeze + commit WIP in L1–L4         (coordinator)          ✓
+        Task 2  Reconcile lane B → owning lanes        (coordinator)          ✓
+23–26   Task 4  Lanes run their queues                 (4 lane agents)        named items ✓ 31/32
+        Task 5  C5 family batches                      (lanes)
         Task 3/6 Integration merge, repeated           (coordinator, whenever a lane reports)
         QA      Continuous live QA on integration      (QA agent, port 5055)
-29 Sep  23:59 new-work freeze
-30 Sep  Task 7  Full live verification at /edit/:id    (coordinator + /qa)
-01 Oct  Task 8  verify:ds, full vitest, /ship          (coordinator)
+26 Sep  23:59 C5 cut — every blank row → `carried — <reason>`
+27 Sep  Task 7  Full live walk at /edit/:id            (coordinator + QA agent)
+28–29   Fixes ONLY for what the 27 Sep walk finds      (lanes, by module)
+29 Sep  23:59 code freeze
+30 Sep  Task 8  verify:ds, full vitest, re-walk the fixed items
+01 Oct  /ship
 ```
+
+Timeline revised 2026-09-24 (owner "han"): verification moved from 30 Sep to 27 Sep. A defect found on the 30th would have had no time to be fixed, and `/edit/:id` had not been checked once.
 
 Execution model (owner, 2026-09-23: "start today, parallel, multiple agents, QA alongside"): this session is the **coordinator** under one `/goal`. It spawns 5 background agents: 4 lane agents (one per worktree; not `isolation: "worktree"`, which failed on this repo) and 1 **QA agent**. The QA agent runs the integration branch in `buildrik-code-gap-A` on port 5055. After every merge it re-walks the done-conditions of the merged items and appends to the verification log, and it reports defects back to the owning lane. The QA agent never edits source. Each lane agent gets: this plan, the spec path, its row in the status table, its port, and the Global Constraints.
 
@@ -230,7 +234,7 @@ Pull the 209 rows from spec §16 / `docs/audit-2026-09-21/03-gap-matrix.md` (Tie
 
 - [ ] **Step 2: Order each lane's C5 slice.** Put user-visible rows first (a user would hit them) and deletions/enumerations last.
 - [ ] **Step 3: One PR-sized commit per family batch.** Each row gets its observable checked live and its ledger status set to `done <sha>`.
-- [ ] **Step 4: 29 Sep 23:59 cut.** Every blank row becomes `carried — <reason>` (e.g. "needs dashboard", "not reached"). The coordinator shows the carried list to the owner on 09-30.
+- [ ] **Step 4: 26 Sep 23:59 cut** (was 29 Sep; revised 2026-09-24). Every blank row becomes `carried — <reason>` (e.g. "needs dashboard", "not reached"). The coordinator shows the carried list to the owner on 09-27.
 
 ### Task 6: Evening merge (every day 24–29 Sep)
 
@@ -239,7 +243,7 @@ Pull the 209 rows from spec §16 / `docs/audit-2026-09-21/03-gap-matrix.md` (Tie
 - [ ] **Step 3:** re-probe the items whose files were touched by two lanes today and log them.
 - [ ] **Step 4:** each lane `git rebase feat/code-gap-2026-09-21` the next morning before new work.
 
-### Task 7: Live verification at `/edit/:id` (30 Sep)
+### Task 7: Live verification at `/edit/:id` (27 Sep; fixes 28–29)
 
 - [ ] **Step 1:** in the A worktree, `.env.local` has `NEXT_PUBLIC_UNIFIED_EDITOR=true` and `NEXT_PUBLIC_FEATURE_PUBLISH=true`. Run `pnpm dev` (dashboard :3000). Sign in, open a real site at `/edit/:id`.
 - [ ] **Step 2:** walk every item in the `/goal` list (1) plus A3 (comment post → forced network failure → error toast with Retry, draft kept). Log `/edit/:id` results.
