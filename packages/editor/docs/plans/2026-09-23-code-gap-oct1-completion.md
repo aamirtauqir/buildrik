@@ -273,3 +273,36 @@ Items deliberately NOT in the Oct 1 scope. Each has an owner decision or a named
 | R3 | Published-snapshot procedure (B8: compare a published version with the draft) | Published HTML never leaves the server | L1 B8 | Dashboard procedure |
 | R4 | Review token in `currentRound` (B3: a real client-link Copy) | Needs the dashboard | L1 B3 | Dashboard returns the token |
 | R5 | CMS Records as a table workspace + side sheet (`4428:143182`) instead of a modal | Full CMS workspace is Tier 3 scope | L3 B13 / owner "Figma wins" | Own item after Oct 1, unless L3 lands it as a small change |
+
+## Visual parity — owner order 2026-09-24: "by Oct 1, visually the same as Figma"
+
+What this changes:
+- A **visual-parity agent** runs from 24 Sep, **continuously**, board screenshot vs live screenshot side by side at 1440×900 (element selected where the board shows it). Each deviation goes straight to the owning lane as a fix. **30 Sep** is the final full visual pass, confirming, not discovering.
+- **Visual C5 rows may not be carried.** Only rows blocked on the dashboard (no visual consequence) may be `carried`.
+- **R5 (CMS Records workspace + side sheet, `4428:143182`) is back in scope** and goes to L3 after its C5 slice. R1 (canvas elements hex vs brand token) stays deferred (owner decision; it is colour behaviour, not layout).
+- Board sample data ("Bella Cucina") is never copied literally; the shape is the contract (CLAUDE.md precedence).
+
+Coverage order (~800 CURRENT boards in `docs/audit-2026-09-21/02-figma-inventory.md`, Figma MCP 200 calls/day shared):
+1. **V1**: the default board of every surface (shell, rail, topbar, Layers, Pages, Inspector, Canvas, Add/Insert, Brand workspace, Publish, Review, History, Templates, Media/Assets, Settings, CMS, AI, Issues, Onboarding, Exit).
+2. **V2**: every board of an item built in this run (A1–C4, C5 rows done).
+3. **V3**: all remaining CURRENT boards, family by family, as budget allows. Boards not reached by 30 Sep are listed as "not compared", never counted as matching.
+
+Output: `docs/plans/2026-09-24-visual-parity-ledger.md`. One row per board: `node · family · live state · MATCH / DRIFT <what, measured> / BLOCKED · owning lane · fix sha`.
+
+## Daily parity cycle — owner 2026-09-24: "same prototype as Figma: visual + flow + prototype, every day, for whatever is final"
+
+An item is **final** when it is merged into integration and passes QA. Every final item then gets three checks against Figma, each day, on the same day it becomes final:
+
+| Check | Question | Source | Figma calls |
+|---|---|---|---|
+| **Visual** | Does the screen look like the board? | board screenshot vs live, 1440×900, measured | 1 per board (cached) |
+| **Flow** | Does the user reach the same place in the same steps? | the prototype's click paths through the boards | 0: dump |
+| **Prototype** | Does every hotspot on the board do in the live app what the prototype does (trigger → destination, overlay vs navigate, back/close)? | `docs/audit-2026-09-21/dump/live-all.json.gz` (10,789 reaction lines, decoder `dump/decode.mjs`) | 0: dump |
+
+Daily Figma budget (200/day, 15/min, shared): visual-parity agent ≤ 120 · lanes ≤ 60 · reserve 20. The coordinator checks the used count at each report; unused budget rolls to V3 boards the same day, never lost.
+
+Each day ends with one line per final item in `scratchpad/parity-daily-<date>.md`: `item · visual MATCH/DRIFT · flow MATCH/DRIFT · prototype N/M hotspots MATCH`. Every DRIFT goes to the owning lane the same day.
+
+Prototype rules (so the check is honest):
+- A reaction whose destination belongs to the dashboard, an archived board or pure sample data is recorded `n/a — <why>`, not DRIFT.
+- Navigation and screen order follow the prototype (visual/IA → board). What the data can do follows the code contract (Zod / service returns), per CLAUDE.md precedence. A conflict between the two goes to the owner and is never silently resolved.
