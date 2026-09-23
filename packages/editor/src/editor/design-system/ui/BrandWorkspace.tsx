@@ -47,7 +47,7 @@
 
 import * as React from "react";
 import { ChevronLeft } from "lucide-react";
-import { Button, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, Select, Tooltip, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
@@ -86,8 +86,7 @@ import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils"
 import { APPLY_CHANGES_LABEL, DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
 import { useBrandDraft } from "./useBrandDraft";
-import { DSModeToggle } from "./DSModeToggle";
-import { useDSModeOptional } from "../state/DSModeContext";
+import { DSModeProvider, useDSModeOptional } from "../state/DSModeContext";
 import { AIPromptModal } from "./AIPromptModal";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
@@ -99,6 +98,7 @@ import { SectionStatusBadge, presetsStatus } from "./SectionStatusBadge";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
+import { ReusableStylesSection, reusableStylesCount } from "./sections/ReusableStylesSection";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { ExportSection } from "./sections/ExportSection";
 import { LintSection, brandChecksCaption, contrastFixFor } from "./sections/LintSection";
@@ -119,6 +119,7 @@ const NAV = [
   { id: "colours",          label: "Colours" },
   { id: "colour-mode",      label: "Colour mode" },
   { id: "fonts",            label: "Fonts & type styles" },
+  { id: "styles",           label: "Styles" },
   { id: "component-styles", label: "Component styles" },
   { id: "classes",          label: "Classes" },
   { id: "presets",          label: "Presets" },
@@ -158,8 +159,7 @@ function isPageId(value: string): value is BrandPageId {
 
 function pageLabel(id: BrandPageId): string {
   return NAV.find((n) => n.id === id)?.label
-    ?? MORE_KINDS.find((k) => `kind-${k.kind}` === id)?.label
-    ?? id;
+    ?? (MORE_KINDS.some((k) => `kind-${k.kind}` === id) ? "Tokens" : id);
 }
 
 // ─── Row chrome (7315:80955: 32-tall rows on a 2px rhythm, 14px, accent tint when on) ──
@@ -225,7 +225,7 @@ export interface BrandWorkspaceProps {
   onClose?: () => void;
 }
 
-export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
+const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   composer,
   projectId,
   initialPage,
@@ -243,7 +243,6 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   const [page, setPage] = React.useState<BrandPageId>(() =>
     initialPage && isPageId(initialPage) ? initialPage : LANDING
   );
-  const [showMoreKinds, setShowMoreKinds] = React.useState(() => page.startsWith("kind-"));
   const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
@@ -316,6 +315,8 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     buttonPresets, cardPresets, formPresets, linkPresets, badgePresets, alertPresets,
     tooltipPresets, modalPresets, navPresets, tablePresets, layoutPresets,
   ];
+
+  const allPresets: StylePreset[] = allPresetRegistries.flatMap((r) => r.presets);
 
   const allRegistries: KindRegistryLike[] = [
     color, type, spacing, radius, shadow, motion, border,
@@ -505,7 +506,6 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       }));
 
     // S2: pull all 11 preset categories into a flat record array for persistence.
-    const allPresets: StylePreset[] = allPresetRegistries.flatMap((r) => r.presets);
     const presetRecords = allPresets.map((p) => ({
       id: p.id, friendlyName: p.friendlyName, category: p.category,
       variant: p.variant, bindings: p.bindings,
@@ -652,7 +652,6 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   const openPage = (id: BrandPageId, tokenId: string | null = null) => {
     setPage(id);
     setSelectedTokenId(tokenId);
-    if (id.startsWith("kind-")) setShowMoreKinds(true);
   };
   const allTokens = React.useMemo(
     () => allRegistries.flatMap((r) => r.tokens),
@@ -704,6 +703,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       case "colours":          return `${visibleColors.length} tokens · light / dark`;
       case "colour-mode":      return "Light and dark values";
       case "fonts":            return fontsCaption(type.tokens);
+      case "styles":           return `Reusable · ${reusableStylesCount(type.tokens, allPresets)}`;
       case "component-styles": return "Default appearance by component";
       case "classes":          return "Names shared across elements";
       case "presets":          return "Section and element presets";
@@ -727,8 +727,9 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             + Add token
           </Button>
         );
+      case "styles":
       case "component-styles": {
-        /* 7316:82755's page action. Gated on the SAME flag that decides
+        /* 7316:82755 / 7316:82153's page action. Gated on the SAME flag that decides
            whether an AIClient is built at all (useComposerInit.ts:132): with
            it off the modal would open over a service with no client and answer
            with AIAssistService's developer string. Blocked, never hidden, and
@@ -775,6 +776,26 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             Run checks
           </Button>
         );
+      default:
+        if (page.startsWith("kind-")) {
+          /* "Tokens · <kind>": the kind is the page's own switch. */
+          return (
+            <Select
+              sizing="sm"
+              aria-label="Token kind"
+              value={page}
+              onChange={(e) => openPage(e.target.value as BrandPageId)}
+              data-testid="brand-kind-switch"
+            >
+              {MORE_KINDS.map((k) => (
+                <option key={k.kind} value={`kind-${k.kind}`}>
+                  {k.label}
+                </option>
+              ))}
+            </Select>
+          );
+        }
+        return null;
       case "fonts":
         /* The fonts a site can pick from are its Site fonts — the same door
            the font picker's "Manage site fonts" opens. */
@@ -783,8 +804,6 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             + Add a font
           </Button>
         );
-      default:
-        return null;
     }
   })();
 
@@ -810,6 +829,17 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             tokens={type.tokens}
             selectedTokenId={selectedTokenId}
             onSelectToken={setSelectedTokenId}
+          />
+        );
+      case "styles":
+        return (
+          <ReusableStylesSection
+            typeTokens={type.tokens}
+            allTokens={allTokens}
+            presets={allPresets}
+            selectedTokenId={selectedTokenId}
+            onSelectToken={setSelectedTokenId}
+            onOpenPresets={() => openPage("presets")}
           />
         );
       case "component-styles":
@@ -859,21 +889,23 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     }
   };
 
-  const navRow = (id: BrandPageId, label: string, dirtyHere: boolean, count?: number) => {
+  /** `slot` names the row when its target moves (the Other tokens row lands
+   *  on whichever kind is open). */
+  const navRow = (id: BrandPageId, label: string, dirtyHere: boolean, count?: number, slot: string = id) => {
     const active = page === id;
     return (
       <Button
-        key={id}
+        key={slot}
         type="button"
         variant="ghost"
         size="xs"
         className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
         onClick={() => openPage(id)}
-        data-section-id={id}
-        data-testid={`brand-row-${id}`}
+        data-section-id={slot}
+        data-testid={`brand-row-${slot}`}
       >
-        <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid={`brand-row-label-${id}`}>
+        <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid={`brand-row-label-${slot}`}>
           {label}
         </span>
         {dirtyHere && (
@@ -905,7 +937,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   const previewControls =
     page === "colour-mode" && composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
 
-  const isTokenPage = page === "colours" || page === "fonts" || page === "spacing" || page.startsWith("kind-");
+  const isTokenPage = page === "colours" || page === "fonts" || page === "styles" || page === "spacing" || page.startsWith("kind-");
 
   return (
     <div
@@ -953,49 +985,22 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             return (
               <React.Fragment key={n.id}>
                 {navRow(n.id, n.label, dirtyHere, navCount(n.id))}
-                {n.id === "spacing" && (
-                  <>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="xs"
-                      className={`${NAV_ROW} tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent)] tw:enabled:hover:text-[var(--bk-accent)]`}
-                      aria-expanded={showMoreKinds}
-                      onClick={() => setShowMoreKinds((v) => !v)}
-                      data-testid="brand-more-kinds"
-                    >
-                      <span className="tw:min-w-0 tw:flex-1" data-testid="brand-more-kinds-label">
-                        {showMoreKinds ? "Fewer token kinds" : "More token kinds"}
-                      </span>
-                      <span aria-hidden="true">{showMoreKinds ? "⌃" : "›"}</span>
-                    </Button>
-                    {showMoreKinds &&
-                      MORE_KINDS.map((k) => navRow(`kind-${k.kind}`, k.label, kindDirty(moreKindRegistry[k.kind])))}
-                  </>
-                )}
+                {/* The other token kinds (G3-130's "Tokens · <kind>" pattern,
+                    which the Spacing board draws). No board draws an entry
+                    to them, so it is ONE row in the nav's own style; the
+                    page's header switches kind. */}
+                {n.id === "spacing" &&
+                  navRow(
+                    page.startsWith("kind-") ? page : "kind-radius",
+                    "Other tokens",
+                    MORE_KINDS.some((k) => kindDirty(moreKindRegistry[k.kind])),
+                    undefined,
+                    "tokens",
+                  )}
               </React.Fragment>
             );
           })}
         </nav>
-        <div className="tw:mt-auto">
-          {/* Beginner / Pro decides what every page offers and has no other
-              route (board 154:132's own footnote tells the user to switch). */}
-          <DSModeToggle className="tw:border-t" />
-          {isBeginner && (
-            <div
-              className="tw:flex tw:min-h-10 tw:items-center tw:px-3 tw:py-2 tw:bg-[var(--bk-bg-subtle)]"
-              data-basic-mode-note
-              data-testid="brand-basic-note"
-            >
-              <span
-                data-testid="brand-basic-note-text"
-                className="tw:block tw:w-full tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
-              >
-                Beginner hides token IDs and empty foundations. Switch to Pro to show them.
-              </span>
-            </div>
-          )}
-        </div>
       </aside>
 
       {/* ── Main: pane + preview column, 40 top / 32 sides, 32 between ──── */}
@@ -1202,5 +1207,17 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     </div>
   );
 };
+
+/**
+ * The boards draw the workspace in one view — every token, ids shown (18
+ * colours on 7315:80955) — and no Beginner / Pro switch (V1 parity, owner
+ * order 2026-09-24). The workspace therefore renders in Pro, in its own
+ * provider: the site-wide mode the inspector reads is not changed or written.
+ */
+export const BrandWorkspace: React.FC<BrandWorkspaceProps> = (props) => (
+  <DSModeProvider initialMode="pro">
+    <BrandWorkspaceBody {...props} />
+  </DSModeProvider>
+);
 
 export default BrandWorkspace;

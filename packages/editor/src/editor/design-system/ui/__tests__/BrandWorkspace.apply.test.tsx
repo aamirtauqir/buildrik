@@ -65,7 +65,7 @@ describe("BrandWorkspace — pages", () => {
     expect(utils.getByTestId("brand-row-presets").getAttribute("aria-current")).toBe("page");
   });
 
-  it("lists the board's nav in its order, Styles omitted, the undesigned kinds behind a disclosure", () => {
+  it("lists the board's nav in its order, Styles included, the other kinds as one row", () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     /* The label cell only — Colours carries its palette count beside it. */
@@ -73,12 +73,16 @@ describe("BrandWorkspace — pages", () => {
       (r) => r.textContent?.trim(),
     );
     expect(labels).toEqual([
-      "Colours", "Colour mode", "Fonts & type styles", "Component styles", "Classes",
-      "Presets", "Brand checks", "Starters", "Spacing", "Import / export",
+      "Colours", "Colour mode", "Fonts & type styles", "Styles", "Component styles", "Classes",
+      "Presets", "Brand checks", "Starters", "Spacing", "Other tokens", "Import / export",
     ]);
-    fireEvent.click(utils.getByTestId("brand-more-kinds"));
-    expect(utils.container.querySelector('[data-section-id="kind-radius"]')).toBeTruthy();
-    expect(utils.container.querySelector('[data-section-id="kind-imagery"]')).toBeTruthy();
+    // No Beginner / Pro switch and no clean-state footer (7315:80955 draws neither).
+    expect(utils.queryByText("Brand is up to date")).toBeNull();
+    expect(utils.container.querySelector('[data-testid="brand-basic-note"]')).toBeNull();
+    fireEvent.click(utils.container.querySelector('[data-section-id="tokens"]')!);
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Tokens");
+    fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: "kind-imagery" } });
+    expect((utils.getByTestId("brand-kind-switch") as HTMLSelectElement).value).toBe("kind-imagery");
   });
 
   it("editing a radius token surfaces the dirty signal (14-kind aggregation)", async () => {
@@ -90,7 +94,7 @@ describe("BrandWorkspace — pages", () => {
     });
     // The nav row for that kind carries the dot; the chip reads Draft.
     expect(
-      utils.getByTestId("brand-row-kind-radius").querySelector('[aria-label="unsaved changes"]'),
+      utils.getByTestId("brand-row-tokens").querySelector('[aria-label="unsaved changes"]'),
     ).toBeTruthy();
     expect(utils.getByText("Draft")).toBeTruthy();
   });
@@ -168,7 +172,8 @@ describe("BrandWorkspace — pages", () => {
     fireEvent.click(utils.getByText("Discard"));
 
     await waitFor(() => {
-      expect(utils.getByText("Brand is up to date")).toBeTruthy();
+      // Clean: the save bar is gone (its clean state is not drawn).
+      expect(utils.queryByTestId("brand-save-bar")).toBeNull();
     });
     expect(buttonReg!.isDirty).toBe(false);
   });

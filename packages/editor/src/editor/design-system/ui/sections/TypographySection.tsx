@@ -86,6 +86,28 @@ export function typeStyleLine(family: string, size: string, element: string): st
   return [family, weight, line].filter(Boolean).join(" ");
 }
 
+/** The type styles — the font-size tokens, largest first, each with its
+ *  board line. Shared by Fonts & type styles and Styles (7316:82153). */
+export function typeStyleRows(source: readonly DesignToken[]): Array<{ id: string; name: string; line: string }> {
+  const order = Object.keys(STYLE_NAMES);
+  return source
+    .filter((t) => t.type === "font-size")
+    .sort((a, b) => {
+      const ia = order.indexOf(a.id);
+      const ib = order.indexOf(b.id);
+      return (ia === -1 ? order.length : ia) - (ib === -1 ? order.length : ib);
+    })
+    .map((t) => {
+      const known = STYLE_NAMES[t.id];
+      const family = familyOf(String(source.find((f) => f.id === (known?.slot ?? "font-body"))?.value ?? ""));
+      return {
+        id: t.id,
+        name: known?.name ?? t.friendlyName ?? t.name,
+        line: typeStyleLine(family, t.value, known?.element ?? "text"),
+      };
+    });
+}
+
 /** "N roles · M active fonts" — the page header's caption. */
 export function fontsCaption(tokens: readonly DesignToken[]): string {
   const families = new Set(
@@ -190,25 +212,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
     };
   }, [composer, read]);
 
-  const styles = React.useMemo(() => {
-    const order = Object.keys(STYLE_NAMES);
-    return source
-      .filter((t) => t.type === "font-size")
-      .sort((a, b) => {
-        const ia = order.indexOf(a.id);
-        const ib = order.indexOf(b.id);
-        return (ia === -1 ? order.length : ia) - (ib === -1 ? order.length : ib);
-      })
-      .map((t) => {
-        const known = STYLE_NAMES[t.id];
-        const family = familyOf(String(source.find((f) => f.id === (known?.slot ?? "font-body"))?.value ?? ""));
-        return {
-          id: t.id,
-          name: known?.name ?? t.friendlyName ?? t.name,
-          line: typeStyleLine(family, t.value, known?.element ?? "text"),
-        };
-      });
-  }, [source]);
+  const styles = React.useMemo(() => typeStyleRows(source), [source]);
 
   if (rows.length === 0 && styles.length === 0) {
     return (
