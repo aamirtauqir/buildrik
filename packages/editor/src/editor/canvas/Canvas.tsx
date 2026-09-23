@@ -271,7 +271,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       addGuide,
       removeGuide,
       updateGuide,
-    } = useCanvasGuides({ enabled: showRulers });
+    } = useCanvasGuides({ composer, enabled: showRulers });
 
     // Hover, marquee, keyboard
     const { hoveredElementId, shouldShowHover, handleCanvasMouseMove, handleCanvasMouseLeave } =

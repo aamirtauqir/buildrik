@@ -3,18 +3,25 @@
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
  *
  * useCanvasGuides Hook
- * Manages canvas guides with localStorage persistence
+ * Ruler guides, saved with the site (G2-033): they live in the project
+ * settings (`canvasGuides`), which round-trip through the site's
+ * projectSettings — not in this browser's localStorage, where they were lost
+ * on another machine and shared across every site on this one.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import type { Composer } from "../../../engine";
+import { EVENTS } from "../../../shared/constants/events";
 import type { CanvasGuide } from "../../../shared/types/canvas";
 import { devLogger } from "../../../shared/utils/devLogger";
 
-const STORAGE_KEY = "buildrick-guides";
+/** A guide drag updates on every pointer move; the site is written once it rests. */
+const PERSIST_DELAY_MS = 300;
 
 export interface UseCanvasGuidesOptions {
+  composer: Composer | null;
   /** Enable/disable guides */
   enabled: boolean;
 }
@@ -28,92 +35,85 @@ export interface UseCanvasGuidesReturn {
   removeGuide: (id: string) => void;
   /** Update guide position */
   updateGuide: (id: string, position: number) => void;
-  /** Clear all guides */
-  clearGuides: () => void;
 }
 
-/**
- * Load guides from localStorage
- */
-function loadGuides(): CanvasGuide[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored) as CanvasGuide[];
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return [];
-}
+const savedGuides = (composer: Composer | null): CanvasGuide[] =>
+  composer?.getProjectSettings().canvasGuides ?? [];
 
-/**
- * Save guides to localStorage
- */
-function saveGuides(guides: CanvasGuide[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(guides));
-  } catch {
-    // Ignore storage errors
-  }
-}
+export function useCanvasGuides({ composer, enabled }: UseCanvasGuidesOptions): UseCanvasGuidesReturn {
+  const [guides, setGuides] = React.useState<CanvasGuide[]>(() => savedGuides(composer));
+  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-/**
- * Hook for managing canvas guides
- */
-export function useCanvasGuides({ enabled }: UseCanvasGuidesOptions): UseCanvasGuidesReturn {
-  const [guides, setGuides] = React.useState<CanvasGuide[]>(() => {
-    if (!enabled) return [];
-    return loadGuides();
-  });
-
-  // Load guides when enabled changes
+  // Read on mount and whenever a project (re)loads — never written back here,
+  // so opening a site does not mark it dirty.
   React.useEffect(() => {
-    if (enabled) {
-      setGuides(loadGuides());
-    }
-  }, [enabled]);
-
-  // Save guides when they change
-  React.useEffect(() => {
-    if (enabled) {
-      saveGuides(guides);
-    }
-  }, [guides, enabled]);
-
-  const addGuide = React.useCallback((type: "horizontal" | "vertical", position: number) => {
-    const newGuide: CanvasGuide = {
-      id: crypto.randomUUID(),
-      type,
-      position,
-      locked: false,
-      color: "#89b4fa",
+    if (!composer) return;
+    const read = () => setGuides(savedGuides(composer));
+    read();
+    composer.on(EVENTS.PROJECT_LOADED, read);
+    return () => {
+      composer.off(EVENTS.PROJECT_LOADED, read);
     };
-    devLogger.guides("add", { type, position, id: newGuide.id });
-    setGuides((prev) => [...prev, newGuide]);
-  }, []);
+  }, [composer]);
 
-  const removeGuide = React.useCallback((id: string) => {
-    devLogger.guides("remove", { id });
-    setGuides((prev) => prev.filter((g) => g.id !== id));
-  }, []);
+  React.useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    []
+  );
 
-  const updateGuide = React.useCallback((id: string, position: number) => {
-    devLogger.guides("update", { id, position });
-    setGuides((prev) => prev.map((g) => (g.id === id ? { ...g, position } : g)));
-  }, []);
+  const commit = React.useCallback(
+    (change: (prev: CanvasGuide[]) => CanvasGuide[]) => {
+      setGuides((prev) => {
+        const next = change(prev);
+        if (timer.current) clearTimeout(timer.current);
+        timer.current = setTimeout(() => {
+          timer.current = null;
+          if (composer) composer.setProjectSettings({ ...composer.getProjectSettings(), canvasGuides: next });
+        }, PERSIST_DELAY_MS);
+        return next;
+      });
+    },
+    [composer]
+  );
 
-  const clearGuides = React.useCallback(() => {
-    devLogger.guides("clear-all");
-    setGuides([]);
-  }, []);
+  const addGuide = React.useCallback(
+    (type: "horizontal" | "vertical", position: number) => {
+      const newGuide: CanvasGuide = {
+        id: crypto.randomUUID(),
+        type,
+        position,
+        locked: false,
+        color: "#89b4fa",
+      };
+      devLogger.guides("add", { type, position, id: newGuide.id });
+      commit((prev) => [...prev, newGuide]);
+    },
+    [commit]
+  );
+
+  const removeGuide = React.useCallback(
+    (id: string) => {
+      devLogger.guides("remove", { id });
+      commit((prev) => prev.filter((g) => g.id !== id));
+    },
+    [commit]
+  );
+
+  const updateGuide = React.useCallback(
+    (id: string, position: number) => {
+      devLogger.guides("update", { id, position });
+      commit((prev) => prev.map((g) => (g.id === id ? { ...g, position } : g)));
+    },
+    [commit]
+  );
 
   return {
     guides: enabled ? guides : [],
     addGuide,
     removeGuide,
     updateGuide,
-    clearGuides,
   };
 }
 
