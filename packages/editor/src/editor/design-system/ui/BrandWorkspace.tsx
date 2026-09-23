@@ -85,6 +85,7 @@ import { mergeProjectTokens } from "../state/projectTokens";
 import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils";
 import { APPLY_CHANGES_LABEL, DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
+import { useBrandDraft } from "./useBrandDraft";
 import { DSModeToggle } from "./DSModeToggle";
 import { useDSModeOptional } from "../state/DSModeContext";
 import { AIPromptModal } from "./AIPromptModal";
@@ -248,6 +249,8 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   const [guardOpen, setGuardOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isFirstLoad, setIsFirstLoad] = React.useState(false);
+  /* The saved brand is in the registries — the auto-draft may restore on top. */
+  const [brandLoaded, setBrandLoaded] = React.useState(false);
 
   // T10 / spec D8: outermost wrapper gets data-ds-preview={resolvedMode} so
   // ds-panel-dark.css can scope overrides to the Brand surface only. Editor
@@ -316,6 +319,15 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     color, type, spacing, radius, shadow, motion, border,
     opacity, zindex, breakpoint, grid, sizing, icon, imagery,
   ];
+
+  // Decision #28: the draft survives a reload.
+  useBrandDraft({
+    projectId,
+    registries: allRegistries,
+    color,
+    addColorToken: color.addToken,
+    ready: brandLoaded,
+  });
 
   /* Cleared when the page changes: a badge saying "Exported CSS" on a page
      the user walked back into later is stale news dressed as fresh. */
@@ -389,6 +401,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
         setIsFirstLoad(true);
       }
       setError(null);
+      setBrandLoaded(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load design tokens");
     }
