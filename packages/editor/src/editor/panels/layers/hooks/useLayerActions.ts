@@ -2,7 +2,8 @@
  * useLayerActions - Manages visibility, lock, rename, delete, duplicate, and move operations.
  *
  * Responsibilities:
- * - Persist/restore hidden, locked, and custom name states per page
+ * - Persist/restore hidden state per page (browser); names and locks are the
+ *   element's own data, saved with the project (C5 G2-061 / G2-065)
  * - Toggle visibility/lock with DOM attribute sync
  * - Inline rename editing
  * - Delete with child count confirmation
@@ -16,10 +17,11 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import type { LayerItem } from "../types";
 import {
+  LAYER_NAME_KEY,
+  getLayerName,
   loadSetFromStorage,
-  loadMapFromStorage,
   saveSetToStorage,
-  saveMapToStorage,
+  takeLegacyLayerState,
   applyStoredStatesToDOM,
 } from "./layersPersistence";
 
@@ -77,17 +79,24 @@ export function useLayerActions(
       // this commit are writing hydrated state rather than the empty initial.
       hydratedPage.current = pageId;
       const storedHidden = loadSetFromStorage(pageId, "hidden");
-      const storedLocked = loadSetFromStorage(pageId, "locked");
-      const storedNames = loadMapFromStorage(pageId);
+      /* Names and locks are read from the elements (saved with the project).
+         Anything still in the old per-browser keys is written into the
+         elements once, then those keys are dropped. */
+      const legacy = takeLegacyLayerState(pageId);
+      const storedLocked = new Set<string>();
+      const storedNames = new Map<string, string>();
+      for (const el of composer?.elements.getAllElements() ?? []) {
+        const id = el.getId();
+        const legacyName = legacy.names.get(id);
+        if (legacyName && !getLayerName(el)) el.setData(LAYER_NAME_KEY, legacyName);
+        if (legacy.locked.has(id) && el.getData().locked !== true) el.setLocked(true);
+        const name = getLayerName(el);
+        if (name) storedNames.set(id, name);
+        if (el.getData().locked === true) storedLocked.add(id);
+      }
       setHiddenIds(storedHidden);
       setLockedIds(storedLocked);
       setCustomNames(storedNames);
-      // Apply engine lock state immediately so transactions respect locks
-      if (composer) {
-        storedLocked.forEach((id) => {
-          composer.elements.getElement(id)?.setLocked(true);
-        });
-      }
       hydrateTimeoutRef.current = setTimeout(() => {
         applyStoredStatesToDOM(storedHidden, storedLocked);
         hydrateTimeoutRef.current = null;
@@ -110,18 +119,6 @@ export function useLayerActions(
     if (!currentPageId || hydratedPage.current !== currentPageId) return;
     saveSetToStorage(currentPageId, "hidden", hiddenIds);
   }, [hiddenIds, currentPageId]);
-
-  // Persist locked state
-  React.useEffect(() => {
-    if (!currentPageId || hydratedPage.current !== currentPageId) return;
-    saveSetToStorage(currentPageId, "locked", lockedIds);
-  }, [lockedIds, currentPageId]);
-
-  // Persist custom names
-  React.useEffect(() => {
-    if (!currentPageId || hydratedPage.current !== currentPageId) return;
-    saveMapToStorage(currentPageId, customNames);
-  }, [customNames, currentPageId]);
 
   const toggleVisibility = React.useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -193,6 +190,12 @@ export function useLayerActions(
          and these names live only in this panel's store — without an
          announcement it would keep showing the old one until something else
          happened to re-render it. */
+      /* Saved with the project (G2-061): the element carries its name. */
+      const el = composer?.elements.getElement(editingId);
+      if (el) {
+        el.setData(LAYER_NAME_KEY, trimmed || undefined);
+        composer?.markDirty();
+      }
       composer?.emit(EVENTS.ELEMENT_RENAMED, { id: editingId, name: trimmed || null });
     }
     setEditingId(null);

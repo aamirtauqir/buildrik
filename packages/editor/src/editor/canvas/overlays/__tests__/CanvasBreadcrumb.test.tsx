@@ -16,6 +16,7 @@ interface El {
   getType: () => string;
   getTagName: () => string;
   getParent: () => El | null;
+  getCustomData: (key: string) => unknown;
 }
 
 function el(id: string, type: string, parent: El | null): El {
@@ -24,6 +25,7 @@ function el(id: string, type: string, parent: El | null): El {
     getType: () => type,
     getTagName: () => type,
     getParent: () => parent,
+    getCustomData: () => undefined,
   };
 }
 

@@ -27,6 +27,9 @@ vi.mock("@/shared/utils/runtimeEnv", async (orig) => ({
 }));
 
 
+/* Set per test: the layer name el-1 carries in its element data. */
+const namedHero: { name: string | undefined } = { name: undefined };
+
 function makeProps(over: Partial<StudioFooterProps> = {}): StudioFooterProps {
   return {
     /* A composer double without an event surface is an incomplete double —
@@ -34,8 +37,12 @@ function makeProps(over: Partial<StudioFooterProps> = {}): StudioFooterProps {
     composer: {
       setZoom: vi.fn(),
       isProjectLoading: () => false,
-      /* The footer reads the active page id to look up layer names. */
-      elements: { getActivePage: () => ({ id: "page-1" }) },
+      /* Layer names are the element's own data (G2-061). */
+      elements: {
+        getActivePage: () => ({ id: "page-1" }),
+        getElement: (id: string) =>
+          id === "el-1" ? { getCustomData: (k: string) => (k === "layerName" ? namedHero.name : undefined) } : undefined,
+      },
       on: vi.fn(),
       off: vi.fn(),
     } as unknown as Composer,
@@ -47,6 +54,7 @@ function makeProps(over: Partial<StudioFooterProps> = {}): StudioFooterProps {
 }
 
 afterEach(() => {
+  namedHero.name = undefined;
   cleanup();
   localStorage.clear();
   for (const n of document.querySelectorAll("[data-buildrick-id]")) n.remove();
@@ -67,7 +75,7 @@ describe("StudioFooter (board 52:10)", () => {
      one the user typed in the layers panel — not the HTML tag. Asserting the
      tag here is what let "Container · div" ship. */
   it("selection with a layer name → '{Type} · {name}', the board's 'Section · Hero'", () => {
-    localStorage.setItem("buildrick-layers-page-1-names", JSON.stringify({ "el-1": "Hero" }));
+    namedHero.name = "Hero";
     render(
       <StudioFooter
         {...makeProps({ selectedElement: { id: "el-1", type: "section", tagName: "div" } })}
@@ -88,12 +96,15 @@ describe("StudioFooter (board 52:10)", () => {
   });
 
   it("a rename lands immediately — the panel persists in an effect, so the event wins", () => {
-    localStorage.setItem("buildrick-layers-page-1-names", JSON.stringify({ "el-1": "Hero" }));
+    namedHero.name = "Hero";
     const handlers: Record<string, ((p: unknown) => void)[]> = {};
     const composer = {
       setZoom: vi.fn(),
       isProjectLoading: () => false,
-      elements: { getActivePage: () => ({ id: "page-1" }) },
+      elements: {
+        getActivePage: () => ({ id: "page-1" }),
+        getElement: () => ({ getCustomData: () => namedHero.name }),
+      },
       on: (e: string, fn: (p: unknown) => void) => {
         (handlers[e] ??= []).push(fn);
       },
@@ -127,7 +138,7 @@ describe("StudioFooter (board 52:10)", () => {
     const composer = {
       setZoom: vi.fn(),
       isProjectLoading: () => false,
-      elements: { getActivePage: () => ({ id: "page-1" }) },
+      elements: { getActivePage: () => ({ id: "page-1" }), getElement: () => undefined },
       selection: { getSelectedIds: () => ["a", "b", "c"] },
       on: vi.fn(),
       off: vi.fn(),
@@ -149,7 +160,7 @@ describe("StudioFooter (board 52:10)", () => {
     const composer = {
       setZoom: vi.fn(),
       isProjectLoading: () => false,
-      elements: { getActivePage: () => ({ id: "page-1" }) },
+      elements: { getActivePage: () => ({ id: "page-1" }), getElement: () => undefined },
       selection: { getSelectedIds: () => ["a"] },
       on: vi.fn(),
       off: vi.fn(),
