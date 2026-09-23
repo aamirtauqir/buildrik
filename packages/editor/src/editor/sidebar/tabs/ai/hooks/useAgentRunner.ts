@@ -4,6 +4,8 @@ import type { AIModel } from "../types";
 import { applyAiEdit } from "../applySetStyle";
 import {
   runPromptOnce,
+  AiRunError,
+  type AiErrorKind,
   type PlanStep,
   type ServerEdit,
   type PageElementRef,
@@ -46,17 +48,31 @@ export interface RunStep {
 
 export type RunPhase = "idle" | "planning" | "running" | "done";
 
+/** The selected element a prompt is scoped to (ScopeChip's element scope). */
+export interface ElementTarget {
+  id: string;
+}
+
+function errorKindOf(e: unknown): AiErrorKind {
+  return e instanceof AiRunError ? e.kind : "other";
+}
+
 interface UseAgentRunnerResult {
   phase: RunPhase;
   steps: RunStep[];
   currentIndex: number;
   error: string | null;
+  /** What kind of failure `error` is — boards 171:136 / 171:105 draw "not
+   *  configured" and "out of credit" as panel states, not as a run error. */
+  errorKind: AiErrorKind | null;
   /** Board 171:36 — a run the user stopped is not a run that finished, and
    *  `phase` alone could not tell them apart (stop() sets "done"). */
   stoppedByUser: boolean;
   autoApply: boolean;
   setAutoApply: (on: boolean) => void;
-  start: (prompt: string) => void;
+  /** Plan and run a prompt. With an element target the plan is that one
+   *  step — the server planner only reasons about pages. */
+  start: (prompt: string, target?: ElementTarget) => void;
   approve: () => void;
   skip: () => void;
   stop: () => void;
@@ -75,6 +91,7 @@ export function useAgentRunner(
   const [steps, setSteps] = React.useState<RunStep[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(-1);
   const [error, setError] = React.useState<string | null>(null);
+  const [errorKind, setErrorKind] = React.useState<AiErrorKind | null>(null);
   const [stoppedByUser, setStoppedByUser] = React.useState(false);
   const [autoApply, setAutoApplyState] = React.useState(false);
 
@@ -221,6 +238,7 @@ export function useAgentRunner(
         stepsRef.current = failed;
         setSteps(failed);
         setError(e instanceof Error ? e.message : "That step failed.");
+        setErrorKind(errorKindOf(e));
         setPhase("done");
         setCurrentIndex(-1);
         composer?.emit("ai:agent-run", { running: false, summary: "" });
@@ -234,25 +252,34 @@ export function useAgentRunner(
   generateStepRef.current = generateStep;
 
   const start = React.useCallback(
-    async (prompt: string) => {
+    async (prompt: string, target?: ElementTarget) => {
       if (!composer) return;
       cancelledRef.current = false;
       setStoppedByUser(false);
       runStartRef.current = Date.now();
       reportedRef.current = false;
       setError(null);
+      setErrorKind(null);
       setSteps([]);
       stepsRef.current = [];
       setCurrentIndex(-1);
       setPhase("planning");
       try {
-        const elements = gatherElements();
-        const { plan } = await runPromptOnce({
-          prompt,
-          scope: { kind: "page", elements, tokens: gatherTokensCb(), assets: gatherMediaAssetsCb() },
-          model,
-          intent: "plan",
-        });
+        let plan: PlanStep[] | null;
+        if (target) {
+          /* Decision #23: one conversation model. An element-scoped prompt
+             is a one-step plan on that element — it runs at once, through the
+             same step gate as any other run. */
+          plan = [{ title: prompt, scope: { kind: "element", id: target.id }, instruction: prompt }];
+        } else {
+          const elements = gatherElements();
+          ({ plan } = await runPromptOnce({
+            prompt,
+            scope: { kind: "page", elements, tokens: gatherTokensCb(), assets: gatherMediaAssetsCb() },
+            model,
+            intent: "plan",
+          }));
+        }
         if (cancelledRef.current) return;
         if (!plan || plan.length === 0) {
           setError("Couldn't break that into steps. Try a more specific build request.");
@@ -266,10 +293,11 @@ export function useAgentRunner(
         generateStepRef.current(0);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Planning failed");
+        setErrorKind(errorKindOf(e));
         setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
       }
     },
-    [composer, model, gatherElements, gatherTokens, gatherMediaAssets],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb],
   );
 
   const approve = React.useCallback(async () => {
@@ -309,7 +337,8 @@ export function useAgentRunner(
     stepsRef.current = [];
     setCurrentIndex(-1);
     setError(null);
+    setErrorKind(null);
   }, []);
 
-  return { phase, steps, currentIndex, error, stoppedByUser, autoApply, setAutoApply, start, approve, skip, stop, reset };
+  return { phase, steps, currentIndex, error, errorKind, stoppedByUser, autoApply, setAutoApply, start, approve, skip, stop, reset };
 }

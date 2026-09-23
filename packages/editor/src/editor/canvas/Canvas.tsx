@@ -7,6 +7,8 @@
 
 import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 import { THRESHOLDS } from "../../shared/constants";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
@@ -68,7 +70,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       device,
       zoom,
       onAIRequest,
-      showComponentView = false,
       showSpacing = false,
       showBadges = false,
       showGuides = true,
@@ -640,6 +641,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     );
 
     const size = DEVICE_SIZES[device];
+    const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly);
 
     /* readOnly withholds every handler that can change the document — inline
        edit, drop, the context menu and the keyboard (Delete, ⌘Z, ⌘D). Click and
@@ -690,7 +692,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           {/* Canvas Content */}
           <div
             ref={canvasRef}
-            className={`buildrick-canvas${showComponentView ? " bd-canvas--component-view" : ""}`}
+            className="buildrick-canvas"
             data-buildrick-canvas="true"
             // Conformance anchor, deliberately separate from the engine markers
             // above. `data-buildrick-canvas` and `.buildrick-canvas` are queried
@@ -725,14 +727,16 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           {isCanvasEmpty && !readOnly && (
             <CanvasEmptyCTA
               started={startedBlank}
+              span={emptyCtaSpan}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
               /* Board 4428:44164's two new doors reuse the seams that already
                  exist: the Add drawer opened on BLOCKS (the canvas menu's
                  "Replace with block…" does the same), and the AI panel (the
                  inspector's ✦ chip). */
               onAddBlock={() => {
-                composer?.emit("ui:switch-tab", { tab: "add" });
-                composer?.emit(EVENTS.UI_INSERT_OPEN_GROUP, { group: "blocks" });
+                if (!composer) return;
+                composer.emit("ui:switch-tab", { tab: "add" });
+                requestInsertGroup(composer, "blocks");
               }}
               onDescribe={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
               onStartBlank={() => {
@@ -823,7 +827,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
               onHelpClick={openCheatSheet}
-              device={device === "watch" ? "mobile" : device}
+              device={device}
               onDeviceChange={onDeviceChange}
               canUndo={canUndo}
               canRedo={canRedo}

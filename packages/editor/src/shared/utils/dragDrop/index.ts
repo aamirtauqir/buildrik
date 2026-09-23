@@ -43,8 +43,6 @@ export type {
   // Drop zone types
   DropZone,
   DropZoneRegistry,
-  // Touch types
-  TouchDragState,
   // Keyboard types
   KeyboardDragConfig,
   // Ghost options
@@ -155,18 +153,6 @@ export {
 // =============================================================================
 
 export { startAutoScroll, stopAutoScroll } from "./autoScroll";
-
-// =============================================================================
-// TOUCH SUPPORT
-// =============================================================================
-
-export {
-  createTouchDragState,
-  hasTouchMoved,
-  startLongPressDetection,
-  cancelLongPressDetection,
-  preventTouchDefaults,
-} from "./touchSupport";
 
 // =============================================================================
 // KEYBOARD SUPPORT

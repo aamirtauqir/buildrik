@@ -64,6 +64,17 @@ describe("setDevice", () => {
     expect(frame().style.height).toBe("100%");
   });
 
+  /* Decision #26 deleted the Watch device; a saved "watch" must not
+     reach applyDeviceSize with no config behind it. */
+  it("ignores a device it has no preset for (legacy \"watch\")", () => {
+    viewport.setDevice("tablet");
+    composer.emit.mockClear();
+    viewport.setDevice("watch" as never);
+    expect(viewport.getDevice()).toBe("tablet");
+    expect(frame().style.width).toBe("768px");
+    expect(composer.emit).not.toHaveBeenCalled();
+  });
+
   it("a wide device with no height falls back to 100% height", () => {
     viewport.setDevice("wide");
     expect(frame().style.width).toBe("1920px");

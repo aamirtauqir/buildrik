@@ -2,15 +2,12 @@ import * as React from "react";
 import { ConfirmDialog, PanelFrame, Button } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { ScopeChip } from "./ScopeChip";
-import { ChatThread } from "./ChatThread";
+import { EmptyThread } from "./EmptyThread";
 import { AgentPlan } from "./AgentPlan";
 import { Composer as PromptComposer } from "./Composer";
 import { useAIScope } from "./hooks/useAIScope";
-import { useStreamPrompt, toServerScope } from "./hooks/useStreamPrompt";
-import { gatherTokens, gatherMediaAssets } from "./hooks/aiScopeContext";
 import { useAgentRunner } from "./hooks/useAgentRunner";
 import { useAiActionGate } from "./hooks/useAiActionGate";
-import { applyAiEdit } from "./applySetStyle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 /* Boards 171:136 / 171:105 — a state block: what is wrong, why, and the way
@@ -21,8 +18,7 @@ const STATE_TITLE = "tw:m-0 tw:text-[14px] tw:font-medium tw:text-[var(--bk-ink)
 const STATE_BODY = "tw:m-0 tw:text-[12px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 const STATE_LINK =
   "tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-accent)]";
-import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
-import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
+import { DEFAULT_MODEL, type AIModel } from "./types";
 import "./AITab.css";
 
 export interface AITabProps {
@@ -36,175 +32,68 @@ export interface AITabProps {
   onBack?: () => void;
 }
 
+/** Board 4418:107268's guard — one element at a time until batch scope exists. */
+const MULTI_GUARD = "AI editing supports one element at a time in v1 — select a single element.";
+
 export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, onBack }) => {
   const { scope, status, lock, unlock } = useAIScope(composer);
-  const stream = useStreamPrompt();
   // Not state: the server owns model choice (`resolveModelForUser` gates it by
   // plan and ignores a client hint it doesn't allow). The picker that used to
   // set this offered four models, three of which the server could never call —
   // a control that never controlled anything. Removed.
   const model: AIModel = DEFAULT_MODEL;
-  /* No mode toggle on any board: the idle state's DRAFT row is the way into
-     a longer job (board 170:2), and the run's own end returns you. */
-  const [mode, setMode] = React.useState<"chat" | "agent">("chat");
-  const [messages, setMessages] = React.useState<ChatMessage[]>([]);
-  const streamingMsgIdRef = React.useRef<string | null>(null);
   const actionGate = useAiActionGate(composer);
   const agent = useAgentRunner(composer, model, actionGate.propose);
-  /* Board 171:2's Retry re-runs the same brief, so the panel has to remember
-     it — the runner does not keep the prompt. */
-  const lastAgentPrompt = React.useRef("");
+  /* Decision #23 (E-8): one conversation model — plan / run. The chat thread,
+     its proposed-change card and ↻ Regenerate are gone; every prompt goes to
+     the runner. Board 171:2's Retry re-runs the same brief, so the panel
+     remembers it — the runner does not keep the prompt. */
+  const lastPrompt = React.useRef<{ text: string; target?: { id: string } } | null>(null);
+  const [guard, setGuard] = React.useState(false);
+  /* Board 921:4478's DRAFT row leads to the brief-entry frame (AgentPlan's
+     idle state); a run ending (reset → idle) hands the panel back. */
+  const [briefing, setBriefing] = React.useState(false);
+  const promptRef = React.useRef<HTMLDivElement>(null);
 
-  /* With the mode toggle gone, a finished or stopped run has to hand the panel
-     back by itself — otherwise the plan's last frame would be the only thing
-     left on screen with no way to ask anything else.
+  const run = React.useCallback(
+    (text: string, target?: { id: string }) => {
+      lastPrompt.current = { text, target };
+      lock();
+      agent.start(text, target);
+    },
+    [agent, lock],
+  );
 
-     It has to key off the TRANSITION back to idle, not off idle itself: a run
-     that hasn't started yet is idle too, so `phase === "idle"` alone bounced
-     the panel out of agent mode the instant the DRAFT row put it there, and
-     the whole agent surface — plan, step gate, failed step, stopped, done —
-     was unreachable. The only thing that returns the runner to idle is
-     reset(), which is what dismissing a finished run calls. */
-  const prevPhase = React.useRef(agent.phase);
-  React.useEffect(() => {
-    const was = prevPhase.current;
-    prevPhase.current = agent.phase;
-    if (mode === "agent" && was !== "idle" && agent.phase === "idle") setMode("chat");
-  }, [mode, agent.phase]);
-
-  /** The last prompt, so the provider-failure state can offer a real retry. */
-  const lastPromptRef = React.useRef<string | null>(null);
-
-  const submit = React.useCallback((text: string) => {
-    lastPromptRef.current = text;
-    const serverScope = toServerScope(scope);
-    if (!serverScope) {
-      // Multi-select (or no scope): surface a message instead of a silent no-op.
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `sys-${Date.now()}`,
-          role: "assistant",
-          text: "AI editing supports one element at a time in v1 — select a single element.",
-          createdAt: Date.now(),
-        },
-      ]);
-      return;
-    }
-
-    // Element scope edits the one element. Page scope (P3) attaches the page's
-    // element list so the AI can edit across many elements in one batch
-    // ("make the whole page modern"); that promotes page scope from chat to an
-    // edit command batch the user accepts.
-    let finalScope = serverScope;
-    let intent: "text" | "style-command" =
-      serverScope.kind === "element" ? "style-command" : "text";
-    if (serverScope.kind === "page" && composer) {
-      const elements = composer.elements
-        .getAllElements()
-        .map((el) => {
-          const content = el.getContent?.();
-          return {
-            id: el.getId(),
-            type: el.getType(),
-            text: content ? String(content).slice(0, 200) : undefined,
-          };
-        })
-        .filter((e) => e.id)
-        .slice(0, 200);
-      if (elements.length > 0) {
-        // Attach the token registry + media library so set-token / set-image
-        // recall works in chat page mode (agent mode already did this; chat
-        // dropped both, so the model guessed non-existent tokens/URLs).
-        finalScope = {
-          kind: "page",
-          elements,
-          tokens: gatherTokens(composer),
-          assets: gatherMediaAssets(composer),
-        };
-        intent = "style-command";
+  const submit = React.useCallback(
+    (text: string) => {
+      if (scope.kind === "multi") {
+        setGuard(true);
+        return;
       }
-    }
+      setGuard(false);
+      run(text, scope.kind === "element" ? { id: scope.id } : undefined);
+    },
+    [scope, run],
+  );
 
-    lock();
-    const userId = `u-${Date.now()}`;
-    const aId = `a-${Date.now() + 1}`;
-    streamingMsgIdRef.current = aId;
-    setMessages((prev) => [
-      ...prev,
-      { id: userId, role: "user", text, createdAt: Date.now() },
-      { id: aId, role: "assistant", text: "", streaming: true, createdAt: Date.now() },
-    ]);
-    stream.start({ prompt: text, scope: finalScope, model, intent });
-  }, [scope, model, lock, stream, composer]);
-
+  /* The scope stays locked while the run is live (board 4418:104454's 🔒)
+     and is handed back when it ends. */
+  const live = agent.phase === "planning" || agent.phase === "running";
   React.useEffect(() => {
-    // Capture the streaming message id in a local BEFORE setMessages. The
-    // functional updater runs during React's render pass — later than this
-    // effect body — so reading `streamingMsgIdRef.current` inside it would see
-    // the value AFTER the `= null` below ran, dropping the final chunk. The
-    // final chunk is exactly the one carrying the edit (edit + done arrive in
-    // one flush with streaming already false), so the edit was silently lost
-    // and the canvas never changed. Bind the id locally to close the race.
-    const targetId = streamingMsgIdRef.current;
-    if (!targetId) return;
-    setMessages((prev) =>
-      prev.map((m) =>
-        m.id === targetId
-          ? { ...m, text: stream.text, streaming: stream.streaming, stopped: stream.stopped, edit: stream.edit ?? m.edit, error: stream.error ?? m.error }
-          : m,
-      ),
-    );
-    if (!stream.streaming) {
-      streamingMsgIdRef.current = null;
-      // Unlock on any completion (done or stopped). Previously only `stopped`
-      // unlocked, so a normal completion left the scope locked and the user
-      // couldn't select a new element for the next edit.
-      unlock();
-    }
-  }, [stream.text, stream.streaming, stream.stopped, stream.edit, stream.error, unlock]);
+    if (agent.phase === "done") unlock();
+    if (agent.phase !== "idle") setBriefing(false);
+  }, [agent.phase, unlock]);
 
-  const onAccept = React.useCallback(async (msgId: string) => {
-    const msg = messages.find((m) => m.id === msgId);
-    let outcome: "applied" | "invalid" = "invalid";
-    if (msg?.edit && composer) {
-      // Apply the command batch in one transaction (one undo step). A bad
-      // element id throws but the transaction still closes (endTransaction in
-      // finally) and the partial edit is recorded as one undoable entry.
-      // applyAiEdit is async (some commands, e.g. insert-component, are async);
-      // await so the "applied" state flips only after the mutation lands.
-      /* `applied` is the number of commands that actually reached the canvas,
-         and it has always been returned — it was just thrown away, so the
-         message flipped to "✓ Applied" whether or not anything changed. The
-         model regularly answers with a command set this editor cannot map
-         (the server labels that batch "No applicable change" and still ships
-         `commands: []`), and clicking Apply on one of those reported success
-         over an untouched canvas. The catch is not success either. */
-      try {
-        const { applied, proposals } = await applyAiEdit(composer, msg.edit);
-        trackAiEditApplied({ applyOps: msg.edit.applyOps, surface: "chat", model });
-        // A privileged action (e.g. publish) was proposed — route it to the
-        // explicit confirm gate instead of applying it to the canvas.
-        if (proposals.length > 0) void actionGate.propose(proposals[0].actionId);
-        outcome = applied > 0 || proposals.length > 0 ? "applied" : "invalid";
-      } catch { /* partial recorded */ }
-    }
-    setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: outcome } } : m));
-    unlock();
-  }, [messages, composer, unlock, model, actionGate]);
+  /* The three panel states replace the run only while nothing from it has
+     landed — a run that failed after applying steps keeps AgentPlan, whose
+     error card carries Undo all. */
+  const failedKind = agent.steps.some((s) => s.status === "applied") ? null : agent.errorKind;
 
-  const onReject = React.useCallback((msgId: string) => {
-    setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "rejected" } } : m));
-    unlock();
-  }, [unlock]);
-
-  const onRegenerate = React.useCallback((msgId: string) => {
-    const idx = messages.findIndex((m) => m.id === msgId);
-    if (idx < 1) return;
-    const userMsg = messages[idx - 1];
-    if (userMsg.role !== "user") return;
-    submit(userMsg.text);
-  }, [messages, submit]);
+  const retry = () => {
+    const again = lastPrompt.current;
+    agent.reset();
+    if (again) run(again.text, again.target);
+  };
 
   return (
     <PanelFrame className="bd-ai-tab" data-testid="ai-panel">
@@ -253,24 +142,20 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           to sit at the bottom, chat-style, under states that had replaced the
           thread entirely. */}
       <ScopeChip scope={scope} status={status} />
-      <PromptComposer
-        onSubmit={
-          mode === "agent"
-            ? (text: string) => {
-                lastAgentPrompt.current = text;
-                agent.start(text);
-              }
-            : submit
-        }
-        onStop={mode === "agent" ? agent.stop : stream.stop}
-        streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}
-      />
+      <div ref={promptRef}>
+        <PromptComposer onSubmit={submit} onStop={agent.stop} streaming={live} />
+      </div>
+      {guard && scope.kind === "multi" ? (
+        <p className={`${STATE_BODY} tw:px-4 tw:py-2`} role="status" data-testid="ai-multi-guard">
+          {MULTI_GUARD}
+        </p>
+      ) : null}
 
       {/* Boards 171:136 and 171:105 — "no key" and "no credit" are states,
           not error lines. The server already tells them apart
           (PRECONDITION_FAILED vs TOO_MANY_REQUESTS); the panel used to print
           either as grey text under a composer that still looked ready. */}
-      {stream.errorKind === "not-configured" ? (
+      {failedKind === "not-configured" ? (
         <div className={STATE_BLOCK}>
           <p className={STATE_TITLE}>AI drafting isn&rsquo;t configured yet.</p>
           <p className={STATE_BODY}>
@@ -286,13 +171,13 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             Open workspace settings
           </Button>
         </div>
-      ) : stream.errorKind === "quota" ? (
+      ) : failedKind === "quota" ? (
         <div className={`${STATE_BLOCK} tw:bg-[var(--bk-warning-tint)]`}>
           <p className={`${STATE_TITLE} tw:text-[var(--bk-error)]`}>AI is out of credit.</p>
           <p className={STATE_BODY}>
             {/* The server's own sentence carries the real limit and reset time
                 — the board's "1 Aug" is sample data. */}
-            Nothing was changed. {stream.error}
+            Nothing was changed. {agent.error}
           </p>
           <Button
             color="light"
@@ -303,7 +188,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
             See plans
           </Button>
         </div>
-      ) : stream.errorKind === "other" && stream.error ? (
+      ) : failedKind === "other" ? (
         /* The third state the boards do not draw, because it is the one the
            server was never supposed to reach: the provider itself failed. It
            used to arrive as a raw code printed where the assistant's reply
@@ -320,31 +205,26 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
               carry the only useful detail there is ("Daily limit reached (10).
               Resets at …"). Printing it under our sentence keeps the detail
               without letting a raw code stand in for the assistant's reply. */}
-          <p className={STATE_BODY}>{stream.error}</p>
+          {agent.error ? <p className={STATE_BODY}>{agent.error}</p> : null}
           <Button
             color="light"
             size="xs"
             className={STATE_LINK}
-            onClick={() => {
-              const again = lastPromptRef.current;
-              stream.reset();
-              if (again) submit(again);
-            }}
+            onClick={retry}
           >
             Try again
           </Button>
         </div>
-      ) : mode === "chat" ? (
-        <>
-          <ChatThread
-            messages={messages}
-            onAccept={onAccept}
-            onReject={onReject}
-            onRegenerate={onRegenerate}
+      ) : agent.phase === "idle" && !briefing ? (
+        <div className="bd-ai-thread">
+          <EmptyThread
             onTry={submit}
-            onDraft={() => setMode("agent")}
+            onDraft={() => {
+              setBriefing(true);
+              promptRef.current?.querySelector("textarea")?.focus();
+            }}
           />
-        </>
+        </div>
       ) : (
         <AgentPlan
           phase={agent.phase}
@@ -358,7 +238,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
           onStop={agent.stop}
           stoppedByUser={agent.stoppedByUser}
           onDismiss={agent.reset}
-          onRetry={lastAgentPrompt.current ? () => agent.start(lastAgentPrompt.current) : undefined}
+          onRetry={lastPrompt.current ? retry : undefined}
           /* Each applied step is its own transaction, so taking the run back
              is exactly that many undos — and nothing has happened since the
              failure to undo by mistake. */

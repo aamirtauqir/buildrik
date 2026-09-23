@@ -7,7 +7,14 @@
 import * as React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+vi.mock("@/services/api-client", () => ({
+  getBuildrikClient: () => ({
+    siteDetail: { sharing: { list: { query: () => new Promise(() => {}) }, create: { mutate: vi.fn() } } },
+  }),
+}));
+
 import { PreviewOverlay } from "../PreviewOverlay";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 afterEach(() => cleanup());
 
@@ -64,5 +71,23 @@ describe("PreviewOverlay", () => {
     // The editor's own device control is under the overlay, so the preview has
     // to carry one or the responsive check cannot be done here at all.
     expect(screen.getByRole("group", { name: "Breakpoint" })).toBeInTheDocument();
+  });
+
+  /* B1 / G1-022: the preview bar carries Share (boards 4418:165611 · 165563 ·
+     120075), which opens the same share modal as the site menu row. Hidden
+     without a site — there is no share link to mint. */
+  it("hides Share button when siteId is null", () => {
+    render(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId={null} />);
+    expect(screen.queryByTestId("preview-share-button")).toBeNull();
+  });
+
+  it("Share opens the share modal", async () => {
+    render(
+      <ToastProvider>
+        <PreviewOverlay html="<p>x</p>" onDone={vi.fn()} siteId="site-abc" />
+      </ToastProvider>
+    );
+    fireEvent.click(screen.getByTestId("preview-share-button"));
+    expect(await screen.findByTestId("preview-share-modal")).toHaveTextContent("Share preview");
   });
 });

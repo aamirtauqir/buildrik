@@ -24,6 +24,7 @@ import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
 import { TransitionCallout } from "./components/TransitionCallout";
+import { takePendingInsertGroup } from "./insertGroupRequest";
 import { buildInsertGroups, elementRows, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
 import { EVENTS } from "../../../../shared/constants";
 import type { ComponentDefinition } from "../../../../shared/types/components";
@@ -46,15 +47,18 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   const isSearching = tab.searchQuery.trim().length > 0;
 
   // Board 137:2 taxonomy: ELEMENTS open (▾), the rest closed (▸).
-  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(
-    () => new Set<InsertGroupId>(["elements"]),
-  );
+  const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(() => {
+    const asked = composer ? takePendingInsertGroup(composer) : undefined;
+    return new Set<InsertGroupId>(asked ? ["elements", asked] : ["elements"]);
+  });
   // Context menu "Replace with block…" (v3 IA Q8) opens this panel AND asks
   // for BLOCKS; without this the door lands on ELEMENTS and the user scrolls.
   React.useEffect(() => {
     if (!composer) return;
-    const open = ({ group }: { group: InsertGroupId }) =>
+    const open = ({ group }: { group: InsertGroupId }) => {
+      takePendingInsertGroup(composer);
       setOpenGroups((prev) => (prev.has(group) ? prev : new Set(prev).add(group)));
+    };
     composer.on(EVENTS.UI_INSERT_OPEN_GROUP, open);
     return () => {
       composer.off(EVENTS.UI_INSERT_OPEN_GROUP, open);

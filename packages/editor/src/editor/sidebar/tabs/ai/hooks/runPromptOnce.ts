@@ -6,9 +6,39 @@ import type { AIModel } from "../types";
  * request/response calls. The agent runner (P4) makes a sequence of these (one
  * plan call, then one per step), where async/await sequencing is far clearer
  * than threading the streaming `useStreamPrompt` hook's state through effects.
- * `useStreamPrompt` stays the right tool for the live chat-streaming UI; this is
- * the right tool for the loop.
+ * Since decision #23 (plan/run only) every AI-panel prompt goes through here;
+ * `useStreamPrompt` serves the in-canvas popover.
  */
+
+/**
+ * Boards 171:136 / 171:105 draw "not configured" and "out of credit" as states
+ * of their own; the server tells them apart by code (PRECONDITION_FAILED from
+ * assertProviderConfigured, TOO_MANY_REQUESTS from the quota gate). Everything
+ * else is a provider or transport failure.
+ */
+export type AiErrorKind = "not-configured" | "quota" | "other";
+
+export function aiErrorKind(code: string | undefined): AiErrorKind {
+  if (code === "PRECONDITION_FAILED") return "not-configured";
+  if (code === "TOO_MANY_REQUESTS") return "quota";
+  return "other";
+}
+
+/**
+ * tRPC's SSE link treats INTERNAL_SERVER_ERROR as retryable and reconnects
+ * instead of calling `onError` — every provider failure arrives that way, so
+ * an outage used to hold the panel on "Thinking…" indefinitely. Two attempts,
+ * then the failure is surfaced.
+ */
+export const AI_RECONNECT_BUDGET = 2;
+
+/** A failed prompt, with the kind the panel renders its state from. */
+export class AiRunError extends Error {
+  constructor(message: string, readonly kind: AiErrorKind) {
+    super(message);
+    this.name = "AiRunError";
+  }
+}
 
 export interface PlanStep {
   title: string;
@@ -70,9 +100,9 @@ interface PromptResult {
 
 /**
  * Fire one streamPrompt subscription and resolve when it completes (`done`),
- * accumulating text and capturing the first edit / plan chunk. Rejects on
- * stream error (quota, provider failure, auth). The caller is responsible for
- * sequencing; this never retries.
+ * accumulating text and capturing the first edit / plan chunk. Rejects with an
+ * `AiRunError` on stream error (quota, provider failure, auth) or once the
+ * reconnect budget is spent. The caller is responsible for sequencing.
  */
 export function runPromptOnce(args: PromptArgs): Promise<PromptResult> {
   return new Promise<PromptResult>((resolve, reject) => {
@@ -80,6 +110,7 @@ export function runPromptOnce(args: PromptArgs): Promise<PromptResult> {
     let edit: ServerEdit | null = null;
     let plan: PlanStep[] | null = null;
     let settled = false;
+    let reconnects = 0;
     const sub = getAiSubscriptionClient().ai.streamPrompt.subscribe(
       { prompt: args.prompt, scope: args.scope, model: args.model, intent: args.intent },
       {
@@ -99,11 +130,19 @@ export function runPromptOnce(args: PromptArgs): Promise<PromptResult> {
             resolve({ text, edit, plan });
           }
         },
-        onError: (err: { message?: string }) => {
+        onError: (err: { message?: string; data?: { code?: string } | null }) => {
           if (settled) return;
           settled = true;
           sub.unsubscribe();
-          reject(new Error(err.message ?? "Stream failed"));
+          reject(new AiRunError(err.message || "Stream failed", aiErrorKind(err.data?.code)));
+        },
+        onConnectionStateChange: (state: { state: string; error?: { message?: string } | null }) => {
+          if (settled || state.state !== "connecting" || !state.error) return;
+          reconnects += 1;
+          if (reconnects < AI_RECONNECT_BUDGET) return;
+          settled = true;
+          sub.unsubscribe();
+          reject(new AiRunError(state.error.message || "The AI service didn't respond.", "other"));
         },
       },
     );

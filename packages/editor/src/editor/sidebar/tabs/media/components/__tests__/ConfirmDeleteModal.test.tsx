@@ -6,7 +6,7 @@
  *   3701:20385                  Delete 2 selected files? — the checked set
  * The V1 board 1175:4827's "Delete file?" title, its 📄 name list and its
  * amber "N files are currently used on the canvas" alert are displaced; the
- * type-DELETE gate past 20 files stays (data safety — code wins).
+ * type-DELETE gate past 20 files is gone (decision #29 — plain confirm).
  *
  * Written 2026-08-01 to close a coverage hole the final whole-branch review
  * named: the only other test that touches this component mocks it to
@@ -209,41 +209,18 @@ describe("Clone 3701:20385 · Delete 2 selected files? — the checked set", () 
   });
 });
 
-describe("the >20-file typed-DELETE gate (V1 board 1175:4827 — data safety, code wins)", () => {
-  it("shows the gate only past the large-bulk threshold", () => {
-    const { unmount } = render(<ConfirmDeleteModal payload={bulk(20)} onConfirm={vi.fn()} onCancel={vi.fn()} />);
-    expect(screen.queryByLabelText("Type DELETE to confirm")).not.toBeInTheDocument();
-    unmount();
-
-    render(<ConfirmDeleteModal payload={bulk(21)} onConfirm={vi.fn()} onCancel={vi.fn()} />);
-    expect(screen.getByTestId("media-delete-title")).toHaveTextContent("Delete 21 selected files?");
-    expect(screen.getByLabelText("Type DELETE to confirm")).toBeInTheDocument();
-  });
-
-  it("the gate input is really styled — not a bare browser input", () => {
-    render(<ConfirmDeleteModal payload={bulk(21)} onConfirm={vi.fn()} onCancel={vi.fn()} />);
-    const input = screen.getByLabelText("Type DELETE to confirm");
-    // TextField's ported .bk-input rules: box, border, focus ring, invalid,
-    // disabled. If the teardown ever strips them again this fails loudly.
-    expect(input.className).toMatch(/tw:border-\[var\(--bk-gray-300\)\]/);
-    expect(input.className).toMatch(/tw:rounded-lg/);
-    expect(input.className).toMatch(/tw:bg-white/);
-  });
-
-  it("keeps confirmation disabled until DELETE is typed exactly", () => {
+/* Decision #29: typed DELETE is for irreversible AND wide actions (site ·
+   collection · record with page · token in use). A large asset delete is a
+   plain confirm — the file list and placement count are the warning. */
+describe("large bulk delete — plain confirm (decision #29)", () => {
+  it("21 files: no typing gate, Delete is enabled and confirms in one click", () => {
     const onConfirm = vi.fn();
     render(<ConfirmDeleteModal payload={bulk(21)} onConfirm={onConfirm} onCancel={vi.fn()} />);
-    const input = screen.getByLabelText("Type DELETE to confirm");
+    expect(screen.getByTestId("media-delete-title")).toHaveTextContent("Delete 21 selected files?");
+    expect(screen.queryByLabelText("Type DELETE to confirm")).toBeNull();
+    expect(screen.queryByText(/stays disabled/)).toBeNull();
     const confirm = screen.getByRole("button", { name: "Delete 21 files" });
-
-    expect(confirm).toBeDisabled();
-
-    fireEvent.change(input, { target: { value: "delete" } });
-    expect(confirm).toBeDisabled();
-
-    fireEvent.change(input, { target: { value: "DELETE" } });
     expect(confirm).toBeEnabled();
-
     fireEvent.click(confirm);
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });

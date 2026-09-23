@@ -47,38 +47,15 @@ describe("ConfirmDeleteModal (board 1175:4827 — the >20 gate, under Clone 3701
     expect(screen.getByTestId("media-delete-body")).toHaveTextContent(/and 29 more will be permanently deleted\. This affects 5 placements\.$/);
   });
 
-  // The Button doc's rule: "disabled without a reason is a bug."
-  it("says WHY delete is disabled while the typed word does not match", () => {
-    render(<ConfirmDeleteModal payload={payload()} onConfirm={vi.fn()} onCancel={vi.fn()} />);
-    expect(
-      screen.getByText("Delete stays disabled until the word matches exactly."),
-    ).toBeInTheDocument();
-  });
-
-  it("the gate only opens on an exact DELETE, and the hint leaves with it", () => {
+  /* Decision #29: 34 files is a plain confirm — no typed word. */
+  it("34 files confirm in one click, with no typed word", () => {
     const onConfirm = vi.fn();
     render(<ConfirmDeleteModal payload={payload()} onConfirm={onConfirm} onCancel={vi.fn()} />);
-    const input = screen.getByLabelText("Type DELETE to confirm");
+    expect(screen.queryByLabelText("Type DELETE to confirm")).toBeNull();
     const button = screen.getByRole("button", { name: "Delete 34 files" });
-
-    fireEvent.change(input, { target: { value: "delete" } });
-    expect(button).toBeDisabled();
-    fireEvent.click(button);
-    expect(onConfirm).not.toHaveBeenCalled();
-
-    fireEvent.change(input, { target: { value: "DELETE" } });
     expect(button).not.toBeDisabled();
-    expect(screen.queryByText(/stays disabled/)).toBeNull();
     fireEvent.click(button);
     expect(onConfirm).toHaveBeenCalledTimes(1);
-  });
-
-  /* Board 1175:4838 draws Delete in --color/error WHILE the gate is up. */
-  it("holds the error fill while disabled instead of flowbite's grey swap", () => {
-    render(<ConfirmDeleteModal payload={payload()} onConfirm={vi.fn()} onCancel={vi.fn()} />);
-    const button = screen.getByTestId("media-delete-confirm");
-    expect(button).toBeDisabled();
-    expect(button.className).toMatch(/tw:disabled:bg-\[var\(--bk-error\)\]/);
   });
 
   it("a small delete needs no typing gate at all", () => {

@@ -62,7 +62,6 @@ export interface SaveState {
 
 /** Overlay visibility state */
 export interface OverlayState {
-  showComponentView: boolean;
   showXRay: boolean;
   showSpacingIndicators: boolean;
   showBadges: boolean;
@@ -138,7 +137,6 @@ export interface UseStudioStateReturn {
 
   // Overlay toggles
   overlays: OverlayState;
-  setShowComponentView: React.Dispatch<React.SetStateAction<boolean>>;
   setShowXRay: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSpacingIndicators: React.Dispatch<React.SetStateAction<boolean>>;
   setShowBadges: React.Dispatch<React.SetStateAction<boolean>>;
@@ -238,7 +236,6 @@ export function useStudioState(): UseStudioStateReturn {
   const [isLeftPanelOpen, setIsLeftPanelOpen] = React.useState(true);
 
   // Overlay states
-  const [showComponentView, setShowComponentView] = React.useState(false);
   const [showXRay, setShowXRay] = React.useState(savedState?.overlays?.showXRay ?? false);
   const [showSpacingIndicators, setShowSpacingIndicators] = React.useState(
     savedState?.overlays?.showSpacingIndicators ?? false
@@ -345,7 +342,6 @@ export function useStudioState(): UseStudioStateReturn {
   // Computed overlay state object
   const overlays: OverlayState = React.useMemo(
     () => ({
-      showComponentView,
       showXRay,
       showSpacingIndicators,
       showBadges,
@@ -356,7 +352,6 @@ export function useStudioState(): UseStudioStateReturn {
       showSuggestions,
     }),
     [
-      showComponentView,
       showXRay,
       showSpacingIndicators,
       showBadges,
@@ -371,9 +366,6 @@ export function useStudioState(): UseStudioStateReturn {
   // Generic overlay toggle
   const toggleOverlay = React.useCallback((overlay: keyof OverlayState) => {
     switch (overlay) {
-      case "showComponentView":
-        setShowComponentView((prev) => !prev);
-        break;
       case "showXRay":
         setShowXRay((prev) => !prev);
         break;
@@ -411,7 +403,6 @@ export function useStudioState(): UseStudioStateReturn {
       setShowGuides(newState);
       setShowSpacingIndicators(newState);
       setShowBadges(newState);
-      setShowComponentView(newState);
       return newState;
     });
   }, []);
@@ -473,7 +464,6 @@ export function useStudioState(): UseStudioStateReturn {
 
     // Overlay toggles
     overlays,
-    setShowComponentView,
     setShowXRay,
     setShowSpacingIndicators,
     setShowBadges,

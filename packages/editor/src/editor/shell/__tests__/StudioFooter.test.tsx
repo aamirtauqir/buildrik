@@ -201,9 +201,9 @@ describe("StudioFooter (board 52:10)", () => {
     expect(screen.getByTestId("footer-device-zoom")).toHaveTextContent(expected);
   });
 
-  it("unmapped device (watch) capitalises instead of dropping the row", () => {
-    render(<StudioFooter {...makeProps({ device: "watch" })} />);
-    expect(screen.getByTestId("footer-device-zoom")).toHaveTextContent("Watch · 100%");
+  it("unmapped device capitalises instead of dropping the row", () => {
+    render(<StudioFooter {...makeProps({ device: "kiosk" as never })} />);
+    expect(screen.getByTestId("footer-device-zoom")).toHaveTextContent("Kiosk · 100%");
   });
 
   it("fractional zoom rounds like the board's clean '100%'", () => {

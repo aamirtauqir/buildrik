@@ -224,7 +224,7 @@ export function DeviceFrameToggle({ active, onToggle, device }: DeviceFrameToggl
   const [isHovered, setIsHovered] = React.useState(false);
 
   // Only show toggle for mobile/tablet (frame exists for those)
-  if (device === "desktop" || device === "watch") {
+  if (device === "desktop") {
     return null;
   }
 

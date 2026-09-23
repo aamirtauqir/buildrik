@@ -13,7 +13,6 @@ export interface CanvasProps {
   device: DeviceType;
   zoom: number;
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
-  showComponentView?: boolean;
   showSpacing?: boolean;
   showBadges?: boolean;
   showGuides?: boolean;
@@ -66,5 +65,4 @@ export const DEVICE_SIZES: Record<string, { width: string; height: string }> = {
   desktop: { width: "100%", height: "100%" },
   tablet: { width: "768px", height: "1024px" },
   mobile: { width: "375px", height: "812px" },
-  watch: { width: "196px", height: "230px" },
 };

@@ -185,7 +185,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setDevice: state.setDevice,
     setZoom: state.setZoom,
     setShowExporter: modals.setShowExporter,
-    setShowComponentView: state.setShowComponentView,
     setIsDirty: state.setIsDirty,
     setSaveState: state.setSaveState,
     openCollectionSetup: modals.openCollectionSetup,
@@ -627,7 +626,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         showGuides={state.overlays.showGuides}
         showGrid={state.overlays.showGrid}
         showRulers={state.overlays.showRulers}
-        showComponentView={state.overlays.showComponentView}
         showXRay={state.overlays.showXRay}
         devMode={state.overlays.devMode}
         onOverlayChange={(overlay, enabled) => {
@@ -807,7 +805,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         selectedElement={selectedElement}
       />
 
-      <PreviewOverlay html={previewHtml} onDone={() => setPreviewHtml(null)} />
+      <PreviewOverlay
+        html={previewHtml}
+        onDone={() => setPreviewHtml(null)}
+        siteId={getSiteIdFromUrl()}
+      />
       {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}
       <CompareHost composer={composer} siteId={getSiteIdFromUrl()} />
 

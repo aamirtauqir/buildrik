@@ -389,7 +389,6 @@ export const EVENTS = {
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
   UI_TOGGLE_AI: "ui:toggle:ai",
-  UI_TOGGLE_COMPONENT_VIEW: "ui:toggle:component-view",
   UI_PANEL_RESIZE: "ui:panel:resize",
 
   // ============================================
