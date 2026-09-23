@@ -59,9 +59,11 @@ function composerWithFonts(families: string[]) {
 const renderDetail = (token: DesignToken, composer: Composer, onValueChange = vi.fn()) => {
   render(
     <DSModeProvider initialMode="pro">
-      <TokenDetailView token={token} composer={composer} onBack={() => {}} onValueChange={onValueChange} />
+      <TokenDetailView token={token} composer={composer} onValueChange={onValueChange} />
     </DSModeProvider>,
   );
+  /* C1 (ii): the card's value line is read-only until Change is pressed. */
+  fireEvent.click(screen.getByTestId("brand-token-action-replace"));
   return onValueChange;
 };
 
@@ -75,9 +77,10 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
     const { composer } = composerWithFonts([]);
     const { unmount } = render(
       <DSModeProvider initialMode="pro">
-        <TokenDetailView token={sizeToken} composer={composer} onBack={() => {}} />
+        <TokenDetailView token={sizeToken} composer={composer} />
       </DSModeProvider>,
     );
+    fireEvent.click(screen.getByTestId("brand-token-action-replace"));
     expect(screen.queryByTestId("brand-token-font-picker")).toBeNull();
     unmount();
     renderDetail(fontToken, composer);
@@ -85,7 +88,7 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
     expect(trigger).toHaveAttribute("aria-haspopup", "listbox");
     expect(trigger).toHaveTextContent("Inter");
     /* The text field stays beside it for a hand-typed stack. */
-    expect(screen.getByLabelText("Light value")).toHaveValue("Inter");
+    expect(screen.getByLabelText("Value")).toHaveValue("Inter");
   });
 
   it("offers the ADDED site fonts under Uploaded, and picking one writes the bare family", () => {
@@ -141,7 +144,7 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
   it("the text field still takes a hand-typed stack", () => {
     const { composer } = composerWithFonts([]);
     const onValueChange = renderDetail(fontToken, composer);
-    fireEvent.change(screen.getByLabelText("Light value"), { target: { value: "Inter, sans-serif" } });
+    fireEvent.change(screen.getByLabelText("Value"), { target: { value: "Inter, sans-serif" } });
     expect(onValueChange).toHaveBeenCalledWith("font-heading", "Inter, sans-serif");
   });
 
@@ -152,9 +155,10 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
     render(
       <DSModeProvider initialMode="pro">
         <FontPicker value="'Inter Variable', sans-serif" onChange={onHeading} composer={composer} />
-        <TokenDetailView token={fontToken} composer={composer} onBack={() => {}} onValueChange={onToken} />
+        <TokenDetailView token={fontToken} composer={composer} onValueChange={onToken} />
       </DSModeProvider>,
     );
+    fireEvent.click(screen.getByTestId("brand-token-action-replace"));
     const list = openTokenPicker();
     fireEvent.click(within(list).getByRole("option", { name: /^Lora/ }));
     expect(onToken).toHaveBeenCalledWith("font-heading", "Lora");
