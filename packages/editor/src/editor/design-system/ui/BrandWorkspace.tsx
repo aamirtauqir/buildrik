@@ -1099,7 +1099,13 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
               mode={resolvedMode}
               onValueChange={changeToken}
               onDelete={deleteToken}
-              onRename={renameToken}
+              /* Only colour and the generic kinds can rename; type and spacing
+                 have no rename path, and a Rename that silently did nothing
+                 was G3-137's defect — the item is disabled for them. */
+              onRename={(() => {
+                const k = kindOf(selectedToken);
+                return k === "color" || isMoreKind(k) ? renameToken : undefined;
+              })()}
               onDeleted={() => setSelectedTokenId(null)}
             />
           )}

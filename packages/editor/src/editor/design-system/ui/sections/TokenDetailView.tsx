@@ -43,6 +43,7 @@ import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";
 import { FontFamilyPicker } from "./FontFamilyPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
+import { TokenRenameDialog } from "./TokenRenameDialog";
 import { Button, HintTooltip, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 
 export interface TokenDetailViewProps {
@@ -236,13 +237,10 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const handleIgnore = () => lintState?.suppress(token.id);
 
   // ─ Menu actions.
+  const [renameOpen, setRenameOpen] = React.useState(false);
   const handleRenameId = () => {
     setMenuOpen(false);
-    // TODO(T8 follow-up): replace window.prompt with a proper modal once the
-    // confirm-dialog primitive is wired into TokensSection.
-    if (typeof window === "undefined") return;
-    const next = window.prompt("Rename token ID:", token.id);
-    if (next && next !== token.id) onRename?.(token.id, next);
+    setRenameOpen(true);
   };
 
   // B4 follow-up (2026-05-17): per-token consumer count drives the delete
@@ -329,6 +327,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               <MenuItem
                 onClick={handleRenameId}
                 disabled={!onRename}
+                title={onRename ? undefined : "Type and spacing tokens keep their IDs."}
                 data-testid="brand-token-action-rename"
               >
                 Rename token…
@@ -564,6 +563,18 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           </IconButton>
         </HintTooltip>
       </div>
+
+      <TokenRenameDialog
+        open={renameOpen}
+        currentId={token.id}
+        takenIds={(allTokens ?? []).map((t) => t.id).filter((id) => id !== token.id)}
+        usage={usageCount}
+        onCancel={() => setRenameOpen(false)}
+        onRename={(newId) => {
+          setRenameOpen(false);
+          onRename?.(token.id, newId);
+        }}
+      />
 
       <TokenReplaceModal
         open={replaceOpen}
