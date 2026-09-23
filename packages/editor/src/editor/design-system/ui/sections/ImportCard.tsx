@@ -253,7 +253,7 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
           <div
             role="button"
             tabIndex={0}
-            aria-label="Drop tokens.json or tailwind.config.ts, or click to browse"
+            aria-label="Drop tokens.json, or click to browse"
             data-testid="import-drop-zone"
             className={`${DROP_BASE} ${isDragOver ? DROP_ACTIVE : DROP_IDLE}`}
             onClick={() => fileInputRef.current?.click()}
@@ -267,14 +267,14 @@ export const ImportCard: React.FC<ImportCardProps> = ({ onOutcome }) => {
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
           >
-            {/* Board 153:120/153:152 draw one centred line: "Drop .json or
-                .ts". The zone stays clickable (aria-label below keeps the
-                fuller, accurate hint for assistive tech). */}
-            Drop .json or .ts
+            {/* 4418:168885: "Drop tokens.json — JSON only". It is true: a .ts
+                Tailwind config only ever surfaced as a parse error, so the
+                picker no longer offers one. */}
+            Drop tokens.json — JSON only
             <TextInput
               ref={fileInputRef}
               type="file"
-              accept="application/json,.json,.ts,.js"
+              accept="application/json,.json"
               className="tw:hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];

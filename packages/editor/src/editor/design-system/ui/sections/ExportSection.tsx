@@ -27,7 +27,8 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button, CopyButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui";
+import { Button, CopyButton, IconButton, Radio, Select, BK_SELECT_BARE_VALUE_THEME } from "@/editor/chrome-ui";
+import { X } from "lucide-react";
 
 const TOKEN_KINDS_COUNT = 14;
 
@@ -73,6 +74,13 @@ const FORMAT_OPTIONS: Array<{
   { id: "json",     label: "JSON",     desc: "Design tokens format" },
   { id: "tailwind", label: "Tailwind", desc: "theme.extend config" },
 ];
+
+/* 4418:168885's preview select reads "CSS variables". */
+const PREVIEW_LABEL: Record<ExportFormat, string> = {
+  css: "CSS variables",
+  json: "JSON tokens",
+  tailwind: "Tailwind config",
+};
 
 type DarkStrategy = NonNullable<BundleOptions["darkStrategy"]>;
 /* Board 153:120 prints the value as "media-query" — three words, not the
@@ -135,9 +143,11 @@ export interface ExportSectionProps {
   /** Boards 306:2265 / 306:2298 — passed straight through to the ImportCard
    *  that owns the outcome. */
   onImportOutcome?(outcome: "imported" | "import-failed"): void;
+  /** The panel's ✕ (4418:168885) — back to the workspace's landing page. */
+  onClose?(): void;
 }
 
-export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImportOutcome }) => {
+export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImportOutcome, onClose }) => {
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
   const spacing    = useSpacingRegistry();
@@ -209,6 +219,21 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
         className="tw:flex tw:flex-col tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:pb-4"
         data-testid="brand-io-card"
       >
+      {/* 4418:168885 draws Import / export as a panel with its own title bar
+          and ✕, in place of the workspace's page header. */}
+      <div className="tw:flex tw:h-12 tw:items-center tw:justify-between tw:gap-2" data-testid="brand-io-head">
+        <h2
+          className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+          data-testid="brand-page-title"
+        >
+          Import / export
+        </h2>
+        {onClose && (
+          <IconButton label="Close Import / export" onClick={onClose} data-testid="brand-io-close" className="tw:size-7 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]">
+            <X size={16} aria-hidden />
+          </IconButton>
+        )}
+      </div>
       {/* Board 153:120 leads with the one decision that changes every export —
           how dark values are written — as a single row with its value at the
           right. It used to be three radio rows buried under the CSS format,
@@ -222,7 +247,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
           from the design system rather than from a hardcoded height. */}
       <div className="tw:flex tw:h-[var(--bk-size-row)] tw:items-center tw:gap-2" data-testid="brand-export-dark-row">
         {/* 14/20, the workspace row label (4418:168885). */}
-        <span data-testid="brand-export-dark-label" className="tw:flex-1 tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]">Dark strategy</span>
+        <span data-testid="brand-export-dark-label" className="tw:w-40 tw:flex-none tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]">Dark strategy <span aria-hidden="true" className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">▾</span></span>
         <Select
           theme={BK_SELECT_BARE_VALUE_THEME}
           className="tw:flex-none"
@@ -332,16 +357,18 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onExported, onImpo
             output before taking it is real capability. It needs a subject of
             its own now that the format rows carry no selection. */}
         <div className="tw:mb-2 tw:flex tw:items-center tw:gap-2">
-          <span className="tw:flex-1 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]">Preview</span>
+          <span className="tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-ink)]">Preview</span>
           <Select
-            className="tw:flex-none"
+            /* 140+ wide so "CSS variables" clears the caret (4418:168885). */
+            className="tw:w-44 tw:flex-none"
+            sizing="sm"
             value={format}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormat(e.target.value as ExportFormat)}
             aria-label="Preview format"
           >
-            {FORMAT_OPTIONS.map(({ id, label }) => (
+            {FORMAT_OPTIONS.map(({ id }) => (
               <option key={id} value={id}>
-                {label}
+                {PREVIEW_LABEL[id]}
               </option>
             ))}
           </Select>

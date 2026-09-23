@@ -889,7 +889,13 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "spacing":
         return <TokensSection {...tokenPageProps} openKind="spacing" />;
       case "export":
-        return <ExportSection onExported={setLastExport} onImportOutcome={setImportOutcome} />;
+        return (
+          /* 4418:168885: a 760 panel centred in the main area — no page
+             header, no preview column. Its ✕ goes back to Colours. */
+          <div className="tw:mx-auto tw:w-full tw:max-w-[760px]">
+            <ExportSection onExported={setLastExport} onImportOutcome={setImportOutcome} onClose={() => openPage("colours")} />
+          </div>
+        );
       default: {
         const kind = page.slice("kind-".length) as MoreKind;
         return <TokensSection {...tokenPageProps} openKind={kind} />;
@@ -944,6 +950,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* 7316:80949 draws the Light / Dark switch inside the preview card. */
   const previewControls =
     page === "colour-mode" && composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
+
+  /* Import / export is drawn as a panel, not a page with a preview. */
+  const isPanelPage = page === "export";
 
   const isTokenPage = page === "colours" || page === "fonts" || page === "styles" || page === "spacing" || page.startsWith("kind-");
 
@@ -1017,6 +1026,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
           {/* 36 tall: the title and the 28px action share the centre line at
               y=58, and the card starts 16 under it at y=92 (7315:80955). */}
+          {!isPanelPage && (
           <header className="tw:flex tw:h-9 tw:shrink-0 tw:items-center tw:justify-between tw:gap-6">
             <div className="tw:flex tw:min-w-0 tw:items-baseline tw:gap-2.5">
               <h2
@@ -1038,6 +1048,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               {pageAction}
             </div>
           </header>
+          )}
 
           {error ? (
             /* Board 781:4311's copy: what failed, and — the half that matters —
@@ -1048,7 +1059,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               onRetry={() => { setError(null); loadFromComposer(); }}
             />
           ) : (
-            <div id={`design-section-${page}`} className="tw:mt-4 tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4" data-testid="brand-page-body">
+            <div id={`design-section-${page}`} className={`${isPanelPage ? "" : "tw:mt-4 "}tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-4`} data-testid="brand-page-body">
               {/* Board 306:2161 draws a status badge in the band under the back
                   row. Its two siblings (bound / unbound) specify a state nothing
                   can answer — elements carry no preset reference — so only this
@@ -1112,6 +1123,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         </div>
 
         {/* ── Preview column ────────────────────────────────────────────── */}
+        {!isPanelPage && (
         <aside
           className="tw:flex tw:w-[468px] tw:shrink-0 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4"
           data-testid="brand-preview-column"
@@ -1158,6 +1170,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             />
           )}
         </aside>
+        )}
       </div>
 
       <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />
