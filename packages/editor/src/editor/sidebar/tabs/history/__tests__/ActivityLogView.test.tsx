@@ -13,10 +13,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { ActivityLogView } from "../components/ActivityLogView";
-import type { ActivityEntry } from "@/services/ActivityService";
+import { ActivityReadError, type ActivityEntry } from "@/services/ActivityService";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 const fetchRecentActivity = vi.fn();
-vi.mock("@/services/ActivityService", () => ({
+vi.mock("@/services/ActivityService", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/services/ActivityService")>()),
   fetchRecentActivity: (siteId: string, filter: string) => fetchRecentActivity(siteId, filter),
 }));
 
@@ -96,18 +98,34 @@ describe("ActivityLogView — state machine", () => {
     await waitFor(() => expect(screen.getByTestId("activity-rows")).toBeTruthy());
   });
 
-  it("renders the permission state when the service throws 401/403 (procedure absent / signed-out)", async () => {
-    fetchRecentActivity.mockRejectedValueOnce(new Error("401 unauthorized: activity.recent not found"));
+  it("the error state never prints the transport's message", async () => {
+    fetchRecentActivity.mockRejectedValueOnce(new ActivityReadError("failed"));
     renderView();
-    const perm = await screen.findByTestId("activity-permission");
-    expect(perm).toBeTruthy();
-    const open = screen.getByText("Open in dashboard") as HTMLButtonElement;
-    fireEvent.click(open);
+    const err = await screen.findByTestId("activity-error");
+    expect(err.textContent).not.toContain("activity.recent");
+  });
+
+  it("renders the permission state when the server refuses (UNAUTHORIZED / FORBIDDEN)", async () => {
+    fetchRecentActivity.mockRejectedValueOnce(new ActivityReadError("unauthorized"));
+    renderView();
+    expect(await screen.findByTestId("activity-permission")).toBeTruthy();
+    fireEvent.click(screen.getByText("Open in dashboard"));
     expect(window.open).toHaveBeenCalledWith(
-      "/dashboard/sites/site_1#activity-log",
+      `${DASHBOARD_URL}/dashboard/sites/site_1#activity-log`,
       "_blank",
       "noopener,noreferrer",
     );
+  });
+
+  /* The procedure does not exist yet (needs-dashboard): the tab says where
+     the log is, it does not sit blank or offer a Retry that cannot work. */
+  it("renders the unavailable state when activity.recent is absent (NOT_FOUND)", async () => {
+    fetchRecentActivity.mockRejectedValueOnce(new ActivityReadError("unavailable"));
+    renderView();
+    const box = await screen.findByTestId("activity-unavailable");
+    expect(box.textContent).toContain("Activity isn't in the editor yet");
+    expect(screen.queryByText("Retry")).toBeNull();
+    expect(screen.getByText("Open in dashboard")).toBeTruthy();
   });
 
   it("renders the no-site banner when siteId is null and skips the fetch entirely", () => {

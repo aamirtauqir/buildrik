@@ -217,6 +217,21 @@ describe("StudioHeader", () => {
       expect(bar.textContent).not.toContain("x.vercel.app");
     });
 
+    /* B6 / G1-019: the activity log opens in the editor (History ·
+       Activity), not a dashboard tab. */
+    it("the site menu's Activity log opens History · Activity in the editor", () => {
+      const onOpenActivity = vi.fn();
+      const open = vi.spyOn(window, "open").mockImplementation(() => null);
+      window.history.replaceState(null, "", "/?siteId=s1");
+      render(<StudioHeader {...makeProps({ onOpenActivity })} />);
+      fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
+      fireEvent.click(screen.getByTestId("site-menu-activity-log"));
+      expect(onOpenActivity).toHaveBeenCalled();
+      expect(open).not.toHaveBeenCalled();
+      window.history.replaceState(null, "", "/");
+      open.mockRestore();
+    });
+
     it("the site menu's Issues row opens the panel and names the count", () => {
       const onOpenIssues = vi.fn();
       render(

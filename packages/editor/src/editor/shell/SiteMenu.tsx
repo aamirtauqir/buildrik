@@ -74,6 +74,9 @@ export interface SiteMenuProps {
    */
   onOpenPublish?: () => void;
   onOpenPublishHistory?: () => void;
+  /** History · Activity, in the editor (B6, G1-019). Omitted = the row
+   *  deep-links to the dashboard's activity section as before. */
+  onOpenActivity?: () => void;
   /** The Issues panel (C3: the topbar chip that opened it is gone). */
   onOpenIssues?: () => void;
   /** The row's tooltip — the issue count sentence (`formatIssueSummary`). */
@@ -153,6 +156,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenPublishHistory,
   onOpenIssues,
   issuesTitle,
+  onOpenActivity,
   onUnpublish,
   onExportCode,
   onOpenTemplates,
@@ -232,7 +236,10 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}>
               Site health
             </MenuItem>
-            <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#activity-log`))}>
+            <MenuItem
+              onClick={run(onOpenActivity ?? (() => openDashboard(`/dashboard/sites/${siteId}#activity-log`)))}
+              data-testid="site-menu-activity-log"
+            >
               Activity log
             </MenuItem>
           </MenuGroup>

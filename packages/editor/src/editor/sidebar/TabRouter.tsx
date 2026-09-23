@@ -221,7 +221,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <HistoryTab
           composer={composer}
           projectId={projectId}
-          initialView={activeSubTab === "published" ? "published" : undefined}
+          initialView={activeSubTab === "published" || activeSubTab === "activity" ? activeSubTab : undefined}
           /* Boards 184:37 / 184:45 / 453:4064 read the same job the Publish
              panel polls — one source, two surfaces. */
           rollbackJob={

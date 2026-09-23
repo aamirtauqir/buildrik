@@ -98,6 +98,8 @@ export interface StudioHeaderProps {
   onOpenShortcuts?: () => void;
   /** Site menu destinations from Figma 642:3664. */
   onOpenPublishHistory?: () => void;
+  /** History · Activity (B6) — the site menu's "Activity log" stays in the editor. */
+  onOpenActivity?: () => void;
   onOpenTemplates?: () => void;
   onOpenComponents?: () => void;
   /** F3 — the review pill is a door, not a label: opens the Review panel. */
@@ -228,6 +230,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenIssues,
   onOpenShortcuts,
   onOpenPublishHistory,
+  onOpenActivity,
   onOpenTemplates,
   onOpenComponents,
   onOpenReview,
@@ -778,6 +781,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             /* C3: the Issues chip left the bar; this row and ⌘K's "Show
                issues" are the panel's doors, and the count rides in the title. */
             onOpenIssues={viewMode.readOnlyView ? undefined : onOpenIssues}
+            onOpenActivity={viewMode.readOnlyView ? undefined : onOpenActivity}
             issuesTitle={formatIssueSummary(errorCount, warnCount)}
             onUnpublish={
               viewMode.readOnlyView || !publishedUrl || !canUnpublish

@@ -8,14 +8,15 @@
  *
  * State machine:
  *   loading   on mount + filter change
- *   error     throw from service → empty/error with Retry
- *   empty     service returned []
- *   ready     rows render
- *   permission  the server answered 401/403 (the procedure absent, the
- *               user signed out, or RBAC says no) — distinct from error:
- *               the rows are not coming back, retrying with a button click
- *               will not fix it. Show "Open in dashboard" so the user can
- *               see what dashboard-side says.
+ *   error        a retryable failure → Retry
+ *   empty        service returned []
+ *   ready        rows render
+ *   permission   UNAUTHORIZED / FORBIDDEN — retrying will not fix it
+ *   unavailable  NOT_FOUND: `activity.recent` is not on the dashboard yet
+ *                (needs-dashboard). Also not retryable.
+ * The last two offer "Open in dashboard" (DASHBOARD_URL, the same door the
+ * site menu used before this tab existed). Never a permanently blank tab —
+ * decision #31.
  *
  * `role="status"` + `aria-live="polite"` on the list region so a screen
  * reader announces the new row set after a filter change without re-reading
@@ -31,12 +32,14 @@ import * as React from "react";
 import { Button, EmptyState, SkeletonListItem } from "@/editor/chrome-ui";
 import type { ActivityLogViewProps } from "../types";
 import {
+  ActivityReadError,
   fetchRecentActivity,
   type ActivityEntry,
   type ActivityFilter,
 } from "@/services/ActivityService";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
-type LoadState = "loading" | "ready" | "empty" | "error" | "permission";
+type LoadState = "loading" | "ready" | "empty" | "error" | "permission" | "unavailable";
 
 const FILTER_LIST: ActivityFilter[] = ["all", "edits", "comments", "publish"];
 
@@ -81,17 +84,10 @@ const ROW_SUMMARY = "tw:text-[13px] tw:text-[var(--bk-ink)] tw:m-0 tw:whitespace
 const ROW_DEEP_LINK =
   "tw:text-[12px] tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline tw:self-start";
 
-function isPermissionError(err: unknown): boolean {
-  if (!err || typeof err !== "object") return false;
-  const msg = String((err as { message?: unknown }).message ?? err).toLowerCase();
-  return msg.includes("401") || msg.includes("403") || msg.includes("unauthor") || msg.includes("forbidden");
-}
-
 export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
   const [filter, setFilter] = React.useState<ActivityFilter>("all");
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<ActivityEntry[]>([]);
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   const fetchSeq = React.useRef(0);
 
@@ -99,13 +95,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
     async (next: ActivityFilter) => {
       const seq = ++fetchSeq.current;
       setState("loading");
-      setErrorMsg(null);
-      if (!siteId) {
-        setRows([]);
-        setState("permission");
-        setErrorMsg("No site selected.");
-        return;
-      }
+      if (!siteId) return;
       try {
         const r = await fetchRecentActivity(siteId, next);
         if (seq !== fetchSeq.current) return; // stale
@@ -113,12 +103,8 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
         setState(r.length === 0 ? "empty" : "ready");
       } catch (e) {
         if (seq !== fetchSeq.current) return;
-        if (isPermissionError(e)) {
-          setState("permission");
-        } else {
-          setState("error");
-        }
-        setErrorMsg(e instanceof Error ? e.message : String(e));
+        const reason = e instanceof ActivityReadError ? e.reason : "failed";
+        setState(reason === "unauthorized" ? "permission" : reason === "unavailable" ? "unavailable" : "error");
       }
     },
     [siteId],
@@ -212,7 +198,7 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
           <div className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]" data-testid="activity-error">
             <EmptyState
               title="Couldn't load activity"
-              body={errorMsg ?? "Something went wrong on our side. Retry, or reopen Activity in a moment."}
+              body="Something went wrong on our side. Retry, or reopen Activity in a moment."
               action={
                 <Button type="button" size="xs" onClick={handleRetry}>
                   Retry
@@ -222,19 +208,23 @@ export const ActivityLogView: React.FC<ActivityLogViewProps> = ({ siteId }) => {
           </div>
         )}
 
-        {state === "permission" && (
+        {(state === "permission" || state === "unavailable") && (
           <div
             className="tw:px-[var(--bk-space-12)] tw:py-[var(--bk-space-16)]"
-            data-testid="activity-permission"
+            data-testid={`activity-${state}`}
           >
             <EmptyState
-              title="Can't show activity in the editor"
-              body="Open the activity log in the dashboard to see who edited, commented, or published."
+              title={state === "permission" ? "Can't show activity in the editor" : "Activity isn't in the editor yet"}
+              body={
+                state === "permission"
+                  ? "Open the activity log in the dashboard to see who edited, commented, or published."
+                  : "The activity log lives in the dashboard for now — it opens in a new tab."
+              }
               action={
                 <Button
                   type="button"
                   size="xs"
-                  onClick={() => handleOpen(`/dashboard/sites/${siteId}#activity-log`)}
+                  onClick={() => handleOpen(`${DASHBOARD_URL}/dashboard/sites/${siteId}#activity-log`)}
                 >
                   Open in dashboard
                 </Button>

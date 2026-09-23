@@ -11,9 +11,12 @@
  * filter does not filter client-side.
  *
  * The `activity.recent` tRPC procedure is the planned endpoint (code-gap
- * plan B6). It is not yet registered in the dashboard `AppRouter`, so the
- * call is `any`-cast at the service boundary. The view renders an error
- * state — not a fake success — when the procedure is absent.
+ * plan B6) and is not registered in the dashboard `AppRouter` yet
+ * (needs-dashboard). The call is typed here by the shape the view needs,
+ * and a failure is thrown as an `ActivityReadError` whose `reason` tells the
+ * view which state to draw: `unavailable` (the procedure does not exist —
+ * NOT_FOUND), `unauthorized` (signed out / no role), `failed` (anything
+ * else, retryable). Never a fake-empty list.
  *
  * @license BSD-3-Clause
  */
@@ -34,16 +37,42 @@ export interface ActivityEntry {
   createdAt: string | Date;
 }
 
+export type ActivityReadFailure = "unavailable" | "unauthorized" | "failed";
+
+export class ActivityReadError extends Error {
+  constructor(readonly reason: ActivityReadFailure) {
+    super(`activity.recent: ${reason}`);
+    this.name = "ActivityReadError";
+  }
+}
+
+/** The planned procedure's shape — absent from `AppRouter` until the
+ *  dashboard half lands, so the typed client cannot name it. */
+interface ActivityRecentClient {
+  activity: { recent: { query(input: { siteId: string; filter: ActivityFilter }): Promise<ActivityEntry[]> } };
+}
+
+function failureOf(err: unknown): ActivityReadFailure {
+  const code = (err as { data?: { code?: unknown } } | null)?.data?.code;
+  if (code === "NOT_FOUND") return "unavailable";
+  if (code === "UNAUTHORIZED" || code === "FORBIDDEN") return "unauthorized";
+  return "failed";
+}
+
 /** siteId may be null when the editor is opened without a project (rare). */
 export async function fetchRecentActivity(
   siteId: string | null | undefined,
   filter: ActivityFilter,
 ): Promise<ActivityEntry[]> {
   if (!siteId) return [];
-  // activity.recent is the planned procedure; not yet present in AppRouter — see code-gap plan B6.
-  const proc = (getBuildrikClient(DASHBOARD_URL) as any).activity?.recent;
-  const rows = await proc.query({ siteId, filter });
-  return (rows as ActivityEntry[]).map((r) => ({
+  const client = getBuildrikClient(DASHBOARD_URL) as unknown as ActivityRecentClient;
+  let rows: ActivityEntry[];
+  try {
+    rows = await client.activity.recent.query({ siteId, filter });
+  } catch (err) {
+    throw new ActivityReadError(failureOf(err));
+  }
+  return rows.map((r) => ({
     id: r.id,
     kind: r.kind,
     actorName: r.actorName ?? null,

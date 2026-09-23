@@ -581,6 +581,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenPublishHistory={() => state.openLeftPanelToTab("history", "published")}
+          onOpenActivity={() => state.openLeftPanelToTab("history", "activity")}
           onOpenTemplates={() => state.openLeftPanelToTab("templates")}
           onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
