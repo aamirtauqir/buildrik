@@ -130,6 +130,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   }
 
   // ── Handlers ──
+  /** Did the replace in flight take a backup? Read by the success toast. */
+  const backupTakenRef = React.useRef(false);
   function handleApplyToCurrent(id: string) {
     if (denyApply()) return;
     const t = findTemplate(id);
@@ -137,7 +139,39 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     if (t.status === "premium") { openUpgrade({ feature: t.name }); return; }
     addAsNewPageRef.current = false;
     pendingId.current = id;
-    hasExistingContent ? sel.setShowReplace(true) : startApply();
+    if (hasExistingContent) sel.setShowReplace(true);
+    else {
+      /* An empty page has nothing to back up. */
+      backupTakenRef.current = false;
+      startApply();
+    }
+  }
+
+  /* Owner decision #25 (C4): replacing the current page takes a History
+     auto-version FIRST — the one path every replace goes through (the
+     drawer's confirm and the full-canvas view's alike). The version is
+     titled, so Saves lists it by name and it is never deduped away. If the
+     backup was asked for and could not be written, nothing is replaced: a
+     toast that promises a backup that does not exist is the worst outcome
+     (QA 2026-09-24). `backupTakenRef` is what the success toast reads. */
+  async function replaceCurrentPage() {
+    const t = findTemplate(pendingId.current) ?? SITE_TEMPLATES[0];
+    backupTakenRef.current = false;
+    if (backupCurrentPage && composer?.versions) {
+      const version = await composer.versions
+        .autoCheckpoint(`Before template “${t.name}”`, { title: `Before template “${t.name}”` })
+        .catch(() => null);
+      if (!version) {
+        addToast({
+          tone: "error",
+          title: "Couldn't save a backup",
+          description: "Nothing was replaced. Try again, or untick the backup to replace without one.",
+        });
+        return;
+      }
+      backupTakenRef.current = true;
+    }
+    startApply();
   }
 
   function handleAddAsNewPage(id: string) {
@@ -296,7 +330,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         addToast({
           tone: "success",
           title: `${replacedName} replaced`,
-          description: backupCurrentPage ? "Backup saved in History › Saves." : `“${t.name}” applied.`,
+          description: backupTakenRef.current ? "Backup saved in History › Saves." : `“${t.name}” applied.`,
           action: { label: "Undo", onClick: () => composer?.history.undo() },
         });
       } else {
@@ -508,19 +542,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           backupCurrentPage={backupCurrentPage}
           onBackupChange={setBackupCurrentPage}
           onCancel={() => sel.setShowReplace(false)}
-          onApply={async () => {
+          onApply={() => {
             sel.setShowReplace(false);
-            /* Owner decision #25 (C4): the backup is a History auto-version,
-               not a "<page> (backup)" page — it restores the whole site from
-               History › Saves instead of leaving a stray page in the
-               sitemap. Taken BEFORE the apply, so it holds the page the user
-               is about to lose. A failed snapshot must not cost the apply
-               the user asked for; the version list simply lacks the row. */
-            if (backupCurrentPage && composer?.versions) {
-              const t = findTemplate(pendingId.current) ?? SITE_TEMPLATES[0];
-              await composer.versions.autoCheckpoint(`Before template “${t.name}”`).catch(() => null);
-            }
-            startApply();
+            void replaceCurrentPage();
           }}
         />
         );

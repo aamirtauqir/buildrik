@@ -217,9 +217,11 @@ describe("AITab — scope + composer wiring", () => {
       });
     });
 
-    expect(screen.getByText(/AI drafting isn.t configured yet\./)).toBeInTheDocument();
-    expect(screen.getByText(/not a silent fallback that pretends to work/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Open workspace settings" })).toBeInTheDocument();
+    /* Board 4418:106796 copy. */
+    expect(screen.getByText("AI isn’t available on this workspace.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "View workspace owner ↗" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Continue by hand in the inspector" })).toBeInTheDocument();
+    expect(screen.getByTestId("ai-state-prompt")).toHaveTextContent("Your prompt: make the hero warmer");
   });
 
   it("keeps an ordinary failure as a message, not as the not-configured state", async () => {
@@ -235,7 +237,7 @@ describe("AITab — scope + composer wiring", () => {
       lastSubscribe.onError?.({ message: "Stream failed", data: { code: "INTERNAL_SERVER_ERROR" } });
     });
 
-    expect(screen.queryByText(/isn.t configured yet/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/isn.t available on this workspace/)).not.toBeInTheDocument();
     // Our headline plus the server's own line — not the not-configured state.
     expect(screen.getByText(/didn.t respond/)).toBeInTheDocument();
     expect(screen.getByText("Stream failed")).toBeInTheDocument();
@@ -262,7 +264,8 @@ describe("AITab — scope + composer wiring", () => {
     expect(screen.getByText("AI is out of credit.")).toBeInTheDocument();
     // The server's own numbers, not a re-worded guess at them.
     expect(screen.getByText(/Nothing was changed\. Daily limit reached \(10\)/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "See plans" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Workspace billing ↗" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Continue by hand in the inspector" })).toBeInTheDocument();
   });
 });
 

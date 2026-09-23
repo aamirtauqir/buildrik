@@ -39,6 +39,19 @@ export function anchorId(targetSelector: string): string {
  */
 export type LocateOutcome = "located" | "page-only" | "gone";
 
+const SCROLL_POLL_MS = 50;
+const SCROLL_GIVE_UP_MS = 5000;
+
+function scrollWhenRendered(id: string, waited = 0): void {
+  const node = getDOMElement(id);
+  if (node) {
+    node.scrollIntoView({ block: "center" });
+    return;
+  }
+  if (waited >= SCROLL_GIVE_UP_MS) return;
+  window.setTimeout(() => scrollWhenRendered(id, waited + SCROLL_POLL_MS), SCROLL_POLL_MS);
+}
+
 export function locateComment(composer: Composer, c: LocatableComment): LocateOutcome {
   /* The page first, then the anchor: the element registry is looked up after
      the switch so a page-scoped registry cannot report a live anchor on
@@ -56,8 +69,9 @@ export function locateComment(composer: Composer, c: LocatableComment): LocateOu
   /* `select` takes the element, not its id — the same shape ContentTab uses. */
   composer.selection.select(el);
   /* Selecting does not move the canvas; on a long page the anchor stays off
-     screen. A page switch re-renders the canvas first, so the scroll waits a
-     beat for the node to exist. */
-  window.setTimeout(() => getDOMElement(id)?.scrollIntoView({ block: "center" }), 60);
+     screen. A page switch re-renders the canvas first, and under load that
+     takes far longer than any fixed beat (QA: a 60 ms wait left the target
+     at y≈1048), so the scroll waits for the node itself — polled, bounded. */
+  scrollWhenRendered(id);
   return "located";
 }

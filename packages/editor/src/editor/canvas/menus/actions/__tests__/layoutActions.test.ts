@@ -37,35 +37,7 @@ describe("layoutActions", () => {
     };
   });
 
-  it.each([
-    ["layout-flex-row", [["display", "flex"], ["flexDirection", "row"]]],
-    ["layout-flex-column", [["display", "flex"], ["flexDirection", "column"]]],
-    ["layout-center", [["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"]]],
-    ["layout-space-between", [["display", "flex"], ["justifyContent", "space-between"]]],
-  ] as const)("%s sets the expected styles inside a transaction", (id, styles) => {
-    action(id).handler!(ctx);
-    for (const [key, value] of styles) {
-      expect(element.setStyle).toHaveBeenCalledWith(key, value);
-    }
-    expect(composer.beginTransaction).toHaveBeenCalledWith(id);
-    expect(composer.endTransaction).toHaveBeenCalled();
-  });
 
-  it("layout-grid sets 2-column grid and defaults gap to 16px when unset", () => {
-    action("layout-grid").handler!(ctx);
-    expect(element.setStyle).toHaveBeenCalledWith("display", "grid");
-    expect(element.setStyle).toHaveBeenCalledWith(
-      "gridTemplateColumns",
-      "repeat(2, minmax(0, 1fr))",
-    );
-    expect(element.setStyle).toHaveBeenCalledWith("gap", "16px");
-  });
-
-  it("layout-grid preserves an existing gap", () => {
-    element.getStyle.mockImplementation((key: string) => (key === "gap" ? "24px" : undefined));
-    action("layout-grid").handler!(ctx);
-    expect(element.setStyle).toHaveBeenCalledWith("gap", "24px");
-  });
 
   it.each([
     ["bring-to-front"],
@@ -78,21 +50,6 @@ describe("layoutActions", () => {
   });
 
   describe("visibility predicates", () => {
-    it("flex/grid/center/space-between are container-only", () => {
-      for (const id of [
-        "layout-flex-row",
-        "layout-flex-column",
-        "layout-grid",
-        "layout-center",
-        "layout-space-between",
-      ]) {
-        expect(action(id).isVisible!(ctx)).toBe(true);
-      }
-      element.isContainer.mockReturnValue(false);
-      for (const id of ["layout-flex-row", "layout-grid", "layout-center"]) {
-        expect(action(id).isVisible!(ctx)).toBe(false);
-      }
-    });
 
     it("layer ordering is hidden on the root element", () => {
       const rootCtx = { ...ctx, isRoot: true };

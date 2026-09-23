@@ -36,6 +36,7 @@ import {
   Timer,
   Sparkles,
   Rocket,
+  HelpCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 // ============================================
@@ -650,6 +651,24 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         )}
 
         <div className="ls-spacer" />
+
+        {/* Every v3 shell board ends the rail with "? Help" (C5 G1-089): the
+            door to the one keyboard sheet (B7), not a tab — it opens an
+            overlay and leaves the drawer as it is. */}
+        {railMode === "figma" && (
+          <HintTooltip content="Keyboard shortcuts · ?" placement="right">
+            <Button
+              color="light"
+              className="ls-btn ls-btn--labeled"
+              onClick={() => composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {})}
+              aria-label="Help — keyboard shortcuts"
+              data-testid="rail-help"
+            >
+              <HelpCircle size={20} />
+              <span className="ls-btn__label">Help</span>
+            </Button>
+          </HintTooltip>
+        )}
       </nav>
       {/* Panel */}
       <div

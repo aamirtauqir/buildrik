@@ -9,6 +9,7 @@ import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
+import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
 import { THRESHOLDS } from "../../shared/constants";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
@@ -454,8 +455,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       syncFromComposer,
       addToast,
       onOpenContextMenu: (elementId, position) => {
-        // elementStack omitted: keyboard target is unambiguous (selectedId),
-        // unlike right-click where multiple elements may overlap
         setContextMenu({ x: position.x, y: position.y, elementId });
       },
     });
@@ -473,7 +472,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       completeDrag: sectionCompleteDrag,
       cancelDrag: sectionCancelDrag,
       setHoveredBoundary: setSectionHoveredBoundary,
-    } = useSectionReorder({ composer, canvasRef });
+    } = useSectionReorder({ composer, canvasRef, addToast });
 
     // Content with CMS bindings resolved — selection/drop highlighting handled by overlay layer
     const { displayContent } = useCanvasContent({ composer, content });
@@ -572,9 +571,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // setContextMenu, so an unguarded close would dismiss the menu the instant
     // it opens (it only survived on already-selected elements).
     React.useEffect(() => {
-      if (contextMenu && contextMenu.elementId === selectedId) return;
+      /* A right-clicked member of a multi-selection keeps the selection
+         (G2-056), so the menu's element may be a member, not the primary. */
+      if (contextMenu && (contextMenu.elementId === selectedId || selectedIds.includes(contextMenu.elementId))) return;
       closeContextMenu();
-    }, [selectedId, closeContextMenu, contextMenu]);
+    }, [selectedId, selectedIds, closeContextMenu, contextMenu]);
 
     // ── Aria-live selection announcements (WCAG 4.1.3) ──────────────────────
     const liveAnnouncement = useSelectionAnnouncement({ composer, selectedId, selectedIds });
@@ -612,7 +613,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [handleSelectionClick, pickMode, composer]
     );
 
-    // Context menu handler - includes element stack detection for "Select from stack" feature
+    // Context menu handler
     const handleContextMenu = React.useCallback(
       (e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
@@ -626,16 +627,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         if (!id) return;
         const el = composer.elements.getElement(id);
         if (!el) return;
-        select(el);
+        /* G2-056: right-clicking a member of a multi-selection keeps the
+           selection, so the menu's Delete / Duplicate / Group act on all of
+           it; right-clicking anything else selects just that. */
+        const current = composer.selection.getSelectedIds?.() ?? [];
+        if (!(current.length > 1 && current.includes(id))) select(el);
 
-        // Detect all elements at this position for "Select from stack" feature
-        const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
-        const elementStack = elementsAtPoint
-          .filter((elem) => elem.hasAttribute("data-buildrick-id"))
-          .map((elem) => elem.getAttribute("data-buildrick-id")!)
-          .filter(Boolean);
-
-        setContextMenu({ x: e.clientX, y: e.clientY, elementId: id, elementStack });
+        setContextMenu({ x: e.clientX, y: e.clientY, elementId: id });
       },
       [composer, select, closeContextMenu, setContextMenu]
     );
@@ -745,6 +743,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               }}
             />
           )}
+
+          {!readOnly && <DeleteSelectionConfirm composer={composer} />}
 
           {/* All overlays delegated to CanvasOverlayGroup */}
           <CanvasOverlayGroup

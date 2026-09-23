@@ -116,12 +116,27 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
     await applyWithBackup();
     const first = SITE_TEMPLATES[0];
     await waitFor(() =>
-      expect(composer.versions.autoCheckpoint).toHaveBeenCalledWith(`Before template “${first.name}”`),
+      expect(composer.versions.autoCheckpoint).toHaveBeenCalledWith(`Before template “${first.name}”`, {
+        title: `Before template “${first.name}”`,
+      }),
     );
     expect(composer.elements.duplicatePage).not.toHaveBeenCalled();
     expect(renames).toHaveLength(0);
     await waitFor(() => expect(order).toContain("apply"));
     expect(order.indexOf(`checkpoint:Before template “${first.name}”`)).toBeLessThan(order.indexOf("apply"));
+  });
+
+  /* QA 2026-09-24: the toast said "Backup saved" whatever happened. If the
+     backup was asked for and could not be written, nothing is replaced. */
+  it("a backup that cannot be written stops the replace, and says so", async () => {
+    const order: string[] = [];
+    const { composer } = makeComposer(["Home"], order);
+    composer.versions.autoCheckpoint.mockImplementationOnce(async () => null as never);
+    render(<TemplatesTab composer={composer as never} />);
+    await applyWithBackup();
+    await waitFor(() => expect(composer.versions.autoCheckpoint).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 50));
+    expect(order).not.toContain("apply");
   });
 
   it("says where the backup lives", async () => {

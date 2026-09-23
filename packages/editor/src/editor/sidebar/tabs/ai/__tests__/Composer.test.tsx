@@ -41,8 +41,13 @@ describe("Composer", () => {
         streaming={false}
       />,
     );
-    const sendBtn = screen.getByLabelText("Plan changes") as HTMLButtonElement;
+    const sendBtn = screen.getByRole("button", { name: "Plan changes" }) as HTMLButtonElement;
     expect(sendBtn.disabled).toBe(true);
+  });
+
+  it("the primary reads 'Plan changes' (board 4418:104454)", () => {
+    render(<Composer onSubmit={vi.fn()} onStop={vi.fn()} streaming={false} />);
+    expect(screen.getByRole("button", { name: "Plan changes" })).toHaveTextContent("Plan changes");
   });
 
   it("send button flips to stop while streaming and calls onStop", () => {

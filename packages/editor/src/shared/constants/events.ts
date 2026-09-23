@@ -348,6 +348,9 @@ export const EVENTS = {
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
+  /** `delete` with N > 1 selected and no { confirmed } — the shell shows its
+   *  confirm (decision #17) and re-runs delete confirmed. Payload { count }. */
+  UI_REQUEST_DELETE_SELECTION: "ui:request-delete-selection",
   /** Inspector expands one section and scrolls it into view
    *  (`{ section: SectionId }`). The context menu's "Add interaction" has no
    *  other way to reach a collapsed section. */

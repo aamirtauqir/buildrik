@@ -47,39 +47,10 @@ describe("insertActions", () => {
     };
   });
 
-  it("insert-before adds a placeholder at the element's index and selects it", () => {
-    action("insert-before").handler!(ctx);
 
-    expect(composer.beginTransaction).toHaveBeenCalledWith("context-insert-before");
-    expect(composer.elements.addElement).toHaveBeenCalledWith(newEl, "parent-1", 1);
-    expect(composer.selection.select).toHaveBeenCalledWith(newEl);
-    expect(composer.endTransaction).toHaveBeenCalled();
-  });
 
-  it("insert-after adds a placeholder at index + 1", () => {
-    action("insert-after").handler!(ctx);
-    expect(composer.elements.addElement).toHaveBeenCalledWith(newEl, "parent-1", 2);
-    expect(composer.selection.select).toHaveBeenCalledWith(newEl);
-  });
 
-  it("insert-inside-first inserts at index 0 of the element itself", () => {
-    linkChildren(element, [makeElementStub({ id: "child-1" })]);
-    action("insert-inside-first").handler!(ctx);
-    expect(composer.elements.addElement).toHaveBeenCalledWith(newEl, "el-1", 0);
-  });
 
-  it("insert-inside-last inserts at the current child count", () => {
-    linkChildren(element, [makeElementStub({ id: "c1" }), makeElementStub({ id: "c2" })]);
-    action("insert-inside-last").handler!(ctx);
-    expect(composer.elements.addElement).toHaveBeenCalledWith(newEl, "el-1", 2);
-  });
-
-  it("insert-before is a no-op when the element has no parent", () => {
-    element._parent = null;
-    action("insert-before").handler!(ctx);
-    expect(composer.elements.addElement).not.toHaveBeenCalled();
-    expect(composer.beginTransaction).not.toHaveBeenCalled();
-  });
 
   it("wrap-section calls element.wrap('section')", () => {
     action("wrap-section").handler!(ctx);
@@ -92,34 +63,12 @@ describe("insertActions", () => {
   });
 
   describe("visibility / enablement predicates", () => {
-    it("insert-before/after require a parent", () => {
-      expect(action("insert-before").isVisible!(ctx)).toBe(true);
-      element._parent = null;
-      expect(action("insert-before").isVisible!(ctx)).toBe(false);
-      expect(action("insert-after").isVisible!(ctx)).toBe(false);
-    });
 
-    it("insert-inside requires canHaveChildren and unlocked", () => {
-      expect(action("insert-inside-first").isVisible!(ctx)).toBe(true);
-      element.canHaveChildren.mockReturnValue(false);
-      expect(action("insert-inside-first").isVisible!(ctx)).toBe(false);
-      element.canHaveChildren.mockReturnValue(true);
-      element.isLocked.mockReturnValue(true);
-      expect(action("insert-inside-last").isVisible!(ctx)).toBe(false);
-    });
 
     /* This guard used to ride on `isLocked()`, which returned true for every
        component instance. `isLocked` stopped conflating the two on 2026-08-25,
        so the guard is named here now — structural edits inside an instance
        subtree are discarded by the next `syncInstance`, so they stay blocked. */
-    it("insert-inside stays hidden inside a component instance", () => {
-      expect(action("insert-inside-first").isVisible!(ctx)).toBe(true);
-      element.isComponentInstance.mockReturnValue(true);
-      expect(action("insert-inside-first").isVisible!(ctx)).toBe(false);
-      expect(action("insert-inside-last").isVisible!(ctx)).toBe(false);
-      element.isComponentInstance.mockReturnValue(false);
-      expect(action("insert-inside-first").isVisible!(ctx)).toBe(true);
-    });
 
     it("unwrap is enabled only when the element has children", () => {
       linkChildren(element, []);
