@@ -31,7 +31,7 @@ import type { BreakpointId } from "../../../shared/types/breakpoints";
  * again. The strip stayed empty after a real override, and the pill's override
  * dot with it.
  */
-export function useBreakpointOverrides(
+function useBreakpointOverrides(
   composer: Composer | null | undefined,
   elementId: string | null | undefined,
   breakpoint: BreakpointId

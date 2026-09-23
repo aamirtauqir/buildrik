@@ -25,11 +25,7 @@
     },
     {
       "action": "click",
-      "testId": "inspector-breakpoint-pill"
-    },
-    {
-      "action": "click",
-      "testId": "inspector-bp-opt-tablet"
+      "testId": "bp-cell-tablet"
     },
     {
       "action": "wait",
@@ -81,12 +77,6 @@
       "testId": "inspector-scope-pill",
       "spec": "inspector-breakpoint-override",
       "nodeId": "160:214"
-    },
-    {
-      "name": "breakpoint-pill",
-      "testId": "inspector-breakpoint-pill",
-      "spec": "inspector-breakpoint-override",
-      "nodeId": "160:216"
     },
     {
       "name": "state-pill",
