@@ -104,6 +104,7 @@ import { ExportSection } from "./sections/ExportSection";
 import { LintSection, brandChecksCaption, contrastFixFor } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
+import { ClassAddDialog } from "./sections/ClassAddDialog";
 import { TypographySection, fontsCaption } from "./sections/TypographySection";
 import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { StartersSection } from "./sections/StartersSection";
@@ -247,6 +248,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
   const [guardOpen, setGuardOpen] = React.useState(false);
+  const [classAddOpen, setClassAddOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isFirstLoad, setIsFirstLoad] = React.useState(false);
   /* The saved brand is in the registries — the auto-draft may restore on top. */
@@ -605,7 +607,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (guardOpen || showReview || showAddToken || aiOpen) return;
+      if (guardOpen || showReview || showAddToken || aiOpen || classAddOpen) return;
       /* An open popover, menu or dialog owns this Escape (the token card's ⋯
          menu, the font picker, the rename / replace dialogs). Leaving the
          workspace on the same keypress that closed a menu was found live. */
@@ -621,7 +623,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
        unmounts it before a later listener could see it was open. */
     window.addEventListener("keydown", handler, true);
     return () => window.removeEventListener("keydown", handler, true);
-  }, [guardOpen, showReview, showAddToken, aiOpen, requestLeave]);
+  }, [guardOpen, showReview, showAddToken, aiOpen, classAddOpen, requestLeave]);
 
   // ─ Pane content ─
   const visibleColors = filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro");
@@ -752,6 +754,12 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
           </Tooltip>
         );
       }
+      case "classes":
+        return (
+          <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setClassAddOpen(true)} data-testid="brand-page-action">
+            + Add class
+          </Button>
+        );
       case "brand-checks":
         /* 7316:84555's page action. The checks also run by themselves on
            every staged edit; this runs them now (useDSLint's one trigger). */
@@ -1138,6 +1146,8 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
           )}
         </aside>
       </div>
+
+      <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />
 
       <BrandDiscardDialog
         open={guardOpen}

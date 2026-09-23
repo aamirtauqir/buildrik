@@ -3,10 +3,10 @@
  * drawer's 153:2).
  *
  * One bordered card, a 48px row per class: `.name` in 14px ink over
- * "used N×". Departures, recorded: the board's "+ Add class" and per-row ›
- * have no code behind them — a class exists only on the elements that carry
- * it (there is no site-level class registry, see below) and there is no class
- * detail — so neither is drawn. Classes in the engine's own `buildrick-`
+ * "used N×". "+ Add class" is the workspace header's action (ClassAddDialog
+ * puts the name on the canvas selection — a class exists only on the
+ * elements that carry it). Departure, recorded: the board's per-row › — there
+ * is no class detail to open. Classes in the engine's own `buildrick-`
  * namespace (the page root's) are not the site's and are not listed.
  *
  * Every CSS class the pages actually carry, and how many elements carry it.
