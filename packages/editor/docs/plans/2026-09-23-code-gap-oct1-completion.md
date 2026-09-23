@@ -288,3 +288,21 @@ Coverage order (~800 CURRENT boards in `docs/audit-2026-09-21/02-figma-inventory
 3. **V3**: all remaining CURRENT boards, family by family, as budget allows. Boards not reached by 30 Sep are listed as "not compared", never counted as matching.
 
 Output: `docs/plans/2026-09-24-visual-parity-ledger.md`. One row per board: `node · family · live state · MATCH / DRIFT <what, measured> / BLOCKED · owning lane · fix sha`.
+
+## Daily parity cycle — owner 2026-09-24: "same prototype as Figma: visual + flow + prototype, every day, for whatever is final"
+
+An item is **final** when it is merged into integration and passes QA. Every final item then gets three checks against Figma, each day, on the same day it becomes final:
+
+| Check | Question | Source | Figma calls |
+|---|---|---|---|
+| **Visual** | Does the screen look like the board? | board screenshot vs live, 1440×900, measured | 1 per board (cached) |
+| **Flow** | Does the user reach the same place in the same steps? | the prototype's click paths through the boards | 0: dump |
+| **Prototype** | Does every hotspot on the board do in the live app what the prototype does (trigger → destination, overlay vs navigate, back/close)? | `docs/audit-2026-09-21/dump/live-all.json.gz` (10,789 reaction lines, decoder `dump/decode.mjs`) | 0: dump |
+
+Daily Figma budget (200/day, 15/min, shared): visual-parity agent ≤ 120 · lanes ≤ 60 · reserve 20. The coordinator checks the used count at each report; unused budget rolls to V3 boards the same day, never lost.
+
+Each day ends with one line per final item in `scratchpad/parity-daily-<date>.md`: `item · visual MATCH/DRIFT · flow MATCH/DRIFT · prototype N/M hotspots MATCH`. Every DRIFT goes to the owning lane the same day.
+
+Prototype rules (so the check is honest):
+- A reaction whose destination belongs to the dashboard, an archived board or pure sample data is recorded `n/a — <why>`, not DRIFT.
+- Navigation and screen order follow the prototype (visual/IA → board). What the data can do follows the code contract (Zod / service returns), per CLAUDE.md precedence. A conflict between the two goes to the owner and is never silently resolved.
