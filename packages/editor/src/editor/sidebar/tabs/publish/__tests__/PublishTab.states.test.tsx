@@ -226,6 +226,28 @@ describe("PublishTab — board 784:4326, just published", () => {
   });
 });
 
+/* Board 4418:99089 (C5 G1-048): a dev simulation says nothing was deployed
+   and offers no live link — its URL can never resolve. */
+describe("PublishTab — a simulated publish says so", () => {
+  it("names the simulation and withholds View live site", async () => {
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 15, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
+        publishJob={job({ uiState: "published", jobId: "job-1", publishedUrl: "https://bella.dev-simulated.invalid" })}
+      />,
+    );
+    await waitFor(() => expect(screen.getByText("Simulated publish — nothing was deployed.")).toBeTruthy());
+    expect(screen.getByText(/PUBLISH_ALLOW_SIMULATION is on/)).toBeTruthy();
+    expect(screen.queryByText("View live site")).toBeNull();
+    expect(screen.queryByText("Published to production.")).toBeNull();
+  });
+});
+
 describe("PublishTab — a fresh load is not a fresh publish", () => {
   /* `justPublished` read two facts that are BOTH true the moment the editor
      opens an already-live site, and neither of which means a publish happened:
