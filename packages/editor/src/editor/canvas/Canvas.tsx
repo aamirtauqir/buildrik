@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { THRESHOLDS } from "../../shared/constants";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
@@ -730,8 +731,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
                  "Replace with block…" does the same), and the AI panel (the
                  inspector's ✦ chip). */
               onAddBlock={() => {
-                composer?.emit("ui:switch-tab", { tab: "add" });
-                composer?.emit(EVENTS.UI_INSERT_OPEN_GROUP, { group: "blocks" });
+                if (!composer) return;
+                composer.emit("ui:switch-tab", { tab: "add" });
+                requestInsertGroup(composer, "blocks");
               }}
               onDescribe={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
               onStartBlank={() => {
