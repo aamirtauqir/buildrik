@@ -9,6 +9,9 @@ import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
+
+/** Grey left each side of the page card when the canvas fits on load. */
+const FIT_GUTTER = 60;
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
 import { THRESHOLDS } from "../../shared/constants";
 import { useToast } from "@/editor/chrome-ui";
@@ -538,6 +541,25 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       return !!rootEl && rootEl.getChildren().length === 0;
     }, [composer, content]);
     const isCanvasEmpty = pageIsEmpty && !projectLoading && !projectUnavailable;
+    /* Boards 5936:44788 / 4428:44164 draw the page as a card inside the
+       canvas — the 1024 desktop frame scaled to leave grey around it — not
+       edge to edge under the drawer and inspector. Once the project has
+       loaded, if the desktop frame is wider than its viewport, zoom to fit
+       its WIDTH with a 60px gutter each side. Only on load: after that the
+       zoom is the user's. */
+    const didInitialFitRef = React.useRef(false);
+    React.useEffect(() => {
+      if (didInitialFitRef.current || projectLoading || !composer || device !== "desktop") return;
+      const frame = frameRef.current;
+      const viewport = scrollRef.current;
+      if (!frame || !viewport) return;
+      didInitialFitRef.current = true;
+      const fw = frame.offsetWidth;
+      const vw = viewport.clientWidth;
+      if (!fw || fw <= vw) return;
+      composer.setZoom(Math.max(10, Math.floor(((vw - FIT_GUTTER * 2) / fw) * 100)));
+    }, [projectLoading, composer, device]);
+
     const showLoadingCanvas = pageIsEmpty && projectLoading;
 
     // Toolbar action callbacks (delegated to useCanvasToolbarActions)
@@ -704,6 +726,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}
+            data-empty-cta={isCanvasEmpty && !readOnly ? "true" : undefined}
             style={contentStyles}
             dangerouslySetInnerHTML={canvasInnerHtml}
           />
@@ -726,6 +749,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             <CanvasEmptyCTA
               started={startedBlank}
               span={emptyCtaSpan}
+              scale={scale}
               onBrowseTemplates={() => composer?.emit("ui:browse-templates", {})}
               /* Board 4428:44164's two new doors reuse the seams that already
                  exist: the Add drawer opened on BLOCKS (the canvas menu's

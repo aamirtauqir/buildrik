@@ -68,41 +68,17 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     );
   }
 
-  /* Board 159:99 draws this state as TWO LINES: a muted sentence and one accent
-     link to the AI. What it replaces was an icon circle, an h3, a description,
-     a two-button CTA stack (Open Build Panel / Browse Templates) and a keyboard
-     tip — six blocks of chrome for "nothing is selected".
-
-     Neither CTA loses its destination: Insert is a rail button and Templates
-     opens from ⌘K and the Pages panel, so the capability is untouched. What
-     changes is that an empty panel stops advertising them. And the one action
-     the board does keep is the AI entry, which is the same one the inspector
-     header carries as `✦ AI` — one answer to "I do not know what to do next",
-     not three. */
+  /* Board 4428:44164 (v3): the no-selection column is a centred pair — a
+     600 "Nothing selected" over a muted two-line hint. The 159:99 version
+     this replaces was a single top-aligned sentence plus "✦ Ask AI ›"; v3
+     draws no AI link here (the header's ✦ AI is the AI door once something
+     is selected). */
   return (
     <div role="status" aria-live="polite" aria-label="No element selected" className={CONTAINER} data-testid="inspector-empty">
-      <p className={DESCRIPTION} data-testid="inspector-empty-text">Select something on the canvas to edit it.</p>
-      {composer && (
-        <Button
-          color="light"
-          size="xs"
-          data-testid="inspector-empty-ask-ai"
-          onClick={() => composer.emit("ui:switch-tab", { tab: "ai" })}
-          /* Board 920:4717 draws this 12/16 across the full 268 content box,
-             not the `link` colour key's shared 13/20 at `min-h-6` — that key
-             is 48 call sites wide, so the two deltas are corrected here.
-             `min-h-4` is the same twMerge group as the theme's `min-h-6`,
-             which is why it wins; a different property (the old `min-h-6`
-             against `h-auto`) would not have. No `leading-*` here: measured,
-             that whole utility family is inert on a chrome Button — the root
-             computes `line-height: normal` with the theme's own `tw:leading-5`
-             on it — and the board's `leading-[0]` is a Figma auto-height
-             artifact, not a line box to match. `min-h-4` gives the 16. */
-          variant="link" className="tw:min-h-4 tw:mt-2 tw:text-[12px] tw:font-normal"
-        >
-          ✦ Ask AI ›
-        </Button>
-      )}
+      <p className={EMPTY_TITLE} data-testid="inspector-empty-title">Nothing selected</p>
+      <p className={DESCRIPTION} data-testid="inspector-empty-text">
+        Click an element on the canvas to edit its style, settings and effects.
+      </p>
     </div>
   );
 };
@@ -140,7 +116,9 @@ const CONTAINER_BASE =
    centring transform and the `text-center` on their parent. `items-stretch`
    gives each child that 268 box; the container's own `text-center` places the
    glyphs inside it. */
-const CONTAINER = `${CONTAINER_BASE} tw:h-40 tw:items-stretch tw:text-center tw:pt-16`; // 159:99/159:100
+/* Board 4428:44164: vertically and horizontally centred in the column. */
+const CONTAINER = `${CONTAINER_BASE} tw:h-full tw:min-h-40 tw:items-center tw:justify-center tw:gap-1 tw:text-center`;
+const EMPTY_TITLE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]";
 const CONTAINER_APPLIED = `${CONTAINER_BASE} tw:items-start tw:pb-6 tw:text-left tw:pt-4`; // 1175:4841, banner at y14
 /* Board 1175:4843/4844 — 12 semibold in the success ink and the template's own
    name at 11 under it. It was 14 over 13, both a step too loud for a banner
@@ -149,7 +127,7 @@ const APPLIED_TITLE = "tw:m-0 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-
 const APPLIED_NAME = "tw:m-0 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-soft)]";
 /* No max-width: the board's sentence sits on one line inside the panel's
    own padding; capping it at 220px broke it across two. */
-const DESCRIPTION = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const DESCRIPTION = "tw:m-0 tw:max-w-[220px] tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
 /* Board 1175:4847 sets the tip at 10; the DS type scale floors at 11 and
    `gate:design-debt-ratchet` locks off-scale sizes at zero, so 11 it is. */
 const TIP = "tw:mt-2.5 tw:text-[11px] tw:text-[var(--bk-ink-muted)]";

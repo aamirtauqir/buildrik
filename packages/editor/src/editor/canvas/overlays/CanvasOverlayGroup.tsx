@@ -36,7 +36,6 @@ import {
   GuidesOverlay,
   GridOverlay,
   RemoteCursorsOverlay,
-  CanvasBreadcrumb,
   SmartGuidesOverlay,
   SectionReorderHandles,
   SelectionLabel,
@@ -367,11 +366,6 @@ export function CanvasOverlayGroup({
           dropSlotRect={dropSlotRect}
           dropTargetPath={dropTargetPath}
         />
-      )}
-
-      {/* Canvas breadcrumb (bottom center) */}
-      {!isDragOver && selectedId && !isResizing && (
-        <CanvasBreadcrumb composer={composer} selectedId={selectedId} onSelectElement={onSelectAncestor} />
       )}
 
       {/* Section reorder handles */}
