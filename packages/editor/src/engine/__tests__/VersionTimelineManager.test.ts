@@ -12,11 +12,7 @@ vi.mock("../storage/VersionHistoryStorage", () => ({
   loadVersions: vi.fn(async () => []),
   loadVersion: vi.fn().mockResolvedValue(null),
   deleteVersion: vi.fn().mockResolvedValue(undefined),
-  deleteAllVersions: vi.fn().mockResolvedValue(undefined),
   pruneVersions: vi.fn().mockResolvedValue(undefined),
-  exportVersions: vi.fn().mockResolvedValue({ versions: [] }),
-  importVersions: vi.fn().mockResolvedValue(undefined),
-  downloadVersionsFile: vi.fn(),
   isStorageAvailable: () => true,
 }));
 

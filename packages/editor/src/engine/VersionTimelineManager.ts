@@ -11,7 +11,6 @@ import type { ProjectData } from "../shared/types";
 import type {
   NamedVersion,
   VersionHistoryConfig,
-  VersionHistoryExport,
   CompareResult,
 } from "../shared/types/versions";
 import { DEFAULT_VERSION_HISTORY_CONFIG } from "../shared/types/versions";
@@ -24,9 +23,6 @@ import {
   loadVersion,
   deleteVersion as deleteVersionFromStorage,
   pruneVersions,
-  exportVersions as exportVersionsFromStorage,
-  importVersions as importVersionsToStorage,
-  downloadVersionsFile,
   isStorageAvailable,
   getStorageStats,
 } from "./storage/VersionHistoryStorage";
@@ -352,47 +348,6 @@ export class VersionTimelineManager {
 
     this.composer.emit(EVENTS.VERSION_LIST_UPDATED, { versions: this.versions });
     return true;
-  }
-
-  // ============================================
-  // Export / Import
-  // ============================================
-
-  /**
-   * Export all versions to a file
-   */
-  async exportVersions(download: boolean = true): Promise<VersionHistoryExport> {
-    const data = await exportVersionsFromStorage(this.projectId);
-
-    if (download) {
-      downloadVersionsFile(data);
-    }
-
-    this.composer.emit(EVENTS.VERSION_EXPORTED, {
-      projectId: this.projectId,
-      count: data.versions.length,
-    });
-
-    return data;
-  }
-
-  /**
-   * Import versions from a file
-   */
-  async importVersions(file: File, clearExisting: boolean = false): Promise<number> {
-    const text = await file.text();
-    const data = JSON.parse(text) as VersionHistoryExport;
-
-    const count = await importVersionsToStorage(data, clearExisting);
-    await this.loadVersionsFromStorage();
-
-    this.composer.emit(EVENTS.VERSION_IMPORTED, {
-      projectId: this.projectId,
-      count,
-      filename: file.name,
-    });
-
-    return count;
   }
 
   // ============================================
