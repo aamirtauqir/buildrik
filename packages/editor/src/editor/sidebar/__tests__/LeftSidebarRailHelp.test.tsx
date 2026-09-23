@@ -28,7 +28,7 @@ beforeAll(() => {
 });
 
 describe("rail Help", () => {
-  it("sits at the foot of the rail and opens the keyboard sheet", () => {
+  it("sits at the foot of the rail and opens the keyboard legend (board 4418:126882)", () => {
     const composer = { emit: vi.fn(), on: vi.fn(), off: vi.fn() };
     render(
       <ToastProvider>
@@ -39,6 +39,6 @@ describe("rail Help", () => {
     expect(help).toHaveTextContent("Help");
     expect(screen.getByTestId("rail").lastElementChild?.contains(help)).toBe(true);
     fireEvent.click(help);
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_CHEAT_SHEET, {});
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND, {});
   });
 });

@@ -342,6 +342,9 @@ export const EVENTS = {
    *  state directly; this is the door for rows that are not a keystroke —
    *  the ⌘K "Keyboard shortcuts" row, the site menu, the footer help button. */
   UI_TOGGLE_CHEAT_SHEET: "ui:toggle:cheat-sheet",
+  /** Rail Help (board 4418:126882): the compact "Keyboard" legend card; its
+   *  "All shortcuts ›" opens the full sheet (UI_TOGGLE_CHEAT_SHEET). */
+  UI_TOGGLE_KEYBOARD_LEGEND: "ui:toggle:keyboard-legend",
   /** Toggle the one ⌘K command palette (StudioHeader owns its state). ⌘⇧P —
    *  the retired canvas palette's chord — and the Pages panel's ⌘K keycap
    *  come in through here. */

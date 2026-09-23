@@ -652,15 +652,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
         <div className="ls-spacer" />
 
-        {/* Every v3 shell board ends the rail with "? Help" (C5 G1-089): the
-            door to the one keyboard sheet (B7), not a tab — it opens an
-            overlay and leaves the drawer as it is. */}
+        {/* Every v3 shell board ends the rail with "? Help" (C5 G1-089). It
+            opens the Keyboard legend card (4418:126882), whose "All shortcuts
+            ›" is the door to the one sheet (B7) — not a tab; the drawer stays. */}
         {railMode === "figma" && (
           <HintTooltip content="Keyboard shortcuts · ?" placement="right">
             <Button
               color="light"
               className="ls-btn ls-btn--labeled"
-              onClick={() => composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {})}
+              onClick={() => composer?.emit(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND, {})}
               aria-label="Help — keyboard shortcuts"
               data-testid="rail-help"
             >
