@@ -472,7 +472,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       completeDrag: sectionCompleteDrag,
       cancelDrag: sectionCancelDrag,
       setHoveredBoundary: setSectionHoveredBoundary,
-    } = useSectionReorder({ composer, canvasRef });
+    } = useSectionReorder({ composer, canvasRef, addToast });
 
     // Content with CMS bindings resolved — selection/drop highlighting handled by overlay layer
     const { displayContent } = useCanvasContent({ composer, content });

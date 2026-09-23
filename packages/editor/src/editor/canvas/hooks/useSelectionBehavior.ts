@@ -87,7 +87,7 @@ export function useSelectionBehavior({
           if (element) {
             if (element.isLocked()) {
               addToast({
-                description: "This element is locked. Unlock it in the Layers panel.",
+                description: "This element is locked. Unlock it here in the inspector or in Layers.",
                 tone: "info",
                 duration: 2500,
               });
@@ -105,7 +105,7 @@ export function useSelectionBehavior({
           if (element) {
             if (element.isLocked()) {
               addToast({
-                description: "This element is locked. Unlock it in the Layers panel.",
+                description: "This element is locked. Unlock it here in the inspector or in Layers.",
                 tone: "info",
                 duration: 2500,
               });
@@ -133,7 +133,7 @@ export function useSelectionBehavior({
           if (element) {
             if (element.isLocked()) {
               addToast({
-                description: "This element is locked. Unlock it in the Layers panel.",
+                description: "This element is locked. Unlock it here in the inspector or in Layers.",
                 tone: "info",
                 duration: 2500,
               });

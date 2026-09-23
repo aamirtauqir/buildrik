@@ -25,6 +25,7 @@ import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
+import { LockedBanner } from "./components/LockedBanner";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorLoading } from "./components/InspectorLoading";
 import { BreakpointOverrides } from "./components/BreakpointOverrides";
@@ -468,6 +469,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
+      <LockedBanner composer={composer} elementId={selectedElement.id} />
       {/* Boards 4428:141170 / 141642 / 142686 — Style · Settings · Effects.
           The sections each tab holds are the registry's `tab` tags; the strip
           only picks which set the body renders. */}

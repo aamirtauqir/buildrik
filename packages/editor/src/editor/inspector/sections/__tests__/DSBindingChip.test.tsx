@@ -10,7 +10,7 @@ describe("DSBindingChip", () => {
     const { getByRole } = render(
       <DSBindingChip state="token" label="color-primary" onClick={onClick} />
     );
-    const btn = getByRole("button", { name: /Jump to token color-primary in Design tab/ });
+    const btn = getByRole("button", { name: /Jump to token color-primary in Brand/ });
     fireEvent.click(btn);
     expect(onClick).toHaveBeenCalled();
   });
@@ -19,7 +19,7 @@ describe("DSBindingChip", () => {
     const { getByRole } = render(
       <DSBindingChip state="preset" label="card-shadow" onClick={() => {}} />
     );
-    expect(getByRole("button", { name: /Jump to preset card-shadow in Design tab/ })).toBeTruthy();
+    expect(getByRole("button", { name: /Jump to preset card-shadow in Brand/ })).toBeTruthy();
   });
 
   it("renders off-ds state with warning prefix and bind-prompt a11y label", () => {

@@ -65,14 +65,14 @@ const STATE_STYLE: Record<
     fg: "var(--bk-success-text)",
     border: "var(--bk-success)",
     prefix: "",
-    actionLabel: (l) => `Jump to token ${l} in Design tab`,
+    actionLabel: (l) => `Jump to token ${l} in Brand`,
   },
   preset: {
     bg: "var(--bk-accent-tint)",
     fg: "var(--bk-accent-text)",
     border: "var(--bk-accent-tint)",
     prefix: "",
-    actionLabel: (l) => `Jump to preset ${l} in Design tab`,
+    actionLabel: (l) => `Jump to preset ${l} in Brand`,
   },
   "off-ds": {
     bg: "var(--bk-warning-tint)",

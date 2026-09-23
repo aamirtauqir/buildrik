@@ -55,10 +55,13 @@ export const Composer: React.FC<ComposerProps> = ({
           <Button
             type="button"
             className="bd-ai-composer-send"
-            aria-label="Plan changes"
             disabled={!trimmed}
             onClick={submit}
-          >↑</Button>
+          >
+            {/* Board 4418:104454's primary is a labelled "Plan changes" — the
+                panel only plans and runs (decision #23). It was a bare ↑. */}
+            Plan changes
+          </Button>
         )}
       </div>
     </div>
