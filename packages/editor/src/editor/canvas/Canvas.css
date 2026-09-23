@@ -323,37 +323,6 @@
   cursor: not-allowed !important;
 }
 
-.bd-selection-box {
-  position: absolute;
-  pointer-events: none;
-  z-index: 1000; /* Z_LAYERS.selectionBox - use unified registry */
-  background: var(--bk-accent-subtle);
-  border: 1px solid var(--bk-accent);
-  border-radius: 4px;
-  box-shadow: var(--bk-shadow-focus);
-  /* NOTE: Removed infinite selectionBoxPulse animation per Phase 4 cleanup */
-}
-
-.bd-selection-box::before,
-.bd-selection-box::after {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--bk-accent);
-  border-radius: 2px;
-}
-
-.bd-selection-box::before {
-  top: -3px;
-  left: -3px;
-}
-
-.bd-selection-box::after {
-  bottom: -3px;
-  right: -3px;
-}
-
 @keyframes emptyCanvasPulse {
   0%, 100% {
     border-color: var(--bk-border);
