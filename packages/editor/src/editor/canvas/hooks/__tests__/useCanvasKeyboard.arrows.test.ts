@@ -124,6 +124,27 @@ describe("useCanvasKeyboard — arrow navigation and movement", () => {
     expect(helperMocks.moveElementPosition).toHaveBeenCalledWith(composer, "el-1", 10, 0);
   });
 
+  /* G2-047: an in-flow element is not nudged; the user is told why, once. */
+  it("a refused nudge (in-flow element) toasts once, not once per key repeat", () => {
+    helperMocks.moveElementPosition.mockReturnValue(false);
+    const addToast = vi.fn();
+    const { result } = renderHook(() =>
+      useCanvasKeyboard({
+        composer,
+        selectedId: "el-1",
+        editingId: null,
+        select: select as never,
+        clear: vi.fn(),
+        syncFromComposer: vi.fn(),
+        addToast,
+      })
+    );
+    act(() => result.current.handleKeyDown(key("ArrowUp", { shiftKey: true })));
+    act(() => result.current.handleKeyDown(key("ArrowUp", { shiftKey: true })));
+    expect(addToast).toHaveBeenCalledTimes(1);
+    expect(addToast.mock.calls[0][0].description).toMatch(/Set Position/);
+  });
+
   it("Alt+ArrowDown reorders the element down among siblings", () => {
     const { result } = mountHook();
     act(() => result.current.handleKeyDown(key("ArrowDown", { altKey: true })));

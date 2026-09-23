@@ -266,11 +266,6 @@ export function CanvasOverlayGroup({
               elementId={selectedId}
               canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
               onSelectParent={onSelectParent}
-              /* SelectionLabel's ancestor dropdown calls onAncestorClick and
-                 nothing supplied it, so every row closed the dropdown and
-                 selected nothing. The handler was already here — the two
-                 siblings below take it as onSelectAncestor. */
-              onAncestorClick={onSelectAncestor}
             />
           )}
           {selectedIds.length === 1 && !isResizing && canvasRef.current && (

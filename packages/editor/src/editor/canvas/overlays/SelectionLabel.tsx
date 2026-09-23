@@ -1,6 +1,8 @@
 /**
  * Selection Label Component
- * Shows element name with parent navigation and settings at top-left of selection
+ * Shows the element name and a "select parent" button at the top-left of the
+ * selection. Its ancestor dropdown is gone (G2-026): the path lives in Layers,
+ * and ← selects the parent.
  * @license BSD-3-Clause
  */
 
@@ -16,23 +18,12 @@ export interface SelectionLabelProps {
   elementId: string;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   onSelectParent: () => void;
-  /* REQUIRED, not optional. The ancestor dropdown always renders its rows and
-     every row calls this — an optional handler let the only consumer omit it,
-     and the dropdown closed on click while selecting nothing. Required means
-     the compiler catches the next omission instead of a user finding it. */
-  onAncestorClick: (ancestorId: string) => void;
 }
 
 interface ElementPosition {
   left: number;
   top: number;
   width: number;
-}
-
-interface AncestorInfo {
-  id: string;
-  name: string;
-  type: string;
 }
 
 /* NOTE: Local getElementName and getTypeIcon functions REMOVED
@@ -44,38 +35,14 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
   elementId,
   canvasRef,
   onSelectParent,
-  onAncestorClick,
 }) => {
   const [position, setPosition] = React.useState<ElementPosition | null>(null);
-  const [showDropdown, setShowDropdown] = React.useState(false);
-  const [ancestors, setAncestors] = React.useState<AncestorInfo[]>([]);
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   // Get element info
   const element = composer.elements.getElement(elementId);
   const elementType = element?.getType?.() || "element";
   const elementTagName = element?.getTagName?.()?.toLowerCase();
   const elementName = getElementNameFromType(elementType, elementTagName);
-
-  // Build ancestor chain
-  React.useEffect(() => {
-    if (!element) return;
-
-    const chain: AncestorInfo[] = [];
-    let current = element.getParent();
-
-    while (current) {
-      const type = current.getType?.() || "element";
-      chain.unshift({
-        id: current.getId?.() || "",
-        name: getElementNameFromType(type, current.getTagName?.()?.toLowerCase()),
-        type,
-      });
-      current = current.getParent();
-    }
-
-    setAncestors(chain);
-  }, [composer, elementId, element]);
 
   // Track element position
   React.useEffect(() => {
@@ -115,20 +82,6 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
     };
   }, [elementId, canvasRef]);
 
-  // Close dropdown on click outside
-  React.useEffect(() => {
-    if (!showDropdown) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showDropdown]);
-
   if (!position || !element) return null;
 
   // Parent info
@@ -163,7 +116,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
             /* px-0: 24 wide against flowbite's 40 of horizontal padding, which
                clamps the content box to zero and hides the svg below. */
             className="tw:px-0"
-            title={`Go to parent: ${parentName} (Alt+↑)`}
+            title={`Go to parent: ${parentName} (←)`}
           >
             <svg
               width="12"
@@ -178,64 +131,11 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
           </Button>
         )}
 
-        {/* Element name (clickable for dropdown) */}
-        <Button onClick={() => setShowDropdown(!showDropdown)} style={nameBtnStyles}>
+        <span style={nameStyles}>
           <span style={{ opacity: 0.7, marginRight: 4 }}>{getTypeIcon(elementType)}</span>
           {elementName}
-          {ancestors.length > 0 && (
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              style={{ marginLeft: 4 }}
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          )}
-        </Button>
+        </span>
       </div>
-      {/* Ancestor dropdown */}
-      {showDropdown && ancestors.length > 0 && (
-        <div ref={dropdownRef} style={dropdownStyles}>
-          {ancestors.map((ancestor, i) => (
-            <Button
-              key={ancestor.id}
-              onClick={() => {
-                onAncestorClick(ancestor.id);
-                setShowDropdown(false);
-              }}
-              style={{
-                ...dropdownItemStyles,
-                paddingLeft: 8 + i * 12,
-              }}
-            >
-              <span style={{ opacity: 0.5, marginRight: 6, fontSize: 12 }}>
-                {getTypeIcon(ancestor.type)}
-              </span>
-              {ancestor.name}
-            </Button>
-          ))}
-          {/* Current element */}
-          <div
-            style={{
-              ...dropdownItemStyles,
-              paddingLeft: 8 + ancestors.length * 12,
-              background: canvasTokens.colors.primary.alpha20,
-              color: canvasTokens.colors.primary.light,
-              cursor: "default",
-            }}
-          >
-            <span style={{ opacity: 0.7, marginRight: 6, fontSize: 12 }}>
-              {getTypeIcon(elementType)}
-            </span>
-            {elementName}
-            <span style={{ marginLeft: "auto", fontSize: 12, opacity: 0.6 }}>current</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -265,45 +165,12 @@ const parentBtnStyles: React.CSSProperties = {
   transition: "background 0.15s",
 };
 
-const nameBtnStyles: React.CSSProperties = {
+const nameStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   padding: "4px 8px",
-  background: "transparent",
-  border: "none",
-  borderRadius: canvasTokens.radius.sm,
   color: canvasTokens.colors.text.primary,
   fontSize: 12,
   fontWeight: 500,
-  cursor: "pointer",
   whiteSpace: "nowrap",
-  transition: `background ${canvasTokens.animation.duration.fast}`,
 };
-
-const dropdownStyles: React.CSSProperties = {
-  position: "absolute",
-  top: "100%",
-  left: 0,
-  marginTop: 4,
-  background: canvasTokens.colors.surface.background,
-  borderRadius: canvasTokens.radius.md,
-  boxShadow: canvasTokens.shadows.panel,
-  overflow: "hidden",
-  minWidth: 160,
-};
-
-const dropdownItemStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  width: "100%",
-  padding: "8px 12px",
-  background: "transparent",
-  border: "none",
-  color: canvasTokens.colors.text.primary,
-  fontSize: 12,
-  textAlign: "left",
-  cursor: "pointer",
-  transition: `background ${canvasTokens.animation.duration.fast}`,
-};
-
-export default SelectionLabel;
