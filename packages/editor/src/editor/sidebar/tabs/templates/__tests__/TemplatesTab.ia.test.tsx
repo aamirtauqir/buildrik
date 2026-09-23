@@ -41,10 +41,9 @@ describe("TemplatesTab — new-design IA (S1)", () => {
   });
 });
 
-/* Decision #24: new-page mode is gone with the drawer — a new page from a
-   template is the New-page modal's From template (#19) or the view's own
-   Create page. Search stays behind the header toggle. */
-describe("TemplatesTab — search", () => {
+/* Board 4418:54134 draws no search box and no header bar with ✕ — the
+   sidebar's ‹ Back to canvas is the one way out. */
+describe("TemplatesTab — no search, no header bar", () => {
   const bareComposer = () =>
     ({
       on: () => {},
@@ -53,8 +52,9 @@ describe("TemplatesTab — search", () => {
       elements: { getActivePage: () => null },
     }) as unknown as Composer;
 
-  it("keeps search behind its header toggle", () => {
+  it("offers no search field or search toggle", () => {
     render(<TemplatesTab composer={bareComposer()} />);
-    expect(screen.queryByRole("textbox", { name: "Search templates" })).toBeNull();
+    expect(screen.queryByRole("textbox")).toBeNull();
+    expect(screen.queryByRole("button", { name: /search templates/i })).toBeNull();
   });
 });
