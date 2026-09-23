@@ -50,7 +50,6 @@ const ContentTab = React.lazy(() => import("./tabs/content/ContentTab"));
 const AITab = React.lazy(() =>
   import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
 );
-const DesignSystemTab = React.lazy(() => import("@/editor/design-system/ui/DesignSystemTab"));
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
@@ -263,9 +262,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       return (
         <ContentTab composer={composer} onCreateCollection={onCreateCollection} {...commonTabProps} />
       );
-
-    case "design":
-      return <DesignSystemTab composer={composer} projectId={projectId} {...commonTabProps} />;
 
     default:
       return null;

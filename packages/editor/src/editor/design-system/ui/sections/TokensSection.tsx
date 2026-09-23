@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
-import { TokensRouter } from "./TokensRouter";
 import { GenericTokenList } from "../tokens/GenericTokenList";
 import { ColorTokenList } from "../colors/ColorTokenList";
 import { TypeTokenList } from "../type/TypeTokenList";
@@ -40,6 +39,10 @@ interface TokensSectionProps {
    *  `‹ Tokens · color`, not two stacked crumbs. */
   openKind?: TokenKind | null;
   onOpenKind?: (kind: TokenKind | null) => void;
+  /** The token whose card the workspace draws in its right column (7315:80955
+   *  — a row click sets it; the detail is a sibling, not a drill-in). */
+  selectedTokenId?: string | null;
+  onSelectToken?: (tokenId: string) => void;
 }
 
 interface KindEntry {
@@ -75,6 +78,8 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   composer,
   openKind = null,
   onOpenKind,
+  selectedTokenId = null,
+  onSelectToken,
 }) => {
   const dsMode = useDSModeOptional();
   const isBeginner = dsMode?.mode !== "pro";
@@ -203,21 +208,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     lineHeight: 1.5,
   };
 
-  // T8: flat token map for TokensRouter — lets the router look up a token by
-  // id without knowing about per-kind registries. Lookup also drives the
-  // detail view's bail-out path when a token disappears.
-  const allTokens = React.useMemo(
-    () => [
-      ...color.tokens, ...type.tokens, ...spacing.tokens,
-      ...radius.tokens, ...shadow.tokens, ...motion.tokens, ...border.tokens,
-      ...opacity.tokens, ...zindex.tokens, ...breakpoint.tokens, ...grid.tokens,
-      ...sizing.tokens, ...icon.tokens, ...imagery.tokens,
-    ],
-    [color.tokens, type.tokens, spacing.tokens, radius.tokens, shadow.tokens,
-     motion.tokens, border.tokens, opacity.tokens, zindex.tokens,
-     breakpoint.tokens, grid.tokens, sizing.tokens, icon.tokens, imagery.tokens],
-  );
-
   // D6.c: re-hydrate every kind registry whenever the underlying project
   // settings shift out from under the React state. Three triggers:
   //  - project:changed  → applyAutoFix's labeled transaction lands here
@@ -244,55 +234,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       composer.off("history:redo", onSettingsShift);
     };
   }, [composer, resetAll]);
-
-  // T8: dispatch a token-value update to whichever registry owns the id.
-  // Detail view (and any future cross-kind editor) calls onTokenChange with
-  // just (id, value) — we resolve the owning registry by token kind.
-  const handleTokenChange = React.useCallback((id: string, value: string, darkValue?: string) => {
-    const tok = allTokens.find((t) => t.id === id);
-    if (!tok) return;
-    const k = tok.kind ?? (tok.category === "colors" ? "color"
-      : tok.category === "typography" ? "type"
-      : tok.category === "spacing" ? "spacing"
-      : undefined);
-    // Only the color registry stores a dark variant — the other kinds take
-    // two args and would ignore a third anyway.
-    if (k === "color")        { color.updateToken(id, value, darkValue); return; }
-    if (k === "type")         { type.updateToken(id, value); return; }
-    if (k === "spacing")      { spacing.updateToken(id, value); return; }
-    const r = newKindRegistry(k as TokenKind);
-    r?.updateToken?.(id, value);
-  }, [allTokens, color, type, spacing, radius, shadow, motion, border,
-      opacity, zindex, breakpoint, grid, sizing, icon, imagery]);
-
-  // T8: dispatch delete. Only color + generic kinds expose deleteToken;
-  // type + spacing intentionally omit it (no DS UX entry for delete on
-  // typography or spacing scales). Detail view's Delete button no-ops for
-  // those token kinds (button still renders, just nothing to call).
-  const handleTokenDelete = React.useCallback((id: string, opts?: { replaceWith?: string }) => {
-    const tok = allTokens.find((t) => t.id === id);
-    if (!tok) return;
-    const k = tok.kind ?? (tok.category === "colors" ? "color" : undefined);
-    if (k === "color") { color.deleteToken(id, opts); return; }
-    const r = newKindRegistry(k as TokenKind);
-    r?.deleteToken?.(id, opts);
-  }, [allTokens, color, radius, shadow, motion, border, opacity, zindex,
-      breakpoint, grid, sizing, icon, imagery]);
-
-  // B1 follow-up (2026-05-17): dispatch rename to the owning registry. Same
-  // routing rules as handleTokenDelete — color flows to useColorTokens, every
-  // other kind to its useTokensForKind registry. Type + spacing currently
-  // have no rename API (no DS UX entry for those) so renames there silently
-  // no-op via optional chaining.
-  const handleTokenRename = React.useCallback((id: string, newId: string) => {
-    const tok = allTokens.find((t) => t.id === id);
-    if (!tok) return;
-    const k = tok.kind ?? (tok.category === "colors" ? "color" : undefined);
-    if (k === "color") { color.renameToken(id, newId); return; }
-    const r = newKindRegistry(k as TokenKind);
-    r?.renameToken?.(id, newId);
-  }, [allTokens, color, radius, shadow, motion, border, opacity, zindex,
-      breakpoint, grid, sizing, icon, imagery]);
 
   // Beginner mode: foundation kinds with zero visible tokens move to the
   // bottom. B5-wire (2026-05-17): "visible" honors the semantic filter, so
@@ -323,206 +264,188 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       opacity.tokens, zindex.tokens, breakpoint.tokens, grid.tokens,
       sizing.tokens, icon.tokens, imagery.tokens]);
 
+  const onRowClick = onSelectToken;
+
   return (
-    <TokensRouter
-      composer={composer}
-      tokens={allTokens}
-      onTokenChange={handleTokenChange}
-      onTokenDelete={handleTokenDelete}
-      onTokenRename={handleTokenRename}
-    >
-      {({ onRowClick }) => (
-        <div>
-          {/* Board 152:52 draws the Tokens destination as a DRILL-IN LIST of
-              kinds — "color 18 ›" — not the accordion of expandable cards this
-              replaced. That accordion came from prototype s02 (its own comment
-              in TokenKindCard says so) and the board moved past it, the same
-              way Brand's root moved from a tab bar to a drill-in. Presets was
-              already a row list, so this brings the last Brand destination onto
-              one nav model. */}
-          {openKind === null &&
-            [...ordered.populated, ...(showAllKinds ? ordered.muted : [])].map((entry) => {
-              const r =
-                entry.kindId === "color" ? color
-                : entry.kindId === "type" ? type
-                : entry.kindId === "spacing" ? spacing
-                : newKindRegistry(entry.kindId);
-              const count = r ? visible(r.tokens).length : 0;
-              /* Not every registry exposes pendingDiff (SpacingRegistry does
-                 not), so the dot reads the one field they all share. */
-              const dirty = r
-                ? r.tokens.some((t) => {
-                    const saved = r.savedTokens.find((s2) => s2.id === t.id);
-                    return saved === undefined || t.value !== saved.value;
-                  })
-                : false;
-              return (
-                <Button
-                  key={entry.kindId}
-                  color="light"
-                  data-kind-id={entry.kindId}
-                  data-testid={`brand-kind-${entry.kindId}`}
-                  data-kind-count={count}
-                  onClick={() => onOpenKind?.(entry.kindId)}
-                  /* Board 152:52 draws these rows at 32, which is also
-                     `--bk-size-row`. `h-auto` + `py-2` let content decide and
-                     measured 36 live — four pixels per row over fourteen rows.
-                     The token and the board agree; the row was answering to
-                     neither. */
-                  className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-4 tw:py-0 tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
-                >
-                  <span
-                    data-testid={`brand-kind-label-${entry.kindId}`}
-                    className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
-                  >
-                    {entry.title.toLowerCase()}
-                    {dirty && (
-                      <span
-                        className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
-                        aria-label="unsaved changes"
-                      />
-                    )}
-                  </span>
-                  <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
-                    {/* 11/16 for the count, 13/20 for the chevron, both in
-                        `--color/ink-muted` — 306:2055 / 306:2056 and their five
-                        siblings. Both leaned on flowbite's `text-sm`, whose 20px
-                        line is only right at 14px, and the chevron shipped a
-                        size small and a shade soft. */}
-                    <span
-                      data-testid={`brand-kind-count-${entry.kindId}`}
-                      className="tw:font-mono tw:tabular-nums tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]"
-                    >{count}</span>
-                    <span
-                      aria-hidden="true"
-                      data-testid={`brand-kind-chevron-${entry.kindId}`}
-                      className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
-                    >›</span>
-                  </span>
-                </Button>
-              );
-            })}
-          {openKind === null && ordered.muted.length > 0 && (
+    <div>
+      {/* Board 152:52 draws the Tokens destination as a DRILL-IN LIST of
+          kinds — "color 18 ›" — not the accordion of expandable cards this
+          replaced. That accordion came from prototype s02 (its own comment
+          in TokenKindCard says so) and the board moved past it, the same
+          way Brand's root moved from a tab bar to a drill-in. Presets was
+          already a row list, so this brings the last Brand destination onto
+          one nav model. */}
+      {openKind === null &&
+        [...ordered.populated, ...(showAllKinds ? ordered.muted : [])].map((entry) => {
+          const r =
+            entry.kindId === "color" ? color
+            : entry.kindId === "type" ? type
+            : entry.kindId === "spacing" ? spacing
+            : newKindRegistry(entry.kindId);
+          const count = r ? visible(r.tokens).length : 0;
+          /* Not every registry exposes pendingDiff (SpacingRegistry does
+             not), so the dot reads the one field they all share. */
+          const dirty = r
+            ? r.tokens.some((t) => {
+                const saved = r.savedTokens.find((s2) => s2.id === t.id);
+                return saved === undefined || t.value !== saved.value;
+              })
+            : false;
+          return (
             <Button
+              key={entry.kindId}
               color="light"
-              data-kind-id="more-kinds"
-              data-testid="brand-more-kinds"
-              aria-expanded={showAllKinds}
-              onClick={() => setShowAllKinds((v) => !v)}
+              data-kind-id={entry.kindId}
+              data-testid={`brand-kind-${entry.kindId}`}
+              data-kind-count={count}
+              onClick={() => onOpenKind?.(entry.kindId)}
+              /* Board 152:52 draws these rows at 32, which is also
+                 `--bk-size-row`. `h-auto` + `py-2` let content decide and
+                 measured 36 live — four pixels per row over fourteen rows.
+                 The token and the board agree; the row was answering to
+                 neither. */
               className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-4 tw:py-0 tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
             >
-              {/* 11px Inter Medium in accent — 1748:8392. It shipped as a
-                  13px `--bk-ink-muted` label, i.e. dressed as one more kind row
-                  but greyer, so the one row that is a DISCLOSURE looked like a
-                  disabled destination. The board draws it as a link. */}
               <span
-                data-testid="brand-more-kinds-label"
-                className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent)]"
+                data-testid={`brand-kind-label-${entry.kindId}`}
+                className="tw:flex tw:items-center tw:gap-[5px] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
               >
-                {showAllKinds ? "Fewer token kinds" : "More token kinds"}
+                {entry.title.toLowerCase()}
+                {dirty && (
+                  <span
+                    className="tw:size-[5px] tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]"
+                    aria-label="unsaved changes"
+                  />
+                )}
               </span>
               <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
-                <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">{ordered.muted.length}</span>
-                <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">{showAllKinds ? "⌃" : "›"}</span>
+                {/* 11/16 for the count, 13/20 for the chevron, both in
+                    `--color/ink-muted` — 306:2055 / 306:2056 and their five
+                    siblings. Both leaned on flowbite's `text-sm`, whose 20px
+                    line is only right at 14px, and the chevron shipped a
+                    size small and a shade soft. */}
+                <span
+                  data-testid={`brand-kind-count-${entry.kindId}`}
+                  className="tw:font-mono tw:tabular-nums tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]"
+                >{count}</span>
+                <span
+                  aria-hidden="true"
+                  data-testid={`brand-kind-chevron-${entry.kindId}`}
+                  className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+                >›</span>
               </span>
             </Button>
-          )}
+          );
+        })}
+      {openKind === null && ordered.muted.length > 0 && (
+        <Button
+          color="light"
+          data-kind-id="more-kinds"
+          data-testid="brand-more-kinds"
+          aria-expanded={showAllKinds}
+          onClick={() => setShowAllKinds((v) => !v)}
+          className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:h-[var(--bk-size-row)] tw:px-4 tw:py-0 tw:rounded-none tw:border-0 tw:bg-transparent tw:font-normal tw:text-left tw:hover:bg-[var(--bk-gray-100)]"
+        >
+          {/* 11px Inter Medium in accent — 1748:8392. It shipped as a
+              13px `--bk-ink-muted` label, i.e. dressed as one more kind row
+              but greyer, so the one row that is a DISCLOSURE looked like a
+              disabled destination. The board draws it as a link. */}
+          <span
+            data-testid="brand-more-kinds-label"
+            className="tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent)]"
+          >
+            {showAllKinds ? "Fewer token kinds" : "More token kinds"}
+          </span>
+          <span className="tw:flex tw:flex-none tw:items-center tw:gap-1.5">
+            <span className="tw:text-xs tw:text-[var(--bk-ink-muted)]">{ordered.muted.length}</span>
+            <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">{showAllKinds ? "⌃" : "›"}</span>
+          </span>
+        </Button>
+      )}
 
-          {KIND_ORDER.filter((e) => e.kindId === openKind).map((entry) => {
-            if (entry.kindId === "color") {
-              const visibleColor = visible(color.tokens);
-              return (
-                <React.Fragment key={entry.kindId}>
-                  <ColorTokenList
-                    tokens={visibleColor}
-                    /* Surface resolution must see the whole palette: Beginner
-                       filters `color-background` out of the view, and the
-                       contrast rule then measured everything against white. */
-                    allTokens={color.tokens}
-                    pendingDiff={color.pendingDiff}
-                    onColorChange={color.updateToken}
-                    onUndo={color.undoToken}
-                    onRedo={color.redoToken}
-                    canUndo={color.canUndo}
-                    canRedo={color.canRedo}
-                    onAddToken={() => onAddTokenClick?.()}
-                    usageByTokenId={usageMap}
-                    getLintIssues={getIssues}
-                    isPro={isPro}
-                    hiddenByModeCount={color.tokens.length - visibleColor.length}
-                    composer={composer}
-                    onRowClick={onRowClick}
-                  />
-                </React.Fragment>
-              );
-            }
-            if (entry.kindId === "type") {
-              const visibleType = visible(type.tokens);
-              return (
-                <React.Fragment key={entry.kindId}>
-                  <TypeTokenList
-                    tokens={visibleType}
-                    responsiveMode={type.responsiveMode}
-                    onTokenChange={type.updateToken}
-                    onResponsiveModeChange={type.setResponsiveMode}
-                    onUndo={type.undoToken}
-                    canUndo={type.canUndo}
-                    onRedo={type.redoToken}
-                    canRedo={type.canRedo}
-                    usageByTokenId={usageMap}
-                    onRowClick={onRowClick}
-                  />
-                </React.Fragment>
-              );
-            }
-            if (entry.kindId === "spacing") {
-              const visibleSpacing = visible(spacing.tokens);
-              return (
-                <React.Fragment key={entry.kindId}>
-                  <SpacingTokenList
-                    tokens={visibleSpacing}
-                    activePreset={spacing.activePreset}
-                    savedPreset={spacing.savedPreset}
-                    isDirty={spacing.isDirty}
-                    onTokenChange={spacing.updateToken}
-                    onPresetApply={spacing.applyPreset}
-                    onResetToDefaults={() => onResetSpacingToDefaults?.()}
-                    onUndo={spacing.undoToken}
-                    canUndo={spacing.canUndo}
-                    onRedo={spacing.redoToken}
-                    canRedo={spacing.canRedo}
-                    usageByTokenId={usageMap}
-                    onRowClick={onRowClick}
-                  />
-                </React.Fragment>
-              );
-            }
-            const r = newKindRegistry(entry.kindId);
-            if (!r) return null;
-            const dirty = Object.keys(r.pendingDiff).length > 0;
-            const visibleR = visible(r.tokens);
-            return (
-              <React.Fragment key={entry.kindId}>
-                <GenericTokenList
-                  tokens={visibleR}
-                  pendingDiff={r.pendingDiff}
-                  onTokenChange={r.updateToken}
-                  onUndo={r.undoToken}
-                  canUndo={r.canUndo}
-                  usageByTokenId={usageMap}
-                  getLintIssues={getIssues}
-                  onRowClick={onRowClick}
-                />
-              </React.Fragment>
-            );
-          })}
-          {isBeginner && (
-            <div style={hintStyle} role="note">
-              Beginner mode hides token IDs and alias graph. Toggle Pro to expose.
-            </div>
-          )}
+      {KIND_ORDER.filter((e) => e.kindId === openKind).map((entry) => {
+        if (entry.kindId === "color") {
+          const visibleColor = visible(color.tokens);
+          return (
+            <React.Fragment key={entry.kindId}>
+              <ColorTokenList
+                tokens={visibleColor}
+                pendingDiff={color.pendingDiff}
+                onAddToken={() => onAddTokenClick?.()}
+                usageByTokenId={usageMap}
+                isPro={isPro}
+                hiddenByModeCount={color.tokens.length - visibleColor.length}
+                selectedTokenId={selectedTokenId}
+                onSelectToken={onSelectToken}
+              />
+            </React.Fragment>
+          );
+        }
+        if (entry.kindId === "type") {
+          const visibleType = visible(type.tokens);
+          return (
+            <React.Fragment key={entry.kindId}>
+              <TypeTokenList
+                tokens={visibleType}
+                responsiveMode={type.responsiveMode}
+                onTokenChange={type.updateToken}
+                onResponsiveModeChange={type.setResponsiveMode}
+                onUndo={type.undoToken}
+                canUndo={type.canUndo}
+                onRedo={type.redoToken}
+                canRedo={type.canRedo}
+                usageByTokenId={usageMap}
+                onRowClick={onRowClick}
+              />
+            </React.Fragment>
+          );
+        }
+        if (entry.kindId === "spacing") {
+          const visibleSpacing = visible(spacing.tokens);
+          return (
+            <React.Fragment key={entry.kindId}>
+              <SpacingTokenList
+                tokens={visibleSpacing}
+                activePreset={spacing.activePreset}
+                savedPreset={spacing.savedPreset}
+                isDirty={spacing.isDirty}
+                onTokenChange={spacing.updateToken}
+                onPresetApply={spacing.applyPreset}
+                onResetToDefaults={() => onResetSpacingToDefaults?.()}
+                onUndo={spacing.undoToken}
+                canUndo={spacing.canUndo}
+                onRedo={spacing.redoToken}
+                canRedo={spacing.canRedo}
+                usageByTokenId={usageMap}
+                onRowClick={onRowClick}
+              />
+            </React.Fragment>
+          );
+        }
+        const r = newKindRegistry(entry.kindId);
+        if (!r) return null;
+        const dirty = Object.keys(r.pendingDiff).length > 0;
+        const visibleR = visible(r.tokens);
+        return (
+          <React.Fragment key={entry.kindId}>
+            <GenericTokenList
+              tokens={visibleR}
+              pendingDiff={r.pendingDiff}
+              onTokenChange={r.updateToken}
+              onUndo={r.undoToken}
+              canUndo={r.canUndo}
+              usageByTokenId={usageMap}
+              getLintIssues={getIssues}
+              onRowClick={onRowClick}
+            />
+          </React.Fragment>
+        );
+      })}
+      {isBeginner && (
+        <div style={hintStyle} role="note">
+          Beginner mode hides token IDs and alias graph. Toggle Pro to expose.
         </div>
       )}
-    </TokensRouter>
+    </div>
   );
 };

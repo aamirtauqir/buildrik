@@ -20,6 +20,7 @@ const LibraryManager = React.lazy(() =>
   import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))
 );
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
+const BrandWorkspace = React.lazy(() => import("@/editor/design-system/ui/BrandWorkspace"));
 
 /** Props shared across all fullpage tabs (no pin concept in fullpage mode) */
 export interface FullPageCommonProps {
@@ -116,6 +117,28 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
               onDirtyChange={onSettingsDirtyChange}
               openRequest={settingsOpen}
               onOpenDesignTab={onSwitchToDesign}
+              onClose={commonTabProps.onClose}
+            />
+          </div>
+        </Portal>
+      );
+
+    /* Board 7315:80955 — Brand is a full-canvas workspace (owner decision
+       OD-1, 2026-09-21): its own 256 nav with `‹ Back to canvas`, a pane and
+       a preview column across the full 1440. Same portal as Settings, for the
+       same reason it is not an OverlayMount: the workspace owns its Escape,
+       its unsaved-draft guard and its dialogs. */
+    case "design":
+      return (
+        <Portal>
+          <div
+            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
+            data-testid="brand-host"
+          >
+            <BrandWorkspace
+              composer={composer}
+              projectId={projectId}
+              initialPage={activeSubTab}
               onClose={commonTabProps.onClose}
             />
           </div>

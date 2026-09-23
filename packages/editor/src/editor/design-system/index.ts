@@ -3,8 +3,9 @@
  * @license BSD-3-Clause
  */
 
-export { DesignSystemTab } from "./ui/DesignSystemTab";
+export { BrandWorkspace } from "./ui/BrandWorkspace";
 export { ProjectTokensApplier } from "./ui/ProjectTokensApplier";
+export { importMigratedProject } from "./migrations/importMigratedProject";
 export type { DesignToken, ThemeMode } from "./types";
 export type { ExportFormat } from "./utils/exportUtils";
 export {
