@@ -24,7 +24,7 @@
 
 import * as React from "react";
 import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuItem, Popover, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
-import { ZOOM_PRESETS } from "./shared";
+import { stepZoom } from "@/shared/constants/canvas";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
 // stays minimal). Device values are the BreakpointSwitcher's 4-way union.
@@ -220,12 +220,12 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       }
       if (key === "=" || key === "+") {
         e.preventDefault();
-        onZoomChange(ZOOM_PRESETS.find((p) => p > zoom) ?? ZOOM_PRESETS[ZOOM_PRESETS.length - 1]);
+        onZoomChange(stepZoom(zoom, 1));
         return;
       }
       if (key === "-" || key === "_") {
         e.preventDefault();
-        onZoomChange([...ZOOM_PRESETS].reverse().find((p) => p < zoom) ?? ZOOM_PRESETS[0]);
+        onZoomChange(stepZoom(zoom, -1));
         return;
       }
 

@@ -7,6 +7,7 @@
  */
 
 import { EVENTS } from "../../shared/constants";
+import { stepZoom } from "../../shared/constants/canvas";
 import type { CommandData, ElementType } from "../../shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
@@ -501,28 +502,19 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     // ============================================
     // Zoom
     // ============================================
-    /* Also chordless, for the same reason and with a visible symptom: ⌘= and
-       ⌘- are printed beside the zoom flyout's + and − buttons, which step
-       through ZOOM_PRESETS, while these step by 10. Measured at 100%: the
-       button gave 150, the chord gave 110. CanvasFooterToolbar owns all five
-       of the flyout's printed rows (fit, selection, 100%, in, out). */
+    /* Chordless: CanvasFooterToolbar owns all five of the flyout's printed
+       rows (fit, selection, 100%, in, out). Same preset step (stepZoom). */
     {
       id: "zoom-in",
       label: "Zoom in",
       group: "View",
-      run: (c) => {
-        const current = c.getState().zoom;
-        c.setZoom(current + 10);
-      },
+      run: (c) => c.setZoom(stepZoom(c.getState().zoom, 1)),
     },
     {
       id: "zoom-out",
       label: "Zoom out",
       group: "View",
-      run: (c) => {
-        const current = c.getState().zoom;
-        c.setZoom(current - 10);
-      },
+      run: (c) => c.setZoom(stepZoom(c.getState().zoom, -1)),
     },
     {
       id: "zoom-reset",

@@ -331,16 +331,17 @@ describe("delete / duplicate / group", () => {
 });
 
 describe("zoom", () => {
-  it("zoom-in adds 10 to the current zoom", () => {
-    composer.getState.mockReturnValue({ zoom: 120, snapToGrid: false, gridSize: 8 });
+  /* G2-016: one step rule — the next preset, same as ⌘=/⌘- and the flyout. */
+  it("zoom-in steps to the next preset", () => {
+    composer.getState.mockReturnValue({ zoom: 100, snapToGrid: false, gridSize: 8 });
     run("zoom-in");
-    expect(composer.setZoom).toHaveBeenCalledWith(130);
+    expect(composer.setZoom).toHaveBeenCalledWith(150);
   });
 
-  it("zoom-out subtracts 10 from the current zoom", () => {
+  it("zoom-out steps to the previous preset", () => {
     composer.getState.mockReturnValue({ zoom: 120, snapToGrid: false, gridSize: 8 });
     run("zoom-out");
-    expect(composer.setZoom).toHaveBeenCalledWith(110);
+    expect(composer.setZoom).toHaveBeenCalledWith(100);
   });
 
   it("zoom-reset returns to 100", () => {

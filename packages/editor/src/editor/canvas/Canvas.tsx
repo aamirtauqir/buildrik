@@ -10,7 +10,7 @@ import { EVENTS } from "../../shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
-import { THRESHOLDS } from "../../shared/constants";
+import { stepZoom } from "../../shared/constants/canvas";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
@@ -393,15 +393,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
        (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
-       command you could find, read and run, and nothing moved. Steps by
-       THRESHOLDS.ZOOM_STEP on the same percent scale ZoomControls uses. */
+       command you could find, read and run, and nothing moved. Steps to the
+       next preset, like ⌘=/⌘- (stepZoom, G2-016). */
     React.useEffect(() => {
       if (!composer) return;
-      const step = (delta: number) => () => {
-        composer.setZoom(composer.getState().zoom + delta);
+      const step = (direction: 1 | -1) => () => {
+        composer.setZoom(stepZoom(composer.getState().zoom, direction));
       };
-      const zoomIn = step(THRESHOLDS.ZOOM_STEP);
-      const zoomOut = step(-THRESHOLDS.ZOOM_STEP);
+      const zoomIn = step(1);
+      const zoomOut = step(-1);
       composer.on(EVENTS.ZOOM_IN, zoomIn);
       composer.on(EVENTS.ZOOM_OUT, zoomOut);
       return () => {

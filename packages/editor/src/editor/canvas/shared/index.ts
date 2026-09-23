@@ -75,6 +75,5 @@ export {
   Z_INDEX,
   SIZES,
   DEVICE_PRESETS,
-  ZOOM_PRESETS,
   ZOOM_LIMITS,
 } from "../../../shared/constants/canvas";
