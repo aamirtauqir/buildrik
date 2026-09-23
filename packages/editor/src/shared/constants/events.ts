@@ -196,23 +196,9 @@ export const EVENTS = {
   // ============================================
   // Template Events
   // ============================================
-  TEMPLATE_LOADED: "template:loaded",
-  TEMPLATE_SAVED: "template:saved",
   TEMPLATE_SAVE_REQUESTED: "template:save-requested",
   TEMPLATE_APPLIED: "template:applied",
   TEMPLATE_REMOVED: "template:removed",
-  /** Template begins loading from a source */
-  TEMPLATE_LOADING: "template:loading",
-  /** Template load failed */
-  TEMPLATE_ERROR: "template:error",
-  /** Template deleted via TemplateManager */
-  TEMPLATE_DELETED: "template:deleted",
-  /** Template source registered with TemplateManager */
-  TEMPLATE_SOURCE_REGISTERED: "template:source:registered",
-  /** TemplateManager cache cleared */
-  TEMPLATE_CACHE_CLEARED: "template:cache:cleared",
-  /** Bulk template import completed */
-  TEMPLATES_IMPORTED: "templates:imported",
 
   // ============================================
   // CMS Events
