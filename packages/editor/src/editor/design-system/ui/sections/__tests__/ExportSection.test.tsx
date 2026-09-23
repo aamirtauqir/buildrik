@@ -48,10 +48,12 @@ describe("ExportSection", () => {
        became a token on 2026-08-29; testids are the durable half. */
     const rows = Array.from(container.querySelectorAll("[data-testid^='format-row-']"));
     const text = container.textContent ?? "";
-    for (const label of ["CSS", "JSON", "Tailwind", "Figma Variables JSON"]) {
+    for (const label of ["CSS", "JSON", "Tailwind"]) {
       expect(text.includes(label), label).toBe(true);
     }
-    expect(rows.length).toBeGreaterThan(0);
+    // C5 G3-149: the Figma "Coming soon" row is gone.
+    expect(text).not.toMatch(/Figma Variables JSON/);
+    expect(rows.length).toBe(3);
   });
 
   /* Board 153:120 draws no chips on rows — title + muted desc, actions right.
@@ -138,7 +140,7 @@ describe("ExportSection", () => {
      greyed Figma line with neither — the board refusing to hand over a file it
      cannot make. This replaces an assertion on a single button whose LABEL
      changed with the selection; that button is gone. */
-  it("gives every live format its own Download, and Figma none", () => {
+  it("gives every format its own Download", () => {
     const { container } = render(wrap(<ExportSection />));
     for (const id of ["css", "json", "tailwind"]) {
       expect(container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();
@@ -146,7 +148,7 @@ describe("ExportSection", () => {
     expect(container.querySelector('[data-download-format="figma"]')).toBeNull();
   });
 
-  it("offers no way to preview or take the Figma stub", () => {
+  it("the preview offers only the three real formats", () => {
     const { container, getByLabelText, getByTestId } = render(wrap(<ExportSection />));
     const options = Array.from(
       (getByLabelText(/preview format/i) as HTMLSelectElement).options,
