@@ -48,7 +48,6 @@ function mount(over: Partial<StudioHeaderProps> = {}) {
     selectedElement: null,
     onSetPreviewLoading: vi.fn(),
     onSetExportLoading: vi.fn(),
-    onShowAI: vi.fn(),
     onShowExporter: vi.fn(),
     onSave: vi.fn(async () => "saved" as const),
     onOpenHistory: vi.fn(),

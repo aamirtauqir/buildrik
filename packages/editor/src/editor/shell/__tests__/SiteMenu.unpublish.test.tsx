@@ -14,14 +14,14 @@ const openMenu = () => fireEvent.click(screen.getByRole("button", { name: "Site 
 describe("SiteMenu — Unpublish site…", () => {
   it("is offered only while a published URL exists, and asks the panel", () => {
     const onUnpublish = vi.fn();
-    render(<SiteMenu onOpenPublish={() => {}} onUnpublish={onUnpublish} publishedUrl="https://x.vercel.app" />);
+    render(<SiteMenu onUnpublish={onUnpublish} publishedUrl="https://x.vercel.app" />);
     openMenu();
     fireEvent.click(screen.getByRole("menuitem", { name: "Unpublish site…" }));
     expect(onUnpublish).toHaveBeenCalledTimes(1);
   });
 
   it("is absent on a site that is not live — there is nothing to take down", () => {
-    render(<SiteMenu onOpenPublish={() => {}} onUnpublish={vi.fn()} publishedUrl={null} />);
+    render(<SiteMenu onUnpublish={vi.fn()} publishedUrl={null} />);
     openMenu();
     expect(screen.queryByRole("menuitem", { name: "Unpublish site…" })).toBeNull();
   });

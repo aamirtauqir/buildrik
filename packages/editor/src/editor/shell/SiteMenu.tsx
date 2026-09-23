@@ -1,36 +1,22 @@
 /**
- * Site menu — the ⋯ overflow in the topbar.
+ * Site menu — the ⋯ overflow in the topbar. Board 4418:126034 (C5 G1-016,
+ * G1-020, G1-025; owner rule 2026-09-24: anything visual, the board wins).
  *
- * Figma: successor to `popover/site-menu` 642:3664 — regrouped per the topbar
- * redesign plan (docs/plans/2026-07-30-topbar-complete-redesign.md §3; node
- * update pending T1). Five named groups, no "More" dump:
+ *   THIS SITE          Site settings ⌘, · Export site… · Duplicate site ·
+ *                      Issues · Activity log · Command palette ⌘K ·
+ *                      Enter view mode · Keyboard shortcuts · Share preview link
+ *   COLLABORATE        Start collaboration (PLANNED while the flag is off) ·
+ *                      Unpublish site…
+ *   LEAVES THE EDITOR  View live site ↗ · Invite teammates ↗ · Account settings ↗
  *
- *   Site       — settings · version history · publish history · export code
- *   Build      — templates · components · design system · plugins
- *   Share      — enter view mode · view live site · copy live URL · share preview link
- *   Workspace  — invite · account · start collaboration (flag-gated)
- *   (footer)   — keyboard shortcuts
+ * The panel doors that used to live here (Version history, Review, Publish
+ * panel, Publish history, Templates, Components, Brand) are not on the board:
+ * each keeps its own door — rail, topbar CTA/chip, save pill, ⌘K and its
+ * chord. Plugins, Ask AI, Site health, Copy live URL and Getting started are
+ * not on the board either.
  *
- * Moved OUT to the bar's tool cluster (plan §2): Preview, Comments. Issues
- * came back IN (C3): the topbar chip was removed and this row replaced it.
- * Removed (D8): "Exit to dashboard" — the bar's ‹ Exit is always visible; a
- * second door in the overflow was dead weight.
- *
- * The view-mode row has now been named three times. D9 renamed "Preview as
- * client" → "Open client view"; 2026-08-23 renamed it again to "Enter view
- * mode", because both earlier names claimed an audience that never receives
- * this surface. A client is sent /share/<token> or /review/<token> — the row
- * below this one, and the review round respectively. This row is the owner
- * looking at their own draft with the editor out of the way, which is what
- * Figma calls view mode. Board 642:3664 still carries the D9 copy; the board
- * is being updated in the same arc, so if it disagrees, the board is stale.
- *
- * A group renders only when at least one of its rows is present (eng D8) —
- * the Share group is all-conditional and an empty MenuGroup div would still
- * draw its border-top.
- *
- * Ask AI keeps a row ONLY in the legacy four-tool-rail mode (its single home
- * is the rail's ✨ AI tab); the row retires with that mode.
+ * In view mode the menu keeps only the way back out — the mode is for looking
+ * at the draft, not for administering the site from it.
  *
  * @license BSD-3-Clause
  */
@@ -41,84 +27,34 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PreviewShareModal } from "./PreviewShareModal";
 
 export interface SiteMenuProps {
-  // ── Site ──────────────────────────────────────────────────────────────────
   onOpenSiteSettings?: () => void;
-  onOpenHistory?: () => void;
-  /**
-   * Opens the Review panel — the same door the topbar pill opens.
-   *
-   * The pill was the ONLY door, and `REVIEW_PILL.none` is null: revoke a round
-   * without sending a new one and the pill disappears, taking the panel with
-   * it. The rail has no Review tab either (6 tabs, none of them Review), so
-   * the panel — its comments, its round history, Compare — became unreachable
-   * without a database write. Reached live doing exactly that. A status
-   * indicator that vanishes with the status cannot also be the navigation.
-   */
-  onOpenReview?: () => void;
-  /**
-   * Opens the Publish panel — board 641:2652, a 320-wide drawer surface with
-   * the environment rows, the since-last-deploy change list, the last deploy
-   * and the pre-publish wizard behind its CTA.
-   *
-   * It had no door. `StudioHeader` took an `onOpenPublish` prop and spent it
-   * on `publishNow = onVercelPublish ?? onOpenPublish ?? handleExport`, where
-   * `onVercelPublish` is a plain `useCallback` in `AquibraStudio` and is
-   * therefore never undefined — so the panel opener could only ever fire in a
-   * build with publishing turned off. Nothing else in the editor switched to
-   * the publish tab: not the rail (publish has no rail zone by design), not
-   * the command palette, not `ui:switch-tab`. The whole panel was unreachable.
-   *
-   * The topbar keeps its fast path to `PublishConfirmModal` — that is
-   * deliberate, and it shares `PublishConfirmFacts` with the wizard's confirm
-   * step so the two cannot drift. This is the panel's own door, next to the
-   * publish history it belongs with.
-   */
-  onOpenPublish?: () => void;
-  onOpenPublishHistory?: () => void;
-  /** History · Activity, in the editor (B6, G1-019). Omitted = the row
-   *  deep-links to the dashboard's activity section as before. */
-  onOpenActivity?: () => void;
+  onExportCode?: () => void;
+  /** Duplicate this site (`sites.duplicate`); the container reports the result. */
+  onDuplicateSite?: () => void;
   /** The Issues panel (C3: the topbar chip that opened it is gone). */
   onOpenIssues?: () => void;
   /** The row's tooltip — the issue count sentence (`formatIssueSummary`). */
   issuesTitle?: string;
-  /** Take the site down. Only offered while a published URL exists; the
-   *  Publish panel hosts the confirm. unpublishSite was fully built with
-   *  Vercel teardown and exposed only in the dashboard, so taking a site down
-   *  meant leaving the editor. */
-  onUnpublish?: () => void;
-  onExportCode?: () => void;
-  // ── Build ─────────────────────────────────────────────────────────────────
-  onOpenTemplates?: () => void;
-  onOpenComponents?: () => void;
-  onOpenDesignSystem?: () => void;
-  onOpenPlugins?: () => void;
-  // ── Share ─────────────────────────────────────────────────────────────────
+  /** History · Activity, in the editor (B6, G1-019). */
+  onOpenActivity?: () => void;
+  onOpenCommandPalette?: () => void;
   readOnlyView?: boolean;
-  /** Client-view toggle is a full-page navigation, so the container owns it —
-   *  it must pass through the dirty-exit guard (F1) like every other exit. */
+  /** View mode is a full-page navigation, so the container owns it — it must
+   *  pass through the dirty-exit guard (F1) like every other exit. */
   onToggleReadOnlyView?: () => void;
+  onOpenShortcuts?: () => void;
+  /** The site the share link is minted for. */
+  siteId?: string | null;
+  /** Collaboration is flag-gated. Absent while the flag is off (the row is
+   *  drawn PLANNED, disabled) and while a session is already running. */
+  onStartCollaboration?: () => void;
+  /** The collab flag — decides between the live row and the PLANNED one. */
+  collabEnabled?: boolean;
+  /** Take the site down; offered while a published URL exists and the role
+   *  allows it. The Publish panel hosts the typed confirm. */
+  onUnpublish?: () => void;
   /** Live URL once the site has been published. */
   publishedUrl?: string | null;
-  /** Copying can fail (no clipboard on insecure origins), so the container
-   *  owns it — this menu has no way to tell the user it didn't work. */
-  onCopyLiveUrl?: () => void;
-  /**
-   * The site this menu belongs to: the share link is minted for it, and the
-   * dashboard hand-offs (Site health, Activity log) land on it.
-   */
-  siteId?: string | null;
-  // ── Workspace ─────────────────────────────────────────────────────────────
-  /** Collaboration is flag-gated; when it is on, the session has to be startable. */
-  onStartCollaboration?: () => void;
-  /** Legacy four-tool rail only — the rail's ✨ AI tab is the canonical home. */
-  onAskAI?: () => void;
-  // ── Footer ────────────────────────────────────────────────────────────────
-  /** Open Keyboard Shortcuts panel (`?`) */
-  onOpenShortcuts?: () => void;
-  /** Re-open the getting-started checklist. Omitted in view mode — a viewer is
-   *  not being onboarded into a build they cannot make. */
-  onReplayOnboarding?: () => void;
 }
 
 function openDashboard(path: string) {
@@ -126,51 +62,32 @@ function openDashboard(path: string) {
 }
 
 /**
- * F6 (OV#5): ⌘H is macOS's OS-level window-hide — the browser never sees the
- * keydown, so advertising it is a lie. The handler (useEditorShortcuts:88)
- * accepts ctrl OR meta on every platform; the hint shows the chord that
- * actually works where the user is.
+ * F6/T9: ⌘, and ⌘/ belong to the browser on macOS; the handlers accept ctrl OR
+ * meta everywhere, so the hint shows the chord that actually reaches the page.
  */
 const IS_MAC = typeof navigator !== "undefined" && /Mac|iP(hone|ad|od)/.test(navigator.platform);
-const HISTORY_KBD = IS_MAC ? "⌃H" : "Ctrl H";
-/**
- * T9 (F22): ⌘, is the browser's own Preferences accelerator on macOS — Chrome,
- * Safari and Firefox all take it before the page, exactly like ⌘H above. Same
- * fix, same reason: the handler already accepts ctrl OR meta, so the control
- * chord is the one that reaches us, and the hint says so.
- */
 const SETTINGS_KBD = IS_MAC ? "⌃," : "Ctrl ,";
-/* This row printed "?", which opens the CANVAS cheat sheet (board 815:4518) —
-   a different screen from the one this row opens. Measured in the editor: "?"
-   drew "⌨️ Keyboard Shortcuts · SELECTION · Select element", while this row and
-   ⌘/ drew "Keyboard Shortcuts · PANELS · Open Insert panel". Print the chord
-   that opens THIS one. */
+const PALETTE_KBD = IS_MAC ? "⌘K" : "Ctrl K";
 const SHORTCUTS_KBD = IS_MAC ? "⌘/" : "Ctrl /";
+
+const PLANNED = "tw:ml-auto tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
 
 export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenSiteSettings,
-  onOpenHistory,
-  onOpenReview,
-  onOpenPublish,
-  onOpenPublishHistory,
+  onExportCode,
+  onDuplicateSite,
   onOpenIssues,
   issuesTitle,
   onOpenActivity,
-  onUnpublish,
-  onExportCode,
-  onOpenTemplates,
-  onOpenComponents,
-  onOpenDesignSystem,
-  onOpenPlugins,
+  onOpenCommandPalette,
   readOnlyView = false,
   onToggleReadOnlyView,
-  publishedUrl,
-  onCopyLiveUrl,
+  onOpenShortcuts,
   siteId,
   onStartCollaboration,
-  onAskAI,
-  onOpenShortcuts,
-  onReplayOnboarding,
+  collabEnabled = false,
+  onUnpublish,
+  publishedUrl,
 }) => {
   const [open, setOpen] = React.useState(false);
   const [shareOpen, setShareOpen] = React.useState(false);
@@ -179,152 +96,117 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
     fn?.();
   };
 
-  const hasSite = Boolean(
-    onOpenSiteSettings || onOpenHistory || onOpenReview || onOpenPublish || onOpenPublishHistory || onOpenIssues || onExportCode,
-  );
-  const hasBuild = Boolean(onOpenTemplates || onOpenComponents || onOpenDesignSystem || onOpenPlugins);
-  const hasShare = Boolean(onToggleReadOnlyView || publishedUrl || siteId);
-
   return (
     <>
-    <Popover
-      open={open}
-      onClose={() => setOpen(false)}
-      placement="bottom-end"
-      label="Site menu"
-      trigger={
-        <IconButton label="Site menu" data-testid="site-menu-trigger" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-          <SiteMenuIcon />
-        </IconButton>
-      }
-    >
-      <Menu label="Site menu" data-testid="site-menu">
-        {hasSite && (
-          <MenuGroup>
-            <MenuLabel>Site</MenuLabel>
-            {onOpenSiteSettings ? (
-              <MenuItem kbd={SETTINGS_KBD} onClick={run(onOpenSiteSettings)} data-testid="site-menu-site-settings">
-                Site settings
-              </MenuItem>
-            ) : null}
-            {onOpenHistory ? (
-              <MenuItem kbd={HISTORY_KBD} onClick={run(onOpenHistory)} data-testid="site-menu-version-history">
-                Version history
-              </MenuItem>
-            ) : null}
-            {onOpenReview ? <MenuItem onClick={run(onOpenReview)}>Review</MenuItem> : null}
-            {onOpenPublish ? <MenuItem onClick={run(onOpenPublish)}>Publish panel</MenuItem> : null}
-            {onOpenIssues ? (
-              <MenuItem onClick={run(onOpenIssues)} title={issuesTitle} data-testid="site-menu-issues">Issues</MenuItem>
-            ) : null}
-            {onOpenPublishHistory ? (
-              <MenuItem onClick={run(onOpenPublishHistory)} data-testid="site-menu-publish-history">Publish history</MenuItem>
-            ) : null}
-            {onUnpublish && publishedUrl ? (
-              <MenuItem onClick={run(onUnpublish)}>Unpublish site…</MenuItem>
-            ) : null}
-            {onExportCode ? <MenuItem onClick={run(onExportCode)} data-testid="site-menu-export-code">Export code</MenuItem> : null}
-          </MenuGroup>
-        )}
+      <Popover
+        open={open}
+        onClose={() => setOpen(false)}
+        placement="bottom-end"
+        label="Site menu"
+        trigger={
+          <IconButton
+            label="Site menu"
+            data-testid="site-menu-trigger"
+            aria-haspopup="menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <SiteMenuIcon />
+          </IconButton>
+        }
+      >
+        <Menu label="Site menu" data-testid="site-menu">
+          {readOnlyView ? (
+            onToggleReadOnlyView ? (
+              <MenuGroup>
+                <MenuItem onClick={run(onToggleReadOnlyView)}>Exit view mode</MenuItem>
+              </MenuGroup>
+            ) : null
+          ) : (
+            <>
+              <MenuGroup>
+                <MenuLabel>This site</MenuLabel>
+                {onOpenSiteSettings ? (
+                  <MenuItem kbd={SETTINGS_KBD} onClick={run(onOpenSiteSettings)} data-testid="site-menu-site-settings">
+                    Site settings
+                  </MenuItem>
+                ) : null}
+                {onExportCode ? (
+                  <MenuItem onClick={run(onExportCode)} data-testid="site-menu-export-code">
+                    Export site…
+                  </MenuItem>
+                ) : null}
+                {onDuplicateSite ? (
+                  <MenuItem onClick={run(onDuplicateSite)} data-testid="site-menu-duplicate">
+                    Duplicate site
+                  </MenuItem>
+                ) : null}
+                {onOpenIssues ? (
+                  <MenuItem onClick={run(onOpenIssues)} title={issuesTitle} data-testid="site-menu-issues">
+                    Issues
+                  </MenuItem>
+                ) : null}
+                {onOpenActivity ? (
+                  <MenuItem onClick={run(onOpenActivity)} data-testid="site-menu-activity-log">
+                    Activity log
+                  </MenuItem>
+                ) : null}
+                {onOpenCommandPalette ? (
+                  <MenuItem kbd={PALETTE_KBD} onClick={run(onOpenCommandPalette)} data-testid="site-menu-command-palette">
+                    Command palette
+                  </MenuItem>
+                ) : null}
+                {onToggleReadOnlyView ? (
+                  <MenuItem onClick={run(onToggleReadOnlyView)}>Enter view mode</MenuItem>
+                ) : null}
+                {onOpenShortcuts ? (
+                  <MenuItem kbd={SHORTCUTS_KBD} onClick={run(onOpenShortcuts)} data-testid="site-menu-shortcuts">
+                    Keyboard shortcuts
+                  </MenuItem>
+                ) : null}
+                {siteId ? (
+                  <MenuItem onClick={run(() => setShareOpen(true))} data-testid="site-menu-share">
+                    Share preview link
+                  </MenuItem>
+                ) : null}
+              </MenuGroup>
 
-        {/* Board 642:3401's second group. Both are real dashboard surfaces —
-            the Health Score panel and Recent Activity on the site's overview —
-            that the editor simply had no door to. They deep-link to their own
-            section rather than to the page, so each lands where its label
-            says it will. */}
-        {siteId && !readOnlyView && (
-          <MenuGroup>
-            <MenuItem onClick={run(() => openDashboard(`/dashboard/sites/${siteId}#site-health`))}>
-              Site health
-            </MenuItem>
-            <MenuItem
-              onClick={run(onOpenActivity ?? (() => openDashboard(`/dashboard/sites/${siteId}#activity-log`)))}
-              data-testid="site-menu-activity-log"
-            >
-              Activity log
-            </MenuItem>
-          </MenuGroup>
-        )}
+              <MenuGroup>
+                <MenuLabel>Collaborate</MenuLabel>
+                {onStartCollaboration ? (
+                  <MenuItem onClick={run(onStartCollaboration)} data-testid="site-menu-collab">
+                    Start collaboration
+                  </MenuItem>
+                ) : !collabEnabled ? (
+                  <MenuItem disabled data-testid="site-menu-collab">
+                    <span className="tw:flex tw:w-full tw:items-center">
+                      Start collaboration
+                      <span className={PLANNED}>Planned</span>
+                    </span>
+                  </MenuItem>
+                ) : null}
+                {onUnpublish && publishedUrl ? (
+                  <MenuItem danger onClick={run(onUnpublish)} data-testid="site-menu-unpublish">
+                    Unpublish site…
+                  </MenuItem>
+                ) : null}
+              </MenuGroup>
 
-        {hasBuild && (
-          <MenuGroup>
-            <MenuLabel>Build</MenuLabel>
-            {/* The design labels Templates "T", which is also the device-switcher
-                chip (W · D · T · M) on the canvas toolbar. Showing a shortcut the
-                product cannot honour is worse than showing none, so it is omitted
-                until Figma resolves the collision. */}
-            {onOpenTemplates ? <MenuItem onClick={run(onOpenTemplates)} data-testid="site-menu-templates">Templates</MenuItem> : null}
-            {onOpenComponents ? (
-              <MenuItem kbd="⇧A" onClick={run(onOpenComponents)} data-testid="site-menu-components">
-                Components
-              </MenuItem>
-            ) : null}
-            {/* "Brand", not "Design system". This row and the rail's Brand
-                button are the SAME destination — both land on tab "design"
-                (AquibraStudio.tsx:509) and the panel that opens is headed
-                "Brand". Two names for one screen is a door the user has to
-                learn twice. Measured live 2026-09-04. */}
-            {onOpenDesignSystem ? <MenuItem onClick={run(onOpenDesignSystem)}>Brand</MenuItem> : null}
-            {onOpenPlugins ? <MenuItem onClick={run(onOpenPlugins)}>Plugins</MenuItem> : null}
-          </MenuGroup>
-        )}
-
-        {hasShare && (
-          <MenuGroup>
-            <MenuLabel>Share</MenuLabel>
-            {onToggleReadOnlyView ? (
-              <MenuItem onClick={run(onToggleReadOnlyView)}>
-                {readOnlyView ? "Exit view mode" : "Enter view mode"}
-              </MenuItem>
-            ) : null}
-            {publishedUrl ? (
-              <MenuItem onClick={run(() => window.open(publishedUrl, "_blank", "noopener,noreferrer"))}>
-                View live site
-              </MenuItem>
-            ) : null}
-            {publishedUrl && onCopyLiveUrl ? <MenuItem onClick={run(onCopyLiveUrl)}>Copy live URL</MenuItem> : null}
-            {/* Board 642:3401 → 4418:165739 (B1 / G1-022). A private link,
-                a different thing from the live URL above it and the one a
-                client is sent before anything is published. The in-editor
-                share modal — the preview overlay's Share opens the same one. */}
-            {siteId && !readOnlyView ? (
-              <MenuItem onClick={run(() => setShareOpen(true))}>
-                Share preview link
-              </MenuItem>
-            ) : null}
-          </MenuGroup>
-        )}
-
-        {/* Workspace doors belong to whoever owns the workspace. In view mode
-            the menu keeps only the way back out — the mode is for looking at
-            the draft, not for administering the workspace from it. */}
-        {readOnlyView ? null : (
-        <MenuGroup>
-          <MenuLabel>Workspace</MenuLabel>
-          <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates</MenuItem>
-          <MenuItem onClick={run(() => openDashboard("/dashboard/settings/account"))}>Account settings</MenuItem>
-          {onStartCollaboration ? (
-            <MenuItem onClick={run(onStartCollaboration)}>Start collaboration</MenuItem>
-          ) : null}
-          {onAskAI ? <MenuItem onClick={run(onAskAI)}>Ask AI</MenuItem> : null}
-        </MenuGroup>
-        )}
-
-        {onOpenShortcuts || onReplayOnboarding ? (
-          <MenuGroup>
-            {onReplayOnboarding ? (
-              <MenuItem onClick={run(onReplayOnboarding)}>Getting started</MenuItem>
-            ) : null}
-            {onOpenShortcuts ? (
-              <MenuItem kbd={SHORTCUTS_KBD} onClick={run(onOpenShortcuts)} data-testid="site-menu-shortcuts">
-                Keyboard shortcuts
-              </MenuItem>
-            ) : null}
-          </MenuGroup>
-        ) : null}
-      </Menu>
-    </Popover>
-    {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} /> : null}
+              <MenuGroup>
+                <MenuLabel>Leaves the editor</MenuLabel>
+                {publishedUrl ? (
+                  <MenuItem onClick={run(() => window.open(publishedUrl, "_blank", "noopener,noreferrer"))}>
+                    View live site ↗
+                  </MenuItem>
+                ) : null}
+                <MenuItem onClick={run(() => openDashboard("/dashboard/settings/team"))}>Invite teammates ↗</MenuItem>
+                <MenuItem onClick={run(() => openDashboard("/dashboard/settings/account"))}>Account settings ↗</MenuItem>
+              </MenuGroup>
+            </>
+          )}
+        </Menu>
+      </Popover>
+      {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} /> : null}
     </>
   );
 };
