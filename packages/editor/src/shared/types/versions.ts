@@ -31,6 +31,10 @@ export interface NamedVersion {
   tags?: string[];
   /** Whether this was auto-created or manually saved */
   isAutoCheckpoint: boolean;
+  /** What an auto-version marks, shown in place of "Auto-save" — the
+   *  template backup's `Before template "<name>"` (C4 #25). Plain auto-saves
+   *  carry none. */
+  title?: string;
   /** Project ID this version belongs to */
   projectId?: string;
   /** Base64 JPEG visual snapshot of the canvas at save time */
@@ -83,9 +87,12 @@ export const DEFAULT_VERSION_HISTORY_CONFIG: VersionHistoryConfig = {
   /* `project:loaded` was in here, so merely OPENING a site minted a version —
      one nobody made, first in the list, and the reason Saves·empty (163:64)
      was unreachable on every healthy site. Founder call G7 (2026-09-02): the
-     first checkpoint waits for a real edit. `template:applied` is one; an
-     ordinary edit is covered by the user's own save. */
-  autoCheckpointEvents: ["template:applied"],
+     first checkpoint waits for a real edit.
+     `template:applied` was here too, and fired AFTER the apply — a version of
+     the page the user already has, listed beside the real backup as a second
+     "Auto-save" at the same minute (QA 2026-09-24). The template backup is
+     the version the Templates panel takes BEFORE it replaces (#25). */
+  autoCheckpointEvents: [],
   enabled: true,
 };
 
