@@ -487,6 +487,15 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       run: () => composer.emit(EVENTS.UI_TOGGLE_EXPORTER),
     },
     {
+      /* The footer word bar's Inspector toggle lives here now (B12, G2-037),
+         beside the ✕ in the inspector header; both emit the one event the
+         shell acts on. No chord — nothing on the board prints one. */
+      id: "toggle-inspector",
+      label: "Toggle inspector",
+      group: "Panels",
+      run: () => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR),
+    },
+    {
       id: "ui-open-ai",
       label: "Open AI assistant",
       group: "Panels",
