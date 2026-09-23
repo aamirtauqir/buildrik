@@ -53,10 +53,11 @@ describe("Time-Travel chord ownership", () => {
     expect(registryChords).not.toContain("ctrl+shift+t");
   });
 
-  it("leaves ui-open-templates reachable without a shortcut", () => {
-    // Dropping the chord must not delete the command — it still needs its
-    // palette row, and `T` remains the panel's real door.
-    expect(commandsSrc).toMatch(/id:\s*"ui-open-templates"/);
+  /* ui-open-templates itself is gone (B7 follow-up to decision #24): its
+     event had no listener, and the palette's "Open Templates" row (from the
+     rail config, `T`) is the one working door. */
+  it("has no ui-open-templates command left to reclaim the chord", () => {
+    expect(commandsSrc).not.toMatch(/id:\s*"ui-open-templates"/);
   });
 
   it("registry chords are unique among themselves", () => {

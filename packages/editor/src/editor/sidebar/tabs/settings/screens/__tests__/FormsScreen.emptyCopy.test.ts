@@ -9,8 +9,8 @@
  * ship, and no code path creates a FormBlock row except site duplication —
  * so `forms.listBlocks` can only ever return the empty list this screen is
  * rendering. The export DOES wire a form when a Formspree/custom webhook URL
- * is set, but the settings section that would set one (shared/forms/
- * FormSettingsSection) has no consumer, so a user cannot reach it either.
+ * is set; decision #33 makes the provider site-level (Settings › Forms), and
+ * the unmounted per-form FormSettingsSection is deleted.
  *
  * @license BSD-3-Clause
  */

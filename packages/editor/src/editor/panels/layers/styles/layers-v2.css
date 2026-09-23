@@ -295,7 +295,13 @@
    to 6. The left value never applied: LayerTreeItem writes padding-left inline
    for the depth ladder. */
 .bdc-layers-tree.bdc-layers-tree-compact .bdc-lr {
+  height: var(--bk-size-row-dense);
   padding: 2px var(--bk-space-8);
+}
+/* "Compact rows" off (C4 #18): the standard 32. Both heights were 28, so the
+   display option toggled a class that changed nothing (QA 2026-09-24). */
+.bdc-layers-tree:not(.bdc-layers-tree-compact) .bdc-lr {
+  height: var(--bk-size-row);
 }
 
 /* ==========================================================================

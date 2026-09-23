@@ -13,4 +13,3 @@ export { TextareaField, type TextareaFieldProps } from "./TextareaField";
 export { SliderField, type SliderFieldProps } from "./SliderField";
 export { FileField, type FileFieldProps } from "./FileField";
 export { FormStateOverlay, type FormStateOverlayProps } from "./FormStateOverlay";
-export { FormSettingsSection, type FormSettingsSectionProps } from "./FormSettingsSection";

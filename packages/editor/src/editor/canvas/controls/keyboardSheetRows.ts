@@ -102,7 +102,7 @@ const PANEL_LETTERS: ChromeChord[] = GROUPED_TABS_CONFIG.filter((t) => Boolean(t
     id: `panel-${t.id}`,
     group: "Panels",
     keys: t.shortcut as string,
-    description: `Open ${t.label} panel`,
+    description: t.mode === "fullpage" ? `Open ${t.label}` : `Open ${t.label} panel`,
   }),
 );
 

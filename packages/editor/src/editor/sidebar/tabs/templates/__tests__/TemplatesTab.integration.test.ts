@@ -1,7 +1,7 @@
 /**
  * TemplatesTab Integration Tests — CRIT-1 + CRIT-3 regression coverage
- * Phase 1 prep: verifies handleApplyToCurrent routes through requestApply (not startApply),
- * and keyboard nav uses setDetailId (not selectedId)
+ * Phase 1 prep: verifies handleApplyToCurrent routes through requestApply (not startApply).
+ * (CRIT-3's keyboard-nav detail id went with the drawer's inline detail — decision #24.)
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -9,8 +9,6 @@ import { renderHook, act } from "@testing-library/react";
 import { render } from "@testing-library/react";
 import * as React from "react";
 import { useTemplateApply } from "../hooks/useTemplateApply";
-import { useTemplateSelection } from "../hooks/useTemplateSelection";
-import { SITE_TEMPLATES } from "../templatesData";
 
 // Mock composer for useTemplateApply
 function createMockComposer(withElements = false) {
@@ -96,43 +94,5 @@ describe("CRIT-1: handleApplyToCurrent routes through requestApply", () => {
     // Guard: should stay in confirming, not re-enter
     expect(result.current.applyState).toBe("confirming");
     expect(result.current.pendingId.current).toBe("tmpl-hero");
-  });
-});
-
-describe("CRIT-3: keyboard nav uses detailId not selectedId", () => {
-  /**
-   * CRIT-3 regression: useTemplateSelection.ts arrow key handler used setSelectedId.
-   * Phase 1 removes selectedId from the hook entirely. The arrow handler must use
-   * setDetailId instead, which is the canonical selection state (TemplatesTab.tsx:304
-   * confirms: isSelected={sel.detailId === tpl.id}).
-   *
-   * Evidence: useTemplateSelection.ts line 109 was:
-   *   if (next) setSelectedId(next.id);
-   * Now:
-   *   if (next) setDetailId(next.id);
-   */
-
-  it("detailId and setDetailId exist on the hook — selectedId is removed in Phase 1", () => {
-    const { result } = renderHook(() => useTemplateSelection(false));
-    // detailId is the canonical selection state
-    expect(result.current.detailId).toBeNull();
-    expect(typeof result.current.setDetailId).toBe("function");
-  });
-
-  it("setDetailId replaces selectedId in the keyboard nav selection model", () => {
-    const { result } = renderHook(() => useTemplateSelection(false));
-
-    // Verify setDetailId works: find first template, advance with ArrowRight logic
-    const firstTemplate = SITE_TEMPLATES[0];
-    act(() => result.current.setDetailId(firstTemplate.id));
-    expect(result.current.detailId).toBe(firstTemplate.id);
-
-    // Verify ArrowRight-style advance: find next in array
-    const idx = SITE_TEMPLATES.findIndex(t => t.id === firstTemplate.id);
-    const next = SITE_TEMPLATES[idx + 1];
-    if (next) {
-      act(() => result.current.setDetailId(next.id));
-      expect(result.current.detailId).toBe(next.id);
-    }
   });
 });
