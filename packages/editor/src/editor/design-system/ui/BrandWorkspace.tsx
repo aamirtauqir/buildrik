@@ -88,7 +88,7 @@ import { DraftChip } from "./DraftChip";
 import { useBrandDraft } from "./useBrandDraft";
 import { DSModeProvider, useDSModeOptional } from "../state/DSModeContext";
 import { AIPromptModal } from "./AIPromptModal";
-import { AddTokenModal } from "./modals/AddTokenModal";
+import { TokenAddDialog } from "./modals/TokenAddDialog";
 import { ReviewModal } from "./modals/ReviewModal";
 import { BrandDiscardDialog } from "./BrandDiscardDialog";
 import { BrandPreview } from "./BrandPreview";
@@ -503,6 +503,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
            reached the registry and never the project: measured live
            2026-09-22, Apply persisted `#C81E1E` and lost `#76A9FA`. */
         ...(t.darkValue ? { darkValue: t.darkValue } : {}),
+        /* The kind rides along: the eleven generic registries hydrate by
+           `kind`, and an added token (not in the seed) has nothing else to
+           say which registry it belongs to on the next load. */
+        ...(t.kind ? { kind: t.kind } : {}),
       }));
 
     // S2: pull all 11 preset categories into a flat record array for persistence.
@@ -572,19 +576,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     addToast({ description: "Spacing reset to defaults — review and Apply to save.", tone: "info" });
   };
 
-  const handleAddToken = (name: string, hex: string) => {
-    const newToken: DesignToken = {
-      id: generateColorTokenId(name),
-      name,
-      value: hex,
-      category: "colors",
-      cssVar: generateColorCssVar(name),
-      type: "color",
-      group: "brand",
-    };
-    color.addToken(newToken);
+  /* "+ Add token" (7318:81125): the kind is the page's. Only kinds with an
+     add path offer it — colour, spacing and the eleven generic kinds. */
+  const addKind: TokenKind | null =
+    page === "colours" ? "color" : page === "spacing" ? "spacing" : page.startsWith("kind-") ? (page.slice(5) as TokenKind) : null;
+  const addRegistry = (k: TokenKind | null): { tokens: DesignToken[]; addToken: (t: DesignToken) => void } | null =>
+    k === "color" ? color : k === "spacing" ? spacing : k && isMoreKind(k) ? moreKindRegistry[k] : null;
+  const handleAddToken = (token: DesignToken) => {
+    addRegistry(token.kind ?? null)?.addToken(token);
     setShowAddToken(false);
-    addToast({ description: `Token "${name}" added`, tone: "success" });
+    setSelectedTokenId(token.id);
+    addToast({ description: `Token "${token.name}" added to the draft`, tone: "success" });
   };
 
   // ─ The door out (7315:80955 KEY_D: if draft → 7317:80979, else → canvas) ─
@@ -722,6 +724,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const pageAction = (() => {
     switch (page) {
       case "colours":
+      case "spacing":
         return (
           <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
             + Add token
@@ -780,6 +783,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         if (page.startsWith("kind-")) {
           /* "Tokens · <kind>": the kind is the page's own switch. */
           return (
+            <div className="tw:flex tw:items-center tw:gap-2">
             <Select
               sizing="sm"
               aria-label="Token kind"
@@ -793,6 +797,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 </option>
               ))}
             </Select>
+            <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
+              + Add token
+            </Button>
+            </div>
           );
         }
         return null;
@@ -1185,11 +1193,14 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           })()}
         />
       )}
-      {showAddToken && (
-        <AddTokenModal
-          existingIds={color.tokens.map((t) => t.id)}
+      {addKind && (
+        <TokenAddDialog
+          open={showAddToken}
+          kind={addKind}
+          siblings={addRegistry(addKind)?.tokens ?? []}
+          takenIds={allTokens.map((t) => t.id)}
+          onCancel={() => setShowAddToken(false)}
           onAdd={handleAddToken}
-          onClose={() => setShowAddToken(false)}
         />
       )}
       <AIPromptModal
