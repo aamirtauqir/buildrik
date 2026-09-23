@@ -121,9 +121,14 @@
    single-class rule ties it on specificity and then loses on source order —
    which is how a 26px send button rendered 40 wide, its own width overrun by
    padding it never asked for. */
-.bd-ai-composer-field .bd-ai-composer-send,
 .bd-ai-composer-field .bd-ai-composer-stop {
   padding: 0;
+}
+
+/* The labelled primary (board 4418:104454): its own width, 8 across. */
+.bd-ai-composer-field .bd-ai-composer-send {
+  width: auto;
+  padding: 0 var(--bk-space-8);
 }
 
 .bd-ai-composer-send,

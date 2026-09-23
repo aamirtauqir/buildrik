@@ -344,7 +344,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     const n = selectedCount;
     /* The engine's own delete: prunes to top-most elements and wraps one
        transaction, so Undo puts all of them back at once. */
-    composer.commands.run("delete");
+    composer.commands.run("delete", { confirmed: true });
     state.selectionHook.clearSelection();
     setDeleteSelectionOpen(false);
     /* Board 6881:71749 "3 elements deleted" + Undo. */

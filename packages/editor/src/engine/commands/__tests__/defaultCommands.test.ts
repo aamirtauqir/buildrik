@@ -71,10 +71,10 @@ function makeComposer() {
 let composer: ReturnType<typeof makeComposer>;
 let byId: Map<string, CommandData>;
 
-function run(id: string) {
+function run(id: string, options?: Record<string, unknown>) {
   const command = byId.get(id);
   if (!command) throw new Error(`command ${id} not in default set`);
-  return command.run(composer as unknown as Composer);
+  return command.run(composer as unknown as Composer, options);
 }
 
 beforeEach(() => {
@@ -259,11 +259,23 @@ describe("delete / duplicate / group", () => {
   /* Measured live at 49 -> 48 with three elements selected: delete read the
      PRIMARY element, exactly as cut did, and wrapped nothing in a transaction —
      so undoing a three-element delete would have taken three presses. */
-  it("delete takes the whole selection, in one transaction", () => {
+  /* Decision #17: more than one element asks first. Unconfirmed, delete
+     removes nothing and asks the shell for its dialog; the dialog (canvas or
+     Layers) runs it again with { confirmed: true }. */
+  it("delete with N > 1 selected asks instead of deleting", () => {
     composer.selection.getAllSelected.mockReturnValue([
       makeElement("el-1"), makeElement("el-2"), makeElement("el-3"),
     ]);
     run("delete");
+    expect(composer.elements.removeElement).not.toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_REQUEST_DELETE_SELECTION, { count: 3 });
+  });
+
+  it("delete takes the whole selection, in one transaction, once confirmed", () => {
+    composer.selection.getAllSelected.mockReturnValue([
+      makeElement("el-1"), makeElement("el-2"), makeElement("el-3"),
+    ]);
+    run("delete", { confirmed: true });
     expect(composer.elements.removeElement).toHaveBeenCalledTimes(3);
     expect(composer.beginTransaction).toHaveBeenCalledTimes(1);
     expect(composer.endTransaction).toHaveBeenCalledTimes(1);

@@ -92,37 +92,6 @@ export const standaloneActions: ContextAction[] = [
       });
     },
   },
-  {
-    id: "reveal-in-layers",
-    label: "Reveal in layers",
-    icon: "eye",
-    group: "standalone",
-    handler: ({ composer, element }) => {
-      composer.selection.select(element as never);
-      // SHOW_IN_LAYERS is the event the shell actually listens for: it switches
-      // the left panel to Layers, opens the drawer, then asks the tree to
-      // scroll. Selecting alone only highlights a row that may not be on
-      // screen — or in a panel that is not even open.
-      composer.emit(EVENTS.SHOW_IN_LAYERS, {});
-    },
-  },
-  {
-    id: "select-parent",
-    label: "Select parent",
-    icon: "arrow-up",
-    group: "standalone",
-    /* The key this binds is Left (useCanvasKeyboard), which the breadcrumb
-       prints as "← Parent". Board 1176:4866 shows a glyph in this column, and
-       the word "Left" read as a direction rather than a key. */
-    shortcut: "←",
-    isVisible: ({ element }) => Boolean(element.getParent()),
-    handler: ({ composer, element }) => {
-      const parent = element.getParent();
-      if (parent) {
-        composer.selection.select(parent as never);
-      }
-    },
-  },
   // ── Group / Ungroup ──────────────────────────────────────────────────────────
   {
     id: "group-elements",

@@ -9,7 +9,7 @@
  *   - This item      — the default (what the inspector controls already do)
  *   - All like this  — a MODE: every edit you make from here also lands on
  *                      every same-type peer, until you leave it
- *   - Whole site     — site-wide colors & fonts live in the Styles tab
+ *   - Whole site     — site-wide colours & fonts live in Brand
  *
  * Compact `This ▾` pill matching Figma node 32-2 (design-system Foundations):
  * scope sits in the breakpoint/state pill row, not as a full-width card block.
@@ -104,14 +104,14 @@ export function ScopeDropdown({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={reachAll ? "Edit reach: all like this" : "Edit reach: this item"}
+        aria-label={reachAll ? "Edit reach: all like this" : "Edit reach: this element"}
         style={{ border: "none", cursor: "pointer" }}
       >
         {/* The pill names the reach it is IN. Board 160:412 draws it reading
             "This" beside a banner that says twelve buttons are being edited —
             the two cannot both be right, and a control that misreports its own
             state is the worse half to keep. */}
-        <span>{reachAll ? "All like this" : "This"}</span>
+        <span>{reachAll ? "All like this" : "This element"}</span>
         <ChevronDown size={10} aria-hidden="true" style={{ opacity: 0.7 }} />
       </Button>
       {open && (
@@ -141,7 +141,7 @@ export function ScopeDropdown({
             }}
             className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
-            <span style={reachAll ? optTop : { ...optTop, color: "var(--bk-accent)" }}>This item</span>
+            <span style={reachAll ? optTop : { ...optTop, color: "var(--bk-accent)" }}>This element</span>
             <span style={optSub}>just here — the default</span>
           </Button>
           <Button
@@ -167,7 +167,7 @@ export function ScopeDropdown({
             color="light"
             style={optionRow}
             data-testid="inspector-scope-site"
-            title="Site-wide colors & fonts live in the Styles tab"
+            title="Site-wide colours & fonts live in Brand"
             onClick={() => {
               setOpen(false);
               onWholeSite?.();
@@ -175,7 +175,7 @@ export function ScopeDropdown({
             className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
           >
             <span style={optTop}>Whole site</span>
-            <span style={optSub}>colors & fonts — Styles tab</span>
+            <span style={optSub}>colours & fonts — Brand</span>
           </Button>
         </div>
       )}

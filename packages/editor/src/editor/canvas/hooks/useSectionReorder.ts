@@ -34,6 +34,8 @@ export interface UseSectionReorderOptions {
   composer: Composer | null;
   canvasRef: React.RefObject<HTMLDivElement | null>;
   enabled?: boolean;
+  /** Board 5940:148012: a finished move says so — "Moved down" + Undo. */
+  addToast?: (toast: { description: string; action?: { label: string; onClick: () => void } }) => void;
 }
 
 export interface UseSectionReorderResult {
@@ -61,6 +63,7 @@ export function useSectionReorder({
   composer,
   canvasRef,
   enabled = true,
+  addToast,
 }: UseSectionReorderOptions): UseSectionReorderResult {
   const [boundaries, setBoundaries] = React.useState<SectionBoundary[]>([]);
   const [dragState, setDragState] = React.useState<SectionDragState | null>(null);
@@ -203,6 +206,10 @@ export function useSectionReorder({
       try {
         composer.elements.moveElement(sectionId, page.root.id, adjustedIndex);
         composer.endTransaction();
+        addToast?.({
+          description: toIndex > fromIndex ? "Moved down" : "Moved up",
+          action: { label: "Undo", onClick: () => composer.history.undo() },
+        });
       } catch {
         composer.rollbackTransaction();
       }
@@ -212,7 +219,7 @@ export function useSectionReorder({
 
     // Recompute boundaries after move
     requestAnimationFrame(computeBoundaries);
-  }, [dragState, composer, computeBoundaries]);
+  }, [dragState, composer, computeBoundaries, addToast]);
 
   const cancelDrag = React.useCallback(() => {
     setDragState(null);
