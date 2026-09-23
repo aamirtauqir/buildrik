@@ -191,41 +191,6 @@ describe("usePages PROJECT_LOADED handler — undo / redo / version-restore", ()
   });
 });
 
-// ── addPage ──────────────────────────────────────────────────────────────────
-
-describe("usePages addPage", () => {
-  it("calls elements.createPage with default name + slug and enters rename mode on the new id", () => {
-    const composer = createMockComposer({ pages: [pg("p1", "Home")] });
-    const { result } = setup(composer);
-
-    act(() => result.current.addPage());
-
-    // 1 existing page → getDefaultPageName returns "About"
-    expect(composer.elements.createPage).toHaveBeenCalledWith("About", { slug: "about" });
-    // Mock harness assigns pg-new-1; renamingPageId comes from createPage's return
-    expect(result.current.renamingPageId).toBe("pg-new-1");
-    expect(result.current.pages).toHaveLength(2);
-  });
-
-  it("shows an error toast and does not enter rename mode when createPage throws", () => {
-    const composer = createMockComposer({ pages: [pg("p1", "Home")] });
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    (composer.elements.createPage as unknown as Mock).mockImplementation(() => {
-      throw new Error("boom");
-    });
-    const { result } = setup(composer);
-
-    act(() => result.current.addPage());
-
-    expect(lastToast()).toMatchObject({
-      description: "Couldn't add page right now. Try again.",
-      tone: "error",
-    });
-    expect(result.current.renamingPageId).toBeNull();
-    consoleSpy.mockRestore();
-  });
-});
-
 // ── commitRename ─────────────────────────────────────────────────────────────
 
 describe("usePages commitRename", () => {

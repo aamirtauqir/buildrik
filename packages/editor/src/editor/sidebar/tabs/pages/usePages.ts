@@ -22,7 +22,6 @@ import * as React from "react";
 import { useToast } from "@/editor/chrome-ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { getDefaultPageName } from "../../../../shared/utils/pageUtils";
 import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem } from "./types";
 import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
@@ -55,7 +54,6 @@ export interface UsePagesReturn {
   closeSettings: () => void;
 
   // Actions (all guard-checked)
-  addPage: () => void;
   selectPage: (pageId: string) => void;
   duplicatePage: (pageId: string) => void;
   deletePage: (pageId: string) => void;
@@ -179,30 +177,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   }, [contextMenu]);
 
   // ── Actions ───────────────────────────────────────────────────────────────
-
-  const addPage = React.useCallback(() => {
-    if (!composer) return;
-    const name = getDefaultPageName(pages);
-    const slug = slugify(name);
-    try {
-      // Use createPage's synchronous return value directly. The previous
-      // setTimeout(60) + getAllPages().last() pattern broke when pages are
-      // prepended instead of appended and when PROJECT_CHANGED fired twice
-      // in a tick.
-      const newest = composer.elements.createPage(name, { slug });
-      // PageRow owns focus: when it mounts with isRenaming=true, its own
-      // effect selects + focuses the input. No rAF needed here — that was
-      // a timing race when the row hadn't mounted within one frame.
-      if (newest) setRenamingPageId(newest.id);
-    } catch (err) {
-      addToast({
-        description: "Couldn't add page right now. Try again.",
-        tone: "error",
-        duration: 4000,
-      });
-      console.error("[pages] addPage failed", err);
-    }
-  }, [composer, pages.length, addToast]);
 
   const selectPage = React.useCallback(
     (pageId: string) => {
@@ -417,7 +391,6 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     settingsPageId,
     openSettings,
     closeSettings,
-    addPage,
     selectPage,
     duplicatePage,
     deletePage,

@@ -339,6 +339,9 @@ export const EVENTS = {
   UI_ONBOARDING_REPLAY: "ui:onboarding-replay",
 
   UI_BROWSE_TEMPLATES: "ui:browse-templates",
+  /** Any Add-page door (Pages footer, one-page link, empty state, page-tab
+   *  "+", ⌘K New page) asks for the New-page modal (decision #19). */
+  UI_NEW_PAGE_REQUESTED: "ui:new-page-requested",
   /** Rail switches to a named tab. Six emitters, no constant until now. */
   UI_SWITCH_TAB: "ui:switch-tab",
   /** Add panel expands one named group (`{ group: InsertGroupId }`). The

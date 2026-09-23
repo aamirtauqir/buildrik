@@ -16,7 +16,6 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { useDirtyPages } from "../shared/useDirtyPages";
-import { getDefaultPageName } from "../../shared/utils/pageUtils";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -76,10 +75,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer, readOnly = fal
     composer?.elements.setActivePage(pageId);
   };
 
-  const handleAddPage = () => {
-    if (!composer) return;
-    composer.elements.createPage(getDefaultPageName(pages));
-  };
+  /* Decision #19: "+" asks for the New-page modal, like every Add-page door. */
+  const handleAddPage = () => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {});
 
   if (!composer || pages.length === 0) return null;
 
