@@ -26,7 +26,6 @@ import {
   contentStyles,
   footerToolbarContainerStyles,
 } from "./canvasStyles";
-import { useInspectorMode } from "./controls/InspectorToggle";
 import {
   useCanvasDragDrop,
   useCanvasInlineEdit,
@@ -169,7 +168,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     });
 
     // Indicators and canvas size
-    const { spacingIndicators, guides } = useCanvasIndicators({
+    const { spacingIndicators } = useCanvasIndicators({
       composer,
       selectedId,
       showSpacing,
@@ -283,15 +282,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         isResizing,
       });
 
-    // Inspector mode (persistent toggle)
-    const { isInspectorEnabled } = useInspectorMode();
-
     // Cursor intelligence - tracks modifier keys for smart hover display
     const { cursorState } = useCursorIntelligence({
       canvasRef,
       isDragging: Boolean(draggingElementId),
       isInvalidDrop: !isValidDrop && isDragOver,
-      inspectorEnabled: isInspectorEnabled,
     });
 
     // Live global custom CSS (Settings → Advanced) injected into the canvas.
@@ -761,7 +756,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             updateGuide={updateGuide}
             removeGuide={removeGuide}
             showGuides={showGuides}
-            guides={guides}
             snapLines={snapLines}
             selectedId={selectedId}
             selectedIds={selectedIds}
@@ -781,7 +775,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             shouldShowHover={shouldShowHover}
             hoveredElementId={hoveredElementId}
             cursorState={cursorState}
-            isInspectorEnabled={isInspectorEnabled}
             devMode={devMode}
             isDragOver={isDragOver}
             dropTargetId={dropTargetId}

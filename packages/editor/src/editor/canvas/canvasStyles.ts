@@ -108,13 +108,6 @@ export const contentStyles: React.CSSProperties = {
   position: "relative",
 };
 
-export const guidesContainerStyles: React.CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  pointerEvents: "none",
-  zIndex: 15,
-};
-
 export const spotsOverlayStyles: React.CSSProperties = {
   position: "absolute",
   top: 0,

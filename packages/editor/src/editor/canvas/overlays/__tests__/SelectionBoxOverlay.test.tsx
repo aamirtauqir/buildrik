@@ -25,9 +25,6 @@ vi.mock("../../hooks/useCanvasResize", () => ({
 }));
 
 // Mock child components to keep the test surface minimal
-vi.mock("../../toolbars/AlignmentToolbar", () => ({
-  AlignmentToolbar: () => null,
-}));
 vi.mock("../SelectionHandles", () => ({
   SelectionHandles: () => null,
 }));
@@ -94,6 +91,7 @@ describe("SelectionBoxOverlay — rotation handle accessibility", () => {
     querySelectorSpy = vi.spyOn(document, "querySelector").mockImplementation((selector) => {
       if (selector === ".buildrick-canvas") return fakeCanvas;
       if (selector === '[data-buildrick-id="el-1"]') return fakeElement;
+      if (selector === '[data-buildrick-id="el-2"]') return fakeElement;
       return null;
     });
   });
@@ -122,6 +120,15 @@ describe("SelectionBoxOverlay — rotation handle accessibility", () => {
       const rule = new RegExp(`\\.${cls}(::?[a-z-]+)?\\s*[,{][^}]*\\b(background|border|box-shadow)\\s*:`);
       expect(css, `.${cls} paints the full-canvas wrapper`).not.toMatch(rule);
     }
+  });
+
+  /* G2-023: align/distribute lives in the Inspector only (board 4418:112166);
+     the canvas-anchored multi-select toolbar was a second home for it. */
+  it("multi-select draws no canvas align toolbar", () => {
+    const composer = makeComposer();
+    render(<SelectionBoxOverlay composer={composer} elementId="el-1" selectedIds={["el-1", "el-2"]} />);
+    expect(screen.queryByTitle(/align/i)).toBeNull();
+    expect(screen.queryByRole("button", { name: /align|distribute/i })).toBeNull();
   });
 
   it("rotation handle has aria-valuenow attribute", () => {

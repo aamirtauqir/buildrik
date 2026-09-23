@@ -13,9 +13,6 @@ export type { DeviceSelectorProps, Device } from "./DeviceSelector";
 export { UnifiedSelectionToolbar } from "./UnifiedSelectionToolbar";
 export type { UnifiedSelectionToolbarProps } from "./UnifiedSelectionToolbar";
 
-export { InspectorToggle, useInspectorMode } from "./InspectorToggle";
-export type { InspectorToggleProps } from "./InspectorToggle";
-
 export { KeyboardCheatSheet } from "./KeyboardCheatSheet";
 export type { KeyboardCheatSheetProps } from "./KeyboardCheatSheet";
 

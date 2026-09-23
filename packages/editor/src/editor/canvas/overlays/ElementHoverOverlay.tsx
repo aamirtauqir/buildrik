@@ -34,8 +34,6 @@ export interface ElementHoverOverlayProps {
   altHeld?: boolean;
   /** Shift key held (with Alt) - show box model */
   shiftHeld?: boolean;
-  /** Inspector mode enabled - always show full details */
-  inspectorEnabled?: boolean;
   /** Parent hierarchy for Alt+Hover display */
   parentHierarchy?: Array<{ id: string; type: string; label: string }>;
   /** Ctrl/Cmd held — signals that drag will clone instead of move */
@@ -72,12 +70,8 @@ const COLORS = {
 // HELPER: Determine hover level
 // =============================================================================
 
-function getHoverLevel(
-  altHeld: boolean,
-  shiftHeld: boolean,
-  inspectorEnabled: boolean
-): HoverLevel {
-  if (inspectorEnabled || (altHeld && shiftHeld)) {
+function getHoverLevel(altHeld: boolean, shiftHeld: boolean): HoverLevel {
+  if (altHeld && shiftHeld) {
     return "boxmodel";
   }
   if (altHeld) {
@@ -95,7 +89,6 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
   canvasRef,
   altHeld = false,
   shiftHeld = false,
-  inspectorEnabled = false,
   parentHierarchy = [],
   isCloneMode = false,
 }) => {
@@ -106,7 +99,7 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
   } | null>(null);
 
   // Calculate hover level
-  const hoverLevel = getHoverLevel(altHeld, shiftHeld, inspectorEnabled);
+  const hoverLevel = getHoverLevel(altHeld, shiftHeld);
 
   React.useEffect(() => {
     if (!hoveredElementId || !canvasRef.current) {

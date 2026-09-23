@@ -30,7 +30,6 @@ const MIGRATION_MAP: Record<string, string> = {
 
   // Canvas controls
   "aquibra-guides": STORAGE_KEYS.GUIDES,
-  "aquibra-inspector-mode": STORAGE_KEYS.INSPECTOR_MODE,
   "aquibra-recent-commands": STORAGE_KEYS.RECENT_COMMANDS,
 
   // Elements tab
@@ -104,7 +103,6 @@ const AQB_TO_BUILDRICK_STORAGE_MAP: Record<string, string> = {
   "aqb-panels": "buildrick-panels",
   "aqb-panel-state": "buildrick-panel-state",
   "aqb-guides": "buildrick-guides",
-  "aqb-inspector-mode": "buildrick-inspector-mode",
   "aqb-recent-commands": "buildrick-recent-commands",
   "aqb-quick-switcher-recent": "buildrick-quick-switcher-recent",
   "aqb-saved-templates": "buildrick-saved-templates",

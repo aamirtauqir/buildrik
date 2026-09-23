@@ -6,7 +6,6 @@
     "packages/editor/src/editor/canvas/Canvas.tsx",
     "packages/editor/src/editor/canvas/CanvasEmptyCTA.tsx",
     "packages/editor/src/editor/canvas/controls/DeviceSelector.tsx",
-    "packages/editor/src/editor/canvas/controls/InspectorToggle.tsx",
     "packages/editor/src/editor/canvas/controls/UnifiedSelectionToolbar.tsx",
     "packages/editor/src/editor/canvas/controls/toolbar/ToolbarActionsSection.tsx",
     "packages/editor/src/editor/canvas/controls/toolbar/ToolbarNavSection.tsx",

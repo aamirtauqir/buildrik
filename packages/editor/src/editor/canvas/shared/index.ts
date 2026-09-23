@@ -59,8 +59,6 @@ export { HIT_EXPANSION, buildElementStack, findElementWithHitExpansion } from ".
 // ============================================
 export { CanvasButton } from "./CanvasButton";
 export type { CanvasButtonProps } from "./CanvasButton";
-export { GuideLine, GuideLines } from "./GuideLine";
-export type { GuideLineProps, GuideLinesProps } from "./GuideLine";
 
 // ============================================
 // Legacy Exports (for backward compatibility)

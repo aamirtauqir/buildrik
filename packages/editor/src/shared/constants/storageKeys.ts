@@ -38,7 +38,6 @@ export const STORAGE_KEYS = {
   /** Saved canvas guides (horizontal/vertical guide positions) */
   GUIDES: "buildrick-guides",
   /** Inspector mode enabled/disabled */
-  INSPECTOR_MODE: "buildrick-inspector-mode",
   /** Recent commands from command palette */
   RECENT_COMMANDS: "buildrick-recent-commands",
 
