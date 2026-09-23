@@ -299,7 +299,7 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
                 <span
                   aria-hidden="true"
                   data-testid={`insert-block-pill-${b.id}`}
-                  className="tw:hidden tw:group-hover:inline-flex tw:h-4 tw:shrink-0 tw:items-center tw:rounded-full tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[10px] tw:font-medium tw:text-[var(--bk-accent-text)]"
+                  className="tw:hidden tw:group-hover:inline-flex tw:h-4 tw:shrink-0 tw:items-center tw:rounded-full tw:bg-[var(--bk-accent-tint)] tw:px-1.5 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-accent-text)]"
                 >
                   Add
                 </span>

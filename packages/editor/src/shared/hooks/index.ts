@@ -17,10 +17,6 @@ export { useElementFlash } from "./useElementFlash";
 // (usePublish removed — the sidebar PublishTab now shares the canonical
 //  usePublishJob state machine with the Topbar; see editor/shell/hooks.)
 
-// Form handler hook (composer-backed form registration + submission)
-export { useFormHandler } from "./useFormHandler";
-export type { UseFormHandlerResult } from "./useFormHandler";
-
 // History tab hooks
 export { useHistoryState } from "./useHistoryState";
 export type { UseHistoryStateReturn } from "./useHistoryState";
