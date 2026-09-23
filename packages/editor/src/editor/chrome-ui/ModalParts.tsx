@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
+import { twMerge } from "tailwind-merge";
 import { OverlayMount } from "./OverlayMount";
 import { IconButton } from "./Icon";
 import {
@@ -23,7 +24,7 @@ import {
   MODAL_FOOT_CLASS,
 } from "./Modal";
 
-export type ModalSize = "sm" | "md" | "fields" | "table" | "question" | "form" | "lg" | "xl";
+export type ModalSize = "sm" | "md" | "fields" | "table" | "question" | "confirm" | "form" | "lg" | "xl";
 
 const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
   sm: "tw:w-[360px]",
@@ -34,6 +35,8 @@ const SIZE_WIDTH_CLASS: Record<ModalSize, string> = {
   /* 1170:4749 records table, 1164:4713 media picker. */
   table: "tw:w-[640px]",
   question: "tw:w-[440px]",
+  /* 7574:193972 (Publish · confirm, v3 IA) draws its dialog at 480. */
+  confirm: "tw:w-[480px]",
   form: "tw:w-[560px]",
   lg: "tw:w-[720px]",
   xl: "tw:w-[960px]",
@@ -119,7 +122,9 @@ export interface ModalTitleProps extends React.HTMLAttributes<HTMLHeadingElement
 export const ModalTitle = React.forwardRef<HTMLHeadingElement, ModalTitleProps>(
   function ModalTitle({ inset = true, className, children, ...rest }, ref) {
     return (
-      <h2 ref={ref} className={[inset ? MODAL_TITLE_HEAD_CLASS : "", MODAL_TITLE_CLASS, className].filter(Boolean).join(" ")} {...rest}>
+      /* twMerge: on a plain element a caller's `tw:text-*` and the default
+         both compile and stylesheet order decides; merged, the caller wins. */
+      <h2 ref={ref} className={twMerge(inset ? MODAL_TITLE_HEAD_CLASS : "", MODAL_TITLE_CLASS, className)} {...rest}>
         {children}
       </h2>
     );
