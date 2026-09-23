@@ -14,10 +14,11 @@
  *   306:2161  "Draft preset"        89px
  *
  * Of THAT trio only "Draft preset" ships. That is the finding, not a shortcut.
- * The rest of the family's Badge instances are separate states and four of them
- * do ship: 306:2232 "Exported", 306:2265 "Imported tokens", 306:2186
- * "Starter applied" and 306:2217 "Warnings suppressed" — each answerable from
- * state the panel already holds.
+ * The rest of the family's Badge instances are separate states and three of
+ * them ship: 306:2232 "Exported", 306:2265 "Imported tokens" and 306:2217
+ * "Warnings suppressed" — each answerable from state the panel already holds.
+ * (306:2186 "Starter applied" went with the drawer's starter grid in C1 (ii):
+ * the workspace's Draft chip says it.)
  *
  * The first guess here was that "bound" meant a preset's `bindings` all resolve
  * to a token id — `bindings: Record<string, { tokenId: string }>` in
@@ -51,10 +52,9 @@ export type SectionStatus =
   | "exported"
   | "imported"
   | "import-failed"
-  | "starter-applied"
   | "warnings-suppressed";
 
-/** The boards' wording, not a paraphrase — 306:2161, 306:2232, 306:2186 and
+/** The boards' wording, not a paraphrase — 306:2161, 306:2232 and
  *  306:2217. The export label names the FORMAT ("Exported CSS"), so it
  *  composes. */
 const LABEL: Record<SectionStatus, string> = {
@@ -62,7 +62,6 @@ const LABEL: Record<SectionStatus, string> = {
   exported: "Exported",
   imported: "Imported tokens",
   "import-failed": "Import failed",
-  "starter-applied": "Starter applied",
   "warnings-suppressed": "Warnings suppressed",
 };
 
@@ -92,7 +91,6 @@ const LEADING: Record<SectionStatus, string> = {
   exported: "tw:leading-4",
   imported: "tw:leading-4",
   "import-failed": "tw:leading-4",
-  "starter-applied": "tw:leading-4",
   "warnings-suppressed": "tw:leading-[18px]",
 };
 const COLOR: Record<SectionStatus, string> = {
@@ -102,17 +100,13 @@ const COLOR: Record<SectionStatus, string> = {
   draft: "tw:border-[var(--bk-gray-400)] tw:bg-[var(--bk-gray-200)] tw:text-[var(--bk-gray-700)]",
   /* 333:2362 names `--flowbite/green/700` for the label, which is
      `--bk-green-700` `var(--bk-green-700)` — a shade darker than `--bk-success-text`
-     (green-600, `var(--bk-green-600)`). Same call as `starter-applied` on 333:2358: the
+     (green-600, `var(--bk-green-600)`). The
      board names the palette entry, not the semantic. Only `exported` moves;
      `imported` is measured on 306:2265 by another recipe. */
   exported: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-green-700)]",
   imported: "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
   /* The one state here that IS a failure, and the only one that may be red. */
   "import-failed": "tw:border-[var(--bk-error)] tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
-  /* 333:2358. `--bk-green-700` rather than `--bk-success-text`: the two are a
-     a shade apart and the board names the palette entry, not the semantic. */
-  "starter-applied":
-    "tw:border-[var(--bk-success)] tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-green-700)]",
   /* 333:2360. `--bk-warning` resolves to the same value as the board's
      `--flowbite/yellow/500`, and `--bk-yellow-100` is its fill; only the 18px
      line is peculiar to this instance. */
