@@ -92,7 +92,6 @@ const SECTIONS: SectionDef[] = [
       ["Facebook", "Social links", "social-facebook"],
       ["LinkedIn", "Social links", "social-linkedin"],
       ["Grid size", "Canvas", "canvas-grid-size"],
-      ["Snap to grid", "Canvas", "canvas-snap"],
     ],
   },
   { screen: "branding", title: "Brand", description: "Colours, fonts, spacing and presets", group: SITE_SETUP },

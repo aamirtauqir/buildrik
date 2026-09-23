@@ -394,24 +394,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     },
 
     // ============================================
-    // Snap to Grid
-    // ============================================
-    /* No chord. ⌘' is printed on the canvas overlay bar for the Grid overlay
-       and bound there; both listeners sit on window and both used to run, so
-       one press toggled the overlay AND flipped this setting — which resize
-       reads, and which nothing on screen shows changing. Same tie-break as
-       ⌘1–⌘4 below: the printed chord wins, the command keeps its palette row. */
-    {
-      id: "toggle-snap-to-grid",
-      label: "Toggle snap to grid",
-      group: "View",
-      run: (c) => {
-        const current = c.getState().snapToGrid;
-        c.setSnapToGrid(!current);
-      },
-    },
-
-    // ============================================
     // Selection
     // ============================================
     {

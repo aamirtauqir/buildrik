@@ -393,6 +393,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       if (Math.round(composer.getState().zoom) !== Math.round(zoom)) composer.setZoom(zoom);
     }, [composer, zoom]);
 
+    /* G2-034: one Grid switch. Snapping (nudge, resize) follows the Grid
+       overlay; the separate snap setting and its ⌘K row are gone. */
+    React.useEffect(() => {
+      composer?.setSnapToGrid(showGrid);
+    }, [composer, showGrid]);
+
     /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
        (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
        command you could find, read and run, and nothing moved. Steps to the

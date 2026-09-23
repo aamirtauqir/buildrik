@@ -374,10 +374,11 @@ describe("SiteSettingsScreen — flush handler contract", () => {
     await loaded();
     fireEvent.change(screen.getByLabelText("Author"), { target: { value: "Bella Cucina team" } });
     fireEvent.change(screen.getByRole("spinbutton", { name: /Grid size/ }), { target: { value: "8" } });
-    fireEvent.click(screen.getByRole("switch", { name: "Snap to grid" }));
     act(() => flush!());
     expect(composer.updateProjectMetadata).toHaveBeenCalledWith(expect.objectContaining({ author: "Bella Cucina team" }));
     expect(composer.setGridSize).toHaveBeenCalledWith(8);
-    expect(composer.setSnapToGrid).toHaveBeenCalledWith(true);
+    // G2-034: snapping follows the canvas Grid toggle — no switch here.
+    expect(screen.queryByRole("switch", { name: "Snap to grid" })).toBeNull();
+    expect(composer.setSnapToGrid).not.toHaveBeenCalled();
   });
 });

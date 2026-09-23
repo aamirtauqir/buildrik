@@ -1,7 +1,7 @@
 /**
  * defaultCommands — behavior of the built-in command closures against a
  * mock Composer: clipboard (copy/cut/paste), zoom, device presets,
- * duplicate/group/select, snap toggle.
+ * duplicate/group/select.
  *
  * DOM-coupled commands (nudge-* / reorder via commandOperations, preview's
  * window.open) are exercised only for their guard paths here.
@@ -378,14 +378,10 @@ describe("selection + toggles", () => {
     expect(composer.selection.clear).toHaveBeenCalled();
   });
 
-  it("toggle-snap-to-grid flips the current state", () => {
-    composer.getState.mockReturnValue({ zoom: 100, snapToGrid: false, gridSize: 8 });
-    run("toggle-snap-to-grid");
-    expect(composer.setSnapToGrid).toHaveBeenCalledWith(true);
-
-    composer.getState.mockReturnValue({ zoom: 100, snapToGrid: true, gridSize: 8 });
-    run("toggle-snap-to-grid");
-    expect(composer.setSnapToGrid).toHaveBeenCalledWith(false);
+  /* G2-034: snapping follows the Grid overlay; there is no second switch. */
+  it("has no separate snap-to-grid command", () => {
+    const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
+    expect(ids).not.toContain("toggle-snap-to-grid");
   });
 
   it("ui-open-* commands emit their toggle events on the captured composer", () => {
@@ -450,7 +446,7 @@ describe("device presets carry no shortcut", () => {
      reads, while the user was toggling the Grid overlay. */
   it("leaves the flyout's and overlay bar's chords to the surfaces that print them", () => {
     const byId = new Map(buildDefaultCommands(composer as unknown as Composer).map((c) => [c.id, c]));
-    for (const id of ["zoom-reset", "zoom-in", "zoom-out", "toggle-snap-to-grid"]) {
+    for (const id of ["zoom-reset", "zoom-in", "zoom-out"]) {
       expect(byId.get(id)).toBeDefined();
       expect(byId.get(id)?.shortcut).toBeUndefined();
     }

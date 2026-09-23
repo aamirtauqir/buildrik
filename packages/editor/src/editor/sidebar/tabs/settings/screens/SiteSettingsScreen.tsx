@@ -18,7 +18,6 @@ import * as React from "react";
 import { Field, Input, LoadCard, SCREEN_FIELD_ERROR, SaveErrorBanner, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
-import { ToggleSwitch } from "@/editor/chrome-ui";
 import { SITE_LOCALES, localeLabel } from "../constants";
 import type { ScreenProps } from "../types";
 
@@ -119,7 +118,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
      Site row's: read once on mount, written on the flush. */
   const [author, setAuthor] = React.useState(() => composer?.getProjectMetadata?.()?.author ?? "");
   const [gridSize, setGridSize] = React.useState(() => composer?.getState?.().gridSize ?? 10);
-  const [snapToGrid, setSnapToGrid] = React.useState(() => composer?.getState?.().snapToGrid ?? false);
   /* null = no Site row read (the standalone demo), so nothing to check
      against; the server enforces `defaultLocale ∈ enabledLocales` either way. */
   const [enabledLocales, setEnabledLocales] = React.useState<string[] | null>(null);
@@ -166,8 +164,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
   // composer.saveProject(). Pulls latest local state from refs so the
   // closure stays single — re-registering per keystroke would defeat the
   // fan-out reduction this whole refactor exists for.
-  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin, author, gridSize, snapToGrid });
-  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin, author, gridSize, snapToGrid };
+  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin, author, gridSize });
+  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin, author, gridSize };
   React.useEffect(() => {
     if (!composer || !registerFlushHandler) return;
     registerFlushHandler(() => {
@@ -198,7 +196,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         composer.updateProjectMetadata?.({ ...(name ? { name } : {}), author });
       }
       composer.setGridSize?.(s.gridSize);
-      composer.setSnapToGrid?.(s.snapToGrid);
     });
     return () => registerFlushHandler(null);
   }, [composer, registerFlushHandler]);
@@ -336,24 +333,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             }}
           />
         </Field>
-        <div className="tw:col-span-full tw:flex tw:items-center tw:gap-4">
-          <span
-            id="canvas-snap-label"
-            className="tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]"
-          >
-            Snap to grid
-          </span>
-          <ToggleSwitch
-            id="canvas-snap"
-            checked={snapToGrid}
-            onChange={(next) => {
-              setSnapToGrid(next);
-              identity.markDirty();
-            }}
-            aria-labelledby="canvas-snap-label"
-            sizing="sm"
-          />
-        </div>
       </Section>
     </Screen>
   );
