@@ -26,6 +26,7 @@ export function UploadZone({
   storage,
   onUpload,
   disabled = false,
+  viewOnlyReason,
   uploadQueue,
   failedUploads,
   onRetryUpload,
@@ -50,16 +51,19 @@ export function UploadZone({
   const isFull = storage.used >= storage.total;
   const usedPercent = storage.total > 0 ? (storage.used / storage.total) * 100 : 0;
   const isNearLimit = !isFull && usedPercent >= 80;
+  /* A viewer's zone takes nothing — not a click, not a drop (audit G3-064). */
+  const viewOnly = Boolean(viewOnlyReason);
+  const inert = disabled || isFull || viewOnly;
 
   const handleFiles = (files: FileList | null) => {
-    if (!files?.length || disabled || isFull) return;
+    if (!files?.length || inert) return;
     onUpload(Array.from(files));
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    if (!isFull) handleFiles(e.dataTransfer.files);
+    if (!inert) handleFiles(e.dataTransfer.files);
   };
 
   const chooseReplacement = (original: FailedUpload) => {
@@ -92,8 +96,8 @@ export function UploadZone({
     (q) => q.status === "pending" || q.status === "uploading" || q.status === "optimizing" || q.status === "processing",
   );
 
-  // Visual state priority: full > uploading > near-limit > drag > idle.
-  const stateClass = isFull
+  // Visual state priority: view-only > full > uploading > near-limit > drag > idle.
+  const stateClass = viewOnly || isFull
     ? "med-upload-zone--disabled"
     : hasActiveUploads
       ? "med-upload-zone--uploading"
@@ -105,7 +109,9 @@ export function UploadZone({
 
   const Icon = isNearLimit ? AlertTriangle : Upload;
 
-  const label = isFull
+  const label = viewOnly
+    ? (viewOnlyReason as string)
+    : isFull
     ? "Storage full"
     : isNearLimit
       ? `Almost full (${Math.round(usedPercent)}%)`
@@ -133,16 +139,17 @@ export function UploadZone({
             : "tw:h-0 tw:overflow-hidden tw:border-0 tw:p-0"),
         ].filter(Boolean).join(" ")}
         data-testid="media-upload-zone"
-        onClick={() => !isFull && !disabled && inputRef.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+        onClick={() => !inert && inputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); if (!viewOnly) setIsDragOver(true); }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
         role="button"
         tabIndex={compact ? -1 : 0}
         aria-hidden={compact && !isDragOver}
+        aria-disabled={viewOnly || undefined}
         aria-label={label}
         aria-live="polite"
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!inert) inputRef.current?.click(); } }}
       >
         <Icon size={compact ? 14 : 20} className="med-upload-zone-icon" />
         <span className="med-upload-zone__label">{label}</span>
