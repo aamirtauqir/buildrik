@@ -100,3 +100,37 @@ describe("contrast findings carry the engine's fix hint (B9 / SH-64)", () => {
     expect(issues[0]).toMatchObject({ tokenId: "color-faint", autoFixHint: "darken-22" });
   });
 });
+
+/* Moved from ColorTokenList.contrast-surface.test.tsx when the Colours table
+   stopped drawing lint state (C1 (ii), board 7315:80955): the finding now
+   lives on the Brand checks page, which reads this function via useDSLint.
+   The regression it guards is unchanged — contrast used to be measured
+   against a hardcoded #0A0A0A, inverting every verdict. */
+describe("contrast is checked against the customer's surface, not a hardcoded one", () => {
+  const LIGHT_SITE = [
+    { id: "color-background", name: "Background", value: "#FFFFFF", darkValue: "#111827",
+      category: "colors", type: "color", kind: "color", group: "surface" },
+    { id: "color-text", name: "Text", value: "#111827", darkValue: "#F9FAFB",
+      category: "colors", type: "color", kind: "color", group: "surface" },
+    { id: "color-pale", name: "Pale", value: "#F5F5F5", darkValue: "#F5F5F5",
+      category: "colors", type: "color", kind: "color", group: "brand" },
+  ] as DesignToken[];
+  const flagged = (tokens: DesignToken[], mode: "light" | "dark") =>
+    buildContrastIssues(tokens, mode).map((i) => i.tokenId);
+
+  it("flags the near-white token on a white page, and only that one", () => {
+    expect(flagged(LIGHT_SITE, "light")).toEqual(["color-pale"]);
+  });
+
+  it("follows the customer into dark mode rather than assuming one surface", () => {
+    expect(flagged(LIGHT_SITE, "dark")).toEqual([]);
+  });
+
+  it("falls back to white, never to near-black, when the palette has no background token", () => {
+    const noSurface = [
+      { id: "color-paper", name: "Paper", value: "#F2F2F2",
+        category: "colors", type: "color", kind: "color", group: "brand" },
+    ] as DesignToken[];
+    expect(flagged(noSurface, "light")).toEqual(["color-paper"]);
+  });
+});

@@ -49,7 +49,8 @@ export interface BrandLivePreviewProps {
   /** Every staged token, all kinds — the preview shows the draft, not the saved brand. */
   tokens: readonly DesignToken[];
   mode: "light" | "dark";
-  /** Extra header controls, drawn between the caption and the zoom. */
+  /** A control drawn over the top edge of the page frame — the Colour mode
+   *  page's Light / Dark switch (7316:80949). */
   controls?: React.ReactNode;
 }
 
@@ -148,7 +149,6 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
         >
           Live preview{pageName ? ` · ${pageName}` : ""}
         </span>
-        {controls}
         {/* 7315:80955 draws the zoom as bare text with a caret ("50% ▾"), not
             a boxed field: the bare theme strips flowbite's border, fill and
             arrow image, and the caret is drawn beside it. */}
@@ -184,6 +184,11 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
           style={{ width: FRAME_W, height: FRAME_H }}
           data-testid="brand-live-preview-frame"
         >
+          {controls && (
+            <div className="tw:absolute tw:left-1/2 tw:top-0.5 tw:z-10 tw:-translate-x-1/2" data-testid="brand-live-preview-controls">
+              {controls}
+            </div>
+          )}
           {doc && (
             <iframe
               ref={frameRef}

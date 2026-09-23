@@ -2,7 +2,9 @@
  * Arc D6.c — Auto-fix history-awareness verification.
  *
  * End-to-end test: real Composer + real TokenRegistryProvider + real
- * TokensSection mounting TokenDetailView. Clicks Auto-fix, asserts the
+ * TokensSection beside the TokenDetailView card, wired the way BrandWorkspace
+ * wires them (C1 (ii): a row click selects, the card is a sibling in the
+ * right column; value edits go to the colour registry). Clicks Auto-fix, asserts the
  * registry value mutates, then calls composer.history.undo() and asserts
  * the registry value reverts to the pre-fix value.
  *
@@ -21,8 +23,9 @@ import { render, fireEvent, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from "vitest";
 import * as React from "react";
 import { Composer } from "@/engine/Composer";
-import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
+import { TokenRegistryProvider, useColorRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { TokensSection } from "@/editor/design-system/ui/sections/TokensSection";
+import { TokenDetailView } from "@/editor/design-system/ui/sections/TokenDetailView";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { ToastProvider } from "@/editor/chrome-ui";
 import type { LintIssue } from "@/engine/designSystem/LintState";
@@ -145,6 +148,31 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     </ToastProvider>
   );
 
+  /** BrandWorkspace's wiring, reduced to the colour kind: the table selects,
+   *  the card reads the registry's live token and writes back through it. */
+  const Host: React.FC<{ composer: Composer }> = ({ composer }) => {
+    const color = useColorRegistry();
+    const [selected, setSelected] = React.useState<string | null>(null);
+    const token = selected ? color.tokens.find((t) => t.id === selected) : undefined;
+    return (
+      <>
+        <TokensSection composer={composer} openKind="color" selectedTokenId={selected} onSelectToken={setSelected} />
+        {token && (
+          <TokenDetailView
+            token={token}
+            composer={composer}
+            allTokens={color.tokens}
+            onValueChange={(id, value, dark) => color.updateToken(id, value, dark)}
+          />
+        )}
+      </>
+    );
+  };
+
+  /** The card prints the light value; it is read-only until Change. */
+  const lightValue = (container: HTMLElement) =>
+    (container.querySelector('[data-testid="brand-token-value-light"]')?.textContent ?? "");
+
   it("Click Auto-fix → registry value mutates AND composer.history.undo() reverts", async () => {
     // Pre-seed localStorage so registry mounts with the lint-flagged token.
     localStorage.setItem(
@@ -162,9 +190,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     await new Promise((r) => setTimeout(r, 20));
 
     const { container, getByText } = render(
-      wrap(composer, /* Tokens is a drill-in (board 152:52); open the colour kind so the
-         token rows this test drives are on screen. */
-      <TokensSection composer={composer} openKind="color" />),
+      wrap(composer, <Host composer={composer} />),
     );
 
     // Drill into the token. Find the row by token id, then click its "open
@@ -186,10 +212,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     expect(autoFixBtn).toBeTruthy();
 
     // Snapshot value before Auto-fix.
-    const valueInputBefore = container.querySelector(
-      'input[aria-label="Light value"]',
-    ) as HTMLInputElement;
-    const preFixValue = valueInputBefore.value;
+    const preFixValue = lightValue(container);
     expect(preFixValue.toLowerCase()).toBe(seedToken.value.toLowerCase());
 
     // Click Auto-fix → engine applyAutoFix writes through setProjectSettings
@@ -205,15 +228,11 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
 
     // After auto-fix the Light value input should reflect a different value.
     await waitFor(() => {
-      const after = (container.querySelector(
-        'input[aria-label="Light value"]',
-      ) as HTMLInputElement).value;
+      const after = lightValue(container);
       expect(after.toLowerCase()).not.toBe(preFixValue.toLowerCase());
     });
 
-    const postFixValue = (container.querySelector(
-      'input[aria-label="Light value"]',
-    ) as HTMLInputElement).value;
+    const postFixValue = lightValue(container);
 
     // Call composer.history.undo() — Cmd+Z equivalent. The spec's contract:
     // this must revert the registry value to preFixValue.
@@ -223,15 +242,11 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     });
 
     await waitFor(() => {
-      const reverted = (container.querySelector(
-        'input[aria-label="Light value"]',
-      ) as HTMLInputElement).value;
+      const reverted = lightValue(container);
       expect(reverted.toLowerCase()).toBe(preFixValue.toLowerCase());
     }, { timeout: 2000 }).catch((err) => {
       // Surface the actual mid-state for the diagnostic.
-      const current = (container.querySelector(
-        'input[aria-label="Light value"]',
-      ) as HTMLInputElement).value;
+      const current = lightValue(container);
       throw new Error(
         `composer.history.undo() did not revert registry value.\n` +
           `  pre-fix: ${preFixValue}\n` +
@@ -259,9 +274,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     await new Promise((r) => setTimeout(r, 20));
 
     const { container } = render(
-      wrap(composer, /* Tokens is a drill-in (board 152:52); open the colour kind so the
-         token rows this test drives are on screen. */
-      <TokensSection composer={composer} openKind="color" />),
+      wrap(composer, <Host composer={composer} />),
     );
 
     const colorRow = await waitFor(() => {
@@ -273,14 +286,11 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     });
     fireEvent.click(colorRow);
 
-    const valueInputBefore = await waitFor(() => {
-      const el = container.querySelector(
-        'input[aria-label="Light value"]',
-      ) as HTMLInputElement | null;
-      if (!el) throw new Error("value input not found");
-      return el;
+    const preValue = await waitFor(() => {
+      const v = lightValue(container);
+      if (!v) throw new Error("card not open");
+      return v;
     });
-    const preValue = valueInputBefore.value;
     expect(preValue.toLowerCase()).toBe(seedToken.value.toLowerCase());
 
     // The AI write path: engine-side, no React hooks.
@@ -292,9 +302,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     expect(written).toBe("#123456");
 
     await waitFor(() => {
-      const after = (container.querySelector(
-        'input[aria-label="Light value"]',
-      ) as HTMLInputElement).value;
+      const after = lightValue(container);
       expect(after.toLowerCase()).toBe("#123456");
     });
 
@@ -304,9 +312,7 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
     });
 
     await waitFor(() => {
-      const reverted = (container.querySelector(
-        'input[aria-label="Light value"]',
-      ) as HTMLInputElement).value;
+      const reverted = lightValue(container);
       expect(reverted.toLowerCase()).toBe(preValue.toLowerCase());
     });
   });

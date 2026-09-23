@@ -1,135 +1,131 @@
 /**
- * T4 — ColorTokenList row-stack view tests. Migrated from 6-col swatch grid
- * shape (now via TokenRow primitive). Original swatch+picker drawer tests
- * dropped (drill-in moves to T8). Surviving tests assert on row-shape
- * (data-token-row), search, group headers, dirty indicator, and Add token.
+ * ColorTokenList — the Colours page's table, board 7315:80955.
+ *
+ * TOKEN · LIGHT · DARK · USED, one row per token, swatch on the gutter. A row
+ * click SELECTS the token (the workspace draws its card in the right column);
+ * it is not a drill-in. The drawer-era furniture — search field, group
+ * headings, per-row lint state, the dark-missing chip — is not on the board:
+ * findings live on Brand checks, missing dark values on Colour mode.
+ *
+ * Rewritten for C1 (ii); it replaced the T4 row-stack and row-shape suites
+ * (and DarkMissingChip, whose list now lives on the Colour mode page).
  */
-import { render, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, fireEvent, within } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { ColorTokenList } from "../ColorTokenList";
 import type { DesignToken, TokenDiff } from "../../../types";
 
-function makeToken(id: string, name: string, value: string, group?: string): DesignToken {
-  return {
-    id, name, value,
-    category: "colors",
-    cssVar: `--bd-${id}`,
-    type: "color",
-    kind: "color",
-    ...(group ? { group } : {}),
-  };
+function makeToken(id: string, name: string, value: string, extra: Partial<DesignToken> = {}): DesignToken {
+  return { id, name, value, category: "colors", cssVar: `--${id}`, type: "color", kind: "color", ...extra };
 }
 
 const baseProps = {
   pendingDiff: {} as Record<string, TokenDiff>,
-  onColorChange: vi.fn(),
-  onUndo: vi.fn(),
-  onRedo: vi.fn(),
-  canUndo: () => false,
-  canRedo: () => false,
   onAddToken: vi.fn(),
 };
 
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
-describe("ColorTokenList — row stack (T4)", () => {
-  it("renders one TokenRow per token", () => {
-    const tokens = [
-      makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
-      makeToken("color-text", "Text", "#0F172A", "brand"),
-      makeToken("color-muted", "Muted", "#64748B", "brand"),
-    ];
-    const { container } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    const rows = container.querySelectorAll("[data-token-row]");
-    expect(rows.length).toBe(3);
+describe("ColorTokenList — the Colours table (7315:80955)", () => {
+  it("draws the board's four column headers", () => {
+    const { getAllByRole } = render(
+      <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1a56db")]} {...baseProps} />,
+    );
+    expect(getAllByRole("columnheader").map((h) => h.textContent).filter(Boolean)).toEqual([
+      "Token", "Light", "Dark", "Used",
+    ]);
   });
 
-  it("each row carries the token id via data-token-row marker", () => {
-    const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
+  it("renders one row per token, keyed by id", () => {
+    const tokens = [
+      makeToken("color-primary", "Primary", "#1A56DB"),
+      makeToken("color-text", "Text", "#111827"),
+      makeToken("color-muted", "Muted", "#6B7280"),
+    ];
     const { container } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
+    expect(container.querySelectorAll("[data-token-row]").length).toBe(3);
     expect(container.querySelector('[data-token-row="color-primary"]')).toBeTruthy();
   });
 
-  it("clicking a row dispatches onRowClick with the token id", () => {
-    const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
-    const onRowClick = vi.fn();
-    const { container } = render(
-      <ColorTokenList tokens={tokens} {...baseProps} onRowClick={onRowClick} />,
+  it("prints light and dark values upper-case, and an em dash when there is no dark value", () => {
+    const { getByTestId } = render(
+      <ColorTokenList
+        tokens={[
+          makeToken("color-primary", "Primary", "#1a56db", { darkValue: "#76a9fa" }),
+          makeToken("color-pale", "Pale", "#F9FAFB"),
+        ]}
+        {...baseProps}
+      />,
     );
-    const row = container.querySelector('[data-token-row="color-primary"]') as HTMLElement;
-    fireEvent.click(row);
-    expect(onRowClick).toHaveBeenCalledWith("color-primary");
+    const row = getByTestId("brand-token-row-color-primary");
+    expect(within(row).getByText("#1A56DB")).toBeTruthy();
+    expect(getByTestId("brand-token-dark-color-primary").textContent).toBe("#76A9FA");
+    expect(getByTestId("brand-token-dark-color-pale").textContent).toBe("—");
   });
 
-  it("groups tokens by their `group` field — brand renders as 'Brand color' header", () => {
+  it("clicking a row selects it — onSelectToken with the id, not a drill-in", () => {
+    const onSelectToken = vi.fn();
+    const { getByTestId } = render(
+      <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1A56DB")]} {...baseProps} onSelectToken={onSelectToken} />,
+    );
+    fireEvent.click(getByTestId("brand-token-row-color-primary"));
+    expect(onSelectToken).toHaveBeenCalledWith("color-primary");
+  });
+
+  it("Enter on a focused row selects it too", () => {
+    const onSelectToken = vi.fn();
+    const { getByTestId } = render(
+      <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1A56DB")]} {...baseProps} onSelectToken={onSelectToken} />,
+    );
+    fireEvent.keyDown(getByTestId("brand-token-row-color-primary"), { key: "Enter" });
+    expect(onSelectToken).toHaveBeenCalledWith("color-primary");
+  });
+
+  it("marks the selected row", () => {
+    const tokens = [makeToken("color-primary", "Primary", "#1A56DB"), makeToken("color-text", "Text", "#111827")];
+    const { getByTestId } = render(<ColorTokenList tokens={tokens} {...baseProps} selectedTokenId="color-text" />);
+    expect(getByTestId("brand-token-row-color-text").getAttribute("aria-selected")).toBe("true");
+    expect(getByTestId("brand-token-row-color-primary").getAttribute("aria-selected")).toBe("false");
+  });
+
+  it("orders the semantic and brand tokens before surface and the primitive scale", () => {
     const tokens = [
-      makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
-      makeToken("color-bg", "Background", "#F8FAFC", "surface"),
+      makeToken("gray-50", "Gray 50", "#F9FAFB", { group: "primitive" }),
+      makeToken("color-surface", "Surface", "#F9FAFB", { group: "surface" }),
+      makeToken("color-primary", "Primary", "#1A56DB", { group: "brand" }),
     ];
-    const { getByText } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    expect(getByText("Brand color")).toBeTruthy();
-    expect(getByText("Surface")).toBeTruthy();
+    const { container } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
+    const ids = [...container.querySelectorAll("[data-token-row]")].map((r) => r.getAttribute("data-token-row"));
+    expect(ids).toEqual(["color-primary", "color-surface", "gray-50"]);
   });
 
-  it("shows a dirty marker on the swatch when token has a pending diff", () => {
-    const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
+  it("draws no drawer furniture: no search field, no group headings, no lint tag", () => {
+    const tokens = [
+      makeToken("color-primary", "Primary", "#1A56DB", { group: "brand" }),
+      makeToken("color-bg", "Background", "#FFFFFF", { group: "surface" }),
+    ];
+    const { container, queryByRole, queryByText } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
+    expect(queryByRole("textbox")).toBeNull();
+    expect(queryByText("Brand color")).toBeNull();
+    expect(container.querySelector("[data-lint-warn]")).toBeNull();
+    expect(container.querySelector("[data-group]")).toBeNull();
+  });
+
+  it("shows a dirty marker on the swatch when the token has a pending diff", () => {
     const pendingDiff: Record<string, TokenDiff> = {
-      "color-primary": { tokenId: "color-primary", previousValue: "#2D6DFF", currentValue: "#FF0000" },
+      "color-primary": { tokenId: "color-primary", previousValue: "#1A56DB", currentValue: "#FF0000" },
     };
-    const { container } = render(
-      <ColorTokenList tokens={tokens} {...baseProps} pendingDiff={pendingDiff} />,
+    const { container, getByTestId } = render(
+      <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1A56DB")]} {...baseProps} pendingDiff={pendingDiff} />,
     );
     expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+    // The row prints the staged value, not the saved one.
+    expect(within(getByTestId("brand-token-row-color-primary")).getByText("#FF0000")).toBeTruthy();
   });
 
-  it("brand group surfaces the first token's value as mono mini-metadata in the header", () => {
-    const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
-    const { container } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    expect(container.textContent).toContain("#2D6DFF");
-  });
-
-  it("preserves the search filter — typing narrows visible rows", () => {
-    const tokens = [
-      makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
-      makeToken("color-text", "Text", "#0F172A", "brand"),
-      makeToken("color-muted", "Muted", "#64748B", "brand"),
-    ];
-    const { container, getByPlaceholderText } = render(
-      <ColorTokenList tokens={tokens} {...baseProps} />,
-    );
-    expect(container.querySelectorAll("[data-token-row]").length).toBe(3);
-    fireEvent.change(getByPlaceholderText("Search colors…"), { target: { value: "primary" } });
-    expect(container.querySelectorAll("[data-token-row]").length).toBe(1);
-  });
-
-  it("preserves the Add token affordance", () => {
-    const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
+  it("the empty library offers its own Add door", () => {
     const onAddToken = vi.fn();
-    const { getByText } = render(
-      <ColorTokenList tokens={tokens} {...baseProps} onAddToken={onAddToken} />,
-    );
-    fireEvent.click(getByText("+ Add token"));
+    const { getByText } = render(<ColorTokenList tokens={[]} {...baseProps} onAddToken={onAddToken} />);
+    fireEvent.click(getByText("+ Add a color"));
     expect(onAddToken).toHaveBeenCalledTimes(1);
-  });
-
-  it("rows with lint issues get warn state via TokenRow (data-lint-warn)", () => {
-    const tokens = [
-      makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
-      makeToken("color-text", "Text", "#0F172A", "brand"),
-    ];
-    const getLintIssues = (id: string) =>
-      id === "color-text"
-        ? [{ type: "banned-hue" as const, severity: "warning" as const, message: "low contrast", autoFixHint: "darken-22" }]
-        : [];
-    const { container } = render(
-      <ColorTokenList tokens={tokens} {...baseProps} getLintIssues={getLintIssues} />,
-    );
-    const warnRow = container.querySelector('[data-token-row="color-text"]') as HTMLElement;
-    expect(warnRow.getAttribute("data-lint-warn")).toBe("true");
-    const cleanRow = container.querySelector('[data-token-row="color-primary"]') as HTMLElement;
-    expect(cleanRow.getAttribute("data-lint-warn")).toBeNull();
   });
 });

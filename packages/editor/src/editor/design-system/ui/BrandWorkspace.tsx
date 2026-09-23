@@ -47,7 +47,7 @@
 
 import * as React from "react";
 import { ChevronLeft } from "lucide-react";
-import { Button, useToast } from "@/editor/chrome-ui";
+import { Button, Tooltip, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../../sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
@@ -103,9 +103,11 @@ import { ExportSection } from "./sections/ExportSection";
 import { LintSection } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
-import { TypographySection } from "./sections/TypographySection";
+import { TypographySection, fontsCaption } from "./sections/TypographySection";
+import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
+import { ColorModeToggle } from "./ColorModeToggle";
 import { useDSLint } from "../state/useDSLint";
 
 // ─── Pages ────────────────────────────────────────────────────────────────────
@@ -164,7 +166,11 @@ const NAV_ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
   "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
-  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+  /* The ghost Button's own `focus:[box-shadow:…]` drew the focus ring on a
+     MOUSE click (measured: rgba(26,86,219,.3) 0 0 0 2px on the clicked row).
+     `focus:shadow-none` is a different twMerge group and lost; the same
+     arbitrary property replaces it. Keyboard focus keeps the ring. */
+  "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
@@ -671,7 +677,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     switch (page) {
       case "colours":          return `${visibleColors.length} tokens · light / dark`;
       case "colour-mode":      return "Light and dark values";
-      case "fonts":            return "The fonts this site uses";
+      case "fonts":            return fontsCaption(type.tokens);
       case "component-styles": return "Default appearance by component";
       case "classes":          return "Names shared across elements";
       case "presets":          return "Section and element presets";
@@ -692,6 +698,41 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
             + Add token
           </Button>
         );
+      case "component-styles": {
+        /* 7316:82755's page action. Gated on the SAME flag that decides
+           whether an AIClient is built at all (useComposerInit.ts:132): with
+           it off the modal would open over a service with no client and answer
+           with AIAssistService's developer string. Blocked, never hidden, and
+           aria-disabled so the reason stays reachable by keyboard. */
+        const aiOn = isFeatureEnabled("dsAi");
+        const cta = (
+          <Button
+            type="button"
+            variant="secondary"
+            size="xs"
+            className={PAGE_ACTION}
+            onClick={aiOn ? () => setAiOpen(true) : undefined}
+            aria-disabled={aiOn ? undefined : "true"}
+            data-open-ai-assist
+            data-testid="brand-page-action"
+          >
+            ✦ Generate with AI
+          </Button>
+        );
+        return aiOn ? cta : (
+          <Tooltip content="AI generation isn't switched on for this workspace yet" placement="bottom" arrow={false}>
+            {cta}
+          </Tooltip>
+        );
+      }
+      case "fonts":
+        /* The fonts a site can pick from are its Site fonts — the same door
+           the font picker's "Manage site fonts" opens. */
+        return (
+          <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openSiteFonts(composer)} data-testid="brand-page-action">
+            + Add a font
+          </Button>
+        );
       default:
         return null;
     }
@@ -710,29 +751,19 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       case "colours":
         return <TokensSection {...tokenPageProps} openKind="color" />;
       case "colour-mode":
-        return <ColourModeSection composer={composer} />;
+        return <ColourModeSection />;
       case "fonts":
-        /* The board's one page is the drawer's two: the active fonts, then the
-           type styles (the type tokens). */
+        /* 7316:81551 — one card: the font roles, then the type styles. */
         return (
-          <>
-            <TypographySection composer={composer} />
-            <TokensSection {...tokenPageProps} openKind="type" />
-          </>
-        );
-      case "component-styles":
-        return (
-          <ComponentsSection
+          <TypographySection
             composer={composer}
-            /* Gated on the SAME flag that decides whether an AIClient is
-               built at all (useComposerInit.ts:132). The flag guarded the
-               client and nothing guarded this entry, so the modal opened over
-               a service with no client and Generate answered every user with
-               AIAssistService's developer string. Absent callback → the
-               section blocks the CTA and says why. */
-            onOpenAIAssist={isFeatureEnabled("dsAi") ? () => setAiOpen(true) : undefined}
+            tokens={type.tokens}
+            selectedTokenId={selectedTokenId}
+            onSelectToken={setSelectedTokenId}
           />
         );
+      case "component-styles":
+        return <ComponentsSection composer={composer} />;
       case "classes":
         return <ClassesSection composer={composer} />;
       case "presets":
@@ -793,6 +824,10 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     if (id === "brand-checks" && lintIssues.length > 0) return lintIssues.length;
     return undefined;
   };
+
+  /* 7316:80949 draws the Light / Dark switch inside the preview card. */
+  const previewControls =
+    page === "colour-mode" && composer?.colorMode ? <ColorModeToggle composer={composer} /> : undefined;
 
   const isTokenPage = page === "colours" || page === "fonts" || page === "spacing" || page.startsWith("kind-");
 
@@ -993,7 +1028,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
           data-testid="brand-preview-column"
         >
           {composer?.exportHTML ? (
-            <BrandLivePreview composer={composer} tokens={allTokens} mode={resolvedMode} />
+            <BrandLivePreview composer={composer} tokens={allTokens} mode={resolvedMode} controls={previewControls} />
           ) : (
             /* No document to render (no composer, or one without an export —
                the load-error and test harnesses): the palette and type slots
@@ -1002,8 +1037,9 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
               className="tw:flex tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]"
               data-testid="brand-live-preview"
             >
-              <div className="tw:flex tw:h-10 tw:items-center tw:px-4 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-                Live preview
+              <div className="tw:flex tw:h-10 tw:items-center tw:gap-3 tw:px-4 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+                <span className="tw:flex-1">Live preview</span>
+                {previewControls}
               </div>
               <BrandPreview colors={visibleColors} />
             </section>
