@@ -2,7 +2,6 @@ import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import { GenericTokenList } from "../tokens/GenericTokenList";
 import { ColorTokenList } from "../colors/ColorTokenList";
-import { TypeTokenList } from "../type/TypeTokenList";
 import { SpacingTokenList } from "../spacing/SpacingTokenList";
 import {
   useColorRegistry,
@@ -377,25 +376,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 hiddenByModeCount={color.tokens.length - visibleColor.length}
                 selectedTokenId={selectedTokenId}
                 onSelectToken={onSelectToken}
-              />
-            </React.Fragment>
-          );
-        }
-        if (entry.kindId === "type") {
-          const visibleType = visible(type.tokens);
-          return (
-            <React.Fragment key={entry.kindId}>
-              <TypeTokenList
-                tokens={visibleType}
-                responsiveMode={type.responsiveMode}
-                onTokenChange={type.updateToken}
-                onResponsiveModeChange={type.setResponsiveMode}
-                onUndo={type.undoToken}
-                canUndo={type.canUndo}
-                onRedo={type.redoToken}
-                canRedo={type.canRedo}
-                usageByTokenId={usageMap}
-                onRowClick={onRowClick}
               />
             </React.Fragment>
           );

@@ -103,7 +103,8 @@ import { ExportSection } from "./sections/ExportSection";
 import { LintSection } from "./sections/LintSection";
 import { filterTokensByMode } from "../utils/semanticKind";
 import { ClassesSection } from "./sections/ClassesSection";
-import { TypographySection } from "./sections/TypographySection";
+import { TypographySection, fontsCaption } from "./sections/TypographySection";
+import { openSiteFonts } from "@/editor/inspector/sections/typography";
 import { StartersSection } from "./sections/StartersSection";
 import { ColourModeSection } from "./sections/ColourModeSection";
 import { ColorModeToggle } from "./ColorModeToggle";
@@ -165,7 +166,11 @@ const NAV_ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border-0 " +
   "tw:bg-transparent tw:px-3 tw:text-left tw:text-[length:var(--bk-text-14)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] " +
-  "tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+  /* The ghost Button's own `focus:[box-shadow:…]` drew the focus ring on a
+     MOUSE click (measured: rgba(26,86,219,.3) 0 0 0 2px on the clicked row).
+     `focus:shadow-none` is a different twMerge group and lost; the same
+     arbitrary property replaces it. Keyboard focus keeps the ring. */
+  "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
@@ -672,7 +677,7 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
     switch (page) {
       case "colours":          return `${visibleColors.length} tokens · light / dark`;
       case "colour-mode":      return "Light and dark values";
-      case "fonts":            return "The fonts this site uses";
+      case "fonts":            return fontsCaption(type.tokens);
       case "component-styles": return "Default appearance by component";
       case "classes":          return "Names shared across elements";
       case "presets":          return "Section and element presets";
@@ -691,6 +696,14 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
         return (
           <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
             + Add token
+          </Button>
+        );
+      case "fonts":
+        /* The fonts a site can pick from are its Site fonts — the same door
+           the font picker's "Manage site fonts" opens. */
+        return (
+          <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => openSiteFonts(composer)} data-testid="brand-page-action">
+            + Add a font
           </Button>
         );
       default:
@@ -713,13 +726,14 @@ export const BrandWorkspace: React.FC<BrandWorkspaceProps> = ({
       case "colour-mode":
         return <ColourModeSection />;
       case "fonts":
-        /* The board's one page is the drawer's two: the active fonts, then the
-           type styles (the type tokens). */
+        /* 7316:81551 — one card: the font roles, then the type styles. */
         return (
-          <>
-            <TypographySection composer={composer} />
-            <TokensSection {...tokenPageProps} openKind="type" />
-          </>
+          <TypographySection
+            composer={composer}
+            tokens={type.tokens}
+            selectedTokenId={selectedTokenId}
+            onSelectToken={setSelectedTokenId}
+          />
         );
       case "component-styles":
         return (

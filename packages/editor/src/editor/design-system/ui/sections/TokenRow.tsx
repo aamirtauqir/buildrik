@@ -1,6 +1,6 @@
 /**
- * TokenRow — SSOT row primitive consumed by ColorTokenList, TypeTokenList,
- * SpacingTokenList, and GenericTokenList (per spec D6 / T9). One render
+ * TokenRow — SSOT row primitive consumed by GenericTokenList
+ * (per spec D6 / T9). One render
  * shape; bespoke FontFamilyRow / TypeScaleRow / ValueChip die in T4-T6.
  *
  * Slots:
