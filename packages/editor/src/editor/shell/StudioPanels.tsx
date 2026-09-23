@@ -18,13 +18,14 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import { useToast } from "@/editor/chrome-ui";
+import { PanelHeaderSize, useToast } from "@/editor/chrome-ui";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
 import { AITab } from "../sidebar/tabs/ai/AITab";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
+import { TabRouter } from "../sidebar/TabRouter";
 import { FullPageView } from "../sidebar/FullPageView";
 import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
@@ -40,6 +41,9 @@ import type { NextMove } from "./lifecycle";
 import { SiteFontsModal } from "../media/components/SiteFontsModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
+
+/** Panels that take the inspector's column instead of the left drawer. */
+const RIGHT_COLUMN_TABS: ReadonlySet<GroupedTabId> = new Set<GroupedTabId>(["publish", "review", "history"]);
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -279,6 +283,30 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
+  /* Boards 4418:97118 / 4418:115784 / 4418:73791: Publish, Review and
+     History are not drawer panels — each REPLACES the inspector in the right
+     column (300), with the left drawer closed. Every door still opens them
+     the way it did (openLeftPanelToTab / ui:switch-tab); only where they
+     render moved. ✕ closes the panel and the inspector returns. */
+  const rightColumnTab = !readOnlyView && isLeftPanelOpen && RIGHT_COLUMN_TABS.has(activeTabId);
+
+  /* The site menu's Unpublish emits UI_UNPUBLISH_REQUEST in the same gesture
+     that opens the Publish panel, before PublishTab has subscribed. This
+     component is always mounted, so it latches the intent and hands it down;
+     PublishTab consumes it once. Cleared on leaving the tab. (Moved here
+     from LeftSidebar with the panel.) */
+  const [unpublishIntent, setUnpublishIntent] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const latch = () => setUnpublishIntent(true);
+    composer.on(EVENTS.UI_UNPUBLISH_REQUEST, latch);
+    return () => {
+      composer.off(EVENTS.UI_UNPUBLISH_REQUEST, latch);
+    };
+  }, [composer]);
+  React.useEffect(() => {
+    if (activeTabId !== "publish") setUnpublishIntent(false);
+  }, [activeTabId]);
   const effectiveFullPageMode =
     isFullPageMode ||
     getTabMode(activeTabId) === "fullpage" ||
@@ -490,7 +518,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            trim four header tools and leave every editing surface in place, so an
            owner opening "what my client sees" was shown the full editor.
            (Founder call, 2026-08-23.) */
-        drawerOpen={!readOnlyView && isLeftPanelOpen && !effectiveFullPageMode}
+        drawerOpen={!readOnlyView && isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
         drawerWidth={drawerWidth}
         fullPageMode={!readOnlyView && effectiveFullPageMode && isLeftPanelOpen}
         // Open whenever not fullpage — the no-selection state is a DRAWN
@@ -507,7 +535,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             activeTab={activeTabId}
             activeSubTab={leftPanelSubTab}
             onTabChange={handleRailTabChange}
-            drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
+            drawerOpen={isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
             onDrawerToggle={onLeftPanelToggle ?? (() => {})}
             onElementSelect={handleElementSelect}
             onBlockClick={handleBlockClick}
@@ -516,12 +544,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onSettingsDirtyChange={setSettingsDirty}
             pagesOpen={pagesOpen}
             projectId={projectId}
-            publishJob={publishJob}
-            nextMove={nextMove}
-            onRequestPublish={onRequestPublish}
             onOpenLibrary={handleOpenLibrary}
             onCreateCollection={onOpenCreateCollection}
-            onResendReview={onResendReview}
             onOpenImageEditor={onOpenImageEditor}
             onOpenIconPicker={onOpenIconPicker}
           />
@@ -566,7 +590,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             replaces them (boards 170:*). Absent in view mode. */}
         {readOnlyView ? null : (
         <LayoutShell.Inspector>
-          {aiInInspector ? (
+          {rightColumnTab ? (
+            <PanelHeaderSize.Provider value="column">
+              <TabRouter
+                activeTab={activeTabId}
+                activeSubTab={leftPanelSubTab}
+                composer={composer}
+                commonTabProps={{ isExpanded: false, onClose: () => onLeftPanelToggle?.() }}
+                onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
+                onCreateComponent={() => {}}
+                unpublishIntent={unpublishIntent}
+                onUnpublishIntentConsumed={() => setUnpublishIntent(false)}
+                projectId={projectId}
+                publishJob={publishJob}
+                nextMove={nextMove}
+                onRequestPublish={onRequestPublish}
+                onResendReview={onResendReview}
+              />
+            </PanelHeaderSize.Provider>
+          ) : aiInInspector ? (
             <AITab
               composer={composer}
               isExpanded={false}

@@ -52,7 +52,8 @@ export interface TabRouterProps {
   composer: Composer | null;
   commonTabProps: {
     isExpanded: boolean;
-    onExpandToggle: () => void;
+    /** Absent for panels hosted in the inspector column — no 700 expand there. */
+    onExpandToggle?: () => void;
     onHelpClick?: () => void;
     onClose: () => void;
   };
@@ -131,7 +132,9 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
 
     case "ai":
-      return <AITab composer={composer} {...commonTabProps} />;
+      return (
+        <AITab composer={composer} {...commonTabProps} onExpandToggle={commonTabProps.onExpandToggle ?? (() => {})} />
+      );
 
     case "layers":
       return (

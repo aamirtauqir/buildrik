@@ -84,6 +84,7 @@ export { UpgradeModal, openUpgrade, type UpgradeModalProps } from "./UpgradeModa
 export {
   PanelHeader,
   PanelHeaderActions,
+  PanelHeaderSize,
   type PanelHeaderProps,
   type PanelHeaderActionsProps,
 } from "./PanelHeader";
