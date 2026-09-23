@@ -273,6 +273,9 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   const [settingsDirty, setSettingsDirty] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState<SettingsOpenRequest | null>(null);
   const [pagesOpen, setPagesOpen] = React.useState<PageSettingsOpenRequest | null>(null);
+  /* New-page modal → From template (#19): the name rides to the Templates
+     view's Create page; a plain visit carries none. */
+  const [templatesNewPageName, setTemplatesNewPageName] = React.useState<string | undefined>(undefined);
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
@@ -305,7 +308,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (!composer) return;
 
-    const openTemplates = () => {
+    const openTemplates = (data?: { newPageName?: string }) => {
+      setTemplatesNewPageName(data?.newPageName);
       onLeftPanelTabChange?.("templates");
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
@@ -349,6 +353,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (activeTabId !== "settings") setSettingsOpen(null);
     if (activeTabId !== "pages") setPagesOpen(null);
+    if (activeTabId !== "templates") setTemplatesNewPageName(undefined);
   }, [activeTabId]);
 
   // Listen for tab switch events
@@ -599,6 +604,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onSwitchToDesign={() => onLeftPanelTabChange?.("design")}
             /* Templates' "Open page settings" after Create page. */
             onTemplatesSwitchTab={(tab) => onLeftPanelTabChange?.(tab)}
+            templatesNewPageName={templatesNewPageName}
             /* The deep-link sub-tab reached the DRAWER and stopped there. Every
                fullpage tab — Settings above all — got nothing, so the site
                menu's "Plugins" landed on the Settings root and looked like a

@@ -372,7 +372,6 @@ export const EVENTS = {
   /** Open the one Compare (B8) on two sides. Every Compare door emits this;
    *  `CompareHost`, mounted by the shell, is the only listener. */
   UI_COMPARE_OPEN: "ui:compare-open",
-  UI_TOGGLE_TEMPLATES: "ui:toggle:templates",
   UI_TOGGLE_EXPORTER: "ui:toggle:exporter",
   /** Settings' `Export` row (Clone 3397:32011) — OPEN, not toggle: the row
    *  leaves Settings for the Export modal, and a toggle emitted with the modal

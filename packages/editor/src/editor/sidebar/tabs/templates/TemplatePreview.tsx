@@ -20,6 +20,11 @@ export interface TemplatePreviewProps {
   onCreatePage: (template: TemplateItem) => void;
   onReplacePage: (template: TemplateItem) => void;
   onBack: () => void;
+  /** G2-097: the pages this template was applied to — the "Used in" tab of the
+   *  retired usage dialog, now a line on the preview. */
+  usedOn?: ReadonlyArray<{ id: string; name: string }>;
+  /** Jump to one of those pages (closes the view). */
+  onOpenPage?: (pageId: string) => void;
 }
 
 type ViewportMode = "desktop" | "tablet" | "mobile";
@@ -36,6 +41,8 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   onCreatePage,
   onReplacePage,
   onBack,
+  usedOn = [],
+  onOpenPage,
 }) => {
   const [viewport, setViewport] = React.useState<ViewportMode>("desktop");
   const width = VIEWPORTS.find((v) => v.id === viewport)?.width ?? 1100;
@@ -59,8 +66,19 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
           <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]">{template.name}</h2>
           <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">
-            Page template · {sectionCount} {sectionCount === 1 ? "section" : "sections"}
+            {template.category === "my-templates" ? "Saved template" : "Page template"} · {sectionCount}{" "}
+            {sectionCount === 1 ? "section" : "sections"}
           </p>
+          {usedOn.length > 0 && (
+            <p className="tw:m-0 tw:flex tw:flex-wrap tw:items-center tw:gap-1 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-soft)]" data-testid="tpl-ws-used-on">
+              Used on
+              {usedOn.map((pg) => (
+                <Button key={pg.id} color="light" size="xs" variant="link" className="tw:min-h-0 tw:p-0" onClick={() => onOpenPage?.(pg.id)}>
+                  {pg.name}
+                </Button>
+              ))}
+            </p>
+          )}
           <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-soft)]">
             {pageName ? `Create a new page, or replace ${pageName}.` : "Create a new page from this template."}
           </p>

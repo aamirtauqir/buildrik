@@ -70,11 +70,10 @@ function makeComposer(existingNames: string[] = ["Home"], order: string[] = []) 
 
 async function applyWithBackup() {
   const first = SITE_TEMPLATES[0];
-  fireEvent.click(await screen.findByText(first.name));
-  /* The detail pane labels it "Apply to current page (<name>)"; the fullpage
-     surface labels the same action "Apply template". */
-  const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
-  fireEvent.click(applyBtn);
+  /* The sidebar row opens the same preview as the grid card (decision #24). */
+  fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
+  /* The card opens the preview (decision #24); its Replace page… is the apply. */
+  fireEvent.click(await screen.findByText("Replace page…"));
   /* Assert the state, do not toggle blindly. The box now DEFAULTS ON — board
      1169:4713 draws it checked, because applying a template replaces the page
      and the safe option belongs on the default. This helper used to click it
@@ -99,9 +98,11 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
     const { composer } = makeComposer(["Home"]);
     render(<TemplatesTab composer={composer as never} />);
     const first = SITE_TEMPLATES[0];
-    fireEvent.click(await screen.findByText(first.name));
-    const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
-    fireEvent.click(applyBtn);
+    /* The sidebar row opens the same preview as the grid card (decision #24).
+       Test ids, not role queries: role + accessible-name resolution over the
+       whole catalogue took ~8 s and timed this test out under load. */
+    fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
+    fireEvent.click(await screen.findByText("Replace page…"));
     const label = await screen.findByText(/save the current page as a backup version first/i);
     const input = (label.closest("label") ?? label).querySelector('input[type="checkbox"]') as HTMLInputElement | null;
     expect(input, "backup checkbox not found").not.toBeNull();
@@ -126,9 +127,9 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
   it("says where the backup lives", async () => {
     const { composer } = makeComposer();
     render(<TemplatesTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText(SITE_TEMPLATES[0].name));
-    const [applyBtn] = await screen.findAllByRole("button", { name: /^apply to current page/i });
-    fireEvent.click(applyBtn);
+    /* Decision #24: a template's row opens the in-view preview; Replace page… is the apply. */
+    fireEvent.click(await screen.findByTestId(`tpl-ws-item-${SITE_TEMPLATES[0].id}`));
+    fireEvent.click(await screen.findByText("Replace page…"));
     expect(await screen.findByText("Keeps your work as a version in History › Saves.")).toBeTruthy();
   });
 });

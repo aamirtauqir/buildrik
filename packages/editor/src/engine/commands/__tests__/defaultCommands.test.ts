@@ -376,8 +376,6 @@ describe("selection + toggles", () => {
   });
 
   it("ui-open-* commands emit their toggle events on the captured composer", () => {
-    run("ui-open-templates");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_TEMPLATES);
     run("ui-open-ai");
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_AI);
   });

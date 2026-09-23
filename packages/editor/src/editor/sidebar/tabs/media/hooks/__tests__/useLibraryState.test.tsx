@@ -48,6 +48,7 @@ function makeComposer(assets: MediaAsset[], folders: Array<{ id: string }> = [])
     getAllFolders: vi.fn(() => folders),
     createFolder: vi.fn(async () => {}),
     deleteFolder: vi.fn(async () => {}),
+    deleteAsset: vi.fn(async () => {}),
     renameFolder: vi.fn(async () => {}),
     updateAsset: vi.fn(async () => {}),
     on: vi.fn((event: string, cb: () => void) => {
@@ -389,14 +390,22 @@ describe("useLibraryState — folder delete guard", () => {
     expect(media.deleteFolder).toHaveBeenCalledWith("empty");
   });
 
-  it("force-deletes a non-empty folder", async () => {
-    const composer = makeComposer([asset({ folderId: "f1" })]);
-    const media = (composer as never as { media: { deleteFolder: ReturnType<typeof vi.fn> } }).media;
+  /* QA 2026-09-24: "Delete folder with contents" kept the file — the engine
+     moves a deleted folder's assets to root. The confirm (board B1-13
+     7564:185465) says the contents are removed, so force deletes them first. */
+  it("force-deletes a non-empty folder WITH its contents", async () => {
+    const composer = makeComposer([asset({ id: "in-f1", folderId: "f1" }), asset({ id: "at-root" })]);
+    const media = (composer as never as {
+      media: { deleteFolder: ReturnType<typeof vi.fn>; deleteAsset: ReturnType<typeof vi.fn> };
+    }).media;
     const { result } = renderHook(() => useLibraryState(composer));
     await act(async () => {
       await result.current.deleteFolder("f1", { force: true });
     });
+    expect(media.deleteAsset).toHaveBeenCalledWith("in-f1");
+    expect(media.deleteAsset).not.toHaveBeenCalledWith("at-root");
     expect(media.deleteFolder).toHaveBeenCalledWith("f1");
+    expect(media.deleteAsset.mock.invocationCallOrder[0]).toBeLessThan(media.deleteFolder.mock.invocationCallOrder[0]);
   });
 });
 

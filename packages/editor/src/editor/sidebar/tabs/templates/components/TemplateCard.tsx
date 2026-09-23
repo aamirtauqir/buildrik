@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import type { TemplateItem } from "../templatesData";
+import { getSectionCount, type TemplateItem } from "../templatesData";
 
 export interface TemplateCardProps {
   template: TemplateItem;
@@ -20,13 +20,6 @@ export interface TemplateCardProps {
   isApplied?: boolean;
   /** Active search query — wraps matching substring in <mark> for highlight. */
   highlightQuery?: string;
-}
-
-/** "landing-page" → "Landing page". */
-function formatCategory(category: string | undefined): string {
-  if (!category) return "";
-  const spaced = category.replace(/[-_]+/g, " ");
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
 function escapeRegex(s: string): string {
@@ -71,9 +64,14 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
     isSelected && "tpl-card--selected",
     isApplied && "tpl-card--applied",
   ].filter(Boolean).join(" ");
-  const categoryLabel = formatCategory(template.category);
   const isPremium = template.status === "premium";
-  const statusLabel = isPremium ? "Pro" : "Free";
+  const sections = getSectionCount(template.html);
+  /* Board 4418:54134: "6 sections · Built-in" / "Saved · from Home". */
+  const meta = [
+    `${sections} ${sections === 1 ? "section" : "sections"}`,
+    template.category === "my-templates" ? "Saved" : "Built-in",
+    ...(isPremium ? ["Pro"] : []),
+  ].join(" · ");
 
   return (
     <div
@@ -100,13 +98,10 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
       </div>
       <div className="tpl-card-info">
         <div className="tpl-card-name">{highlightQuery ? renderHighlighted(template.name, highlightQuery) : template.name}</div>
-        {categoryLabel && (
-          <div className="tpl-card-category">
-            {categoryLabel}
-            <span className="tpl-card-meta-sep"> · </span>
-            <span className={`tpl-card-status${isPremium ? " tpl-card-status--pro" : ""}`}>{statusLabel}</span>
-          </div>
-        )}
+        <div className="tpl-card-category" data-testid={`tpl-card-meta-${template.id}`}>
+          {meta}
+        </div>
+        <div className="tpl-card-cta">Preview template →</div>
       </div>
     </div>
   );
