@@ -7,6 +7,7 @@
  */
 
 import type { BreakpointConfig, BreakpointId } from "../types/breakpoints";
+import type { DeviceType } from "../types/state";
 
 /**
  * Breakpoint definitions
@@ -94,41 +95,14 @@ export function getBreakpointForWidth(width: number): BreakpointId {
 // ============================================================================
 
 /**
- * Device preview dimensions for canvas display
- * These are fixed dimensions for simulating device viewports
+ * The one device-size table (G2-013). The canvas frame, the engine viewport
+ * and the legacy device presets all read it; they used to carry three tables
+ * that disagreed on Desktop (100 % / 1280 / 1920). Desktop fills the column,
+ * floored at BREAKPOINTS.desktop.minWidth; Wide is a fixed 1920.
  */
-const DEVICE_BREAKPOINTS = {
-  desktop: {
-    width: "100%",
-    height: "100%",
-    label: "Desktop",
-    icon: "desktop",
-  },
-  tablet: {
-    width: 768,
-    height: 1024,
-    label: "Tablet",
-    icon: "tablet",
-  },
-  mobile: {
-    width: 375,
-    height: 812,
-    label: "Mobile",
-    icon: "mobile",
-  },
-} as const;
-
-export type DevicePreviewType = keyof typeof DEVICE_BREAKPOINTS;
-
-/**
- * Get device preview dimensions
- */
-export function getDevicePreviewSize(device: DevicePreviewType): {
-  width: string | number;
-  height: string | number;
-} {
-  return {
-    width: DEVICE_BREAKPOINTS[device].width,
-    height: DEVICE_BREAKPOINTS[device].height,
-  };
-}
+export const DEVICE_PREVIEW_SIZES = {
+  wide: { label: "Wide", width: 1920, height: "100%" },
+  desktop: { label: "Desktop", width: "100%", height: "100%" },
+  tablet: { label: "Tablet", width: 768, height: 1024 },
+  mobile: { label: "Mobile", width: 375, height: 812 },
+} as const satisfies Record<DeviceType, { label: string; width: number | "100%"; height: number | "100%" }>;

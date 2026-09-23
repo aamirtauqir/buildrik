@@ -11,6 +11,8 @@ import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupReque
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
 import { stepZoom } from "../../shared/constants/canvas";
+import { getBreakpointForWidth } from "../../shared/constants/breakpoints";
+import type { DeviceType } from "../../shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
@@ -633,7 +635,13 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       [composer, select, closeContextMenu, setContextMenu]
     );
 
-    const size = DEVICE_SIZES[device];
+    /* G2-014: "Custom width…" previews at a width of the user's choosing, in
+       the breakpoint that width falls in; any other device pick drops it. */
+    const [customWidth, setCustomWidth] = React.useState<{ width: number; device: DeviceType } | null>(null);
+    const activeCustomWidth = customWidth?.device === device ? customWidth.width : null;
+    const size = activeCustomWidth
+      ? { width: `${activeCustomWidth}px`, height: DEVICE_SIZES[device].height }
+      : DEVICE_SIZES[device];
     const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly);
 
     /* readOnly withholds every handler that can change the document — inline
@@ -821,7 +829,24 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onZoomToSelection={handleZoomToSelection}
               onHelpClick={openCheatSheet}
               device={device}
-              onDeviceChange={onDeviceChange}
+              onDeviceChange={
+                onDeviceChange
+                  ? (d) => {
+                      setCustomWidth(null);
+                      onDeviceChange(d);
+                    }
+                  : undefined
+              }
+              customWidth={activeCustomWidth}
+              onCustomWidth={
+                onDeviceChange
+                  ? (width) => {
+                      const bp = getBreakpointForWidth(width);
+                      if (bp !== device) onDeviceChange(bp);
+                      setCustomWidth({ width, device: bp });
+                    }
+                  : undefined
+              }
               canUndo={canUndo}
               canRedo={canRedo}
               onUndo={composer ? () => composer.history.undo() : undefined}

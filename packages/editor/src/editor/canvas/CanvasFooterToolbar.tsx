@@ -7,6 +7,9 @@
  *   (Canvas · View menu): Snap guides · Spacing · Grid · Rulers · Badges ·
  *   X-Ray as check rows, each with its chord (G2-037: "one contextual
  *   selector", not a word bar). The chords themselves stay bound below.
+ * - Its last two rows, Breakpoint ▸ (5930:44781, with Custom width… →
+ *   5930:44824) and Zoom ▸ (7048:78112), plus the bar's own "100% ▾"
+ *   (7048:78046, board 5936:44788).
  * - Help ?
  *
  * The Inspector toggle that sat at the end of the word bar has no home on the
@@ -23,8 +26,10 @@
  */
 
 import * as React from "react";
-import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuItem, Popover, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuItem, MenuSeparator, Popover, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
+import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
 import { stepZoom } from "@/shared/constants/canvas";
+import { CustomWidthModal } from "./controls/CustomWidthModal";
 // Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
 // (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
 // stays minimal). Device values are the BreakpointSwitcher's 4-way union.
@@ -72,6 +77,10 @@ export interface CanvasFooterToolbarProps {
   onUndo?: () => void;
   /** Perform redo. */
   onRedo?: () => void;
+  /** Preview width set by "Custom width…", or null for the device's own. */
+  customWidth?: number | null;
+  /** Apply a custom preview width (board 5930:44824). */
+  onCustomWidth?: (width: number) => void;
 }
 
 // ============================================
@@ -152,6 +161,71 @@ const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: s
   { key: "xray", label: "X-Ray", kbd: "⌘⇧X" },
 ];
 
+/* Breakpoint ▸ rows — board 5930:44781. Wide stays on the W/D/T/M switcher. */
+const BREAKPOINT_ROWS = ["desktop", "tablet", "mobile"] as const;
+/* Zoom ▸ / "100% ▾" rows — boards 7048:78046 / 7048:78112. */
+const ZOOM_ROWS = [50, 75, 100, 150, 200] as const;
+
+/** A menu row that opens a sub-menu to its right: label, current value, ▸. */
+function SubmenuRow({
+  label,
+  value,
+  open,
+  onOpen,
+  onClose,
+  testId,
+  children,
+}: {
+  label: string;
+  value: string;
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  testId: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Popover
+      block
+      open={open}
+      onClose={onClose}
+      placement="right-end"
+      label={label}
+      trigger={
+        <MenuItem
+          kbd={`${value} ▸`}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          className="tw:bg-[var(--bk-bg-subtle)]"
+          data-testid={testId}
+          onClick={onOpen}
+        >
+          <span className="tw:font-medium">{label}</span>
+        </MenuItem>
+      }
+    >
+      {children}
+    </Popover>
+  );
+}
+
+function ZoomMenu({ zoom, onPick, onFit }: { zoom: number; onPick: (z: number) => void; onFit?: () => void }) {
+  return (
+    <Menu label="Zoom" data-testid="canvas-zoom-menu" className="tw:min-w-[152px]">
+      {onFit && (
+        <MenuItem selected={false} data-testid="canvas-zoom-fit" onClick={onFit}>
+          Fit to screen
+        </MenuItem>
+      )}
+      {ZOOM_ROWS.map((z) => (
+        <MenuItem key={z} selected={Math.round(zoom) === z} data-testid={`canvas-zoom-${z}`} onClick={() => onPick(z)}>
+          {z}%
+        </MenuItem>
+      ))}
+    </Menu>
+  );
+}
+
 /* The trigger reads like the words it replaces: a grey pill while any overlay
    is on, plain otherwise, so the bar still says at a glance that something is
    drawn over the canvas. */
@@ -176,6 +250,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   canRedo,
   onUndo,
   onRedo,
+  customWidth,
+  onCustomWidth,
 }) => {
   /* Board 817:4649 prints a chord against every toggle, and none of them was
      bound — the hints on this bar were the only place they existed. The
@@ -246,6 +322,25 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
 
   const showEditGroup = Boolean(onUndo || onRedo || (device && onDeviceChange));
   const [viewOpen, setViewOpen] = React.useState(false);
+  const [viewSub, setViewSub] = React.useState<"breakpoint" | "zoom" | null>(null);
+  const [zoomOpen, setZoomOpen] = React.useState(false);
+  const [customOpen, setCustomOpen] = React.useState(false);
+  const closeView = () => {
+    setViewOpen(false);
+    setViewSub(null);
+  };
+  const zoomTo = (z: number) => {
+    onZoomChange(z);
+    closeView();
+    setZoomOpen(false);
+  };
+  const fit = onFitToScreen
+    ? () => {
+        onFitToScreen();
+        closeView();
+        setZoomOpen(false);
+      }
+    : undefined;
   const activeOverlays = VIEW_ROWS.filter((row) => overlays[row.key]).length;
 
   return (
@@ -307,7 +402,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       <div className={GROUP}>
         <Popover
           open={viewOpen}
-          onClose={() => setViewOpen(false)}
+          onClose={closeView}
           placement="top"
           label="View"
           trigger={
@@ -344,9 +439,97 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 {row.label}
               </MenuItem>
             ))}
+            <MenuSeparator />
+            {device && onDeviceChange && (
+              <SubmenuRow
+                label="Breakpoint"
+                value={customWidth ? `${customWidth}px` : DEVICE_PREVIEW_SIZES[device].label}
+                open={viewSub === "breakpoint"}
+                onOpen={() => setViewSub((s) => (s === "breakpoint" ? null : "breakpoint"))}
+                onClose={() => setViewSub(null)}
+                testId="canvas-view-breakpoint"
+              >
+                <Menu label="Breakpoint" data-testid="canvas-breakpoint-menu" className="tw:min-w-[152px]">
+                  {BREAKPOINT_ROWS.map((id) => {
+                    const size = DEVICE_PREVIEW_SIZES[id];
+                    const current = device === id && !customWidth;
+                    return (
+                      <MenuItem
+                        key={id}
+                        kbd={current ? "✓" : typeof size.width === "number" ? `${size.width}px` : undefined}
+                        className={current ? "tw:bg-[var(--bk-bg-subtle)]" : undefined}
+                        aria-current={current || undefined}
+                        data-testid={`canvas-breakpoint-${id}`}
+                        onClick={() => {
+                          onDeviceChange(id);
+                          closeView();
+                        }}
+                      >
+                        {size.label}
+                      </MenuItem>
+                    );
+                  })}
+                  {onCustomWidth && (
+                    <>
+                      <MenuSeparator />
+                      <MenuItem
+                        data-testid="canvas-breakpoint-custom"
+                        onClick={() => {
+                          closeView();
+                          setCustomOpen(true);
+                        }}
+                      >
+                        Custom width…
+                      </MenuItem>
+                    </>
+                  )}
+                </Menu>
+              </SubmenuRow>
+            )}
+            <SubmenuRow
+              label="Zoom"
+              value={`${Math.round(zoom)}%`}
+              open={viewSub === "zoom"}
+              onOpen={() => setViewSub((s) => (s === "zoom" ? null : "zoom"))}
+              onClose={() => setViewSub(null)}
+              testId="canvas-view-zoom"
+            >
+              <ZoomMenu zoom={zoom} onPick={zoomTo} onFit={fit} />
+            </SubmenuRow>
           </Menu>
         </Popover>
+        {/* "100% ▾" — board 5936:44788's bar; opens 7048:78046. */}
+        <Popover
+          open={zoomOpen}
+          onClose={() => setZoomOpen(false)}
+          placement="top"
+          label="Zoom"
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              className={`${VIEW_TRIGGER} tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:hover:bg-[var(--bk-gray-100)]`}
+              aria-haspopup="menu"
+              aria-expanded={zoomOpen}
+              aria-label={`Zoom ${Math.round(zoom)}%`}
+              data-testid="canvas-zoom-trigger"
+              onClick={() => setZoomOpen((v) => !v)}
+            >
+              {Math.round(zoom)}% ▾
+            </Button>
+          }
+        >
+          <ZoomMenu zoom={zoom} onPick={zoomTo} onFit={fit} />
+        </Popover>
       </div>
+      {onCustomWidth && (
+        <CustomWidthModal
+          open={customOpen}
+          initialWidth={customWidth ?? BREAKPOINTS.desktop.minWidth}
+          onClose={() => setCustomOpen(false)}
+          onApply={onCustomWidth}
+        />
+      )}
       {/* Help Button */}
       {onHelpClick && (
         <>

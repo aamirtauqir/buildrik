@@ -9,8 +9,10 @@ import {
   getBreakpointConfig,
   isValidBreakpoint,
   getBreakpointForWidth,
-  getDevicePreviewSize,
+  DEVICE_PREVIEW_SIZES,
+  BREAKPOINTS,
 } from "../breakpoints";
+import { DEVICE_PRESETS } from "../canvas";
 
 describe("getBreakpointQuery", () => {
   it("returns null for desktop (base styles) and media queries otherwise", () => {
@@ -46,10 +48,15 @@ describe("getBreakpointForWidth", () => {
   });
 });
 
-describe("getDevicePreviewSize", () => {
-  it("returns fixed device dimensions", () => {
-    expect(getDevicePreviewSize("mobile")).toEqual({ width: 375, height: 812 });
-    expect(getDevicePreviewSize("tablet")).toEqual({ width: 768, height: 1024 });
-    expect(getDevicePreviewSize("desktop")).toEqual({ width: "100%", height: "100%" });
+describe("DEVICE_PREVIEW_SIZES — the one device table (G2-013)", () => {
+  it("holds fixed device dimensions", () => {
+    expect(DEVICE_PREVIEW_SIZES.mobile).toMatchObject({ width: 375, height: 812 });
+    expect(DEVICE_PREVIEW_SIZES.tablet).toMatchObject({ width: 768, height: 1024 });
+    expect(DEVICE_PREVIEW_SIZES.desktop).toMatchObject({ width: "100%", height: "100%" });
+    expect(DEVICE_PREVIEW_SIZES.wide).toMatchObject({ width: 1920 });
+  });
+
+  it("the legacy presets agree with it", () => {
+    expect(DEVICE_PRESETS.map((d) => d.width)).toEqual([BREAKPOINTS.desktop.minWidth, 768, 375]);
   });
 });

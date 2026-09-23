@@ -121,7 +121,7 @@ describe("device registry", () => {
   it("getDevices returns a copy — mutating it does not affect the viewport", () => {
     const devices = viewport.getDevices();
     delete (devices as Record<string, unknown>).desktop;
-    expect(viewport.getDeviceConfig("desktop")).toEqual({ name: "Desktop", width: 1280 });
+    expect(viewport.getDeviceConfig("desktop")).toEqual({ name: "Desktop", width: 1024 });
   });
 
   it("addDevice registers a custom device config", () => {
